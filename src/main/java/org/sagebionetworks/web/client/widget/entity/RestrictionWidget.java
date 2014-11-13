@@ -69,6 +69,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.jiraURLHelper = jiraURLHelper;
 		this.iconsImageBundle = iconsImageBundle;
 		shownAccessRequirements = new HashSet<Long>();
+		view.setPresenter(this);
 	}
 	
 	public void configure(EntityBundle bundle, boolean showChangeLink, boolean showIfProject, boolean showFlagLink, com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback) {
@@ -209,7 +210,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		if (!includeRestrictionWidget()) return null;
 		configureUI();
 		
-		return asWidget();
+		return view.asWidget();
 	}
 	
 	private void configureUI() {
@@ -390,6 +391,16 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		};
+	}
+	
+	@Override
+	public void reportIssueClicked() {
+		view.showFlagModal();
+	}
+	
+	@Override
+	public void anonymousReportIssueClicked() {
+		view.showAnonymousFlagModal();
 	}
 
 }

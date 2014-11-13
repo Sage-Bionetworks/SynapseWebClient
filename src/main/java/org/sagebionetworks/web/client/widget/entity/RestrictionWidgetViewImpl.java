@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
@@ -60,7 +60,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@UiField
 	InlineRadio noHumanDataRadio;
 	@UiField
-	Text notSensitiveHumanDataMessage;
+	Alert notSensitiveHumanDataMessage;
+	
 	@UiField
 	Button imposeRestrictionOkButton;
 	
@@ -142,6 +143,20 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				presenter.anonymousFlagModalOkClicked();
 			}
 		});
+		
+		reportIssueLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.reportIssueClicked();
+			}
+		});
+		
+		anonymousReportIssueLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.anonymousReportIssueClicked();
+			}
+		});
 	}
 
 	@Override
@@ -188,6 +203,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public void showVerifyDataSensitiveDialog(
 			final Callback imposeRestrictionsCallback) {
 		this.imposeRestrictionsCallback = imposeRestrictionsCallback;
+		resetImposeRestrictionModal();
 		imposeRestrictionModal.show();
 	}
 	
@@ -225,11 +241,13 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void showChangeLink(ClickHandler changeLinkClickHandler) {
 		linkUI.setVisible(true);
+		changeLink.setVisible(true);
 		this.changeLinkClickHandler = changeLinkClickHandler;
 	}
 	@Override
 	public void showShowLink(ClickHandler showLinkClickHandler) {
 		linkUI.setVisible(true);
+		showLink.setVisible(true);
 		this.showLinkClickHandler = showLinkClickHandler;
 	}
 	@Override
@@ -249,8 +267,13 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		changeLink.setVisible(false);
 		showLinkClickHandler = null;
 		changeLinkClickHandler = null;
+		resetImposeRestrictionModal();
+	}
+	
+	private void resetImposeRestrictionModal() {
 		yesHumanDataRadio.setValue(false);
 		noHumanDataRadio.setValue(false);
+		notSensitiveHumanDataMessage.setVisible(false);
 	}
 	
 	@Override

@@ -56,6 +56,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void flagData();
 		void anonymousFlagModalOkClicked();
+		void reportIssueClicked();
+		void anonymousReportIssueClicked();
 	}
 
 }

@@ -7,21 +7,23 @@
 	
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
- 	
-	<bh:Div>
-	    
-		<bh:Div ui:field="loadingUI" >
+ 	<bh:Span>
+	    <bh:Div ui:field="loadingUI" >
 			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 			<bh:Text> Loading...</bh:Text>
 		</bh:Div>
 	    <bh:Span ui:field="controlledUseUI">
 	        <g:Image styleName="displayInline" resource='{icons.shieldRed16}' />
+			<!-- Note, tooltip does not work if wrapping Text -->
 			<b:Tooltip placement="BOTTOM" text="Conditions for use are set by human privacy regulations or contractual obligations">
-				<bh:Text>Controlled Use</bh:Text>
+			    <g:InlineLabel text="Controlled Use" />
 			</b:Tooltip>
 		</bh:Span>
 		<bh:Span ui:field="noneUI">
-			<bh:Text>None</bh:Text>    
+		    <!-- Note, tooltip does not work if wrapping Text -->
+			<b:Tooltip placement="BOTTOM" text="Conditions for use are set by human privacy regulations or contractual obligations">
+				<g:InlineLabel text="None" />
+			</b:Tooltip>
 		</bh:Span>
 		
 		<bh:Span ui:field="linkUI">
@@ -29,13 +31,13 @@
 		</bh:Span>
 		
 		<bh:Span ui:field="flagUI">
-		    <g:Image styleName="displayInline" resource='{icons.flagSmall16}' />
+		    <g:Image styleName="displayInline moveup-2 moveright-5" resource='{icons.flagSmall16}' />
 			<b:Tooltip placement="BOTTOM" text="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
 				<b:Anchor ui:field="reportIssueLink">report issue</b:Anchor>
 			</b:Tooltip>
 		</bh:Span>
 		<bh:Span ui:field="anonymousFlagUI">
-		    <g:Image styleName="displayInline" resource='{icons.flagSmall16}' />
+		    <g:Image styleName="displayInline moveup-2 moveright-5" resource='{icons.flagSmall16}' />
 			<b:Tooltip placement="BOTTOM" text="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
 				<b:Anchor ui:field="anonymousReportIssueLink">report issue</b:Anchor>
 			</b:Tooltip>
@@ -46,12 +48,14 @@
 			
 		<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
-			    <bh:Text>Is this sensitive human data that must be protected?</bh:Text>
+			    <g:InlineLabel styleName="margin-right-10 margin-bottom-10" text="Is this sensitive human data that must be protected?" />
 			    <b:InlineRadio ui:field="yesHumanDataRadio" name="humandata" text="Yes"/>
 	        	<b:InlineRadio ui:field="noHumanDataRadio" name="humandata" text="No"/>
 	        	<bh:Div>
-	        	    <bh:Text ui:field="notSensitiveHumanDataMessage">Sage Bionetworks does not typically impose conditions on use of Folder content containing non-human data unless there is a legal, ethical or regulatory reason to do so.
-	        	        If you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org</bh:Text>
+					<b:Alert ui:field="notSensitiveHumanDataMessage"  type="WARNING">
+						<bh:Text text="Sage Bionetworks does not typically impose conditions on use of Folder content containing non-human data unless there is a legal, ethical or regulatory reason to do so.
+	        	        If you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org"/>
+					</b:Alert>
 	        	</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
@@ -82,12 +86,12 @@
 		<!-- TODO: modal to replace GovernanceDialogHelper.showAccessRequirement -->
 		<b:Modal ui:field="accessRestrictionModal" size="LARGE" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
 		  <b:ModalBody>
+		      <bh:Text>TODO!</bh:Text>
 		  </b:ModalBody>
 		  <b:ModalFooter>
-		    <b:Button ui:field="button" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
+		    <b:Button ui:field="accessRestrictionsOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
 		  </b:ModalFooter>
 		</b:Modal>
-		
-	</bh:Div>
+	</bh:Span>
 	
 </ui:UiBinder>
