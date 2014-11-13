@@ -82,7 +82,10 @@ public class TableModelTestUtils {
 					break;
 				case ENTITYID:
 					defaultValue = "syn123";
-					break;	
+					break;
+				case LINK:
+					defaultValue = "http";
+					break;		
 				default:
 					throw new IllegalStateException("huh? missing enum");
 				}
@@ -277,6 +280,8 @@ public class TableModelTestUtils {
 			return "" + (i * 3.41 + 3.12 + (isUpdate ? 10000 : 0));
 		case ENTITYID:
 			return "syn"+i;
+		case LINK:
+			return "";	
 		}
 		throw new IllegalArgumentException("Unknown ColumnType: " + cm.getColumnType());
 	}

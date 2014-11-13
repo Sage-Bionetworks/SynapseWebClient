@@ -7,6 +7,8 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -40,13 +42,15 @@ public class TableEntityWidget implements IsWidget,
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Show Schema' to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
-	public static final long DEFAULT_LIMIT = 10L;
+	public static final long DEFAULT_LIMIT = 25;
 
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
 	TableEntityWidgetView view;
 	ActionMenuWidget actionMenu;
+	PreflightController preflightController;
 
+	EntityBundle entityBundle;
 	String tableId;
 	TableBundle tableBundle;
 	boolean canEdit;
@@ -60,12 +64,14 @@ public class TableEntityWidget implements IsWidget,
 			TableQueryResultWidget queryResultsWidget,
 			QueryInputWidget queryInputWidget,
 			DownloadTableQueryModalWidget downloadTableQueryModalWidget,
-			UploadTableModalWidget uploadTableModalWidget) {
+			UploadTableModalWidget uploadTableModalWidget,
+			PreflightController preflightController) {
 		this.view = view;
 		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
+		this.preflightController = preflightController;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
@@ -89,6 +95,7 @@ public class TableEntityWidget implements IsWidget,
 	 */
 	public void configure(EntityBundle bundle, boolean canEdit,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
+		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
@@ -266,6 +273,18 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onEditResults() {
+		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckEditResults();
+			}
+		});
+	}
+	
+	/**
+	 * Called only when all pre-flight checks on entity edit have been met.
+	 */
+	public void postCheckEditResults(){
 		queryResultsWidget.onEditRows();
 	}
 
@@ -275,7 +294,19 @@ public class TableEntityWidget implements IsWidget,
 		downloadTableQueryModalWidget.showModal();
 	}
 	
-	private void onUploadTableData(){
+	public void onUploadTableData(){
+		// proceed as long as the user has meet all upload pre-flight checks
+		this.preflightController.checkUploadToEntity(this.entityBundle, new Callback(){
+			@Override
+			public void invoke() {
+				postCheckonUploadTableData();
+			}});
+	}
+	
+	/**
+	 * Called after all pre-flight checks for upload has passed.
+	 */
+	private void postCheckonUploadTableData(){
 		this.uploadTableModalWidget.showModal(new WizardCallback() {
 			@Override
 			public void onFinished() {

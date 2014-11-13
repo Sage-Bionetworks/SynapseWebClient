@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -386,4 +387,7 @@ public interface SynapseClientAsync {
 
 	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	
+	void getHost(String urlString, AsyncCallback<String> callback);
+
 }

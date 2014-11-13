@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -31,7 +32,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	PortalGinInjector ginInjector;
 	List<ColumnModel> types;
 	RowSelectionListener rowSelectionListener;
-	PaginationWidget paginationWidget;
+	DetailedPaginationWidget paginationWidget;
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	/*
@@ -40,7 +41,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, PaginationWidget paginationWidget){
+	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;

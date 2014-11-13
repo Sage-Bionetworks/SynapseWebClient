@@ -124,6 +124,7 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
@@ -137,6 +138,7 @@ import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -1604,5 +1606,26 @@ public class SynapseClientImplTest {
 		SynapseClientImpl.safeLongToInt(testValue);
 	}
 
+	@Test
+	public void testGetHost() throws RestServiceException {
+		assertEquals("mydomain.com", synapseClient.getHost("sfTp://mydomain.com/foo/bar"));
+		assertEquals("mydomain.com", synapseClient.getHost("http://mydomain.com/foo/bar"));
+		assertEquals("mydomain.com", synapseClient.getHost("http://mydomain.com"));
+		assertEquals("mydomain.com", synapseClient.getHost("sftp://mydomain.com:22/foo/bar"));
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testGetHostNull() throws RestServiceException {
+		synapseClient.getHost(null);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testGetHostEmpty() throws RestServiceException {
+		synapseClient.getHost("");
+	}
 
+	@Test (expected=BadRequestException.class)
+	public void testGetHostBadUrl() throws RestServiceException {
+		synapseClient.getHost("foobar");
+	}
 }

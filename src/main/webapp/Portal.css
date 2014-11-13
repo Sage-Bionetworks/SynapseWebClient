@@ -8,6 +8,10 @@
 	text-align: center;
 } */
 
+.overflow-y-scroll-imp {
+	overflow-y: scroll !important;
+}
+
 .sf-j-menu {
 	float: right !important;
 	margin-bottom: 1em;
@@ -29,13 +33,16 @@
 	padding: 3px 7px 3px 7px;
 }
 
-.markdown-editor-commands-container {
-	border-radius: 0.2em;
-}
-.markdown-editor-commands-container td {
-	padding: 3px 0px 3px 3px;
+.margin-right-3-buttons >button {
+	margin-right: 3px;
 }
 
+.md-command-bar>button {
+	margin: 2px 3px 2px 0px;
+}
+.md-command-bar>div {
+	margin: 2px 3px 2px 0px;
+}
 
 .header-username-picture-container {
 	border: solid #ccc;
@@ -687,6 +694,10 @@ a.shortBtn {
 	margin-right: -15px;
 }
 
+.margin-150 {
+	margin: 150px;
+}
+
 .tab-background {
 	background-color: #f9f9f9;
 	border-left: 1px solid #ddd;
@@ -783,7 +794,7 @@ a.shortBtn {
 
 .input-xs, select.input-xs {
   height: 20px !important;
-  padding: 4px 8px !important;
+  padding: 0px 8px !important;
   font-size: 11px !important;
   border-radius: 3px !important;
 }
@@ -873,7 +884,7 @@ a.shortBtn {
 }
 
 .font-size-32 {
-	font-size: 32px;
+	font-size: 32px !important;
 	font-family: Yanone Kaffeesatz;
 }
 
@@ -888,8 +899,24 @@ a.shortBtn {
 .font-size-58 {
 	font-size: 58px;
 }
+.font-size-36 {
+	font-size: 36px;
+}
+
+.font-size-30 {
+	font-size: 30px;
+}
+
+.font-size-24 {
+	font-size: 24px;
+}
+
 .font-size-22 {
 	font-size: 22px;
+}
+
+.font-size-18 {
+	font-size: 18px;
 }
 
 .font-size-17 {
@@ -899,8 +926,15 @@ a.shortBtn {
 .font-size-15 {
 	font-size: 15px;
 }
+.font-size-14 {
+	font-size: 14px;
+}
+
 .font-size-13 {
 	font-size: 13px;
+}
+.font-size-12 {
+	font-size: 12px;
 }
 
 .vertical-align-bottom {

@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -3534,4 +3539,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
        return (int) l;
    }
 
+	public String getHost(String urlString) throws RestServiceException {
+		if (urlString == null || urlString.length() == 0) {
+			throw new IllegalArgumentException("url is required");
+		}
+		//URL does not recognize sftp:// protocol.  replace with http (we're after the host in this method)
+		if (urlString.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+			urlString = "http://" + urlString.substring(WebConstants.SFTP_PREFIX.length());
+		}
+		try {
+			URL url = new URL(urlString);
+			return url.getHost();
+		} catch (MalformedURLException e) {
+			throw new BadRequestException(e.getMessage());
+		}
+	}
 }

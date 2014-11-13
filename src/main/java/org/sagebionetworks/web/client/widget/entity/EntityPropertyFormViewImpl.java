@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -40,9 +39,7 @@ import com.google.inject.Inject;
 public class EntityPropertyFormViewImpl extends FormPanel implements EntityPropertyFormView {
 	Presenter presenter;
 	TextField<String> nameField;
-	TextArea markdownDescriptionField;
 	List<Field<?>> propertyFields;
-	
 	FormFieldFactory formFactory;
 	FormPanel formPanel;
 	ContentPanel propPanel;
@@ -101,6 +98,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	    window.show();	
 	}
 	
+	
 	@Override
 	protected void onRender(Element parent, int index) {
 		super.onRender(parent, index);
@@ -148,18 +146,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		// Name is the first
 		formPanel.add(nameField, basicFormData);
 		
-		//markdown widget to be removed from entity property form
-		//only reconfigure the md editor if the entity id is set
-		if (!DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
-			if (presenter.getEntity().getId() != null) {
-				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  ObjectType.ENTITY.toString(), null, DisplayUtils.getVersion(presenter.getEntity())), markdownDescriptionField, formPanel, true, false, new WidgetDescriptorUpdatedHandler() {
-					@Override
-					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						presenter.refreshEntityAttachments();
-					}
-				}, null, null);
-			}
-		}
 		// Add them to the form
 		for (Field<?> formField : propertyFields) {
 			// FormData thisData = new FormData("-100");
@@ -168,6 +154,20 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		// Add both panels back.
 		this.propPanel.add(formPanel);
+		//markdown widget to be removed from entity property form
+		//only reconfigure the md editor if the entity id is set
+		if (!DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
+			if (presenter.getEntity().getId() != null) {
+				String markdown = presenter.getFormModel().getDescription().getValue();
+				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  ObjectType.ENTITY.toString(), null, DisplayUtils.getVersion(presenter.getEntity())), markdown, false, new WidgetDescriptorUpdatedHandler() {
+					@Override
+					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+						presenter.refreshEntityAttachments();
+					}
+				});
+				propPanel.add(markdownEditorWidget.asWidget());
+			}
+		}
 		this.layout();
 	}
 	
@@ -181,11 +181,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		nameField.setToolTip((ToolTipConfig)null);
-		
-		 if (!DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
-             markdownDescriptionField = formFactory.createTextAreaField(model.getDescription());
-             markdownDescriptionField.setWidth((DIALOG_WIDTH-90)+"px");
-	     }
 		
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());
@@ -229,5 +224,10 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		form.setBodyStyleName("form-background"); 
 		form.setLabelAlign(LabelAlign.RIGHT);
 		return form;
+	}
+	
+	@Override
+	public String getMarkdownDescription() {
+		return markdownEditorWidget.getMarkdown();
 	}
 }

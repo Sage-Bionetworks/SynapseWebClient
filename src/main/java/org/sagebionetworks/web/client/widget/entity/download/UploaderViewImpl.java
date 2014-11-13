@@ -518,9 +518,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 
 	@Override
-	public void showUploadingToExternalStorage(String url, String banner) {
+	public void showUploadingToExternalStorage(String host, String banner) {
 		uploadDestinationContainer.clear();
-		uploadDestinationContainer.add(new HTML(DisplayConstants.UPLOAD_DESTINATION + "<strong>" + SafeHtmlUtils.htmlEscape(url) + "</strong>"));
+		uploadDestinationContainer.add(new HTML(DisplayConstants.UPLOAD_DESTINATION + "<strong>" + SafeHtmlUtils.htmlEscape(host) + "</strong>"));
 		if (banner != null)
 			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
 		externalUsername.setVisible(true);

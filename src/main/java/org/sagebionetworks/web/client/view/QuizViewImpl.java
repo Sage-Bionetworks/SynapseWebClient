@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
-import org.sagebionetworks.repo.model.quiz.QuestionResponse;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.ResponseCorrectness;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -26,8 +25,8 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.Window;
 import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -78,12 +77,12 @@ public class QuizViewImpl extends Composite implements QuizView {
 	
 	@UiField
 	Anchor tryAgainLink;
-	
+	@UiField
+	SpanElement loadingUI;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private CertificateWidget certificateWidget;
-	private Window loadingWindow;
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
@@ -146,11 +145,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@Override
 	public void showLoading() {
-		if(loadingWindow == null) {
-			loadingWindow = DisplayUtils.createLoadingWindow(sageImageBundle, "");
-		}
-		loadingWindow.show();
-
+		DisplayUtils.show(loadingUI);
 	}
 
 	@Override
@@ -344,6 +339,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@Override
 	public void hideLoading() {
-		if(loadingWindow != null) loadingWindow.hide();
+		DisplayUtils.hide(loadingUI);
 	}
 }

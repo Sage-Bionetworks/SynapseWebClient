@@ -29,6 +29,7 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 	@Override
 	public void onPrimary() {
 		view.submitForm(action, method, encodingType);
+		view.hideModal();
 	}
 
 	
@@ -62,6 +63,7 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 
 	
 	public void showModal() {
+		view.clearForm();
 		this.view.showModal();
 	}
 	

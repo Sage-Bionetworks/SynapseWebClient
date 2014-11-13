@@ -78,6 +78,10 @@
 								<a class="link howToUseLink" href="mailto:synapseInfo@sagebase.org" target="_blank">Contact Us</a><br/>
 								Other questions about Synapse?
 							</li>
+							<li>
+								<a class="link howToUseLink" href="#!Help:Collaboratorium" target="_blank">Interactive Workshop</a><br/>
+								A hands-on guide for using Synapse
+							</li>
 						</ul>
 					</div>
 				</g:HTMLPanel>
@@ -130,34 +134,34 @@
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn312572"><g:Image resource='{sageImageBundle.dream85SM}' /></a>
+			          <a href="#!Synapse:syn2813589"><g:Image resource='{sageImageBundle.dreamSMCRNA}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">			              
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn312572">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 20px;" href="#!Synapse:syn2813589">Challenge Details &amp; Pre-registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn2455683"><g:Image resource='{sageImageBundle.dream9AML}' /></a>
+			          <a href="#!Synapse:syn2813581"><g:Image resource='{sageImageBundle.dreamSMCHet}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: -45px; left: 200px;" href="#!Synapse:syn2455683">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 20px; " href="#!Synapse:syn2813581">Challenge Details &amp; Pre-registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn2290704"><g:Image resource='{sageImageBundle.dream9AD}' /></a>
+			          <a href="#!Synapse:syn2811262"><g:Image resource='{sageImageBundle.dreamOP}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: -60px;" href="#!Synapse:syn2290704">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 10px; left: 50px;" href="#!Synapse:syn2811262">Challenge Details &amp; Pre-registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn2384331"><g:Image resource='{sageImageBundle.dream9Broad}' /></a>
+			          <a href="#!Synapse:syn2813558"><g:Image resource='{sageImageBundle.dreamPDS}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			                <p><a class="btn btn-large btn-primary" style="position: relative; top: -64px;" href="#!Synapse:syn2384331">Challenge Details &amp; Registration</a></p>
+			                <p><a class="btn btn-large btn-primary" style="position: relative; top: 5px;" href="#!Synapse:syn2813558">Challenge Details &amp; Pre-registration</a></p>
 			            </div>
 			          </div>
 			        </div>

@@ -160,6 +160,10 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementController;
+import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserController;
+import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
@@ -271,6 +275,10 @@ import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationView;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationViewImpl;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidgetImpl;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
@@ -671,6 +679,8 @@ public class PortalGinModule extends AbstractGinModule {
 		// basic pagination
 		bind(BasicPaginationView.class).to(BasicPaginationViewImpl.class);
 		bind(PaginationWidget.class).to(BasicPaginationWidget.class);
+		bind(DetailedPaginationWidget.class).to(DetailedPaginationWidgetImpl.class);
+		bind(DetailedPaginationView.class).to(DetailedPaginationViewImpl.class);
 		
 		// EntityPageTop
 		bind(EntityPageTopViewImpl.class).in(Singleton.class);
@@ -691,6 +701,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityActionController.class).to(EntityActionControllerImpl.class);
 		bind(EntityActionControllerView.class).to(EntityActionControllerViewImpl.class);
 		bind(PreflightController.class).to(PreflightControllerImpl.class);
+		bind(AccessRequirementController.class).to(AccessRequirementControllerImpl.class);
+		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
