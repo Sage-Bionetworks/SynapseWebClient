@@ -48,10 +48,10 @@
 			
 		<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
-			    <g:InlineLabel styleName="margin-right-10 margin-bottom-10" text="Is this sensitive human data that must be protected?" />
+			    <g:InlineLabel styleName="margin-right-10" text="Is this sensitive human data that must be protected?" />
 			    <b:InlineRadio ui:field="yesHumanDataRadio" name="humandata" text="Yes"/>
 	        	<b:InlineRadio ui:field="noHumanDataRadio" name="humandata" text="No"/>
-	        	<bh:Div>
+	        	<bh:Div styleName="margin-top-10">
 					<b:Alert ui:field="notSensitiveHumanDataMessage"  type="WARNING">
 						<bh:Text text="Sage Bionetworks does not typically impose conditions on use of Folder content containing non-human data unless there is a legal, ethical or regulatory reason to do so.
 	        	        If you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org"/>
