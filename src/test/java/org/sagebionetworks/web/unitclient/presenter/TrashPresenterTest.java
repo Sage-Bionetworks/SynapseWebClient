@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.web.NotFoundException;
@@ -138,12 +140,15 @@ public class TrashPresenterTest {
 	@Test
 	public void testRestoreParentNotFoundFailureRestoreCall() {
 		ForbiddenException ex = mock(ForbiddenException.class);
-		when(ex.getMessage()).thenReturn("Message");
-		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapse).restoreFromTrash(
+		String forbiddenMessage = "Forbidden Exception error message";
+		when(ex.getMessage()).thenReturn(forbiddenMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		presenter.restoreEntity(trashList.getResults().get(0));
-		verify(mockView).showErrorMessage(anyString());
+		ArgumentCaptor<String> errorMessageCaptor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).showErrorMessage(errorMessageCaptor.capture());
+		assertTrue(errorMessageCaptor.getValue().contains(forbiddenMessage));
 	}
 	
 	/* 
