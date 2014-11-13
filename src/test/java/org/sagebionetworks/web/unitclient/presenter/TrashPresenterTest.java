@@ -132,12 +132,16 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).getEntity(
 				anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
-		verify(mockView).displayFailureMessage(anyString(), anyString());	}
+		verify(mockView).displayFailureMessage(anyString(), anyString());
+	}
 	
 	@Test
 	public void testRestoreParentNotFoundFailureRestoreCall() {
+		ForbiddenException ex = mock(ForbiddenException.class);
+		when(ex.getMessage()).thenReturn("Message");
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		presenter.restoreEntity(trashList.getResults().get(0));
 		verify(mockView).showErrorMessage(anyString());
 	}
