@@ -53,57 +53,6 @@ public class GovernanceDialogHelper {
 	        dialog.setResizable(false);		
 	}
 	
-	private static ImageResource flagIcon(IconsImageBundle iconsImageBundle) {
-		return iconsImageBundle.flagSmall16();
-	}
-	
-	// for an anonymous user attempting to 'flag' a data object
-	public static void showAnonymousFlagDialog(final Callback loginCallback, IconsImageBundle iconsImageBundle) {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-        dialog.setIcon(AbstractImagePrototype.create(flagIcon(iconsImageBundle)));
-        dialog.addText(DisplayConstants.FLAG_DIALOG_PREFIX+DisplayConstants.FLAG_DIALOG_ANONYMOUS_SUFFIX);
-        dialog.setHeading(DisplayConstants.FLAG_DIALOG_TITLE); 
-        dialog.okText = DisplayConstants.BUTTON_TEXT_LOGIN;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button okButton = dialog.getButtonById(Dialog.OK);
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				loginCallback.invoke();
-			}
-        });       
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
-	
-	// for a logged-in user trying to 'flag' a data object
-	public static void showLoggedInFlagDialog(final String jiraFlagLink, IconsImageBundle iconsImageBundle) {
-        final Dialog dialog = new Dialog();
-        configureDialog(dialog);
-        dialog.setIcon(AbstractImagePrototype.create(flagIcon(iconsImageBundle)));
-    	StringBuilder sb = new StringBuilder(DisplayConstants.FLAG_DIALOG_PREFIX);
-    	sb.append(DisplayConstants.FLAG_DIALOG_LOGGED_IN_SUFFIX);
-    	dialog.addText(sb.toString());
-        dialog.setHeading(DisplayConstants.FLAG_DIALOG_TITLE); 
-        dialog.okText = DisplayConstants.BUTTON_TEXT_FLAG_DATA;
-        dialog.setButtons(Dialog.OKCANCEL);
-        Button okButton = dialog.getButtonById(Dialog.OK);
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// open jira page to make 'flag' issue
-				Window.open(jiraFlagLink, "_blank", "");
-			}
-        	
-        });
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
-	}
-	
-		
-	
 	private static ContentPanel createTextPanel(Dialog dialog) {
 		ContentPanel panel = new ContentPanel();		
 		panel.setLayoutData(new RowLayout(Orientation.VERTICAL));		

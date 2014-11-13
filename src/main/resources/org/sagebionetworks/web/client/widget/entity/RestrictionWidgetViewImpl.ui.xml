@@ -83,15 +83,7 @@
 			</b:ModalFooter>
 		</b:Modal>
 		
-		<!-- TODO: modal to replace GovernanceDialogHelper.showAccessRequirement -->
-		<b:Modal ui:field="accessRestrictionModal" size="LARGE" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
-		  <b:ModalBody>
-		      <bh:Text>TODO!</bh:Text>
-		  </b:ModalBody>
-		  <b:ModalFooter>
-		    <b:Button ui:field="accessRestrictionsOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
-		  </b:ModalFooter>
-		</b:Modal>
+		<bh:Div ui:field="accessRestrictionDialogContainer" />
 	</bh:Span>
 	
 </ui:UiBinder>

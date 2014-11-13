@@ -20,20 +20,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	public void open(String url);
 	
-	public void showAccessRequirement(
-			 RESTRICTION_LEVEL restrictionLevel, 
-			 APPROVAL_TYPE approvalType,
-			 boolean isAnonymous,
-			 boolean hasAdministrativeAccess,
-			 boolean hasFulfilledAccessRequirements,
-			 IconsImageBundle iconsImageBundle,
-			 String accessRequirementText,  
-			 Callback imposeRestrictionsCallback, 
-			 Callback touAcceptanceCallback, 
-			 Callback requestACTCallback,
-			 Callback loginCallback,
-			 String jiraFlagLink,
-			 Callback showNextRestrictionCallback);
 	/**
 	 * If user indicates that data is sensitive, then view will invoke callback to lockdown the current entity 
 	 * @param imposeRestrictionsCallback
@@ -49,7 +35,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	void showFlagModal();
 	void showAnonymousFlagModal();
-		
+	void setAccessRequirementDialog(Widget dialog);
+	
 	/**
 	 * Presenter interface
 	 */

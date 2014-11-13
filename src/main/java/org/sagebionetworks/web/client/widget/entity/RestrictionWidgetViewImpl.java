@@ -8,10 +8,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -75,6 +72,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@UiField
 	Button anonymousFlagModalOkButton;
 	
+	@UiField
+	Div accessRestrictionDialogContainer;
 	
 	Presenter presenter;
 	
@@ -170,36 +169,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	@Override
-	public void showAccessRequirement(RESTRICTION_LEVEL restrictionLevel,
-			APPROVAL_TYPE approvalType, 
-			boolean isAnonymous,
-			boolean hasAdministrativeAccess,
-			boolean hasFulfilledAccessRequirements,
-			IconsImageBundle iconsImageBundle, 
-			String accessRequirementText,
-			Callback imposeRestrictionsCallback,
-			Callback touAcceptanceCallback, 
-			Callback requestACTCallback,
-			Callback loginCallback, 
-			String jiraFlagLink, 
-			Callback onHideCallback) {
-		GovernanceDialogHelper.showAccessRequirement(
-				restrictionLevel,
-				approvalType,
-				isAnonymous,
-				hasAdministrativeAccess,
-				hasFulfilledAccessRequirements,
-				iconsImageBundle,
-				accessRequirementText,
-				imposeRestrictionsCallback,
-				touAcceptanceCallback,
-				requestACTCallback,
-				loginCallback,
-				jiraFlagLink, 
-				onHideCallback);	
-	}
-	
-	@Override
 	public void showVerifyDataSensitiveDialog(
 			final Callback imposeRestrictionsCallback) {
 		this.imposeRestrictionsCallback = imposeRestrictionsCallback;
@@ -286,6 +255,11 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		anonymousFlagModal.show();
 	}
 	
+	@Override
+	public void setAccessRequirementDialog(Widget dialog) {
+		accessRestrictionDialogContainer.clear();
+		accessRestrictionDialogContainer.add(dialog);
+	}
 	/*
 	 * Private Methods
 	 */

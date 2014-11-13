@@ -97,6 +97,8 @@ import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
+import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
+import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
@@ -964,6 +966,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(LoginModalView.class).to(LoginModalViewImpl.class);
 		
+		bind(AccessRequirementDialogView.class).to(AccessRequirementDialogViewImpl.class);
 	}
 
 }
