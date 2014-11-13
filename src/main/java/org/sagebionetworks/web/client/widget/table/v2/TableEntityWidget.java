@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -43,6 +48,7 @@ public class TableEntityWidget implements IsWidget,
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Show Schema' to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
 	public static final long DEFAULT_LIMIT = 25;
+	public static final int MAX_SORT_COLUMNS = 3;
 
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
@@ -270,6 +276,43 @@ public class TableEntityWidget implements IsWidget,
 		this.currentQuery.setOffset(newOffset);
 		setQuery(this.currentQuery);
 	}
+	
+	@Override
+	public void onToggleSort(String header) {
+		List<SortItem> newSort = new LinkedList<SortItem>();
+		List<SortItem> oldSort = this.currentQuery.getSort();
+		this.currentQuery.setSort(newSort);
+		SortItem item = new SortItem();
+		item.setColumn(header);
+		item.setDirection(SortDirection.ASC);
+		newSort.add(item);
+		if(oldSort != null){
+			// If the current column is sorted then toggle it.
+			SortDirection currentDirection = getCurrentDirection(oldSort, header);
+			if(currentDirection != null){
+				if(SortDirection.ASC.equals(currentDirection)){
+					item.setDirection(SortDirection.DESC);
+				}else{
+					item.setDirection(SortDirection.ASC);
+				}
+			}
+		}
+		setQuery(this.currentQuery);
+	}
+	/**
+	 * Find the current sort direction for the given column.
+	 * @param list
+	 * @param header
+	 * @return Null if the column is not currently sorted, else the SortDirection of the column.
+	 */
+	private SortDirection getCurrentDirection(List<SortItem> list, String header){
+		for(SortItem item: list){
+			if(item.getColumn().equals(header)){
+				return item.getDirection();
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public void onEditResults() {
@@ -328,4 +371,6 @@ public class TableEntityWidget implements IsWidget,
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 		}
 	}
+
+
 }

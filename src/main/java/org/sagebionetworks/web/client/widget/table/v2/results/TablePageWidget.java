@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader.HeaderClickHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -56,7 +58,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 * @param rowSelectionListener If null then selection will be disabled.
 	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, Query query, boolean isEditable, RowSelectionListener rowSelectionListener, PageChangeListener pageChangeListener){
+	public void configure(QueryResultBundle bundle, Query query, boolean isEditable, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
 		this.rowSelectionListener = rowSelectionListener;
 		// The pagination widget is only visible if a listener was provider
 		if(pageChangeListener != null){
@@ -68,10 +70,25 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		// Map the columns to types
 		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getSelectColumns());
 		// setup the headers from the types
-		List<String> headers = new ArrayList<String>();
+		List<IsWidget> headers = new ArrayList<IsWidget>();
 		for (ColumnModel type: types) {
-			headers.add(type.getName());
+			// Create each header
+			String headerName = type.getName();
+			SortableTableHeader sth = ginInjector.createSortableTableHeader();
+			HeaderClickHandler headerClickHandler = createHeaderClickHandler(
+					pageChangeListener, headerName);
+			sth.configure(type.getName(), headerClickHandler);
+			headers.add(sth);
+			SortDirection direction = getSortDirection(query, headerName);
+			if(direction != null){
+				if(SortDirection.ASC.equals(direction)){
+					sth.setIcon(IconType.ANGLE_DOWN);
+				}else{
+					sth.setIcon(IconType.ANGLE_UP);
+				}
+			}
 		}
+		
 		// Create a navigation handler
 		if(isEditable){
 			// We only need key press navigation for editors.
@@ -87,6 +104,39 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
+	}
+	
+	private SortDirection getSortDirection(Query query, String header){
+		if(query != null){
+			if(query.getSort() != null){
+				for(SortItem item: query.getSort()){
+					if(item.getColumn().equals(header)){
+						return item.getDirection();
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Create HeaderClickHandler for a given header.
+	 * @param pageChangeListener
+	 * @param header
+	 * @return
+	 */
+	private HeaderClickHandler createHeaderClickHandler(final PagingAndSortingListener pageChangeListener,
+			final String header) {
+		// Null if we were not passed a PagingAndSortingListener.
+		HeaderClickHandler headerClickHandler = null;
+		if(pageChangeListener != null){
+			headerClickHandler = new HeaderClickHandler(){
+				@Override
+				public void onHeaderClicked() {
+					pageChangeListener.onToggleSort(header);
+				}};
+		}
+		return headerClickHandler;
 	}
 
 	/**

@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.pagination.PagingAndSortingListener;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,7 +25,7 @@ import com.google.inject.Inject;
  * @author jmhill
  *
  */
-public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PageChangeListener {
+public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -199,5 +200,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	
 	public Query getStartingQuery(){
 		return this.startingQuery;
+	}
+
+	@Override
+	public void onToggleSort(String header) {
+		if(this.queryListener != null){
+			this.queryListener.onToggleSort(header);
+		}
 	}
 }

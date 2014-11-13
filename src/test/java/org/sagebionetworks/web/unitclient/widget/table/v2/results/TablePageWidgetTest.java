@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
@@ -46,7 +47,7 @@ public class TablePageWidgetTest {
 	TablePageView mockView;
 	PortalGinInjector mockGinInjector;
 	RowSelectionListener mockListner;
-	PageChangeListener mockPageChangeListner;
+	PagingAndSortingListener mockPageChangeListner;
 	DetailedPaginationWidget mockPaginationWidget;
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	TablePageWidget widget;
@@ -63,7 +64,7 @@ public class TablePageWidgetTest {
 		mockCellFactory = Mockito.mock(CellFactory.class);
 		mockListner = Mockito.mock(RowSelectionListener.class);
 		mockPaginationWidget = Mockito.mock(DetailedPaginationWidget.class);
-		mockPageChangeListner = Mockito.mock(PageChangeListener.class);
+		mockPageChangeListner = Mockito.mock(PagingAndSortingListener.class);
 		mockKeyboardNavigationHandler = Mockito.mock(KeyboardNavigationHandler.class);
 		
 		// Use stubs for all cells.

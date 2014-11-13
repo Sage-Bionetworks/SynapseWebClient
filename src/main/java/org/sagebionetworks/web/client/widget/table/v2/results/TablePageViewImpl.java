@@ -6,11 +6,11 @@ import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,8 +22,6 @@ import com.google.inject.Inject;
  */
 public class TablePageViewImpl implements TablePageView {
 	
-	private static String MIN_WIDTH = "75px";
-
 	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {}
 	
 	@UiField
@@ -46,16 +44,13 @@ public class TablePageViewImpl implements TablePageView {
 	}
 
 	@Override
-	public void setTableHeaders(List<String> headers) {
+	public void setTableHeaders(List<IsWidget> headers) {
 		header.clear();
 		body.clear();
 		// Blank header for the selection.
 		header.add(new TableHeader());
-		for(String value: headers){
-			TableHeader th = new TableHeader();
-			th.setMinimumWidth(MIN_WIDTH);
-			th.add(new Strong(value));
-			header.add(th);
+		for(IsWidget inHeader: headers){
+			header.add(inHeader);
 		}
 	}
 
