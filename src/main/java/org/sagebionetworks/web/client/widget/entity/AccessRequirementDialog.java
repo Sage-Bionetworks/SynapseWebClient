@@ -23,8 +23,6 @@ import com.google.inject.Inject;
 
 public class AccessRequirementDialog implements AccessRequirementDialogView.Presenter, SynapseWidgetPresenter {
 	
-	com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback;
-	
 	private AccessRequirement ar;
 	private AccessRequirementDialogView view;
 	AuthenticationController authenticationController;
@@ -60,9 +58,13 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			boolean accessApproved,
 			Callback imposeRestrictionsCallback, 
 			Callback finishedCallback) {
+		this.ar = ar;
+		if (ar == null) {
+			finished();
+			return;
+		}
 		//hide all
 		view.clear();
-		this.ar = ar;
 		this.entityId = entityId;
 		this.imposeRestrictionCallback = imposeRestrictionsCallback;
 		this.finishedCallback = finishedCallback;
@@ -159,6 +161,10 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		view.showModal();
 	}
 	
+	public void hide() {
+		view.hideModal();
+	}
+	
 	public String getJiraFlagUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
@@ -195,7 +201,9 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 
 	@Override
 	public void imposeRestrictionClicked() {
-		imposeRestrictionCallback.invoke();	
+		view.hideModal();
+		if (imposeRestrictionCallback != null)
+			imposeRestrictionCallback.invoke();	
 	}
 	
 	@Override
@@ -207,13 +215,13 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		Callback onSuccess = new Callback() {
 			@Override
 			public void invoke() {
-				entityUpdatedCallback.onSuccess(null);
+				finished();
 			}
 		};
 		CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
-				entityUpdatedCallback.onFailure(t);
+				view.showErrorMessage(t.getMessage());
 			}
 		};
 		GovernanceServiceHelper.signTermsOfUse(
@@ -225,13 +233,20 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 				jsonObjectAdapter);
 	}
 
+	public void finished() {
+		if (finishedCallback != null)
+			finishedCallback.invoke();
+	}
+	
 	@Override
 	public void flagClicked(){
+		view.hideModal();
 		view.open(getJiraFlagUrl());
 	}
 
 	@Override
 	public void requestACTClicked(){
+		view.hideModal();
 		view.open(getJiraRequestAccessUrl());
 	}
 	
@@ -242,6 +257,7 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	
 	@Override
 	public void loginClicked() {
+		view.hideModal();
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
 	
@@ -253,5 +269,9 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		return view.asWidget();
 	}
 	
+	@Override
+	public void cancelClicked() {
+		finished();
+	}
 	
 }

@@ -5,17 +5,15 @@ import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -110,6 +108,16 @@ public class AccessRequirementDialogViewImpl implements AccessRequirementDialogV
 				presenter.loginClicked();
 			}
 		});
+		
+		ClickHandler onCancel = new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.cancelClicked();
+			}
+		};
+		cancelButton.addClickHandler(onCancel);
+		closeButton.addClickHandler(onCancel);
 	}
 	
 	
@@ -146,6 +154,10 @@ public class AccessRequirementDialogViewImpl implements AccessRequirementDialogV
 	@Override
 	public void showModal() {
 		widget.show();
+	}
+	@Override
+	public void hideModal() {
+		widget.hide();
 	}
 	
 	@Override

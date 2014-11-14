@@ -64,12 +64,12 @@
 		 </bh:Div>
 	  </b:ModalBody>
 	  <b:ModalFooter>
-	      <b:Button ui:field="cancelButton" type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-	      <b:Button ui:field="closeButton" type="DEFAULT" dataDismiss="MODAL">Close</b:Button>
-	      <b:Button ui:field="loginButton" type="PRIMARY" dataDismiss="MODAL">Login</b:Button>
-	      <b:Button ui:field="imposeRestrictionsButton" type="PRIMARY" dataDismiss="MODAL">Add Restrictions</b:Button>
-	      <b:Button ui:field="signTermsButton" type="PRIMARY" dataDismiss="MODAL">Accept Terms of Use</b:Button>
-	      <b:Button ui:field="requestAccessFromACTButton" type="PRIMARY" dataDismiss="MODAL">Request Access</b:Button>
+	      <b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
+	      <b:Button ui:field="closeButton" type="DEFAULT" >Close</b:Button>
+	      <b:Button ui:field="loginButton" type="PRIMARY">Login</b:Button>
+	      <b:Button ui:field="imposeRestrictionsButton" type="PRIMARY">Add Restrictions</b:Button>
+	      <b:Button ui:field="signTermsButton" type="PRIMARY" >Accept Terms of Use</b:Button>
+	      <b:Button ui:field="requestAccessFromACTButton" type="PRIMARY">Request Access</b:Button>
 	  </b:ModalFooter>
 	</b:Modal>
 	

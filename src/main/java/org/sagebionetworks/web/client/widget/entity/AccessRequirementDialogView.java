@@ -12,7 +12,7 @@ public interface AccessRequirementDialogView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);
 	void showModal();
-	
+	void hideModal();
 	void open(String url);
 	
 	void showControlledUseUI();
@@ -44,6 +44,7 @@ public interface AccessRequirementDialogView extends IsWidget, SynapseView {
 		void imposeRestrictionClicked();
 		void flagClicked();
 		void loginClicked();
+		void cancelClicked();
 	}
 
 }

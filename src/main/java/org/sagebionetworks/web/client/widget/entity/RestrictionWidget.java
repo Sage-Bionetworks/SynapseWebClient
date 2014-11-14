@@ -100,10 +100,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		return GovernanceServiceHelper.entityRestrictionLevel(bundle.getAccessRequirements());
 	}
 
-	public boolean hasFulfilledAccessRequirements() {
-		return bundle.getUnmetAccessRequirements().size()==0L;
-	}
-
 	public boolean includeRestrictionWidget() {
 		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof TableEntity) || (bundle.getEntity() instanceof Locationable) || (bundle.getEntity() instanceof Folder) || (showIfProject && bundle.getEntity() instanceof Project);
 	}
@@ -130,6 +126,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		allArsIterator = bundle.getAccessRequirements().iterator();
 		unmetArsIterator = bundle.getUnmetAccessRequirements().iterator();
 		currentAR = selectNextAccessRequirement();
+	}
+	
+	public boolean isCurrentAccessRequirementUnmet() {
+		return bundle.getUnmetAccessRequirements().contains(currentAR);
 	}
 
 	private UserProfile getUserProfile() {
@@ -231,7 +231,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		//if there is another access requirement to show, then show it.
 		if (currentAR != null) {
 			shownAccessRequirements.add(currentAR.getId());
-			boolean hasFulfilledAccessRequirements = isAnonymous() ? false : hasFulfilledAccessRequirements();
+			boolean isApproved = isAnonymous() ? false : !isCurrentAccessRequirementUnmet();
 			
 			Callback showNextRestrictionCallback = new Callback() {
 				@Override
@@ -240,11 +240,14 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				}
 			};
 			
-			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, hasFulfilledAccessRequirements, imposeRestrictionsCallback, showNextRestrictionCallback);
+			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, isApproved, imposeRestrictionsCallback, showNextRestrictionCallback);
 			accessRequirementDialog.show();
-		} else if (hasAdministrativeAccess && bundle.getAccessRequirements().isEmpty()) {
-			//there are no access restrictions, and this person has administrative access.  verify data sensitivity, and if try then lockdown
-			view.showVerifyDataSensitiveDialog(imposeRestrictionsCallback);
+		} else {
+			accessRequirementDialog.hide();
+			if (hasAdministrativeAccess && bundle.getAccessRequirements().isEmpty()) {
+				//there are no access restrictions, and this person has administrative access.  verify data sensitivity, and if try then lockdown
+				view.showVerifyDataSensitiveDialog(imposeRestrictionsCallback);
+			}
 		}
 	}
 	
