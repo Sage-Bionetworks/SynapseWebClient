@@ -178,10 +178,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				throw new IllegalArgumentException(restrictionLevel.toString());
 		}
 		
-		if(showFlagLink) {
-			view.showFlagUI();
-		}
-		
 		//show the info link if there are any restrictions, or if we are supposed to show the flag link (to allow people to flag or  admin to "change" the data access level).
 		boolean isChangeLink = restrictionLevel==RESTRICTION_LEVEL.OPEN && hasAdministrativeAccess;
 		boolean isRestricted = restrictionLevel!=RESTRICTION_LEVEL.OPEN;

@@ -103,6 +103,13 @@ public class AccessRequirementDialogViewImpl implements AccessRequirementDialogV
 				presenter.flagClicked();
 			}
 		});
+		
+		loginButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.loginClicked();
+			}
+		});
 	}
 	
 	

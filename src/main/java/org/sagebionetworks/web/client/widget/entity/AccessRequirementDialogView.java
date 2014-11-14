@@ -43,6 +43,7 @@ public interface AccessRequirementDialogView extends IsWidget, SynapseView {
 		void signTermsOfUseClicked();
 		void imposeRestrictionClicked();
 		void flagClicked();
+		void loginClicked();
 	}
 
 }
