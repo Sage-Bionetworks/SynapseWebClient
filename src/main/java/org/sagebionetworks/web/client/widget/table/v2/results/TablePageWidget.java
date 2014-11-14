@@ -82,9 +82,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			SortDirection direction = getSortDirection(query, headerName);
 			if(direction != null){
 				if(SortDirection.ASC.equals(direction)){
-					sth.setIcon(IconType.ANGLE_DOWN);
+					sth.setIcon(IconType.SORT_ASC);
 				}else{
-					sth.setIcon(IconType.ANGLE_UP);
+					sth.setIcon(IconType.SORT_DESC);
 				}
 			}
 		}

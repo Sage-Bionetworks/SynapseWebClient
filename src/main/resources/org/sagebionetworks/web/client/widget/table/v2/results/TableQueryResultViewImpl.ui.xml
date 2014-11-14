@@ -8,7 +8,6 @@
 	<g:HTMLPanel>
 		<b:Panel>
 			<b:PanelBody>
-				<bh:Div styleName="margin-top-15" />
 				<b:Alert ui:field="errorAlert" type="DANGER"></b:Alert>
 
 				<g:SimplePanel ui:field="tablePanel" />

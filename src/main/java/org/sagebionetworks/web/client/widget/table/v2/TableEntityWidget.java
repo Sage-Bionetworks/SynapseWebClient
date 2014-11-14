@@ -293,7 +293,8 @@ public class TableEntityWidget implements IsWidget,
 				if(SortDirection.ASC.equals(currentDirection)){
 					item.setDirection(SortDirection.DESC);
 				}else{
-					item.setDirection(SortDirection.ASC);
+					// clear sort on this column
+					newSort.remove(item);
 				}
 			}
 		}

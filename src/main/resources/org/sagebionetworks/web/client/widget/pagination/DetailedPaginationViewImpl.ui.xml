@@ -11,7 +11,7 @@
 				<bh:Text ui:field="message"></bh:Text>
 			</b:Column>
 			<b:Column size="XS_8" offset="XS_2">
-				<b:Pagination ui:field="pageContainer" styleName="pagination margin-top-0">
+				<b:Pagination ui:field="pageContainer" addStyleNames="margin-top-0">
 				</b:Pagination>
 			</b:Column>
 		</b:Row>
