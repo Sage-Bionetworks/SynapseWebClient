@@ -44,7 +44,7 @@ public class QueryResultEditorWidget implements
 		this.startingBundle = bundle;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, true, this, null);
+		pageWidget.configure(bundle, null, null, true, this, null);
 	}
 
 	@Override

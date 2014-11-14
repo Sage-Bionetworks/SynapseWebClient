@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -409,7 +410,21 @@ public interface SynapseClient extends RemoteService {
 	 * @param sql
 	 */
 	public void validateTableQuery(String sql) throws RestServiceException;
-	
+	/**
+	 * For the given table SQL toggle the sort on the given column and return the modified SQL.
+	 * @param sql
+	 * @param header
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public String toggleSortOnTableQuery(String sql, String header) throws RestServiceException;
+	/**
+	 * Get the sort info for this table.
+	 * @param sql
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public List<SortItem> getSortFromTableQuery(String sql) throws RestServiceException;
 	/**
 	 * Apply PartialRowSet to a table entity.
 	 * 

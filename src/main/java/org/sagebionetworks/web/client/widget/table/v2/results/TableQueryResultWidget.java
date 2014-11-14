@@ -1,16 +1,18 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PagingAndSortingListener;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -101,12 +103,33 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * Called after a successful query.
 	 * @param bundle
 	 */
-	private void setQueryResults(QueryResultBundle bundle){
+	private void setQueryResults(final QueryResultBundle bundle){
+		// Get the sort info
+		this.synapseClient.getSortFromTableQuery(this.startingQuery.getSql(), new AsyncCallback<List<SortItem>>() {
+			
+			@Override
+			public void onSuccess(List<SortItem> sortItems) {
+				setQueryResultsAndSort(bundle, sortItems);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				showError(caught);
+			}
+		});
+
+	}
+	
+	private void setQueryResultsAndSort(QueryResultBundle bundle, List<SortItem> sortItems){
 		this.bundle = bundle;
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
+		SortItem sort = null;
+		if(sortItems != null && !sortItems.isEmpty()){
+			sort = sortItems.get(0);
+		}
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery, false, null, this);
+		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, null, this);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true);
 	}
@@ -204,8 +227,18 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	@Override
 	public void onToggleSort(String header) {
-		if(this.queryListener != null){
-			this.queryListener.onToggleSort(header);
-		}
+		synapseClient.toggleSortOnTableQuery(this.startingQuery.getSql(), header, new AsyncCallback<String>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				showError(caught);
+			}
+
+			@Override
+			public void onSuccess(String sql) {
+				startingQuery.setSql(sql);
+				startingQuery.setOffset(0L);
+				runQuery();
+			}});
 	}
+	
 }

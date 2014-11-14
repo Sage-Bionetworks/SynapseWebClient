@@ -255,6 +255,8 @@ public class TableEntityWidget implements IsWidget,
 	
 		// Set this as the query if it was successful
 		if (wasSuccessful) {
+			this.currentQuery = this.queryResultsWidget.getStartingQuery();
+			this.queryInputWidget.configure(this.currentQuery.getSql(), this, this.canEdit);
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
 		}
 	}

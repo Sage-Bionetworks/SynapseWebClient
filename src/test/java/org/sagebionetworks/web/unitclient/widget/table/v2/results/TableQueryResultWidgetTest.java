@@ -80,7 +80,7 @@ public class TableQueryResultWidgetTest {
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), null, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -100,7 +100,7 @@ public class TableQueryResultWidgetTest {
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), null, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -178,7 +178,7 @@ public class TableQueryResultWidgetTest {
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), null, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);

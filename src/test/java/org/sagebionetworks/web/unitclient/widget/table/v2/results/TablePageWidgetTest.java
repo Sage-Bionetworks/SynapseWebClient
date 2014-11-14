@@ -132,7 +132,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureRoundTrip(){
 		boolean isEditable = true;
-		widget.configure(bundle, query, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
 		List<Row> extracted = widget.extractRowSet();
 		assertEquals(rows, extracted);
 		List<String> headers = widget.extractHeaders();
@@ -147,7 +147,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureWithPaging(){
 		boolean isEditable = true;
-		widget.configure(bundle, query, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
@@ -156,7 +156,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureNoPaging(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, isEditable, null, null);
+		widget.configure(bundle, null, null, isEditable, null, null);
 		verify(mockPaginationWidget, never()).configure(anyLong(), anyLong(), anyLong(), any(PageChangeListener.class));
 		verify(mockView).setPaginationWidgetVisible(false);
 	}
@@ -164,7 +164,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testOnAddNewRow(){
 		boolean isEditable = true;
-		widget.configure(bundle, query, isEditable, null, mockPageChangeListner);
+		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
 		widget.onAddNewRow();
 		widget.onAddNewRow();
 		widget.onAddNewRow();
@@ -175,7 +175,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testSelectAllAndDeleteSelected(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, isEditable, mockListner, null);
+		widget.configure(bundle, null, null, isEditable, mockListner, null);
 		widget.onSelectAll();
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
@@ -195,7 +195,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testSelectNone(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, isEditable, mockListner, null);
+		widget.configure(bundle, null, null, isEditable, mockListner, null);
 		widget.onSelectAll();
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
@@ -210,7 +210,7 @@ public class TablePageWidgetTest {
 	@Test
 	public void testToggleSelect(){
 		boolean isEditable = true;
-		widget.configure(bundle, null, isEditable, mockListner, null);
+		widget.configure(bundle, null, null, isEditable, mockListner, null);
 		widget.onSelectNone();
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();

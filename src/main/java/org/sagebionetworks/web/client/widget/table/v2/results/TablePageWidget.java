@@ -58,7 +58,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 * @param rowSelectionListener If null then selection will be disabled.
 	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, Query query, boolean isEditable, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
+	public void configure(QueryResultBundle bundle, Query query, SortItem sort, boolean isEditable, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
 		this.rowSelectionListener = rowSelectionListener;
 		// The pagination widget is only visible if a listener was provider
 		if(pageChangeListener != null){
@@ -79,12 +79,13 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 					pageChangeListener, headerName);
 			sth.configure(type.getName(), headerClickHandler);
 			headers.add(sth);
-			SortDirection direction = getSortDirection(query, headerName);
-			if(direction != null){
-				if(SortDirection.ASC.equals(direction)){
-					sth.setIcon(IconType.SORT_ASC);
-				}else{
-					sth.setIcon(IconType.SORT_DESC);
+			if(sort != null){
+				if(headerName.equals(sort.getColumn())){
+					if(SortDirection.ASC.equals(sort.getDirection())){
+						sth.setIcon(IconType.SORT_ASC);
+					}else{
+						sth.setIcon(IconType.SORT_DESC);
+					}
 				}
 			}
 		}
@@ -104,19 +105,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
-	}
-	
-	private SortDirection getSortDirection(Query query, String header){
-		if(query != null){
-			if(query.getSort() != null){
-				for(SortItem item: query.getSort()){
-					if(item.getColumn().equals(header)){
-						return item.getDirection();
-					}
-				}
-			}
-		}
-		return null;
 	}
 
 	/**

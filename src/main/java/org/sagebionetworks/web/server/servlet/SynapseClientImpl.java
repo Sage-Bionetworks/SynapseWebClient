@@ -119,6 +119,7 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -143,6 +144,7 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.server.table.TableSqlProcessor;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -3419,6 +3421,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public String toggleSortOnTableQuery(String sql, String header)	throws RestServiceException {
+		try {
+			return TableSqlProcessor.toggleSort(sql, header);
+		} catch (ParseException e) {
+			throw new TableQueryParseException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public List<SortItem> getSortFromTableQuery(String sql)
+			throws RestServiceException {
+		try {
+			return TableSqlProcessor.getSortingInfo(sql);
+		} catch (ParseException e) {
+			throw new TableQueryParseException(e.getMessage());
+		}
+	}
+
+	
+	@Override
 	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body )
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -3554,4 +3576,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new BadRequestException(e.getMessage());
 		}
 	}
+
 }
