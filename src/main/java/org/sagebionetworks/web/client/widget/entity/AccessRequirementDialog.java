@@ -56,7 +56,6 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			String entityId,
 			boolean hasAdministrativeAccess,
 			boolean accessApproved,
-			Callback imposeRestrictionsCallback, 
 			Callback finishedCallback) {
 		this.ar = ar;
 		if (ar == null) {
@@ -66,7 +65,6 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		//hide all
 		view.clear();
 		this.entityId = entityId;
-		this.imposeRestrictionCallback = imposeRestrictionsCallback;
 		this.finishedCallback = finishedCallback;
 		boolean isAnonymous = isAnonymous();
 		APPROVAL_TYPE approvalType = getApprovalType();

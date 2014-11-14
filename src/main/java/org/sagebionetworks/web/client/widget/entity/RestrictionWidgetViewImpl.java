@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -79,7 +78,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	//this UI widget
 	Widget widget;
-	private Callback imposeRestrictionsCallback;
+	
 	private ClickHandler changeLinkClickHandler, showLinkClickHandler;
 	
 	
@@ -89,13 +88,13 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		yesHumanDataRadio.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				notSensitiveHumanDataMessage.setVisible(false);
+				presenter.yesHumanDataClicked();
 			}
 		});
 		noHumanDataRadio.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				notSensitiveHumanDataMessage.setVisible(true);
+				presenter.notHumanDataClicked();
 			}
 		});
 
@@ -103,14 +102,11 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				if (yesHumanDataRadio.getValue()) {
-					imposeRestrictionModal.hide();
-					imposeRestrictionsCallback.invoke();
-				} else if (noHumanDataRadio.getValue()) {
-					imposeRestrictionModal.hide();
-				} else {
+				if (!yesHumanDataRadio.getValue() && !noHumanDataRadio.getValue()) {
 					//no selection
 					DisplayUtils.showErrorMessage("You must make a selection before continuing.");
+				} else {
+					presenter.imposeRestrictionClicked();
 				}
 			}
 		});
@@ -169,9 +165,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	@Override
-	public void showVerifyDataSensitiveDialog(
-			final Callback imposeRestrictionsCallback) {
-		this.imposeRestrictionsCallback = imposeRestrictionsCallback;
+	public void showVerifyDataSensitiveDialog() {
 		resetImposeRestrictionModal();
 		imposeRestrictionModal.show();
 	}
@@ -237,12 +231,14 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		showLinkClickHandler = null;
 		changeLinkClickHandler = null;
 		resetImposeRestrictionModal();
+		
 	}
 	
 	private void resetImposeRestrictionModal() {
 		yesHumanDataRadio.setValue(false);
 		noHumanDataRadio.setValue(false);
 		notSensitiveHumanDataMessage.setVisible(false);
+		imposeRestrictionOkButton.setEnabled(true);
 	}
 	
 	@Override
@@ -260,6 +256,17 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		accessRestrictionDialogContainer.clear();
 		accessRestrictionDialogContainer.add(dialog);
 	}
+	
+	@Override
+	public void setImposeRestrictionOkButtonEnabled(boolean enable) {
+		imposeRestrictionOkButton.setEnabled(enable);
+	}
+	
+	@Override
+	public void setNotSensitiveHumanDataMessageVisible(boolean visible) {
+		notSensitiveHumanDataMessage.setVisible(visible);
+	}
+	
 	/*
 	 * Private Methods
 	 */

@@ -200,7 +200,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 					entityId, 
 					false, /*hasAdministrativeAccess*/
 					false, /*accessApproved*/
-					null, 
 					finishedCallback /*on hide dialog callback*/);
 			accessRequirementDialog.show();
 		} else {

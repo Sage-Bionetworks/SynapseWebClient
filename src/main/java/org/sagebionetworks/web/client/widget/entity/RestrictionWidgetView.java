@@ -24,7 +24,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	 * If user indicates that data is sensitive, then view will invoke callback to lockdown the current entity 
 	 * @param imposeRestrictionsCallback
 	 */
-	public void showVerifyDataSensitiveDialog(Callback imposeRestrictionsCallback);
+	public void showVerifyDataSensitiveDialog();
 	
 	void showControlledUseUI();
 	void showNoRestrictionsUI();
@@ -37,6 +37,9 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	void showAnonymousFlagModal();
 	void setAccessRequirementDialog(Widget dialog);
 	
+	void setImposeRestrictionOkButtonEnabled(boolean enable);
+	void setNotSensitiveHumanDataMessageVisible(boolean visible);
+	
 	/**
 	 * Presenter interface
 	 */
@@ -45,6 +48,10 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 		void anonymousFlagModalOkClicked();
 		void reportIssueClicked();
 		void anonymousReportIssueClicked();
+		void imposeRestrictionClicked();
+		
+		void yesHumanDataClicked();
+		void notHumanDataClicked();
 	}
 
 }

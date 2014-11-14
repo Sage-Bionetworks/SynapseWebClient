@@ -160,11 +160,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			jiraFlagLink = getJiraFlagUrl();
 		}
 		final RESTRICTION_LEVEL restrictionLevel = getRestrictionLevel();
-		Callback imposeRestrictionsCallback = getImposeRestrictionsCallback();
 		
 		ClickHandler aboutLinkClickHandler = getAboutLinkClickHandler(
-				hasAdministrativeAccess,
-				imposeRestrictionsCallback);
+				hasAdministrativeAccess);
 		
 		switch (restrictionLevel) {
 			case OPEN:
@@ -204,8 +202,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	private ClickHandler getAboutLinkClickHandler(
-			final boolean hasAdministrativeAccess,
-			final Callback imposeRestrictionsCallback 
+			final boolean hasAdministrativeAccess
 			) {
 		 
 		return new ClickHandler() {			
@@ -213,14 +210,13 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				public void onClick(ClickEvent event) {
 					//will run through all access requirements, unmet first (see selectNextAccessRequirement)
 					resetAccessRequirementCount();
-					showNextAccessRequirement(hasAdministrativeAccess, imposeRestrictionsCallback);
+					showNextAccessRequirement(hasAdministrativeAccess);
 				}
 		};
 	}
 	
 	public void showNextAccessRequirement(
-			final boolean hasAdministrativeAccess,
-			final Callback imposeRestrictionsCallback			
+			final boolean hasAdministrativeAccess
 			) {
 		
 		//iterate over access requirements until we reach one that we have not yet shown (or there are none left to show).
@@ -236,38 +232,33 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			Callback showNextRestrictionCallback = new Callback() {
 				@Override
 				public void invoke() {
-					showNextAccessRequirement(hasAdministrativeAccess, imposeRestrictionsCallback);
+					showNextAccessRequirement(hasAdministrativeAccess);
 				}
 			};
 			
-			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, isApproved, imposeRestrictionsCallback, showNextRestrictionCallback);
+			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, isApproved, showNextRestrictionCallback);
 			accessRequirementDialog.show();
 		} else {
 			accessRequirementDialog.hide();
 			if (hasAdministrativeAccess && bundle.getAccessRequirements().isEmpty()) {
 				//there are no access restrictions, and this person has administrative access.  verify data sensitivity, and if try then lockdown
-				view.showVerifyDataSensitiveDialog(imposeRestrictionsCallback);
+				view.showVerifyDataSensitiveDialog();
 			}
 		}
 	}
 	
-	public Callback getImposeRestrictionsCallback() {
-		return new Callback() {
+	public void imposeRestrictionClicked() {
+		view.showLoading();
+		synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){
 			@Override
-			public void invoke() {
-				view.showLoading();
-				synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){
-					@Override
-					public void onSuccess(EntityWrapper result) {
-						entityUpdatedCallback.onSuccess(null);
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						entityUpdatedCallback.onFailure(caught);
-					}
-				});
+			public void onSuccess(EntityWrapper result) {
+				entityUpdatedCallback.onSuccess(null);
 			}
-		};
+			@Override
+			public void onFailure(Throwable caught) {
+				entityUpdatedCallback.onFailure(caught);
+			}
+		});
 	}
 	
 	@Override
@@ -283,6 +274,23 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	@Override
 	public void anonymousReportIssueClicked() {
 		view.showAnonymousFlagModal();
+	}
+	
+	
+	@Override
+	public void notHumanDataClicked() {
+		//disable impose restriction button
+		view.setImposeRestrictionOkButtonEnabled(false);
+		//and show the warning message
+		view.setNotSensitiveHumanDataMessageVisible(true);		
+	}
+	
+	@Override
+	public void yesHumanDataClicked() {
+		//enable impose restriction button
+		view.setImposeRestrictionOkButtonEnabled(true);
+		//and hide the warning message
+		view.setNotSensitiveHumanDataMessageVisible(false);
 	}
 
 }
