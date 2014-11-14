@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -18,6 +19,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,7 +55,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
-		orderEditorModal.configure(tree);
+		orderEditorModal.configure(copyTree(tree));
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
@@ -74,7 +76,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			ulContainer.setVisible(true);
 			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
 //			ulContainer.add(ul);
-			
+
 			editOrderButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -109,6 +111,44 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		}
 		clearWidths();
 	}
+	
+	// TODO: Super redundant!!
+	private Tree copyTree(Tree tree) {
+		Tree newTree = new Tree();
+		for (int i = 0; i < tree.getItemCount(); i++) {
+			TreeItem newChild = new TreeItem();
+			buildTreeRecurse(tree.getItem(i), newChild);
+			newTree.addItem(newChild);
+			Label label = new Label();
+			if (tree.getItem(i).getWidget() instanceof Anchor) {
+				label.setText(((Anchor)tree.getItem(i).getWidget()).getText());
+			} else if (tree.getItem(i).getWidget() instanceof Label) {
+				label.setText(((Label)tree.getItem(i).getWidget()).getText());
+			}
+			newChild.setWidget(label);
+		}
+		return newTree;
+	}
+	
+	// TODO: Super redundant!!
+	private void buildTreeRecurse(TreeItem item1, TreeItem item2) {
+		for (int i = 0; i < item1.getChildCount(); i++) {
+			TreeItem child = item1.getChild(i);
+			TreeItem newChild = new TreeItem();
+			item2.addItem(newChild);
+			Label label = new Label();
+			if (child.getWidget() instanceof Anchor) {
+				label.setText(((Anchor)child.getWidget()).getText());
+			} else if (child.getWidget() instanceof Label) {
+				label.setText(((Label)child.getWidget()).getText());
+			}
+			newChild.setWidget(label);
+			item2.setState(true);
+			buildTreeRecurse(child, newChild);
+		}
+	}
+	
+	
 	
 //	private void recurseOpenItem(SubPageTreeItem item) {
 //		item.setState(true);
