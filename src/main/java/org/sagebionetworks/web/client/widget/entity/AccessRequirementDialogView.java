@@ -14,14 +14,35 @@ public interface AccessRequirementDialogView extends IsWidget, SynapseView {
 	void showModal();
 	
 	void open(String url);
+	
+	void showControlledUseUI();
+	void showNoRestrictionsUI();
+	void showOpenUI();
+	void showApprovedHeading();
+	void showTouHeading();
+	void showActHeading();
+	void showAnonymousAccessNote();
+	void showTermsUI();
+	void setTerms(String arText);
+	void showImposeRestrictionsAllowedNote();
+	void showImposeRestrictionsNotAllowedNote();
+	void showAnonymousFlagNote();
+	void showImposeRestrictionsNotAllowedFlagNote();
+	void showCancelButton();
+	void showCloseButton();
+	void showLoginButton();
+	void showImposeRestrictionsButton();
+	void showSignTermsButton();
+	void showRequestAccessFromACTButton();
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void requestACTClicked();
 		void signTermsOfUseClicked();
-		void anonymousOkClicked();
 		void imposeRestrictionClicked();
+		void flagClicked();
 	}
 
 }

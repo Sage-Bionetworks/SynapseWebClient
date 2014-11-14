@@ -12,7 +12,7 @@
 	<b:Modal size="LARGE" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
 	  <b:ModalBody>
 	    <bh:Div ui:field="controlledUseUI">
-	       	<g:Image styleName="displayInline" resource='{icons.shieldRed16}' />
+	       	<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.shieldRed16}' />
 			<g:InlineLabel styleName="font-size-18" text="Access to these data is Controlled Use" />
 			
 		</bh:Div>
@@ -24,47 +24,49 @@
 		    <bh:Text>This data is currently accessible to all registered Synapse users.</bh:Text>
 		</bh:Div>
 		<bh:Div ui:field="approvedHeading">
-		    <g:InlineLabel styleName="font-size-12" text="Access Requirements Fulfilled:  You have access to these data under the following terms:" />
+		    <g:InlineLabel styleName="boldText" text="Access Requirements Fulfilled:  You have access to these data under the following terms:" />
 		</bh:Div>
 		<bh:Div ui:field="touHeading">
-		    <bh:Text>Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:</bh:Text>
+		    <g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:" />
 		</bh:Div>
 		<bh:Div ui:field="actHeading">
-		    <bh:Text>Access to the data requires that you are a registered Synapse user and fulfill the following requirements:</bh:Text>
+		    <g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and fulfill the following requirements:" />
 		</bh:Div>
 		<!-- terms -->
-		<b:BlockQuote>
-		    <bh:Paragraph ui:field="terms"></bh:Paragraph>
+		<b:BlockQuote ui:field="termsUI">
+		    <bh:Paragraph>
+		    	<g:HTML ui:field="terms" />
+		    </bh:Paragraph>
 		</b:BlockQuote>
 		<bh:Div ui:field="anonymousAccessNote">
 		    <bh:Text>Note:  You must log in to gain access to restricted data.</bh:Text>
 		</bh:Div>
 		<bh:Div ui:field="imposeRestrictionsAllowedNote">
 		    <bh:Text>You are responsible to ensure your data is shared in compliance with the </bh:Text>
-		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link" href="#!WikiPlace:dataAccessLevelsContent" target="_blank" />
+		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5" href="#!Help:Governance" target="_blank" />
 		    <bh:Text> and all applicable laws.  To add data restrictions, contact the Access and Compliance Team (ACT), by clicking below. </bh:Text>
 		    <g:InlineLabel styleName="boldText" text="NOTE:  If you continue, data access to all registered Synapse users will be temporarily restricted pending review by the ACT." />
 		</bh:Div>
 		<bh:Div ui:field="imposeRestrictionsNotAllowedNote">
 		    <bh:Text>For more information on use conditions, please read the </bh:Text>
-		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link" href="#!WikiPlace:dataAccessLevelsContent" target="_blank" />
+		    <b:Anchor text="Conditions for using Human Data in Synapse" styleName="link margin-left-5" href="#!Help:Governance" target="_blank" />
 		    <bh:Text>.</bh:Text>
 		</bh:Div>
 		<bh:Div ui:field="anonymousFlagNote">
 		    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please </bh:Text>
-			<g:InlineLabel styleName="boldText" text="log in" />
+			<g:InlineLabel styleName="boldText" text=" log in " />
 			<bh:Text> to alert the Synapse Access and Compliance Team (ACT).</bh:Text>
 		 </bh:Div>
 		<bh:Div ui:field="imposeRestrictionsNotAllowedFlagNote">
 		    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) by clicking </bh:Text>
-		    <b:Anchor ui:field="jiraFlagLink" text="here" styleName="link" target="_blank" />
+		    <b:Anchor ui:field="jiraFlagLink" text=" here" styleName="link" target="_blank" />
 		    <bh:Text>.</bh:Text>
 		 </bh:Div>
 	  </b:ModalBody>
 	  <b:ModalFooter>
-	      <b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-	      <b:Button type="DEFAULT" dataDismiss="MODAL">Close</b:Button>
-	      <b:Button ui:field="loginButton" type="PRIMARY" dataDismiss="MODAL">Login</b:Button>
+	      <b:Button ui:field="cancelButton" type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+	      <b:Button ui:field="closeButton" type="DEFAULT" dataDismiss="MODAL">Close</b:Button>
+	      <b:Button ui:field="loginButton" type="PRIMARY" dataDismiss="MODAL" href="#!LoginPlace:0">Login</b:Button>
 	      <b:Button ui:field="imposeRestrictionsButton" type="PRIMARY" dataDismiss="MODAL">Add Restrictions</b:Button>
 	      <b:Button ui:field="signTermsButton" type="PRIMARY" dataDismiss="MODAL">Accept Terms of Use</b:Button>
 	      <b:Button ui:field="requestAccessFromACTButton" type="PRIMARY" dataDismiss="MODAL">Request Access</b:Button>

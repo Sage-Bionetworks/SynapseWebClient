@@ -4,12 +4,10 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -57,9 +55,11 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			AccessRequirement ar,
 			String entityId,
 			boolean hasAdministrativeAccess,
-			boolean hasFulfilledAccessRequirements,
+			boolean accessApproved,
 			Callback imposeRestrictionsCallback, 
 			Callback finishedCallback) {
+		//hide all
+		view.clear();
 		this.ar = ar;
 		this.entityId = entityId;
 		this.imposeRestrictionCallback = imposeRestrictionsCallback;
@@ -71,25 +71,85 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		if ((restrictionLevel==RESTRICTION_LEVEL.OPEN && approvalType!=APPROVAL_TYPE.NONE) ||
 				(restrictionLevel!=RESTRICTION_LEVEL.OPEN && approvalType==APPROVAL_TYPE.NONE)) 
 			throw new IllegalArgumentException("restrictionLevel="+restrictionLevel+" but approvalType="+approvalType);
-		if (restrictionLevel!=RESTRICTION_LEVEL.OPEN && isAnonymous && hasFulfilledAccessRequirements) 
+		if (restrictionLevel!=RESTRICTION_LEVEL.OPEN && isAnonymous && accessApproved) 
 			throw new IllegalArgumentException("restrictionLevel!=APPROVAL_REQUIRED.NONE && isAnonymous && accessApproved");
 		boolean imposeRestrictionsAllowed = (restrictionLevel==RESTRICTION_LEVEL.OPEN && hasAdministrativeAccess);
 		
-		if (approvalType!=APPROVAL_TYPE.NONE) {
-			String arText = GovernanceServiceHelper.getAccessRequirementText(ar); 
-			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
-				//show user agreement that user can sign
-				//view.show...
-				//touAcceptanceCallback would have been set, should call back to signTermsOfUseClicked
-			} else { // APPROVAL_TYPE.ACT_APPROVAL
-				// get the Jira link for ACT approval
-				if (!isAnonymous) {
-					//show ACT request UI
-					//view.show...
-					//requestACTCallback would have been set, should call back to requestACTClicked
-				}
-			}
+		if (restrictionLevel==RESTRICTION_LEVEL.OPEN) {
+			view.showNoRestrictionsUI();
+			view.showOpenUI();
 		}
+		else {
+			view.showControlledUseUI();
+			// next, if you are approved, comes "You have access to this data under the following..."
+    		// or if you are not approved, "In order to Access..."
+     		if (accessApproved) {
+     			view.showApprovedHeading();
+      		} else {
+      			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
+          			view.showTouHeading();
+     			} else if (approvalType==APPROVAL_TYPE.ACT_APPROVAL) { //restrictionLevel==APPROVAL_REQUIRED.ACT_APPROVAL
+          			view.showActHeading();
+     			} else {
+     				throw new IllegalArgumentException("Cannot have non-RESTRICTION_LEVEL.OPEN with APPROVAL_TYPE none.");
+     			}
+      		}
+    		// next comes the Terms of Use or ACT info, in its own box
+     		view.showTermsUI();
+     		view.setTerms(GovernanceServiceHelper.getAccessRequirementText(ar));
+     		// if not logged in there's an extra line "Note:  You must log in to access restricted data."
+           	if (isAnonymous) {
+           		view.showAnonymousAccessNote();
+           	}
+		}
+		
+		// next there's a prompt with a link to the Governance page
+       	if (imposeRestrictionsAllowed) {
+        	view.showImposeRestrictionsAllowedNote();
+     	} else {
+     		view.showImposeRestrictionsNotAllowedNote();
+     	}
+      	
+		// finally there the Flag notice and hyperlink
+      	// (but not for a user having admin access to their own dataaset
+      	if (isAnonymous) {
+      		view.showAnonymousFlagNote();
+      	} else if (!imposeRestrictionsAllowed) {
+      		view.showImposeRestrictionsNotAllowedFlagNote();
+      	}
+      	
+      	// buttons
+     	if (isAnonymous) {
+      		// login or cancel
+     		view.showLoginButton();
+     		view.showCancelButton();
+     	} else { 
+      		if (approvalType==APPROVAL_TYPE.NONE) {
+      			if (hasAdministrativeAccess) {
+      				// button to add restriction or cancel
+      				view.showImposeRestrictionsButton();
+      				view.showCancelButton();
+      			} else {
+        			// just a close button
+      				view.showCloseButton();
+     			}
+    		} else {
+     			if (accessApproved) {
+     				// just a close button
+     				view.showCloseButton();
+     			} else {
+	     			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
+	     				// agree to TOU, cancel
+	     				view.showSignTermsButton();
+	     				view.showCancelButton();
+	     			} else { // APPROVAL_TYPE.ACT_APPROVAL
+	     				// request access, cancel
+	     				view.showRequestAccessFromACTButton();
+	     				view.showCancelButton();
+	     			}
+     			}
+      		}
+      	}
 		
 	}
 	
@@ -164,11 +224,10 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	}
 
 	@Override
-	public void anonymousOkClicked() {
-		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
+	public void flagClicked(){
+		view.open(getJiraFlagUrl());
 	}
 
-	
 	@Override
 	public void requestACTClicked(){
 		view.open(getJiraRequestAccessUrl());
