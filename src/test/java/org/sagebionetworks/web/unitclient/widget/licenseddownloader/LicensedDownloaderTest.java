@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -17,7 +17,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
@@ -28,9 +27,6 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
@@ -51,10 +47,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
+import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.JiraGovernanceConstants;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
@@ -63,7 +56,6 @@ import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownload
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -85,7 +77,6 @@ public class LicensedDownloaderTest {
 	Locationable entity;
 	EntityBundle entityBundle;
 	Entity parentEntity;
-	UserSessionData user1;
 	List<LocationData> locations;	
 	EntityPath entityPath;
 	EntityWrapper StudyEntityWrapper;
@@ -93,6 +84,8 @@ public class LicensedDownloaderTest {
 	EntityWrapper pathEntityWrapper;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	AccessRequirementDialog mockAccessRequirementDialog;
+	
 	String baseFileHandleUrl="http://mytestbasefilehandleurl/filehandle";
 	@SuppressWarnings("unchecked")
 	@Before
@@ -120,10 +113,10 @@ public class LicensedDownloaderTest {
 		GWTWrapper mockGWTWrapper = mock(GWTWrapper.class);
 		AuthenticationController mockAuthController = mock(AuthenticationController.class);
 		jiraURLHelper  = new JiraURLHelperImpl(gc, mockJiraClient, mockGWTWrapper, mockAuthController);
-		
+		mockAccessRequirementDialog = mock(AccessRequirementDialog.class);
 
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, mockSynapseJSNIUtils, mockGwt);
+				mockSynapseJSNIUtils, mockGwt, mockAccessRequirementDialog);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -165,18 +158,6 @@ public class LicensedDownloaderTest {
 		entityHeader.setType("/layer");
 		path.add(entityHeader);
 		entityPath.setPath(path);
-		
-		// User
-		user1 = new UserSessionData();
-		UserProfile profile = new UserProfile();
-		profile.setDisplayName("Display Name");
-		profile.setOwnerId("1");
-		user1.setProfile(profile);
-		user1.setSession(new Session());
-		user1.getSession().setSessionToken("token");
-		user1.setIsSSO(false);
-
-		licensedDownloader.setUserProfile(profile);
 		
 		// create a DownloadLocation model for this test
 		LocationData downloadLocation = new LocationData();				
@@ -292,49 +273,6 @@ public class LicensedDownloaderTest {
 		assertNull(widget);		
 	}
 	
-	@Test 
-	public void testSetLicenseAgreement() {	
-		String touText = "some agreement";
-		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
-		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setTermsOfUse(touText);
-		accessRequirements.add(accessRequirement);
-
-		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);				
-		verify(mockView).setLicenseHtml(touText);
-		
-		reset(mockView);
-		
-		ACTAccessRequirement actAR = new ACTAccessRequirement();
-		String actContactInfo = "act contact info";
-		actAR.setActContactInfo(actContactInfo);
-		accessRequirements.add(actAR);
-		List<AccessRequirement> unmetAccessRequirements = new ArrayList<AccessRequirement>();
-		unmetAccessRequirements.add(actAR);
-		licensedDownloader.setLicenseAgreement(accessRequirements, unmetAccessRequirements);				
-		verify(mockView).setLicenseHtml(actContactInfo);
-	}
-	
-	@SuppressWarnings({ "unchecked", "deprecation" })
-	@Test
-	public void testSetLicenseAccepted() {
-		String touText = "some agreement";
-		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
-		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setTermsOfUse(touText);
-		accessRequirements.add(accessRequirement);
-
-		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
-		licensedDownloader.setLicenseAccepted();		
-		verify(mockView).setApprovalType(APPROVAL_TYPE.USER_AGREEMENT);
-		verify(mockView).setRestrictionLevel(RESTRICTION_LEVEL.RESTRICTED);
-
-		// with callback
-		resetMocks();		
-	
-		licensedDownloader.setLicenseAccepted();		
-	}
-
 	@Test
 	public void testGetDirectDownloadUrlAvailable(){
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();

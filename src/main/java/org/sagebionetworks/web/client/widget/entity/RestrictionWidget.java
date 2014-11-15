@@ -78,10 +78,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.bundle = bundle;
 	}
 
-	@SuppressWarnings("unchecked")
-	public void clearState() {
-	}
-
 	public String getJiraFlagUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
@@ -236,7 +232,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				}
 			};
 			
-			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, isApproved, showNextRestrictionCallback);
+			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, isApproved, getImposeRestrictionCallback(), showNextRestrictionCallback);
 			accessRequirementDialog.show();
 		} else {
 			accessRequirementDialog.hide();
@@ -247,6 +243,14 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		}
 	}
 	
+	public Callback getImposeRestrictionCallback() {
+		return new Callback() {
+			@Override
+			public void invoke() {
+				imposeRestrictionClicked();
+			}
+		};
+	}
 	public void imposeRestrictionClicked() {
 		view.showLoading();
 		synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){

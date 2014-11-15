@@ -99,7 +99,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		});
 
 		imposeRestrictionOkButton.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
 				if (!yesHumanDataRadio.getValue() && !noHumanDataRadio.getValue()) {

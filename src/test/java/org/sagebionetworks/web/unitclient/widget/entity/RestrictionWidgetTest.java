@@ -1,20 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
-import org.sagebionetworks.repo.model.RSSFeed;
-import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -31,16 +31,11 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
+import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
-import org.sagebionetworks.web.shared.EntityWrapper;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RestrictionWidgetTest {
 
@@ -53,6 +48,7 @@ public class RestrictionWidgetTest {
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	JiraURLHelper mockJiraURLHelper;
+	AccessRequirementDialog mockAccessRequirementDialog;
 	RestrictionWidget widget;
 	Versionable vb;
 	String entityId = "syn123";
@@ -84,9 +80,9 @@ public class RestrictionWidgetTest {
 		
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		mockAccessRequirementDialog = mock(AccessRequirementDialog.class);
 
-
-		widget = new RestrictionWidget(mockView, mockSynapseClient, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockJiraURLHelper, mockIcons);
+		widget = new RestrictionWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockAccessRequirementDialog);
 
 		vb = new Data();
 		vb.setId(entityId);
@@ -116,27 +112,8 @@ public class RestrictionWidgetTest {
 	}
 	
 	@Test
-	public void testGetJiraRestrictionUrl() {
-		String restrictionURLString = "restrictionURLString";
-		when(mockJiraURLHelper.createAccessRestrictionIssue(any(String.class),any(String.class),any(String.class))).thenReturn(restrictionURLString);
-		assertEquals(restrictionURLString, widget.getJiraRestrictionUrl());
-	}
-	
-	@Test
-	public void testGetJiraRequestAccessUrl() {
-		String requestAccessURLString = "requestAccessURLString";
-		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
-		assertEquals(requestAccessURLString, widget.getJiraRequestAccessUrl());
-	}
-	
-	@Test
 	public void testGetRestrictionLevel() {
 		assertEquals(RESTRICTION_LEVEL.RESTRICTED, widget.getRestrictionLevel());
-	}
-	
-	@Test
-	public void testGetApprovalType() {
-		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, widget.getApprovalType());
 	}
 	
 	@Test
@@ -147,37 +124,14 @@ public class RestrictionWidgetTest {
 		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
-		boolean hasAdministrativeAccess = false;
-		Callback emptyCallback = new Callback(){
-			@Override
-			public void invoke() {
-			}
-		};
 		//show nothing if empty and no admin privs (should not get into this state)
-		widget.showNextAccessRequirement(false, hasAdministrativeAccess, mockIconsImageBundle, emptyCallback, emptyCallback, null);
-		verify(mockView, never()).showAccessRequirement(any(RESTRICTION_LEVEL.class), any(APPROVAL_TYPE.class), anyBoolean(), anyBoolean(), anyBoolean(), any(IconsImageBundle.class), anyString(), any(Callback.class), any(Callback.class), any(Callback.class), any(Callback.class), anyString(), any(Callback.class));
-		verify(mockView, never()).showVerifyDataSensitiveDialog(any(Callback.class));
+		widget.showNextAccessRequirement(false);
+		verify(mockAccessRequirementDialog, never()).show();
+		verify(mockView, never()).showVerifyDataSensitiveDialog();
 
 		//should show verification of sensitive data dialog if we have admin privileges
-		hasAdministrativeAccess = true;
-		widget.showNextAccessRequirement(false, hasAdministrativeAccess, mockIconsImageBundle, emptyCallback, emptyCallback, null);
-		verify(mockView, never()).showAccessRequirement(any(RESTRICTION_LEVEL.class), any(APPROVAL_TYPE.class), anyBoolean(), anyBoolean(), anyBoolean(), any(IconsImageBundle.class), anyString(), any(Callback.class), any(Callback.class), any(Callback.class), any(Callback.class), anyString(), any(Callback.class));
-		verify(mockView).showVerifyDataSensitiveDialog(any(Callback.class));
+		widget.showNextAccessRequirement(true);
+		verify(mockAccessRequirementDialog, never()).show();
+		verify(mockView).showVerifyDataSensitiveDialog();
 	}
-	
-	@Test
-	public void testAccessRequirementCallback() throws JSONObjectAdapterException {
-		Callback arCallback = widget.accessRequirementCallback(bundle.getAccessRequirements().get(0));
-		arCallback.invoke();
-		
-		ArgumentCaptor<EntityWrapper> entityWrapperCaptor = ArgumentCaptor.forClass(EntityWrapper.class);
-		verify(mockSynapseClient).createAccessApproval(entityWrapperCaptor.capture(), any(AsyncCallback.class));
-		EntityWrapper wrapper = entityWrapperCaptor.getValue();
-		String accessApprovalJson = wrapper.getEntityJson();
-		TermsOfUseAccessApproval approval = new TermsOfUseAccessApproval(adapterFactory.createNew(accessApprovalJson));
-		assertEquals(testAccessRequirementId, approval.getRequirementId());
-	}
-	
-	
-	
 }

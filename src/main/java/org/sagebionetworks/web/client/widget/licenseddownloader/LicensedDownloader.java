@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
@@ -95,13 +94,13 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param entity
 	 * @param showDownloadLocations
 	 */
-	public void configure(EntityBundle entityBundle, UserProfile userProfile) {
+	public void configure(EntityBundle entityBundle) {
 		view.setPresenter(this);
 		this.entityId = entityBundle.getEntity().getId();
-		extractBundle(entityBundle, userProfile);
+		extractBundle(entityBundle);
 	}
 	
-	private void extractBundle(EntityBundle entityBundle, UserProfile userProfile) {
+	private void extractBundle(EntityBundle entityBundle) {
 		loadDownloadUrl(entityBundle);		
 		List<AccessRequirement> ars = entityBundle.getAccessRequirements();
 		List<AccessRequirement> unmetARs = entityBundle.getUnmetAccessRequirements();
@@ -200,6 +199,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 					entityId, 
 					false, /*hasAdministrativeAccess*/
 					false, /*accessApproved*/
+					null,
 					finishedCallback /*on hide dialog callback*/);
 			accessRequirementDialog.show();
 		} else {

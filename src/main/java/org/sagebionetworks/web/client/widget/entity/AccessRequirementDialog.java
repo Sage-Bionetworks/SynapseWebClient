@@ -7,7 +7,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -40,8 +39,8 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
-			JiraURLHelper jiraURLHelper,
-			IconsImageBundle iconsImageBundle) {
+			JiraURLHelper jiraURLHelper
+			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -56,16 +55,14 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			String entityId,
 			boolean hasAdministrativeAccess,
 			boolean accessApproved,
+			Callback imposeRestrictionCallback,
 			Callback finishedCallback) {
 		this.ar = ar;
-		if (ar == null) {
-			finished();
-			return;
-		}
+		this.entityId = entityId;
+		this.imposeRestrictionCallback = imposeRestrictionCallback;
+		this.finishedCallback = finishedCallback;
 		//hide all
 		view.clear();
-		this.entityId = entityId;
-		this.finishedCallback = finishedCallback;
 		boolean isAnonymous = isAnonymous();
 		APPROVAL_TYPE approvalType = getApprovalType();
 		RESTRICTION_LEVEL restrictionLevel = getRestrictionLevel();
@@ -183,10 +180,6 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 				primaryEmail, 
 				entityId, 
 				ar.getId().toString());
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void clearState() {
 	}
 	
 	public RESTRICTION_LEVEL getRestrictionLevel() {
