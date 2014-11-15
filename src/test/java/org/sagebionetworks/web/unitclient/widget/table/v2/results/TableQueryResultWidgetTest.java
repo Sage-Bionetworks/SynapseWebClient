@@ -19,7 +19,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -32,12 +32,11 @@ public class TableQueryResultWidgetTest {
 	
 	TablePageWidget mockPageWidget;
 	JobTrackingWidgetStub jobTrackingStub;
-	QueryResultsListner mockListner;
+	QueryResultsListener mockListner;
 	TableQueryResultView mockView;
 	SynapseClientAsync mockSynapseClient;
 	QueryResultEditorWidget mockQueryResultEditor;
 	PortalGinInjector mockGinInjector;
-	AdapterFactory adapterFactory;
 	TableQueryResultWidget widget;
 	Query query;
 	QueryResultBundle bundle;
@@ -46,7 +45,7 @@ public class TableQueryResultWidgetTest {
 	@Before
 	public void before(){
 		jobTrackingStub = new JobTrackingWidgetStub();
-		mockListner = Mockito.mock(QueryResultsListner.class);
+		mockListner = Mockito.mock(QueryResultsListener.class);
 		mockView = Mockito.mock(TableQueryResultView.class);
 		mockPageWidget = Mockito.mock(TablePageWidget.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -55,8 +54,7 @@ public class TableQueryResultWidgetTest {
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(jobTrackingStub);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		adapterFactory = new AdapterFactoryImpl();
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, adapterFactory);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector);
 		query = new Query();
 		query.setSql("select * from syn123");
 		bundle = new QueryResultBundle();

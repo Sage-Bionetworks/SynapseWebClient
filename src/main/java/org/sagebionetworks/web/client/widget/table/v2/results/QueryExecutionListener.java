@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+
 /**
  * Abstraction for a listener that needs to know when a query is executing.
  * 

@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -32,7 +31,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
-	AdapterFactory adapterFactory;
 	TableQueryResultView view;
 	PortalGinInjector ginInjector;
 	QueryResultBundle bundle;
@@ -40,17 +38,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
-	QueryResultsListner queryListener;
+	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, AdapterFactory adapterFactory){
+	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector){
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
-		this.adapterFactory = adapterFactory;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
@@ -62,7 +59,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param isEditable Is the user allowed to edit the query results?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, QueryResultsListner listener){
+	public void configure(Query query, boolean isEditable, QueryResultsListener listener){
 		this.isEditable = isEditable;
 		this.startingQuery = query;
 		this.queryListener = listener;
@@ -216,9 +213,21 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	@Override
 	public void onPageChange(Long newOffset) {
+		this.startingQuery.setOffset(newOffset);
+		queryChanging();
+	}
+	
+	private void runSql(String sql){
+		startingQuery.setSql(sql);
+		startingQuery.setOffset(0L);
+		queryChanging();
+	}
+
+	private void queryChanging() {
 		if(this.queryListener != null){
-			this.queryListener.onPageChange(newOffset);
+			this.queryListener.onStartingNewQuery(this.startingQuery);
 		}
+		runQuery();
 	}
 	
 	public Query getStartingQuery(){
@@ -227,6 +236,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	@Override
 	public void onToggleSort(String header) {
+		// This call will generate a new SQL string with the requestd column toggled.
 		synapseClient.toggleSortOnTableQuery(this.startingQuery.getSql(), header, new AsyncCallback<String>(){
 			@Override
 			public void onFailure(Throwable caught) {
@@ -235,9 +245,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 			@Override
 			public void onSuccess(String sql) {
-				startingQuery.setSql(sql);
-				startingQuery.setOffset(0L);
-				runQuery();
+				runSql(sql);
 			}});
 	}
 	

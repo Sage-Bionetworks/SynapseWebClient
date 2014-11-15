@@ -21,8 +21,9 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -38,7 +39,7 @@ import com.google.inject.Inject;
  * 
  */
 public class TableEntityWidget implements IsWidget,
-		TableEntityWidgetView.Presenter, QueryResultsListner,
+		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
 	public static final String HIDE_SCHEMA = "Hide Schema";
@@ -273,35 +274,6 @@ public class TableEntityWidget implements IsWidget,
 		setQuery(this.currentQuery);
 	}
 
-	@Override
-	public void onPageChange(Long newOffset) {
-		this.currentQuery.setOffset(newOffset);
-		setQuery(this.currentQuery);
-	}
-	
-	@Override
-	public void onToggleSort(String header) {
-		List<SortItem> newSort = new LinkedList<SortItem>();
-		List<SortItem> oldSort = this.currentQuery.getSort();
-		this.currentQuery.setSort(newSort);
-		SortItem item = new SortItem();
-		item.setColumn(header);
-		item.setDirection(SortDirection.ASC);
-		newSort.add(item);
-		if(oldSort != null){
-			// If the current column is sorted then toggle it.
-			SortDirection currentDirection = getCurrentDirection(oldSort, header);
-			if(currentDirection != null){
-				if(SortDirection.ASC.equals(currentDirection)){
-					item.setDirection(SortDirection.DESC);
-				}else{
-					// clear sort on this column
-					newSort.remove(item);
-				}
-			}
-		}
-		setQuery(this.currentQuery);
-	}
 	/**
 	 * Find the current sort direction for the given column.
 	 * @param list
@@ -373,6 +345,12 @@ public class TableEntityWidget implements IsWidget,
 			actionMenu.setActionText(Action.TOGGLE_TABLE_SCHEMA, SHOW_SCHEMA);
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 		}
+	}
+
+	@Override
+	public void onStartingNewQuery(Query newQuery) {
+		this.currentQuery = newQuery;
+		this.queryInputWidget.configure(newQuery.getSql(), this, this.canEdit);
 	}
 
 
