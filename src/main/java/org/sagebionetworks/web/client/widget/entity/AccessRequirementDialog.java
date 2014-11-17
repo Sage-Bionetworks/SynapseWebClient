@@ -270,7 +270,7 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	}
 	
 	public boolean isAnonymous() {
-		return getUserProfile()==null;
+		return !authenticationController.isLoggedIn();
 	}
 	@Override
 	public Widget asWidget() {

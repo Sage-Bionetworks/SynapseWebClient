@@ -101,12 +101,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		imposeRestrictionOkButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (!yesHumanDataRadio.getValue() && !noHumanDataRadio.getValue()) {
-					//no selection
-					DisplayUtils.showErrorMessage("You must make a selection before continuing.");
-				} else {
-					presenter.imposeRestrictionClicked();
-				}
+				presenter.imposeRestrictionClicked();
 			}
 		});
 		
@@ -266,6 +261,15 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		notSensitiveHumanDataMessage.setVisible(visible);
 	}
 	
+	@Override
+	public Boolean isNoHumanDataRadioSelected() {
+		return noHumanDataRadio.getValue();
+	}
+	
+	@Override
+	public Boolean isYesHumanDataRadioSelected() {
+		return yesHumanDataRadio.getValue();
+	}
 	/*
 	 * Private Methods
 	 */

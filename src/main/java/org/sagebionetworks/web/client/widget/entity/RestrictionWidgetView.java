@@ -39,6 +39,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	void setImposeRestrictionOkButtonEnabled(boolean enable);
 	void setNotSensitiveHumanDataMessageVisible(boolean visible);
+	Boolean isYesHumanDataRadioSelected();
+	Boolean isNoHumanDataRadioSelected();
 	
 	/**
 	 * Presenter interface
@@ -52,6 +54,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 		
 		void yesHumanDataClicked();
 		void notHumanDataClicked();
+		
+		
 	}
 
 }

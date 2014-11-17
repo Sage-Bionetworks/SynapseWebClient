@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -33,7 +32,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	Callback entityUpdated;
 	EntityBundle bundle;
 	
-	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private JiraURLHelper jiraURLHelper;
 	private GlobalApplicationState globalApplicationState;
@@ -48,13 +46,11 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	@Inject
 	public RestrictionWidget(
 			RestrictionWidgetView view,
-			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			JiraURLHelper jiraURLHelper,
 			AccessRequirementDialog accessRestrictionDialog) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jiraURLHelper = jiraURLHelper;
@@ -241,9 +237,20 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	public void imposeRestrictionClicked() {
-		view.showLoading();
-		//the access requirement dialog knows how to impose the restriction
-		accessRequirementDialog.imposeRestriction(bundle.getEntity().getId(), entityUpdated);
+		Boolean isYesSelected = view.isYesHumanDataRadioSelected();
+		Boolean isNoSelected = view.isNoHumanDataRadioSelected();
+		
+		if (isNoSelected != null && isNoSelected) {
+			//this should not be possible, since the impose restrictions button is not enabled when the No radio button is selected!
+			view.showErrorMessage("Please contact the Synapse Access and Compliance Team (ACT) to discuss imposing restrictions, at act@sagebase.org");
+		} else if ((isYesSelected == null || !isYesSelected) && (isNoSelected == null || !isNoSelected)) {
+			//no selection
+			view.showErrorMessage("You must make a selection before continuing.");
+		} else {
+			view.showLoading();
+			//the access requirement dialog knows how to impose the restriction
+			accessRequirementDialog.imposeRestriction(bundle.getEntity().getId(), entityUpdated);
+		}
 	}
 	
 	@Override
