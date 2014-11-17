@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -29,8 +29,10 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
@@ -44,7 +46,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class RestrictionWidgetTest {
 
-	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	RestrictionWidgetView mockView;
@@ -62,13 +63,13 @@ public class RestrictionWidgetTest {
 	Long testAccessRequirementId = 92837L;
 	Callback mockEntityUpdatedCallback;
 	UserEntityPermissions mockPermissions;
+	PlaceChanger mockPlaceChanger;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(RestrictionWidgetView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
@@ -82,12 +83,13 @@ public class RestrictionWidgetTest {
 		up.setOwnerId("101");
 		up.setEmails(emailAddresses);
 		usd.setProfile(up);
-		
+		mockPlaceChanger = mock(PlaceChanger.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		mockAccessRequirementDialog = mock(AccessRequirementDialog.class);
 
-		widget = new RestrictionWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockAccessRequirementDialog);
+		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockAccessRequirementDialog);
 
 		vb = new Data();
 		vb.setId(entityId);
@@ -132,11 +134,6 @@ public class RestrictionWidgetTest {
 		widget.resetAccessRequirementCount();
 	}
 	
-	private void setupAnonymous() {
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-	}
-	
 	@Test
 	public void testShowVerifySensitiveDataDialog() {
 		//set up so that it has no requirements
@@ -175,7 +172,7 @@ public class RestrictionWidgetTest {
 	
 	@Test
 	public void testConfigureAnonymousControlled() {
-		setupAnonymous();
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 
 		//anonymous, with our tou restriction set up in before()
 		widget.configure(bundle, 
@@ -215,7 +212,7 @@ public class RestrictionWidgetTest {
 	@Test
 	public void testConfigureAnonymousOpen() {
 		//no access restrictions, anonymous
-		setupAnonymous();
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		setupEmptyAccessRequirements();
 		widget.configure(bundle, 
 				true,						//showChangeLink 
@@ -232,4 +229,73 @@ public class RestrictionWidgetTest {
 		verify(mockView).setAccessRequirementDialog(any(Widget.class));
 	}
 	
+	@Test
+	public void testImposeRestrictionClickedNoSelectionNulls() {
+		when(mockView.isNoHumanDataRadioSelected()).thenReturn(null);
+		when(mockView.isYesHumanDataRadioSelected()).thenReturn(null);
+		widget.imposeRestrictionClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+
+	@Test
+	public void testImposeRestrictionClickedNoSelection2() {
+		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
+		when(mockView.isYesHumanDataRadioSelected()).thenReturn(false);
+		widget.imposeRestrictionClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testImposeRestrictionClickedNoIsSelected() {
+		when(mockView.isNoHumanDataRadioSelected()).thenReturn(true);
+		when(mockView.isYesHumanDataRadioSelected()).thenReturn(false);
+		widget.imposeRestrictionClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testImposeRestrictionClickedYesIsSelected() {
+		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
+		when(mockView.isYesHumanDataRadioSelected()).thenReturn(true);
+		widget.imposeRestrictionClicked();
+		verify(mockView).showLoading();
+		verify(mockAccessRequirementDialog).imposeRestriction(anyString(), any(Callback.class));
+	}
+
+	@Test
+	public void testFlagData() {
+		widget.flagData();
+		verify(mockView).open(anyString());
+	}
+	
+	@Test
+	public void testAnonymousFlagModalOkClicked() {
+		widget.anonymousFlagModalOkClicked();
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testReportIssueClicked() {
+		widget.reportIssueClicked();
+		verify(mockView).showFlagModal();
+	}
+	
+	@Test
+	public void testAnonymousReportIssueClicked() {
+		widget.anonymousReportIssueClicked();
+		verify(mockView).showAnonymousFlagModal();
+	}
+	
+	@Test
+	public void testNotHumanDataClicked() {
+		widget.notHumanDataClicked();
+		verify(mockView).setImposeRestrictionOkButtonEnabled(false);
+		verify(mockView).setNotSensitiveHumanDataMessageVisible(true);
+	}
+	@Test
+	public void testYesHumanDataClicked() {
+		widget.yesHumanDataClicked();
+		verify(mockView).setImposeRestrictionOkButtonEnabled(true);
+		verify(mockView).setNotSensitiveHumanDataMessageVisible(false);
+	}
 }
