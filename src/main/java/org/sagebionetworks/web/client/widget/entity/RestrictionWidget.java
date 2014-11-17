@@ -15,8 +15,6 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -24,11 +22,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -73,6 +69,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.showIfProject = showIfProject;
 		this.showFlagLink = showFlagLink;
 		setEntityBundle(bundle);
+		configureUI();
 	}
 	
 	public void setEntityBundle(EntityBundle bundle) {
@@ -136,18 +133,16 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	public boolean isAnonymous() {
-		return getUserProfile()==null;
+		return !authenticationController.isLoggedIn();
 	}
 
 	@Override
 	public Widget asWidget() {
 		if (!includeRestrictionWidget()) return null;
-		configureUI();
-		
 		return view.asWidget();
 	}
 	
-	private void configureUI() {
+	public void configureUI() {
 		view.clear();
 		boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
