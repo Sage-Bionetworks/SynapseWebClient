@@ -1468,6 +1468,10 @@ ol.lowerroman {
 	top: 4px;
 }
 
+.moveright-5 {
+	position: relative;
+	left: 5px;
+}
 
 .highlight-box {
     position: relative;
