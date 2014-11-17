@@ -16,7 +16,9 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.EntityWrapper;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -30,7 +32,8 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	JSONObjectAdapter jsonObjectAdapter;
 	JiraURLHelper jiraURLHelper;
 	String entityId;
-	Callback imposeRestrictionCallback, finishedCallback;
+	Callback finishedCallback;
+	Callback entityUpdated;
 	
 	@Inject
 	public AccessRequirementDialog(
@@ -55,11 +58,11 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			String entityId,
 			boolean hasAdministrativeAccess,
 			boolean accessApproved,
-			Callback imposeRestrictionCallback,
+			Callback entityUpdated,
 			Callback finishedCallback) {
 		this.ar = ar;
 		this.entityId = entityId;
-		this.imposeRestrictionCallback = imposeRestrictionCallback;
+		this.entityUpdated = entityUpdated;
 		this.finishedCallback = finishedCallback;
 		//hide all
 		view.clear();
@@ -193,8 +196,22 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	@Override
 	public void imposeRestrictionClicked() {
 		view.hideModal();
-		if (imposeRestrictionCallback != null)
-			imposeRestrictionCallback.invoke();	
+		imposeRestriction(entityId, entityUpdated);
+	}
+	
+	public void imposeRestriction(String entityId, final Callback entityUpdated) {
+		view.hideModal();
+		synapseClient.createLockAccessRequirement(entityId, new AsyncCallback<EntityWrapper>(){
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				if (entityUpdated != null)
+					entityUpdated.invoke();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	@Override

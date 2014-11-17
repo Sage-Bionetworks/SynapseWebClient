@@ -15,6 +15,8 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -32,7 +34,7 @@ import com.google.inject.Inject;
 
 public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter {
 	
-	com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback;
+	Callback entityUpdated;
 	EntityBundle bundle;
 	
 	private SynapseClientAsync synapseClient;
@@ -65,8 +67,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		view.setPresenter(this);
 	}
 	
-	public void configure(EntityBundle bundle, boolean showChangeLink, boolean showIfProject, boolean showFlagLink, com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback) {
-		this.entityUpdatedCallback = entityUpdatedCallback;
+	public void configure(EntityBundle bundle, boolean showChangeLink, boolean showIfProject, boolean showFlagLink, Callback entityUpdated) {
+		this.entityUpdated = entityUpdated;
 		this.showChangeLink = showChangeLink;
 		this.showIfProject = showIfProject;
 		this.showFlagLink = showFlagLink;
@@ -232,7 +234,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				}
 			};
 			
-			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, isApproved, getImposeRestrictionCallback(), showNextRestrictionCallback);
+			accessRequirementDialog.configure(getAccessRequirement(), bundle.getEntity().getId(), hasAdministrativeAccess, isApproved, entityUpdated, showNextRestrictionCallback);
 			accessRequirementDialog.show();
 		} else {
 			accessRequirementDialog.hide();
@@ -243,26 +245,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		}
 	}
 	
-	public Callback getImposeRestrictionCallback() {
-		return new Callback() {
-			@Override
-			public void invoke() {
-				imposeRestrictionClicked();
-			}
-		};
-	}
 	public void imposeRestrictionClicked() {
 		view.showLoading();
-		synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				entityUpdatedCallback.onSuccess(null);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				entityUpdatedCallback.onFailure(caught);
-			}
-		});
+		//the access requirement dialog knows how to impose the restriction
+		accessRequirementDialog.imposeRestriction(bundle.getEntity().getId(), entityUpdated);
 	}
 	
 	@Override

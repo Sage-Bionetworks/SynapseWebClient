@@ -5,8 +5,10 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.core.client.GWT;
@@ -95,14 +97,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		clearmeta();
 		
 		Entity e = bundle.getEntity();
-		restrictionWidget.configure(bundle, true, false, true, new com.google.gwt.core.client.Callback<Void, Throwable>() {
+		restrictionWidget.configure(bundle, true, false, true, new Callback() {
 			@Override
-			public void onSuccess(Void result) {
+			public void invoke() {
 				presenter.fireEntityUpdatedEvent();
-			}
-			@Override
-			public void onFailure(Throwable reason) {
-				showErrorMessage(reason.getMessage());
 			}
 		});
 		

@@ -92,6 +92,7 @@ public class AccessRequirementDialogTest {
 		actAR.setId(actAccessRequirementId);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(EntityWrapper.class),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 	}
 	
 	//many ways to configure this dialog.  verify UI in each case
@@ -374,6 +375,25 @@ public class AccessRequirementDialogTest {
 		verify(mockView).showErrorMessage(errorMessage);
 	}
 	
+	@Test
+	public void testImposeRestriction() throws JSONObjectAdapterException {
+		standardConfigure();
+		widget.imposeRestrictionClicked();
+		
+		verify(mockSynapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
+		verify(mockImposeRestrictionCallback).invoke();
+	}
 	
+	@Test
+	public void testImposeRestrictionFailure() throws JSONObjectAdapterException {
+		String errorMessage = "failed to impose restriction";
+		standardConfigure();
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
+		widget.imposeRestrictionClicked();
+		
+		verify(mockSynapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
+		verify(mockImposeRestrictionCallback, never()).invoke();
+		verify(mockView).showErrorMessage(errorMessage);
+	}
 	
 }
