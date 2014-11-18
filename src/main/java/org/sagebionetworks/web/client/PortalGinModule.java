@@ -362,6 +362,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorV
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
@@ -888,6 +890,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UploadCSVFinishPageView.class).to(UploadCSVFinishPageViewImpl.class);
 		bind(UploadCSVAppendPage.class).to(UploadCSVAppendPageImpl.class);
 		bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
+		bind(SortableTableHeader.class).to(SortableTableHeaderImpl.class);
 		
 		bind(CreateDownloadPage.class).to(CreateDownloadPageImpl.class);
 		bind(CreateDownloadPageView.class).to(CreateDownloadPageViewImpl.class);

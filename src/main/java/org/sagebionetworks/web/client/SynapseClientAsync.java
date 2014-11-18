@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -344,6 +345,20 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
+	/**
+	 * For the given table SQL toggle the sort on the given column and return the modified SQL.
+	 * @param sql
+	 * @param header
+	 * @param callback
+	 */
+	void toggleSortOnTableQuery(String sql, String header, AsyncCallback<String> callback);
+	
+	/**
+	 * Parse the query and determine the sort columns.
+	 * @param sql
+	 * @param callback
+	 */
+	void getSortFromTableQuery(String sql, AsyncCallback<List<SortItem>> callback);
 
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
