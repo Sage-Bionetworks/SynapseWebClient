@@ -244,4 +244,18 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			this.rowSelectionListener.onSelectionChanged();
 		}
 	}
+
+	/**
+	 * Is this page valid?
+	 * @return
+	 */
+	public boolean isValid() {
+		boolean isValid = true;
+		for(RowWidget row: rows){
+			if(!row.isValid()){
+				isValid = false;
+			}
+		}
+		return isValid;
+	}
 }

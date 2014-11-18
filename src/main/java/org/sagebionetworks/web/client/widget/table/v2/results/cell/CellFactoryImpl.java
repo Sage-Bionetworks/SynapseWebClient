@@ -22,12 +22,22 @@ public class CellFactoryImpl implements CellFactory {
 
 	@Override
 	public Cell createRenderer(ColumnModel model) {
-		return ginInjector.createStringRendererCell();
+		switch(model.getColumnType()){
+		case ENTITYID:
+			return ginInjector.createEntityCellRenderer();
+		default:
+			return ginInjector.createStringRendererCell();
+		}
 	}
 
 	@Override
 	public CellEditor createEditor(ColumnModel model) {
-		return ginInjector.createStringEditorCell();
+		switch(model.getColumnType()){
+		case ENTITYID:
+			return ginInjector.createEntityCellEditor();
+		default:
+			return ginInjector.createStringEditorCell();
+		}
 	}
 
 }

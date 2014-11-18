@@ -273,75 +273,9 @@ public class RowSetUtilsTest {
 		assertEquals(null, pr.getValues().get(headers.get(1)));
 	}
 	
-	@Test
-	public void testIsValueChangedNullNull(){
-		assertFalse(RowSetUtils.isValueChanged(null, null));
-	}
+
 	
-	@Test
-	public void testIsValueChangedEmptyNull(){
-		assertFalse(RowSetUtils.isValueChanged(" ", null));
-	}
-	
-	@Test
-	public void testIsValueChangedNullEmpty(){
-		assertFalse(RowSetUtils.isValueChanged(null, "\t"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealNull(){
-		assertTrue(RowSetUtils.isValueChanged("a", null));
-	}
-	
-	@Test
-	public void testIsValueChangedNullReal(){
-		assertTrue(RowSetUtils.isValueChanged(null, "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealEmpty(){
-		assertTrue(RowSetUtils.isValueChanged("a", ""));
-	}
-	
-	@Test
-	public void testIsValueChangedEmptyReal(){
-		assertTrue(RowSetUtils.isValueChanged("", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealRealDifferent(){
-		assertTrue(RowSetUtils.isValueChanged("b", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealRealSame(){
-		assertFalse(RowSetUtils.isValueChanged("a", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealSpaceRealSame(){
-		assertFalse(RowSetUtils.isValueChanged(" a ", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealRealSpaceSame(){
-		assertFalse(RowSetUtils.isValueChanged(" a ", " a\t"));
-	}
-	
-	@Test
-	public void testTrimWithEmptyAsNull_Null(){
-		assertEquals(null, RowSetUtils.trimWithEmptyAsNull(null));
-	}
-	
-	@Test
-	public void testTrimWithEmptyAsNullOkay(){
-		assertEquals("a", RowSetUtils.trimWithEmptyAsNull("a"));
-	}
-	
-	@Test
-	public void testTrimWithEmptyAsNull_Trim(){
-		assertEquals("a", RowSetUtils.trimWithEmptyAsNull(" a\n "));
-	}
+
 	/**
 	 * This is currently throwing an exception.
 	 * @throws JSONObjectAdapterException

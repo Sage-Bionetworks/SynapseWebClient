@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -128,6 +129,20 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	public int getWidgetCount() {
 		return cells.size();
 	}
-	
+
+	/**
+	 * Is this row valid?
+	 * Note: This must only be called on an editor.
+	 * @return
+	 */
+	public boolean isValid() {
+		boolean valid = true;
+		for(Cell cell: cells){
+			if(!((CellEditor)cell).isValid()){
+				valid = false;
+			}
+		}
+		return valid;
+	}
 
 }

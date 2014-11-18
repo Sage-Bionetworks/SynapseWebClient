@@ -69,4 +69,9 @@ public class CellStub implements CellEditor {
 		
 	}
 
+	@Override
+	public boolean isValid() {
+		return true;
+	}
+
 }

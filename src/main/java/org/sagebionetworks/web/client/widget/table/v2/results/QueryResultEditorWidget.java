@@ -100,4 +100,9 @@ public class QueryResultEditorWidget implements
 		this.view.setErrorMessageVisible(true);
 	}
 
+	public boolean isValid() {
+		// Are the results valid
+		return pageWidget.isValid();
+	}
+
 }
