@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -25,12 +26,14 @@ import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.client.widget.pagination.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
+import org.sagebionetworks.web.client.widget.table.v2.results.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
@@ -62,7 +65,7 @@ public class TablePageWidgetTest {
 	QueryResultBundle bundle;
 	List<Row> rows;
 	Query query;
-	
+
 	@Before
 	public void before(){
 		mockView = Mockito.mock(TablePageView.class);
@@ -102,7 +105,7 @@ public class TablePageWidgetTest {
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
-		List<String> headers = TableModelTestUtils.getColumnModelIds(schema);
+		headers = TableModelTestUtils.getColumnModelIds(schema);
 		// Include an aggregate result in the headers.
 		headers.add("sum(four)");
 		rows = TableModelTestUtils.createRows(schema, 3);
@@ -127,6 +130,7 @@ public class TablePageWidgetTest {
 		query.setLimit(100L);
 		query.setOffset(0L);
 		query.setSql("select * from syn123");
+	
 	}
 	
 	@Test
@@ -151,6 +155,59 @@ public class TablePageWidgetTest {
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
+	}
+	
+	@Test
+	public void testConfigureWithSortDescending(){
+		int sortColumnIndex = 2;
+		SortItem sort = new SortItem();
+		sort.setColumn(schema.get(sortColumnIndex).getName());
+		sort.setDirection(SortDirection.DESC);
+		boolean isEditable = true;
+		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
+		// Pagination should be setup since a page change listener was provided.
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		verify(mockView).setPaginationWidgetVisible(true);
+		
+		// Check each header
+		for(int i=0; i<sortHeaders.size(); i++){
+			SortableTableHeader sth = sortHeaders.get(i);
+			String headerName;
+			if(i < bundle.getSelectColumns().size()){
+				headerName = bundle.getSelectColumns().get(i).getName();
+			}else{
+				headerName = "sum(four)";
+			}
+			verify(sth).configure(headerName, mockPageChangeListner);
+			if(i == sortColumnIndex){
+				verify(sth).setIcon(IconType.SORT_DESC);
+			}else{
+				verify(sth, never()).setIcon(any(IconType.class));
+			}
+		}
+	}
+	
+	@Test
+	public void testConfigureWithSortAscending(){
+		int sortColumnIndex = 1;
+		SortItem sort = new SortItem();
+		sort.setColumn(schema.get(sortColumnIndex).getName());
+		sort.setDirection(SortDirection.ASC);
+		boolean isEditable = true;
+		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
+		// Pagination should be setup since a page change listener was provided.
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		verify(mockView).setPaginationWidgetVisible(true);
+		
+		// Check each header
+		for(int i=0; i<sortHeaders.size(); i++){
+			SortableTableHeader sth = sortHeaders.get(i);
+			if(i == sortColumnIndex){
+				verify(sth).setIcon(IconType.SORT_ASC);
+			}else{
+				verify(sth, never()).setIcon(any(IconType.class));
+			}
+		}
 	}
 	
 	@Test

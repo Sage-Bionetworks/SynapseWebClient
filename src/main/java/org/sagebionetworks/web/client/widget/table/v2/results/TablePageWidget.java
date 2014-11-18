@@ -13,9 +13,7 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
-import org.sagebionetworks.web.client.widget.pagination.PagingAndSortingListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader.HeaderClickHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -75,9 +73,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create each header
 			String headerName = type.getName();
 			SortableTableHeader sth = ginInjector.createSortableTableHeader();
-			HeaderClickHandler headerClickHandler = createHeaderClickHandler(
-					pageChangeListener, headerName);
-			sth.configure(type.getName(), headerClickHandler);
+			sth.configure(type.getName(), pageChangeListener);
 			headers.add(sth);
 			if(sort != null){
 				if(headerName.equals(sort.getColumn())){
@@ -105,26 +101,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
-	}
-
-	/**
-	 * Create HeaderClickHandler for a given header.
-	 * @param pageChangeListener
-	 * @param header
-	 * @return
-	 */
-	private HeaderClickHandler createHeaderClickHandler(final PagingAndSortingListener pageChangeListener,
-			final String header) {
-		// Null if we were not passed a PagingAndSortingListener.
-		HeaderClickHandler headerClickHandler = null;
-		if(pageChangeListener != null){
-			headerClickHandler = new HeaderClickHandler(){
-				@Override
-				public void onHeaderClicked() {
-					pageChangeListener.onToggleSort(header);
-				}};
-		}
-		return headerClickHandler;
 	}
 
 	/**

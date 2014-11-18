@@ -8,14 +8,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -41,6 +43,7 @@ public class TableQueryResultWidgetTest {
 	Query query;
 	QueryResultBundle bundle;
 	PartialRowSet delta;
+	SortItem sort;
 	
 	@Before
 	public void before(){
@@ -61,6 +64,11 @@ public class TableQueryResultWidgetTest {
 		bundle.setMaxRowsPerPage(123L);
 		bundle.setQueryCount(88L);
 		
+		sort = new SortItem();
+		sort.setColumn("a");
+		sort.setDirection(SortDirection.DESC);
+		AsyncMockStubber.callSuccessWith(Arrays.asList(sort)).when(mockSynapseClient).getSortFromTableQuery(any(String.class),  any(AsyncCallback.class));
+		
 		// delta
 		delta = new PartialRowSet();
 		delta.setTableId("syn123");
@@ -78,7 +86,7 @@ public class TableQueryResultWidgetTest {
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), null, false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -98,7 +106,7 @@ public class TableQueryResultWidgetTest {
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), null, false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -176,7 +184,7 @@ public class TableQueryResultWidgetTest {
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), null, false, null, widget);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);

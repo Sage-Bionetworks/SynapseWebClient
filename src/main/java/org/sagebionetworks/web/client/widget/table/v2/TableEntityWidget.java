@@ -1,14 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.SortDirection;
-import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -21,7 +16,6 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -165,7 +159,7 @@ public class TableEntityWidget implements IsWidget,
 				// use a default query
 				startQuery = getDefaultQuery();
 			}
-			setQuery(startQuery);
+			setQuery(startQuery, false);
 		}
 	}
 
@@ -174,12 +168,14 @@ public class TableEntityWidget implements IsWidget,
 	 * 
 	 * @param sql
 	 */
-	private void setQuery(Query query) {
+	private void setQuery(Query query, boolean isFromResults) {
 		this.currentQuery = query;
 		this.queryInputWidget.configure(query.getSql(), this, this.canEdit);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
-		this.queryResultsWidget.configure(query, this.canEdit, this);
+		if(!isFromResults){
+			this.queryResultsWidget.configure(query, this.canEdit, this);
+		}
 	}
 
 	/**
@@ -256,8 +252,6 @@ public class TableEntityWidget implements IsWidget,
 	
 		// Set this as the query if it was successful
 		if (wasSuccessful) {
-			this.currentQuery = this.queryResultsWidget.getStartingQuery();
-			this.queryInputWidget.configure(this.currentQuery.getSql(), this, this.canEdit);
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
 		}
 	}
@@ -271,22 +265,7 @@ public class TableEntityWidget implements IsWidget,
 		this.currentQuery.setSql(sql);
 		this.currentQuery.setLimit(DEFAULT_LIMIT);
 		this.currentQuery.setOffset(DEFAULT_OFFSET);
-		setQuery(this.currentQuery);
-	}
-
-	/**
-	 * Find the current sort direction for the given column.
-	 * @param list
-	 * @param header
-	 * @return Null if the column is not currently sorted, else the SortDirection of the column.
-	 */
-	private SortDirection getCurrentDirection(List<SortItem> list, String header){
-		for(SortItem item: list){
-			if(item.getColumn().equals(header)){
-				return item.getDirection();
-			}
-		}
-		return null;
+		setQuery(this.currentQuery, false);
 	}
 
 	@Override
@@ -349,9 +328,6 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onStartingNewQuery(Query newQuery) {
-		this.currentQuery = newQuery;
-		this.queryInputWidget.configure(newQuery.getSql(), this, this.canEdit);
+		setQuery(newQuery, true);
 	}
-
-
 }

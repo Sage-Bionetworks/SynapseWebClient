@@ -15,7 +15,7 @@ public interface SortableTableHeader extends IsWidget {
 	 * @param text
 	 * @param handler
 	 */
-	public void configure(String text, HeaderClickHandler handler);
+	public void configure(String text, SortingListener listener);
 	
 	/**
 	 * Set the icon to be shown with this header.
@@ -24,11 +24,4 @@ public interface SortableTableHeader extends IsWidget {
 	 */
 	public void setIcon(IconType icon);
 	
-
-	public interface HeaderClickHandler {
-		/**
-		 * Called when the header is clicked.
-		 */
-		public void onHeaderClicked();
-	}
 }

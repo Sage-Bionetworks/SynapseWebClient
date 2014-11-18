@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
