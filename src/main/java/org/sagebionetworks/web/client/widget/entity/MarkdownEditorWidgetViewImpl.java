@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -291,8 +292,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			initFormattingGuide(formattingGuideWikiPageKey);
 		resizeMarkdownTextArea();
 		
-		if (mdCommands != null && mdCommands.getElement() != null)
-			Window.scrollTo(0, mdCommands.getElement().getAbsoluteTop());
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			
+			@Override
+			public void execute() {
+				Window.scrollTo(0, mdCommands.getAbsoluteTop());		
+			}
+		});
 	}
 	
 	@Override
