@@ -139,7 +139,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 			+ "    &lt;repository&gt;<br/>"
 			+ "        &lt;id&gt;sagebionetworks&lt;/id&gt;<br/>"
 			+ "        &lt;name&gt;sagebionetworks-releases&lt;/name&gt;<br/>"
-			+ "        &lt;url&gt;http://sagebionetworks.artifactoryonline.com/sagebionetworks/ext-releases-local&lt;/url&gt;<br/>"
+			+ "        &lt;url&gt;http://sagebionetworks.artifactoryonline.com/sagebionetworks/libs-releases-local&lt;/url&gt;<br/>"
 			+ "    &lt;/repository&gt;<br/>"
 			+ "&lt;/distributionManagement&gt;<br/>"
 			+ "<br/>"
