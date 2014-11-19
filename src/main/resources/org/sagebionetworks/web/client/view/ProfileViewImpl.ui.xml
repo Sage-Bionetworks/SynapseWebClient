@@ -33,11 +33,11 @@
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
 							<div class="highlight-box" ui:field="projectsHighlightBox" highlight-box-title="Projects">
 							    <bh:Div ui:field="projectFiltersUI">
-								    <b:Button dataToggle="COLLAPSE" dataTarget="#projectFiltersCollapse" text="Filters"/>
+								    <b:Button dataToggle="COLLAPSE" dataTarget="#projectFiltersCollapse" text="Filters..."/>
 								    <bh:Div styleName="margin-top-15" />
 									<b:Collapse b:id="#projectFiltersCollapse" toggle="false">
-								        <g:Anchor ui:field="allProjectsLink" />
-								        <g:Anchor ui:field="myProjectsLink" />
+								        <g:Anchor ui:field="allProjectsLink" text="All" />
+								        <g:Anchor ui:field="myProjectsLink" text="My Projects"/>
 								        <bh:Div ui:field="teamFiltersContainer"/>
 									</b:Collapse>
 								</bh:Div>

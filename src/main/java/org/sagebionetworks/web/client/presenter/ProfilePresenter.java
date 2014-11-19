@@ -15,12 +15,12 @@ import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -240,6 +240,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getMoreProjects() {
 		if (isOwner) {
+			view.showProjectFiltersUI();
+			
 			//this depends on the active filter
 			switch (filterType) {
 				case ALL:
@@ -402,23 +404,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(EntityQueryResults results) {
 				List<ProjectHeader> headers = getHeadersFromQueryResults(results);
-				view.addProjects(headers);
-				projectPageAdded(results.getTotalEntityCount().intValue());
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showProjectsLoading(false);
-				view.setProjectsError("Could not load my projects:" + caught.getMessage());
-			}
-		});
-
-		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
-			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
-				view.showProjectsLoading(false);
-				List<ProjectHeader> headers = projectHeaders.getResults();
-				view.addProjects(headers);
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				addProjectResults(headers, results.getTotalEntityCount().intValue());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -433,10 +419,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getUserProjects(userId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				view.showProjectsLoading(false);
 				List<ProjectHeader> headers = projectHeaders.getResults();
-				view.addProjects(headers);
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				addProjectResults(headers, projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -444,6 +428,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.setProjectsError("Could not load user projects:" + caught.getMessage());
 			}
 		});
+	}
+	
+	public void addProjectResults(List<ProjectHeader> headers, int totalCount) {
+		view.showProjectsLoading(false);
+		view.addProjects(headers);
+		projectPageAdded(totalCount);
 	}
 	
 	public void projectPageAdded(int totalNumberOfResults) {
@@ -712,8 +702,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		sort.setDirection(SortDirection.ASC);
 		newQuery.setSort(sort);
 		Condition creatorCondition = EntityQueryUtils.buildCondition(EntityFieldName.createdByPrincipalId, Operator.EQUALS, creatorUserId);
-		Condition projectCondition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, (Object)null);
-		newQuery.setConditions(Arrays.asList(creatorCondition, projectCondition));
+		newQuery.setConditions(Arrays.asList(creatorCondition));
+		newQuery.setFilterByType(EntityType.project);
 		newQuery.setLimit(limit);
 		newQuery.setOffset(offset);
 		return newQuery;
