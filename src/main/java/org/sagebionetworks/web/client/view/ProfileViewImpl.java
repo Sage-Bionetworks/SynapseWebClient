@@ -5,6 +5,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
@@ -108,6 +109,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement settingsTabContainer;
 	
 	//Project tab
+	//filters
+	@UiField
+	Div projectFiltersUI;
+	@UiField
+	Anchor allProjectsLink;
+	@UiField
+	Anchor myProjectsLink;
+	@UiField
+	Div teamFiltersContainer;
+	
 	@UiField
 	TextBox createProjectTextBox;
 	@UiField
@@ -231,6 +242,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		showProjectsLoading(false);
+		
+		allProjectsLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.allProjectsClicked();
+			}
+		});
+		
+		myProjectsLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.myProjectsClicked();
+			}
+		});
 	}
 	
 	private void initCertificationBadge() {
@@ -319,13 +344,26 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams, boolean showNotifications) {
-		myTeamsWidget.configure(teams, true, showNotifications, new TeamListWidget.RequestCountCallback() {
+	public void setTeams(List<Team> teams, boolean isOwner) {
+		myTeamsWidget.configure(teams, true, isOwner, new TeamListWidget.RequestCountCallback() {
 			@Override
 			public void invoke(String teamId, Long requestCount) {
 				presenter.addMembershipRequests(requestCount.intValue());
 			}
 		});
+		if (isOwner) {
+			//also create a link for each team in the project filters
+			for (final Team team : teams) {
+				Anchor teamFilter = new Anchor(team.getName());
+				teamFilter.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.teamFilterClicked(team);
+					}
+				});
+				teamFiltersContainer.add(teamFilter);
+			}
+		}
 	}
 	
 	@Override
@@ -555,6 +593,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
+		projectFiltersUI.setVisible(false);
+		teamFiltersContainer.clear();
 	}
 	
 	@Override
@@ -643,5 +683,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			Callback yesCallback
 			) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
+	}
+	
+	@Override
+	public void showProjectFiltersUI() {
+		projectFiltersUI.setVisible(true);
 	}
 }

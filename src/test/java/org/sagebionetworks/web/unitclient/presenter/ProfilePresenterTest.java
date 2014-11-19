@@ -319,7 +319,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetMyProjects() {
-		profilePresenter.getMyProjects("anyUserId", 1);
+		profilePresenter.getAllMyProjects("anyUserId", 1);
 		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
 	}
@@ -327,7 +327,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testGetMyProjectsError() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(anyInt(), anyInt(),  any(AsyncCallback.class));
-		profilePresenter.getMyProjects("anyUserId", 1);
+		profilePresenter.getAllMyProjects("anyUserId", 1);
 		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setProjectsError(anyString());
 	}
