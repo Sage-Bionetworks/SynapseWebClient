@@ -8,8 +8,8 @@
 	text-align: center;
 } */
 
-.overflow-y-scroll-imp {
-	overflow-y: scroll !important;
+.overflow-y-auto-imp {
+	overflow-y: auto !important;
 }
 
 .sf-j-menu {
@@ -125,7 +125,7 @@
 .downloadLink,.downloadLink:hover,.downloadLink:visited { text-decoration:underline; margin-left:5px;}
 
 /* header links. transition from grey to black on hover, don't underline */
-.headerLink { line-height: 25px; font-size: 13px; font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
+.headerLink { line-height: 25px; font-size: 13px; font-weight: bold; padding: 0px 2px 0px 4px;
   -o-transition:.2s;
   -ms-transition:.2s;
   -moz-transition:.2s;
@@ -1805,7 +1805,10 @@ iframe[seamless] {
 /*
  * Bootstrap Overrides 
  */
- 
+.modal {
+    overflow-y: auto !important;
+}
+
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,
 .x-menu-list-item>a:visited>* {
