@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.place;
 
+import static org.junit.Assert.*;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -118,4 +120,23 @@ public class SynapsePlaceTest {
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 
+	@Test
+	public void testGetHrefForDotVersionNull(){
+		assertEquals(null, Synapse.getHrefForDotVersion(null));
+	}
+	
+	@Test
+	public void testGetTokenForDotVersionEmpty(){
+		assertEquals(null, Synapse.getHrefForDotVersion(""));
+	}
+	
+	@Test
+	public void testGetTokenForDotVersionNoVersion(){
+		assertEquals("#!Synapse:syn123", Synapse.getHrefForDotVersion("SYN123"));
+	}
+	
+	@Test
+	public void testGetTokenForDotVersionWithVersion(){
+		assertEquals("#!Synapse:syn123/version/3", Synapse.getHrefForDotVersion("syn123.3"));
+	}
 }

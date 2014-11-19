@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
@@ -37,17 +36,21 @@ public class RowWidgetTest {
 	RowWidget rowWidget;
 	List<ColumnModel> types;
 	Row aRow;
+	List<CellStub> cellStubs;	
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(RowView.class);
 		mockCellFactory = Mockito.mock(CellFactory.class);
 		mockListner = Mockito.mock(RowSelectionListener.class);
+		cellStubs = new LinkedList<CellStub>();
 		// Use stubs for all cells.
 		Answer<Cell> answer = new Answer<Cell>() {
 			@Override
 			public Cell answer(InvocationOnMock invocation) throws Throwable {
-				return new CellStub();
+				CellStub stub = new CellStub();
+				cellStubs.add(stub);
+				return stub;
 			}
 		};
 		when(mockCellFactory.createEditor(any(ColumnModel.class))).thenAnswer(answer);
@@ -94,6 +97,15 @@ public class RowWidgetTest {
 		rowWidget.configure(types, isEditor, aRow, mockListner);
 		// selection must be shown when given a listener.
 		verify(mockView).setSelectVisible(true);
+	}
+	
+	@Test
+	public void testIsValid(){
+		boolean isEditor = true;
+		rowWidget.configure(types, isEditor, aRow, mockListner);
+		assertTrue(rowWidget.isValid());
+		cellStubs.get(4).setIsValid(false);
+		assertFalse(rowWidget.isValid());
 	}
 
 }

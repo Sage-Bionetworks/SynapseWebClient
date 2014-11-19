@@ -26,6 +26,8 @@ import com.google.inject.Inject;
  *
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
+	
+	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -189,6 +191,20 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public void onSave() {
 		view.setSaveButtonLoading(true);
 		// Extract the delta
+		if(!this.queryResultEditor.isValid()){
+			showEditError(SEE_THE_ERRORS_ABOVE);
+		}else{
+			// Changes are valid so proceed with the save.
+			saveValidChanges();
+		}
+
+	}
+
+	/**
+	 * Save after validating the changes in the editor.
+	 */
+	private void saveValidChanges() {
+		queryResultEditor.hideError();
 		PartialRowSet prs = this.queryResultEditor.extractDelta();
 		synapseClient.applyTableDelta(prs, new AsyncCallback<Void>() {
 			
@@ -204,11 +220,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			}
 		});
 	}
-	
+	/**
+	 * Show an error in the editor.
+	 * @param message
+	 */
 	private void showEditError(String message){
 		view.setSaveButtonLoading(false);
 		queryResultEditor.showError(message);
 	}
+	
 
 	@Override
 	public void onPageChange(Long newOffset) {
@@ -235,7 +255,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 
 	@Override
 	public void onToggleSort(String header) {
-		// This call will generate a new SQL string with the requestd column toggled.
+		// This call will generate a new SQL string with the requested column toggled.
 		synapseClient.toggleSortOnTableQuery(this.startingQuery.getSql(), header, new AsyncCallback<String>(){
 			@Override
 			public void onFailure(Throwable caught) {
