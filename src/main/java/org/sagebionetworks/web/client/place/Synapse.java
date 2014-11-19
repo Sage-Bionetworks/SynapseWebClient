@@ -6,8 +6,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-import static org.sagebionetworks.web.client.StringUtils.*;
-
 public class Synapse extends Place implements RestartActivityOptional{
 	public static final String DOT_REGEX = "\\.";
 	public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
