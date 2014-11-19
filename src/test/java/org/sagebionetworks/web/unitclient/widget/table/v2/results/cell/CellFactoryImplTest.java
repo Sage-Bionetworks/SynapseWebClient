@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -11,6 +11,8 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 
@@ -18,6 +20,8 @@ public class CellFactoryImplTest {
 
 	StringEditorCell mockStringEditorCell;
 	StringRendererCell mockStringRendererCell;
+	EntityIdCellEditor mockEntityIdCellEditor;
+	EntityIdCellRenderer mockEntityIdCellRenderer;
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
 
@@ -27,8 +31,12 @@ public class CellFactoryImplTest {
 		mockInjector = Mockito.mock(PortalGinInjector.class);
 		mockStringEditorCell = Mockito.mock(StringEditorCell.class);
 		mockStringRendererCell = Mockito.mock(StringRendererCell.class);
+		mockEntityIdCellEditor = Mockito.mock(EntityIdCellEditor.class);
+		mockEntityIdCellRenderer = Mockito.mock(EntityIdCellRenderer.class);
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
+		when(mockInjector.createEntityIdCellEditor()).thenReturn(mockEntityIdCellEditor);
+		when(mockInjector.createEntityIdCellRenderer()).thenReturn(mockEntityIdCellRenderer);
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 
@@ -56,6 +64,20 @@ public class CellFactoryImplTest {
 			Cell cell = cellFactory.createRenderer(cm);
 			assertNotNull("Could not create a cell renderer for type: "+type, cell);
 		}
+	}
+	
+	@Test
+	public void testGetEntityIdRenderer(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.ENTITYID);
+		assertEquals(mockEntityIdCellRenderer, cellFactory.createRenderer(cm));
+	}
+	
+	@Test
+	public void testGetEntityIdEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.ENTITYID);
+		assertEquals(mockEntityIdCellEditor, cellFactory.createEditor(cm));
 	}
 
 }

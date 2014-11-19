@@ -65,4 +65,10 @@ public class QueryResultEditorWidgetTest {
 		verify(mockPageWidget).onToggleSelect();
 	}
 	
+	@Test
+	public void testIsValid(){
+		widget.isValid();
+		verify(mockPageWidget).isValid();
+	}
+	
 }

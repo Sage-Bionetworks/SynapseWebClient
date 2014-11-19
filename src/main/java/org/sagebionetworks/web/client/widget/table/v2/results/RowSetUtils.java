@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.StringUtils.isValueChanged;
+import static org.sagebionetworks.web.client.StringUtils.trimWithEmptyAsNull;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -127,42 +130,7 @@ public class RowSetUtils {
 			return pr;
 		}
 	}
-	/**
-	 * Compare two cell values and decide if there is a change.
-	 * This method will treat empty string and null as equal.
-	 * Also non-null strings are trimmed before compared.
-	 * @param original
-	 * @param changed
-	 * @return
-	 */
-	public static boolean isValueChanged(String inOriginal, String inChanged){
-		String tOriginal = trimWithEmptyAsNull(inOriginal);
-		String tChanged = trimWithEmptyAsNull(inChanged);
-		if(tOriginal == null){
-			if(tChanged == null){
-				return false;
-			}
-			return true;
-		}else{
-			return !tOriginal.equals(tChanged);
-		}
-	}
-	/**
-	 * @return Returns null if the passed value is null.  Returns null if the trimmed string is empty else the trimmed string.  
-	 */
-	public static String trimWithEmptyAsNull(String toUpdate){
-		if(toUpdate == null){
-			return null;
-		}else{
-			String trim = toUpdate.trim();
-			if(trim.isEmpty()){
-				return null;
-			}else{
-				return trim;
-			}
-		}
-	}
-	
+
 
 	/**
 	 * Build up a map of rowIds to rows. Any row without a RowID will no be
