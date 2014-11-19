@@ -24,7 +24,7 @@ public class CellFactoryImpl implements CellFactory {
 	public Cell createRenderer(ColumnModel model) {
 		switch(model.getColumnType()){
 		case ENTITYID:
-			return ginInjector.createEntityCellRenderer();
+			return ginInjector.createEntityIdCellRenderer();
 		default:
 			return ginInjector.createStringRendererCell();
 		}
@@ -34,7 +34,7 @@ public class CellFactoryImpl implements CellFactory {
 	public CellEditor createEditor(ColumnModel model) {
 		switch(model.getColumnType()){
 		case ENTITYID:
-			return ginInjector.createEntityCellEditor();
+			return ginInjector.createEntityIdCellEditor();
 		default:
 			return ginInjector.createStringEditorCell();
 		}

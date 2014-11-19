@@ -5,6 +5,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
  * @author jhill
  *
  */
-public interface EntityCellEditor extends CellEditor {
+public interface EntityIdCellEditor extends CellEditor {
 
 }

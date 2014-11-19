@@ -65,6 +65,7 @@ public class TablePageWidgetTest {
 	QueryResultBundle bundle;
 	List<Row> rows;
 	Query query;
+	List<CellStub> cellStubs;
 
 	@Before
 	public void before(){
@@ -75,12 +76,15 @@ public class TablePageWidgetTest {
 		mockPaginationWidget = Mockito.mock(DetailedPaginationWidget.class);
 		mockPageChangeListner = Mockito.mock(PagingAndSortingListener.class);
 		mockKeyboardNavigationHandler = Mockito.mock(KeyboardNavigationHandler.class);
+		cellStubs = new LinkedList<CellStub>();
 		
 		// Use stubs for all cells.
 		Answer<Cell> cellAnswer = new Answer<Cell>() {
 			@Override
 			public Cell answer(InvocationOnMock invocation) throws Throwable {
-				return new CellStub();
+				CellStub stub = new CellStub();
+				cellStubs.add(stub);
+				return stub;
 			}
 		};
 		when(mockCellFactory.createEditor(any(ColumnModel.class))).thenAnswer(cellAnswer);
@@ -282,5 +286,15 @@ public class TablePageWidgetTest {
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
 		assertFalse(widget.isOneRowOrMoreRowsSelected());
+	}
+	
+	@Test
+	public void testIsValid(){
+		boolean isEditable = true;
+		widget.configure(bundle, null, null, isEditable, mockListner, null);
+		assertTrue(widget.isValid());
+		// Set on cell to be invalid
+		cellStubs.get(3).setIsValid(false);
+		assertFalse(widget.isValid());
 	}
 }

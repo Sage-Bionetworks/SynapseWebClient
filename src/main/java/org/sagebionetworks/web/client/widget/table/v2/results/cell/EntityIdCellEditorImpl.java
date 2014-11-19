@@ -10,7 +10,7 @@ import com.google.inject.Inject;
  * @author jhill
  *
  */
-public class EntityCellEditorImpl extends AbstractCellEditor implements EntityCellEditor{
+public class EntityIdCellEditorImpl extends AbstractCellEditor implements EntityIdCellEditor{
 
 	public static final String MUST_BE_OF_THE_FORM_SYN123 = "Must be of the form: 'syn123'";
 	public static final String SYN_PREFIX = "syn";
@@ -18,7 +18,7 @@ public class EntityCellEditorImpl extends AbstractCellEditor implements EntityCe
 	
 
 	@Inject
-	public EntityCellEditorImpl(CellEditorView view) {
+	public EntityIdCellEditorImpl(CellEditorView view) {
 		super(view);
 		view.setPlaceholder(PLACE_HOLDER);
 	}

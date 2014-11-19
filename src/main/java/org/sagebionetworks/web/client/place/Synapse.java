@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.place;
 
+import org.sagebionetworks.web.client.StringUtils;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
+
+import static org.sagebionetworks.web.client.StringUtils.*;
 
 public class Synapse extends Place implements RestartActivityOptional{
 	public static final String VERSION_DELIMITER = "/version/";
@@ -181,4 +185,16 @@ public class Synapse extends Place implements RestartActivityOptional{
 		return noRestartActivity;
 	}
 	
+	/**
+	 * Given a string where the version number is delimited with a dot (.) convert to a valid token.
+	 * @param dotNotation
+	 * @return
+	 */
+	public static String getHrefForDotVersion(String dotNotation){
+		dotNotation = StringUtils.trimWithEmptyAsNull(dotNotation);
+		if(dotNotation == null){
+			return null;
+		}
+		return "#!Synapse:"+dotNotation.replaceAll("\\.", VERSION_DELIMITER).toLowerCase();
+	}
 }

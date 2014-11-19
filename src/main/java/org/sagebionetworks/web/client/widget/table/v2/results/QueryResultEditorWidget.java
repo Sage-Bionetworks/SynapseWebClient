@@ -99,6 +99,13 @@ public class QueryResultEditorWidget implements
 		this.view.showErrorMessage(message);
 		this.view.setErrorMessageVisible(true);
 	}
+	
+	/**
+	 * Hide the error.
+	 */
+	public void hideError(){
+		this.view.setErrorMessageVisible(false);
+	}
 
 	public boolean isValid() {
 		// Are the results valid

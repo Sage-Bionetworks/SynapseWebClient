@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class CellStub implements CellEditor {
 	
 	private String value;
+	boolean isValid = true;
 
 	@Override
 	public Widget asWidget() {
@@ -68,10 +69,14 @@ public class CellStub implements CellEditor {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void setIsValid(boolean isValid){
+		this.isValid = isValid;
+	}
 
 	@Override
 	public boolean isValid() {
-		return true;
+		return isValid;
 	}
 
 }
