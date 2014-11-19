@@ -638,7 +638,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				public void noWikiFound() {
 					if(isProject) {
 						//if wiki area not specified and no wiki found, show Files tab instead for projects 
-						if(area != EntityArea.WIKI) {							
+						// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
+						if(area == null) {							
 							setTabSelected(Synapse.EntityArea.FILES, false);
 						}
 					} else {
@@ -731,9 +732,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		// Wiki
-		String wikiPageId = null; // TODO : pull from entity
-		addWikiPageWidget(tablesTabContainer, bundle, wikiPageId, null);
+//		// Wiki
+//		String wikiPageId = null; // TODO : pull from entity
+//		addWikiPageWidget(tablesTabContainer, bundle, wikiPageId, null);
 
 		// Table
 		QueryChangeHandler qch = new QueryChangeHandler() {			
