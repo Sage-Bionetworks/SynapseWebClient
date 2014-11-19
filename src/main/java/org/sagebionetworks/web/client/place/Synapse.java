@@ -9,6 +9,8 @@ import com.google.gwt.place.shared.Prefix;
 import static org.sagebionetworks.web.client.StringUtils.*;
 
 public class Synapse extends Place implements RestartActivityOptional{
+	public static final String DOT_REGEX = "\\.";
+	public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
 	public static final String VERSION_DELIMITER = "/version/";
 	
 	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
@@ -195,6 +197,6 @@ public class Synapse extends Place implements RestartActivityOptional{
 		if(dotNotation == null){
 			return null;
 		}
-		return "#!Synapse:"+dotNotation.replaceAll("\\.", VERSION_DELIMITER).toLowerCase();
+		return SYNAPSE_ENTITY_PREFIX+dotNotation.replaceAll(DOT_REGEX, VERSION_DELIMITER).toLowerCase();
 	}
 }
