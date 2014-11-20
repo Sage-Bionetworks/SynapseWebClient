@@ -89,6 +89,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeade
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
@@ -250,6 +251,7 @@ public interface PortalGinInjector extends Ginjector {
 	public StringEditorCell createStringEditorCell();
 	public EntityIdCellEditor createEntityIdCellEditor();
 	public EntityIdCellRenderer createEntityIdCellRenderer();
+	public EnumCellEditor createEnumCellEditor();
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();
