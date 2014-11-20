@@ -3542,6 +3542,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Long teamIdLong = Long.parseLong(teamId);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, limit, offset);
+			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	
+	@Override
 	public ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

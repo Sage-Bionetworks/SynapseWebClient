@@ -47,6 +47,12 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showConfirmDialog(String title, String message, Callback yesCallback);
 	void showProjectsLoading(boolean isLoading);
 	void showProjectFiltersUI();
+	boolean isMyProjectFilterSelected();
+	boolean isAllProjectFilterSelected();
+	void setAllProjectFilterSelected();
+	void setMyProjectFilterSelected();
+	void setTeamProjectFilterSelected(Team team);
+	Team getSelectedTeamFilter();
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -60,8 +66,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();
 		void getMoreProjects();
-		void teamFilterClicked(Team team);
-		void allProjectsClicked();
-		void myProjectsClicked();
+		void applyFilterClicked();
 	}
 }

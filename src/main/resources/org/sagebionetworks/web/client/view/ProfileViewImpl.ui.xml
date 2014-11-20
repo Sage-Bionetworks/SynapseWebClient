@@ -32,15 +32,7 @@
 					<div class="row">
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
 							<div class="highlight-box" ui:field="projectsHighlightBox" highlight-box-title="Projects">
-							    <bh:Div ui:field="projectFiltersUI">
-								    <b:Button dataToggle="COLLAPSE" dataTarget="#projectFiltersCollapse" text="Filters..."/>
-								    <bh:Div styleName="margin-top-15" />
-									<b:Collapse b:id="#projectFiltersCollapse" toggle="false">
-								        <g:Anchor ui:field="allProjectsLink" text="All" />
-								        <g:Anchor ui:field="myProjectsLink" text="My Projects"/>
-								        <bh:Div ui:field="teamFiltersContainer"/>
-									</b:Collapse>
-								</bh:Div>
+							    <b:Button ui:field="projectFiltersUI" dataTarget="#filtersModal" dataToggle="MODAL" icon="FILTER" pull="RIGHT" addStyleNames="margin-right-10">Filters...</b:Button>
 								<g:FlowPanel ui:field="projectsTabContent" />
 								<div ui:field="projectsLoadingUI" >
 									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
@@ -116,6 +108,22 @@
 		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
 		<!-- end footer -->
-
+		
+		<b:Modal b:id="filtersModal" title="Project Filters" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		  <b:ModalBody>
+		      <b:FormGroup>
+		      	<g:FlowPanel>
+			        <b:Radio name="filterRadio" ui:field="myProjectsFilter" formValue="myProjectsFilterId" text="My Projects"/>
+			        <bh:Div ui:field="teamFiltersContainer"/>
+			        <b:Radio ui:field="allProjectsFilter" name="filterRadio" formValue="allProjectsFilterId" text="All"/>
+			    </g:FlowPanel>
+		    </b:FormGroup>
+		  </b:ModalBody>
+		  <b:ModalFooter>
+			<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button ui:field="filterOkButton" dataDismiss="MODAL" type="PRIMARY" >Apply</b:Button>
+		  </b:ModalFooter>
+		</b:Modal>
+		
 	</g:HTMLPanel>
 </ui:UiBinder> 

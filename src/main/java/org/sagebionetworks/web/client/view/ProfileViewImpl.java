@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -111,11 +113,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//Project tab
 	//filters
 	@UiField
-	Div projectFiltersUI;
+	Button projectFiltersUI;
 	@UiField
-	Anchor allProjectsLink;
+	Radio allProjectsFilter;
 	@UiField
-	Anchor myProjectsLink;
+	Radio myProjectsFilter;
 	@UiField
 	Div teamFiltersContainer;
 	
@@ -170,6 +172,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField 
 	DivElement projectsLoadingUI;
 	
+	@UiField
+	Button filterOkButton;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
@@ -183,7 +188,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private TeamListWidget myTeamsWidget;
 	private SettingsPresenter settingsPresenter;
 	private PortalGinInjector ginInjector;
-	
+	private Team selectedFilterTeam;
+	private List<Radio> teamFilters = new ArrayList<Radio>();
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, 
@@ -243,19 +249,47 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		});
 		showProjectsLoading(false);
 		
-		allProjectsLink.addClickHandler(new ClickHandler() {
+		filterOkButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.allProjectsClicked();
+				presenter.applyFilterClicked();
 			}
 		});
-		
-		myProjectsLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.myProjectsClicked();
+	}
+	
+	@Override
+	public boolean isAllProjectFilterSelected() {
+		return allProjectsFilter.getValue();
+	}
+	
+	@Override
+	public void setAllProjectFilterSelected() {
+		allProjectsFilter.setValue(true);
+	}
+	
+	@Override
+	public void setMyProjectFilterSelected() {
+		myProjectsFilter.setValue(true);
+	}
+	
+	@Override
+	public void setTeamProjectFilterSelected(Team team) {
+		for (Radio teamFilter : teamFilters) {
+			if (team.getId().equals(teamFilter.getFormValue())) {
+				teamFilter.setValue(true);
+				break;
 			}
-		});
+		}
+	}
+	
+	@Override
+	public boolean isMyProjectFilterSelected() {
+		return myProjectsFilter.getValue();
+	}
+	
+	@Override
+	public Team getSelectedTeamFilter() {
+		return selectedFilterTeam;
 	}
 	
 	private void initCertificationBadge() {
@@ -268,7 +302,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10");
 		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
 		certifiedUserImage.addClickHandler(new ClickHandler() {
-	@Override
+			@Override
 			public void onClick(ClickEvent event) {
 				clear();
 				tooltip.hide();
@@ -354,14 +388,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (isOwner) {
 			//also create a link for each team in the project filters
 			for (final Team team : teams) {
-				Anchor teamFilter = new Anchor(team.getName());
+				Radio teamFilter = new Radio(team.getName());
+				teamFilter.setName("filterRadio");
 				teamFilter.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						presenter.teamFilterClicked(team);
+						selectedFilterTeam = team;
 					}
 				});
-				teamFiltersContainer.add(teamFilter);
+				teamFiltersContainer.add(new SimplePanel(teamFilter));
+				teamFilter.setFormValue(team.getId());
+				teamFilters.add(teamFilter);
 			}
 		}
 	}
@@ -595,6 +632,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		clearTeamNotificationCount();
 		projectFiltersUI.setVisible(false);
 		teamFiltersContainer.clear();
+		teamFilters.clear();
+		selectedFilterTeam = null;
 	}
 	
 	@Override
