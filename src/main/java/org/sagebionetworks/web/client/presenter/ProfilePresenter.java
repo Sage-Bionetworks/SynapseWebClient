@@ -251,7 +251,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					getAllMyProjects(currentOffset);
 					break;
 				case MINE:
-					getProjectsICreated(currentOffset);
+					getProjectsCreatedByMe(currentOffset);
 					break;
 				case TEAM:
 					getTeamProjects(currentOffset);
@@ -434,7 +434,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 
-	public void getProjectsICreated(int offset) {
+	public void getProjectsCreatedByMe(int offset) {
 		view.showProjectsLoading(true);
 
 		EntityQuery childrenQuery = createGetProjectsQuery(currentUserId, PROJECT_PAGE_SIZE, offset);
@@ -760,5 +760,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return headerList;
 	}
 
+	/**
+	 * For testing purposes only
+	 * @param currentUserId
+	 */
+	public void setCurrentUserId(String currentUserId) {
+		this.currentUserId = currentUserId;
+	}
 }
 
