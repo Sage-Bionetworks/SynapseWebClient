@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.PortalGinInjector;
 
@@ -32,12 +35,29 @@ public class CellFactoryImpl implements CellFactory {
 
 	@Override
 	public CellEditor createEditor(ColumnModel model) {
-		switch(model.getColumnType()){
-		case ENTITYID:
-			return ginInjector.createEntityIdCellEditor();
-		default:
-			return ginInjector.createStringEditorCell();
+		CellEditor editor;
+		// enums get their own special editor
+		if(model.getEnumValues() != null && !model.getEnumValues().isEmpty()){
+			EnumCellEditor enumEditor = ginInjector.createEnumCellEditor();
+			enumEditor.configure(model.getEnumValues());
+			editor = enumEditor;
+		}else{
+			switch(model.getColumnType()){
+			case BOOLEAN:
+				// Boolean use an enum editor.
+				editor = ginInjector.createBooleanCellEditor();
+				break;
+			case ENTITYID:
+				editor = ginInjector.createEntityIdCellEditor();
+				break;
+			default:
+				editor = ginInjector.createStringEditorCell();
+			}
 		}
+		// Configure each editor with the default value.
+		editor.setValue(model.getDefaultValue());
+		return editor;
+
 	}
 
 }
