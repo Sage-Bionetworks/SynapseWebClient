@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -13,8 +12,6 @@ public class EnumCellEditorImpl implements EnumCellEditor {
 
 
 	EnumCellEditorView view;
-
-	List<String> validValues;
 	
 	@Inject
 	public EnumCellEditorImpl(EnumCellEditorView view){
@@ -74,10 +71,8 @@ public class EnumCellEditorImpl implements EnumCellEditor {
 
 	@Override
 	public void configure(List<String> validValues) {
-		this.validValues = new ArrayList<String>(validValues.size());
 		// Add each value to the select
 		for(String value: validValues){
-			this.validValues.add(value);
 			this.view.addOption(value);
 		}
 	}

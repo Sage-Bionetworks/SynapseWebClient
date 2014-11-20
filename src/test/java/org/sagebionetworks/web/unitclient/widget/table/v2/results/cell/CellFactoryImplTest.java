@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +13,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
@@ -24,6 +29,7 @@ public class CellFactoryImplTest {
 	EntityIdCellEditor mockEntityIdCellEditor;
 	EntityIdCellRenderer mockEntityIdCellRenderer;
 	EnumCellEditor mockEnumEditor;
+	BooleanCellEditor mockBooleanCellEditor;
 	
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
@@ -37,12 +43,14 @@ public class CellFactoryImplTest {
 		mockEntityIdCellEditor = Mockito.mock(EntityIdCellEditor.class);
 		mockEntityIdCellRenderer = Mockito.mock(EntityIdCellRenderer.class);
 		mockEnumEditor = Mockito.mock(EnumCellEditor.class);
+		mockBooleanCellEditor = Mockito.mock(BooleanCellEditor.class);
 		
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
 		when(mockInjector.createEntityIdCellEditor()).thenReturn(mockEntityIdCellEditor);
 		when(mockInjector.createEntityIdCellRenderer()).thenReturn(mockEntityIdCellRenderer);
 		when(mockInjector.createEnumCellEditor()).thenReturn(mockEnumEditor);
+		when(mockInjector.createBooleanCellEditor()).thenReturn(mockBooleanCellEditor);
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 
@@ -85,5 +93,21 @@ public class CellFactoryImplTest {
 		cm.setColumnType(ColumnType.ENTITYID);
 		assertEquals(mockEntityIdCellEditor, cellFactory.createEditor(cm));
 	}
+	
+	@Test
+	public void testGetEnumEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.STRING);
+		cm.setEnumValues(Arrays.asList("a","b","c"));
+		assertEquals(mockEnumEditor, cellFactory.createEditor(cm));
+		// should be configured with the enum values
+		verify(mockEnumEditor).configure(cm.getEnumValues());
+	}
 
+	@Test
+	public void testGetBooleanEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.BOOLEAN);
+		assertEquals(mockBooleanCellEditor, cellFactory.createEditor(cm));
+	}
 }

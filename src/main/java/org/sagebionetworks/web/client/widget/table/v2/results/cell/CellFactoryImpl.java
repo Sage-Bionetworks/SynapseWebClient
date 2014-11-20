@@ -16,8 +16,6 @@ import com.google.inject.Inject;
  */
 public class CellFactoryImpl implements CellFactory {
 	
-	private static final List<String> booleanOptions = Arrays.asList("true", "false");
-	
 	PortalGinInjector ginInjector;
 	
 	@Inject
@@ -47,9 +45,7 @@ public class CellFactoryImpl implements CellFactory {
 			switch(model.getColumnType()){
 			case BOOLEAN:
 				// Boolean use an enum editor.
-				EnumCellEditor enumEditor = ginInjector.createEnumCellEditor();
-				enumEditor.configure(booleanOptions);
-				editor = enumEditor;
+				editor = ginInjector.createBooleanCellEditor();
 				break;
 			case ENTITYID:
 				editor = ginInjector.createEntityIdCellEditor();
