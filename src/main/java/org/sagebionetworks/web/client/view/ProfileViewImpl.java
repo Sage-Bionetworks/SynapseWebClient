@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -171,6 +172,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@UiField 
 	DivElement projectsLoadingUI;
+	@UiField 
+	Row profilePictureLoadingUI;
+	@UiField 
+	Row profileInfoLoadingUI;
 	
 	@UiField
 	Button filterOkButton;
@@ -602,8 +607,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void showLoading() {
+		profilePictureLoadingUI.setVisible(true);
+		profileInfoLoadingUI.setVisible(true);
 	}
 
+	@Override
+	public void hideLoading() {
+		profilePictureLoadingUI.setVisible(false);
+		profileInfoLoadingUI.setVisible(false);
+	}
+	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);

@@ -167,6 +167,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
+		view.showLoading();
 		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
@@ -181,6 +182,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					}
 				@Override
 				public void onFailure(Throwable caught) {
+					view.hideLoading();
 					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
 				}
 			});
@@ -191,6 +193,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
+					view.hideLoading();
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget());
 					tabClicked(area);
@@ -201,6 +204,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.hideLoading();
 				if (caught instanceof NotFoundException) {
 					view.updateView(profile, isOwner, null, profileForm.asWidget());
 					tabClicked(area);

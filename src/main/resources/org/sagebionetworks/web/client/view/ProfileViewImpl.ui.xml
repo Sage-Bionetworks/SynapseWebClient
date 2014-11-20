@@ -15,11 +15,21 @@
 			<div class="row margin-top-5">
 			    <div class="col-md-3 col-xs-12">
 			        <div class="padding-15 light-border">
+			            <b:Row ui:field="profilePictureLoadingUI" visible="false">
+				            <b:Column size="XS_12" offset="XS_5">
+				            	<g:Image styleName="center" resource='{sageImageBundle.loading31}' />
+							</b:Column>
+						</b:Row>
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
 			        	<g:FlowPanel ui:field="viewProfilePanel" />
 			        </div>
 			    </div>
 			    <div class="col-md-9 col-xs-12">
+			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
+			        	<b:Column size="XS_12" offset="XS_5">
+							<g:Image styleName="center" resource='{sageImageBundle.loading31}' />
+						</b:Column>
+					</b:Row>
 				    <div class="row" ui:field="navtabContainer">
 					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>

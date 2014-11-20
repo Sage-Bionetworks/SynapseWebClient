@@ -54,6 +54,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamProjectFilterSelected(Team team);
 	Team getSelectedTeamFilter();
 	void setProjectHighlightBoxText(String text);
+	void hideLoading();
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
