@@ -17,7 +17,8 @@
 			        <div class="padding-15 light-border">
 			            <b:Row ui:field="profilePictureLoadingUI" visible="false">
 				            <b:Column size="XS_12" offset="XS_5">
-				            	<g:Image styleName="center" resource='{sageImageBundle.loading31}' />
+				            	<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
+				            	<bh:Text>&nbsp; Loading...</bh:Text>
 							</b:Column>
 						</b:Row>
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
@@ -27,7 +28,8 @@
 			    <div class="col-md-9 col-xs-12">
 			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
 			        	<b:Column size="XS_12" offset="XS_5">
-							<g:Image styleName="center" resource='{sageImageBundle.loading31}' />
+							<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
+							<bh:Text>&nbsp; Loading...</bh:Text>
 						</b:Column>
 					</b:Row>
 				    <div class="row" ui:field="navtabContainer">
