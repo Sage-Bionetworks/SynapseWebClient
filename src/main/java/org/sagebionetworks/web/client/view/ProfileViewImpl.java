@@ -174,6 +174,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	Button filterOkButton;
+	@UiField
+	Button filterCancelButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -253,6 +255,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked();
+			}
+		});
+		
+		filterCancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.cancelFilterClicked();
 			}
 		});
 	}

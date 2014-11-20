@@ -67,5 +67,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void certificationBadgeClicked();
 		void getMoreProjects();
 		void applyFilterClicked();
+		void cancelFilterClicked();
 	}
 }

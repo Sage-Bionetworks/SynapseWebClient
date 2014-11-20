@@ -239,21 +239,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	public void getMoreProjects() {
+		updateFilterView();
 		if (isOwner) {
-			view.showProjectFiltersUI();
-			
 			//this depends on the active filter
 			switch (filterType) {
 				case ALL:
-					view.setAllProjectFilterSelected();
 					getAllMyProjects(currentOffset);
 					break;
 				case MINE:
-					view.setMyProjectFilterSelected();
 					getProjectsICreated(currentOffset);
 					break;
 				case TEAM:
-					view.setTeamProjectFilterSelected(filterTeam);
 					getTeamProjects(currentOffset);
 					break;
 				default:
@@ -261,6 +257,27 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 		} else
 			getUserProjects(currentOffset);
+	}
+	
+	public void updateFilterView() {
+		if (isOwner) {
+			view.showProjectFiltersUI();
+			
+			//this depends on the active filter
+			switch (filterType) {
+				case ALL:
+					view.setAllProjectFilterSelected();
+					break;
+				case MINE:
+					view.setMyProjectFilterSelected();
+					break;
+				case TEAM:
+					view.setTeamProjectFilterSelected(filterTeam);
+					break;
+				default:
+					break;
+			}
+		}
 	}
 	
 	@Override
@@ -703,6 +720,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			//must be a team filter
 			setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, view.getSelectedTeamFilter());
 		}
+	}
+	
+	@Override
+	public void cancelFilterClicked() {
+		//update the filter in the view based on the previously selected filter
+		updateFilterView();
 	}
 	
 	private EntityQuery createGetProjectsQuery(String creatorUserId, long limit, long offset) {
