@@ -387,6 +387,7 @@ public class SynapseClientImplTest {
 		headers.setResults(projectHeaders);
 		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
 		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsForTeam(anyLong(), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1567,7 +1568,7 @@ public class SynapseClientImplTest {
 		assertEquals(errorMessage, logEntry.getMessage());
 	}
 
-@Test
+	@Test
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
@@ -1584,6 +1585,17 @@ public class SynapseClientImplTest {
 		synapseClient.getUserProjects(userIdString, limit, offset);
 		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
 	}
+	
+	@Test
+	public void testGetProjectsForTeam() throws Exception {
+		int limit = 13;
+		int offset = 40;
+		Long teamId = 144l;
+		String teamIdString = teamId.toString();
+		synapseClient.getProjectsForTeam(teamIdString, limit, offset);
+		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(limit), eq(offset));
+	}
+
 	
 	@Test
 	public void testSafeLongToInt() {
