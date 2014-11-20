@@ -235,11 +235,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
 		this.filterType =filterType;
 		filterTeam = team;
+		updateFilterView();
 		refreshProjects();
 	}
 
 	public void getMoreProjects() {
-		updateFilterView();
 		if (isOwner) {
 			//this depends on the active filter
 			switch (filterType) {
@@ -267,12 +267,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			switch (filterType) {
 				case ALL:
 					view.setAllProjectFilterSelected();
+					view.setProjectHighlightBoxText("All Projects");
 					break;
 				case MINE:
 					view.setMyProjectFilterSelected();
+					view.setProjectHighlightBoxText("My Projects");
 					break;
 				case TEAM:
 					view.setTeamProjectFilterSelected(filterTeam);
+					view.setProjectHighlightBoxText("Team Projects (" + filterTeam.getName() + ")");
 					break;
 				default:
 					break;
@@ -728,7 +731,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		updateFilterView();
 	}
 	
-	private EntityQuery createGetProjectsQuery(String creatorUserId, long limit, long offset) {
+	public EntityQuery createGetProjectsQuery(String creatorUserId, long limit, long offset) {
 		EntityQuery newQuery = new EntityQuery();
 		Sort sort = new Sort();
 		sort.setColumnName(EntityFieldName.name.name());
@@ -742,7 +745,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return newQuery;
 	}
 	
-	private List<ProjectHeader> getHeadersFromQueryResults(EntityQueryResults results) {
+	public List<ProjectHeader> getHeadersFromQueryResults(EntityQueryResults results) {
 		List<ProjectHeader> headerList = new LinkedList<ProjectHeader>();
 		for (EntityQueryResult result : results.getEntities()) {
 			ProjectHeader header = new ProjectHeader();

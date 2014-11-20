@@ -382,6 +382,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.setHighlightBoxUser(favoritesHighlightBox, displayName, "Favorites");
 	}
 	
+	@Override
+	public void setProjectHighlightBoxText(String text) {
+		projectsHighlightBox.setAttribute("highlight-box-title", text);	
+	}
 	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
 		updateUserInfoPanel.add(profileFormWidget);
 	}
