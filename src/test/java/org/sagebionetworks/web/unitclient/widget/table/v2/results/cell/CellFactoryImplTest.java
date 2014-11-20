@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 
@@ -22,6 +23,8 @@ public class CellFactoryImplTest {
 	StringRendererCell mockStringRendererCell;
 	EntityIdCellEditor mockEntityIdCellEditor;
 	EntityIdCellRenderer mockEntityIdCellRenderer;
+	EnumCellEditor mockEnumEditor;
+	
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
 
@@ -33,10 +36,13 @@ public class CellFactoryImplTest {
 		mockStringRendererCell = Mockito.mock(StringRendererCell.class);
 		mockEntityIdCellEditor = Mockito.mock(EntityIdCellEditor.class);
 		mockEntityIdCellRenderer = Mockito.mock(EntityIdCellRenderer.class);
+		mockEnumEditor = Mockito.mock(EnumCellEditor.class);
+		
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
 		when(mockInjector.createEntityIdCellEditor()).thenReturn(mockEntityIdCellEditor);
 		when(mockInjector.createEntityIdCellRenderer()).thenReturn(mockEntityIdCellRenderer);
+		when(mockInjector.createEnumCellEditor()).thenReturn(mockEnumEditor);
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 
