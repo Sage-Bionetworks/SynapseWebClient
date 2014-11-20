@@ -13,9 +13,4 @@ public interface EnumCellEditorView extends IsWidget, TakesValue<String>, Focusa
 	 */
 	void addOption(String value);
 
-	/**
-	 * Call refresh after all options are added.
-	 */
-	void refresh();
-
 }

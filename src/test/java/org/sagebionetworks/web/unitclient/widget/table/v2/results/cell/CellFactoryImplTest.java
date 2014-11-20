@@ -110,4 +110,24 @@ public class CellFactoryImplTest {
 		cm.setColumnType(ColumnType.BOOLEAN);
 		assertEquals(mockBooleanCellEditor, cellFactory.createEditor(cm));
 	}
+	
+	@Test
+	public void testGetEditorDefaultValueNull(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.STRING);
+		cm.setDefaultValue(null);
+		assertEquals(mockStringEditorCell, cellFactory.createEditor(cm));
+		// The null default value should be passed to the editor.
+		verify(mockStringEditorCell).setValue(null);
+	}
+	
+	@Test
+	public void testGetEditorDefaultValueNotNull(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.STRING);
+		cm.setDefaultValue("a default value");
+		assertEquals(mockStringEditorCell, cellFactory.createEditor(cm));
+		// The null default value should be passed to the editor.
+		verify(mockStringEditorCell).setValue(cm.getDefaultValue());
+	}
 }

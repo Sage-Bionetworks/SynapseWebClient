@@ -69,10 +69,4 @@ public class EnumCellEditorViewImpl implements EnumCellEditorView {
 		option.setText(value);
 		select.add(option);
 	}
-
-	@Override
-	public void refresh() {
-		//select.refresh();
-	}
-
 }
