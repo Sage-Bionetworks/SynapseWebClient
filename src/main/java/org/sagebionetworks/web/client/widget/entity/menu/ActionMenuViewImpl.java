@@ -303,6 +303,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		};
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null, true);
+		uploader.disableMultipleFileUploads();
 		uploader.show();
 	}
 	
