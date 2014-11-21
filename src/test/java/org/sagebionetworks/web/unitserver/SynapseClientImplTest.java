@@ -881,6 +881,24 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
+	public void testCreateExternalFile() throws Exception {
+		//test setting file handle name
+		String parentEntityId = "syn123333";
+		String externalUrl = "sftp://foobar.edu/b/test.txt";
+		String fileName = "testing.txt";
+		when(mockSynapse.createExternalFileHandle(any(ExternalFileHandle.class))).thenReturn(new ExternalFileHandle());
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(new FileEntity());
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName);
+		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
+		verify(mockSynapse).createExternalFileHandle(captor.capture());
+		ExternalFileHandle handle = captor.getValue();
+		//verify name is set
+		assertEquals(fileName, handle.getFileName());
+		assertEquals(externalUrl, handle.getExternalURL());
+	}
+	
+	
+	@Test
 	public void testGetEntityDoi() throws Exception {
 		//wiring test
 		Doi testDoi = new Doi();
