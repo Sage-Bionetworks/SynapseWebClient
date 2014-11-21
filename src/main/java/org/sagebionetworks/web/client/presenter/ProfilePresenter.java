@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +14,16 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -72,7 +84,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentOffset;
-	public final static int PROJECT_PAGE_SIZE=20;
+	public final static int PROJECT_PAGE_SIZE=100;
+	public ProjectFilterEnum filterType;
+	public Team filterTeam;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -153,6 +167,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
+		view.showLoading();
 		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
@@ -167,6 +182,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					}
 				@Override
 				public void onFailure(Throwable caught) {
+					view.hideLoading();
 					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
 				}
 			});
@@ -177,6 +193,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
+					view.hideLoading();
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget());
 					tabClicked(area);
@@ -187,6 +204,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.hideLoading();
 				if (caught instanceof NotFoundException) {
 					view.updateView(profile, isOwner, null, profileForm.asWidget());
 					tabClicked(area);
@@ -198,7 +216,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			private void proceed() {
-				refreshProjects();
+				setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
 				refreshTeams();
 				if (isOwner) {
 					getFavorites();
@@ -212,12 +230,61 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clearProjects();
 		getMoreProjects();
 	}
+	
+	/**
+	 * Sets the project filter.  If filtered to a specific team, then the Team argument will be used.
+	 * @param filterType
+	 * @param team
+	 */
+	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
+		this.filterType =filterType;
+		filterTeam = team;
+		updateFilterView();
+		refreshProjects();
+	}
 
 	public void getMoreProjects() {
-		if (isOwner)
-			getMyProjects(currentUserId, currentOffset);
-		else
-			getUserProjects(currentUserId, currentOffset);
+		if (isOwner) {
+			//this depends on the active filter
+			switch (filterType) {
+				case ALL:
+					getAllMyProjects(currentOffset);
+					break;
+				case MINE:
+					getProjectsCreatedByMe(currentOffset);
+					break;
+				case TEAM:
+					getTeamProjects(currentOffset);
+					break;
+				default:
+					break;
+			}
+		} else
+			getUserProjects(currentOffset);
+	}
+	
+	public void updateFilterView() {
+		if (isOwner) {
+			view.showProjectFiltersUI();
+			
+			//this depends on the active filter
+			switch (filterType) {
+				case ALL:
+					view.setAllProjectFilterSelected();
+					view.setProjectHighlightBoxText("All Projects");
+					break;
+				case MINE:
+					view.setMyProjectFilterSelected();
+					view.setProjectHighlightBoxText("My Projects");
+					break;
+				case TEAM:
+					view.setTeamProjectFilterSelected(filterTeam);
+					view.setProjectHighlightBoxText("Team Projects (" + filterTeam.getName() + ")");
+					break;
+				default:
+					break;
+			}
+		}
 	}
 	
 	@Override
@@ -337,15 +404,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getMyProjects(String userId, int offset) {
+	public void getAllMyProjects(int offset) {
 		view.showProjectsLoading(true);
 		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				view.showProjectsLoading(false);
-				List<ProjectHeader> headers = projectHeaders.getResults();
-				view.addProjects(headers);
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				addProjectResults(projectHeaders.getResults(), projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -355,15 +419,46 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getUserProjects(String userId, int offset) {
+	public void getTeamProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getUserProjects(userId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
+				addProjectResults(projectHeaders.getResults(), projectHeaders.getTotalNumberOfResults());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
 				view.showProjectsLoading(false);
+				view.setProjectsError("Could not load team projects:" + caught.getMessage());
+			}
+		});
+	}
+
+	public void getProjectsCreatedByMe(int offset) {
+		view.showProjectsLoading(true);
+
+		EntityQuery childrenQuery = createGetProjectsQuery(currentUserId, PROJECT_PAGE_SIZE, offset);
+		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
+			@Override
+			public void onSuccess(EntityQueryResults results) {
+				List<ProjectHeader> headers = getHeadersFromQueryResults(results);
+				addProjectResults(headers, results.getTotalEntityCount().intValue());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showProjectsLoading(false);
+				view.setProjectsError("Could not load projects I created:" + caught.getMessage());
+			}
+		});
+	}
+	
+	public void getUserProjects(int offset) {
+		view.showProjectsLoading(true);
+		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+			@Override
+			public void onSuccess(ProjectPagedResults projectHeaders) {
 				List<ProjectHeader> headers = projectHeaders.getResults();
-				view.addProjects(headers);
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				addProjectResults(headers, projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -371,6 +466,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.setProjectsError("Could not load user projects:" + caught.getMessage());
 			}
 		});
+	}
+	
+	public void addProjectResults(List<ProjectHeader> headers, int totalCount) {
+		view.showProjectsLoading(false);
+		view.addProjects(headers);
+		projectPageAdded(totalCount);
 	}
 	
 	public void projectPageAdded(int totalNumberOfResults) {
@@ -614,6 +715,57 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void certificationBadgeClicked() {
 		goTo(new Certificate(currentUserId));
-}
+	}
+	
+	@Override
+	public void applyFilterClicked() {
+		if (view.isAllProjectFilterSelected()) {
+			setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+		} else if (view.isMyProjectFilterSelected()) {
+			setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+		} else {
+			//must be a team filter
+			setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, view.getSelectedTeamFilter());
+		}
+	}
+	
+	@Override
+	public void cancelFilterClicked() {
+		//update the filter in the view based on the previously selected filter
+		updateFilterView();
+	}
+	
+	public EntityQuery createGetProjectsQuery(String creatorUserId, long limit, long offset) {
+		EntityQuery newQuery = new EntityQuery();
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
+		newQuery.setSort(sort);
+		Condition creatorCondition = EntityQueryUtils.buildCondition(EntityFieldName.createdByPrincipalId, Operator.EQUALS, creatorUserId);
+		newQuery.setConditions(Arrays.asList(creatorCondition));
+		newQuery.setFilterByType(EntityType.project);
+		newQuery.setLimit(limit);
+		newQuery.setOffset(offset);
+		return newQuery;
+	}
+	
+	public List<ProjectHeader> getHeadersFromQueryResults(EntityQueryResults results) {
+		List<ProjectHeader> headerList = new LinkedList<ProjectHeader>();
+		for (EntityQueryResult result : results.getEntities()) {
+			ProjectHeader header = new ProjectHeader();
+			header.setId(result.getId());
+			header.setName(result.getName());
+			headerList.add(header);
+		}
+		return headerList;
+	}
+
+	/**
+	 * For testing purposes only
+	 * @param currentUserId
+	 */
+	public void setCurrentUserId(String currentUserId) {
+		this.currentUserId = currentUserId;
+	}
 }
 

@@ -36,7 +36,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setFavoritesError(String string);
 	void setChallenges(List<EntityHeader> headers);
 	void setChallengesError(String error);
-	void setTeams(List<Team> teams, boolean showNotifications);
+	void setTeams(List<Team> teams, boolean isOwner);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
 	void clearProjects();
@@ -46,6 +46,15 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTabSelected(ProfileArea areaTab);
 	void showConfirmDialog(String title, String message, Callback yesCallback);
 	void showProjectsLoading(boolean isLoading);
+	void showProjectFiltersUI();
+	boolean isMyProjectFilterSelected();
+	boolean isAllProjectFilterSelected();
+	void setAllProjectFilterSelected();
+	void setMyProjectFilterSelected();
+	void setTeamProjectFilterSelected(Team team);
+	Team getSelectedTeamFilter();
+	void setProjectHighlightBoxText(String text);
+	void hideLoading();
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -59,5 +68,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();
 		void getMoreProjects();
+		void applyFilterClicked();
+		void cancelFilterClicked();
 	}
 }
