@@ -1381,6 +1381,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			FileEntity newEntity = new FileEntity();
 			ExternalFileHandle efh = new ExternalFileHandle();
 			efh.setExternalURL(externalUrl);
+			if (isManuallySettingName)
+				efh.setFileName(name);
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			newEntity.setDataFileHandleId(clone.getId());
