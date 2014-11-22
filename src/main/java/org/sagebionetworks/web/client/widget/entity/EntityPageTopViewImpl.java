@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +42,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
@@ -487,7 +485,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(filesTabContainer, bundle, wikiPageId,  null);
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
-		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanAddChild(), bundle.getPermissions().getCanCertifiedUserAddChild()));
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
 		filesTabContainer.add(row);		
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
@@ -543,7 +541,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// File Tab: Files, Annotations & old
 		row = DisplayUtils.createRowContainer();		
-		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanAddChild(), bundle.getPermissions().getCanCertifiedUserAddChild()));
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
 		filesTabContainer.add(row);			
 		filesTabContainer.add(createAttachmentsWidget(bundle, false)); // Attachments (TODO : this should eventually be removed)
 		// Created By/Modified By
@@ -812,8 +810,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return wrapper;
 	}
 
-	private Widget createEntityFilesBrowserWidget(Entity entity, boolean canAddChild, boolean canCertifiedUserAddChild) {
-		filesBrowser.configure(entity.getId(), canAddChild, canCertifiedUserAddChild);
+	private Widget createEntityFilesBrowserWidget(Entity entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
+		filesBrowser.configure(entity.getId(), canCertifiedUserAddChild, isCertifiedUser);
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("col-md-12 margin-top-10");
 		lc.add(filesBrowser.asWidget());

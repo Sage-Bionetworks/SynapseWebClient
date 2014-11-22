@@ -15,12 +15,10 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,7 +37,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	AuthenticationController authenticationController;
 	CookieProvider cookies;
 	EntityAccessRequirementsWidget accessRequirementsWidget;
-	boolean canAddChild, canCertifiedUserAddChild;
+	boolean isCertifiedUser,canCertifiedUserAddChild;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view,
@@ -66,9 +64,9 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	 * Configure tree view with given entityId's children as start set
 	 * @param entityId
 	 */
-	public void configure(String entityId, boolean canAddChild, boolean canCertifiedUserAddChild) {
+	public void configure(String entityId, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
 		this.configuredEntityId = entityId;
-		this.canAddChild = canAddChild;
+		this.isCertifiedUser = isCertifiedUser;
 		this.canCertifiedUserAddChild = canCertifiedUserAddChild;
 		view.configure(entityId, canCertifiedUserAddChild);
 	}
@@ -103,11 +101,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, authenticationController, isCertificationRequired(canAddChild, canCertifiedUserAddChild));
-	}
-	
-	public static boolean isCertificationRequired(boolean canAddChild, boolean canCertifiedUserAddChild) {
-		return !canAddChild && canCertifiedUserAddChild;
+		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, authenticationController, isCertifiedUser);
 	}
 	
 	//any access requirements to accept?
@@ -117,30 +111,17 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			final UploadView view,
 			final SynapseClientAsync synapseClient,
 			final AuthenticationController authenticationController,
-			final boolean isCertificationRequired) {
+			final boolean isCertifiedUser) {
 		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean accepted) {
 				if (accepted)
-					uploadButtonClickedStep2(entityId, view, synapseClient, authenticationController, isCertificationRequired);
+					uploadButtonClickedStep2(entityId, view, synapseClient, authenticationController, isCertifiedUser);
 			}
 		};
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
-	/**
-	 * Invokes the callback iff the user certification feature is enabled on the backend AND certification requirements have been met.
-	 * Otherwise, it will pop up the "get certified" dialog
-	 * @return
-	 */
-	@Override
-	public void callbackIfCertifiedIfEnabled(Callback callback) {
-		if (FilesBrowser.isCertificationRequired(canAddChild, canCertifiedUserAddChild)) {
-			view.showQuizInfoDialog(true, null);
-		} else
-			callback.invoke();
-	}
-  
 	/**
 	 * Check for user certification passing record.  NOTE: This should be removed after certification is required 
 	 * (we will check the permissions up front and block on click), 
@@ -157,35 +138,21 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			final UploadView view,
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
-			final boolean isCertificationRequired) {
-
-		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String passingRecord) {
-				view.showUploadDialog(entityId);
-			}
-
-			@Override
-			public void onFailure(Throwable t) {
-				if (t instanceof NotFoundException) {
-					view.showQuizInfoDialog(isCertificationRequired, new Callback() {
-						@Override
-						public void invoke() {
-							// remind me later clicked
-							view.showUploadDialog(entityId);
-						}
-					});
-				} else
-					view.showErrorMessage(t.getMessage());
-			}
-		};
-		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+			final boolean isCertifiedUser) {
+		if (isCertifiedUser)
+			view.showUploadDialog(entityId);
+		else
+			view.showQuizInfoDialog();
 	}
 	
 	@Override
 	public void addFolderClicked() {
-		createFolder();
+		if (isCertifiedUser)
+			createFolder();
+		else
+			view.showQuizInfoDialog();
 	}
+	
 	
 	public void createFolder() {
 		Entity folder = createNewEntity(Folder.class.getName(), configuredEntityId);
