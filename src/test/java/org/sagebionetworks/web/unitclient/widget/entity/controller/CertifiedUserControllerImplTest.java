@@ -38,7 +38,7 @@ public class CertifiedUserControllerImplTest {
 		permissions.setIsCertifiedUser(true);
 		controller.checkUploadToEntity(bundle, mockCallback);
 		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show(true, null);
+		verify(mockQuizInfoDialog, never()).show();
 	}
 	
 	@Test
@@ -46,7 +46,7 @@ public class CertifiedUserControllerImplTest {
 		permissions.setIsCertifiedUser(false);
 		controller.checkUploadToEntity(bundle, mockCallback);
 		verify(mockCallback, never()).invoke();
-		verify(mockQuizInfoDialog).show(true, null);
+		verify(mockQuizInfoDialog).show();
 	}
 	
 	@Test
@@ -55,7 +55,7 @@ public class CertifiedUserControllerImplTest {
 		controller.checkCreateEntity(bundle, Project.class.getName(), mockCallback);
 		// Do not need to certified to create projects
 		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show(true, null);
+		verify(mockQuizInfoDialog, never()).show();
 	}
 	
 	@Test
@@ -64,7 +64,7 @@ public class CertifiedUserControllerImplTest {
 		controller.checkCreateEntity(bundle, TableEntity.class.getName(), mockCallback);
 		// must be certified to create any non-project
 		verify(mockCallback, never()).invoke();
-		verify(mockQuizInfoDialog).show(true, null);
+		verify(mockQuizInfoDialog).show();
 	}
 	
 	@Test
@@ -73,7 +73,7 @@ public class CertifiedUserControllerImplTest {
 		controller.checkCreateEntity(bundle, TableEntity.class.getName(), mockCallback);
 		// must be certified to create any non-project
 		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show(true, null);
+		verify(mockQuizInfoDialog, never()).show();
 	}
 	
 	@Test
@@ -81,7 +81,7 @@ public class CertifiedUserControllerImplTest {
 		permissions.setIsCertifiedUser(false);
 		controller.checkUpdateEntity(bundle, mockCallback);
 		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show(true, null);
+		verify(mockQuizInfoDialog, never()).show();
 	}
 	
 	@Test
@@ -89,6 +89,6 @@ public class CertifiedUserControllerImplTest {
 		permissions.setIsCertifiedUser(true);
 		controller.checkUpdateEntity(bundle, mockCallback);
 		verify(mockCallback).invoke();
-		verify(mockQuizInfoDialog, never()).show(true, null);
+		verify(mockQuizInfoDialog, never()).show();
 	}
 }

@@ -7,9 +7,6 @@
 	<g:HTMLPanel>
 		<div class="margin-10">
 		    In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data. 
-		    <span ui:field="beforeLockdownMessage">
-		        Starting on <span ui:field="lockdownDate1" />, only users who have passed a short Certified User Quiz will be able to upload content into Synapse. Don’t wait for <span ui:field="lockdownDate2" /> - get your certification today! 
-		    </span>
 		</div>
 	</g:HTMLPanel>
 </ui:UiBinder>

@@ -284,8 +284,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 						@Override
 						public void invoke() {
 							UserEntityPermissions permissions = entityBundle.getPermissions();
-							boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
-							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, isCertificationRequired);
+							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, permissions.getIsCertifiedUser());
 						}
 					});
 				}
@@ -308,8 +307,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	}
 	
 	@Override
-	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
-		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
+	public void showQuizInfoDialog() {
+		quizInfoDialog.show();
 	}
 		
 	/**

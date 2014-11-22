@@ -23,7 +23,7 @@ public class CertifiedUserControllerImpl implements CertifiedUserController {
 		if(toUpdate.getPermissions().getIsCertifiedUser()){
 			callback.invoke();
 		}else{
-			quizInfoDialog.show(true, null);
+			quizInfoDialog.show();
 		}
 	}
 
@@ -38,7 +38,7 @@ public class CertifiedUserControllerImpl implements CertifiedUserController {
 			if(bundle.getPermissions().getIsCertifiedUser()){
 				callback.invoke();
 			}else{
-				quizInfoDialog.show(true, null);
+				quizInfoDialog.show();
 			}
 		}
 	}

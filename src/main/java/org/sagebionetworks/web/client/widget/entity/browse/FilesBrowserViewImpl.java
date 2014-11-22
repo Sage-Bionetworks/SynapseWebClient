@@ -79,12 +79,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 				@Override
 				public void onClick(ClickEvent event) {
 					//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
-					presenter.callbackIfCertifiedIfEnabled(new Callback() {
-						@Override
-						public void invoke() {
-							presenter.addFolderClicked();
-						}
-					});
+					presenter.addFolderClicked();
 				}
 			});
 		
@@ -107,8 +102,8 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	}
 	
 	@Override
-	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
-		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
+	public void showQuizInfoDialog() {
+		quizInfoDialog.show();
 	}
 	
 	@Override
@@ -255,13 +250,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.callbackIfCertifiedIfEnabled(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.uploadButtonClicked();
-					}
-				});
-				
+				presenter.uploadButtonClicked();
 			}
 		});
 		return uploadButton;
