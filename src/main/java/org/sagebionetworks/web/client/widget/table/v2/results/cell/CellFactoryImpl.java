@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.PortalGinInjector;
 
@@ -28,6 +25,8 @@ public class CellFactoryImpl implements CellFactory {
 		switch(model.getColumnType()){
 		case ENTITYID:
 			return ginInjector.createEntityIdCellRenderer();
+		case DATE:
+			return ginInjector.createDateCellRenderer();
 		default:
 			return ginInjector.createStringRendererCell();
 		}
@@ -43,8 +42,10 @@ public class CellFactoryImpl implements CellFactory {
 			editor = enumEditor;
 		}else{
 			switch(model.getColumnType()){
+			case DATE:
+				editor = ginInjector.createDateCellEditor();
+				break;
 			case BOOLEAN:
-				// Boolean use an enum editor.
 				editor = ginInjector.createBooleanCellEditor();
 				break;
 			case ENTITYID:
