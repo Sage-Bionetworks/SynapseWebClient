@@ -3,7 +3,11 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 import java.util.Date;
 
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
+import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.constants.DateTimePickerView;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,6 +25,7 @@ public class DateCellEditorViewImpl implements DateCellEditorView {
 	@Inject
 	public DateCellEditorViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
+		dateTimePicker.setMinView(DateTimePickerView.MONTH);
 	}
 
 	@Override
@@ -56,6 +61,16 @@ public class DateCellEditorViewImpl implements DateCellEditorView {
 	@Override
 	public void setTabIndex(int index) {
 		dateTimePicker.getTextBox().setTabIndex(index);
+	}
+
+	@Override
+	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
+		return dateTimePicker.getTextBox().addKeyDownHandler(handler);
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> event) {
+		dateTimePicker.getTextBox().fireEvent(event);
 	}
 
 }

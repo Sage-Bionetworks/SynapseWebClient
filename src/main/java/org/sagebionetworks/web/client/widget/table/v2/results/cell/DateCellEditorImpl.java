@@ -51,13 +51,12 @@ public class DateCellEditorImpl implements DateCellEditor {
 
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
-		// Not supported for this type.
-		return null;
+		return view.addKeyDownHandler(handler);
 	}
 
 	@Override
 	public void fireEvent(GwtEvent<?> event) {
-		// Not supported for this type.
+		view.fireEvent(event);
 	}
 
 	@Override

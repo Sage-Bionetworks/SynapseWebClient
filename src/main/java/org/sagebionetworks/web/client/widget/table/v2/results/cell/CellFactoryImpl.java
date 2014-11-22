@@ -25,6 +25,8 @@ public class CellFactoryImpl implements CellFactory {
 		switch(model.getColumnType()){
 		case ENTITYID:
 			return ginInjector.createEntityIdCellRenderer();
+		case DATE:
+			return ginInjector.createDateCellRenderer();
 		default:
 			return ginInjector.createStringRendererCell();
 		}

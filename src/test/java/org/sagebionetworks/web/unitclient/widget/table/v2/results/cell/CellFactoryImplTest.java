@@ -16,6 +16,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
@@ -30,6 +32,8 @@ public class CellFactoryImplTest {
 	EntityIdCellRenderer mockEntityIdCellRenderer;
 	EnumCellEditor mockEnumEditor;
 	BooleanCellEditor mockBooleanCellEditor;
+	DateCellEditor mockDateCellEditor;
+	DateCellRenderer mockDateCellRenderer;
 	
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
@@ -44,6 +48,8 @@ public class CellFactoryImplTest {
 		mockEntityIdCellRenderer = Mockito.mock(EntityIdCellRenderer.class);
 		mockEnumEditor = Mockito.mock(EnumCellEditor.class);
 		mockBooleanCellEditor = Mockito.mock(BooleanCellEditor.class);
+		mockDateCellEditor = Mockito.mock(DateCellEditor.class);
+		mockDateCellRenderer = Mockito.mock(DateCellRenderer.class);
 		
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
@@ -51,6 +57,8 @@ public class CellFactoryImplTest {
 		when(mockInjector.createEntityIdCellRenderer()).thenReturn(mockEntityIdCellRenderer);
 		when(mockInjector.createEnumCellEditor()).thenReturn(mockEnumEditor);
 		when(mockInjector.createBooleanCellEditor()).thenReturn(mockBooleanCellEditor);
+		when(mockInjector.createDateCellEditor()).thenReturn(mockDateCellEditor);
+		when(mockInjector.createDateCellRenderer()).thenReturn(mockDateCellRenderer);
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 
@@ -129,5 +137,19 @@ public class CellFactoryImplTest {
 		assertEquals(mockStringEditorCell, cellFactory.createEditor(cm));
 		// The null default value should be passed to the editor.
 		verify(mockStringEditorCell).setValue(cm.getDefaultValue());
+	}
+	
+	@Test
+	public void testGetDateCellEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.DATE);
+		assertEquals(mockDateCellEditor, cellFactory.createEditor(cm));
+	}
+	
+	@Test
+	public void testGetDateCellRenderer(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.DATE);
+		assertEquals(mockDateCellRenderer, cellFactory.createRenderer(cm));
 	}
 }
