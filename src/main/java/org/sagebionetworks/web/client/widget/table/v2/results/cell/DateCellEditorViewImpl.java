@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 import java.util.Date;
 
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
-import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.constants.DateTimePickerView;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -25,7 +24,6 @@ public class DateCellEditorViewImpl implements DateCellEditorView {
 	@Inject
 	public DateCellEditorViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
-		dateTimePicker.setMinView(DateTimePickerView.MONTH);
 	}
 
 	@Override
