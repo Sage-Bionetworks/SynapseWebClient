@@ -30,15 +30,12 @@ import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -237,25 +234,16 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void resetToInitialState() {
 		hideLoading();
-		uploadBtn.setEnabled(true);
-		formFieldsPanel.setVisible(true);
-		DRAG_AND_DROP_HTML.setVisible(true);
+		enableUpload();
 		// Clear previously selected files.
 		fileUploadHTML.setHTML(createFileUploadHTML().toString());
 	}
 	
 	@Override
-	public void showNoFilesSelectedForUpload() {
-		showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
-		hideLoading();
-		resetToInitialState();
-	}
-	
-	@Override
-	public void showExternalCredentialsRequiredMessage() {
-		showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
-		hideLoading();
-		resetToInitialState();
+	public void enableUpload() {
+		uploadBtn.setEnabled(true);
+		formFieldsPanel.setVisible(true);
+		DRAG_AND_DROP_HTML.setVisible(true);
 	}
 	
 	@Override
