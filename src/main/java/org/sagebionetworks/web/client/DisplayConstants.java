@@ -273,7 +273,7 @@ public class DisplayConstants {
  	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
 	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
-	public static final String ERROR_UPLOAD = "An error occurred during upload. Please try again.";
+	public static final String ERROR_UPLOAD_TITLE = "Upload Error";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_FINISHING = "Finishing...";
@@ -618,7 +618,7 @@ public class DisplayConstants {
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
 	public static final String SYNAPSE_TUTORIAL = "Synapse Tutorial";
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
-	
+	public static final String INVALID_USERNAME_OR_PASSWORD = "The user name or password is incorrect.  Please try again.";
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
 	public static final String EVALUATION_JOIN_TEAM_ERROR = "Unable to join team associated with the evaluation: ";
 	public static final String JOIN_TEAM_ERROR = "Unable to request membership to the team: ";

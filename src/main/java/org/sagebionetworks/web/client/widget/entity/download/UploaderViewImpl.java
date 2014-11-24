@@ -287,6 +287,11 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
+	
+	@Override
+	public void showErrorMessage(String title, String message) {
+		DisplayUtils.showErrorMessage(title, message);
+	}
 
 	@Override
 	public void showLoading() {

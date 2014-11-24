@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -254,7 +254,7 @@ public class UploaderTest {
 	}
 	
 	private void verifyUploadError() {
-		verify(view).showErrorMessage(anyString());
+		verify(view).showErrorMessage(anyString(), anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
 		verify(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
 	}
@@ -493,5 +493,14 @@ public class UploaderTest {
 		verify(view).clear();
 		assertNull(uploader.getCurrentExternalUploadUrl());
 		assertNull(uploader.getCurrentUploadType());
+	}
+	
+	@Test
+	public void testIsJschAuthorizationError() {
+		assertFalse(uploader.isJschAuthorizationError(""));
+		assertFalse(uploader.isJschAuthorizationError(null));
+		assertFalse(uploader.isJschAuthorizationError("Bad request."));
+		assertTrue(uploader.isJschAuthorizationError("com.jcraft.jsch.JSchException: Auth fail"));
+		assertTrue(uploader.isJschAuthorizationError("com.JCRAFT.jsch.jschexception: Auth FAIL"));
 	}
 }

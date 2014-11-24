@@ -575,8 +575,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				setExternalFilePath(path, fileName);
 			}
 		}else {
-			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));
+			if (isJschAuthorizationError(uploadResult.getMessage())) {
+				uploadError(DisplayConstants.INVALID_USERNAME_OR_PASSWORD, new Exception(uploadResult.getMessage()));
+			} else {
+				uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));	
+			}
 		}
+	}
+	
+	public boolean isJschAuthorizationError(String message) {
+		if (message != null) {
+			String lowerCaseMessage = message.toLowerCase();
+			if (lowerCaseMessage.contains("jschexception") && lowerCaseMessage.contains("auth fail")) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void showCancelButton(boolean showCancel) {
@@ -609,10 +623,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		});
 	}
 	private void uploadError(String message, Throwable t) {
-		String details = "";
-		if (message != null && message.length() > 0)
-			details = "  \n" + message;
-		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
+		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, message);
 		logger.errorToRepositoryServices(message, t);
 		fireCancelEvent();
 	}
