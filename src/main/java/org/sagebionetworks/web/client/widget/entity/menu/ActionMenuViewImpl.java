@@ -222,7 +222,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		
 		// put delete last
 		if(permissions.getCanDelete()) {
-			addDeleteItem(toolsButton, typeDisplay);
+			addDeleteItem(toolsButton, entity, typeDisplay);
 		}
 		
 		toolsButton.setVisible(toolsButton.getCount() > 0);
@@ -232,13 +232,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * 'Delete Entity' item
 	 * @param entityType 
 	 */	
-	private void addDeleteItem(DropdownButton menuBtn, final String typeDisplay) {
+	private void addDeleteItem(DropdownButton menuBtn, final Entity entity, final String typeDisplay) {
 		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-trash") + " "
 						+ DisplayConstants.LABEL_DELETE + " " + typeDisplay));
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Callback() {
+				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay + " \"" + entity.getName() + "\"?", new Callback() {
 					
 					@Override
 					public void invoke() {
