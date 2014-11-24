@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +42,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -246,6 +248,18 @@ public class UploaderTest {
 	}
 	
 	@Test
+	public void testDirectUploadNoFilesSelected() throws Exception {
+		uploader.setFileNames(null);
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		uploader.handleUploads();
+		verify(view).hideLoading();
+		verify(view).showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
+		verify(view).enableUpload();
+		
+		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
+	}
+	
+	@Test
 	public void testDirectUploadTeamIconHappyCase() throws Exception {
 		CallbackP callback = mock(CallbackP.class);
 		uploader.asWidget(null,  null, callback, false);
@@ -398,11 +412,13 @@ public class UploaderTest {
 		uploader.setCurrentUploadType(UploadType.S3);
 		uploader.handleUploads();
 		
-		verify(view, Mockito.never()).showExternalCredentialsRequiredMessage();
-		
+		verify(view, Mockito.never()).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+		reset(view);
 		uploader.setCurrentUploadType(UploadType.SFTP);
 		uploader.handleUploads();
-		verify(view).showExternalCredentialsRequiredMessage();
+		verify(view).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+		verify(view).hideLoading();
+		verify(view).enableUpload();
 	}
 	
 	@Test
@@ -412,7 +428,7 @@ public class UploaderTest {
 		
 		uploader.setCurrentUploadType(UploadType.SFTP);
 		uploader.handleUploads();
-		verify(view, Mockito.never()).showExternalCredentialsRequiredMessage();
+		verify(view, Mockito.never()).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
 	}
 	
 	@Test

@@ -156,7 +156,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			currIndex = 0;
 			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
 				//no files selected.
-				view.showNoFilesSelectedForUpload();
+				view.hideLoading();
+				view.showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
+				view.enableUpload();
 				return;
 			}
 		}
@@ -166,7 +168,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			String username = view.getExternalUsername();
 			String password = view.getExternalPassword();
 			if (!DisplayUtils.isDefined(username) || !DisplayUtils.isDefined(password)) {
-				view.showExternalCredentialsRequiredMessage();
+				view.hideLoading();
+				view.showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+				view.enableUpload();
 				return;
 			}
 		}
