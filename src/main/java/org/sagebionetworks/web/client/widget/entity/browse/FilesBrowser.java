@@ -229,7 +229,19 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		});
 	}
 	
+	/**
+	 * For testing purposes
+	 * @return
+	 */
 	public String getCurrentFolderEntityId() {
 		return currentFolderEntityId;
 	};
+	
+	/**
+	 * For testing purposes
+	 * @return
+	 */
+	public void setCurrentFolderEntityId(String currentFolderEntityId) {
+		this.currentFolderEntityId = currentFolderEntityId;
+	}
 }

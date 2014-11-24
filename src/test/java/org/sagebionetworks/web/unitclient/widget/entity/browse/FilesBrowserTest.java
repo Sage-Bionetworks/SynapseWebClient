@@ -40,7 +40,6 @@ public class FilesBrowserTest {
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
-	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	FilesBrowser filesBrowser;
@@ -57,10 +56,9 @@ public class FilesBrowserTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockAccessRequirementsWidget = mock(EntityAccessRequirementsWidget.class);
 		adapterFactory = new AdapterFactoryImpl();
-		autoGenFactory = new AutoGenFactory();
 		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView, mockSynapseClient,
-				mockNodeModelCreator, adapterFactory, autoGenFactory,
+				mockNodeModelCreator, adapterFactory,
 				mockGlobalApplicationState, mockAuthenticationController, mockCookies, mockAccessRequirementsWidget);
 		verify(mockView).setPresenter(filesBrowser);
 		boolean isCertified = true;
@@ -116,8 +114,8 @@ public class FilesBrowserTest {
 		boolean skipTrashCan = true;
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
-		
-		filesBrowser.deleteFolder(id, skipTrashCan);
+		filesBrowser.setCurrentFolderEntityId(id);
+		filesBrowser.deleteFolder(skipTrashCan);
 		verify(mockSynapseClient).deleteEntityById(eq(id), eq(skipTrashCan), any(AsyncCallback.class));
 		verify(mockView).refreshTreeView(anyString());
 	}
@@ -128,7 +126,8 @@ public class FilesBrowserTest {
 		String id = "syn456";
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
-		filesBrowser.deleteFolder(id, true);
+		filesBrowser.setCurrentFolderEntityId(id);
+		filesBrowser.deleteFolder(true);
 		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
