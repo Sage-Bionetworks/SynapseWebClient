@@ -167,7 +167,6 @@ public class DisplayConstants {
 	public static final String BUTTON_CHANGE_PASSWORD = "Change Password";
 	public static final String BUTTON_UPDATE_WITH_LINKED_IN = "Update With LinkedIn";
 	public static final String BUTTON_CHANGE_USER_INFO = "Update Profile";
-	public static final String LABEL_SINGLE_SIGN_ON_LOGGING_IN = "Logging you in.";
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
 	public static final String LABEL_ENTITY_NOT_FOUND = "Sorry, that Synapse Id could not be located.";
