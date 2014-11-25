@@ -255,7 +255,7 @@ public class AccessRequirementDialogTest {
 	
 	@Test
 	public void testConfigureAct() {
-//		actAR.setShowRequestAccessFlag(true);
+		actAR.setOpenJiraIssue(true);
 		widget.configure(actAR, 
 				entityId, 
 				true, 							/** hasAdministrativeAccess **/
@@ -287,7 +287,7 @@ public class AccessRequirementDialogTest {
 	
 	@Test
 	public void testConfigureActNoRequestAccess() {
-//		actAR.setShowRequestAccessFlag(false);
+		actAR.setOpenJiraIssue(false);
 		widget.configure(actAR, 
 				entityId, 
 				true, 							/** hasAdministrativeAccess **/

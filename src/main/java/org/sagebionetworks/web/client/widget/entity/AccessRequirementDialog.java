@@ -200,8 +200,7 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	
 	public boolean isShowRequestAccessFromACTButton() {
 		if (ar instanceof ACTAccessRequirement) 
-//			return ar.getShowRequestAccessFlag();
-			return true;
+			return ar.getOpenJiraIssue();
 		return false;
 	}
 
