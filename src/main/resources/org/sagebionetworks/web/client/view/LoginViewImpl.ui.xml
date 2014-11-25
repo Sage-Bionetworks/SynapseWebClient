@@ -68,6 +68,14 @@
 							<g:Button ui:field="takePledgeButton" styleName="btn btn-lg btn-primary margin-top-10 right" text="Take the pledge, I do"/>
 						</div>
 					</div>
+					<b:Modal ui:field="termsOfUseDialog" title="" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
+						<b:ModalBody>
+							<g:SimplePanel ui:field="termsOfUseContainer" />
+						</b:ModalBody>
+						<b:ModalFooter>
+							<b:Button type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
+						</b:ModalFooter>
+					</b:Modal>					
 				</g:HTMLPanel>
 				</div> <!-- close class="container" -->
 <!-- start footer -->

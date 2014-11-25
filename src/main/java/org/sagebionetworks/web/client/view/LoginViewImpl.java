@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Row;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -17,7 +15,6 @@ import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -70,10 +67,13 @@ public class LoginViewImpl extends Composite implements LoginView {
 	Button takePledgeButton;
 	@UiField
 	Row loadingUi;
+	@UiField
+	Modal termsOfUseDialog;
+	@UiField
+	SimplePanel termsOfUseContainer;
 	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
-	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
@@ -83,10 +83,9 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Inject
 	public LoginViewImpl(Binder uiBinder,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle, LoginWidget loginWidget) {
+			LoginWidget loginWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
@@ -218,7 +217,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 			viewToULink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					TermsOfUseHelper.showTermsOfUse(content, null);
+					termsOfUseContainer.setWidget(new HTML(content));
+					termsOfUseDialog.show();
 				}
 			});
 		}
