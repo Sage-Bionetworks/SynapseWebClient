@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface LicensedDownloaderView extends IsWidget, SynapseView {
 	
@@ -19,23 +20,6 @@ public interface LicensedDownloaderView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	
-	/**
-	 *
-	 */
-	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel);
-	
-	/**
-	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
-	 * @param approvalType
-	 */
-	public void setApprovalType(APPROVAL_TYPE approvalType);
-	
-	/**
-	 * Set the license text to display
-	 * @param licenseHtml
-	 */
-	public void setLicenseHtml(String licenseHtml);	
 	
 	/**
 	 * Show the License Box window
@@ -66,21 +50,13 @@ public interface LicensedDownloaderView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		
-		/**
-		 * Call when the user accepts the presented License Agreement
-		 */
-		public void setLicenseAccepted();
-		
 		public boolean isDownloadAllowed();
-
-		public Callback getTermsOfUseCallback();
-
-		public Callback getRequestAccessCallback();
 
 		void clearHandlers();
 
 		void addEntityUpdatedHandler(EntityUpdatedHandler handler);
-
+		
+		void showWindow();
 	}
 
 	public void showDownloadFailure();

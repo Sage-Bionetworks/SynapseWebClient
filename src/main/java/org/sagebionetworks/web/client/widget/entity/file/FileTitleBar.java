@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -10,7 +11,10 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.http.client.URL;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -97,6 +101,19 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	}
 
 	
+	public void queryForSftpLoginInstructions(String url) {
+		synapseClient.getHost(url, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String host) {
+				//update the download login dialog message
+				view.setLoginInstructions(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SafeHtmlUtils.htmlEscape(host));
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
 	
 	/*
 	 * Private Methods

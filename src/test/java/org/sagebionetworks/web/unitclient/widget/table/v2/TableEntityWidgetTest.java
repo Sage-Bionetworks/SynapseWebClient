@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -23,15 +23,20 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 /**
  * Business logic tests for the TableEntityWidget
@@ -47,6 +52,7 @@ public class TableEntityWidgetTest {
 	ActionMenuWidget mockActionMenu;
 	DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
 	UploadTableModalWidget mockUploadTableModalWidget;
+	PreflightController mockPreflightController;
 	TableEntityWidgetView mockView;
 	QueryChangeHandler mockQueryChangeHandler;
 	TableQueryResultWidget mockQueryResultsWidget;
@@ -66,6 +72,7 @@ public class TableEntityWidgetTest {
 		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
 		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
 		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
+		mockPreflightController = Mockito.mock(PreflightController.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
 		columns = TableModelTestUtils.createOneOfEachType();
@@ -75,7 +82,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 		
@@ -288,5 +295,66 @@ public class TableEntityWidgetTest {
 		widget.onSchemaToggle(schemaShown);
 		verify(mockActionMenu).setActionText(Action.TOGGLE_TABLE_SCHEMA, TableEntityWidget.SHOW_SCHEMA);
 		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
+	}
+	
+	@Test
+	public void testUploadTableCSVPreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		boolean canEdit = true;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.onUploadTableData();
+		// should not proceed to upload.
+		verify(mockUploadTableModalWidget, never()).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testUploadTableCSVPreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		boolean canEdit = true;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.onUploadTableData();
+		// proceed to upload
+		verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testEditTablePreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		boolean canEdit = true;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.onEditResults();
+		// should not proceed to edit
+		verify(mockQueryResultsWidget, never()).onEditRows();
+	}
+	
+	@Test
+	public void testEditTablePreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		boolean canEdit = true;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.onEditResults();
+		// proceed to edit
+		verify(mockQueryResultsWidget).onEditRows();
+	}
+	
+	@Test
+	public void testOnStartingnewQuery(){
+		boolean canEdit = true;
+		// Start with a query that is not on the first page
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		startQuery.setLimit(100L);
+		startQuery.setOffset(101L);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		reset(mockQueryResultsWidget);
+		// Set new sql
+		Query newQuery = new Query();
+		newQuery.setSql("select 1,2,3 from syn123");
+		widget.onStartingNewQuery(newQuery);
+		// Should get passed to the input widget
+		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget, canEdit);
+		// Should not be sent to the results as that is where it came from.
+		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), any(QueryResultsListener.class));
 	}
 }

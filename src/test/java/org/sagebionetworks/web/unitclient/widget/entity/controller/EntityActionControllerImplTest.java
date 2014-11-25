@@ -1,16 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import org.gwtbootstrap3.client.ui.Pre;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
@@ -31,9 +36,6 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
-
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
-
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -146,7 +148,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		// should not make it to the pre-flight check
-		verify(mockPreflightController, never()).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 	}
 	
 	@Test
@@ -156,12 +158,12 @@ public class EntityActionControllerImplTest {
 		/*
 		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
 		 */
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-		verify(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// Must not make it to the actual delete since preflight failed.
 		verify(mockSynapseClient, never()).deleteEntityById(anyString(), any(AsyncCallback.class));
 	}
@@ -171,14 +173,14 @@ public class EntityActionControllerImplTest {
 		// confirm the delete
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		// confirm pre-flight
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		String error = "some error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-		verify(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
@@ -189,13 +191,13 @@ public class EntityActionControllerImplTest {
 		// confirm the delete
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		// confirm pre-flight
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-		verify(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + entityDispalyType + WAS_SUCCESSFULLY_DELETED);

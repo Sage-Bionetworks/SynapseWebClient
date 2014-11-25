@@ -7,7 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface QuizInfoWidgetView extends IsWidget, SynapseView {
 
 	void setPresenter(Presenter presenter);
-	void configure(boolean isCertificationRequired);
+	void configure();
 	
 	/**
 	 * Presenter interface

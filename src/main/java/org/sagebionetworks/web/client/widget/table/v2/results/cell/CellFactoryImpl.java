@@ -22,12 +22,43 @@ public class CellFactoryImpl implements CellFactory {
 
 	@Override
 	public Cell createRenderer(ColumnModel model) {
-		return ginInjector.createStringRendererCell();
+		switch(model.getColumnType()){
+		case ENTITYID:
+			return ginInjector.createEntityIdCellRenderer();
+		case DATE:
+			return ginInjector.createDateCellRenderer();
+		default:
+			return ginInjector.createStringRendererCell();
+		}
 	}
 
 	@Override
 	public CellEditor createEditor(ColumnModel model) {
-		return ginInjector.createStringEditorCell();
+		CellEditor editor;
+		// enums get their own special editor
+		if(model.getEnumValues() != null && !model.getEnumValues().isEmpty()){
+			EnumCellEditor enumEditor = ginInjector.createEnumCellEditor();
+			enumEditor.configure(model.getEnumValues());
+			editor = enumEditor;
+		}else{
+			switch(model.getColumnType()){
+			case DATE:
+				editor = ginInjector.createDateCellEditor();
+				break;
+			case BOOLEAN:
+				editor = ginInjector.createBooleanCellEditor();
+				break;
+			case ENTITYID:
+				editor = ginInjector.createEntityIdCellEditor();
+				break;
+			default:
+				editor = ginInjector.createStringEditorCell();
+			}
+		}
+		// Configure each editor with the default value.
+		editor.setValue(model.getDefaultValue());
+		return editor;
+
 	}
 
 }

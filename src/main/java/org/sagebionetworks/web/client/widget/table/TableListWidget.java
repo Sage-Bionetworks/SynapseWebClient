@@ -11,7 +11,11 @@ import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
@@ -34,6 +38,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public static final Long PAGE_SIZE = 10L;
 	public static final Long OFFSET_ZERO = 0L;
 
+	private PreflightController preflightController;
 	private TableListWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private PaginationWidget paginationWidget;
@@ -41,13 +46,16 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private UploadTableModalWidget uploadTableModalWidget;
 	private boolean canEdit;
 	private EntityQuery query;
+	private EntityBundle parentBundle;
 	
 	@Inject
-	public TableListWidget(TableListWidgetView view,
+	public TableListWidget(PreflightController preflightController,
+			TableListWidgetView view,
 			SynapseClientAsync synapseClient,
 			CreateTableModalWidget createTableModalWidget,
 			PaginationWidget paginationWidget,
 			UploadTableModalWidget uploadTableModalWidget) {
+		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.createTableModalWidget = createTableModalWidget;
@@ -65,11 +73,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	 * @param canEdit
 	 * @param showAddTable
 	 */
-	public void configure(String projectOwnerId, final boolean canEdit) {
-		this.canEdit = canEdit;
-		this.createTableModalWidget.configure(projectOwnerId, this);
-		this.uploadTableModalWidget.configure(projectOwnerId, null);
-		this.query = createQuery(projectOwnerId);
+	public void configure(EntityBundle parentBundle) {
+		this.parentBundle = parentBundle;
+		this.canEdit = parentBundle.getPermissions().getCanEdit();
+		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
+		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
+		this.query = createQuery(parentBundle.getEntity().getId());
 		queryForOnePage(OFFSET_ZERO);
 	}
 
@@ -129,6 +138,18 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 
 	@Override
 	public void onUploadTable() {
+		// This operation creates an entity and uploads data to the entity so both checks must pass.
+		preflightController.checkCreateEntityAndUpload(parentBundle, TableEntity.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckUploadTable();
+			}
+		});
+	}
+	/**
+	 * Called after a successful preflight check.
+	 */
+	private void postCheckUploadTable(){
 		this.uploadTableModalWidget.showModal(new WizardCallback() {
 			
 			@Override
@@ -150,8 +171,22 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 
 	@Override
 	public void onAddTable() {
+		preflightController.checkCreateEntity(parentBundle, TableEntity.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateTable();
+			}
+		});
+
+	}
+	
+	/**
+	 * Called after all pre-flight checks are performed on a table.
+	 */
+	private void postCheckCreateTable(){
 		this.createTableModalWidget.showCreateModal();
 	}
+	
 
 	@Override
 	public void tableCreated() {

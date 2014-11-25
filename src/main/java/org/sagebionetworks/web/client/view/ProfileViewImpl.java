@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
@@ -108,6 +112,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement settingsTabContainer;
 	
 	//Project tab
+	//filters
+	@UiField
+	Button projectFiltersUI;
+	@UiField
+	Radio allProjectsFilter;
+	@UiField
+	Radio myProjectsFilter;
+	@UiField
+	Div teamFiltersContainer;
+	
 	@UiField
 	TextBox createProjectTextBox;
 	@UiField
@@ -158,6 +172,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@UiField 
 	DivElement projectsLoadingUI;
+	@UiField 
+	Row profilePictureLoadingUI;
+	@UiField 
+	Row profileInfoLoadingUI;
+	
+	@UiField
+	Button filterOkButton;
+	@UiField
+	Button filterCancelButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -172,7 +195,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private TeamListWidget myTeamsWidget;
 	private SettingsPresenter settingsPresenter;
 	private PortalGinInjector ginInjector;
-	
+	private Team selectedFilterTeam;
+	private List<Radio> teamFilters = new ArrayList<Radio>();
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, 
@@ -231,6 +255,55 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		showProjectsLoading(false);
+		
+		filterOkButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked();
+			}
+		});
+		
+		filterCancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.cancelFilterClicked();
+			}
+		});
+	}
+	
+	@Override
+	public boolean isAllProjectFilterSelected() {
+		return allProjectsFilter.getValue();
+	}
+	
+	@Override
+	public void setAllProjectFilterSelected() {
+		allProjectsFilter.setValue(true);
+	}
+	
+	@Override
+	public void setMyProjectFilterSelected() {
+		myProjectsFilter.setValue(true);
+	}
+	
+	@Override
+	public void setTeamProjectFilterSelected(Team team) {
+		for (Radio teamFilter : teamFilters) {
+			if (team.getId().equals(teamFilter.getFormValue())) {
+				teamFilter.setValue(true);
+				break;
+			}
+		}
+	}
+	
+	@Override
+	public boolean isMyProjectFilterSelected() {
+		return myProjectsFilter.getValue();
+	}
+	
+	@Override
+	public Team getSelectedTeamFilter() {
+		return selectedFilterTeam;
 	}
 	
 	private void initCertificationBadge() {
@@ -243,7 +316,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10");
 		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
 		certifiedUserImage.addClickHandler(new ClickHandler() {
-	@Override
+			@Override
 			public void onClick(ClickEvent event) {
 				clear();
 				tooltip.hide();
@@ -314,18 +387,38 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.setHighlightBoxUser(favoritesHighlightBox, displayName, "Favorites");
 	}
 	
+	@Override
+	public void setProjectHighlightBoxText(String text) {
+		projectsHighlightBox.setAttribute("highlight-box-title", text);	
+	}
 	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
 		updateUserInfoPanel.add(profileFormWidget);
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams, boolean showNotifications) {
-		myTeamsWidget.configure(teams, true, showNotifications, new TeamListWidget.RequestCountCallback() {
+	public void setTeams(List<Team> teams, boolean isOwner) {
+		myTeamsWidget.configure(teams, true, isOwner, new TeamListWidget.RequestCountCallback() {
 			@Override
 			public void invoke(String teamId, Long requestCount) {
 				presenter.addMembershipRequests(requestCount.intValue());
 			}
 		});
+		if (isOwner) {
+			//also create a link for each team in the project filters
+			for (final Team team : teams) {
+				Radio teamFilter = new Radio(team.getName());
+				teamFilter.setName("filterRadio");
+				teamFilter.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						selectedFilterTeam = team;
+					}
+				});
+				teamFiltersContainer.add(new SimplePanel(teamFilter));
+				teamFilter.setFormValue(team.getId());
+				teamFilters.add(teamFilter);
+			}
+		}
 	}
 	
 	@Override
@@ -514,8 +607,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void showLoading() {
+		profilePictureLoadingUI.setVisible(true);
+		profileInfoLoadingUI.setVisible(true);
 	}
 
+	@Override
+	public void hideLoading() {
+		profilePictureLoadingUI.setVisible(false);
+		profileInfoLoadingUI.setVisible(false);
+	}
+	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
@@ -555,6 +656,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
+		projectFiltersUI.setVisible(false);
+		teamFiltersContainer.clear();
+		teamFilters.clear();
+		selectedFilterTeam = null;
 	}
 	
 	@Override
@@ -643,5 +748,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			Callback yesCallback
 			) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
+	}
+	
+	@Override
+	public void showProjectFiltersUI() {
+		projectFiltersUI.setVisible(true);
 	}
 }

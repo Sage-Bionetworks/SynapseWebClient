@@ -124,6 +124,7 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
@@ -137,6 +138,7 @@ import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -385,6 +387,7 @@ public class SynapseClientImplTest {
 		headers.setResults(projectHeaders);
 		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
 		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsForTeam(anyLong(), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -876,6 +879,24 @@ public class SynapseClientImplTest {
 		file.setName(newName);
 		verify(mockSynapse).putEntity(eq(file));  //should equal the previous file but with the new name
 	}
+	
+	@Test
+	public void testCreateExternalFile() throws Exception {
+		//test setting file handle name
+		String parentEntityId = "syn123333";
+		String externalUrl = "sftp://foobar.edu/b/test.txt";
+		String fileName = "testing.txt";
+		when(mockSynapse.createExternalFileHandle(any(ExternalFileHandle.class))).thenReturn(new ExternalFileHandle());
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(new FileEntity());
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName);
+		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
+		verify(mockSynapse).createExternalFileHandle(captor.capture());
+		ExternalFileHandle handle = captor.getValue();
+		//verify name is set
+		assertEquals(fileName, handle.getFileName());
+		assertEquals(externalUrl, handle.getExternalURL());
+	}
+	
 	
 	@Test
 	public void testGetEntityDoi() throws Exception {
@@ -1565,7 +1586,7 @@ public class SynapseClientImplTest {
 		assertEquals(errorMessage, logEntry.getMessage());
 	}
 
-@Test
+	@Test
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
@@ -1582,6 +1603,17 @@ public class SynapseClientImplTest {
 		synapseClient.getUserProjects(userIdString, limit, offset);
 		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
 	}
+	
+	@Test
+	public void testGetProjectsForTeam() throws Exception {
+		int limit = 13;
+		int offset = 40;
+		Long teamId = 144l;
+		String teamIdString = teamId.toString();
+		synapseClient.getProjectsForTeam(teamIdString, limit, offset);
+		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(limit), eq(offset));
+	}
+
 	
 	@Test
 	public void testSafeLongToInt() {
@@ -1604,5 +1636,26 @@ public class SynapseClientImplTest {
 		SynapseClientImpl.safeLongToInt(testValue);
 	}
 
+	@Test
+	public void testGetHost() throws RestServiceException {
+		assertEquals("mydomain.com", synapseClient.getHost("sfTp://mydomain.com/foo/bar"));
+		assertEquals("mydomain.com", synapseClient.getHost("http://mydomain.com/foo/bar"));
+		assertEquals("mydomain.com", synapseClient.getHost("http://mydomain.com"));
+		assertEquals("mydomain.com", synapseClient.getHost("sftp://mydomain.com:22/foo/bar"));
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testGetHostNull() throws RestServiceException {
+		synapseClient.getHost(null);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testGetHostEmpty() throws RestServiceException {
+		synapseClient.getHost("");
+	}
 
+	@Test (expected=BadRequestException.class)
+	public void testGetHostBadUrl() throws RestServiceException {
+		synapseClient.getHost("foobar");
+	}
 }

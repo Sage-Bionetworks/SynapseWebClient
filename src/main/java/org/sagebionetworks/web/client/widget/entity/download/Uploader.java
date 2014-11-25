@@ -156,7 +156,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			currIndex = 0;
 			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
 				//no files selected.
-				view.showNoFilesSelectedForUpload();
+				view.hideLoading();
+				view.showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
+				view.enableUpload();
 				return;
 			}
 		}
@@ -166,7 +168,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			String username = view.getExternalUsername();
 			String password = view.getExternalPassword();
 			if (!DisplayUtils.isDefined(username) || !DisplayUtils.isDefined(password)) {
-				view.showExternalCredentialsRequiredMessage();
+				view.hideLoading();
+				view.showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+				view.enableUpload();
 				return;
 			}
 		}
@@ -200,7 +204,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						if (UploadType.SFTP == d.getUploadType()){
 							currentUploadType = UploadType.SFTP;
 							currentExternalUploadUrl = d.getUrl();
-							view.showUploadingToExternalStorage(getSftpDomain(currentExternalUploadUrl), d.getBanner());
+							getSftpHost(currentExternalUploadUrl, d.getBanner());
 							disableMultipleFileUploads();
 						} else {
 							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + d.getUploadType()));
@@ -219,18 +223,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public String getSftpDomain(String url) {
-		if (url == null)
-			return null;
-		if (!url.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
-			throw new IllegalArgumentException("Not a sftp url: " + url);
-		}
-		String domain = url.substring(WebConstants.SFTP_PREFIX.length());
-		int slashIndex = domain.indexOf("/");
-		if (slashIndex != -1) {
-			domain = domain.substring(0, slashIndex);
-		}
-		return domain;
+	public void getSftpHost(String url, final String banner) {
+		synapseClient.getHost(url, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String host) {
+				view.showUploadingToExternalStorage(host, banner);		
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	/**
@@ -576,8 +579,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				setExternalFilePath(path, fileName);
 			}
 		}else {
-			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));
+			if (isJschAuthorizationError(uploadResult.getMessage())) {
+				uploadError(DisplayConstants.INVALID_USERNAME_OR_PASSWORD, new Exception(uploadResult.getMessage()));
+			} else {
+				uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));	
+			}
 		}
+	}
+	
+	public boolean isJschAuthorizationError(String message) {
+		if (message != null) {
+			String lowerCaseMessage = message.toLowerCase();
+			if (lowerCaseMessage.contains("jschexception") && lowerCaseMessage.contains("auth fail")) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void showCancelButton(boolean showCancel) {
@@ -610,10 +627,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		});
 	}
 	private void uploadError(String message, Throwable t) {
-		String details = "";
-		if (message != null && message.length() > 0)
-			details = "  \n" + message;
-		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
+		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, message);
 		logger.errorToRepositoryServices(message, t);
 		fireCancelEvent();
 	}

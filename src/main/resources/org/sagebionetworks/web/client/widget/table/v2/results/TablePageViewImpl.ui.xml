@@ -5,18 +5,16 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<g:ScrollPanel>
-			<t:Table styleName="table table-striped table-condensed">
-				<t:THead>
-					<t:TableRow ui:field="header">
-					</t:TableRow>
-				</t:THead>
-				<t:TBody ui:field="body"></t:TBody>
-			</t:Table>
+			<b:Form>
+				<t:Table styleName="table table-striped table-condensed">
+					<t:THead>
+						<t:TableRow ui:field="header">
+						</t:TableRow>
+					</t:THead>
+					<t:TBody ui:field="body"></t:TBody>
+				</t:Table>
+			</b:Form>
 		</g:ScrollPanel>
-		<b:Row>
-			<b:Column size="XS_4" offset="XS_5">
-				<g:SimplePanel ui:field="paginationPanel"/>
-			</b:Column>
-		</b:Row>
+		<g:SimplePanel ui:field="paginationPanel" />
 	</bh:Div>
 </ui:UiBinder>

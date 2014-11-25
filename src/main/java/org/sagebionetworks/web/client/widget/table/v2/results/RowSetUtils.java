@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.StringUtils.isValueChanged;
+import static org.sagebionetworks.web.client.StringUtils.trimWithEmptyAsNull;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -105,13 +108,13 @@ public class RowSetUtils {
 			String header = headers.get(i);
 			// aggregate rows can have null headers so skip them.
 			if (header != null) {
-				String value = toUpdate.getValues().get(i);
-				if (original == null) {
-					// Create
-					map.put(header, value);
-				} else if (!value.equals(original.getValues().get(i))) {
-					// update
-					map.put(header, value);
+				String updateValue =  toUpdate.getValues().get(i);
+				if(original == null){
+					map.put(header, trimWithEmptyAsNull(updateValue));
+				}else{
+					if(isValueChanged(original.getValues().get(i), updateValue)){
+						map.put(header, trimWithEmptyAsNull(updateValue));
+					}
 				}
 			}
 		}
@@ -127,6 +130,7 @@ public class RowSetUtils {
 			return pr;
 		}
 	}
+
 
 	/**
 	 * Build up a map of rowIds to rows. Any row without a RowID will no be

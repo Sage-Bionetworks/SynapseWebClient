@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,12 +25,13 @@ import com.google.inject.Inject;
  * @author jmhill
  *
  */
-public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PageChangeListener {
+public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
+	
+	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
-	AdapterFactory adapterFactory;
 	TableQueryResultView view;
 	PortalGinInjector ginInjector;
 	QueryResultBundle bundle;
@@ -37,17 +39,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
-	QueryResultsListner queryListener;
+	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, AdapterFactory adapterFactory){
+	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector){
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
-		this.adapterFactory = adapterFactory;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
@@ -59,7 +60,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param isEditable Is the user allowed to edit the query results?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, QueryResultsListner listener){
+	public void configure(Query query, boolean isEditable, QueryResultsListener listener){
 		this.isEditable = isEditable;
 		this.startingQuery = query;
 		this.queryListener = listener;
@@ -100,12 +101,33 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * Called after a successful query.
 	 * @param bundle
 	 */
-	private void setQueryResults(QueryResultBundle bundle){
+	private void setQueryResults(final QueryResultBundle bundle){
+		// Get the sort info
+		this.synapseClient.getSortFromTableQuery(this.startingQuery.getSql(), new AsyncCallback<List<SortItem>>() {
+			
+			@Override
+			public void onSuccess(List<SortItem> sortItems) {
+				setQueryResultsAndSort(bundle, sortItems);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				showError(caught);
+			}
+		});
+
+	}
+	
+	private void setQueryResultsAndSort(QueryResultBundle bundle, List<SortItem> sortItems){
 		this.bundle = bundle;
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
+		SortItem sort = null;
+		if(sortItems != null && !sortItems.isEmpty()){
+			sort = sortItems.get(0);
+		}
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery, false, null, this);
+		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, null, this);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true);
 	}
@@ -169,6 +191,20 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public void onSave() {
 		view.setSaveButtonLoading(true);
 		// Extract the delta
+		if(!this.queryResultEditor.isValid()){
+			showEditError(SEE_THE_ERRORS_ABOVE);
+		}else{
+			// Changes are valid so proceed with the save.
+			saveValidChanges();
+		}
+
+	}
+
+	/**
+	 * Save after validating the changes in the editor.
+	 */
+	private void saveValidChanges() {
+		queryResultEditor.hideError();
 		PartialRowSet prs = this.queryResultEditor.extractDelta();
 		synapseClient.applyTableDelta(prs, new AsyncCallback<Void>() {
 			
@@ -184,20 +220,52 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			}
 		});
 	}
-	
+	/**
+	 * Show an error in the editor.
+	 * @param message
+	 */
 	private void showEditError(String message){
 		view.setSaveButtonLoading(false);
 		queryResultEditor.showError(message);
 	}
+	
 
 	@Override
 	public void onPageChange(Long newOffset) {
+		this.startingQuery.setOffset(newOffset);
+		queryChanging();
+	}
+	
+	private void runSql(String sql){
+		startingQuery.setSql(sql);
+		startingQuery.setOffset(0L);
+		queryChanging();
+	}
+
+	private void queryChanging() {
 		if(this.queryListener != null){
-			this.queryListener.onPageChange(newOffset);
+			this.queryListener.onStartingNewQuery(this.startingQuery);
 		}
+		runQuery();
 	}
 	
 	public Query getStartingQuery(){
 		return this.startingQuery;
 	}
+
+	@Override
+	public void onToggleSort(String header) {
+		// This call will generate a new SQL string with the requested column toggled.
+		synapseClient.toggleSortOnTableQuery(this.startingQuery.getSql(), header, new AsyncCallback<String>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				showError(caught);
+			}
+
+			@Override
+			public void onSuccess(String sql) {
+				runSql(sql);
+			}});
+	}
+	
 }

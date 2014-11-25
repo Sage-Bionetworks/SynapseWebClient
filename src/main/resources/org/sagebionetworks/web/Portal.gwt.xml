@@ -2,6 +2,7 @@
 <module rename-to='Portal'>
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name='com.google.gwt.user.User' />
+	
 
 	<!-- Inherit the default GWT style sheet. You can change -->
 	<!-- the theme of your GWT application by uncommenting -->
@@ -53,6 +54,7 @@
 	
 	<!-- GWT Inherits  -->
 	<inherits name="org.sagebionetworks.web.Portal"/>
+	<inherits name="org.sagebionetworks.web.client.PortalResources"/>
 	<inherits name="com.gwtplatform.mvp.Mvp"/>
 	<inherits name="com.extjs.gxt.ui.GXT" />
 	<inherits name="org.sagebionetworks.repo.SharedSynpaseDTOs"/>

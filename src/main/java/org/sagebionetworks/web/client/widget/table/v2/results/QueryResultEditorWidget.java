@@ -44,7 +44,7 @@ public class QueryResultEditorWidget implements
 		this.startingBundle = bundle;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, true, this, null);
+		pageWidget.configure(bundle, null, null, true, this, null);
 	}
 
 	@Override
@@ -98,6 +98,18 @@ public class QueryResultEditorWidget implements
 	public void showError(String message) {
 		this.view.showErrorMessage(message);
 		this.view.setErrorMessageVisible(true);
+	}
+	
+	/**
+	 * Hide the error.
+	 */
+	public void hideError(){
+		this.view.setErrorMessageVisible(false);
+	}
+
+	public boolean isValid() {
+		// Are the results valid
+		return pageWidget.isValid();
 	}
 
 }

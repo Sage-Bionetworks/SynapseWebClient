@@ -97,6 +97,8 @@ import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
+import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
+import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
@@ -160,6 +162,10 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementController;
+import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserController;
+import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
@@ -276,6 +282,10 @@ import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationView;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationViewImpl;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidgetImpl;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
@@ -357,12 +367,34 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorV
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
@@ -676,6 +708,8 @@ public class PortalGinModule extends AbstractGinModule {
 		// basic pagination
 		bind(BasicPaginationView.class).to(BasicPaginationViewImpl.class);
 		bind(PaginationWidget.class).to(BasicPaginationWidget.class);
+		bind(DetailedPaginationWidget.class).to(DetailedPaginationWidgetImpl.class);
+		bind(DetailedPaginationView.class).to(DetailedPaginationViewImpl.class);
 		
 		// EntityPageTop
 		bind(EntityPageTopViewImpl.class).in(Singleton.class);
@@ -696,6 +730,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityActionController.class).to(EntityActionControllerImpl.class);
 		bind(EntityActionControllerView.class).to(EntityActionControllerViewImpl.class);
 		bind(PreflightController.class).to(PreflightControllerImpl.class);
+		bind(AccessRequirementController.class).to(AccessRequirementControllerImpl.class);
+		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
@@ -883,6 +919,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UploadCSVFinishPageView.class).to(UploadCSVFinishPageViewImpl.class);
 		bind(UploadCSVAppendPage.class).to(UploadCSVAppendPageImpl.class);
 		bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
+		bind(SortableTableHeader.class).to(SortableTableHeaderImpl.class);
 		
 		bind(CreateDownloadPage.class).to(CreateDownloadPageImpl.class);
 		bind(CreateDownloadPageView.class).to(CreateDownloadPageViewImpl.class);
@@ -898,8 +935,18 @@ public class PortalGinModule extends AbstractGinModule {
 		/*
 		 * TableEntity cell bindings.
 		 */
+		bind(CellEditorView.class).to(CellEditorViewImpl.class);
 		bind(StringEditorCell.class).to(StringEditorCellImpl.class);
 		bind(StringRendererCell.class).to(StringRendererCellImpl.class);
+		bind(EntityIdCellEditor.class).to(EntityIdCellEditorImpl.class);
+		bind(EntityIdCellRenderer.class).to(EntityIdCellRendererImpl.class);
+		bind(EnumCellEditor.class).to(EnumCellEditorImpl.class);
+		bind(EnumCellEditorView.class).to(EnumCellEditorViewImpl.class);
+		bind(BooleanCellEditor.class).to(BooleanCellEditorImpl.class);
+		bind(DateCellEditorView.class).to(DateCellEditorViewImpl.class);
+		bind(DateCellEditor.class).to(DateCellEditorImpl.class);
+		bind(DateCellRenderer.class).to(DateCellRendererImpl.class);
+		bind(DateCellRendererView.class).to(DateCellRendererViewImpl.class);
 
 		/*
 		 * Teams Places
@@ -961,6 +1008,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(LoginModalView.class).to(LoginModalViewImpl.class);
 		
+		bind(AccessRequirementDialogView.class).to(AccessRequirementDialogViewImpl.class);
 	}
 
 }

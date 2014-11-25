@@ -126,8 +126,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			loadProjectsAndFavorites();
 			//validate token
 			validateToken();
-			//check for user certification
-			checkIfCertified();
 		}
 	}
 		
@@ -392,20 +390,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					} 
 				}
-			}
-		});
-	}
-	
-	public void checkIfCertified() {
-		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String passingRecordJson) {
-				//show nothing
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (caught instanceof NotFoundException) 
-					view.showCertificationReminder(true);
 			}
 		});
 	}

@@ -85,7 +85,14 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
@@ -245,6 +252,12 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	public StringRendererCell createStringRendererCell();
 	public StringEditorCell createStringEditorCell();
+	public EntityIdCellEditor createEntityIdCellEditor();
+	public EntityIdCellRenderer createEntityIdCellRenderer();
+	public EnumCellEditor createEnumCellEditor();
+	public BooleanCellEditor createBooleanCellEditor();
+	public DateCellEditor createDateCellEditor();
+	public DateCellRenderer createDateCellRenderer();
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();
@@ -264,5 +277,8 @@ public interface PortalGinInjector extends Ginjector {
 
 	public BasicPaginationWidget createBasicPaginationWidget();
 
+
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
+
+	public SortableTableHeader createSortableTableHeader();
 }

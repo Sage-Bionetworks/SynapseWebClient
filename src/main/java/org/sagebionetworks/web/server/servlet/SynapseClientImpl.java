@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -114,6 +119,7 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -138,6 +144,7 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.server.table.TableSqlProcessor;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -1374,6 +1381,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			FileEntity newEntity = new FileEntity();
 			ExternalFileHandle efh = new ExternalFileHandle();
 			efh.setExternalURL(externalUrl);
+			if (isManuallySettingName)
+				efh.setFileName(name);
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			newEntity.setDataFileHandleId(clone.getId());
@@ -3414,6 +3423,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public String toggleSortOnTableQuery(String sql, String header)	throws RestServiceException {
+		try {
+			return TableSqlProcessor.toggleSort(sql, header);
+		} catch (ParseException e) {
+			throw new TableQueryParseException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public List<SortItem> getSortFromTableQuery(String sql)
+			throws RestServiceException {
+		try {
+			return TableSqlProcessor.getSortingInfo(sql);
+		} catch (ParseException e) {
+			throw new TableQueryParseException(e.getMessage());
+		}
+	}
+
+	
+	@Override
 	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body )
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -3515,6 +3544,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Long teamIdLong = Long.parseLong(teamId);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, limit, offset);
+			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	
+	@Override
 	public ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -3533,5 +3575,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
        }
        return (int) l;
    }
+
+	public String getHost(String urlString) throws RestServiceException {
+		if (urlString == null || urlString.length() == 0) {
+			throw new IllegalArgumentException("url is required");
+		}
+		//URL does not recognize sftp:// protocol.  replace with http (we're after the host in this method)
+		if (urlString.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+			urlString = "http://" + urlString.substring(WebConstants.SFTP_PREFIX.length());
+		}
+		try {
+			URL url = new URL(urlString);
+			return url.getHost();
+		} catch (MalformedURLException e) {
+			throw new BadRequestException(e.getMessage());
+		}
+	}
 
 }

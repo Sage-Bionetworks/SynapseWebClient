@@ -131,6 +131,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	public void getIsCertified() {
+		view.showLoading();
 		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
@@ -138,6 +139,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					//if certified, show the certificate
 					//otherwise, show the quiz
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
+					view.hideLoading();
 					view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
 				
 				} catch (JSONObjectAdapterException e) {
@@ -146,6 +148,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.hideLoading();
 				if (caught instanceof NotFoundException) {
 					getQuiz();
 				} else {
@@ -158,11 +161,13 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	public void getQuiz() {
+		view.showLoading();
 		synapseClient.getCertificationQuiz(new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String quizJson) {
 				try {
 					quiz = new Quiz(adapterFactory.createNew(quizJson));
+					view.hideLoading();
 					view.showQuiz(quiz);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -171,6 +176,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.hideLoading();
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
 				} 

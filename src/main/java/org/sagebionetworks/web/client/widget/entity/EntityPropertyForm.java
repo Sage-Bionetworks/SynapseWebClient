@@ -94,7 +94,13 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 	
 	@Override
 	public void saveButtonClicked() {
-		callback.saveEntity(adapter, annos);	
+		try {
+			if (!DisplayUtils.isWikiSupportedType(getEntity()))
+				adapter.put("description", view.getMarkdownDescription());
+			callback.saveEntity(adapter, annos);
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(e.getMessage());
+		}	
 	}
 	
 	public void refreshEntityAttachments(Entity newEntity) throws JSONObjectAdapterException {

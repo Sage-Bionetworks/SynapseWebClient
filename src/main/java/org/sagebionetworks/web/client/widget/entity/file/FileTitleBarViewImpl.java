@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.file;
 import org.gwtbootstrap3.client.ui.ImageAnchor;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
@@ -154,9 +152,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 		favoriteWidget.configure(entity.getId());
 		
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-		licensedDownloader.configure(entityBundle, userProfile);
+		licensedDownloader.configure(entityBundle);
 		
 		md5Link.clear();
 		md5LinkContainer.clear();
@@ -205,6 +201,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				authorizedDirectDownloadImage.setVisible(true);
 				authorizedDirectDownloadLink.setText(entity.getName());
 				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
+				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
+				presenter.queryForSftpLoginInstructions(url);
 			} else {
 				directDownloadLink.setVisible(true);
 				directDownloadImage.setVisible(true);
@@ -218,6 +216,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			licensedDownloadLink.setVisible(true);
 			downloadButtonContainer.setVisible(true);
 		}
+	}
+	@Override
+	public void setLoginInstructions(String instructions) {
+		loginModalWidget.setInstructionMessage(instructions);
 	}
 	
 	@Override

@@ -325,19 +325,4 @@ public class HomePresenterTest {
 		//should automatically log you out
 		verify(mockAuthenticationController).logoutUser();
 	}
-
-	@Test
-	public void testIsCertified() {
-		//user has not passed the certification quiz
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
-		homePresenter.checkIfCertified();
-		verify(mockView).showCertificationReminder(eq(true));
-	}
-	
-	@Test
-	public void testIsNotCertified() {
-		homePresenter.checkIfCertified();
-		verify(mockView, times(0)).showCertificationReminder(anyBoolean());
-	}
-
 }

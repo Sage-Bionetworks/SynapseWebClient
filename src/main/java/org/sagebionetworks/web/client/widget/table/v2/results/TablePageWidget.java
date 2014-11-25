@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
@@ -31,7 +32,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	PortalGinInjector ginInjector;
 	List<ColumnModel> types;
 	RowSelectionListener rowSelectionListener;
-	PaginationWidget paginationWidget;
+	DetailedPaginationWidget paginationWidget;
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	/*
@@ -40,7 +41,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, PaginationWidget paginationWidget){
+	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, DetailedPaginationWidget paginationWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
 		this.view = view;
@@ -55,7 +56,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 * @param rowSelectionListener If null then selection will be disabled.
 	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, Query query, boolean isEditable, RowSelectionListener rowSelectionListener, PageChangeListener pageChangeListener){
+	public void configure(QueryResultBundle bundle, Query query, SortItem sort, boolean isEditable, RowSelectionListener rowSelectionListener, final PagingAndSortingListener pageChangeListener){
 		this.rowSelectionListener = rowSelectionListener;
 		// The pagination widget is only visible if a listener was provider
 		if(pageChangeListener != null){
@@ -67,10 +68,24 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		// Map the columns to types
 		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getSelectColumns());
 		// setup the headers from the types
-		List<String> headers = new ArrayList<String>();
+		List<IsWidget> headers = new ArrayList<IsWidget>();
 		for (ColumnModel type: types) {
-			headers.add(type.getName());
+			// Create each header
+			String headerName = type.getName();
+			SortableTableHeader sth = ginInjector.createSortableTableHeader();
+			sth.configure(type.getName(), pageChangeListener);
+			headers.add(sth);
+			if(sort != null){
+				if(headerName.equals(sort.getColumn())){
+					if(SortDirection.ASC.equals(sort.getDirection())){
+						sth.setIcon(IconType.SORT_ASC);
+					}else{
+						sth.setIcon(IconType.SORT_DESC);
+					}
+				}
+			}
 		}
+		
 		// Create a navigation handler
 		if(isEditable){
 			// We only need key press navigation for editors.
@@ -228,5 +243,19 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if(!this.isSelectionChanging && this.rowSelectionListener != null){
 			this.rowSelectionListener.onSelectionChanged();
 		}
+	}
+
+	/**
+	 * Is this page valid?
+	 * @return
+	 */
+	public boolean isValid() {
+		boolean isValid = true;
+		for(RowWidget row: rows){
+			if(!row.isValid()){
+				isValid = false;
+			}
+		}
+		return isValid;
 	}
 }

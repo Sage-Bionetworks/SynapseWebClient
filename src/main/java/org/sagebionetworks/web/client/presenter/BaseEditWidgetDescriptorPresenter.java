@@ -24,7 +24,6 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	//contains all of the widget specific parameters
 	Map<String, String> widgetDescriptor;
 	private WidgetRegistrar widgetRegistrar;
-	private WikiPageKey wikiKey;
 	
 	@Inject
 	public BaseEditWidgetDescriptorPresenter(BaseEditWidgetDescriptorView view, WidgetRegistrar widgetRegistrar){
@@ -34,29 +33,6 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		handlerManager = new HandlerManager(this);
 	}
 
-	/**
-	 * Pop up an editor to create a new widget of the given class type (class that implements WidgetDescriptor).  Add the given handler, which will be notified when the widget descriptor has been updated.
-	 * @param entityId
-	 * @param attachmentName
-	 * @param handler
-	 */
-	public static void editNewWidget(BaseEditWidgetDescriptorPresenter presenter, WikiPageKey wikiKey, String contentTypeKey, WidgetDescriptorUpdatedHandler handler, boolean isWiki) {
-		presenter.addWidgetDescriptorUpdatedHandler(handler);
-		presenter.editNew(wikiKey, contentTypeKey, isWiki);
-	}
-
-	/**
-	 * Pop up an editor to create a new widget of the given class type (class that implements WidgetDescriptor).  Add the given handler, which will be notified when the widget descriptor has been updated.
-	 * @param entityId
-	 * @param attachmentName
-	 * @param handler
-	 */
-	public static void editExistingWidget(BaseEditWidgetDescriptorPresenter presenter, WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor, WidgetDescriptorUpdatedHandler handler, boolean isWiki) {
-		presenter.addWidgetDescriptorUpdatedHandler(handler);
-		presenter.editExisting(wikiKey, contentTypeKey, descriptor, isWiki);
-	}
-
-	
 	@Override
 	public void apply() {
 		//widgetDescriptor should have all of the updated parameter info.  But we do need to ask for the widget name from the view.
@@ -120,7 +96,6 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		if(wikiKey.getOwnerObjectType() == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
 		if(contentTypeKey == null) throw new IllegalArgumentException("content type key cannot be null");
 		cleanInit();
-		this.wikiKey = wikiKey;
 		this.contentTypeKey = contentTypeKey;
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
@@ -131,7 +106,6 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	private void cleanInit() {
-		wikiKey = null;
 		contentTypeKey = null;
 		attachmentName = null;
 		view.clear();

@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -161,8 +160,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	 */
 	@Override
 	public void callbackIfCertifiedIfEnabled(Callback callback) {
-		if (FilesBrowser.isCertificationRequired(entityBundle.getPermissions().getCanAddChild(), entityBundle.getPermissions().getCanCertifiedUserAddChild())) {
-			view.showQuizInfoDialog(true, null);
+		if (!entityBundle.getPermissions().getIsCertifiedUser()) {
+			view.showQuizInfoDialog();
 		} else
 			callback.invoke();
 	}

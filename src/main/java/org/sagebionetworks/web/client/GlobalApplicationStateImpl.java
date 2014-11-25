@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
@@ -163,15 +164,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	@Override
-	public void initSynapseProperties() {
+	public void initSynapseProperties(final Callback c) {
 		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				synapseProperties = properties;
+				c.invoke();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				c.invoke();
 			}
 		});
 	}

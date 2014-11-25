@@ -222,7 +222,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		
 		// put delete last
 		if(permissions.getCanDelete()) {
-			addDeleteItem(toolsButton, typeDisplay);
+			addDeleteItem(toolsButton, entity, typeDisplay);
 		}
 		
 		toolsButton.setVisible(toolsButton.getCount() > 0);
@@ -232,13 +232,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * 'Delete Entity' item
 	 * @param entityType 
 	 */	
-	private void addDeleteItem(DropdownButton menuBtn, final String typeDisplay) {
+	private void addDeleteItem(DropdownButton menuBtn, final Entity entity, final String typeDisplay) {
 		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-trash") + " "
 						+ DisplayConstants.LABEL_DELETE + " " + typeDisplay));
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Callback() {
+				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay + " \"" + entity.getName() + "\"?", new Callback() {
 					
 					@Override
 					public void invoke() {
@@ -284,8 +284,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 						@Override
 						public void invoke() {
 							UserEntityPermissions permissions = entityBundle.getPermissions();
-							boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
-							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, isCertificationRequired);
+							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, permissions.getIsCertifiedUser());
 						}
 					});
 				}
@@ -303,12 +302,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		};
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null, true);
+		uploader.disableMultipleFileUploads();
 		uploader.show();
 	}
 	
 	@Override
-	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
-		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
+	public void showQuizInfoDialog() {
+		quizInfoDialog.show();
 	}
 		
 	/**

@@ -7,10 +7,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.widget.entity.GovernanceDialogHelper;
 
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.Orientation;
@@ -39,9 +35,6 @@ import com.google.inject.Inject;
 public class LicensedDownloaderViewImpl extends LayoutContainer implements LicensedDownloaderView {
 
 	private Presenter presenter;
-	private RESTRICTION_LEVEL restrictionLevel;
-	private APPROVAL_TYPE approvalType;	
-	private String licenseTextHtml;
 	private SafeHtml safeDownloadHtml;
 	private Window downloadWindow;
 	private LayoutContainer downloadContentContainer;
@@ -75,33 +68,12 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	 */
 	@Override
 	public void showWindow() {
-		if (!presenter.isDownloadAllowed()) return;
-		
-		if (approvalType==APPROVAL_TYPE.NONE) {
-			if (directDownloadURL != null) {
-				DisplayUtils.newWindow(directDownloadURL, "", "");
-			} else {
-				createDownloadWindow();
-				downloadWindow.show();
-			}
+		if (directDownloadURL != null) {
+			DisplayUtils.newWindow(directDownloadURL, "", "");
 		} else {
-			Callback termsOfUseCallback = presenter.getTermsOfUseCallback();
-			GovernanceDialogHelper.showAccessRequirement(
-					restrictionLevel,
-					approvalType, 
-					false/*isAnonymous*/, 
-					false/*hasAdministrativeAccess*/,
-					false/*accessApproved*/, 
-					icons, 
-					licenseTextHtml, 
-					null/*imposeRestrictionsCallback*/, 
-					termsOfUseCallback, 
-					presenter.getRequestAccessCallback(), 
-					null/*loginCallback*/, 
-					null/*jiraFlagLink*/,
-					null /*on hide dialog callback*/);
+			createDownloadWindow();
+			downloadWindow.show();
 		}
-		
 	}
 
 	@Override
@@ -117,32 +89,13 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 		downloadButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				view.showWindow();
+				presenter.showWindow();
 			}
 		});
 				
 		return downloadButton;
 	}
 
-	@Override
-	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel) {
-		this.restrictionLevel = restrictionLevel;		
-	}
-
-	/**
-	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
-	 * @param approvalType
-	 */
-	@Override
-	public void setApprovalType(APPROVAL_TYPE approvalType) {
-		this.approvalType = approvalType;		
-	}
-
-	@Override
-	public void setLicenseHtml(String licenseHtml) {
-		this.licenseTextHtml = licenseHtml;
-	}
-	
 	@Override
 	public void setDownloadLocation(String md5, String directDownloadUrl) {
 		this.directDownloadURL = directDownloadUrl;
@@ -217,7 +170,6 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	@Override
 	public void clear() {
 		// defaults
-		licenseTextHtml = "";
 		safeDownloadHtml = SafeHtmlUtils.fromSafeConstant("");
 		locations = null;
 	}

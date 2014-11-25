@@ -21,14 +21,15 @@ public interface UploaderView extends IsWidget, SynapseView {
 	public void showProgressBar();
 	public void showConfirmDialog(String message, Callback yesCallback, Callback noCallback);
 	void resetToInitialState();
-	void showNoFilesSelectedForUpload();
 	void enableMultipleFileUploads(boolean isEnabled);
 	void setShowCancelButton(boolean showCancel);
 	void showUploaderUI();
 	void triggerUpload();
 	
+	void showErrorMessage(String title, String details);
+	
 	void showUploadingToSynapseStorage(String banner);
-	void showUploadingToExternalStorage(String url, String banner);
+	void showUploadingToExternalStorage(String host, String banner);
 	
 	/**
 	 * SFTP requires username and password, so prompt for it in the upload form.
@@ -41,7 +42,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	String getExternalPassword();
 	
-	void showExternalCredentialsRequiredMessage();
+	void enableUpload();
 	
 	/**
 	 * Presenter interface

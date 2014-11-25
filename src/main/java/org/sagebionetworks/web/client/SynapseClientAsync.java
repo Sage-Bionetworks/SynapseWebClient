@@ -28,8 +28,10 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -343,6 +345,20 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
+	/**
+	 * For the given table SQL toggle the sort on the given column and return the modified SQL.
+	 * @param sql
+	 * @param header
+	 * @param callback
+	 */
+	void toggleSortOnTableQuery(String sql, String header, AsyncCallback<String> callback);
+	
+	/**
+	 * Parse the query and determine the sort columns.
+	 * @param sql
+	 * @param callback
+	 */
+	void getSortFromTableQuery(String sql, AsyncCallback<List<SortItem>> callback);
 
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
@@ -384,6 +400,23 @@ public interface SynapseClientAsync {
 	 */
 	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
 
+	/**
+	 * Return all projects that the current user can access, sorted by access time
+	 * @param limit
+	 * @param offset
+	 * @param projectHeaders
+	 */
 	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	/**
+	 * Return projects that the current user can access due to being on a particular team. 
+	 * @param teamId
+	 * @param limit
+	 * @param offset
+	 * @param projectHeaders
+	 */
+	void getProjectsForTeam(String teamId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	
+	void getHost(String urlString, AsyncCallback<String> callback);
+
 }
