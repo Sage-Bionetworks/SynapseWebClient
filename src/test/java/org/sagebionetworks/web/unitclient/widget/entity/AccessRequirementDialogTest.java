@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -11,7 +14,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -253,6 +255,7 @@ public class AccessRequirementDialogTest {
 	
 	@Test
 	public void testConfigureAct() {
+//		actAR.setShowRequestAccessFlag(true);
 		widget.configure(actAR, 
 				entityId, 
 				true, 							/** hasAdministrativeAccess **/
@@ -280,6 +283,38 @@ public class AccessRequirementDialogTest {
 		verify(mockView, never()).showSignTermsButton();
 		verify(mockView).showRequestAccessFromACTButton();
 		verify(mockView, never()).showCloseButton();
+	}
+	
+	@Test
+	public void testConfigureActNoRequestAccess() {
+//		actAR.setShowRequestAccessFlag(false);
+		widget.configure(actAR, 
+				entityId, 
+				true, 							/** hasAdministrativeAccess **/
+				false, 							/** accessApproved **/ 
+				mockImposeRestrictionCallback,	/** imposeRestrictionCallback **/ 
+				mockFinishedCallback			/** finishedCallback **/
+		);
+		verify(mockView).clear();
+		verify(mockView, never()).showNoRestrictionsUI();
+		verify(mockView, never()).showOpenUI();
+		verify(mockView).showControlledUseUI();
+		verify(mockView, never()).showApprovedHeading();
+		verify(mockView, never()).showTouHeading();
+		verify(mockView).showActHeading();
+		verify(mockView).showTermsUI();
+		verify(mockView).setTerms(actContactInfo);
+		verify(mockView, never()).showAnonymousAccessNote();
+		verify(mockView, never()).showImposeRestrictionsAllowedNote();
+		verify(mockView).showImposeRestrictionsNotAllowedNote();
+		verify(mockView, never()).showAnonymousFlagNote();
+		verify(mockView).showImposeRestrictionsNotAllowedFlagNote();
+		verify(mockView, never()).showImposeRestrictionsButton();
+		verify(mockView, never()).showLoginButton();
+		verify(mockView, never()).showCancelButton();
+		verify(mockView, never()).showSignTermsButton();
+		verify(mockView, never()).showRequestAccessFromACTButton();
+		verify(mockView).showCloseButton();
 	}
 	
 	@Test

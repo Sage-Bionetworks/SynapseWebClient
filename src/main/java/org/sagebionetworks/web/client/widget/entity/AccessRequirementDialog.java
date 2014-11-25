@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -145,9 +146,13 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	     				view.showSignTermsButton();
 	     				view.showCancelButton();
 	     			} else { // APPROVAL_TYPE.ACT_APPROVAL
-	     				// request access, cancel
-	     				view.showRequestAccessFromACTButton();
-	     				view.showCancelButton();
+	     				if (isShowRequestAccessFromACTButton()) {
+	     					// request access, cancel
+	     					view.showRequestAccessFromACTButton();
+		     				view.showCancelButton();	
+	     				} else {
+	     					view.showCloseButton();
+	     				}
 	     			}
      			}
       		}
@@ -192,6 +197,14 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	public APPROVAL_TYPE getApprovalType() {
 		return GovernanceServiceHelper.accessRequirementApprovalType(ar);
 	}
+	
+	public boolean isShowRequestAccessFromACTButton() {
+		if (ar instanceof ACTAccessRequirement) 
+//			return ar.getShowRequestAccessFlag();
+			return true;
+		return false;
+	}
+
 
 	@Override
 	public void imposeRestrictionClicked() {
