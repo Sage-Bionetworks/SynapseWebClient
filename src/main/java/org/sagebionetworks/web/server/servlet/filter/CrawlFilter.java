@@ -78,7 +78,7 @@ public class CrawlFilter implements Filter {
 				int port = request.getServerPort();
 				String domain = request.getServerName();
 				String lowerCaseDomain = domain.toLowerCase();
-				if (!lowerCaseDomain.contains("www.synapse.org") && !lowerCaseDomain.contains("repo-prod.prod.sagebase.org")) {
+				if (!lowerCaseDomain.contains("www.synapse.org")) {
 					response.setContentType("text/html");
 					HttpServletResponse httpResponse = (HttpServletResponse) response;
 					httpResponse.setStatus(HttpServletResponse.SC_OK);
