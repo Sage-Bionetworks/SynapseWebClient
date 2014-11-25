@@ -561,6 +561,7 @@ public class DisplayConstants {
 	public static final String ALWAYS_CURRENT_VERSION = "Always refer to the most current version";
 	public static final String BROWSE_MY_ENTITIES = "Browse My Entities";
 	public static final String ENTER_SYNAPSE_ID = "Enter Synapse Id";
+	public static final String ENTER_PAGE_TITLE = "Enter Page Title";
 	public static final String REFER_TO_SPECIFIC_VERSION = "Refer to a Specific Version";
 	public static final String CURRENT = "Current";
 	public static final String CURRENTLY_SELCTED = "Currently Selected";

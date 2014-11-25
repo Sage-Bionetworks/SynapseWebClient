@@ -263,7 +263,8 @@ SynapseWidgetPresenter {
 	 
 	@Override
 	public void createPage(final String name) {
-		createPage(name, null);
+		if (DisplayUtils.isDefined(name))
+			createPage(name, null);
 	}
 	
 	public void createPage(final String name, final org.sagebionetworks.web.client.utils.Callback onSuccess) {
