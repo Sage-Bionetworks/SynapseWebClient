@@ -211,6 +211,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 	private void scoreQuiz(PassingRecord passingRecord) {
 		//go through and highlight correct/incorrect answers
 		testContainer.clear();
+		if (passingRecord.getCorrections() == null)
+			return;
 		int questionNumber = 1;
 		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
 			//indicate success/failure
@@ -233,8 +235,10 @@ public class QuizViewImpl extends Composite implements QuizView {
 		}
 		//scored quiz cannot be resubmitted
 		submitButton.setVisible(false);
-		DisplayUtils.show(scoreContainer);
-		scoreContainer.setInnerHTML("Score: " + passingRecord.getScore() + "/" + passingRecord.getCorrections().size() );
+		if (passingRecord.getCorrections() != null) {
+			DisplayUtils.show(scoreContainer);
+			scoreContainer.setInnerHTML("Score: " + passingRecord.getScore() + "/" + passingRecord.getCorrections().size() );
+		}
 	}
 	
 	@Override
