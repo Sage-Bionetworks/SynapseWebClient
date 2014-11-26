@@ -46,6 +46,8 @@ public class Profile extends Place implements RestartActivityOptional{
 			}
 		} else {
 			userId = token;
+			//and by default go to the projects tab
+			area = Synapse.ProfileArea.PROJECTS;
 		}
 	}
 	

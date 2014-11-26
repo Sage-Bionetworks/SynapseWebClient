@@ -21,7 +21,8 @@ public class ProfilePlaceTest {
 		Profile place = tokenizer.getPlace(testToken);
 		
 		Assert.assertEquals(testUserId, place.getUserId());
-		Assert.assertNull(place.getArea());
+		//default area is projects
+		Assert.assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 	

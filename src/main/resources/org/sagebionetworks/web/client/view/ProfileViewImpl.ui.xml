@@ -16,8 +16,8 @@
 			    <div class="col-md-3 col-xs-12">
 			        <div class="padding-15 light-border">
 			            <b:Row ui:field="profilePictureLoadingUI" visible="false">
-				            <b:Column size="XS_12" offset="XS_5">
-				            	<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
+				            <b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
+				            	<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
 				            	<bh:Text>&nbsp; Loading...</bh:Text>
 							</b:Column>
 						</b:Row>
@@ -27,7 +27,7 @@
 			    </div>
 			    <div class="col-md-9 col-xs-12">
 			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
-			        	<b:Column size="XS_12" offset="XS_5">
+			        	<b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
 							<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
 							<bh:Text>&nbsp; Loading...</bh:Text>
 						</b:Column>
