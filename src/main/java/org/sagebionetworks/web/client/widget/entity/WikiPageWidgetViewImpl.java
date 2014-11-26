@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -24,7 +26,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
-import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
@@ -460,14 +461,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
 				}
 				else {
-					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
+					Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
 						@Override
-						public void onSave(String name, String description) {
+						public void callback(String name) {
 							presenter.createPage(name);
 						}
 					});
 				}
-				
 			}
 		});
 		return btn;
