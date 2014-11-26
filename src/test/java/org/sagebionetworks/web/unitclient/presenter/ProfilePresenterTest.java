@@ -867,4 +867,21 @@ public class ProfilePresenterTest {
 		profilePresenter.certificationBadgeClicked();
 		verify(mockPlaceChanger).goTo(any(Certificate.class));
 	}
+	
+	@Test
+	public void testUpdateArea() {
+		profilePresenter.setPlace(place);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		profilePresenter.updateArea(ProfileArea.FAVORITES);
+		verify(mockPlaceChanger).goTo(any(Profile.class));
+	}
+
+	@Test
+	public void testUpdateAreaNoChange() {
+		profilePresenter.setPlace(place);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		profilePresenter.updateArea(ProfileArea.PROJECTS);
+		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
+	}
+	
 }
