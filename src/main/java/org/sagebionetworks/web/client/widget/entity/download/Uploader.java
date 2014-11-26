@@ -147,6 +147,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.triggerUpload();
 	}
 	
+	public String[] getSelectedFileNames() {
+		return synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID);
+	}
+	
+	@Override
+	public String getSelectedFilesText() {
+		String[] selectedFiles = getSelectedFileNames();
+		if (selectedFiles == null)
+			return UploaderViewImpl.DRAG_AND_DROP;
+		else if (selectedFiles.length == 1) {
+			return selectedFiles[0];
+		} else {
+			return selectedFiles.length + " files";
+		}
+	}
+	
 	@Override
 	public void handleUploads() {
 		//field validation
@@ -154,7 +170,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			//setup upload process.
 			fileHasBeenUploaded = false;
 			currIndex = 0;
-			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
+			if ((fileNames = getSelectedFileNames()) == null) {
 				//no files selected.
 				view.hideLoading();
 				view.showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
