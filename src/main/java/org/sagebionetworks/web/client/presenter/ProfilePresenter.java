@@ -688,8 +688,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void tabClicked(final ProfileArea tab) {
-		if (tab == null)
+		if (tab == null) {
 			view.showErrorMessage("The selected tab is undefined.");
+			return;
+		}
 		//if we are editing, then pop up a confirm
 		if (globalApplicationState.isEditing()) {
 			Callback yesCallback = new Callback() {

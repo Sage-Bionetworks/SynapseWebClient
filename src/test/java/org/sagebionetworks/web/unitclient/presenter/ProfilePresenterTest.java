@@ -758,7 +758,7 @@ public class ProfilePresenterTest {
 		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Profile capturedPlace = captor.getValue();
-		assertNull(capturedPlace.getArea());
+		assertEquals(ProfileArea.PROJECTS, capturedPlace.getArea());
 		assertEquals(testUserId, capturedPlace.getUserId());
 	}
 	@Test
@@ -836,7 +836,8 @@ public class ProfilePresenterTest {
 	@Test
 	public void testTabClickedDefault(){
 		profilePresenter.tabClicked(null);
-		verify(mockView).setTabSelected(eq(ProfileArea.PROJECTS));
+		verify(mockView).showErrorMessage(anyString());
+		verify(mockView, never()).setTabSelected(any(ProfileArea.class));
 	}
 	
 	@Test
