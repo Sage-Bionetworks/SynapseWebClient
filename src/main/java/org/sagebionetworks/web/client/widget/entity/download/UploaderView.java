@@ -66,5 +66,6 @@ public interface UploaderView extends IsWidget, SynapseView {
 		void cancelClicked();
 		
 		void disableMultipleFileUploads();
+		String getSelectedFilesText();
 	}
 }
