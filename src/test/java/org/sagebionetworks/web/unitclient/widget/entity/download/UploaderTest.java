@@ -59,6 +59,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -519,4 +520,24 @@ public class UploaderTest {
 		assertTrue(uploader.isJschAuthorizationError("com.jcraft.jsch.JSchException: Auth fail"));
 		assertTrue(uploader.isJschAuthorizationError("com.JCRAFT.jsch.jschexception: Auth FAIL"));
 	}
+	
+	@Test
+	public void testGetSelectedFilesText() {
+		String fileName = "single file.txt";
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{fileName});
+		assertEquals(fileName, uploader.getSelectedFilesText());
+	}
+	
+	@Test
+	public void testGetSelectedFilesTextNoFiles() {
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		assertEquals(UploaderViewImpl.DRAG_AND_DROP, uploader.getSelectedFilesText());
+	}
+	
+	@Test
+	public void testGetSelectedFilesTextMultipleFiles() {
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"file1", "file2"});
+		assertEquals("2 files", uploader.getSelectedFilesText());
+	}
+
 }
