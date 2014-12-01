@@ -244,7 +244,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				view.showVerifyDataSensitiveDialog();
 			} else {
 				//finished showing access requirements, refresh the bundle
-				entityUpdated.invoke();
+				if (entityUpdated != null)
+					entityUpdated.invoke();
 			}
 		}
 	}
@@ -298,4 +299,11 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		view.setNotSensitiveHumanDataMessageVisible(false);
 	}
 
+	/**
+	 * For unit testing
+	 * @param entityUpdated
+	 */
+	public void setEntityUpdated(Callback entityUpdated) {
+		this.entityUpdated = entityUpdated;
+	}
 }
