@@ -162,7 +162,7 @@ public class RestrictionWidgetTest {
 		
 		verify(mockView).clear();
 		verify(mockView).showControlledUseUI();
-
+		verify(mockView).showUnmetRequirementsIcon();
 		//has existing terms, has "show" link
 		verify(mockView).showShowLink(any(ClickHandler.class));
 		verify(mockView).showFlagUI();
@@ -183,6 +183,7 @@ public class RestrictionWidgetTest {
 		
 		verify(mockView).clear();
 		verify(mockView).showControlledUseUI();
+		verify(mockView).showUnmetRequirementsIcon();
 
 		verify(mockView).showShowLink(any(ClickHandler.class));
 		verify(mockView).showAnonymousFlagUI();
@@ -190,6 +191,21 @@ public class RestrictionWidgetTest {
 		verify(mockView).setAccessRequirementDialog(any(Widget.class));
 	}
 	
+	@Test
+	public void testConfigureLoggedInControlledMet() {
+		when(bundle.getUnmetAccessRequirements()).thenReturn(new ArrayList<AccessRequirement>());
+		
+		//is logged in, with our tou restriction set up in before(), has admin access (can change)
+		widget.configure(bundle, 
+				true,						//showChangeLink 
+				true,						//showIfProject 
+				true,						//showFlagLink 
+				mockEntityUpdatedCallback);	//entityUpdated
+		
+		verify(mockView).clear();
+		verify(mockView).showControlledUseUI();
+		verify(mockView).showMetRequirementsIcon();
+	}
 	@Test
 	public void testConfigureLoggedInOpen() {
 		//no access restrictions, logged in, has admin access (can change)
@@ -227,6 +243,22 @@ public class RestrictionWidgetTest {
 		verify(mockView).showAnonymousFlagUI();
 		
 		verify(mockView).setAccessRequirementDialog(any(Widget.class));
+	}
+	
+	@Test
+	public void testEntityUpdatedCallback() {
+		Callback mockEntityUpdatedCallback = mock(Callback.class);
+		widget.setEntityUpdated(mockEntityUpdatedCallback);
+		//show nothing if empty and no admin privs (should not get into this state)
+		//in before, we set up a single unmet access requirement
+		widget.showNextAccessRequirement(false);
+		verify(mockEntityUpdatedCallback, never()).invoke();
+		verify(mockAccessRequirementDialog).show();
+		
+		widget.showNextAccessRequirement(false);
+		//we have shown all access requirements, should now update bundle
+		verify(mockEntityUpdatedCallback).invoke();
+		
 	}
 	
 	@Test

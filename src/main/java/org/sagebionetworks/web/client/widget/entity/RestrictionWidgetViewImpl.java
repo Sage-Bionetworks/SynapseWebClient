@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,6 +27,10 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@UiField
 	Span controlledUseUI;
+	@UiField
+	Image unmetRequirementsIcon;
+	@UiField
+	Image metRequirementsIcon;
 	
 	@UiField
 	Span noneUI;
@@ -186,6 +191,18 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public void showControlledUseUI() {
 		controlledUseUI.setVisible(true);
 	}
+	
+	@Override
+	public void showUnmetRequirementsIcon() {
+		unmetRequirementsIcon.setVisible(true);
+	}
+	
+	@Override
+	public void showMetRequirementsIcon() {
+		metRequirementsIcon.setVisible(true);
+	}
+
+
 	@Override
 	public void showFlagUI() {
 		flagUI.setVisible(true);
@@ -225,7 +242,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		showLinkClickHandler = null;
 		changeLinkClickHandler = null;
 		resetImposeRestrictionModal();
-		
+		unmetRequirementsIcon.setVisible(false);
+		metRequirementsIcon.setVisible(false);
 	}
 	
 	private void resetImposeRestrictionModal() {
