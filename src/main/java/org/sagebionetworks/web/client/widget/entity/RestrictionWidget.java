@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -119,6 +120,11 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		currentAR = selectNextAccessRequirement();
 	}
 	
+	public boolean hasUnmetAccessRequirements() {
+		List<AccessRequirement> unmetArs = bundle.getUnmetAccessRequirements();
+		return (unmetArs != null && !unmetArs.isEmpty());
+	}
+	
 	public boolean isCurrentAccessRequirementUnmet() {
 		return bundle.getUnmetAccessRequirements().contains(currentAR);
 	}
@@ -160,6 +166,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			case RESTRICTED:
 			case CONTROLLED:
 				view.showControlledUseUI();
+				if (hasUnmetAccessRequirements())
+					view.showUnmetRequirementsIcon();
+				else
+					view.showMetRequirementsIcon();
 				break;
 			default:
 				throw new IllegalArgumentException(restrictionLevel.toString());
@@ -232,6 +242,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			if (hasAdministrativeAccess && bundle.getAccessRequirements().isEmpty()) {
 				//there are no access restrictions, and this person has administrative access.  verify data sensitivity, and if try then lockdown
 				view.showVerifyDataSensitiveDialog();
+			} else {
+				//finished showing access requirements, refresh the bundle
+				entityUpdated.invoke();
 			}
 		}
 	}
