@@ -29,6 +29,8 @@ public class TablePageViewImpl implements TablePageView {
 	TBody body;
 	@UiField
 	SimplePanel paginationPanel;
+	@UiField
+	SimplePanel editorPopupBuffer;
 	
 	Widget widget;
 	
@@ -71,6 +73,11 @@ public class TablePageViewImpl implements TablePageView {
 	@Override
 	public void setPaginationWidgetVisible(boolean visible) {
 		this.paginationPanel.setVisible(visible);
+	}
+
+	@Override
+	public void setEditorBufferVisible(boolean isEditable) {
+		this.editorPopupBuffer.setVisible(isEditable);
 	}
 
 }
