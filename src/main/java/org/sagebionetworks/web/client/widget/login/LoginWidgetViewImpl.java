@@ -3,10 +3,8 @@ package org.sagebionetworks.web.client.widget.login;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.view.TermsOfUseHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.SpanElement;
@@ -184,11 +182,6 @@ public class LoginWidgetViewImpl extends Composite implements
 		signInBtn.setEnabled(true);
 		signInBtn.setText(DisplayConstants.SIGN_IN);
 	}
-
-	@Override
-	public void showTermsOfUse(String content, final AcceptTermsOfUseCallback callback) {
-		TermsOfUseHelper.showTermsOfUse(content, callback);
-     }
 
 	/*
 	 * Private Methods

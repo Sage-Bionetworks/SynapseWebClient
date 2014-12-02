@@ -37,6 +37,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -147,6 +148,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.triggerUpload();
 	}
 	
+	public String[] getSelectedFileNames() {
+		return synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID);
+	}
+	
+	@Override
+	public String getSelectedFilesText() {
+		String[] selectedFiles = getSelectedFileNames();
+		if (selectedFiles == null)
+			return UploaderViewImpl.DRAG_AND_DROP;
+		else if (selectedFiles.length == 1) {
+			return selectedFiles[0];
+		} else {
+			return selectedFiles.length + " files";
+		}
+	}
+	
 	@Override
 	public void handleUploads() {
 		//field validation
@@ -154,7 +171,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			//setup upload process.
 			fileHasBeenUploaded = false;
 			currIndex = 0;
-			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
+			if ((fileNames = getSelectedFileNames()) == null) {
 				//no files selected.
 				view.hideLoading();
 				view.showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
@@ -580,7 +597,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		}else {
 			if (isJschAuthorizationError(uploadResult.getMessage())) {
-				uploadError(DisplayConstants.INVALID_USERNAME_OR_PASSWORD, new Exception(uploadResult.getMessage()));
+				uploadError(DisplayConstants.INVALID_USERNAME_OR_PASSWORD, new UnauthorizedException(uploadResult.getMessage()));
 			} else {
 				uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));	
 			}

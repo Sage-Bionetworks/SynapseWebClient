@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,6 +23,9 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	public void showVerifyDataSensitiveDialog();
 	
 	void showControlledUseUI();
+	void showUnmetRequirementsIcon();
+	void showMetRequirementsIcon();
+	
 	void showNoRestrictionsUI();
 	void showFlagUI();
 	void showAnonymousFlagUI();
@@ -42,6 +41,7 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	Boolean isYesHumanDataRadioSelected();
 	Boolean isNoHumanDataRadioSelected();
 	
+	
 	/**
 	 * Presenter interface
 	 */
@@ -54,8 +54,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 		
 		void yesHumanDataClicked();
 		void notHumanDataClicked();
-		
-		
 	}
 
 }

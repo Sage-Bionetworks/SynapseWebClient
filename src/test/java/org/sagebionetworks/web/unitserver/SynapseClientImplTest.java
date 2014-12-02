@@ -1582,7 +1582,7 @@ public class SynapseClientImplTest {
 		ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
 		verify(mockSynapse).logError(captor.capture());
 		LogEntry logEntry = captor.getValue();
-		assertTrue(logEntry.getLabel().length() - "SWC: ".length() <= SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE);
+		assertTrue(logEntry.getLabel().length() < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE+100);
 		assertEquals(errorMessage, logEntry.getMessage());
 	}
 

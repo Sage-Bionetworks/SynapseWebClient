@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.FieldSet;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
@@ -14,8 +16,11 @@ import org.gwtbootstrap3.client.ui.TabContent;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
@@ -30,10 +35,13 @@ import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -59,7 +67,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		UploaderView {
 	
 	private boolean showCancelButton = true;
-	private boolean multipleFileUploads = true;
 	private boolean isExternal;
 	
 	private TextBox externalUsername;
@@ -67,6 +74,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
 	public static final String FILE_FIELD_STYLENAME = "dragAndDropUploadBox";
+	public static final String FILE_BORDER_STYLENAME = "dragAndDropBorder";
 	public static final String FILE_FIELD_DROP_STYLE_NAME = "dropable";
 	public static final String FILE_UPLOAD_LABEL_STYLENAME = "fileUploadLabel";
 	public static final int BUTTON_HEIGHT_PX = 25;
@@ -90,16 +98,16 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private FlowPanel uploadPanel;
 	
-	private Button uploadBtn;
-	private Button cancelBtn; 
+	private Button uploadBtn, cancelBtn, chooseFileBtn;
 	private Progress progressContainer;
 	private ProgressBar progressBar;
 
 	// external link panel
 	
 	private HTML spinningProgressContainer;
-	private HTML fileUploadHTML;
-	private static final HTML DRAG_AND_DROP_HTML = new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>");
+	private Input fileUploadInput;
+	private Heading fileUploadLabel = new Heading(HeadingSize.H5);
+	public static final String DRAG_AND_DROP = "or Drag & Drop";
 	FlowPanel container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
@@ -134,6 +142,11 @@ public class UploaderViewImpl extends FlowPanel implements
 		
 		spinningProgressContainer = new HTML();
 		
+		chooseFileBtn = new Button("Choose File");
+		chooseFileBtn.setType(ButtonType.INFO);
+		chooseFileBtn.setSize(ButtonSize.LARGE);
+		chooseFileBtn.addStyleName("col-xs-offset-4 moveup-70 displayInline");
+		
 		uploadBtn = new Button();
 		uploadBtn.setType(ButtonType.PRIMARY);
 		uploadBtn.setPull(Pull.RIGHT);
@@ -165,7 +178,7 @@ public class UploaderViewImpl extends FlowPanel implements
 					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
 				} else {
 					formFieldsPanel.setVisible(false);
-					DRAG_AND_DROP_HTML.setVisible(false);
+					fileUploadLabel.setVisible(false);
 					uploadBtn.setEnabled(false);
 					initializeProgress();
 					presenter.handleUploads();	
@@ -236,14 +249,16 @@ public class UploaderViewImpl extends FlowPanel implements
 		hideLoading();
 		enableUpload();
 		// Clear previously selected files.
-		fileUploadHTML.setHTML(createFileUploadHTML().toString());
+		enableMultipleFileUploads(true);
+		fileUploadInput.setValue(null);
+		fileUploadLabel.setText(DRAG_AND_DROP);
 	}
 	
 	@Override
 	public void enableUpload() {
 		uploadBtn.setEnabled(true);
 		formFieldsPanel.setVisible(true);
-		DRAG_AND_DROP_HTML.setVisible(true);
+		fileUploadLabel.setVisible(true);
 	}
 	
 	@Override
@@ -359,8 +374,10 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	@Override
 	public void enableMultipleFileUploads(boolean isEnabled) {
-		this.multipleFileUploads = isEnabled;
-		fileUploadHTML.setHTML(createFileUploadHTML().toString());
+		if (isEnabled)
+			fileUploadInput.getElement().setAttribute("multiple", null);
+		else
+			fileUploadInput.getElement().removeAttribute("multiple");
 	}
 
 	/*
@@ -474,10 +491,32 @@ public class UploaderViewImpl extends FlowPanel implements
 	private void initUploadPanel() {
 		uploadDestinationContainer = new FlowPanel();
 		uploadDestinationContainer.addStyleName("alert alert-info margin-5");
-		
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
-		fileUploadHTML = createFileUploadHTML();
+		FlowPanel fileInputPanel = new FlowPanel();
+		fileInputPanel.addStyleName(FILE_BORDER_STYLENAME);
+		fileUploadInput = new Input(InputType.FILE);
+		fileUploadInput.setId(FILE_FIELD_ID);
+		fileUploadInput.setName("uploads[]");
+		fileUploadInput.setStyleName(FILE_FIELD_STYLENAME);
+		fileUploadLabel.addStyleName("moveup-70 margin-left-5 displayInline");
+		fileUploadInput.addValueChangeHandler(new ValueChangeHandler<String>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				fileUploadLabel.setText(presenter.getSelectedFilesText());
+			}
+		});
+		chooseFileBtn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//click file upload input field
+				fileUploadInput.getElement().<InputElement>cast().click();
+			}
+		});
+		fileInputPanel.add(fileUploadInput);
+		fileInputPanel.add(chooseFileBtn);
+		fileInputPanel.add(fileUploadLabel);
+		enableMultipleFileUploads(true);
 		formFieldsPanel = new FlowPanel();
 		
 		externalUsername = new TextBox();
@@ -493,14 +532,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		
 		formFieldsPanel.add(externalUsername);
 		formFieldsPanel.add(externalPassword);
-		formFieldsPanel.add(fileUploadHTML);
+		formFieldsPanel.add(fileInputPanel);
 		configureUploadButton(); // upload tab first by default
 		
 		formPanel.setWidget(formFieldsPanel);
 		uploadPanel = new FlowPanel();
 		uploadPanel.add(uploadDestinationContainer);
 		uploadPanel.add(formPanel);
-		uploadPanel.add(DRAG_AND_DROP_HTML);
 		
 		Row row = new Row();
 		Column col = new Column(ColumnSize.XS_12);
@@ -574,13 +612,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	private void configureUploadButtonForExternal() {
 		isExternal = true;
 		uploadBtn.setText("Save");
-	}
-	
-	private HTML createFileUploadHTML() {
-		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple></input>");
-		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" /></input>");
 	}
 	
 	private void removeDragAndDropHandlers() {

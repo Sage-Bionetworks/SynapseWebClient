@@ -150,7 +150,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void updateArea(ProfileArea area) {
-		if (area != null) {
+		if (area != null && !area.equals(place.getArea())) {
 			place.setArea(area);
 			place.setNoRestartActivity(true);
 			globalApplicationState.getPlaceChanger().goTo(place);
@@ -687,21 +687,23 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void tabClicked(ProfileArea tab) {
-		//Project tab is default
-		final ProfileArea areaTab = tab == null ? ProfileArea.PROJECTS : tab; 
+	public void tabClicked(final ProfileArea tab) {
+		if (tab == null) {
+			view.showErrorMessage("The selected tab is undefined.");
+			return;
+		}
 		//if we are editing, then pop up a confirm
 		if (globalApplicationState.isEditing()) {
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
 					profileForm.rollback();
-					view.setTabSelected(areaTab);
+					view.setTabSelected(tab);
 				}
 			};
 			view.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
 		} else
-			view.setTabSelected(areaTab);
+			view.setTabSelected(tab);
 	}
 	
 	/**

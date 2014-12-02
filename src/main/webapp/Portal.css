@@ -634,6 +634,9 @@ a.shortBtn {
 .margin-top-100 {
 	margin-top: 100px;
 }
+.margin-top-300 {
+	margin-top: 300px;
+}
 
 .margin-left-180 {
 	margin-left: 180px;
@@ -747,10 +750,12 @@ a.shortBtn {
 .dragAndDropUploadBox {
 	width: 100%;
 	padding: 3em 0 6em 38%;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+.dragAndDropBorder {
 	border: 2px dashed;
-	margin-bottom: 12px;
 	border-radius: 3em;
-	display: inline !important;
 }
 
 
@@ -1428,6 +1433,12 @@ ol.lowerroman {
 	position: relative;
 	top: -35px;
 }
+
+.moveup-70 {
+	position: relative;
+	top: -70px;
+}
+
 
 .moveup-8 {
 	position: relative;

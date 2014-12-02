@@ -65,6 +65,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}else{
 			view.setPaginationWidgetVisible(false);
 		}
+		view.setEditorBufferVisible(isEditable);
 		// Map the columns to types
 		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getSelectColumns());
 		// setup the headers from the types
