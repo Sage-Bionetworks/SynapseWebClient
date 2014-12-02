@@ -37,6 +37,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -596,7 +597,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		}else {
 			if (isJschAuthorizationError(uploadResult.getMessage())) {
-				uploadError(DisplayConstants.INVALID_USERNAME_OR_PASSWORD, new Exception(uploadResult.getMessage()));
+				uploadError(DisplayConstants.INVALID_USERNAME_OR_PASSWORD, new UnauthorizedException(uploadResult.getMessage()));
 			} else {
 				uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));	
 			}

@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.CombineFileChunksException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -246,6 +247,7 @@ public class MultipartUploaderTest {
 		uploader.uploadSelectedFile("123", mockHandler);
 		uploader.chunkUploadFailure(2, attempt, 2, 1024, requestList, "");
 		verify(mockHandler).uploadFailed(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK);
+		verify(mockLogger).errorToRepositoryServices(anyString(), any(CombineFileChunksException.class));
 	}
 	
 	@Test

@@ -584,7 +584,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (label != null) {
 				outputLabel = label.substring(0, Math.min(label.length(), MAX_LOG_ENTRY_LABEL_SIZE));
 			}
-			entry.setLabel("SWC: " + outputLabel);
+			new PortalVersionHolder();
+			entry.setLabel("SWC/" + PortalVersionHolder.getVersionInfo() + "/" + outputLabel);
 			entry.setMessage(message);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
