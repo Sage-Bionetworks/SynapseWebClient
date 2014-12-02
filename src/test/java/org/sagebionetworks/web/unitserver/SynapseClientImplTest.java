@@ -1582,8 +1582,7 @@ public class SynapseClientImplTest {
 		ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
 		verify(mockSynapse).logError(captor.capture());
 		LogEntry logEntry = captor.getValue();
-		//25 extra characters allowed for the prefix and portal version
-		assertTrue(logEntry.getLabel().length() - 25 <= SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE);
+		assertTrue(logEntry.getLabel().length() < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE+100);
 		assertEquals(errorMessage, logEntry.getMessage());
 	}
 
