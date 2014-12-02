@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.CombineFileChunksException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.i18n.client.NumberFormat;
@@ -234,7 +235,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 */
 	public void chunkUploadFailure(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList, String detailedMessage) {
 		if (currentAttempt >= MAX_RETRY)
-			uploadError(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK + detailedMessage, new Exception(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK));
+			uploadError(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK + detailedMessage, new CombineFileChunksException(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK));
 		else { //retry
 			//sleep for a second on the client, then try again.
 			gwt.scheduleExecution(new Callback() {
