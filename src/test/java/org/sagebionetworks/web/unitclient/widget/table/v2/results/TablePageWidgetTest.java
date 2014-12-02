@@ -159,6 +159,23 @@ public class TablePageWidgetTest {
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
+		verify(mockView).setEditorBufferVisible(true);
+	}
+	
+	@Test
+	public void testConfigureEditable(){
+		boolean isEditable = true;
+		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		verify(mockView).setEditorBufferVisible(true);
+	}
+	
+	@Test
+	public void testConfigureNotEditable(){
+		boolean isEditable = false;
+		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		verify(mockView).setEditorBufferVisible(false);
 	}
 	
 	@Test
