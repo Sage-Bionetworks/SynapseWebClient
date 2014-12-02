@@ -385,9 +385,9 @@ public class UploaderTest {
 		verify(view).showUploadingToExternalStorage(anyString(), anyString());
 		verify(view).enableMultipleFileUploads(false);
 		
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader.setFileNames(new String[] {"test.txt"});
 		uploader.uploadToSftpProxy(url);
+		verify(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		//capture the value sent to the form to submit
 		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
 		verify(view).submitForm(c.capture());
