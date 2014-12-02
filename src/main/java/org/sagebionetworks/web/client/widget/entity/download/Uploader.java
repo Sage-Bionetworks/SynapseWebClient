@@ -467,13 +467,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void setExternalFilePath(String path, String name) {
-		if (entityId != null) {
+		boolean isUpdating = entityId != null || entity != null;
+		if (isUpdating) {
 			//existing entity
 			if (entity==null || entity instanceof FileEntity) {
 				updateExternalFileEntity(entityId, path, name);
 			} else {
 				synapseClient.updateExternalLocationable(entityId, path, name, new AsyncCallback<EntityWrapper>() {
-					
 					public void onSuccess(EntityWrapper result) {
 						externalLinkUpdated(result, entity.getClass());
 					};
