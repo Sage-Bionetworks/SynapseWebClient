@@ -112,7 +112,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		clearWidths();
 	}
 	
-	// TODO: Super redundant!!
+	// TODO: Super redundant!! Super gross.
 	private Tree copyTree(Tree tree) {
 		Tree newTree = new Tree();
 		for (int i = 0; i < tree.getItemCount(); i++) {
@@ -148,14 +148,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		}
 	}
 	
-	
-	
-//	private void recurseOpenItem(SubPageTreeItem item) {
-//		item.setState(true);
-//		for (int i = 0; i < item.getChildCount(); i++) {
-//			recurseOpenItem((SubPageTreeItem) item.getChild(i));
-//		}
-//	}
 	
 	private List<SubPageTreeItem> getTreeRootChildren(Tree tree) {
 		List<SubPageTreeItem> result =  new ArrayList<SubPageTreeItem>();
