@@ -675,14 +675,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		fileHasBeenUploaded = false;
 		currIndex = 0;
 	}
-
-	/**
-	 * For testing purposes
-	 * @return
-	 */
-	public String getDirectUploadFileEntityId() {
-		return entityId;
-	}
 	
 	/**
 	 * For testing purposes
