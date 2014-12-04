@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 
 import com.google.inject.Inject;
 
@@ -15,10 +16,12 @@ import com.google.inject.Inject;
 public class QueryTokenProvider {
 	
 	AdapterFactory factory;
+	GWTWrapper gwt;
 	
 	@Inject
-	public QueryTokenProvider(AdapterFactory factory){
+	public QueryTokenProvider(AdapterFactory factory, GWTWrapper gwt){
 		this.factory = factory;
+		this.gwt = gwt;
 	}
 	
 	/**
@@ -42,6 +45,9 @@ public class QueryTokenProvider {
 	 */
 	public Query tokenToQuery(String token){
 		try {
+			if(token.startsWith("%")){
+				token = gwt.urlDecode(token);
+			}
 			return new Query(factory.createNew(token));
 		} catch (JSONObjectAdapterException e) {
 			return null;

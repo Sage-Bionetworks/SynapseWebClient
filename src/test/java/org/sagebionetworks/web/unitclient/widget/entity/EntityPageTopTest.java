@@ -59,6 +59,7 @@ import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.unitclient.presenter.GWTStub;
 
 import com.google.gwt.event.shared.EventBus;
 
@@ -98,7 +99,7 @@ public class EntityPageTopTest {
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		queryTokenProvider = new QueryTokenProvider(new AdapterFactoryImpl());
+		queryTokenProvider = new QueryTokenProvider(new AdapterFactoryImpl(), new GWTStub());
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);

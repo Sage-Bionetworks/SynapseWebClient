@@ -15,6 +15,9 @@ public interface GWTWrapper {
 
 	String encodeQueryString(String queryString);
 	String decodeQueryString(String queryString);
+	
+	String urlEncode(String toEncode);
+	String urlDecode(String toDecode);
 
 	XMLHttpRequest createXMLHttpRequest();
 
