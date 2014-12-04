@@ -286,6 +286,38 @@ public class AccessRequirementDialogTest {
 	}
 	
 	@Test
+	public void testConfigureActNullOpenJiraIssue() {
+		actAR.setOpenJiraIssue(null);
+		widget.configure(actAR, 
+				entityId, 
+				true, 							/** hasAdministrativeAccess **/
+				false, 							/** accessApproved **/ 
+				mockImposeRestrictionCallback,	/** imposeRestrictionCallback **/ 
+				mockFinishedCallback			/** finishedCallback **/
+		);
+		verify(mockView).clear();
+		verify(mockView, never()).showNoRestrictionsUI();
+		verify(mockView, never()).showOpenUI();
+		verify(mockView).showControlledUseUI();
+		verify(mockView, never()).showApprovedHeading();
+		verify(mockView, never()).showTouHeading();
+		verify(mockView).showActHeading();
+		verify(mockView).showTermsUI();
+		verify(mockView).setTerms(actContactInfo);
+		verify(mockView, never()).showAnonymousAccessNote();
+		verify(mockView, never()).showImposeRestrictionsAllowedNote();
+		verify(mockView).showImposeRestrictionsNotAllowedNote();
+		verify(mockView, never()).showAnonymousFlagNote();
+		verify(mockView).showImposeRestrictionsNotAllowedFlagNote();
+		verify(mockView, never()).showImposeRestrictionsButton();
+		verify(mockView, never()).showLoginButton();
+		verify(mockView).showCancelButton();
+		verify(mockView, never()).showSignTermsButton();
+		verify(mockView).showRequestAccessFromACTButton();
+		verify(mockView, never()).showCloseButton();
+	}
+	
+	@Test
 	public void testConfigureActNoRequestAccess() {
 		actAR.setOpenJiraIssue(false);
 		widget.configure(actAR, 
