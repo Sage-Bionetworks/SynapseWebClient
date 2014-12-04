@@ -15,7 +15,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.unitclient.presenter.GWTStub;
 
 public class QueryTokenProviderTest {
 	
@@ -24,7 +23,7 @@ public class QueryTokenProviderTest {
 	
 	@Before
 	public void before(){
-		provider = new QueryTokenProvider(new AdapterFactoryImpl(), new GWTStub());
+		provider = new QueryTokenProvider(new AdapterFactoryImpl());
 		// Setup a complex query
 		query = new Query();
 		query.setSql("select one, two, three from syn123 where name=\"bar\" and type in('one','two','three'");

@@ -1,12 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import java.io.UnsupportedEncodingException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.GWTWrapper;
 
 import com.google.inject.Inject;
 
@@ -20,12 +16,10 @@ public class QueryTokenProvider {
 	
 	private static final String UTF_8 = "UTF-8";
 	AdapterFactory factory;
-	GWTWrapper gwt;
 	
 	@Inject
-	public QueryTokenProvider(AdapterFactory factory, GWTWrapper gwt){
+	public QueryTokenProvider(AdapterFactory factory){
 		this.factory = factory;
-		this.gwt = gwt;
 	}
 	
 	/**

@@ -90,15 +90,5 @@ public class GWTWrapperImpl implements GWTWrapper {
 	public String getAppVersion() {
 		return Navigator.getAppVersion();
 	}
-
-	@Override
-	public String urlEncode(String decodedURL) {
-		return URL.encode(decodedURL);
-	}
-
-	@Override
-	public String urlDecode(String encodedURL) {
-		return URL.decode(encodedURL);
-	}
 	
 }
