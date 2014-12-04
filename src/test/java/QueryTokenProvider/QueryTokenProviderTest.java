@@ -2,14 +2,18 @@ package QueryTokenProvider;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.unitclient.presenter.GWTStub;
 
@@ -50,14 +54,21 @@ public class QueryTokenProviderTest {
 	}
 	
 	@Test 
-	public void testEncoded(){
+	public void testEncoded() throws JSONObjectAdapterException, UnsupportedEncodingException{
 		Query expected = new Query();
 		expected.setSql("SELECT * FROM syn1681358");
 		expected.setIsConsistent(true);
 		expected.setLimit(25L);
 		expected.setOffset(0L);
-		String token = "%7B%22limit%22:25,%20%22sql%22:%22SELECT%20*%20FROM%20syn1681358%22,%20%22isConsistent%22:true,%20%22offset%22:0%7D";
+		String json = EntityFactory.createJSONStringForEntity(expected);
+		String token = new String(Base64.encodeBase64(json.getBytes("UTF-8")), "UTF-8");
 		assertEquals(expected, provider.tokenToQuery(token));
 	}
 
+	@Test
+	public void testOldToken(){
+		String oldToken = "{%22limit%22:25,%20%22sql%22:%22SELECT%20*%20FROM%20syn2780485%22,%20%22isConsistent%22:true,%20%22offset%22:0}";
+		assertEquals(null, provider.tokenToQuery(oldToken));
+	}
+	
 }
