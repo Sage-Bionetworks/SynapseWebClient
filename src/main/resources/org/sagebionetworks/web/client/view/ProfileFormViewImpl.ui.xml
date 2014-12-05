@@ -111,7 +111,7 @@
 			</div>
 		</div>
 		
-		<b:Modal ui:field="previewDialog" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
+		<b:Modal ui:field="previewDialog" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 		  <b:ModalBody>
 		      <g:HTMLPanel>
 			  	<div class="row">
