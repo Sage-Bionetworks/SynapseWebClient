@@ -170,7 +170,7 @@ public class PortalServletModule extends ServletModule {
 		try {
 			String gwtCodeServerPort = System.getProperty("gwt.codeserver.port");
 			if (!debugRpcInitialized && gwtCodeServerPort != null && gwtCodeServerPort.trim().length() > 0) { 
-				//until we upgrade to gwt 1.6 or later, we need to manually copy the gwt.rpc files to the Portal directory.
+				//until we upgrade to gwt 2.6 or later, we need to manually copy the gwt.rpc files to the Portal directory.
 				String targetDir = System.getProperty("user.dir") + "/Portal/";
 				new File(targetDir).mkdirs();
 				WebClient webClient = new WebClient();
@@ -181,6 +181,7 @@ public class PortalServletModule extends ServletModule {
 					HtmlAnchor anchor = (HtmlAnchor)object;
 					String href = anchor.getHrefAttribute();
 					if (href.endsWith("gwt.rpc")) {
+						//now copy gwt.rpc file to the target directory!
 						URL website = new URL(rootPage + href);
 						ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 						FileOutputStream fos = new FileOutputStream(targetDir + href);
@@ -188,7 +189,6 @@ public class PortalServletModule extends ServletModule {
 						fos.close();
 					}
 				}
-				//now copy those files to the target directory!
 				
 				debugRpcInitialized = true;
 				webClient.closeAllWindows();
