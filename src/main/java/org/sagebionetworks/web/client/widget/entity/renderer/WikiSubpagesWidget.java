@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl.GetOrderHintCallback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -30,6 +32,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -137,7 +140,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				try {
 					final PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
 					
-					
 					synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
 						@Override
 						public void onSuccess(V2WikiOrderHint result) {
@@ -159,72 +161,121 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				}
 			}
 			
-			private Tree buildTree(PaginatedResults<JSONEntity> wikiHeaders) {
-				Map<String, SubPageTreeItem> wikiId2TreeItem = new HashMap<String, SubPageTreeItem>();
-				
-				//now grab all of the headers associated with this level
-				for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-					V2WikiHeader header = (V2WikiHeader) headerEntity;
-					boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
-					Place targetPlace;
-					String title;
-					if (header.getParentId() == null) {
-						targetPlace = ownerObjectLink;
-						title = ownerObjectName;
-					}
-					else {
-						targetPlace = getLinkPlace(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), header.getId());
-						title = header.getTitle();
-					}
-					
-					SubPageTreeItem item = new SubPageTreeItem(title, targetPlace, isCurrentPage);
-					wikiId2TreeItem.put(header.getId(), item);
-				}
-				//now set up the relationships
-				Tree tree = new Tree();
-				
-				for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-					V2WikiHeader header = (V2WikiHeader) headerEntity;
-					if (header.getParentId() != null){
-						//add this as a child							
-						SubPageTreeItem parent = wikiId2TreeItem.get(header.getParentId());
-						SubPageTreeItem child = wikiId2TreeItem.get(header.getId());
-						parent.addItem(child);
-						parent.setState(true);
-					} else {
-						String styleName = wikiId2TreeItem.get(header.getId()).isCurrentPage() ? "active" : "";
-						
-						tree.addItem(wikiId2TreeItem.get(header.getId()));
-					}
-				}
-				return tree;
-			}
-			
-			private void sortHeadersByOrderHint(PaginatedResults<JSONEntity> wikiHeaders, V2WikiOrderHint orderHint) {
-				// TODO: Sort headers by order hint.
-			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				//if this is because the wiki header root was not found, and the parent wiki id is null,
 				if (caught instanceof NotFoundException) {
 					//do nothing, show nothing
 					view.clear();
-				}
-				else
+				} else {
 					view.showErrorMessage(caught.getMessage());
+				}
 			}
 		});
 	}
+	
+	private void sortHeadersByOrderHint(PaginatedResults<JSONEntity> wikiHeaders, V2WikiOrderHint orderHint) {
+		// TODO: Sort headers by order hint.
+		List<JSONEntity> headerList = wikiHeaders.getResults();
+		List<String> idList = orderHint.getOrderHint();
+		if (idList == null) return;
+		
+		int insertIndex = 0;
+		for (int i = 0; i < idList.size(); i++) {
+			for (int j = 0; j < headerList.size(); j++) {
+				if (((V2WikiHeader) headerList.get(j)).getId().equals(idList.get(i))) {
+					// The header was in the order hint. Move that header towards the front.
+					JSONEntity toMove = headerList.remove(j);
+					headerList.add(insertIndex, toMove);
+					insertIndex++;
+				}
+			}
+		}
+	}
+	
+	private Tree buildTree(PaginatedResults<JSONEntity> wikiHeaders) {
+		Map<String, SubPageTreeItem> wikiId2TreeItem = new HashMap<String, SubPageTreeItem>();
+		
+		//now grab all of the headers associated with this level
+		for (JSONEntity headerEntity : wikiHeaders.getResults()) {
+			V2WikiHeader header = (V2WikiHeader) headerEntity;
+			boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
+			Place targetPlace;
+			String title;
+			if (header.getParentId() == null) {
+				targetPlace = ownerObjectLink;
+				title = ownerObjectName;
+			}
+			else {
+				targetPlace = getLinkPlace(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), header.getId());
+				title = header.getTitle();
+			}
+			
+			SubPageTreeItem item = new SubPageTreeItem(header, title, targetPlace, isCurrentPage);
+			wikiId2TreeItem.put(header.getId(), item);
+		}
+		//now set up the relationships
+		Tree tree = new Tree();
+		
+		for (JSONEntity headerEntity : wikiHeaders.getResults()) {
+			V2WikiHeader header = (V2WikiHeader) headerEntity;
+			if (header.getParentId() != null){
+				//add this as a child							
+				SubPageTreeItem parent = wikiId2TreeItem.get(header.getParentId());
+				SubPageTreeItem child = wikiId2TreeItem.get(header.getId());
+				parent.addItem(child);
+				parent.setState(true);
+			} else {
+				String styleName = wikiId2TreeItem.get(header.getId()).isCurrentPage() ? "active" : "";
+				
+				tree.addItem(wikiId2TreeItem.get(header.getId()));
+			}
+		}
+		return tree;
+	}
+	
+	@Override
+	public Callback getUpdateOrderHintCallback(final GetOrderHintCallback getCurrentOrderListCallback) {
+		return new Callback() {
+			@Override
+			public void invoke() {
+				final List<String> newOrderHintIdList = getCurrentOrderListCallback.getCurrentOrderHint();
+				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
+					@Override
+					public void onSuccess(V2WikiOrderHint result) {
+						result.setOrderHint(newOrderHintIdList);
+						synapseClient.updateV2WikiOrderHint(wikiKey, result, new AsyncCallback<V2WikiOrderHint>() {
+							@Override
+							public void onSuccess(V2WikiOrderHint result) {
+								Window.alert("Updated. Party!");
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								Window.alert("Not updated. No party = ^ (");
+							}
+						});
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						// Failed to get order hint. Just ignore it?
+						// TODO:
+					}
+				});
+			}
+		};
+	}
+	
 }
 
 class SubPageTreeItem extends TreeItem {
+	private V2WikiHeader header;
 	private String text;
 	private Place targetPlace;
 	private boolean isCurrentPage;
 	
-	public SubPageTreeItem(String text, Place targetPlace, boolean isCurrentPage) {
+	public SubPageTreeItem(V2WikiHeader header, String text, Place targetPlace, boolean isCurrentPage) {
 		super();
+		this.header = header;
 		this.text = text;
 		this.targetPlace = targetPlace;
 		this.isCurrentPage = isCurrentPage;
@@ -245,15 +296,8 @@ class SubPageTreeItem extends TreeItem {
 		//setState(true);
 	}
 	
-	public List<SubPageTreeItem> getChildren() {
-		List<SubPageTreeItem> children = new ArrayList<SubPageTreeItem>();
-		for (int i = 0; i < super.getChildCount(); i++) {
-			children.add((SubPageTreeItem) super.getChild(i));
-		}
-		return children;
-	}
-	
 	public String getText()				{	return text;			}
 	public Place getTargetPlace()		{	return targetPlace;		}
 	public boolean isCurrentPage()		{	return isCurrentPage;	}
+	public V2WikiHeader getHeader()		{	return header;			}
 }

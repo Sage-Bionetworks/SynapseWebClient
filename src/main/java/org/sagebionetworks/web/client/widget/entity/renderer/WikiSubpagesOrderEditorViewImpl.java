@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 
@@ -149,7 +152,6 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		}
 	}
 
-	
 	/********************* TODO *********************/
 	@Override
 	public void showLoading() {

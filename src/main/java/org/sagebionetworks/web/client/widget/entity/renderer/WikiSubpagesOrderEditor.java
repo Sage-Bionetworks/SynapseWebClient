@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 
 import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -23,7 +27,7 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 		this.synapseClient = synapseClient;
 	}
 	
-	public void configure(Tree subpageTree, HasChangesHandler hasChangesHandler) {
+	public void configure(Tree subpageTree, HasChangesHandler hasChangesHandler, Callback updateOrderCallback) {
 		this.subpageTree = subpageTree;
 		this.hasChangesHandler = hasChangesHandler;
 		view.configure(subpageTree);
@@ -45,9 +49,12 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 	
 	public void pushChangesToSynapse(Callback changesPushedCallback) {
 		
-		// No services to call (yet).
+		
 	}
 	
+	public Tree getTree() {
+		return subpageTree;
+	}
 	
 	/**
 	 * This handler is notified when there are changes made to the editor.

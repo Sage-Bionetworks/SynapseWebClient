@@ -2,8 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -47,6 +49,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		this.globalAppState = globalAppState;
 		this.orderEditorModal = orderEditorModal;
 	}
+	
 	@Override
 	public void clear() {
 		super.clear();
@@ -55,7 +58,12 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
-		orderEditorModal.configure(copyTree(tree));
+		orderEditorModal.configure(copyTree(tree), presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
+																							@Override
+																							public List<String> getCurrentOrderHint() {
+																								return getCurrentOrderHint();
+																							}
+																						}));
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
@@ -148,7 +156,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		}
 	}
 	
-	
 	private List<SubPageTreeItem> getTreeRootChildren(Tree tree) {
 		List<SubPageTreeItem> result =  new ArrayList<SubPageTreeItem>();
 		for (int i = 0; i < tree.getItemCount(); i++) {
@@ -221,19 +228,20 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			DisplayUtils.show(ulContainer);
 	}
 	
-	private void addTreeItemsRecursive(UnorderedListPanel ul, List<SubPageTreeItem> children) {
-		for (SubPageTreeItem treeItem : children) {
-			String styleName = treeItem.isCurrentPage() ? "active" : "";
-			ul.add(getListItem(treeItem), styleName);
-			if (treeItem.getChildCount() > 0){
-				UnorderedListPanel subList = new UnorderedListPanel();
-				subList.addStyleName("nav");
-				subList.setVisible(true);
-				ul.add(subList);
-				addTreeItemsRecursive(subList, treeItem.getChildren());
-			}
-		}
-	}
+//	private void addTreeItemsRecursive(UnorderedListPanel ul, List<TreeItem> children) {
+//		for (TreeItem treeItemBasic : children) {
+//			SubPageTreeItem treeItem = (SubPageTreeItem) treeItemBasic;
+//			String styleName = treeItem.isCurrentPage() ? "active" : "";
+//			ul.add(getListItem(treeItem), styleName);
+//			if (treeItem.getChildCount() > 0){
+//				UnorderedListPanel subList = new UnorderedListPanel();
+//				subList.addStyleName("nav");
+//				subList.setVisible(true);
+//				ul.add(subList);
+//				addTreeItemsRecursive(subList, treeItem.getChildren());
+//			}
+//		}
+//	}
 	
 	private Widget getListItem(final SubPageTreeItem treeItem) {
 		Anchor l = new Anchor(treeItem.getText());
@@ -291,4 +299,13 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 //			return EntityTreeImageBundle.DEFAULT_RESOURCES.treeLeaf();
 //		}
 //	}
+	
+	@Override
+	public List<String> getCurrentOrderHintIdList() {
+		return orderEditorModal.getCurrentOrderIdList();
+	}
+	
+	public interface GetOrderHintCallback {
+		public List<String> getCurrentOrderHint();
+	}
 }

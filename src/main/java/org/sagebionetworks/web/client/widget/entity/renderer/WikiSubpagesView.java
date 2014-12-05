@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.List;
+
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl.GetOrderHintCallback;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -22,10 +26,13 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer);
 	void hideSubpages();
 	void showSubpages();
+	
+	List<String> getCurrentOrderHintIdList();
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
+		Callback getUpdateOrderHintCallback(GetOrderHintCallback getCurrentOrderListCallback);
 	}
 }
