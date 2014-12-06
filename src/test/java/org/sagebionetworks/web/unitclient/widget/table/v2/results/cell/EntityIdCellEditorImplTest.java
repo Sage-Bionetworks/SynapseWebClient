@@ -70,4 +70,19 @@ public class EntityIdCellEditorImplTest {
 		when(mockView.getValue()).thenReturn("syn123.34");
 		assertTrue(editor.isValid());
 	}
+	
+	@Test
+	public void testValidBad(){
+		String[] badValues = new String[]{
+			"ssyn123.34",
+			"syn123.34.1",
+			"syn123.34.1",
+			"syn123a.b",
+		};
+		for(String bad: badValues){
+			when(mockView.getValue()).thenReturn(bad);
+			assertFalse(editor.isValid());
+		}
+
+	}
 }

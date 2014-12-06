@@ -51,6 +51,9 @@ public class CellFactoryImpl implements CellFactory {
 			case ENTITYID:
 				editor = ginInjector.createEntityIdCellEditor();
 				break;
+			case DOUBLE:
+				editor = ginInjector.createDoubleCellEditor();
+				break;	
 			default:
 				editor = ginInjector.createStringEditorCell();
 			}

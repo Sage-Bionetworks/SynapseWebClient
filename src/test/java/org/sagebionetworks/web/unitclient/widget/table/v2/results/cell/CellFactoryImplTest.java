@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
@@ -34,6 +35,7 @@ public class CellFactoryImplTest {
 	BooleanCellEditor mockBooleanCellEditor;
 	DateCellEditor mockDateCellEditor;
 	DateCellRenderer mockDateCellRenderer;
+	DoubleCellEditor mockDoubleCellEditor;
 	
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
@@ -50,6 +52,7 @@ public class CellFactoryImplTest {
 		mockBooleanCellEditor = Mockito.mock(BooleanCellEditor.class);
 		mockDateCellEditor = Mockito.mock(DateCellEditor.class);
 		mockDateCellRenderer = Mockito.mock(DateCellRenderer.class);
+		mockDoubleCellEditor = Mockito.mock(DoubleCellEditor.class);
 		
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
@@ -59,6 +62,7 @@ public class CellFactoryImplTest {
 		when(mockInjector.createBooleanCellEditor()).thenReturn(mockBooleanCellEditor);
 		when(mockInjector.createDateCellEditor()).thenReturn(mockDateCellEditor);
 		when(mockInjector.createDateCellRenderer()).thenReturn(mockDateCellRenderer);
+		when(mockInjector.createDoubleCellEditor()).thenReturn(mockDoubleCellEditor);
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 
