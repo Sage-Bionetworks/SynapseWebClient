@@ -392,6 +392,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
@@ -941,6 +945,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DateCellRenderer.class).to(DateCellRendererImpl.class);
 		bind(DateCellRendererView.class).to(DateCellRendererViewImpl.class);
 		bind(DoubleCellEditor.class).to(DoubleCellEditorImpl.class);
+		bind(IntegerCellEditor.class).to(IntegerCellEditorImpl.class);
+		bind(LinkCellRenderer.class).to(LinkCellRendererImpl.class);
 
 		/*
 		 * Teams Places

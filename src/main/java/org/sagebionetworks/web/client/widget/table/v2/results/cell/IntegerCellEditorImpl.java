@@ -6,17 +6,17 @@ import org.sagebionetworks.web.client.StringUtils;
 import com.google.inject.Inject;
 
 /**
- * Table editor for columns of type DOUBLE.
+ * Integer (Java Long) cell editor.
  * 
  * @author jhill
  *
  */
-public class DoubleCellEditorImpl extends AbstractCellEditor implements DoubleCellEditor{
+public class IntegerCellEditorImpl extends AbstractCellEditor implements IntegerCellEditor {
 
-	public static final String VALUE_MUST_BE_A_DOUBLE = "Value must be a double (i.e.,'-1.234e-3').";
+	public static final String VALUE_MUST_BE_AN_INTEGER = "Value must be an integer.";
 
 	@Inject
-	public DoubleCellEditorImpl(CellEditorView view) {
+	public IntegerCellEditorImpl(CellEditorView view) {
 		super(view);
 	}
 
@@ -26,10 +26,10 @@ public class DoubleCellEditorImpl extends AbstractCellEditor implements DoubleCe
 		if(value != null){
 			try{
 				// if it parses it is valid.
-				Double.parseDouble(value);
+				Long.parseLong(value);
 			}catch(NumberFormatException e){
 				view.setValidationState(ValidationState.ERROR);
-				view.setHelpText(VALUE_MUST_BE_A_DOUBLE);
+				view.setHelpText(VALUE_MUST_BE_AN_INTEGER);
 				return false;
 			}
 		}

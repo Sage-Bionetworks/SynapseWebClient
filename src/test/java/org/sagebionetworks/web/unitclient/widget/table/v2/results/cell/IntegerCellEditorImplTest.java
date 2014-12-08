@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,25 +10,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
 
-public class DoubleCellEditorImplTest {
+public class IntegerCellEditorImplTest {
 
 	CellEditorView mockView;
-	DoubleCellEditorImpl editor;
+	IntegerCellEditorImpl editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(CellEditorView.class);
-		editor = new DoubleCellEditorImpl(mockView);
+		editor = new IntegerCellEditorImpl(mockView);
 	}
 	
 	@Test
 	public void testValid(){
 		String[] badValues = new String[]{
 			"12",
-			"-12.1",
-			"-.123e+32",
+			"-12",
+			"+456456456457456",
 		};
 		for(String bad: badValues){
 			when(mockView.getValue()).thenReturn(bad);
@@ -40,12 +41,12 @@ public class DoubleCellEditorImplTest {
 		when(mockView.getValue()).thenReturn("some junk");
 		assertFalse(editor.isValid());
 		verify(mockView).setValidationState(ValidationState.ERROR);
-		verify(mockView).setHelpText(DoubleCellEditorImpl.VALUE_MUST_BE_A_DOUBLE);
+		verify(mockView).setHelpText(IntegerCellEditorImpl.VALUE_MUST_BE_AN_INTEGER);
 	}
 	
 	@Test
 	public void testValidState(){
-		when(mockView.getValue()).thenReturn("123.456");
+		when(mockView.getValue()).thenReturn("123");
 		assertTrue(editor.isValid());
 		verify(mockView).setValidationState(ValidationState.NONE);
 		verify(mockView).setHelpText("");
