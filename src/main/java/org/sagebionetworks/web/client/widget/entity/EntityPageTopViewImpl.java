@@ -77,11 +77,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
-	@UiField
-	SimplePanel fullWidthPanel;
-	@UiField
-	SimplePanel topFullWidthPanel;
-
+	
 	@UiField
 	Anchor wikiLink;
 	@UiField
@@ -112,6 +108,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PortalGinInjector ginInjector;
 	
 	private Breadcrumb breadcrumb;
+	
+	//project level info
+	@UiField
+	SimplePanel projectMetadataContainer;
+	@UiField
+	SimplePanel projectDescriptionContainer;
+	@UiField
+	SimplePanel projectActionMenuContainer;
+
 	
 	@UiField
 	Row wikiTabContainer;
@@ -267,6 +272,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.versionNumber = versionNumber;
 		this.currentArea = area;
 		DisplayUtils.hide(adminListItem);
+		clearContent();
 		
 		// disable tables completely for now
 		if (!DisplayUtils.isInTestWebsite(cookies)) DisplayUtils.hide(tablesListItem);
@@ -308,7 +314,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.setVisible(false);
 		tablesTabContainer.setVisible(false);
 		adminTabContainer.setVisible(false);
-		
+	}
+	
+	private void clearContent() {
+		projectMetadataContainer.clear();
+		projectDescriptionContainer.clear();
+		projectActionMenuContainer.clear();
 		
 		fileBreadcrumbContainer.clear();
 		fileTitlebarContainer.clear();
@@ -323,6 +334,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileProgrammaticClientsContainer.clear();
 		fileModifiedAndCreatedContainer.clear();
 		wikiPageContainer.clear();
+		fileHistoryContainer.setVisible(false);
 		fileSnapshotsContainer.setVisible(false);
 		
 		tableBreadcrumbContainer.clear();
@@ -532,10 +544,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectTitleContainer.setVisible(false);
 		// Project header: Metadata & Description
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
-		fileMetadataContainer.add(entityMetadata.asWidget());
-		fileDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
+		projectMetadataContainer.add(entityMetadata.asWidget());
+		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 		// ActionMenu
-		fileActionMenuContainer.add(actionMenu.asWidget(bundle, versionNumber));
+		projectActionMenuContainer.add(actionMenu.asWidget(bundle, versionNumber));
 
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiPageContainer, bundle, wikiPageId, area);
@@ -607,10 +619,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tab.addClassName("active");
 	}
 	
-	private void addWikiPageWidget(final SimplePanel container, EntityBundle bundle, String wikiPageId, final Synapse.EntityArea area) {
+	private void addWikiPageWidget(SimplePanel container, EntityBundle bundle, String wikiPageId, final Synapse.EntityArea area) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			container.add(wikiPageWidget.asWidget());
+			Widget wikiW = wikiPageWidget.asWidget();
+			final SimplePanel wrapper = new SimplePanel(wikiW);
+			wrapper.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
+			if(!isProject) wrapper.addStyleName("margin-top-15");
+				container.add(wrapper);
 			boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
 				@Override
@@ -627,16 +643,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 						}
 					} else {
 						// hide description area, and add description command in the Tools menu
-						container.setVisible(false);
+						wrapper.setVisible(false);
 						actionMenu.showAddDescriptionCommand(new Callback() {
 							@Override
 							public void invoke() {
 								wikiPageWidget.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME, new Callback() {
-									
 									@Override
 									public void invoke() {
 										//if successful, then show the wiki page and remove the special command from the action menu
-										container.setVisible(true);
+										wrapper.setVisible(true);
 										actionMenu.hideAddDescriptionCommand();
 									}
 								});
@@ -660,7 +675,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);		
 		fileMetadataContainer.add(entityMetadata.asWidget());		
 		//File History
-		fileHistoryContainer.add(fileHistoryWidget.asWidget());
+		fileHistoryContainer.setVisible(true);
 		// Description
 		fileDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 
