@@ -158,6 +158,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel fileTitlebarContainer;
 	@UiField
+	SimplePanel locationableTitlebarContainer;
+	@UiField
 	SimplePanel fileMetadataContainer;
 	@UiField
 	SimplePanel fileActionMenuContainer;
@@ -175,11 +177,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel tableWidgetContainer;
 	@UiField
 	SimplePanel tableModifiedAndCreatedContainer;
-	
+	@UiField
+	SimplePanel tableListWidgetContainer;
 	
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
 	private FileHistoryWidget fileHistoryWidget;
+	private TableListWidget tableListWidget;
 	private Long versionNumber;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
@@ -210,7 +214,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PortalGinInjector ginInjector, 
 			FilesBrowser filesBrowser, 
 			MarkdownWidget markdownWidget, 
-			WikiPageWidget wikiPageWidget, 
+			WikiPageWidget wikiPageWidget,
+			TableListWidget tableListWidget,
 			PreviewWidget previewWidget, CookieProvider cookies,
 			GlobalApplicationState globalApplicationState) {
 		this.iconsImageBundle = iconsImageBundle;
@@ -230,12 +235,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
+		this.tableListWidget = tableListWidget;
 		this.cookies = cookies;
 		this.globalApplicationState = globalApplicationState;
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.add(fileHistoryWidget.asWidget());
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileSnapshotsContainer.add(snapshotWidget.asWidget());
+		locationableTitlebarContainer.add(locationableTitleBar.asWidget());
+		fileTitlebarContainer.add(fileTitleBar.asWidget());
+		tableListWidgetContainer.add(tableListWidget);
 		initProjectLayout();
 	}
 	
@@ -322,7 +331,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectActionMenuContainer.clear();
 		
 		fileBreadcrumbContainer.clear();
-		fileTitlebarContainer.clear();
+		fileTitlebarContainer.setVisible(false);
+		locationableTitlebarContainer.setVisible(false);
 		fileMetadataContainer.clear();
 		fileActionMenuContainer.clear();
 		fileDescriptionContainer.clear();
@@ -343,6 +353,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableActionControllerContainer.clear();
 		tableWidgetContainer.clear();
 		tableModifiedAndCreatedContainer.clear();
+		tableListWidgetContainer.setVisible(false);
 	}
 	
 	private void fillProjectLink(final EntityHeader projectHeader) {
@@ -433,9 +444,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES, false));
 		// File Title Bar
 		if (bundle.getEntity() instanceof FileEntity) {
-			fileTitlebarContainer.add(fileTitleBar.asWidget(bundle));
+			fileTitleBar.configure(bundle);
+			fileTitlebarContainer.setVisible(true);
 		} else {
-			fileTitlebarContainer.add(locationableTitleBar.asWidget(bundle));
+			locationableTitleBar.configure(bundle);
+			locationableTitlebarContainer.setVisible(true);
 		}		
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
@@ -445,7 +458,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				
 		// File History
 		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-		
+		fileHistoryContainer.setVisible(true);
 		// Description
 		fileDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki
@@ -559,7 +572,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 
 		// Tables Tab
-		tablesTabContainer.add(createTableListWidget(bundle));
+		tableListWidget.configure(bundle);
+		tableListWidgetContainer.setVisible(true);
 		
 		// Admin Tab: evaluations
 		evaluationList.configure(bundle.getEntity().getId(), new CallbackP<Boolean>() {
@@ -675,6 +689,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);		
 		fileMetadataContainer.add(entityMetadata.asWidget());		
 		//File History
+		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
 		fileHistoryContainer.setVisible(true);
 		// Description
 		fileDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
@@ -826,11 +841,4 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
         lc.add(attachmentsPanel.asWidget());
 		return lc;
 	}
-
-	private Widget createTableListWidget(EntityBundle bundle) {		
-		final TableListWidget listWidget = ginInjector.getTableListWidget();		
-		listWidget.configure(bundle);
-		return listWidget.asWidget();		
-	}
-	
 }

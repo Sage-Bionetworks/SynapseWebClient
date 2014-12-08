@@ -11,7 +11,7 @@
 				<g:SimplePanel styleName="margin-top-5" ui:field="projectTitleContainer"/>
 				
 				<!--Project level information -->
-				<b:Row>
+				<b:Row addStyleNames="margin-top-5">
 					<b:Column size="MD_8">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 						<g:SimplePanel ui:field="projectDescriptionContainer"/>
@@ -41,6 +41,7 @@
 					<b:Column size="MD_8">
 						<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
 						<g:SimplePanel ui:field="fileTitlebarContainer"/>
+						<g:SimplePanel ui:field="locationableTitlebarContainer"/>
 						<g:SimplePanel ui:field="fileMetadataContainer"/>
 					</b:Column>
 					<b:Column size="MD_4">
@@ -52,10 +53,16 @@
 						<g:SimplePanel addStyleNames="panel panel-body margin-top-15" ui:field="fileSnapshotsContainer"/>
 						<g:SimplePanel ui:field="filesWikiPageContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
-						<g:SimplePanel ui:field="filePreviewContainer"/>
-						<g:SimplePanel ui:field="fileProvenanceContainer"/>
+						<b:Row>
+							<g:SimplePanel ui:field="filePreviewContainer"/>
+							<g:SimplePanel ui:field="fileProvenanceContainer"/>
+						</b:Row>
 						<g:SimplePanel ui:field="fileAttachmentsContainer"/>
-						<g:SimplePanel addStyleNames="margin-top-15" ui:field="fileProgrammaticClientsContainer"/>
+						<b:Row>
+							<b:Column size="XS_12">
+								<g:SimplePanel ui:field="fileProgrammaticClientsContainer"/>		
+							</b:Column>
+						</b:Row>
 						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
 					</b:Column>
 				</b:Row>
@@ -68,6 +75,7 @@
 						<g:SimplePanel ui:field="tableActionMenuContainer"/>
 					</b:Column>
 					<b:Column size="XS_12">
+						<g:SimplePanel ui:field="tableListWidgetContainer"/>
 						<g:SimplePanel ui:field="tableActionControllerContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
