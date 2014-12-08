@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -20,7 +21,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -57,11 +57,9 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -96,12 +94,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	LIElement tablesListItem;
 	@UiField
 	LIElement adminListItem;
+	
 	@UiField
-	SimplePanel projectTitleContainer;
+	Div projectTitleUI;
+	@UiField
+	Anchor projectHeaderAnchor;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
+	
 	private ActionMenu actionMenu;
 	private LocationableTitleBar locationableTitleBar;
 	private FileTitleBar fileTitleBar;
@@ -197,10 +198,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private EntityArea currentArea;
 	private AdministerEvaluationsList evaluationList;
 	private static int WIDGET_HEIGHT_PX = 270;
+	private String currentProjectAnchorTargetId;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
-			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
+			SageImageBundle sageImageBundle,
 			ActionMenu actionMenu,
 			LocationableTitleBar locationableTitleBar,
 			FileTitleBar fileTitleBar,
@@ -218,7 +220,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			TableListWidget tableListWidget,
 			PreviewWidget previewWidget, CookieProvider cookies,
 			GlobalApplicationState globalApplicationState) {
-		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
 		this.breadcrumb = breadcrumb;
@@ -245,7 +246,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		locationableTitlebarContainer.add(locationableTitleBar.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
+
 		initProjectLayout();
+		
+		initClickHandlers();
 	}
 	
 	private void initProjectLayout() {
@@ -257,6 +261,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tablesLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.TABLES));
 		adminLink.setText(DisplayConstants.CHALLENGE_ADMIN);
 		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
+	}
+	
+	private void initClickHandlers() {
+		projectHeaderAnchor.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(currentProjectAnchorTargetId, null, null, null));
+			}
+		});
+
 	}
 	
 	private ClickHandler getTabClickHandler(final Synapse.EntityArea targetTab) {
@@ -289,7 +303,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		hideTabContent();
 		
 		// project header
-		fillProjectLink(projectHeader);
+		showProjectLink(projectHeader);
 	
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
@@ -356,22 +370,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableListWidgetContainer.setVisible(false);
 	}
 	
-	private void fillProjectLink(final EntityHeader projectHeader) {
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(AbstractImagePrototype.create(iconsImageBundle.synapseProject24()).getHTML())
-		.appendHtmlConstant("<span class=\"dropLargeIconText\"> ")
-		.appendEscaped(projectHeader.getName())
-		.appendHtmlConstant("</span>");
-		Anchor a = new Anchor(shb.toSafeHtml());
-		a.addStyleName("projectTitle");
-		a.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(projectHeader.getId(), null, null, null));
-			}
-		});
-		projectTitleContainer.setWidget(a);
-		projectTitleContainer.setVisible(true);
+	private void showProjectLink(final EntityHeader projectHeader) {
+		currentProjectAnchorTargetId = projectHeader.getId();
+		projectTitleUI.setVisible(true);
+		projectHeaderAnchor.setText(projectHeader.getName());
 	}
 	
 	@Override
@@ -475,7 +477,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			fileProvenanceContainer.add(createProvenanceWidget(bundle, provFullWidth));
 		}
 		// Attachments
-		fileAttachmentsContainer.add(createAttachmentsWidget(bundle, false));		
+		fileAttachmentsContainer.add(createAttachmentsWidget(bundle));		
 		// Programmatic Clients
 		fileProgrammaticClientsContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
 		// Created By/Modified By
@@ -489,7 +491,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		UserBadge modifiedByBadge = ginInjector.getUserBadgeWidget();
 		modifiedByBadge.configure(entity.getModifiedBy());
-		
 		
 		InlineHTML inlineHtml = new InlineHTML(DisplayConstants.CREATED_BY);
 		attributionPanel.add(inlineHtml);
@@ -525,11 +526,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	// Render the Folder entity
 	private void renderFolderEntity(EntityBundle bundle,
 			String entityTypeDisplay, String wikiPageId, EntityHeader projectHeader) {		
-		// tab container
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
-		// File tab: everything
-		// ** LEFT/RIGHT
-		// add breadcrumbs
 		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES, false));
 		// ActionMenu
 		fileActionMenuContainer.add(actionMenu.asWidget(bundle, versionNumber));
@@ -554,7 +551,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// tab container
 		setTabSelected(area, false);
 
-		projectTitleContainer.setVisible(false);
+		projectTitleUI.setVisible(false);
 		// Project header: Metadata & Description
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
 		projectMetadataContainer.add(entityMetadata.asWidget());
@@ -567,7 +564,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// File Tab: Files, Annotations & old
 		fileBrowserContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
-		fileAttachmentsContainer.add(createAttachmentsWidget(bundle, false)); // Attachments (TODO : this should eventually be removed)
+		fileAttachmentsContainer.add(createAttachmentsWidget(bundle)); // Attachments (TODO : this should eventually be removed)
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 
@@ -699,7 +696,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), readOnly);		
 		fileSnapshotsContainer.setVisible(true);		
 		// Attachments
-		fileAttachmentsContainer.add(createAttachmentsWidget(bundle, false));
+		fileAttachmentsContainer.add(createAttachmentsWidget(bundle));
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 	}
@@ -818,7 +815,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
    		return lc;
 	}
 	
-	private Widget createAttachmentsWidget(final EntityBundle bundle, boolean showWhenEmpty) {	    
+	private Widget createAttachmentsWidget(final EntityBundle bundle) {	    
 		SimplePanel lc = new SimplePanel();
 	    lc.getElement().setAttribute("highlight-box-title", DisplayConstants.BUTTON_WIKI_ATTACHMENTS);
 		lc.setStyleName("highlight-box"); 
@@ -826,7 +823,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
         // We just create a new one each time.
         attachmentsPanel.configure(baseURl, bundle.getEntity(), false);
-        if(!showWhenEmpty && attachmentsPanel.isEmpty()) 
+        if(attachmentsPanel.isEmpty()) 
         	return new SimplePanel();
         attachmentsPanel.clearHandlers();
         attachmentsPanel.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {

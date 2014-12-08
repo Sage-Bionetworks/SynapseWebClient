@@ -40,13 +40,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntitySchemaCache schemaCache;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
-	private WidgetRegistrar widgetRegistrar;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private GlobalApplicationState globalApplicationState;
 	private EntityBundle bundle;
 	private String entityTypeDisplay;
 	private EventBus bus;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
 	private String areaToken;
@@ -65,18 +63,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntitySchemaCache schemaCache,
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
-			WidgetRegistrar widgetRegistrar,
 			GlobalApplicationState globalApplicationState,
-			EventBus bus, JSONObjectAdapter jsonObjectAdapter,
+			EventBus bus,
 			QueryTokenProvider queryTokenProvider) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.schemaCache = schemaCache;
 		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
-		this.widgetRegistrar = widgetRegistrar;
 		this.bus = bus;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;	
 		this.queryTokenProvider = queryTokenProvider;
 		this.projectAreaState = new ProjectAreaState();

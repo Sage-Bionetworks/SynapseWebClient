@@ -8,7 +8,10 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
 	<g:HTMLPanel styleName="margin-left-15 margin-right-15">											
-				<g:SimplePanel styleName="margin-top-5" ui:field="projectTitleContainer"/>
+				<bh:Div ui:field="projectTitleUI">
+			       	<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.synapseProject24}' />
+					<g:Anchor ui:field="projectHeaderAnchor" styleName="dropLargeIconText projectTitle" text="" />
+				</bh:Div>
 				
 				<!--Project level information -->
 				<b:Row addStyleNames="margin-top-5">
@@ -18,8 +21,6 @@
 					</b:Column>
 					<b:Column size="MD_4">
 						<g:SimplePanel ui:field="projectActionMenuContainer"/>
-					</b:Column>
-					<b:Column size="XS_12">
 					</b:Column>
 				</b:Row>
 				
