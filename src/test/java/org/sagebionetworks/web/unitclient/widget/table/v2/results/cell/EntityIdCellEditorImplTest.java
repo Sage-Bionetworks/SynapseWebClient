@@ -44,7 +44,7 @@ public class EntityIdCellEditorImplTest {
 	}
 	
 	@Test
-	public void testValidCapse(){
+	public void testValidCaps(){
 		when(mockView.getValue()).thenReturn("SYN9999");
 		assertTrue(editor.isValid());
 	}
@@ -69,5 +69,20 @@ public class EntityIdCellEditorImplTest {
 		// null should be valid
 		when(mockView.getValue()).thenReturn("syn123.34");
 		assertTrue(editor.isValid());
+	}
+	
+	@Test
+	public void testValidBad(){
+		String[] badValues = new String[]{
+			"ssyn123.34",
+			"syn123.34.1",
+			"syn123.34e",
+			"syn123a.b",
+		};
+		for(String bad: badValues){
+			when(mockView.getValue()).thenReturn(bad);
+			assertFalse(editor.isValid());
+		}
+
 	}
 }

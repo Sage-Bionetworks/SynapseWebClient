@@ -382,6 +382,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
@@ -390,6 +392,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
@@ -938,6 +944,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DateCellEditor.class).to(DateCellEditorImpl.class);
 		bind(DateCellRenderer.class).to(DateCellRendererImpl.class);
 		bind(DateCellRendererView.class).to(DateCellRendererViewImpl.class);
+		bind(DoubleCellEditor.class).to(DoubleCellEditorImpl.class);
+		bind(IntegerCellEditor.class).to(IntegerCellEditorImpl.class);
+		bind(LinkCellRenderer.class).to(LinkCellRendererImpl.class);
 
 		/*
 		 * Teams Places

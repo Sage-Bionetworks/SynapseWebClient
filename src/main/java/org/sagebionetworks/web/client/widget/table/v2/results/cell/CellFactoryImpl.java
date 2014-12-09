@@ -27,6 +27,8 @@ public class CellFactoryImpl implements CellFactory {
 			return ginInjector.createEntityIdCellRenderer();
 		case DATE:
 			return ginInjector.createDateCellRenderer();
+		case LINK:
+			return ginInjector.createLinkCellRenderer();
 		default:
 			return ginInjector.createStringRendererCell();
 		}
@@ -51,6 +53,12 @@ public class CellFactoryImpl implements CellFactory {
 			case ENTITYID:
 				editor = ginInjector.createEntityIdCellEditor();
 				break;
+			case DOUBLE:
+				editor = ginInjector.createDoubleCellEditor();
+				break;
+			case INTEGER:
+				editor = ginInjector.createIntegerCellEditor();
+				break;					
 			default:
 				editor = ginInjector.createStringEditorCell();
 			}

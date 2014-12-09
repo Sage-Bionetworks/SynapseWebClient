@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.sagebionetworks.web.client.place.Synapse;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public class EntityIdCellRendererImpl extends Anchor implements EntityIdCellRenderer{
+public class LinkCellRendererImpl extends Anchor implements LinkCellRenderer {
 
 	@Override
 	public Widget asWidget() {
@@ -14,7 +13,7 @@ public class EntityIdCellRendererImpl extends Anchor implements EntityIdCellRend
 
 	@Override
 	public void setValue(String value) {
-		this.setHref(Synapse.getHrefForDotVersion(value));
+		this.setHref(value);
 		this.setText(value);
 		this.setTarget(BLANK);
 	}
@@ -23,5 +22,4 @@ public class EntityIdCellRendererImpl extends Anchor implements EntityIdCellRend
 	public String getValue() {
 		return this.getText();
 	}
-
 }
