@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -9,9 +12,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
+import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl.Binder;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -24,7 +28,6 @@ import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
@@ -34,118 +37,94 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityFinderViewImpl extends LayoutContainer implements EntityFinderView {
+public class EntityFinderViewImpl implements EntityFinderView {
 	
-	private static final int HEIGHT_PX = 500;
-	private static final int HEIGHT_BOTTOM_RIGHT_PX = 48;
-	private static final int HEIGHT_BOTTOM_RIGHT_PADDING_PX = 10;	
-	private static final int LEFT_WIDTH_PX = 180;
-	private static final int RIGHT_WIDTH_PX = 621;
+	public interface Binder extends UiBinder<Widget, EntityFinderViewImpl> {}
+	
 	private static final int MARGIN_WIDTH_PX = 10;
 	private static final MarginData MARGIN_10 = new MarginData(MARGIN_WIDTH_PX);
-	private static final MarginData MARGIN_RIGHT_10 = new MarginData(0, MARGIN_WIDTH_PX, 0, 0);	
-
-	private static final int TOTAL_WIDTH_PX = LEFT_WIDTH_PX + RIGHT_WIDTH_PX + MARGIN_WIDTH_PX;
-		
+	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private MyEntitiesBrowser myEntitiesBrowser;	
 	private EntitySearchBox entitySearchBox;
 	
-	private Widget myEntitiesBrowserWidget;
-	private LayoutContainer entitySearchWidget;
-	private LayoutContainer enterIdWidget;
-	private LayoutContainer enterIdEntityDetail;
-	private LayoutContainer versionChooser;
+	//the modal dialog
+	private Modal modal;
+	
+	@UiField
+	Button okButton;
+	
+	@UiField
+	SimplePanel browseMyEntitiesContainer;
+	@UiField
+	SimplePanel searchContainer;
+	@UiField
+	SimplePanel enterSynapseIdContainer;
+	@UiField
+	SimplePanel myEntitiesBrowserContainer;
+	@UiField
+	SimplePanel entitySearchWidgetContainer;
+	@UiField
+	SimplePanel enterIdWidgetContainer;
+	@UiField
+	FlowPanel versionContainer;
+	@UiField
+	HTML selectedText;
+	
 	private LayoutContainer versionComboContainer;
-	private HTML selectedText;
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
-	private LayoutContainer container;
-	private LayoutContainer left;
-	private LayoutContainer rightTop;
-	private LayoutContainer rightBottom;
 	private SimpleComboBox<VersionInfoModelData> versionComboBox;
 	private Radio currentVersionRadio;
 	private Radio specifyVersionRadio;
 			
 	@Inject
-	public EntityFinderViewImpl(SageImageBundle sageImageBundle,
+	public EntityFinderViewImpl(Binder binder,
+			SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
-			MyEntitiesBrowser myEntitiesBrowser, EntitySearchBox entitySearchBox) {
+			MyEntitiesBrowser myEntitiesBrowser, 
+			EntitySearchBox entitySearchBox) {
+		this.modal = (Modal)binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.entitySearchBox = entitySearchBox;
 		
 		selectedRef = new Reference();
-	}
-	
-	@Override
-	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
-		super.onRender(parent, index);		
-	}
+		okButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.okClicked();
+			}
+		});
 		
-	@Override
-	public Widget asWidget() {
-		if(container == null) {
-			container = new LayoutContainer();
-			container.setScrollMode(Scroll.NONE);
-			add(container);
-		} else {
-			container.removeAll();
-		}
-		selectedRef = new Reference();
-		presenter.setSelectedEntity(selectedRef);
-		
-		// left and right
-		left = new LayoutContainer();
-		left.setBorders(true);
-		left.setHeight(HEIGHT_PX);
-		left.addStyleName("floatleft notopmargin whiteBackground");
-		left.setWidth(LEFT_WIDTH_PX);
-		LayoutContainer right = new LayoutContainer();
-		right.addStyleName("floatleft notopmargin last");
-		right.setWidth(RIGHT_WIDTH_PX);
-		
-		rightTop = new LayoutContainer();
-		rightTop.addStyleName("floatleft whiteBackground notopmargin last");
-		rightTop.setWidth(RIGHT_WIDTH_PX);
-		rightTop.setHeight(HEIGHT_PX - HEIGHT_BOTTOM_RIGHT_PX - HEIGHT_BOTTOM_RIGHT_PADDING_PX);
-		rightTop.setBorders(true);
-		
-		rightBottom = new LayoutContainer();
-		rightBottom.addStyleName("floatleft whiteBackground last");
-		rightBottom.setWidth(RIGHT_WIDTH_PX);
-		rightBottom.setHeight(HEIGHT_BOTTOM_RIGHT_PX);
-		rightBottom.setBorders(true);
-		createSelectedWidget();
-			
-		right.add(rightTop);
-		right.add(rightBottom, new MarginData(HEIGHT_BOTTOM_RIGHT_PADDING_PX, 0, 0, 0));
-		
-		// pane widgets
 		createMyEntityBrowserWidget();		
 		createSearchBoxWidget();			
-		createEnterIdWidget(); 
-		
-		// set top widget into rightTop view
-		replaceRightWidget(myEntitiesBrowserWidget);
-		
-		container.add(left, MARGIN_RIGHT_10);
-		container.add(right);
-		
-		container.layout(true);
-		return this;
-	}	
-
+		createEnterIdWidget();
+		showTopRightContainer(myEntitiesBrowserContainer);
+	}
+	
+	private void hideAllRightTopWidgets() {
+		myEntitiesBrowserContainer.setVisible(false);
+		entitySearchWidgetContainer.setVisible(false);
+		enterIdWidgetContainer.setVisible(false);
+	}
+	
+	private void showTopRightContainer(SimplePanel container) {
+		versionContainer.clear();
+		hideAllRightTopWidgets();
+		container.setVisible(true);
+	}
+	
 	@Override 
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -167,6 +146,9 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 
 	@Override
 	public void clear() {
+		selectedRef = new Reference();
+		presenter.setSelectedEntity(selectedRef);
+		showTopRightContainer(myEntitiesBrowserContainer);
 	}
 
 	/*
@@ -190,17 +172,16 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 			}
 		});
 
-		myEntitiesBrowserWidget = myEntitiesBrowser.asWidget();
+		myEntitiesBrowserContainer.setWidget(myEntitiesBrowser.asWidget());
 
 		// list entry
 		Widget entry = createNewLeftEntry(DisplayConstants.BROWSE_MY_ENTITIES, new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
-				replaceRightWidget(myEntitiesBrowserWidget);				
+	        	showTopRightContainer(myEntitiesBrowserContainer);
 	        }
 	    });
-		left.add(entry);
-
+		browseMyEntitiesContainer.setWidget(entry);
 	}
 
 	private void createSearchBoxWidget() {
@@ -214,22 +195,24 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 			}
 		}, false);
 		
-		entitySearchWidget = new LayoutContainer();
+		LayoutContainer entitySearchWidget = new LayoutContainer();
 		HTML search = new HTML("<h4>" + DisplayConstants.LABEL_SEARCH + "</h4>");
 		search.addStyleName("span-2 notopmargin");		
 		entitySearchWidget.add(search, new MarginData(0, 0, 10, 0));
 		Widget box = entitySearchBox.asWidget(490);
 		box.addStyleName("span-13 notopmargin last");
 		entitySearchWidget.add(box, new MarginData(0, 0, 10, 0));
-
+		
+		entitySearchWidgetContainer.setWidget(entitySearchWidget);
+		
 		// list entry
 		Widget entry = createNewLeftEntry(DisplayConstants.LABEL_SEARCH, new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
-				replaceRightWidget(entitySearchWidget);
+	        	showTopRightContainer(entitySearchWidgetContainer);
 	        }
 	    });
-		left.add(entry);
+		searchContainer.setWidget(entry);
 	}	
 
 	private void createEnterIdWidget() {
@@ -248,9 +231,9 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		widget.add(input, margin);
 		
 		final Button btn = new Button(DisplayConstants.LOOKUP);
-		btn.addSelectionListener(new SelectionListener<ButtonEvent>() {			
+		btn.addClickHandler(new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				// lookup id
 				presenter.lookupEntity(input.getValue(), new AsyncCallback<Entity>() {
 					@Override
@@ -266,37 +249,20 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 					}
 				});
 			}
-
 		});
 		btn.addStyleName("floatleft");
-		btn.setHeight(25);
+		btn.setSize(ButtonSize.LARGE);
 		widget.add(btn);
-		
-		// Enter key submits lookup
-		new KeyNav<ComponentEvent>(input) {
-			@Override
-			public void onEnter(ComponentEvent ce) {
-				super.onEnter(ce);
-				if(btn.isEnabled())
-					btn.fireEvent(Events.Select);
-			}
-		};
+		enterIdWidgetContainer.setWidget(widget);
 
-		
-		enterIdEntityDetail = new LayoutContainer();
-		versionChooser = new LayoutContainer();
-		widget.add(enterIdEntityDetail);
-		widget.add(versionChooser);
-		this.enterIdWidget = widget;		
-		
 		// list entry		
 		final Widget entry = createNewLeftEntry(DisplayConstants.ENTER_SYNAPSE_ID, new ClickHandler(){
 	        @Override
 	        public void onClick(ClickEvent event) {
-				replaceRightWidget(enterIdWidget);				
+	        	showTopRightContainer(enterIdWidgetContainer);
 	        }
 	    });
-		left.add(entry);
+		enterSynapseIdContainer.setWidget(entry);
 	}
 				
 	private Widget createNewLeftEntry(String name, ClickHandler handler) {
@@ -308,34 +274,17 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		p.setWidget(new HTML(name));
 		return p;
 	}
-
-	private void replaceRightWidget(Widget widget) {
-		if(rightTop != null && widget != null) {
-			rightTop.removeAll();
-			versionChooser = null;
-			rightTop.add(widget, MARGIN_10);
-			rightTop.layout(true);
-		}
-	}
 	
-	private void createSelectedWidget() {
-		selectedText = new HTML("");
-		selectedText.addStyleName("floatleft");
-		rightBottom.add(selectedText, MARGIN_10);
-	}
-
 	private void updateSelectedView() {		
 		selectedText.setHTML("<h4>" + DisplayConstants.CURRENTLY_SELCTED + ": " + DisplayUtils.createEntityVersionString(selectedRef) + "</h4>");
 	}
 
 	private void createVersionChooser(String entityId) {
-		if(versionChooser != null) rightTop.remove(versionChooser);
 		boolean showVersions = presenter.showVersions();
-		versionChooser = new LayoutContainer();
 		
 		MarginData first = new MarginData(15, 10, 0, 10);
 		MarginData others = new MarginData(15, 10, 0, 0);
-		MarginData verticalSpace = new MarginData(5, 0, 0, 0);
+		
 		int boxHeight = 52;
 		
 		LayoutContainer currentVersion = new LayoutContainer();
@@ -351,7 +300,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		label.addStyleName("floatleft");
 		currentVersion.add(currentVersionRadio, first);
 		currentVersion.add(label, others);
-		versionChooser.add(currentVersion);
+		versionContainer.add(currentVersion);
 		
 		LayoutContainer specificVersion = new LayoutContainer();
 		if(!showVersions) specificVersion.disable();
@@ -370,7 +319,7 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		specificVersion.add(specifyVersionRadio, first);
 		specificVersion.add(label, others);
 		specificVersion.add(versionComboContainer, others);
-		versionChooser.add(specificVersion, verticalSpace);
+		versionContainer.add(specificVersion);
 		
 		final RadioGroup group = new RadioGroup();
 		group.add(currentVersionRadio);
@@ -396,9 +345,6 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		    	}
 		    }
 		});
-		
-		rightTop.add(versionChooser, MARGIN_10);
-		rightTop.layout(true);
 	}
 
 	@Override
@@ -444,12 +390,6 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		versionComboContainer.layout(true);
 	}
 
-	private void setSelected(String entityId, Long versionNumber) {
-		selectedRef.setTargetId(entityId);
-		selectedRef.setTargetVersionNumber(versionNumber);
-		presenter.setSelectedEntity(selectedRef);
-	}
-	
 	private void setSelectedId(String entityId) {
 		// clear out selection and set new id
 		selectedRef.setTargetId(entityId);
@@ -490,20 +430,15 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 	}
 	
 	@Override
-	public int getViewWidth() {
-		return TOTAL_WIDTH_PX + 25;
-	}
-
-	@Override
-	public int getViewHeight() {
-		return HEIGHT_PX + 80;
-	}
-
-	@Override
-	public void refresh() {
-		replaceRightWidget(myEntitiesBrowserWidget);
+	public void show() {
+		//show modal
+		modal.show();
 	}
 	
+	@Override
+	public void hide() {
+		modal.hide();
+	}
 }
 
 

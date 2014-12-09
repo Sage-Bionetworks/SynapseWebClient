@@ -29,7 +29,6 @@ import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -138,19 +137,18 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		findEntitiesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				entityFinder.configure(false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
 							entityField.setValue(DisplayUtils.createEntityVersionString(selected));
-							window.hide();
+							entityFinder.hide();
 						} else {
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
 				});
+				entityFinder.show();
 			}
 		});
 		AdapterField buttonField = new AdapterField(findEntitiesButton);

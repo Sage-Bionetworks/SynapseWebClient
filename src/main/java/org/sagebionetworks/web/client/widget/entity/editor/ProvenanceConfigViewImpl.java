@@ -67,19 +67,18 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 		findEntitiesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				entityFinder.configure(true);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				entityFinder.configure(true, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {					
 							appendEntityListValue(selected);
-							window.hide();
+							entityFinder.hide();
 						} else {
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
 				});
+				entityFinder.show();
 			}
 		});
 		AdapterField buttonField = new AdapterField(findEntitiesButton);
