@@ -11,9 +11,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.http.client.URL;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,15 +37,13 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle) {		
+	public void configure(EntityBundle bundle) {		
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
 		
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
-		
 		view.createTitlebar(bundle, entityType, authenticationController);
-		return view.asWidget();
 	}
 	
 	/**
@@ -70,7 +66,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	 */
 	@Override
 	public Widget asWidget() {
-		return null;
+		return view.asWidget();
 	}
     
 	@Override
