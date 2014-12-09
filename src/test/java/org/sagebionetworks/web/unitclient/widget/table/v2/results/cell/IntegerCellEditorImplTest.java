@@ -25,13 +25,13 @@ public class IntegerCellEditorImplTest {
 	
 	@Test
 	public void testValid(){
-		String[] badValues = new String[]{
+		String[] goodValues = new String[]{
 			"12",
 			"-12",
 			"+456456456457456",
 		};
-		for(String bad: badValues){
-			when(mockView.getValue()).thenReturn(bad);
+		for(String good: goodValues){
+			when(mockView.getValue()).thenReturn(good);
 			assertTrue(editor.isValid());
 		}
 	}

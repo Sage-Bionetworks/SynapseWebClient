@@ -76,12 +76,11 @@ public class EntityIdCellEditorImplTest {
 		String[] badValues = new String[]{
 			"ssyn123.34",
 			"syn123.34.1",
-			"syn123.34.1",
+			"syn123.34e",
 			"syn123a.b",
 		};
 		for(String bad: badValues){
 			when(mockView.getValue()).thenReturn(bad);
-			System.out.println(bad);
 			assertFalse(editor.isValid());
 		}
 
