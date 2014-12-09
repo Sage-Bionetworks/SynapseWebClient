@@ -15,7 +15,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -153,15 +152,6 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 230;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
 	}
 	
 	@Override

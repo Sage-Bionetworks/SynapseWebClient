@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -23,7 +24,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -236,16 +236,16 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Dialog window) {
+	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
 		uploadTab.removeAll();
 		//update the uploadPanel
-		initUploadPanel(wikiKey, window);
+		initUploadPanel(wikiKey, dialogCallback);
 		
 		this.setHeight(DISPLAY_HEIGHT);
 		this.layout(true);
 	}
 	
-	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
+	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
 		
 		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
 		
@@ -254,18 +254,14 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		Listener uploadTabChangeListener = new Listener<TabPanelEvent>() {
 			@Override
 			public void handleEvent(TabPanelEvent be) {
-				if(uploadedFileHandleName != null) {
-					window.getButtonById(Dialog.OK).enable();
-				} else {
-					window.getButtonById(Dialog.OK).disable();
-				}
+				dialogCallback.setPrimaryEnabled(uploadedFileHandleName != null);
 			}
 		};
 		
 		Listener tabChangeListener = new Listener<TabPanelEvent>() {
 			@Override
 			public void handleEvent(TabPanelEvent be) {
-				window.getButtonById(Dialog.OK).enable();
+				dialogCallback.setPrimaryEnabled(true);
 			}
 		};
 		
@@ -284,7 +280,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 						//save close this dialog with a save
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
 						//enable the ok button
-						window.getButtonById(Dialog.OK).enable();
+						dialogCallback.setPrimaryEnabled(true);
 						presenter.addFileHandleId(result.getMessage());
 						//add the local file to the client cache.  May need to fall back to the local reference in the preview (if handle has not yet been saved to the wiki)
 						String fileUrl = synapseJSNIUtils.getFileUrl(AddAttachmentDialog.ATTACHMENT_FILE_FIELD_ID);
@@ -359,14 +355,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 
 	@Override
 	public void clear() {
-	}
-	@Override
-	public int getDisplayHeight() {
-		return DISPLAY_HEIGHT;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 130;
 	}
 	
 	@Override

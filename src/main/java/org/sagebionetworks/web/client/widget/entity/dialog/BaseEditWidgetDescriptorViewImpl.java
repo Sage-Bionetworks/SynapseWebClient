@@ -3,102 +3,60 @@ package org.sagebionetworks.web.client.widget.entity.dialog;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseEditWidgetDescriptorView {
+public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescriptorView {
+	public interface Binder extends UiBinder<Widget, BaseEditWidgetDescriptorViewImpl> {}
 	
-	Dialog window;
+	//the modal
+	Modal modal;
+
+	@UiField
 	SimplePanel paramsPanel;
-	SimplePanel baseContentPanel;
-	String saveButtonText = "Save";
+	@UiField
+	Button okButton;
 	
 	private Presenter presenter;
 	private WidgetEditorPresenter widgetDescriptorPresenter;
-	private static final int STARTING_HEIGHT = 110;
-	private static final int STARTING_WIDTH = 370;
 	private WidgetRegistrar widgetRegistrar;
+	private DialogCallback dialogCallback;
 	
 	@Inject
-	public BaseEditWidgetDescriptorViewImpl(WidgetRegistrar widgetRegistrar) {
+	public BaseEditWidgetDescriptorViewImpl(Binder binder, WidgetRegistrar widgetRegistrar) {
+		this.modal = (Modal)binder.createAndBindUi(this);
 		this.widgetRegistrar = widgetRegistrar;
-		
-		paramsPanel = new SimplePanel();
-		baseContentPanel = new SimplePanel();
-
-		initializeBaseContentPanel();
-	}
-	
-	private Dialog getNewDialog() {
-		Dialog window = new Dialog();
-		window.setMaximizable(false);
-	    window.setPlain(true);  
-	    window.setModal(true);  
-	    //window.setLayout(new FitLayout());
-	    window.okText = saveButtonText;
-	    window.setButtons(Dialog.OKCANCEL);
-	    window.setHideOnButtonClick(false);
-	    
-	    Button saveButton = window.getButtonById(Dialog.OK);	    
-	    saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		okButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				presenter.apply();
 			}
-	    });
-	    Button cancelButton = window.getButtonById(Dialog.CANCEL);	    
-	    cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				hide();
-			}
-	    });
-	    return window;
-	}
-	
-	private void initializeBaseContentPanel() {
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setStyleAttribute("margin", "10px");
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		baseContentPanel.add(hp);
-	}
-	
-	private void setupDialog(String windowTitle) {
-		FlowPanel container = new FlowPanel();
-		container.add(paramsPanel);
-		container.add(new HTML("<hr style=\"margin: 0px\">"));
-		container.add(baseContentPanel);
+		});
 		
-		window.add(container);
-	    
-	    String width = Integer.toString(STARTING_WIDTH + widgetDescriptorPresenter.getAdditionalWidth()) + "px";
-		String height = Integer.toString(STARTING_HEIGHT + widgetDescriptorPresenter.getDisplayHeight())+"px";
-		container.setWidth(width);
-		container.setHeight(height);
-		window.setWidth(width);
-		window.setHeight(height);
-		window.setHeading(windowTitle);
+		dialogCallback = new DialogCallback() {
+			@Override
+			public void setPrimaryEnabled(boolean enable) {
+				okButton.setEnabled(enable);
+			}
+		};
 	}
 	
 	@Override
 	public void show() {
 		if (widgetDescriptorPresenter != null) {
-			window.show();
+			modal.show();
 		} else {
 			//widget editor presenter not found for this content type
 			DisplayUtils.showErrorMessage("No editor was found for the selected widget.");
@@ -107,7 +65,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 
 	@Override
 	public void hide() {
-		window.hide();
+		modal.hide();
 	}
 
 	@Override
@@ -132,18 +90,16 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	
 	@Override
 	public void setWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> widgetDescriptor, boolean isWiki) {
-		window = getNewDialog();
-		
 		//clear out params panel.  Get the right params editor based on the descriptor (it's concrete class, and configure based on the parameters inside of it).
+		okButton.setEnabled(true);
 		paramsPanel.clear();
-		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki, window);
+		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki, dialogCallback);
 		if (widgetDescriptorPresenter != null) {
 			Widget w = widgetDescriptorPresenter.asWidget();
 			paramsPanel.add(w);
 			//finish setting up the main dialog
 			String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
-			setupDialog(friendlyName);
-
+			modal.setTitle(friendlyName);
 		} else {
 			showErrorMessage("No editor found for the content type: " + contentTypeKey);
 		}
@@ -165,15 +121,6 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	}
 	
 	@Override
-	public void showBaseParams(boolean visible) {
-		baseContentPanel.setVisible(visible);
-	}
-	
-	@Override
 	public void clear() {
-	}
-	@Override
-	public void setSaveButtonText(String text) {
-		this.saveButtonText = text;
 	}
 }

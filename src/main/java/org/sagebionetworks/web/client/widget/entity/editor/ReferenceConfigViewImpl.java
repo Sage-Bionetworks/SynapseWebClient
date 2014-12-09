@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
@@ -43,16 +42,7 @@ public class ReferenceConfigViewImpl extends LayoutContainer implements Referenc
 	public Widget asWidget() {
 		return this;
 	}
-	@Override
-	public int getDisplayHeight() {
-		return 60;
-	}
-
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
-	}
-
+	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		if(!refField.isValid()) {

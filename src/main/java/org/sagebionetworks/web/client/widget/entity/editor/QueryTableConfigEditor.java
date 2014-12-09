@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -26,7 +27,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
 		String uri = tableConfig.getUri();
@@ -65,16 +66,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	private void updateDescriptor(String key, String value) {
 		if (value != null && value.trim().length() > 0)
 			descriptor.put(key, value);
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

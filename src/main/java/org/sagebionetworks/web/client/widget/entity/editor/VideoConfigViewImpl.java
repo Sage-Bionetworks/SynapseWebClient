@@ -112,15 +112,6 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 250;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 20;
-	}
 	
 	@Override
 	public String getMp4Entity() {

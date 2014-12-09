@@ -145,14 +145,6 @@ public class ProvenanceConfigViewImpl extends LayoutContainer implements Provena
 	}
 
 	@Override
-	public int getDisplayHeight() {
-		return 150;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 40;
-	}
-	@Override
 	public void clear() {
 	}
 	@Override

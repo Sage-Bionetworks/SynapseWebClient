@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -22,7 +23,7 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	}		
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;		
 		if (descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY) != null)
 			view.setEntityList(descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY));
@@ -57,16 +58,6 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 		descriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, view.getDepth().toString());
 		if(view.getProvDisplayHeight() != null) descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, view.getProvDisplayHeight().toString());
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY,Boolean.toString(view.isExpanded())); 
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

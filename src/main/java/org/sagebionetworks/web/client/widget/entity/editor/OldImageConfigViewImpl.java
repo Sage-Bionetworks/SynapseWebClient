@@ -197,14 +197,6 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 	@Override
 	public void clear() {
 	}
-	@Override
-	public int getDisplayHeight() {
-		return 150;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 130;
-	}
 	
 	@Override
 	public String getImageUrl() {

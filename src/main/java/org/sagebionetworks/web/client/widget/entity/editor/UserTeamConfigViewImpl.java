@@ -84,13 +84,4 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 40;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
-	}
 }

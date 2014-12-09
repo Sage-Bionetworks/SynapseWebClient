@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -22,7 +23,7 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 		String videoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
 		if (videoId != null)
@@ -46,15 +47,6 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, DisplayUtils.getYouTubeVideoId(view.getVideoUrl()));
 	}
 	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
-	}
 	
 	@Override
 	public String getTextToInsert() {

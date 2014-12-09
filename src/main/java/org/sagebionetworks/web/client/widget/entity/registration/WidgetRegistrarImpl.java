@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -48,7 +49,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, Dialog window) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, DialogCallback dialogCallback) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -87,7 +88,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(wikiKey, model, window);
+			presenter.configure(wikiKey, model, dialogCallback);
 		return presenter;
 	}
 

@@ -164,14 +164,6 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 	}
 
 	@Override
-	public int getDisplayHeight() {
-		return 400;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 631;
-	}
-	@Override
 	public void clear() {
 	}
 	
