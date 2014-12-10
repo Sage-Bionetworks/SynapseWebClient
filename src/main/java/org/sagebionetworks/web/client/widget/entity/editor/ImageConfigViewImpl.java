@@ -26,7 +26,6 @@ import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -34,7 +33,6 @@ import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.core.client.GWT;
@@ -46,9 +44,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigView {
+public class ImageConfigViewImpl extends FlowPanel implements ImageConfigView {
 
-	private static final int DISPLAY_HEIGHT = 250;
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
 	EntityFinder entityFinder;
@@ -76,7 +73,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	@Override
 	public void initView() {
-		setLayout(new FitLayout());
 		uploadedFileHandleName = null;
 		VerticalPanel externalLinkPanel = new VerticalPanel();
 		externalLinkPanel.add(getExternalLinkPanel());
@@ -107,9 +103,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		
 		synapseTab.add(synapseEntityPanel);
 		tabPanel.add(synapseTab);
-		
-		this.setHeight(DISPLAY_HEIGHT);
-		this.layout(true);
 	}
 	
 	private FormPanel getSynapseEntityPanel() {
@@ -238,9 +231,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		uploadTab.removeAll();
 		//update the uploadPanel
 		initUploadPanel(wikiKey, dialogCallback);
-		
-		this.setHeight(DISPLAY_HEIGHT);
-		this.layout(true);
 	}
 	
 	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
@@ -289,7 +279,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 					}
 					uploadStatusPanel.addStyleName("margin-left-180");
 					uploadTab.add(uploadStatusPanel);
-					layout(true);
 				}
 			}
 		}, null);
@@ -299,7 +288,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	    uploadParamsPanel = new ImageParamsPanel();
 	    container.add(uploadParamsPanel);
 		uploadTab.add(container);
-		layout(true);
 	}
 	
 	@Override

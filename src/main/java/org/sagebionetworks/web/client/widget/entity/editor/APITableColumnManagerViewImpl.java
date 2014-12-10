@@ -42,7 +42,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -50,7 +49,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class APITableColumnManagerViewImpl extends LayoutContainer implements APITableColumnManagerView {
+public class APITableColumnManagerViewImpl extends FlowPanel implements APITableColumnManagerView {
 	
 	private static final int COLUMN_WIDTH_PX = 210;
 	private static final String CONFIG_COL_KEY = "config";
@@ -70,13 +69,10 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 	public APITableColumnManagerViewImpl(IconsImageBundle iconsImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
 		gridStore = new ListStore<BaseModelData>();
+		init();
 	}
 	
-	@Override
-	protected void onRender(Element parent, int index) {
-		super.onRender(parent, index);
-		this.setBorders(true);
-		
+	private void init() {
 		FlowPanel mainPanel = new FlowPanel();
 		//header and add button
 		LayoutContainer c = new LayoutContainer();
@@ -141,9 +137,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 			populateStore(configs);			
 		}
 		
-		if(isRendered())
-			grid.reconfigure(gridStore, columnModel);
-		this.layout(true);		
+		grid.reconfigure(gridStore, columnModel);
 	}
 
 	/**
@@ -288,10 +282,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 
 	@Override
 	public Widget asWidget() {
-		if(isRendered()) {
-			grid.reconfigure(gridStore, columnModel);
-			this.layout(true);
-		}
+		grid.reconfigure(gridStore, columnModel);
 		return this;
 	}
 

@@ -8,14 +8,14 @@ import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ReferenceConfigViewImpl extends LayoutContainer implements ReferenceConfigView {
+public class ReferenceConfigViewImpl extends FlowPanel implements ReferenceConfigView {
 	private Presenter presenter;
 	private TextField<String> refField;
-	private TextField<String> linkField;
 	
 	@Inject
 	public ReferenceConfigViewImpl() {

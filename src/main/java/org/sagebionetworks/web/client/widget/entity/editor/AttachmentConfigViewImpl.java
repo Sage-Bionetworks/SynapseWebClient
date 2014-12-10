@@ -12,15 +12,14 @@ import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AttachmentConfigViewImpl extends LayoutContainer implements AttachmentConfigView {
+public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentConfigView {
 
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
@@ -37,11 +36,7 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	
 	@Override
 	public void initView() {
-		setLayout(new FitLayout());
 		uploadedFileHandleName = null;
-		
-		this.setHeight(150);
-		this.layout(true);
 	}
 	
 	
@@ -60,12 +55,10 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
 		//update the uploadPanel
 		initUploadPanel(wikiKey, dialogCallback);
-		
-		this.layout(true);
 	}
 	
 	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
-		removeAll();
+		clear();
 		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
 		
 		//The ok/submitting button will be enabled when attachments are uploaded
@@ -85,13 +78,11 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 					}
 					uploadStatusPanel.addStyleName("margin-left-180");
 					add(uploadStatusPanel);
-					layout(true);
 				}
 				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 			}
 		}, null);
 		add(uploadPanel);
-		layout(true);
 	}
 	
 	@Override
