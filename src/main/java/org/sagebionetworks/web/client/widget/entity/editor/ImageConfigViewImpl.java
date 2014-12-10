@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -31,12 +32,10 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -67,8 +66,13 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	TabListItem externalTabListItem;
 	@UiField
 	TabListItem synapseTabListItem;
+	@UiField
+	FlowPanel uploadSuccessUI;
+	@UiField
+	FlowPanel uploadFailureUI;
+	@UiField
+	Text uploadErrorText;
 	
-	private HTMLPanel uploadStatusPanel;
 	private String uploadedFileHandleName;
 	
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
@@ -99,6 +103,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		synapseEntityPanel.add(synapseParamsPanel);
 		
 		synapseTab.add(synapseEntityPanel);
+		
+		uploadSuccessUI.setVisible(false);
+		uploadFailureUI.setVisible(false);
 	}
 	
 	private FormPanel getSynapseEntityPanel() {
@@ -241,11 +248,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 			public void onSaveAttachment(UploadResult result) {
 				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 				if(result != null){
-					if (uploadStatusPanel != null)
-						uploadTab.remove(uploadStatusPanel);
 					if(UploadStatus.SUCCESS == result.getUploadStatus()){
-						//save close this dialog with a save
-						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
+						uploadFailureUI.setVisible(false);
+						uploadSuccessUI.setVisible(true);
 						//enable the ok button
 						dialogCallback.setPrimaryEnabled(true);
 						presenter.addFileHandleId(result.getMessage());
@@ -254,10 +259,10 @@ public class ImageConfigViewImpl implements ImageConfigView {
 						if (fileUrl != null)
 							clientCache.put(uploadedFileHandleName+WebConstants.TEMP_IMAGE_ATTACHMENT_SUFFIX, fileUrl);
 					}else{
-						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
+						uploadErrorText.setText(result.getMessage());
+						uploadFailureUI.setVisible(true);
+						uploadSuccessUI.setVisible(false);
 					}
-					uploadStatusPanel.addStyleName("margin-left-180");
-					uploadTab.add(uploadStatusPanel);
 				}
 			}
 		}, null);

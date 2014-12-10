@@ -3,6 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	<ui:with field='iconsImageBundle' type='org.sagebionetworks.web.client.IconsImageBundle'/>
+	
 	<bh:Div>
 		<!-- Tabs -->
 		<b:NavTabs>
@@ -12,7 +14,16 @@
 		</b:NavTabs>
 		<b:TabContent>
 			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
-				<g:SimplePanel ui:field="uploadTab" />	
+				<g:SimplePanel ui:field="uploadTab" />
+				
+				<g:FlowPanel ui:field="uploadSuccessUI">
+					<g:Image resource='{iconsImageBundle.checkGreen16}' addStyleNames="margin-left-5" />
+					<bh:Text>Uploaded successfully</bh:Text>
+				</g:FlowPanel>
+				<g:FlowPanel ui:field="uploadFailureUI">
+					<g:Image resource='{iconsImageBundle.error16}' addStyleNames="margin-left-5" />
+					<bh:Text ui:field="uploadErrorText"></bh:Text>
+				</g:FlowPanel>
 			</b:TabPane>
 			<b:TabPane b:id="tab2" addStyleNames="panel margin-top-15">
 				<g:SimplePanel ui:field="externalTab" />
