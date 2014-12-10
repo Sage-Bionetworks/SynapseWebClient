@@ -2,8 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
@@ -14,25 +18,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
-import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
-import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl.Binder;
 
-import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FieldEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
-import com.extjs.gxt.ui.client.event.SelectionChangedListener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.extjs.gxt.ui.client.widget.form.Radio;
-import com.extjs.gxt.ui.client.widget.form.RadioGroup;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboValue;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -51,11 +38,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	
 	public interface Binder extends UiBinder<Widget, EntityFinderViewImpl> {}
 	
-	private static final int MARGIN_WIDTH_PX = 10;
-	private static final MarginData MARGIN_10 = new MarginData(MARGIN_WIDTH_PX);
-	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private MyEntitiesBrowser myEntitiesBrowser;	
 	private EntitySearchBox entitySearchBox;
 	
@@ -78,16 +61,23 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@UiField
 	SimplePanel enterIdWidgetContainer;
 	@UiField
-	FlowPanel versionContainer;
+	FlowPanel versionUI;
 	@UiField
 	HTML selectedText;
+	@UiField
+	Button versionDropDownButton;
+	@UiField
+	DropDownMenu versionDropDownMenu;
 	
-	private LayoutContainer versionComboContainer;
+	@UiField
+	Radio currentVersionRadio;
+	@UiField
+	Radio currentVersionRadioShowingVersions;
+	@UiField
+	InlineRadio specificVersionRadio;
+	
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
-	private SimpleComboBox<VersionInfoModelData> versionComboBox;
-	private Radio currentVersionRadio;
-	private Radio specifyVersionRadio;
-			
+	private Long maxVersion = 0L;
 	@Inject
 	public EntityFinderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -95,7 +85,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			MyEntitiesBrowser myEntitiesBrowser, 
 			EntitySearchBox entitySearchBox) {
 		this.modal = (Modal)binder.createAndBindUi(this);
-		this.sageImageBundle = sageImageBundle;
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.entitySearchBox = entitySearchBox;
 		
@@ -111,6 +100,25 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		createSearchBoxWidget();			
 		createEnterIdWidget();
 		showTopRightContainer(myEntitiesBrowserContainer);
+		
+		ClickHandler currentVersionClickHandler = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				versionDropDownButton.setEnabled(false);
+    			setSelectedVersion(null);
+    			updateSelectedView();		    			
+	    	}
+		};
+		currentVersionRadio.addClickHandler(currentVersionClickHandler);
+		currentVersionRadioShowingVersions.addClickHandler(currentVersionClickHandler);
+		specificVersionRadio.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				versionDropDownButton.setEnabled(true);
+				setSelectedVersion(maxVersion);
+				updateSelectedView();
+			}
+		});
 	}
 	
 	private void hideAllRightTopWidgets() {
@@ -120,7 +128,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 	
 	private void showTopRightContainer(SimplePanel container) {
-		versionContainer.clear();
+		versionUI.setVisible(false);
+		versionDropDownMenu.clear();
 		hideAllRightTopWidgets();
 		container.setVisible(true);
 	}
@@ -280,114 +289,65 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}
 
 	private void createVersionChooser(String entityId) {
+		versionUI.setVisible(false);
 		boolean showVersions = presenter.showVersions();
+		specificVersionRadio.setEnabled(showVersions);
+		if (showVersions) {
+			currentVersionRadio.setVisible(false);
+			currentVersionRadioShowingVersions.setVisible(true);
+			currentVersionRadioShowingVersions.setValue(true);
+		} else {
+			currentVersionRadioShowingVersions.setVisible(false);
+			currentVersionRadio.setVisible(true);
+			currentVersionRadio.setValue(true);
+		}
 		
-		MarginData first = new MarginData(15, 10, 0, 10);
-		MarginData others = new MarginData(15, 10, 0, 0);
-		
-		int boxHeight = 52;
-		
-		LayoutContainer currentVersion = new LayoutContainer();
-		currentVersion.setBorders(true);		
-		currentVersion.setHeight(boxHeight);
-		currentVersion.addStyleName("clearleft");
-		currentVersionRadio = new Radio();
-		currentVersionRadio.setId("123");
-		currentVersionRadio.setValue(true);		
-		currentVersionRadio.addStyleName("floatleft");
-		HTML label = showVersions ? new HTML(DisplayConstants.CURRENT_VERSION + " (" + DisplayConstants.ALWAYS_CURRENT_VERSION + ")")
-				: new HTML(DisplayConstants.CURRENT_VERSION);
-		label.addStyleName("floatleft");
-		currentVersion.add(currentVersionRadio, first);
-		currentVersion.add(label, others);
-		versionContainer.add(currentVersion);
-		
-		LayoutContainer specificVersion = new LayoutContainer();
-		if(!showVersions) specificVersion.disable();
-		specificVersion.setBorders(true);
-		specificVersion.setHeight(boxHeight);
-		specificVersion.addStyleName("clearleft");
-		specifyVersionRadio = new Radio();
-		specifyVersionRadio.setId("456");
-		specifyVersionRadio.addStyleName("floatleft");
-		label = new HTML(DisplayConstants.REFER_TO_SPECIFIC_VERSION);
-		label.addStyleName("floatleft");
-		versionComboContainer = new LayoutContainer();
-		versionComboContainer.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
-		versionComboContainer.addStyleName("floatleft");
 		presenter.loadVersions(entityId);
-		specificVersion.add(specifyVersionRadio, first);
-		specificVersion.add(label, others);
-		specificVersion.add(versionComboContainer, others);
-		versionContainer.add(specificVersion);
-		
-		final RadioGroup group = new RadioGroup();
-		group.add(currentVersionRadio);
-		group.add(specifyVersionRadio);
-		group.setSelectionRequired(true);		
-		
-		group.addListener(Events.Change, new Listener<FieldEvent>() {
-		    @Override
-		    public void handleEvent(FieldEvent fe) {
-		    	Radio selected = group.getValue();
-		    	if(currentVersionRadio.equals(selected)) {
-		    		if(versionComboBox != null) {
-		    			versionComboBox.disable();
-		    			versionComboBox.clearSelections();
-		    		}
-		    		if(currentVersionRadio.getValue()) {
-		    			// current always selected. null out selected
-		    			setSelectedVersion(null);
-		    			updateSelectedView();		    			
-		    		}
-		    	} else if(specifyVersionRadio.equals(selected)) {
-		    		if(versionComboBox != null) versionComboBox.enable();
-		    	}
-		    }
-		});
+		versionUI.setVisible(true);
 	}
 
+	private String getVersionLabel(VersionInfo info, boolean isCurrent) {
+		String current = isCurrent ? " [" + DisplayConstants.CURRENT + "]" : "";
+		if(info.getVersionLabel().equals(info.getVersionNumber().toString())) {
+			return info.getVersionNumber().toString() + current;
+		} else {
+			return info.getVersionLabel() + " (" + info.getVersionNumber() + ")" + current;
+		}  
+	}
+	
 	@Override
 	public void setVersions(List<VersionInfo> versions) {
-		versionComboContainer.removeAll();
 		if(versions == null) return;
-		versionComboBox = new SimpleComboBox<VersionInfoModelData>();
-		versionComboBox.setTypeAhead(false);
-		versionComboBox.setEditable(false);
-		versionComboBox.setForceSelection(true);
-		versionComboBox.setTriggerAction(TriggerAction.ALL);
-		versionComboBox.disable();
-		Long maxVersion = 0L;
-		VersionInfoModelData maxModel = null;
-		for(int i=0; i<versions.size(); i++) {
-			VersionInfo info = versions.get(i);
-			VersionInfoModelData model = new VersionInfoModelData(info, false); 
+		versionDropDownMenu.clear();
+		versionDropDownButton.setEnabled(false);
+		maxVersion = 0L;
+		//find maxVersion
+		for (VersionInfo info : versions) {
 			if(info.getVersionNumber() > maxVersion) {
 				maxVersion = info.getVersionNumber();
-				maxModel = model;
 			}
-			versionComboBox.add(model);
 		}
-		if(maxModel != null) maxModel.setIsCurrent(true);
-		versionComboBox.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<VersionInfoModelData>>() {			
-			@Override
-			public void selectionChanged(SelectionChangedEvent<SimpleComboValue<VersionInfoModelData>> se) {
-				SimpleComboValue<VersionInfoModelData> val = se.getSelectedItem();
-				if(val != null) {
-					VersionInfoModelData data = val.getValue();
-					if(data != null && data.getVersionInfo() != null) {
-						VersionInfo info = data.getVersionInfo();
-						setSelectedVersion(info.getVersionNumber());
-						updateSelectedView();
-						return;
-					}
+		//now add items to the drop down menu
+		for (final VersionInfo info : versions) {
+			boolean isCurrent = info.getVersionNumber() == maxVersion;
+			final String text = getVersionLabel(info, isCurrent);
+			AnchorListItem item = new AnchorListItem(text);
+			item.setMarginLeft(10);
+			ClickHandler itemClicked = new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					versionDropDownButton.setText(text);
+					setSelectedVersion(info.getVersionNumber());
+					updateSelectedView();
 				}
-				showErrorMessage(DisplayConstants.ERROR_GENERIC);
+			};
+			item.addClickHandler(itemClicked);
+			versionDropDownMenu.add(item);
+			if (isCurrent) {
+				//set text to the current version by default
+				versionDropDownButton.setText(text);
 			}
-		});
-		
-		versionComboContainer.add(versionComboBox);
-		versionComboContainer.layout(true);
+		}
 	}
 
 	private void setSelectedId(String entityId) {
@@ -400,33 +360,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	private void setSelectedVersion(Long versionNumber) {
 		selectedRef.setTargetVersionNumber(versionNumber);
 		presenter.setSelectedEntity(selectedRef);
-	}
-	
-	class VersionInfoModelData {		
-		private VersionInfo info;
-		private boolean isCurrent;
-		
-		public VersionInfoModelData(VersionInfo info, boolean isCurrent) {
-			this.info = info;		
-			this.isCurrent = isCurrent;
-		}
-		
-		public VersionInfo getVersionInfo() {
-			return info;
-		}
-		
-		public void setIsCurrent(boolean isCurrent) {
-			this.isCurrent = isCurrent;
-		}
-		
-		public String toString() {
-			String current = isCurrent ? " [" + DisplayConstants.CURRENT + "]" : "";
-			if(info.getVersionLabel().equals(info.getVersionNumber().toString())) {
-				return info.getVersionNumber().toString() + current;
-			} else {
-				return info.getVersionLabel() + " (" + info.getVersionNumber() + ")" + current;
-			}			
-		}
 	}
 	
 	@Override

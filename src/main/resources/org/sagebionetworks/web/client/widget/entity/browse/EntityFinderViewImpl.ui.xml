@@ -26,7 +26,17 @@
 							<g:SimplePanel ui:field="myEntitiesBrowserContainer" />
 							<g:SimplePanel ui:field="entitySearchWidgetContainer" />
 							<g:SimplePanel ui:field="enterIdWidgetContainer" />
-							<g:FlowPanel ui:field="versionContainer" />
+							
+							<g:FlowPanel ui:field="versionUI" addStyleNames="margin-top-10">
+								<b:Radio ui:field="currentVersionRadio" name="versionRadio" text="Current Version" />
+								<b:Radio ui:field="currentVersionRadioShowingVersions"  name="versionRadio" text="Current Version (Always refer to the most current version)" />
+								<b:InlineRadio ui:field="specificVersionRadio"  name="versionRadio" text="Refer to a Specific Version" />
+								<b:ButtonGroup addStyleNames="margin-left-10">
+			                    	<b:Button ui:field="versionDropDownButton" size="SMALL" dataToggle="DROPDOWN" addStyleNames="btn-block"/>
+			                    	<b:DropDownMenu ui:field="versionDropDownMenu" addStyleNames="btn-block"/>
+			                    </b:ButtonGroup>								
+							</g:FlowPanel>
+
 						</b:PanelBody>
 					</b:Panel>
 					<!-- right bottom -->

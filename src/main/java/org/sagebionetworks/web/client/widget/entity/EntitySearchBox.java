@@ -28,13 +28,10 @@ import com.google.inject.Inject;
  */
 public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget {
 	
-	private AdapterFactory adapterFactory;
 	private EntitySearchBoxView view;
 	private EntitySelectedHandler handler;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 
 	private boolean retrieveVersions = false;
 	
@@ -50,12 +47,9 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController) {
 		super();		
-		this.adapterFactory = factory;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}
 
