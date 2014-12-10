@@ -31,8 +31,6 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -237,24 +235,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
-		
-		ClickHandler uploadTabChangeListener = new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				dialogCallback.setPrimaryEnabled(uploadedFileHandleName != null);
-			}
-		};
-		ClickHandler tabChangeListener = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dialogCallback.setPrimaryEnabled(true);
-			}
-		};
-		
-		uploadTabListItem.addClickHandler(uploadTabChangeListener);
-		externalTabListItem.addClickHandler(tabChangeListener);
-		synapseTabListItem.addClickHandler(tabChangeListener);
 		
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
 			@Override
