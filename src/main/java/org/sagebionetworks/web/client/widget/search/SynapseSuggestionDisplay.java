@@ -9,12 +9,13 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 /*
  * SuggestionDisplay (for decorating the SuggestBox Popup)
  */
-public class UserGroupSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
+public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
 	private SageImageBundle sageImageBundle;
 	
 	private Label resultsLabel;
@@ -26,7 +27,7 @@ public class UserGroupSuggestionDisplay extends SuggestBox.DefaultSuggestionDisp
 	
 	private HTMLPanel loadingPanel;
 	
-	public UserGroupSuggestionDisplay(SageImageBundle sageImageBundle) {
+	public SynapseSuggestionDisplay(SageImageBundle sageImageBundle) {
 		super();
 		this.sageImageBundle = sageImageBundle;
 		getPopupPanel().addStyleName("userGroupSuggestBoxPopup");
@@ -55,7 +56,7 @@ public class UserGroupSuggestionDisplay extends SuggestBox.DefaultSuggestionDisp
 	public Widget getPopupContents(){	return popupContents;	}
 	
 	
-	public void showLoading(UserGroupSuggestBoxViewImpl suggestBox) {
+	public void showLoading(UIObject suggestBox) {
 		popupContents = getPopupPanel().getWidget();
 		if (loadingPanel == null) {
 			loadingPanel = new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle));
