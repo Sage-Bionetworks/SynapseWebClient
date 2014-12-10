@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	<bh:Div>
+		<!-- Tabs -->
+		<b:NavTabs>
+			<b:TabListItem ui:field="uploadTabListItem" active="true" dataTarget="#tab1" text="Upload"/>
+			<b:TabListItem ui:field="externalTabListItem" dataTarget="#tab2" text="From the Web"/>
+			<b:TabListItem ui:field="synapseTabListItem" dataTarget="#tab3" text="From Synapse File"/>
+		</b:NavTabs>
+		<b:TabContent>
+			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
+				<g:SimplePanel ui:field="uploadTab" />	
+			</b:TabPane>
+			<b:TabPane b:id="tab2" addStyleNames="panel margin-top-15">
+				<g:SimplePanel ui:field="externalTab" />
+			</b:TabPane>
+			<b:TabPane b:id="tab3" addStyleNames="panel margin-top-15">
+				<g:SimplePanel ui:field="synapseTab" />
+			</b:TabPane>
+			
+		</b:TabContent>
+	</bh:Div>
+	
+</ui:UiBinder>
