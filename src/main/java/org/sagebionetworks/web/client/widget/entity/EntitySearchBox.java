@@ -72,17 +72,12 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	 */	
 	public Widget asWidget(int width) {
 		view.setDisplayWidth(width);
-		return this.view.asWidget();
+		return asWidget();
 	}
 
-	/**
-	 * Default size
-	 * @param DIALOG_WIDTH
-	 * @return
-	 */
 	@Override
 	public Widget asWidget() {
-		return asWidget(300);
+		return view.asWidget();
 	}
 	
 	public void setEntitySelectedHandler(EntitySelectedHandler handler, boolean retrieveVersions) {

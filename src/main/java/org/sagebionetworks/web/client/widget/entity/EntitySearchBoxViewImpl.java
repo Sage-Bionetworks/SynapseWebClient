@@ -25,7 +25,6 @@ import com.google.inject.Inject;
 
 /**
  * This widget is a Synapse entity Id search box
- * 
  *
  */
 public class EntitySearchBoxViewImpl extends SuggestBox implements EntitySearchBoxView, IsWidget {
@@ -37,8 +36,8 @@ public class EntitySearchBoxViewImpl extends SuggestBox implements EntitySearchB
 			EntitySearchBoxSuggestOracle oracle,
 			SageImageBundle sageImageBundle) {
 		super(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
-		addStyleName("userGroupSuggestBox");
-		
+		addStyleName("form-control");
+		getElement().setAttribute("placeholder", "Enter search terms");
 		addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
@@ -61,7 +60,6 @@ public class EntitySearchBoxViewImpl extends SuggestBox implements EntitySearchB
 					presenter.setSelectedSuggestion(null);
 				}
 			}
-			
 		});
 		
 		// Previous suggestions button.

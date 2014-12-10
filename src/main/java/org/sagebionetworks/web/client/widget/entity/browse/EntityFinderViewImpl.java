@@ -8,7 +8,8 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -19,9 +20,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -57,13 +55,16 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@UiField
 	SimplePanel myEntitiesBrowserContainer;
 	@UiField
-	SimplePanel entitySearchWidgetContainer;
+	FlowPanel entitySearchWidgetContainer;
 	@UiField
-	SimplePanel enterIdWidgetContainer;
+	SimplePanel entitySearchBoxContainer;
+	
+	@UiField
+	FlowPanel enterIdWidgetContainer;
 	@UiField
 	FlowPanel versionUI;
 	@UiField
-	HTML selectedText;
+	Text selectedText;
 	@UiField
 	Button versionDropDownButton;
 	@UiField
@@ -75,6 +76,11 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	Radio currentVersionRadioShowingVersions;
 	@UiField
 	InlineRadio specificVersionRadio;
+	
+	@UiField
+	TextBox synapseIdTextBox;
+	@UiField
+	Button lookupSynapseIdButton;
 	
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
 	private Long maxVersion = 0L;
@@ -127,7 +133,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		enterIdWidgetContainer.setVisible(false);
 	}
 	
-	private void showTopRightContainer(SimplePanel container) {
+	private void showTopRightContainer(Widget container) {
 		versionUI.setVisible(false);
 		versionDropDownMenu.clear();
 		hideAllRightTopWidgets();
@@ -203,16 +209,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				createVersionChooser(entityId);
 			}
 		}, false);
-		
-		LayoutContainer entitySearchWidget = new LayoutContainer();
-		HTML search = new HTML("<h4>" + DisplayConstants.LABEL_SEARCH + "</h4>");
-		search.addStyleName("span-2 notopmargin");		
-		entitySearchWidget.add(search, new MarginData(0, 0, 10, 0));
-		Widget box = entitySearchBox.asWidget(490);
-		box.addStyleName("span-13 notopmargin last");
-		entitySearchWidget.add(box, new MarginData(0, 0, 10, 0));
-		
-		entitySearchWidgetContainer.setWidget(entitySearchWidget);
+		entitySearchBoxContainer.add(entitySearchBox.asWidget());
 		
 		// list entry
 		Widget entry = createNewLeftEntry(DisplayConstants.LABEL_SEARCH, new ClickHandler(){
@@ -225,26 +222,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}	
 
 	private void createEnterIdWidget() {
-		MarginData margin = new MarginData(0, 10, 0, 0);
-		
-		LayoutContainer widget = new LayoutContainer();
-		HTML html = new HTML("<h4>" + DisplayConstants.SYNAPSE_ID + "</h4>");
-		html.addStyleName("floatleft");
-		widget.add(html, margin);		
-		
-		final TextField<String> input = new TextField<String>();
-		input.setEmptyText(DisplayConstants.ENTER_SYNAPSE_ID + " (i.e. syn123)");
-		input.addStyleName("floatleft");
-		input.setWidth(250);
-		input.setHeight(25);
-		widget.add(input, margin);
-		
-		final Button btn = new Button(DisplayConstants.LOOKUP);
-		btn.addClickHandler(new ClickHandler() {
+		lookupSynapseIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				// lookup id
-				presenter.lookupEntity(input.getValue(), new AsyncCallback<Entity>() {
+				presenter.lookupEntity(synapseIdTextBox.getValue(), new AsyncCallback<Entity>() {
 					@Override
 					public void onSuccess(Entity entity) {
 						setSelectedId(entity.getId());
@@ -252,18 +233,13 @@ public class EntityFinderViewImpl implements EntityFinderView {
 						// if versionable, create and show versions
 						createVersionChooser(entity.getId());
 					}
-
 					@Override
-					public void onFailure(Throwable caught) {						
+					public void onFailure(Throwable caught) {
 					}
 				});
 			}
 		});
-		btn.addStyleName("floatleft");
-		btn.setSize(ButtonSize.LARGE);
-		widget.add(btn);
-		enterIdWidgetContainer.setWidget(widget);
-
+		
 		// list entry		
 		final Widget entry = createNewLeftEntry(DisplayConstants.ENTER_SYNAPSE_ID, new ClickHandler(){
 	        @Override
@@ -284,8 +260,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		return p;
 	}
 	
-	private void updateSelectedView() {		
-		selectedText.setHTML("<h4>" + DisplayConstants.CURRENTLY_SELCTED + ": " + DisplayUtils.createEntityVersionString(selectedRef) + "</h4>");
+	private void updateSelectedView() {
+		selectedText.setText(DisplayUtils.createEntityVersionString(selectedRef));
 	}
 
 	private void createVersionChooser(String entityId) {

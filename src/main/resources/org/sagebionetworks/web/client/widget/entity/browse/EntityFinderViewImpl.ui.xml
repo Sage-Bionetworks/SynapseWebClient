@@ -24,8 +24,24 @@
 					<b:Panel>
 						<b:PanelBody>
 							<g:SimplePanel ui:field="myEntitiesBrowserContainer" />
-							<g:SimplePanel ui:field="entitySearchWidgetContainer" />
-							<g:SimplePanel ui:field="enterIdWidgetContainer" />
+							<!-- entity search widget container -->
+							<g:FlowPanel ui:field="entitySearchWidgetContainer">
+								<b:Heading size="H4">
+									<bh:Text>Search</bh:Text>
+								</b:Heading>
+								<g:SimplePanel ui:field="entitySearchBoxContainer" />
+							</g:FlowPanel>
+							<g:FlowPanel ui:field="enterIdWidgetContainer">
+								<b:Heading size="H4">
+									<bh:Text>Enter Synapse ID</bh:Text>
+								</b:Heading> 
+								<b:InputGroup>
+									<b:TextBox ui:field="synapseIdTextBox" placeholder="Enter Synapse ID (i.e. syn123)" autoComplete="false"/>
+									<b:InputGroupButton>
+										<b:Button ui:field="lookupSynapseIdButton" text="Lookup" />
+									</b:InputGroupButton>
+								</b:InputGroup>
+							</g:FlowPanel>
 							
 							<g:FlowPanel ui:field="versionUI" addStyleNames="margin-top-10">
 								<b:Radio ui:field="currentVersionRadio" name="versionRadio" text="Current Version" />
@@ -42,7 +58,10 @@
 					<!-- right bottom -->
 					<b:Panel>
 						<b:PanelBody>
-							<g:HTML ui:field="selectedText"></g:HTML>
+							<b:Heading size="H4">
+								<bh:Text>Currently Selected:&nbsp;</bh:Text>
+								<bh:Text ui:field="selectedText"/>
+							</b:Heading>
 						</b:PanelBody>
 					</b:Panel>
 				</b:Column>
