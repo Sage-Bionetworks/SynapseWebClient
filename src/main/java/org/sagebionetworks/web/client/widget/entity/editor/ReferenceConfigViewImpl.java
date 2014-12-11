@@ -1,53 +1,36 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ReferenceConfigViewImpl extends FlowPanel implements ReferenceConfigView {
+public class ReferenceConfigViewImpl implements ReferenceConfigView {
+	public interface ReferenceConfigViewImplUiBinder extends UiBinder<Widget, ReferenceConfigViewImpl> {}
 	private Presenter presenter;
-	private TextField<String> refField;
+	private Widget widget;
+	@UiField
+	TextBox referenceField;
 	
 	@Inject
-	public ReferenceConfigViewImpl() {
+	public ReferenceConfigViewImpl(ReferenceConfigViewImplUiBinder binder) {
+		widget = binder.createAndBindUi(this);
 	}
 
 	@Override
 	public void initView() {
-		VerticalPanel vp = new VerticalPanel();
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		refField = new TextField<String>();
-		refField.setAllowBlank(false);
-		Label refLabel = new Label(DisplayConstants.REFERENCE_LABEL);
-		refLabel.setWidth(60);
-		refField.setWidth(270);
-		hp.add(refLabel);
-		hp.add(refField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		add(vp);
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if(!refField.isValid()) {
-			throw new IllegalArgumentException(refField.getErrorMessage());
-		}
 	}
 
 	@Override
@@ -67,9 +50,7 @@ public class ReferenceConfigViewImpl extends FlowPanel implements ReferenceConfi
 
 	@Override
 	public void clear() {
-		if(refField != null) {
-			refField.setValue("");
-		}
+		referenceField.setValue("");
 	}
 
 	@Override
@@ -79,12 +60,12 @@ public class ReferenceConfigViewImpl extends FlowPanel implements ReferenceConfi
 
 	@Override
 	public void setReference(String reference) {
-		refField.setValue(reference);
+		referenceField.setValue(reference);
 	}
 
 	@Override
 	public String getReference() {
-		return refField.getValue();
+		return referenceField.getValue();
 	}
 
 }

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -38,7 +39,9 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 	
 	@Override
 	public void updateDescriptorFromView() {
-		view.checkParams();
+		if(!DisplayUtils.isDefined(view.getReference())) {
+			throw new IllegalArgumentException("A reference is required.");
+		}
 		
 		//Add the inline parameter to make the widget render inline
 		descriptor.put(WidgetConstants.INLINE_WIDGET_KEY, "true");

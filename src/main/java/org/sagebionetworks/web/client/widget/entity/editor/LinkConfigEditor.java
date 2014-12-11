@@ -38,7 +38,6 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		
 	}
 	
 	@Override
