@@ -4,9 +4,8 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxSuggestOracle.EntitySearchBoxSuggestion;
+import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestionDisplay;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -33,7 +32,7 @@ public class EntitySearchBoxViewImpl extends SuggestBox implements EntitySearchB
 	
 	@Inject
 	public EntitySearchBoxViewImpl(
-			EntitySearchBoxSuggestOracle oracle,
+			EntitySearchBoxOracle oracle,
 			SageImageBundle sageImageBundle) {
 		super(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		addStyleName("form-control");
@@ -102,11 +101,11 @@ public class EntitySearchBoxViewImpl extends SuggestBox implements EntitySearchB
 		Label resultsLbl = ((SynapseSuggestionDisplay) getSuggestionDisplay()).getResultsLabel();
 		
 		prevBtn.setEnabled(offset != 0);
-		boolean moreResults = offset + UserGroupSuggestBox.PAGE_SIZE < responsePage.getFound();
+		boolean moreResults = offset + EntitySearchBox.PAGE_SIZE < responsePage.getFound();
 		nextBtn.setEnabled(moreResults);
 		
 		String resultsLabel = "Displaying " + (offset + 1) + " - "
-								+ (moreResults ? offset + UserGroupSuggestBox.PAGE_SIZE : responsePage.getFound())
+								+ (moreResults ? offset + EntitySearchBox.PAGE_SIZE : responsePage.getFound())
 								+ " of " + responsePage.getFound();
 		resultsLbl.setText(resultsLabel);
 	}
@@ -155,8 +154,8 @@ public class EntitySearchBoxViewImpl extends SuggestBox implements EntitySearchB
 	}
 	
 	@Override
-	public EntitySearchBoxSuggestOracle getOracle() {
-		return (EntitySearchBoxSuggestOracle) getSuggestOracle();
+	public EntitySearchBoxOracle getOracle() {
+		return (EntitySearchBoxOracle) getSuggestOracle();
 	}
 
 	

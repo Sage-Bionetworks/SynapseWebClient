@@ -8,14 +8,11 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxSuggestOracle.EntitySearchBoxSuggestion;
+import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -41,22 +38,19 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	private EntitySelectedHandler handler;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private EntitySearchBoxSuggestOracle oracle;
+	private EntitySearchBoxOracle oracle;
 	private boolean retrieveVersions = false;
 	private EntitySearchBoxSuggestion selectedSuggestion;
 	private long offset;
 	
 	/**
 	 * 
-	 * @param factory
 	 * @param cache
 	 * @param propertyView
 	 */
 	@Inject
-	public EntitySearchBox(AdapterFactory factory, EntitySearchBoxView view,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+	public EntitySearchBox(EntitySearchBoxView view,
+			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
 		super();		
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -189,6 +183,15 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	
 	public void setOffset(long offset) {
 		this.offset = offset;
+	}
+	
+	/**
+	 * For testing. This would break the suggest box, as it does
+	 * not update the view's oracle.
+	 * @param oracle
+	 */
+	public void setOracle(EntitySearchBoxOracle oracle) {
+		this.oracle = oracle;
 	}
 
 }

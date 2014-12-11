@@ -6,7 +6,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
-public class EntitySearchBoxSuggestOracle extends SuggestOracle {
+public class EntitySearchBoxOracle extends SuggestOracle {
 	private SuggestOracle.Request request;
 	private SuggestOracle.Callback callback;
 	

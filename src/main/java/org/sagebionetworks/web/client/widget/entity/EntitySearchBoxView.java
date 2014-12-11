@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxSuggestOracle.EntitySearchBoxSuggestion;
+import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -25,7 +25,7 @@ public interface EntitySearchBoxView extends IsWidget, SynapseView {
 	void updateFieldStateForSuggestions(SearchResults responsePage, long offset);
 	void setDisplayWidth(int width);
 	int getWidth();
-	EntitySearchBoxSuggestOracle getOracle();
+	EntitySearchBoxOracle getOracle();
 	void hideLoading();
 	
 	/**
