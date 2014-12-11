@@ -6,8 +6,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -19,6 +17,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -54,12 +54,12 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 	private Presenter presenter;
 	private boolean isEmpty;
 	private Widget widget;
-	
+	IconsImageBundle iconsImageBundle;
 	@Inject
 	public APITableColumnManagerViewImpl(APITableColumnManagerViewImplUiBinder binder,
 			IconsImageBundle iconsImageBundle) {
 		widget = binder.createAndBindUi(this);
-		
+		this.iconsImageBundle = iconsImageBundle;
 		addColumnButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -112,13 +112,14 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 			Div row = new Div();
 			row.add(new InlineHTML(data.getDisplayColumnName()));
 			
-			Button deleteColumnButton = new Button("", IconType.TIMES, new ClickHandler() {
+			AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
+			Anchor deleteColumnButton = DisplayUtils.createIconLink(img, new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.deleteColumnConfig(data);
 				}
 			});
-			deleteColumnButton.setPull(Pull.RIGHT);
+			deleteColumnButton.addStyleName("margin-left-5");
 			row.add(deleteColumnButton);
 			columnRenderersTable.add(row);
 		}

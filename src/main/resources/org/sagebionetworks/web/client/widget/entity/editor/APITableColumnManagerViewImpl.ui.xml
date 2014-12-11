@@ -10,7 +10,7 @@
 			<bh:Text>Column Configuration</bh:Text>
 		</b:Heading>
 		<g:FlowPanel ui:field="columnRenderersTable" />
-		<b:Button ui:field="addColumnButton" icon="PLUS" size="SMALL">Add Column Renderer</b:Button>
+		<b:Button ui:field="addColumnButton" icon="PLUS" size="SMALL" addStyleNames="margin-top-10">Add Column Renderer</b:Button>
 		<b:Modal ui:field="newColumnModal" title="Column Configuration"
 			fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
