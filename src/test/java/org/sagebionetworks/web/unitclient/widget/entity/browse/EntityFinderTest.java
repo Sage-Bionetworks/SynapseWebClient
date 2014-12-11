@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -16,11 +15,13 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -147,6 +148,21 @@ public class EntityFinderTest {
 		entityFinder.loadVersions(id);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.UNABLE_TO_LOAD_VERSIONS);
+	}	
+	
+	@Test
+	public void testSelectionHandler() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configure(true, mockHandler);
+		Reference mockReference = mock(Reference.class);
+		
+		//the view usually sets the selected entity in the presenter
+		entityFinder.setSelectedEntity(mockReference);
+		
+		//then the view calls okClicked if the user has clicked ok in the entity finder
+		entityFinder.okClicked();
+		
+		verify(mockHandler).onSelected(mockReference);
 	}	
 	
 }
