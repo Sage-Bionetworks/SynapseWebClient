@@ -30,7 +30,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracle oracle, SageImageBundle sageImageBundle) {
 		super(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		addStyleName("userGroupSuggestBox");
-		
+		getValueBox().addStyleName("form-control");
 		addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 
 			@Override
@@ -134,7 +134,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	@Override
 	public void setPlaceholderText(String text) {
-		getElement().setAttribute("placeHolder", text);
+		getValueBox().getElement().setAttribute("placeholder", text);
 	}
 	
 	@Override

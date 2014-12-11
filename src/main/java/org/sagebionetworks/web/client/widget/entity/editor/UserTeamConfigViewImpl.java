@@ -36,7 +36,6 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 		clear();
 		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 		suggestBox.setPlaceholderText("Enter name...");
-		suggestBox.setWidth(330 + "px");
 		SimplePanel panel = new SimplePanel();
 		panel.setWidget(suggestBox.asWidget());
 		panel.addStyleName("margin-10");
