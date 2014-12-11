@@ -5,7 +5,10 @@ import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -63,6 +66,9 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 			loadingPanel.setWidth(suggestBox.getOffsetWidth() + "px");
 		}
 		getPopupPanel().setWidget(loadingPanel);
+		//When in a bootstrap modal, the popup panel only has the correct top position when the window is scrolled up.
+		//When the modal is scrolled down in the page, the gwt PopupPanel gets confused (because the suggestBox always reports the same top position).
+		DisplayUtils.scrollToTop();
 		getPopupPanel().showRelativeTo(suggestBox);
 	}
 	
