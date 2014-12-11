@@ -85,7 +85,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			List<Reference> allRefs = new ArrayList<Reference>();
 			allRefs.add(ref);
 			ReferenceList list = new ReferenceList();
-			list.setReferences(allRefs);		
+			list.setReferences(allRefs);	
 			try {
 				synapseClient.getEntityHeaderBatch(list.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
 					@Override

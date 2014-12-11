@@ -48,8 +48,7 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 	// TODO: Aren't really any service calls yet.
 	
 	public void pushChangesToSynapse(Callback changesPushedCallback) {
-		
-		
+		changesPushedCallback.invoke();
 	}
 	
 	public Tree getTree() {

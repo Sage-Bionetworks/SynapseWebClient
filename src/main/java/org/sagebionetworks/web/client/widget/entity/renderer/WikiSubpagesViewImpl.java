@@ -88,12 +88,13 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			editOrderButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					orderEditorModal.show(new Callback() {
-						@Override
-						public void invoke() {
-							Window.alert("WikiSubpagesViewImpl supposed to do something here??");
-						}
-					});
+					orderEditorModal.show(
+							presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
+								@Override
+								public List<String> getCurrentOrderHint() {
+									return getCurrentOrderHintIdList();
+								}
+							}));
 				}
 			});
 			
@@ -124,8 +125,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private Tree copyTree(Tree tree) {
 		Tree newTree = new Tree();
 		for (int i = 0; i < tree.getItemCount(); i++) {
-			TreeItem newChild = new TreeItem();
-			buildTreeRecurse(tree.getItem(i), newChild);
+			SubPageTreeItem oldItem = (SubPageTreeItem) tree.getItem(i);
+			SubPageTreeItem newChild = new SubPageTreeItem(oldItem.getHeader(), oldItem.getText(), oldItem.getTargetPlace(), oldItem.isCurrentPage());
+			buildTreeRecurse(oldItem, newChild);
 			newTree.addItem(newChild);
 			Label label = new Label();
 			if (tree.getItem(i).getWidget() instanceof Anchor) {
@@ -139,20 +141,20 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	// TODO: Super redundant!!
-	private void buildTreeRecurse(TreeItem item1, TreeItem item2) {
+	private void buildTreeRecurse(SubPageTreeItem item1, SubPageTreeItem item2) {
 		for (int i = 0; i < item1.getChildCount(); i++) {
-			TreeItem child = item1.getChild(i);
-			TreeItem newChild = new TreeItem();
+			SubPageTreeItem oldItem = (SubPageTreeItem) item1.getChild(i);
+			SubPageTreeItem newChild = new SubPageTreeItem(oldItem.getHeader(), oldItem.getText(), oldItem.getTargetPlace(), oldItem.isCurrentPage());
 			item2.addItem(newChild);
 			Label label = new Label();
-			if (child.getWidget() instanceof Anchor) {
-				label.setText(((Anchor)child.getWidget()).getText());
-			} else if (child.getWidget() instanceof Label) {
-				label.setText(((Label)child.getWidget()).getText());
+			if (oldItem.getWidget() instanceof Anchor) {
+				label.setText(((Anchor)oldItem.getWidget()).getText());
+			} else if (oldItem.getWidget() instanceof Label) {
+				label.setText(((Label)oldItem.getWidget()).getText());
 			}
 			newChild.setWidget(label);
 			item2.setState(true);
-			buildTreeRecurse(child, newChild);
+			buildTreeRecurse(oldItem, newChild);
 		}
 	}
 	
