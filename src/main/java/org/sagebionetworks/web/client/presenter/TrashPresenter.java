@@ -172,7 +172,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 				if (caught instanceof ForbiddenException) {
 					// Show to view, as handleServiceException call in createFailureDisplay
 					// will show message about insufficient privileges.
-					view.showErrorMessage(caught.getMessage());
+					view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND + " " + caught.getMessage());
 				} else {
 					createFailureDisplay(ERROR_RESTORING_ENTITY_TITLE, caught);
 				}
