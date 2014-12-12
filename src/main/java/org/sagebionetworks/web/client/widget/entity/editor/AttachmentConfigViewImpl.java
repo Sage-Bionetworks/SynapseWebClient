@@ -1,26 +1,25 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.repo.model.attachment.UploadResult;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AttachmentConfigViewImpl extends LayoutContainer implements AttachmentConfigView {
+public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentConfigView {
 
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
@@ -37,11 +36,7 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	
 	@Override
 	public void initView() {
-		setLayout(new FitLayout());
 		uploadedFileHandleName = null;
-		
-		this.setHeight(150);
-		this.layout(true);
 	}
 	
 	
@@ -57,19 +52,17 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Dialog window) {
+	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
 		//update the uploadPanel
-		initUploadPanel(wikiKey, window);
-		
-		this.layout(true);
+		initUploadPanel(wikiKey, dialogCallback);
 	}
 	
-	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
-		removeAll();
+	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
+		clear();
 		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
 		
 		//The ok/submitting button will be enabled when attachments are uploaded
-		window.getButtonById(Dialog.OK).disable();
+		dialogCallback.setPrimaryEnabled(false);
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.IMAGE_CONFIG_UPLOAD, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
@@ -78,20 +71,18 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 						//save close this dialog with a save
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
 						//enable the ok button
-						window.getButtonById(Dialog.OK).enable();
+						dialogCallback.setPrimaryEnabled(true);
 						presenter.addFileHandleId(result.getMessage());
 					}else{
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
 					}
 					uploadStatusPanel.addStyleName("margin-left-180");
 					add(uploadStatusPanel);
-					layout(true);
 				}
 				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 			}
 		}, null);
 		add(uploadPanel);
-		layout(true);
 	}
 	
 	@Override
@@ -128,15 +119,6 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	@Override
 	public void clear() {
 	}
-	@Override
-	public int getDisplayHeight() {
-		return 130;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 90;
-	}
-	
 	/*
 	 * Private Methods
 	 */

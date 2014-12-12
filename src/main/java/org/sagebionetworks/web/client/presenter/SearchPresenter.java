@@ -298,7 +298,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		synapseClient.search(currentSearch, new AsyncCallback<SearchResults>() {			
 			@Override
 			public void onSuccess(SearchResults result) {
-				currentResult = result;		
+				currentResult = result;
 				view.setSearchResults(currentResult, join(currentSearch.getQueryTerm(), " "), newQuery);
 				newQuery = false;
 			}

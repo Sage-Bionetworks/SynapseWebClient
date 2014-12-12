@@ -6,7 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionDisplay;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestionDisplay;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,9 +28,9 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	@Inject
 	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracle oracle, SageImageBundle sageImageBundle) {
-		super(oracle, new TextBox(), new UserGroupSuggestionDisplay(sageImageBundle));
+		super(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		addStyleName("userGroupSuggestBox");
-		
+		getValueBox().addStyleName("form-control");
 		addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 
 			@Override
@@ -58,7 +58,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 		});
 		
 		// Previous suggestions button.
-		((UserGroupSuggestionDisplay) getSuggestionDisplay()).getPrevButton().addClickHandler(new ClickHandler() {
+		((SynapseSuggestionDisplay) getSuggestionDisplay()).getPrevButton().addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
@@ -68,7 +68,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 		});
 		
 		// Next suggestions button.
-		((UserGroupSuggestionDisplay) getSuggestionDisplay()).getNextButton().addClickHandler(new ClickHandler() {
+		((SynapseSuggestionDisplay) getSuggestionDisplay()).getNextButton().addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
@@ -85,9 +85,9 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	@Override
 	public void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset) {
-		Button prevBtn = ((UserGroupSuggestionDisplay) getSuggestionDisplay()).getPrevButton();
-		Button nextBtn = ((UserGroupSuggestionDisplay) getSuggestionDisplay()).getNextButton();
-		Label resultsLbl = ((UserGroupSuggestionDisplay) getSuggestionDisplay()).getResultsLabel();
+		Button prevBtn = ((SynapseSuggestionDisplay) getSuggestionDisplay()).getPrevButton();
+		Button nextBtn = ((SynapseSuggestionDisplay) getSuggestionDisplay()).getNextButton();
+		Label resultsLbl = ((SynapseSuggestionDisplay) getSuggestionDisplay()).getResultsLabel();
 		
 		prevBtn.setEnabled(offset != 0);
 		boolean moreResults = offset + UserGroupSuggestBox.PAGE_SIZE < responsePage.getTotalNumberOfResults();
@@ -114,12 +114,12 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	@Override
 	public void showLoading() {
-		((UserGroupSuggestionDisplay) getSuggestionDisplay()).showLoading(this);
+		((SynapseSuggestionDisplay) getSuggestionDisplay()).showLoading(this);
 	}
 	
 	@Override
 	public void hideLoading() {
-		((UserGroupSuggestionDisplay) getSuggestionDisplay()).hideLoading();
+		((SynapseSuggestionDisplay) getSuggestionDisplay()).hideLoading();
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	@Override
 	public void setPlaceholderText(String text) {
-		getElement().setAttribute("placeHolder", text);
+		getValueBox().getElement().setAttribute("placeholder", text);
 	}
 	
 	@Override

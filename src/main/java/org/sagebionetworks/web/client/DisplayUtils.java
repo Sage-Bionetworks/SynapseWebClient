@@ -1816,31 +1816,6 @@ public class DisplayUtils {
 		public void onSelected(T selected);		
 	}
 	
-	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading(DisplayConstants.FIND_ENTITIES);
-		window.setLayout(new FitLayout());
-		window.add(entityFinder.asWidget(), new FitData(4));				
-		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				Reference selected = entityFinder.getSelectedEntity();
-				handler.onSelected(selected);
-			}
-		}));
-		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-		}));
-		window.setButtonAlign(HorizontalAlignment.RIGHT);
-		window.show();
-		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
-		entityFinder.refresh();
-	}
-
 	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
 		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
 		int i = 0;

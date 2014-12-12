@@ -14,10 +14,10 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import com.extjs.gxt.ui.client.widget.Dialog;
 public class ImageConfigEditorTest {
 		
 	ImageConfigEditor editor;
@@ -44,7 +44,7 @@ public class ImageConfigEditorTest {
 	public void testConfigure() {
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, null);
-		verify(mockView).configure(any(WikiPageKey.class), any(Dialog.class));
+		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
 		when(mockView.getUploadedFileHandleName()).thenReturn("a test file name");
 		
 		when(mockView.isExternal()).thenReturn(false);

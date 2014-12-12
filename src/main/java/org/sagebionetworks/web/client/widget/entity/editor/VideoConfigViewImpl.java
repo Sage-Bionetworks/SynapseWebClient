@@ -56,19 +56,18 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 		ClickHandler clickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				entityFinder.configure(false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {					
 							textBox.setValue(selected.getTargetId());
-							window.hide();
+							entityFinder.hide();
 						} else {
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
 				});
+				entityFinder.show();
 			}
 		};
 		textBox.addClickHandler(clickHandler);
@@ -111,15 +110,6 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 250;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 20;
 	}
 	
 	@Override

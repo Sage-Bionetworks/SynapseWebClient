@@ -1,19 +1,18 @@
-package org.sagebionetworks.web.client.widget.search;
+package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.repo.model.search.Hit;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
-public class UserGroupSuggestOracle extends SuggestOracle {
+public class EntitySearchBoxOracle extends SuggestOracle {
 	private SuggestOracle.Request request;
 	private SuggestOracle.Callback callback;
 	
-	private UserGroupSuggestBox suggestBox;
+	private EntitySearchBox suggestBox;
 	
-	public void configure(UserGroupSuggestBox suggestBox) {
+	public void configure(EntitySearchBox suggestBox) {
 		this.suggestBox = suggestBox;
 	}
 	
@@ -30,7 +29,6 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 				suggestBox.getSuggestions(request, callback);
 			}
 		}
-		
 	};
 	
 	@Override
@@ -44,53 +42,41 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		this.callback = callback;
 		
 		timer.cancel();
-		timer.schedule(UserGroupSuggestBox.DELAY);
+		timer.schedule(EntitySearchBox.DELAY);
 	}
 	
 	public SuggestOracle.Request getRequest()	{	return request;		}
 	public SuggestOracle.Callback getCallback()	{	return callback;	}
 	
-	public UserGroupSuggestion makeUserGroupSuggestion(UserGroupHeader header, String prefix) {
-		return new UserGroupSuggestion(header, prefix);
+	public EntitySearchBoxSuggestion makeEntitySuggestion(Hit hit, String prefix) {
+		return new EntitySearchBoxSuggestion(hit, prefix);
 	}
 
 
 	/*
 	 * Suggestion
 	 */
-	public class UserGroupSuggestion implements IsSerializable, Suggestion {
-		private UserGroupHeader header;
+	public class EntitySearchBoxSuggestion implements IsSerializable, Suggestion {
+		private Hit hit;
 		private String prefix;
 		
-		public UserGroupSuggestion(UserGroupHeader header, String prefix) {
-			this.header = header;
+		public EntitySearchBoxSuggestion(Hit hit, String prefix) {
+			this.hit = hit;
 			this.prefix = prefix;
 		}
 		
-		public UserGroupHeader getHeader()		{	return header;			}
+		public Hit getHit()		{	return hit;			}
 		public String getPrefix() 				{	return prefix;			}
 		public void setPrefix(String prefix)	{	this.prefix = prefix;	}
 		
 		@Override
 		public String getDisplayString() {
-			return DisplayUtils.getUserGroupDisplaySuggestionHtml(header, suggestBox.getWidth() + "px",
-					suggestBox.getBaseFileHandleUrl(), suggestBox.getBaseProfileAttachmentUrl());
+			return hit.getName() + " | "+hit.getId();
 		}
 
 		@Override
 		public String getReplacementString() {
-			// Example output:
-			// Pac Man  |  114085
-			StringBuilder sb = new StringBuilder();
-			if (!header.getIsIndividual())
-				sb.append("(Team) ");
-			
-			String firstName = header.getFirstName();
-			String lastName = header.getLastName();
-			String username = header.getUserName();
-			sb.append(DisplayUtils.getDisplayName(firstName, lastName, username));
-			sb.append("  |  " + header.getOwnerId());
-			return sb.toString();
+			return getDisplayString();
 		}
 		
 	} // end inner class UserGroupSuggestion	

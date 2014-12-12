@@ -17,7 +17,6 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -133,20 +132,19 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
     		findEntityButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
     			@Override
     			public void componentSelected(ButtonEvent ce) {
-    				entityFinder.configure(true);				
-    				final Window window = new Window();
-    				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+    				entityFinder.configure(true, new SelectedHandler<Reference>() {					
     					@Override
     					public void onSelected(Reference selected) {
     						if(selected.getTargetId() != null) {					
     							selectedReference = selected;
     							selectedText.setHTML("&nbsp<h7>" + DisplayUtils.createEntityVersionString(selected) + "</h7>");
-    							window.hide();
+    							entityFinder.hide();
     						} else {
     							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
     						}
     					}
     				});
+    				entityFinder.show();
     			}
     		});
     		HorizontalPanel findEntityHorizintalPanel = new HorizontalPanel();

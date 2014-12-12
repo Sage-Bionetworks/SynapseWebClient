@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -28,13 +27,10 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.extjs.gxt.ui.client.widget.Window;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -336,20 +332,18 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	}
 	
 	private void createShortcut() {
-		entityFinder.configure(false);				
-		final Window window = new Window();
-		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+		entityFinder.configure(false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				if(selected.getTargetId() != null) {
 					presenter.createLink(selected.getTargetId());
-					window.hide();
+					entityFinder.hide();
 				} else {
 					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 				}
 			}
 		});					
-
+		entityFinder.show();
 	}
 	
 	private void addSubmitToEvaluationItem(DropdownButton menuBtn, Entity entity,EntityType entityType) {
@@ -395,19 +389,18 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	}
 
 	private void moveItem() {
-		entityFinder.configure(false);				
-		final Window window = new Window();
-		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+		entityFinder.configure(false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				if(selected.getTargetId() != null) {
 					presenter.moveEntity(selected.getTargetId());
-					window.hide();
+					entityFinder.hide();
 				} else {
 					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 				}
 			}
-		});	
+		});
+		entityFinder.show();
 	}
 	
 	private void addUploadToGenomeSpace(final DropdownButton menuBtn, final EntityBundle bundle) {
