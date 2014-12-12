@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Anchor;
@@ -18,13 +19,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationListViewImpl extends Panel implements EvaluationListView {
-	List<Evaluation> selectedEvaluations;
+	List<InlineCheckBox> evaluationCheckboxes;
 	
 	private Presenter presenter;
 	
 	@Inject
 	public EvaluationListViewImpl() {
-		selectedEvaluations = new ArrayList<Evaluation>();
+		evaluationCheckboxes = new ArrayList<InlineCheckBox>();
 	}
 	
 	@Override
@@ -46,19 +47,9 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 		for(final Evaluation data: list){
 			Div row = new Div();
 			final InlineCheckBox selectBox = new InlineCheckBox(data.getName());
-			selectBox.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (selectBox.getValue()) {
-						selectedEvaluations.add(data);
-					} else {
-						selectedEvaluations.remove(data);
-					}
-				}
-			});
 			selectBox.addStyleName("margin-left-10");
 			row.add(selectBox);
-			
+			evaluationCheckboxes.add(selectBox);
 			if (DisplayUtils.isDefined(data.getSubmissionInstructionsMessage())) {
 				Anchor moreInfoButton = new Anchor();
 				moreInfoButton.setIcon(IconType.INFO_CIRCLE);
@@ -94,7 +85,7 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 	@Override
 	public void clear() {
 		super.clear();
-		selectedEvaluations.clear();
+		evaluationCheckboxes.clear();
 	}
 
 	@Override
@@ -107,7 +98,13 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 		DisplayUtils.showErrorMessage(message);
 	}
 
-	public List<Evaluation> getSelectedEvaluations() {
-		return selectedEvaluations;
+	public List<Integer> getSelectedEvaluationIndexes() {
+		List<Integer> selectedIndexes = new ArrayList<Integer>();
+		for (int i = 0; i < evaluationCheckboxes.size(); i++) {
+			if (evaluationCheckboxes.get(i).getValue()) {
+				selectedIndexes.add(i);
+			}
+		}
+		return selectedIndexes;
 	}
 }
