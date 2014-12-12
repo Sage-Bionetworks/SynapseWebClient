@@ -475,7 +475,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			EntityBadge badge = ginInjector.getEntityBadgeWidget();
 			badge.configure(entityHeaderWrapper);
 			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-bottom-10 col-xs-12 col-lg-6");
+			widget.addStyleName("margin-bottom-10 col-xs-12");
 			targetPanel.add(widget);
 		}
 		if (projectHeaders.isEmpty())
