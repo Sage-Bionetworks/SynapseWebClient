@@ -3,18 +3,16 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,12 +21,10 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 	List<Evaluation> selectedEvaluations;
 	
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	
 	@Inject
-	public EvaluationListViewImpl(IconsImageBundle iconsImageBundle) {
+	public EvaluationListViewImpl() {
 		selectedEvaluations = new ArrayList<Evaluation>();
-		this.iconsImageBundle = iconsImageBundle;
 	}
 	
 	@Override
@@ -64,14 +60,15 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 			row.add(selectBox);
 			
 			if (DisplayUtils.isDefined(data.getSubmissionInstructionsMessage())) {
-				AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.informationBalloon16());
-				Anchor moreInfoButton = DisplayUtils.createIconLink(img, new ClickHandler() {
+				Anchor moreInfoButton = new Anchor();
+				moreInfoButton.setIcon(IconType.INFO_CIRCLE);
+				moreInfoButton.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
 						DisplayUtils.showInfoDialog(data.getName(), data.getSubmissionInstructionsMessage(), null);
 					}
 				});
-				moreInfoButton.addStyleName("margin-left-10");
+				moreInfoButton.addStyleName("margin-left-10 greyText-imp");
 				row.add(moreInfoButton);
 			}
 			add(row);
