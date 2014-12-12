@@ -153,6 +153,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	@Override
 	public void setDefaultEditor(final CellEditor defaultEditor) {
 		this.defaultWidget = defaultEditor;
+		defaultPanel.clear();
 		defaultPanel.add(defaultEditor);
 	}
 }
