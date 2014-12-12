@@ -177,7 +177,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private void sortHeadersByOrderHint(PaginatedResults<JSONEntity> wikiHeaders, V2WikiOrderHint orderHint) {
 		// TODO: Sort headers by order hint.
 		List<JSONEntity> headerList = wikiHeaders.getResults();
-		List<String> idList = orderHint.getOrderHint();
+		List<String> idList = orderHint.getIdList();
 		if (idList == null) return;
 		
 		int insertIndex = 0;
@@ -243,8 +243,8 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
 					@Override
 					public void onSuccess(V2WikiOrderHint result) {
-						result.setOrderHint(newOrderHintIdList);
-						synapseClient.updateV2WikiOrderHint(wikiKey, result, new AsyncCallback<V2WikiOrderHint>() {
+						result.setIdList(newOrderHintIdList);
+						synapseClient.updateV2WikiOrderHint(result, new AsyncCallback<V2WikiOrderHint>() {
 							@Override
 							public void onSuccess(V2WikiOrderHint result) {
 								Window.alert("Updated. Party!");
