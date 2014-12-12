@@ -27,7 +27,7 @@
 			<b:TextBox ui:field="maxSize" placeholder="Size" width="75px"/>
 		</t:TableData>
 		<t:TableData>
-			<b:TextBox ui:field="defaultValue" placeholder="Default Value"/>
+			<g:SimplePanel ui:field="defaultPanel"/>
 		</t:TableData>
 		<t:TableData>
 			<b:TextBox ui:field="restrictValues" placeholder="value1, value2, value-n..."/>

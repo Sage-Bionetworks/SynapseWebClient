@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -9,20 +11,8 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jmhill
  *
  */
-public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub implements ColumnModelTableRowEditor {
+public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub implements ColumnModelTableRowEditorWidget {
 
-	TypePresenter presenter;
-	boolean sizeFieldVisible;
-	
-	@Override
-	public void setTypePresenter(TypePresenter presenter) {
-		this.presenter = presenter;
-	}
-
-	@Override
-	public void setSizeFieldVisible(boolean visible) {
-		this.sizeFieldVisible = visible;
-	}
 
 	@Override
 	public IsWidget getWidget(int index) {
@@ -35,5 +25,13 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public void configure(ColumnModel model,
+			SelectionPresenter selectionPresenter) {
+		ColumnModelUtils.applyColumnModelToRow(model, this);
+		setSelectionPresenter(selectionPresenter);
+	}
+
 
 }

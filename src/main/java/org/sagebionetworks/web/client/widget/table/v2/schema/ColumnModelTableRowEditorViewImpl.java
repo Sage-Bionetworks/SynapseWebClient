@@ -5,13 +5,16 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -21,9 +24,9 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow implements ColumnModelTableRowEditor {
+public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableRow implements ColumnModelTableRowEditorView {
 	
-	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowEditorImpl> {	}
+	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowEditorViewImpl> {	}
 	@UiField
 	TextBox name;
 	@UiField
@@ -31,14 +34,15 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 	@UiField
 	TextBox maxSize;
 	@UiField
-	TextBox defaultValue;
+	SimplePanel defaultPanel;
+	CellEditor defaultWidget;
 	@UiField
 	TextBox restrictValues;
 	String id;
 	TypePresenter presenter;
 	
 	@Inject
-	public ColumnModelTableRowEditorImpl(Binder uiBinder){
+	public ColumnModelTableRowEditorViewImpl(Binder uiBinder){
 		row = uiBinder.createAndBindUi(this);
 	}
 	
@@ -64,7 +68,7 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 
 	@Override
 	public String getDefaultValue() {
-		return defaultValue.getText();
+		return defaultWidget.getValue();
 	}
 
 	@Override
@@ -105,7 +109,7 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 
 	@Override
 	public void setDefaultValue(String defaultValue) {
-		this.defaultValue.setText(defaultValue);
+		this.defaultWidget.setValue(defaultValue);
 	}
 
 	@Override
@@ -133,7 +137,7 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 		case 2:
 			return maxSize;
 		case 3:
-			return defaultValue;
+			return defaultWidget;
 		case 4:
 			return restrictValues;
 		default:
@@ -144,5 +148,11 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 	@Override
 	public int getWidgetCount() {
 		return 5;
+	}
+
+	@Override
+	public void setDefaultEditor(final CellEditor defaultEditor) {
+		this.defaultWidget = defaultEditor;
+		defaultPanel.add(defaultEditor);
 	}
 }

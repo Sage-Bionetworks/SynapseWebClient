@@ -110,23 +110,20 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	}
 
 	@Override
-	public ColumnModelTableRowEditor addNewColumn() {
+	public ColumnModelTableRowEditorWidget addNewColumn() {
 		// Create a new column
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
 		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
 		// Assign an id to this column
-		ColumnModelTableRowEditor rowEditor = ginInjector.createNewColumnModelTableRowEditor();
+		ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
 		// bind this row for navigation.
 		if(this.keyboardNavigationHandler != null){
 			this.keyboardNavigationHandler.bindRow(rowEditor);
 		}
-		ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
-		rowEditor.setSelectionPresenter(this);
 		editor.addColumn(rowEditor);
 		this.editorRows.add(rowEditor);
-		// Setup a presenter for this row
-		new ColumnModelTableRowEditorPresenter(rowEditor);
+		rowEditor.configure(cm, this);
 		checkSelectionState();
 		return rowEditor;
 	}

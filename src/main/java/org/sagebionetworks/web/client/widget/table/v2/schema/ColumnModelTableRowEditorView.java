@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 /**
  * Editor add more business logic to the column model process.
@@ -8,7 +9,7 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
  * @author John
  *
  */
-public interface ColumnModelTableRowEditor extends ColumnModelTableRow, KeyboardNavigationHandler.RowOfWidgets {
+public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, KeyboardNavigationHandler.RowOfWidgets {
 
 	/**
 	 * Control for this view.
@@ -35,4 +36,10 @@ public interface ColumnModelTableRowEditor extends ColumnModelTableRow, Keyboard
 	 * @param visible
 	 */
 	public void setSizeFieldVisible(boolean visible);
+
+	/**
+	 * Set the editor to be used for default values.
+	 * @param defaultEditor
+	 */
+	public void setDefaultEditor(CellEditor defaultEditor);
 }

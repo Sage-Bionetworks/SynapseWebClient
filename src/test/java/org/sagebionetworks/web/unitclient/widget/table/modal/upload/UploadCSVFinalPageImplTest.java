@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishP
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadRequestUtils;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
@@ -85,9 +85,9 @@ public class UploadCSVFinalPageImplTest {
 		fileName = "testing.csv";
 		parentId = "syn123";
 		fileHandleId = "456";
-		when(mockPortalGinInjector.createNewColumnModelTableRowEditor()).thenAnswer(new Answer<ColumnModelTableRowEditor>() {
+		when(mockPortalGinInjector.createColumnModelEditorWidget()).thenAnswer(new Answer<ColumnModelTableRowEditorWidget>() {
 			@Override
-			public ColumnModelTableRowEditor answer(InvocationOnMock invocation)
+			public ColumnModelTableRowEditorWidget answer(InvocationOnMock invocation)
 					throws Throwable {
 				return new ColumnModelTableRowEditorStub();
 			}

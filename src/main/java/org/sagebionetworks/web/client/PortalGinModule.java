@@ -400,8 +400,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorC
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewerImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -893,7 +895,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CreateTableModalWidget.class).to(CreateTableModalWidgetImpl.class);
 		bind(ColumnModelsViewBase.class).to(ColumnModelsViewBaseImpl.class);
 		bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
-		bind(ColumnModelTableRowEditor.class).to(ColumnModelTableRowEditorImpl.class);
+		bind(ColumnModelTableRowEditorView.class).to(ColumnModelTableRowEditorViewImpl.class);
+		bind(ColumnModelTableRowEditorWidget.class).to(ColumnModelTableRowEditorWidgetImpl.class);
 		bind(ColumnModelTableRowViewer.class).to(ColumnModelTableRowViewerImpl.class);
 		bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
 		bind(RowView.class).to(RowViewImpl.class);
