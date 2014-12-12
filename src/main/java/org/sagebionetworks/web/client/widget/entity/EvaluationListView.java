@@ -21,9 +21,8 @@ public interface EvaluationListView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void configure(List<Evaluation> list);
 		List<Evaluation> getSelectedEvaluations();
-		Evaluation getEvaluation(String evaluationId);
 	}
 
 	void configure(List<Evaluation> evaluationList);
-	List<Evaluation> getSelectedEvaluations();
+	List<Integer> getSelectedEvaluationIndexes();
 }
