@@ -190,7 +190,7 @@ public interface SynapseClientAsync {
     public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
     public void getV2WikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
     public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
-    public void updateV2WikiOrderHint(WikiPageKey key, V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
+    public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
     public void getV2WikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
     public void getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version, AsyncCallback<String> callback);
     public void getV2WikiHistory(WikiPageKey key, Long limit, Long offset, AsyncCallback<String> callback);

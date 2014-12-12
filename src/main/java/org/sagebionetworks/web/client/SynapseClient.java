@@ -291,7 +291,7 @@ public interface SynapseClient extends RemoteService {
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
     public String getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	public V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
-	public V2WikiOrderHint updateV2WikiOrderHint(org.sagebionetworks.web.shared.WikiPageKey key, V2WikiOrderHint toUpdate) throws RestServiceException;
+	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
     public String getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
     public String getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version) throws RestServiceException;
     public String getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;

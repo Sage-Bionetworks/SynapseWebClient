@@ -1792,14 +1792,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public V2WikiOrderHint updateV2WikiOrderHint(org.sagebionetworks.web.shared.WikiPageKey key, V2WikiOrderHint toUpdate) throws RestServiceException {
+	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
-				key.getOwnerObjectId(),
-				ObjectType.valueOf(key.getOwnerObjectType()),
-				key.getWikiPageId());
 		try {
-			V2WikiOrderHint orderHint = synapseClient.updateV2WikiOrderHint(properKey, toUpdate);
+			V2WikiOrderHint orderHint = synapseClient.updateV2WikiOrderHint(toUpdate);
 			return orderHint;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
