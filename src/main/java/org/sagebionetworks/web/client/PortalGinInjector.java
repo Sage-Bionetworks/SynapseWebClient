@@ -98,7 +98,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEd
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
