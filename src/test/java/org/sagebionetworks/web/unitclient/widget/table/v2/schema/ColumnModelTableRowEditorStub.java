@@ -13,7 +13,8 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub implements ColumnModelTableRowEditorWidget {
 
-
+	private boolean isValid = true;
+	
 	@Override
 	public IsWidget getWidget(int index) {
 		// TODO Auto-generated method stub
@@ -31,6 +32,19 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 			SelectionPresenter selectionPresenter) {
 		ColumnModelUtils.applyColumnModelToRow(model, this);
 		setSelectionPresenter(selectionPresenter);
+	}
+
+	@Override
+	public boolean validate() {
+		return isValid;
+	}
+
+	/**
+	 * Override the is valid
+	 * @param isValid
+	 */
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
 	}
 
 

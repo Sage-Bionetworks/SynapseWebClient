@@ -42,4 +42,38 @@ public interface ColumnModelTableRowEditorView extends ColumnModelTableRow, Keyb
 	 * @param defaultEditor
 	 */
 	public void setDefaultEditor(CellEditor defaultEditor);
+
+	/**
+	 * Set an error for a name.
+	 * @param string
+	 */
+	public void setNameError(String string);
+
+	/**
+	 * Clear an error for a name.
+	 */
+	public void clearNameError();
+
+	/**
+	 * Set an error on the size of a column.
+	 * @param string
+	 */
+	public void setSizeError(String string);
+
+	/**
+	 * Clear a size error.
+	 */
+	public void clearSizeError();
+
+	/**
+	 * Validate the default editor.
+	 * @return
+	 */
+	public boolean validateDefault();
+
+	/**
+	 * Show/hid the restrict values editor
+	 * @param showRestrictValues
+	 */
+	public void setRestrictValuesVisible(boolean showRestrictValues);
 }

@@ -186,8 +186,30 @@ public class ColumnModelsWidgetTest {
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
 		verify(mockBaseView).hideEditor();
+		verify(mockBaseView).hideErrors();
 		// Save success should be called.
 		verify(mockUpdateHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException{
+		boolean isEdtiable = true;
+		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
+		// Show the dialog
+		widget.onEditColumns();
+		// Add a column
+		ColumnModelTableRowEditorStub editor = (ColumnModelTableRowEditorStub) widget.addNewColumn();
+		editor.setValid(false);
+		editor.setColumnName("a name");
+		// Now call save
+		widget.onSave();
+		verify(mockBaseView, never()).setLoading();
+		verify(mockBaseView, never()).hideEditor();
+		verify(mockBaseView, never()).hideErrors();
+		// Save success should be called.
+		verify(mockBaseView).showError(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
 	}
 	
 	@Test
@@ -307,4 +329,5 @@ public class ColumnModelsWidgetTest {
 		assertTrue(two.isSelected());
 		assertTrue(three.isSelected());
 	}
+	
 }

@@ -2,17 +2,18 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,11 +29,19 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 	
 	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowEditorViewImpl> {	}
 	@UiField
+	FormGroup nameGroup;
+	@UiField
 	TextBox name;
+	@UiField
+	HelpBlock nameHelp;
 	@UiField
 	Select type;
 	@UiField
+	FormGroup sizeGroup;
+	@UiField
 	TextBox maxSize;
+	@UiField
+	HelpBlock sizeHelp;	
 	@UiField
 	SimplePanel defaultPanel;
 	CellEditor defaultWidget;
@@ -155,5 +164,40 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 		this.defaultWidget = defaultEditor;
 		defaultPanel.clear();
 		defaultPanel.add(defaultEditor);
+	}
+
+	@Override
+	public void setNameError(String error) {
+		this.nameGroup.setValidationState(ValidationState.ERROR);
+		this.nameHelp.setText(error);
+	}
+
+	@Override
+	public void clearNameError() {
+		this.nameGroup.setValidationState(ValidationState.NONE);
+		this.nameHelp.setText("");
+	}
+
+	@Override
+	public void setSizeError(String error) {
+		this.sizeGroup.setValidationState(ValidationState.ERROR);
+		this.sizeHelp.setText(error);
+	}
+
+	@Override
+	public void clearSizeError() {
+		this.sizeGroup.setValidationState(ValidationState.NONE);
+		this.sizeHelp.setText("");
+	}
+
+	@Override
+	public boolean validateDefault() {
+		return this.defaultWidget.isValid();
+	}
+
+	@Override
+	public void setRestrictValuesVisible(boolean showRestrictValues) {
+		this.restrictValues.setVisible(showRestrictValues);
+		this.restrictValues.clear();
 	}
 }

@@ -10,5 +10,11 @@ public interface ColumnModelTableRowEditorWidget extends RowOfWidgets, ColumnMod
 	 * @param selectionPresenter When provided, this editor will show the selection check-box and register selection changes.
 	 */
 	public void configure(ColumnModel model, SelectionPresenter selectionPresenter);
+	/**
+	 * Validate This column model.
+	 * 
+	 * @return
+	 */
+	public boolean validate();
 
 }
