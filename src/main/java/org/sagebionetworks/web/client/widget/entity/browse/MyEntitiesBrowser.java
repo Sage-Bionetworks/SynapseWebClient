@@ -59,24 +59,24 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		view.setPresenter(this);
 	}	
 
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		handlerManager = new HandlerManager(this);		
+		handlerManager = new HandlerManager(this);	
 	}
 
-	/**
-	 * Does nothing. Use asWidget(Entity)
-	 */
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);
-		loadUserUpdateable();
-		loadFavorites();
+		refresh();
 		return view.asWidget();
 	}
-
+	
+	public void refresh() {
+		loadUserUpdateable();
+		loadFavorites();
+	}
+	
 	/**
 	 * Define custom handling for when an entity is clicked
 	 * @param handler

@@ -163,6 +163,11 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	public void clear() {
 		selectedRef = new Reference();
 		presenter.setSelectedEntity(selectedRef);
+		updateSelectedView();
+		myEntitiesBrowser.clearState();
+		myEntitiesBrowser.refresh();
+		synapseIdTextBox.clear();
+		entitySearchBox.clearSelection();
 		showTopRightContainer(myEntitiesBrowserContainer);
 	}
 
