@@ -7,7 +7,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -30,6 +29,7 @@ import com.google.inject.Inject;
  */
 public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnModelsViewBase.Presenter, ColumnModelTableRow.SelectionPresenter, SynapseWidgetPresenter{
 	
+	public static final String SEE_THE_ERROR_S_ABOVE = "See the error(s) above.";
 	public static final ColumnType DEFAULT_NEW_COLUMN_TYPE = ColumnType.STRING;
 	public static final long DEFAULT_STRING_MAX_SIZE = 50L;
 	PortalGinInjector ginInjector;
@@ -110,23 +110,20 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	}
 
 	@Override
-	public ColumnModelTableRowEditor addNewColumn() {
+	public ColumnModelTableRowEditorWidget addNewColumn() {
 		// Create a new column
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
 		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
 		// Assign an id to this column
-		ColumnModelTableRowEditor rowEditor = ginInjector.createNewColumnModelTableRowEditor();
+		ColumnModelTableRowEditorWidget rowEditor = ginInjector.createColumnModelEditorWidget();
 		// bind this row for navigation.
 		if(this.keyboardNavigationHandler != null){
 			this.keyboardNavigationHandler.bindRow(rowEditor);
 		}
-		ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
-		rowEditor.setSelectionPresenter(this);
 		editor.addColumn(rowEditor);
 		this.editorRows.add(rowEditor);
-		// Setup a presenter for this row
-		new ColumnModelTableRowEditorPresenter(rowEditor);
+		rowEditor.configure(cm, this);
 		checkSelectionState();
 		return rowEditor;
 	}
@@ -170,6 +167,13 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 
 	@Override
 	public void onSave() {
+		// Save it the data is valid
+		if(!validate()){
+			baseView.showError(SEE_THE_ERROR_S_ABOVE);
+			return;
+		}else{
+			baseView.hideErrors();
+		}
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = getEditedColumnModels();
 		baseView.setLoading();
@@ -187,6 +191,24 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 				baseView.hideEditor();
 				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}}); 
+	}
+	
+	/**
+	 * Validate each editor.
+	 * @return
+	 */
+	private boolean validate(){
+		// Validate each editor row
+		boolean valid = true;
+		for(ColumnModelTableRow editor: editorRows){
+			if(editor instanceof ColumnModelTableRowEditorWidget){
+				ColumnModelTableRowEditorWidget widget = (ColumnModelTableRowEditorWidget) editor;
+				if(!widget.validate()){
+					valid = false;
+				}
+			}
+		}
+		return valid;
 	}
 
 	@Override
