@@ -129,7 +129,7 @@ public class ColumnModelTableRowEditorWidgetTest {
 				ColumnTypeViewEnum.Integer,
 				ColumnTypeViewEnum.Entity));
 		for(ColumnTypeViewEnum type: ColumnTypeViewEnum.values()){
-			assertEquals("Unexpected for type: "+type, expectedTrue.contains(type), editor.canHaveRestrectedValues(type));
+			assertEquals("Unexpected for type: "+type, expectedTrue.contains(type), editor.canHaveRestrictedValues(type));
 		}
 	}
 

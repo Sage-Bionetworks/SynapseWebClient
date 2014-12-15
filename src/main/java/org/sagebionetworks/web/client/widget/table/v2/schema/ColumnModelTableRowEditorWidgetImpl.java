@@ -56,7 +56,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 			view.setMaxSize(null);
 			view.setSizeFieldVisible(false);
 		}
-		view.setRestrictValuesVisible(canHaveRestrectedValues(newType));
+		view.setRestrictValuesVisible(canHaveRestrictedValues(newType));
 		view.clearSizeError();
 		this.currentType = newType;
 		CellEditor defaultEditor = getDefaultEditorForType(newType);
@@ -85,7 +85,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	 * @param type
 	 * @return
 	 */
-	public boolean canHaveRestrectedValues(ColumnTypeViewEnum type){
+	public boolean canHaveRestrictedValues(ColumnTypeViewEnum type){
 		switch(type){
 		case String:
 			return true;
