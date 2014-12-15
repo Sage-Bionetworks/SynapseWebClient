@@ -30,6 +30,6 @@ public interface WikiSubpagesOrderEditorModalWidget extends IsWidget {
 	public void configure(Tree subpagesTree, Callback udpateOrderCallback);
 	
 	public Tree getTree();
-	public List<String> getCurrentOrderIdList();
+//	public List<String> getCurrentOrderIdList();
 	
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeItem;
 
 public class WikiSubpagesTreeUtils {
 	
@@ -78,6 +80,21 @@ public class WikiSubpagesTreeUtils {
 					insertIndex++;
 				}
 			}
+		}
+	}
+	
+	public static List<String> getCurrentOrderIdList(Tree tree) {
+		List<String> idList = new LinkedList<String>();
+		for (int i = 0; i < tree.getItemCount(); i++) {
+			recurseAddIds(idList, tree.getItem(i));
+		}
+		return idList;
+	}
+
+	private static void recurseAddIds(List<String> idList, TreeItem root) {
+		idList.add(((SubPageTreeItem) root).getHeader().getId());
+		for (int i = 0; i < root.getChildCount(); i++) {
+			recurseAddIds(idList, root.getChild(i));
 		}
 	}
 	

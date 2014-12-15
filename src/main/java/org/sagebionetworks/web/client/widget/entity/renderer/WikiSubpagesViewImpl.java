@@ -268,7 +268,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	@Override
 	public List<String> getCurrentOrderHintIdList() {
-		return orderEditorModal.getCurrentOrderIdList();
+		return WikiSubpagesTreeUtils.getCurrentOrderIdList(orderEditorModal.getTree());
 	}
 	
 	public interface GetOrderHintCallback {
