@@ -283,14 +283,13 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 				if(size < 1 || size > MAX_STRING_SIZE){
 					view.setSizeError(MUST_BE_A_NUMBER);
 					isValid = false;
-				}else{
-					view.clearSizeError();
 				}
 			} catch (NumberFormatException e) {
 				view.setSizeError(MUST_BE_A_NUMBER);
 				isValid = false;
 			}
-		}else{
+		}
+		if(isValid){
 			view.clearSizeError();
 		}
 		return isValid;
