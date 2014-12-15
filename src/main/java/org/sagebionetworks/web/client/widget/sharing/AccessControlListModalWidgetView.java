@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
+
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction between the a AccessControlListModalWidget and its view.
@@ -25,7 +27,13 @@ public interface AccessControlListModalWidgetView extends IsWidget {
 	 * @param string
 	 */
 	void setDefaultButtonText(String string);
-
+	
+	/**
+	 * Change the size of the modal.
+	 * @param size The new size of the modal.
+	 */
+	void setSize(ModalSize size);
+	
 	/**
 	 * Show/hide the primary button.
 	 * @param b

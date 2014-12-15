@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
@@ -76,6 +77,11 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	}
 	
 	@Override
+	public void setSize(ModalSize size) {
+		view.setSize(size);
+	}
+	
+	@Override
 	public List<String> getCurrentOrderIdList() {
 		return getCurrentOrderList(editor.getTree());
 	}
@@ -94,4 +100,5 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 			recurseAddIds(idList, root.getChild(i));
 		}
 	}
+
 }

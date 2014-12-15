@@ -144,7 +144,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						@Override
 						public void onSuccess(V2WikiOrderHint result) {
 							// "Sort" stuff'
-							sortHeadersByOrderHint(wikiHeaders, result);
+							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, result);
 							Tree tree = buildTree(wikiHeaders);
 							view.configure(tree, wikiSubpagesContainer, wikiPageContainer);
 						}
@@ -172,25 +172,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				}
 			}
 		});
-	}
-	
-	private void sortHeadersByOrderHint(PaginatedResults<JSONEntity> wikiHeaders, V2WikiOrderHint orderHint) {
-		// TODO: Sort headers by order hint.
-		List<JSONEntity> headerList = wikiHeaders.getResults();
-		List<String> idList = orderHint.getIdList();
-		if (idList == null) return;
-		
-		int insertIndex = 0;
-		for (int i = 0; i < idList.size(); i++) {
-			for (int j = 0; j < headerList.size(); j++) {
-				if (((V2WikiHeader) headerList.get(j)).getId().equals(idList.get(i))) {
-					// The header was in the order hint. Move that header towards the front.
-					JSONEntity toMove = headerList.remove(j);
-					headerList.add(insertIndex, toMove);
-					insertIndex++;
-				}
-			}
-		}
 	}
 	
 	private Tree buildTree(PaginatedResults<JSONEntity> wikiHeaders) {
@@ -247,7 +228,8 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						synapseClient.updateV2WikiOrderHint(result, new AsyncCallback<V2WikiOrderHint>() {
 							@Override
 							public void onSuccess(V2WikiOrderHint result) {
-								Window.alert("Updated. Party!");
+								//Window.alert("Updated. Party!");
+								refreshTableOfContents();
 							}
 							@Override
 							public void onFailure(Throwable caught) {
@@ -279,21 +261,16 @@ class SubPageTreeItem extends TreeItem {
 		this.text = text;
 		this.targetPlace = targetPlace;
 		this.isCurrentPage = isCurrentPage;
-		if (isCurrentPage) {
-			setWidget(new Label(text));	// TODO: Something special = ^ )
-		} else {
-			Anchor l = new Anchor(text);
-			l.addStyleName("link");
-//			l.addClickHandler(new ClickHandler() {
-//				@Override
-//				public void onClick(ClickEvent event) {
-//					globalAppState.getPlaceChanger().goTo(treeItem.getTargetPlace());
-//				}
-//			});
-			setWidget(l);
-		}
+		setWidget(new Label(text));	// TODO: Something special = ^ )
 		
-		//setState(true);
+	}
+	
+	public List<SubPageTreeItem> getChildren() {
+		List<SubPageTreeItem> children = new LinkedList<SubPageTreeItem>();
+		for (int i = 0; i < getChildCount(); i++) {
+			children.add((SubPageTreeItem) getChild(i));
+		}
+		return children;
 	}
 	
 	public String getText()				{	return text;			}

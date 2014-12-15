@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -48,6 +49,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState, WikiSubpagesOrderEditorModalWidget orderEditorModal) {
 		this.globalAppState = globalAppState;
 		this.orderEditorModal = orderEditorModal;
+		orderEditorModal.setSize(ModalSize.SMALL);
 	}
 	
 	@Override
@@ -56,38 +58,45 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+	public void configure(final Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
-		orderEditorModal.configure(copyTree(tree), presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
-																							@Override
-																							public List<String> getCurrentOrderHint() {
-																								return getCurrentOrderHint();
-																							}
-																						}));
+//		orderEditorModal.configure(WikiSubpagesTreeUtils.copyTree(tree), presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
+//																							@Override
+//																							public List<String> getCurrentOrderHint() {
+//																								return getCurrentOrderHint();
+//																							}
+//																						}));
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		//this widget shows nothing if it doesn't have any pages!
-		
 		if (tree.getItemCount() == 0)
 			return;
+		
 		//only show the tree if the root has children
 		if (tree.getItemCount() > 0) {
 			//traverse the tree, and create anchors
-//			final UnorderedListPanel ul = new UnorderedListPanel();
-//			ul.addStyleName("notopmargin nav bs-sidenav");
-//			addTreeItemsRecursive(ul, getTreeRootChildren(tree));
+			final UnorderedListPanel ul = new UnorderedListPanel();
+			ul.addStyleName("notopmargin nav bs-sidenav");
+			addTreeItemsRecursive(ul, WikiSubpagesTreeUtils.getTreeRootChildren(tree));
 			showHideButton = DisplayUtils.createButton("");
-			editOrderButton = DisplayUtils.createButton("");
+			editOrderButton = DisplayUtils.createButton("Edit Order");
+			editOrderButton.addStyleName("btn btn-default btn-xs right");
 			ulContainer = new FlowPanel();
 			ulContainer.addStyleName("notopmargin nav bs-sidenav");
 			ulContainer.setVisible(true);
 			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
-//			ulContainer.add(ul);
+			ulContainer.add(ul);
 
 			editOrderButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
+					orderEditorModal.configure(WikiSubpagesTreeUtils.copyTree(tree), presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
+						@Override
+						public List<String> getCurrentOrderHint() {
+							return getCurrentOrderHint();
+						}
+					}));
 					orderEditorModal.show(
 							presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
 								@Override
@@ -108,8 +117,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			
-			ulContainer.add(tree);
-			
 			add(editOrderButton);
 			add(ulContainer);
 			add(showHideButton);
@@ -121,49 +128,18 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		clearWidths();
 	}
 	
-	// TODO: Super redundant!! Super gross.
-	private Tree copyTree(Tree tree) {
-		Tree newTree = new Tree();
-		for (int i = 0; i < tree.getItemCount(); i++) {
-			SubPageTreeItem oldItem = (SubPageTreeItem) tree.getItem(i);
-			SubPageTreeItem newChild = new SubPageTreeItem(oldItem.getHeader(), oldItem.getText(), oldItem.getTargetPlace(), oldItem.isCurrentPage());
-			buildTreeRecurse(oldItem, newChild);
-			newTree.addItem(newChild);
-			Label label = new Label();
-			if (tree.getItem(i).getWidget() instanceof Anchor) {
-				label.setText(((Anchor)tree.getItem(i).getWidget()).getText());
-			} else if (tree.getItem(i).getWidget() instanceof Label) {
-				label.setText(((Label)tree.getItem(i).getWidget()).getText());
+	private void addTreeItemsRecursive(UnorderedListPanel ul, List<SubPageTreeItem> children) {
+		for (SubPageTreeItem child : children) {
+			String styleName = child.isCurrentPage() ? "active" : "";
+			ul.add(getListItem(child), styleName);
+			if (child.getChildCount() > 0){
+				UnorderedListPanel subList = new UnorderedListPanel();
+				subList.addStyleName("nav");
+				subList.setVisible(true);
+				ul.add(subList);
+				addTreeItemsRecursive(subList, child.getChildren());
 			}
-			newChild.setWidget(label);
 		}
-		return newTree;
-	}
-	
-	// TODO: Super redundant!!
-	private void buildTreeRecurse(SubPageTreeItem item1, SubPageTreeItem item2) {
-		for (int i = 0; i < item1.getChildCount(); i++) {
-			SubPageTreeItem oldItem = (SubPageTreeItem) item1.getChild(i);
-			SubPageTreeItem newChild = new SubPageTreeItem(oldItem.getHeader(), oldItem.getText(), oldItem.getTargetPlace(), oldItem.isCurrentPage());
-			item2.addItem(newChild);
-			Label label = new Label();
-			if (oldItem.getWidget() instanceof Anchor) {
-				label.setText(((Anchor)oldItem.getWidget()).getText());
-			} else if (oldItem.getWidget() instanceof Label) {
-				label.setText(((Label)oldItem.getWidget()).getText());
-			}
-			newChild.setWidget(label);
-			item2.setState(true);
-			buildTreeRecurse(oldItem, newChild);
-		}
-	}
-	
-	private List<SubPageTreeItem> getTreeRootChildren(Tree tree) {
-		List<SubPageTreeItem> result =  new ArrayList<SubPageTreeItem>();
-		for (int i = 0; i < tree.getItemCount(); i++) {
-			result.add((SubPageTreeItem) tree.getItem(i));
-		}
-		return result;
 	}
 	
 	/**
@@ -186,6 +162,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (wikiSubpagesContainer != null){
 			wikiSubpagesContainer.removeStyleName(SHOW_SUBPAGES_STYLE);
 			wikiSubpagesContainer.addStyleName(HIDE_SUBPAGES_STYLE);
+		}
+		
+		if (editOrderButton != null) {
+			editOrderButton.setVisible(false);
 		}
 				
 		if (showHideButton != null) {
@@ -212,8 +192,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		}
 		
 		if (editOrderButton != null) {
-			editOrderButton.setText("Edit Order");
-			editOrderButton.addStyleName("btn btn-default btn-xs right");
+			editOrderButton.setVisible(true);
 		}
 			
 		if (wikiPageContainer != null) {
@@ -229,21 +208,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (ulContainer != null)
 			DisplayUtils.show(ulContainer);
 	}
-	
-//	private void addTreeItemsRecursive(UnorderedListPanel ul, List<TreeItem> children) {
-//		for (TreeItem treeItemBasic : children) {
-//			SubPageTreeItem treeItem = (SubPageTreeItem) treeItemBasic;
-//			String styleName = treeItem.isCurrentPage() ? "active" : "";
-//			ul.add(getListItem(treeItem), styleName);
-//			if (treeItem.getChildCount() > 0){
-//				UnorderedListPanel subList = new UnorderedListPanel();
-//				subList.addStyleName("nav");
-//				subList.setVisible(true);
-//				ul.add(subList);
-//				addTreeItemsRecursive(subList, treeItem.getChildren());
-//			}
-//		}
-//	}
 	
 	private Widget getListItem(final SubPageTreeItem treeItem) {
 		Anchor l = new Anchor(treeItem.getText());
