@@ -63,7 +63,10 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 	}
 	
 	@Override
-	public void initView() {		
+	public void initView() {	
+		depthField.setValue("1");
+		entityListField.setValue("");
+		displayHeightField.setValue("");
 	}
 
 	@Override
