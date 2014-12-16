@@ -3,12 +3,13 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, WidgetEditorPresenter {
@@ -53,7 +54,10 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	@Override
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
-		view.checkParams();
+		if (view.getEntityList() == null)
+			throw new IllegalArgumentException(DisplayConstants.ERROR_ENTER_AT_LEAST_ONE_ENTITY);
+		if (!DisplayUtils.isDefined(view.getDepth()))
+			throw new IllegalArgumentException(DisplayConstants.ERROR_ENTER_DEPTH);
 		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, view.getEntityList());
 		descriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, view.getDepth().toString());
 		if(view.getProvDisplayHeight() != null) descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, view.getProvDisplayHeight().toString());
