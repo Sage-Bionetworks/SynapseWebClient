@@ -42,6 +42,7 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	@Override
 	public void show(Callback changeCallback) {
 		this.changeCallback = changeCallback;
+		hasChanges(false);			// TODO: This? Don't yet enable the save button.
 		view.setLoading(false);
 		view.showDialog();
 	}
