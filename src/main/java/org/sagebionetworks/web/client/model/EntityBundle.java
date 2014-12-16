@@ -24,7 +24,7 @@ public class EntityBundle {
 	private UserEntityPermissions permissions;
 	private EntityPath path;
 	private List<AccessRequirement> accessRequirements;
-	private List<AccessRequirement> unmetAccessRequirements;
+	private List<AccessRequirement> unmetDownloadAccessRequirements;
 	private Boolean hasChildren;
 	private List<FileHandle> fileHandles;
 	private TableBundle tableBundle;
@@ -32,7 +32,7 @@ public class EntityBundle {
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
 			List<AccessRequirement> accessRequirements,
-		List<AccessRequirement> unmetAccessRequirements, List<FileHandle> fileHandles, TableBundle tableBundle
+		List<AccessRequirement> unmetDownloadAccessRequirements, List<FileHandle> fileHandles, TableBundle tableBundle
 	) {
 		super();
 		this.entity = entity;
@@ -40,7 +40,7 @@ public class EntityBundle {
 		this.permissions = permissions;
 		this.path = path;
 		this.accessRequirements=accessRequirements;
-		this.unmetAccessRequirements=unmetAccessRequirements;
+		this.unmetDownloadAccessRequirements=unmetDownloadAccessRequirements;
 		this.fileHandles = fileHandles;
 		this.tableBundle = tableBundle;
 	}
@@ -82,12 +82,12 @@ public class EntityBundle {
 			List<AccessRequirement> accessRequirements) {
 		this.accessRequirements = accessRequirements;
 	}
-	public List<AccessRequirement> getUnmetAccessRequirements() {
-		return unmetAccessRequirements;
+	public List<AccessRequirement> getUnmetDownloadAccessRequirements() {
+		return unmetDownloadAccessRequirements;
 	}
-	public void setUnmetAccessRequirements(
-			List<AccessRequirement> unmetAccessRequirements) {
-		this.unmetAccessRequirements = unmetAccessRequirements;
+	public void setUnmetDownloadAccessRequirements(
+			List<AccessRequirement> unmetDownloadAccessRequirements) {
+		this.unmetDownloadAccessRequirements = unmetDownloadAccessRequirements;
 	}
 	
 	public List<FileHandle> getFileHandles() {
@@ -124,8 +124,8 @@ public class EntityBundle {
 				+ ((permissions == null) ? 0 : permissions.hashCode());
 		result = prime
 				* result
-				+ ((unmetAccessRequirements == null) ? 0
-						: unmetAccessRequirements.hashCode());
+				+ ((unmetDownloadAccessRequirements == null) ? 0
+						: unmetDownloadAccessRequirements.hashCode());
 		return result;
 	}
 	@Override
@@ -172,11 +172,11 @@ public class EntityBundle {
 				return false;
 		} else if (!permissions.equals(other.permissions))
 			return false;
-		if (unmetAccessRequirements == null) {
-			if (other.unmetAccessRequirements != null)
+		if (unmetDownloadAccessRequirements == null) {
+			if (other.unmetDownloadAccessRequirements != null)
 				return false;
-		} else if (!unmetAccessRequirements
-				.equals(other.unmetAccessRequirements))
+		} else if (!unmetDownloadAccessRequirements
+				.equals(other.unmetDownloadAccessRequirements))
 			return false;
 		return true;
 	}
@@ -185,7 +185,7 @@ public class EntityBundle {
 		return "EntityBundle [entity=" + entity + ", annotations="
 				+ annotations + ", permissions=" + permissions + ", path="
 				+ path + ", accessRequirements=" + accessRequirements
-				+ ", unmetAccessRequirements=" + unmetAccessRequirements
+				+ ", unmetDownloadAccessRequirements=" + unmetDownloadAccessRequirements
 				+ ", hasChildren=" + hasChildren + ", fileHandles=" + fileHandles
 				+ "]";
 	}

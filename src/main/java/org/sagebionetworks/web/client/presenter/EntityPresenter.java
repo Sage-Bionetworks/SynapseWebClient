@@ -175,7 +175,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		List<AccessRequirement> filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
 		bundle.setAccessRequirements(filteredList);
 		
-		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
-		bundle.setUnmetAccessRequirements(filteredList);
+		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetDownloadAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
+		bundle.setUnmetDownloadAccessRequirements(filteredList);
 	}
 }

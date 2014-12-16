@@ -94,7 +94,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		UserEntityPermissions permissions = null;
 		EntityPath path = null;
 		List<AccessRequirement> accessRequirements = null;
-		List<AccessRequirement> unmetAccessRequirements = null;
+		List<AccessRequirement> unmetDownloadAccessRequirements = null;
 		List<FileHandle> fileHandles = null;
 		TableBundle tableBundle = null;
 		Long version = null;
@@ -123,13 +123,13 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 				accessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
 			}
 		}			
-		// unmetAccessRequirements?
-		if(transport.getUnmetAccessRequirementsJson() != null){
-			unmetAccessRequirements =  new ArrayList<AccessRequirement>();
-			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getUnmetAccessRequirementsJson());
+		// unmetDownloadAccessRequirements?
+		if(transport.getUnmetDownloadAccessRequirementsJson() != null){
+			unmetDownloadAccessRequirements =  new ArrayList<AccessRequirement>();
+			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getUnmetDownloadAccessRequirementsJson());
 			for (int i=0; i<aa.length(); i++) {
 				JSONObjectAdapter joa = aa.getJSONObject(i);
-				unmetAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
+				unmetDownloadAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
 			}
 		}
 		// file handles?
@@ -149,7 +149,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		
 		// put it all together.
 		EntityBundle eb = new EntityBundle(entity, annotations, permissions,
-				path, accessRequirements, unmetAccessRequirements, fileHandles, tableBundle);
+				path, accessRequirements, unmetDownloadAccessRequirements, fileHandles, tableBundle);
 		// Set the child count when there.
 		if(transport.getHasChildren() != null){
 			eb.setChildCount(transport.getHasChildren());

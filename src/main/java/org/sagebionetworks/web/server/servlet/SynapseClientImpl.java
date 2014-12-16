@@ -474,7 +474,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb
+				ebt.setUnmetDownloadAccessRequirementsJson(createJSONStringFromArray(eb
 						.getUnmetAccessRequirements()));
 			}
 			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
@@ -1167,7 +1167,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	@Override
 	public AccessRequirementsTransport getUnmetAccessRequirements(
-			String entityId) throws RestServiceException {
+			String entityId, ACCESS_TYPE accessType) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
@@ -1175,7 +1175,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			subjectId.setType(RestrictableObjectType.ENTITY);
 
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements = synapseClient
-					.getUnmetAccessRequirements(subjectId);
+					.getUnmetAccessRequirements(subjectId, accessType);
 			JSONObjectAdapter arJson = accessRequirements
 					.writeToJSONObject(adapterFactory.createNew());
 			AccessRequirementsTransport transport = new AccessRequirementsTransport();
@@ -1205,7 +1205,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			subjectId.setType(RestrictableObjectType.EVALUATION);
 
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements = synapseClient
-					.getUnmetAccessRequirements(subjectId);
+					.getUnmetAccessRequirements(subjectId, ACCESS_TYPE.PARTICIPATE);
 			JSONObjectAdapter arJson = accessRequirements
 					.writeToJSONObject(adapterFactory.createNew());
 			return arJson.toJSONString();
@@ -1232,7 +1232,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements;
 			if (unmetOnly)
 				accessRequirements = synapseClient
-						.getUnmetAccessRequirements(subjectId);
+						.getUnmetAccessRequirements(subjectId, ACCESS_TYPE.PARTICIPATE);
 			else
 				accessRequirements = synapseClient
 						.getAccessRequirements(subjectId);
@@ -1259,7 +1259,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements;
 			if (unmetOnly)
 				accessRequirements = synapseClient
-						.getUnmetAccessRequirements(subjectId);
+						.getUnmetAccessRequirements(subjectId, targetAccessType);
 			else
 				accessRequirements = synapseClient
 						.getAccessRequirements(subjectId);
