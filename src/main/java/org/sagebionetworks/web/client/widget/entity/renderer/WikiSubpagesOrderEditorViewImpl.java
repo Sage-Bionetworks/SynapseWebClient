@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -36,6 +37,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	
 	private Presenter presenter;
 	private Tree tree;
+	private HasChangesHandler hasChangesHandler;
 
 	@Inject
 	public WikiSubpagesOrderEditorViewImpl(Binder binder) {
@@ -76,8 +78,9 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	}
 	
 	@Override
-	public void configure(Tree subpageTree) {
+	public void configure(Tree subpageTree, HasChangesHandler hasChangesHandler) {
 		this.tree = subpageTree;
+		this.hasChangesHandler = hasChangesHandler;
 		treePanel.setWidget(tree);
 		addTreeSelectionHandler(tree);
 	}
@@ -121,11 +124,13 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 					if (index > 0) {
 						parent.removeItem(selectedItem);
 						parent.insertItem(index - 1, selectedItem);
+						hasChangesHandler.hasChanges(true);
 					}
 				} else {
 					if (index < maxIndex) {
 						parent.removeItem(selectedItem);
 						parent.insertItem(index + 1, selectedItem);
+						hasChangesHandler.hasChanges(true);
 					}
 				}
 			} else {
@@ -140,11 +145,13 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 					if (index > 0) {
 						tree.removeItem(selectedItem);
 						tree.insertItem(index - 1, selectedItem);
+						hasChangesHandler.hasChanges(true);
 					}
 				} else {
 					if (index < maxIndex) {
 						tree.removeItem(selectedItem);
 						tree.insertItem(index + 1, selectedItem);
+						hasChangesHandler.hasChanges(true);
 					}
 				}
 			}

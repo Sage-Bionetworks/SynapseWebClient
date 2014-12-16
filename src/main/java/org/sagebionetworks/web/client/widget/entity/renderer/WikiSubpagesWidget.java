@@ -247,34 +247,34 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		};
 	}
 	
-}
-
-class SubPageTreeItem extends TreeItem {
-	private V2WikiHeader header;
-	private String text;
-	private Place targetPlace;
-	private boolean isCurrentPage;
-	
-	public SubPageTreeItem(V2WikiHeader header, String text, Place targetPlace, boolean isCurrentPage) {
-		super();
-		this.header = header;
-		this.text = text;
-		this.targetPlace = targetPlace;
-		this.isCurrentPage = isCurrentPage;
-		setWidget(new Label(text));	// TODO: Something special = ^ )
+	public static class SubPageTreeItem extends TreeItem {
+		private V2WikiHeader header;
+		private String text;
+		private Place targetPlace;
+		private boolean isCurrentPage;
 		
-	}
-	
-	public List<SubPageTreeItem> getChildren() {
-		List<SubPageTreeItem> children = new LinkedList<SubPageTreeItem>();
-		for (int i = 0; i < getChildCount(); i++) {
-			children.add((SubPageTreeItem) getChild(i));
+		public SubPageTreeItem(V2WikiHeader header, String text, Place targetPlace, boolean isCurrentPage) {
+			super();
+			this.header = header;
+			this.text = text;
+			this.targetPlace = targetPlace;
+			this.isCurrentPage = isCurrentPage;
+			setWidget(new Label(text));	// TODO: Something special = ^ )
+			
 		}
-		return children;
+		
+		public List<SubPageTreeItem> getChildren() {
+			List<SubPageTreeItem> children = new LinkedList<SubPageTreeItem>();
+			for (int i = 0; i < getChildCount(); i++) {
+				children.add((SubPageTreeItem) getChild(i));
+			}
+			return children;
+		}
+		
+		public String getText()				{	return text;			}
+		public Place getTargetPlace()		{	return targetPlace;		}
+		public boolean isCurrentPage()		{	return isCurrentPage;	}
+		public V2WikiHeader getHeader()		{	return header;			}
 	}
 	
-	public String getText()				{	return text;			}
-	public Place getTargetPlace()		{	return targetPlace;		}
-	public boolean isCurrentPage()		{	return isCurrentPage;	}
-	public V2WikiHeader getHeader()		{	return header;			}
 }

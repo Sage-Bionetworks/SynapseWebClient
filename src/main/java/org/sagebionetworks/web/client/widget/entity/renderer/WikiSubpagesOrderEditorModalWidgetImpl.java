@@ -42,14 +42,13 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	@Override
 	public void show(Callback changeCallback) {
 		this.changeCallback = changeCallback;
-		//this.editor.refresh();
 		view.setLoading(false);
 		view.showDialog();
 	}
 
 	@Override
-	public void configure(Tree subpagesTree, Callback updateOrderCallback) {
-		editor.configure(subpagesTree, this, updateOrderCallback);
+	public void configure(Tree subpagesTree, Callback updateOrderCallback) {	// TODO: Update order callback?
+		editor.configure(subpagesTree, this);
 		view.addEditor(editor.asWidget());
 	}
 
@@ -80,26 +79,5 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	public void setSize(ModalSize size) {
 		view.setSize(size);
 	}
-	
-	// TODO: Remove
-//	@Override
-//	public List<String> getCurrentOrderIdList() {
-//		return getCurrentOrderList(editor.getTree());
-//	}
-//	
-//	private List<String> getCurrentOrderList(Tree tree) {
-//		List<String> idList = new LinkedList<String>();
-//		for (int i = 0; i < tree.getItemCount(); i++) {
-//			recurseAddIds(idList, tree.getItem(i));
-//		}
-//		return idList;
-//	}
-//
-//	private void recurseAddIds(List<String> idList, TreeItem root) {
-//		idList.add(((SubPageTreeItem) root).getHeader().getId());
-//		for (int i = 0; i < root.getChildCount(); i++) {
-//			recurseAddIds(idList, root.getChild(i));
-//		}
-//	}
 
 }

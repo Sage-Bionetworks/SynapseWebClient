@@ -9,6 +9,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.SubPageTreeItem;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -65,7 +66,6 @@ public class WikiSubpagesTreeUtils {
 	}
 	
 	public static void sortHeadersByOrderHint(PaginatedResults<JSONEntity> wikiHeaders, V2WikiOrderHint orderHint) {
-		// TODO: Sort headers by order hint.
 		List<JSONEntity> headerList = wikiHeaders.getResults();
 		List<String> idList = orderHint.getIdList();
 		if (idList == null) return;

@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl.EntityTreeImageBundle;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.SubPageTreeItem;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
