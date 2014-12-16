@@ -82,7 +82,8 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	@Override
 	public void setSelectedSuggestion(EntitySearchBoxSuggestion suggestion) {
 		selectedSuggestion = suggestion;
-		entitySelected(selectedSuggestion.getHit().getId(), selectedSuggestion.getHit().getName());
+		if (suggestion != null)
+			entitySelected(selectedSuggestion.getHit().getId(), selectedSuggestion.getHit().getName());
 	}
 	
 	public void entitySelected(final String entityId, final String name) {

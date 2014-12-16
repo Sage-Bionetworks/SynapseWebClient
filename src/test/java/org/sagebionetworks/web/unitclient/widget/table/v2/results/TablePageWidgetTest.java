@@ -21,11 +21,13 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -60,8 +62,9 @@ public class TablePageWidgetTest {
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	TablePageWidget widget;
 	List<ColumnModel> schema;
+	SelectColumn derivedColumn;
 	List<SortableTableHeader> sortHeaders;
-	List<String> headers;
+	List<SelectColumn> headers;
 	QueryResultBundle bundle;
 	List<Row> rows;
 	Query query;
@@ -109,9 +112,12 @@ public class TablePageWidgetTest {
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
-		headers = TableModelTestUtils.getColumnModelIds(schema);
+		headers = TableModelTestUtils.buildSelectColumns(schema);
 		// Include an aggregate result in the headers.
-		headers.add("sum(four)");
+		derivedColumn = new SelectColumn();
+		derivedColumn.setColumnType(ColumnType.DOUBLE);
+		derivedColumn.setName("sum(four)");
+		headers.add(derivedColumn);
 		rows = TableModelTestUtils.createRows(schema, 3);
 		// Add an additional column to the rows for the aggregate results
 		int i =0;
@@ -126,8 +132,9 @@ public class TablePageWidgetTest {
 		QueryResult qr = new QueryResult();
 		qr.setQueryResults(set);
 		bundle.setQueryResult(qr);
-		bundle.setSelectColumns(schema);
+		bundle.setSelectColumns(headers);
 		bundle.setQueryCount(99L);
+		bundle.setColumnModels(schema);
 		
 		query = new Query();
 		query.setIsConsistent(true);
@@ -143,10 +150,13 @@ public class TablePageWidgetTest {
 		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
 		List<Row> extracted = widget.extractRowSet();
 		assertEquals(rows, extracted);
-		List<String> headers = widget.extractHeaders();
-		List<String> expected = TableModelTestUtils.getColumnModelIds(schema);
-		// there should be a null at the end for the aggregate function.
-		expected.add(null);
+		List<ColumnModel> headers = widget.extractHeaders();
+		List<ColumnModel> expected = new LinkedList<ColumnModel>(schema);
+		// there should be a derived column at the end for the for the aggregate function.
+		ColumnModel derived = new ColumnModel();
+		derived.setColumnType(derivedColumn.getColumnType());
+		derived.setName(derivedColumn.getName());
+		expected.add(derived);
 		assertEquals(expected, headers);
 		// are the rows registered?
 		verify(mockKeyboardNavigationHandler, times(extracted.size())).bindRow(any(RowOfWidgets.class));

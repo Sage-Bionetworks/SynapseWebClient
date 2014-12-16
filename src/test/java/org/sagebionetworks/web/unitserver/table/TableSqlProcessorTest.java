@@ -62,12 +62,6 @@ public class TableSqlProcessorTest {
 	}
 	
 	@Test
-	public void testIsAggregate() throws ParseException{
-		assertTrue(TableSqlProcessor.isAggregateFunction("count(foo)"));
-		assertFalse(TableSqlProcessor.isAggregateFunction("\"foo\""));
-	}
-	
-	@Test
 	public void testToggleSortNoSort() throws ParseException{
 		String sql = "select * from syn123";
 		String expected = "SELECT * FROM syn123 ORDER BY \"foo\" ASC";
@@ -110,7 +104,7 @@ public class TableSqlProcessorTest {
 	@Test
 	public void testToggleSortAggregate() throws ParseException{
 		String sql = "select bar, count(foo) from syn123 group by bar";
-		String expected = "SELECT bar, COUNT(foo) AS countfoo FROM syn123 GROUP BY bar ORDER BY \"countfoo\" ASC";
+		String expected = "SELECT bar, COUNT(foo) FROM syn123 GROUP BY bar ORDER BY \"count(foo)\" ASC";
 		// call under test.
 		String results = TableSqlProcessor.toggleSort(sql, "count(foo)");
 		assertEquals(expected, results);

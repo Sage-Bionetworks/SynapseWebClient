@@ -3,20 +3,24 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<bh:Div>
+	<g:HTMLPanel>
 		<!-- Tabs -->
-		<b:NavTabs>
-			<b:TabListItem active="true" dataTarget="#tab1" text="My Projects"/>
-			<b:TabListItem dataTarget="#tab2" text="My Favorites"/>
-		</b:NavTabs>
-		<b:TabContent>
-			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
-				<g:SimplePanel ui:field="myProjectsContainer" />	
-			</b:TabPane>
-			<b:TabPane b:id="tab2" addStyleNames="panel margin-top-15">
-				<g:SimplePanel ui:field="myFavoritesContainer" />
-			</b:TabPane>
-		</b:TabContent>
-	</bh:Div>
-	
+		<div class="margin-top-15">
+		    <ul class="nav nav-tabs">
+			    <li class="active margin-left-15" ui:field="myProjectsListItem">
+			    	<g:Anchor styleName="text-align-center no-background" ui:field="myProjectsLink" text="My Projects" />
+			    </li>
+			    <li ui:field="myFavoritesListItem">
+			    	<g:Anchor styleName="text-align-center link no-background" ui:field="myFavoritesLink" text="My Favorites" />
+			    </li>
+		    </ul>
+		</div>
+		
+		<bh:Div ui:field="myProjectsTabContents" addStyleNames="panel margin-top-15">
+			<g:SimplePanel ui:field="myProjectsContainer" />
+		</bh:Div>
+		<bh:Div ui:field="myFavoritesTabContents" addStyleNames="panel margin-top-15">
+			<g:SimplePanel ui:field="myFavoritesContainer" />
+		</bh:Div>
+	</g:HTMLPanel>
 </ui:UiBinder>
