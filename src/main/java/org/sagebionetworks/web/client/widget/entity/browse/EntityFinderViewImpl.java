@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.gwtbootstrap3.client.ui.html.UnorderedList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -45,6 +46,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	
 	@UiField
 	Button okButton;
+	@UiField
+	Button cancelButton;
 	
 	@UiField
 	SimplePanel browseMyEntitiesContainer;
@@ -93,7 +96,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		this.modal = (Modal)binder.createAndBindUi(this);
 		this.myEntitiesBrowser = myEntitiesBrowser;
 		this.entitySearchBox = entitySearchBox;
-		
 		selectedRef = new Reference();
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -101,7 +103,12 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				presenter.okClicked();
 			}
 		});
-		
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				modal.hide();
+			}
+		});
 		createMyEntityBrowserWidget();		
 		createSearchBoxWidget();			
 		createEnterIdWidget();
@@ -163,6 +170,11 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	public void clear() {
 		selectedRef = new Reference();
 		presenter.setSelectedEntity(selectedRef);
+		updateSelectedView();
+		myEntitiesBrowser.clearState();
+		myEntitiesBrowser.refresh();
+		synapseIdTextBox.clear();
+		entitySearchBox.clearSelection();
 		showTopRightContainer(myEntitiesBrowserContainer);
 	}
 
