@@ -574,7 +574,7 @@ public class DisplayConstants {
 	public static final String IMAGE_FILE_ENTITY = "Image File Entity";
 	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
-	public static final String ERROR_ENTER_DEPTH = "Please enter a depth";
+	public static final String ERROR_ENTER_DEPTH = "Please enter a valid depth";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_VIDEO_FILE = "Please set at least one video file format";
 	public static final String FIND_ENTITIES = "Find Entities";
 	public static final String FIND_ENTITY = "Find Entity";

@@ -7,8 +7,8 @@
 		<b:Form type="HORIZONTAL">
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel for="entityList" addStyleNames="col-xs-4">Entity List</b:FormLabel>
-					<g:FlowPanel addStyleNames="col-xs-8">
+					<b:FormLabel for="entityList" addStyleNames="col-xs-2">Entity List</b:FormLabel>
+					<g:FlowPanel addStyleNames="col-xs-10">
 						<b:InputGroup>
 							<b:TextBox ui:field="entityListField" name="entityList" b:id="entityList" />
 							<b:InputGroupButton>
@@ -18,19 +18,19 @@
 					</g:FlowPanel>
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:FormLabel for="depth" addStyleNames="col-xs-4">Depth</b:FormLabel>
-					<g:FlowPanel addStyleNames="col-xs-8">
+					<b:FormLabel for="depth" addStyleNames="col-xs-2">Depth</b:FormLabel>
+					<g:FlowPanel addStyleNames="col-xs-10">
 						<b:TextBox ui:field="depthField" name="depth" b:id="depth" />
 					</g:FlowPanel>
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:FormLabel for="displayHeight" addStyleNames="col-xs-4">Display Height (px)</b:FormLabel>
-					<g:FlowPanel addStyleNames="col-xs-8">
+					<b:FormLabel for="displayHeight" addStyleNames="col-xs-2">Display Height (px)</b:FormLabel>
+					<g:FlowPanel addStyleNames="col-xs-10">
 						<b:TextBox placeholder="275 (Default)" ui:field="displayHeightField" name="displayHeight" b:id="displayHeight" />
 					</g:FlowPanel>
 				</b:FormGroup>
 				<b:FormGroup>
-					<g:FlowPanel addStyleNames="col-xs-offset-4 col-xs-8">
+					<g:FlowPanel addStyleNames="col-xs-offset-2 col-xs-10">
 						<b:CheckBox ui:field="showExpandCheckbox" text="Show Expand"/>
 					</g:FlowPanel>
 				</b:FormGroup>

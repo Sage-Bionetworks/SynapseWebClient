@@ -105,8 +105,8 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 		return depthField.getValue();
 	}
 	@Override
-	public void setDepth(Long depth) {
-		depthField.setValue(depth.toString());
+	public void setDepth(String depth) {
+		depthField.setValue(depth);
 	}
 	@Override
 	public String getEntityList() {
@@ -129,12 +129,12 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 	}
 
 	@Override
-	public void setProvDisplayHeight(int provDisplayHeight) {
-		displayHeightField.setValue(Integer.toString(provDisplayHeight));
+	public void setProvDisplayHeight(String provDisplayHeight) {
+		displayHeightField.setValue(provDisplayHeight);
 	}
 	@Override
-	public Integer getProvDisplayHeight() {
-		return displayHeightField.getValue() != null ? Integer.parseInt(displayHeightField.getValue()) : null;		
+	public String getProvDisplayHeight() {
+		return displayHeightField.getValue();		
 	}
 	
 	
