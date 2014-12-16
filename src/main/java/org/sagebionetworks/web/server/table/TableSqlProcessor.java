@@ -21,6 +21,7 @@ import org.sagebionetworks.table.query.model.SortKey;
 import org.sagebionetworks.table.query.model.SortSpecification;
 import org.sagebionetworks.table.query.model.SortSpecificationList;
 import org.sagebionetworks.table.query.model.TableExpression;
+import org.sagebionetworks.table.query.model.visitors.ToSimpleSqlVisitor;
 
 /**
  * Processor table operations
@@ -45,14 +46,6 @@ public class TableSqlProcessor {
 			throws ParseException {
 		QuerySpecification model = TableQueryParser.parserQuery(sql);
 		SelectList selectList = model.getSelectList();
-		// is this an aggregate column?
-		if(isAggregateFunction(columnName)){
-			// Create an alias for the aggregate for the column
-			String alias = createAlias(columnName);
-			// add the alias to the function
-			selectList = addAliasToSelect(selectList, columnName, alias);
-			columnName = alias; 
-		}
 		return toggleSortNonAggregate(model, selectList, columnName);
 	}
 	/**
@@ -125,16 +118,6 @@ public class TableSqlProcessor {
 	private static SortKey createSortKey(String columnName) {
 		return new SortKey(new ColumnReference(new ColumnName(new Identifier(new ActualIdentifier(null, columnName))), null));
 	}
-	
-	/**
-	 * Is the passed column name an aggregate function?
-	 * @param columnName
-	 * @return
-	 * @throws ParseException
-	 */
-	public static boolean isAggregateFunction(String columnName) throws ParseException{
-		return new TableQueryParser(columnName).derivedColumn().isAggregate();
-	}
 
 	/**
 	 * Create a SQL string from an exiting QuerySpecification and a new OrderByClause.
@@ -149,9 +132,9 @@ public class TableSqlProcessor {
 				model.getSetQuantifier(), selectList,
 				new TableExpression(te.getFromClause(), te.getWhereClause(),
 						te.getGroupByClause(), newCluase, te.getPagination()));
-		StringBuilder builder = new StringBuilder();
-		newQuery.toSQL(builder, null);
-		return builder.toString();
+		ToSimpleSqlVisitor visitor = new ToSimpleSqlVisitor();
+		newQuery.visit(visitor);
+		return visitor.getSql();
 	}
 	
 	/**
