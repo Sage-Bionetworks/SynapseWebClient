@@ -73,12 +73,13 @@ public class BooleanCellEditorImpl implements BooleanCellEditor {
 
 	@Override
 	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
-		return view.addKeyDownHandler(handler);
+		// This ListBox handles key events so we do not wan to forward them.
+		return null;
 	}
 
 	@Override
 	public void fireEvent(GwtEvent<?> event) {
-		view.fireEvent(event);
+		// This ListBox handles key events so we do not wan to forward them.
 	}
 
 	@Override
