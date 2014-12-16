@@ -334,7 +334,7 @@ public class SynapseClientImplTest {
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
-		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
+		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class))).thenReturn(ars);
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -432,7 +432,7 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle.getPermissions());
 		assertNotNull(bundle.getHasChildren());
 		assertNotNull(bundle.getAccessRequirementsJson());
-		assertNotNull(bundle.getUnmetAccessRequirementsJson());
+		assertNotNull(bundle.getUnmetDownloadAccessRequirementsJson());
 	}
 	
 	@Test
@@ -448,7 +448,7 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getPermissions());
 		assertNull(bundle.getHasChildren());
 		assertNull(bundle.getAccessRequirementsJson());
-		assertNull(bundle.getUnmetAccessRequirementsJson());
+		assertNull(bundle.getUnmetDownloadAccessRequirementsJson());
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
@@ -1522,7 +1522,7 @@ public class SynapseClientImplTest {
 	public void testGetEntityUnmetAccessRequirements() throws Exception {
 		//verify it calls getUnmetAccessRequirements when unmet is true
 		synapseClient.getEntityAccessRequirements(entityId, true, null);
-		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class));
+		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class));
 	}
 	
 	@Test

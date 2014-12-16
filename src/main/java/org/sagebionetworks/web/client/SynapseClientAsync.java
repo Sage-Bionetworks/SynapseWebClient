@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -31,7 +32,6 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -143,7 +143,7 @@ public interface SynapseClientAsync {
 
 	public void createLockAccessRequirement(String entityId, AsyncCallback<EntityWrapper> callback);
 	
-	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
+	public void getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType, AsyncCallback<AccessRequirementsTransport> callback);
 	
 	/**
 	 * 

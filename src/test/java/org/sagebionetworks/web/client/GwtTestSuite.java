@@ -345,7 +345,7 @@ public class GwtTestSuite extends GWTTestCase {
 		transport.setTableData(tableBundle);
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
-		transport.setUnmetAccessRequirementsJson(entityListToString(ars));
+		transport.setUnmetDownnloadAccessRequirementsJson(entityListToString(ars));
 		
 		// Now make sure we can translate it
 		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(factory, new JSONObjectGwt());
@@ -356,7 +356,7 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(path, results.getPath());
 		assertEquals(uep, results.getPermissions());
 		assertEquals(ars, results.getAccessRequirements());
-		assertEquals(ars, results.getUnmetAccessRequirements());
+		assertEquals(ars, results.getUnmetDownloadAccessRequirements());
 		assertEquals(fileHandles, results.getFileHandles());
 	}
 	

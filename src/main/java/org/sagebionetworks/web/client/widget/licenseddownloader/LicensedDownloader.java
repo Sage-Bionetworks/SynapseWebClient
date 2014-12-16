@@ -103,7 +103,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private void extractBundle(EntityBundle entityBundle) {
 		loadDownloadUrl(entityBundle);		
 		List<AccessRequirement> ars = entityBundle.getAccessRequirements();
-		List<AccessRequirement> unmetARs = entityBundle.getUnmetAccessRequirements();
+		List<AccessRequirement> unmetARs = entityBundle.getUnmetDownloadAccessRequirements();
 		// first, clear license agreement.  then, if there is an agreement required, set it below
 		setLicenseAgreement(ars, unmetARs);
 	}
