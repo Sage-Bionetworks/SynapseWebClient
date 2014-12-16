@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -67,7 +68,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}
 		view.setEditorBufferVisible(isEditable);
 		// Map the columns to types
-		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getSelectColumns());
+		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getColumnModels());
 		// setup the headers from the types
 		List<IsWidget> headers = new ArrayList<IsWidget>();
 		for (ColumnModel type: types) {
@@ -224,16 +225,11 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	}
 	
 	/**
-	 * Extract the list of headers (ColumnModel ids), from this page.
-	 * Note: Values can be null for columns that are aggregate functions.
+	 * Headers for this page.  If a ColumnModle has an ID then it is a real column.  If the ID is null then it is a derived column.
 	 * @return
 	 */
-	public List<String> extractHeaders(){
-		List<String> headers = new ArrayList<String>(types.size());
-		for(ColumnModel cm: types){
-			headers.add(cm.getId());
-		}
-		return headers;
+	public List<ColumnModel> extractHeaders(){
+		return types;
 	}
 	
 	/**
