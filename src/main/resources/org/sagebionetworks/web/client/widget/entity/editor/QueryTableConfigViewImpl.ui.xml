@@ -5,23 +5,17 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<b:Form type="HORIZONTAL">
+		<b:Form>
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel for="query" addStyleNames="col-xs-2">Query</b:FormLabel>
-					<g:FlowPanel addStyleNames="col-xs-10">
-						<b:TextBox ui:field="queryField" name="query" b:id="query" />
-					</g:FlowPanel>
+					<b:FormLabel for="query">Query</b:FormLabel>
+					<b:TextBox ui:field="queryField" name="query" b:id="query" />
 				</b:FormGroup>
 				<b:FormGroup>
-					<g:FlowPanel addStyleNames="col-xs-offset-2 col-xs-10">
-						<b:CheckBox ui:field="isPagingField" text="Support pagination"/>
-					</g:FlowPanel>
+					<b:CheckBox ui:field="isPagingField" text="Support pagination"/>
 				</b:FormGroup>
 				<b:FormGroup>
-					<g:FlowPanel addStyleNames="col-xs-offset-2 col-xs-10">
-						<b:CheckBox ui:field="isRowVisibleField" text="Show row numbers"/>
-					</g:FlowPanel>
+					<b:CheckBox ui:field="isRowVisibleField" text="Show row numbers"/>
 				</b:FormGroup>
 			</b:FieldSet>
 		</b:Form>
