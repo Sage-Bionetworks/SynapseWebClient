@@ -345,7 +345,7 @@ public class GwtTestSuite extends GWTTestCase {
 		transport.setTableData(tableBundle);
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
-		transport.setUnmetDownnloadAccessRequirementsJson(entityListToString(ars));
+		transport.setUnmetDownloadAccessRequirementsJson(entityListToString(ars));
 		
 		// Now make sure we can translate it
 		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(factory, new JSONObjectGwt());

@@ -474,7 +474,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setUnmetDownnloadAccessRequirementsJson(createJSONStringFromArray(eb
+				ebt.setUnmetDownloadAccessRequirementsJson(createJSONStringFromArray(eb
 						.getUnmetAccessRequirements()));
 			}
 			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
@@ -1205,7 +1205,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			subjectId.setType(RestrictableObjectType.EVALUATION);
 
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements = synapseClient
-					.getUnmetAccessRequirements(subjectId, ACCESS_TYPE.PARTICIPATE); // TODO is this right?
+					.getUnmetAccessRequirements(subjectId, ACCESS_TYPE.PARTICIPATE);
 			JSONObjectAdapter arJson = accessRequirements
 					.writeToJSONObject(adapterFactory.createNew());
 			return arJson.toJSONString();

@@ -98,7 +98,7 @@ public class EntityBundleTransport implements Serializable {
 	public String getUnmetDownloadAccessRequirementsJson() {
 		return unmetDownloadAccessRequirementsJson;
 	}
-	public void setUnmetDownnloadAccessRequirementsJson(String unmetDownloadAccessRequirementsJson) {
+	public void setUnmetDownloadAccessRequirementsJson(String unmetDownloadAccessRequirementsJson) {
 		this.unmetDownloadAccessRequirementsJson = unmetDownloadAccessRequirementsJson;
 	}
 	
