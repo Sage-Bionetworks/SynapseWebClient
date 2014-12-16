@@ -1,47 +1,35 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.presenter.LoginPresenter;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class YouTubeConfigViewImpl extends LayoutContainer implements YouTubeConfigView {
-
+public class YouTubeConfigViewImpl implements YouTubeConfigView {
+	public interface YouTubeConfigViewImplUiBinder extends UiBinder<Widget, YouTubeConfigViewImpl> {}
+	private Widget widget;
 	private Presenter presenter;
-	private TextField<String> urlField;
+	@UiField
+	TextBox urlField;
 	
 	@Inject
-	public YouTubeConfigViewImpl() {
+	public YouTubeConfigViewImpl(YouTubeConfigViewImplUiBinder binder) {
+		widget = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public void initView() {
-		//build the view
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setStyleAttribute("margin", "10px");
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		urlField = new TextField<String>();
-		urlField.setAllowBlank(false);
-		urlField.setRegex(WebConstants.VALID_URL_REGEX);
-		urlField.getMessages().setRegexText(DisplayConstants.INVALID_URL_MESSAGE);
-		Label urlLabel = new Label(DisplayConstants.YOUTUBE_VIDEO_URL_LABEL);
-		urlLabel.setWidth(70);
-		urlField.setWidth(248);
-		hp.add(urlLabel);
-		hp.add(urlField);
-		add(hp);
+		urlField.setValue("");
 	}
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!urlField.isValid())
-			throw new IllegalArgumentException(urlField.getErrorMessage());
+		String url = getVideoUrl();
+		if (LoginPresenter.isValidUrl(url, false))
+			throw new IllegalArgumentException("Invalid URL: " + url);
 	}
 	@Override
 	public String getVideoUrl() {
@@ -55,7 +43,7 @@ public class YouTubeConfigViewImpl extends LayoutContainer implements YouTubeCon
 	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 	
 	@Override 
