@@ -9,6 +9,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 
 /**
  * Utilities for working with ColumnModels
@@ -158,7 +159,7 @@ public class ColumnModelUtils {
 	 * @param schema
 	 * @return
 	 */
-	public static List<ColumnModel> buildTypesForQueryResults(List<String> headers, List<ColumnModel> schema){
+	public static List<ColumnModel> buildTypesForQueryResults(List<SelectColumn> headers, List<ColumnModel> schema){
 		// If the headers are null or empty then just use the schema
 		if(headers == null || headers.isEmpty()){
 			return schema;
@@ -166,13 +167,13 @@ public class ColumnModelUtils {
 		Map<String, ColumnModel> map = buildMapColumnIdtoModel(schema);
 		List<ColumnModel>  results = new ArrayList<ColumnModel>(headers.size());
 		// lookup each header
-		for(String header: headers){
-			ColumnModel cm = map.get(header);
+		for(SelectColumn header: headers){
+			ColumnModel cm = map.get(header.getId());
 			if(cm == null){
-				// Aggregate functions will not have a column model. So we create a fake column for it.
+				// Not all select columns match the schema.  For this case we use a column model with a null id.
 				ColumnModel aggregateColumn = new ColumnModel();
-				aggregateColumn.setName(header);
-				aggregateColumn.setColumnType(ColumnType.STRING);
+				aggregateColumn.setName(header.getName());
+				aggregateColumn.setColumnType(header.getColumnType());
 				results.add(aggregateColumn);
 			}else{
 				results.add(cm);

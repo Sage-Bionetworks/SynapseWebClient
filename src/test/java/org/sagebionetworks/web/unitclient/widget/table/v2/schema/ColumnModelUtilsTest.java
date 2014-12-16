@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -10,9 +11,10 @@ import java.util.Map;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
+import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 public class ColumnModelUtilsTest {
 	
@@ -134,20 +136,24 @@ public class ColumnModelUtilsTest {
 		two.setColumnType(ColumnType.STRING);
 		List<ColumnModel> models = Arrays.asList(one,two);
 		// headers can includes the names of aggregation functions.
-		List<String> headers = Arrays.asList("sum(one)", two.getId(), one.getId());
+		List<SelectColumn> headers = TableModelTestUtils.buildSelectColumns(models);
+		SelectColumn derived = new SelectColumn();
+		derived.setColumnType(ColumnType.INTEGER);
+		derived.setName("sum(one)");
+		headers.add(0, derived);
 		List<ColumnModel> results = ColumnModelUtils.buildTypesForQueryResults(headers, models);
 		assertNotNull(results);
 		assertEquals(3, results.size());
 		// the first column should have the name of the aggregate function.
 		ColumnModel cm = results.get(0);
 		assertEquals("sum(one)", cm.getName());
-		assertEquals(ColumnType.STRING, cm.getColumnType());
+		assertEquals(ColumnType.INTEGER, cm.getColumnType());
 		assertEquals(null, cm.getId());
 		// the second should match two
-		cm = results.get(1);
+		cm = results.get(2);
 		assertEquals(two, cm);
 		// The last should match first
-		cm = results.get(2);
+		cm = results.get(1);
 		assertEquals(one, cm);
 	}
 
