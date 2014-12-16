@@ -112,7 +112,7 @@
 				</bh:Div>
 			</b:Column>
 		</b:Row>
-	    <b:Modal b:id="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+	    <b:Modal b:id="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:FlowPanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>
@@ -121,7 +121,7 @@
 		  </b:ModalFooter>
 		</b:Modal>
 		
-	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:FlowPanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
 		  </b:ModalBody>

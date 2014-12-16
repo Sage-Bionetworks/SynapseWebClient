@@ -47,7 +47,7 @@
 			
 		<!-- Modals associated with the restriction widget -->
 			
-		<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
 			    <g:InlineLabel styleName="margin-right-10" text="Is this sensitive human data that must be protected?" />
 			    <b:InlineRadio ui:field="yesHumanDataRadio" name="humandata" text="Yes"/>
@@ -65,7 +65,7 @@
 			</b:ModalFooter>
 		</b:Modal>
 		
-		<b:Modal ui:field="flagModal" title="Flag Data" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal ui:field="flagModal" title="Flag Data" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
 			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) by clicking below.</bh:Text>
 			</b:ModalBody>
@@ -74,7 +74,7 @@
 				<b:Button ui:field="flagModalOkButton" type="PRIMARY" dataDismiss="MODAL">Flag Data</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
-		<b:Modal ui:field="anonymousFlagModal" title="Flag Data" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal ui:field="anonymousFlagModal" title="Flag Data" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
 			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please log in to alert the Synapse Access and Compliance Team (ACT).</bh:Text>
 			</b:ModalBody>

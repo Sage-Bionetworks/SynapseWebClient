@@ -17,7 +17,6 @@ public interface QueryTableConfigView extends IsWidget, WidgetEditorView {
 	
 	public Boolean isPaging();
 	public Boolean isShowRowNumbers();
-	public String getRowNumberColumnName();
 	public List<APITableColumnConfig> getConfigs();
 	public void configure(APITableConfig tableConfig);
 	

@@ -116,6 +116,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public Widget asWidget(Entity entity, String parentEntityId, CallbackP<String> fileHandleIdCallback, boolean isEntity) {
 		this.view.setPresenter(this);
 		this.entity = entity;
+		this.entityId = entity != null ? entity.getId() : null;
 		this.parentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.view.createUploadForm(isEntity, parentEntityId);
@@ -190,11 +191,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				view.enableUpload();
 				return;
 			}
-		}
-		
-		entityId = null;
-		if (entity != null) {
-			entityId = entity.getId();
 		}
 		
 		uploadBasedOnConfiguration();
@@ -288,7 +284,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void uploadToSftpProxy(final String url) {
 		try {
-			view.submitForm(getSftpProxyLink(url, globalAppState, gwt));
+			Callback callback = new Callback() {
+				@Override
+				public void invoke() {
+					view.submitForm(getSftpProxyLink(url, globalAppState, gwt));		
+				}
+			};
+			checkForExistingFileName(fileNames[currIndex], callback);
 		} catch (Exception e) {
 			uploadError(e.getMessage(), e);
 		}
@@ -298,7 +300,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity) {
 			//use case B from above
-			directUploadStep1(fileNames[currIndex]);
+			Callback callback = new Callback() {
+				@Override
+				public void invoke() {
+					directUploadStep2(fileNames[currIndex]);
+				}
+			};
+			checkForExistingFileName(fileNames[currIndex], callback);
 		} else {
 			//use case A from above
 			//uses the default action url
@@ -357,10 +365,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	/**
 	 * Look for a file with the same name (if we aren't uploading to an existing File already).
 	 * @param fileName
+	 * @param callback Called when upload should continue.  Otherwise, it is not called.
 	 */
-	public void directUploadStep1(final String fileName) {
+	public void checkForExistingFileName(final String fileName, final Callback callback) {
 		if (entity != null || parentEntityId == null) {
-			directUploadStep2(fileName);
+			callback.invoke();
 		} else {
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
 				@Override
@@ -374,7 +383,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								public void invoke() {
 									//yes, override
 									entityId = result;
-									directUploadStep2(fileName);
+									callback.invoke();
 								}
 							},
 							new Callback() {
@@ -388,7 +397,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onFailure(Throwable caught) {
 					if (caught instanceof NotFoundException) {
 						//there was not already a file with this name in this directory.
-						directUploadStep2(fileName);
+						callback.invoke();
 					} else if (caught instanceof ConflictException) {
 						//there was an entity found with same parent ID and name, but
 						//it was not a File Entity.
@@ -459,29 +468,25 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void setExternalFilePath(String path, String name) {
-		if (entity==null || entity instanceof FileEntity) {
+		boolean isUpdating = entityId != null || entity != null;
+		if (isUpdating) {
+			//existing entity
+			if (entity==null || entity instanceof FileEntity) {
+				updateExternalFileEntity(entityId, path, name);
+			} else {
+				synapseClient.updateExternalLocationable(entityId, path, name, new AsyncCallback<EntityWrapper>() {
+					public void onSuccess(EntityWrapper result) {
+						externalLinkUpdated(result, entity.getClass());
+					};
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+					}
+				} );
+			}
+		} else {
 			//new data, use the appropriate synapse call
-			//if we haven't created the entity yet, do that first
-			if (entity == null) {
-				createNewExternalFileEntity(path, name);
-			}
-			else {
-				updateExternalFileEntity(entity.getId(), path, name);
-			}
-		}
-		else {
-			//old data
-			String entityId = entity.getId();
-			synapseClient.updateExternalLocationable(entityId, path, name, new AsyncCallback<EntityWrapper>() {
-				
-				public void onSuccess(EntityWrapper result) {
-					externalLinkUpdated(result, entity.getClass());
-				};
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
-				}
-			} );
+			createNewExternalFileEntity(path, name);
 		}
 	}
 	
@@ -675,14 +680,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		fileNames = null;
 		fileHasBeenUploaded = false;
 		currIndex = 0;
-	}
-
-	/**
-	 * For testing purposes
-	 * @return
-	 */
-	public String getDirectUploadFileEntityId() {
-		return entityId;
 	}
 	
 	/**

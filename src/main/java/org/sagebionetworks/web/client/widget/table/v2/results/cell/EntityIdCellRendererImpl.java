@@ -16,6 +16,7 @@ public class EntityIdCellRendererImpl extends Anchor implements EntityIdCellRend
 	public void setValue(String value) {
 		this.setHref(Synapse.getHrefForDotVersion(value));
 		this.setText(value);
+		this.setTarget(BLANK);
 	}
 
 	@Override

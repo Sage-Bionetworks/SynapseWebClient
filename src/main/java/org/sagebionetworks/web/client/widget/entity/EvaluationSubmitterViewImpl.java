@@ -3,53 +3,106 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.HashSet;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
-	
-	public static final int DEFAULT_DIALOG_HEIGHT = 310;
-	public static final int DEFAULT_DIALOG_WIDTH = 480;
+	public interface EvaluationSubmitterViewImplUiBinder extends UiBinder<Widget, EvaluationSubmitterViewImpl> {}
 	private Presenter presenter;
 	private EvaluationList evaluationList;
-	private SageImageBundle sageImageBundle;
-	private  IconsImageBundle iconsImageBundle;
 	private EntityFinder entityFinder;
-	private Dialog window;
 	private boolean showEntityFinder;
 	private Reference selectedReference;
-	private HTML selectedText;
-	private TextField<String> submissionName, teamName;
+	Modal modal;
+	
+	@UiField
+	Button okButton;
+	@UiField
+	Button entityFinderButton;
+	@UiField
+	SimplePanel evaluationListContainer;
+	@UiField
+	TextBox submissionNameField;
+	@UiField
+	TextBox teamNameField;
+	@UiField
+	Heading selectedText;
+	@UiField
+	FormGroup entityFinderUI;
 	
 	@Inject
-	public EvaluationSubmitterViewImpl(EntityFinder entityFinder, EvaluationList evaluationList, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
+	public EvaluationSubmitterViewImpl(EvaluationSubmitterViewImplUiBinder binder, EntityFinder entityFinder, EvaluationList evaluationList) {
+		modal = (Modal)binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
-		initializeWindow();
+		
+		evaluationListContainer.setWidget(evaluationList.asWidget());
+		initClickHandlers();
+	}
+	
+	public void initClickHandlers() {
+		okButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				List<Evaluation> evaluations = evaluationList.getSelectedEvaluations();
+				if (evaluations.size() > 0) {
+					if (showEntityFinder) {
+						if (selectedReference == null || selectedReference.getTargetId() == null) {
+							//invalid, return.
+							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
+							return;
+						}
+					}
+					presenter.submitToEvaluations(selectedReference, submissionNameField.getValue(), teamNameField.getValue(), evaluations);
+				} else {
+					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
+				}
+			}
+		});
+		
+		entityFinderButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				entityFinder.configure(true, new SelectedHandler<Reference>() {					
+					@Override
+					public void onSelected(Reference selected) {
+						if(selected.getTargetId() != null) {					
+							selectedReference = selected;
+							selectedText.setText(DisplayUtils.createEntityVersionString(selected));
+							entityFinder.hide();
+						} else {
+							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+						}
+					}
+				});
+				entityFinder.show();
+			}
+		});
 	}
 	
 	@Override
@@ -59,14 +112,12 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 
 	@Override
 	public void showLoading() {
-		window.removeAll();
-		window.setSize(DEFAULT_DIALOG_WIDTH, DEFAULT_DIALOG_HEIGHT);
-		window.add(DisplayUtils.createFullWidthLoadingPanel(sageImageBundle, "Loading Submission Options..."));
-		window.show();
 	}
 	
 	@Override
 	public void clear() {
+		selectedReference = null;
+		selectedText.setText("");
 	}
 	
 	@Override
@@ -116,108 +167,16 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	@Override
 	public void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations) {
-		window.removeAll();
-		selectedReference = null;
-        evaluationList.configure(evaluations);
+		clear();
+		entityFinderUI.setVisible(showEntityFinder);
+		evaluationList.configure(evaluations);
         this.showEntityFinder = showEntityFinder;
-	    submissionName = new TextField<String>();
-	    submissionName.setWidth(400);
-	    teamName = new TextField<String>();
-	    teamName.setWidth(400);
-	    
-        FlowPanel panel = new FlowPanel();
-        panel.addStyleName("margin-left-10");
-        if (showEntityFinder) {
-        	panel.add(new HTML("<h6 class=\"margin-top-10\">Select the Entity that you would like to submit:</h6>"));
-        	Button findEntityButton = new Button(DisplayConstants.FIND_ENTITY, AbstractImagePrototype.create(iconsImageBundle.magnify16()));
-    		findEntityButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
-    			@Override
-    			public void componentSelected(ButtonEvent ce) {
-    				entityFinder.configure(true);				
-    				final Window window = new Window();
-    				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
-    					@Override
-    					public void onSelected(Reference selected) {
-    						if(selected.getTargetId() != null) {					
-    							selectedReference = selected;
-    							selectedText.setHTML("&nbsp<h7>" + DisplayUtils.createEntityVersionString(selected) + "</h7>");
-    							window.hide();
-    						} else {
-    							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-    						}
-    					}
-    				});
-    			}
-    		});
-    		HorizontalPanel findEntityHorizintalPanel = new HorizontalPanel();
-    		findEntityHorizintalPanel.add(findEntityButton);
-        	selectedText = new HTML("");
-        	findEntityHorizintalPanel.add(selectedText);
-        	panel.add(findEntityHorizintalPanel);
-        	window.setSize(DEFAULT_DIALOG_WIDTH,DEFAULT_DIALOG_HEIGHT + 70);
-        }
-        else {
-        	window.setSize(DEFAULT_DIALOG_WIDTH,DEFAULT_DIALOG_HEIGHT);
-        }
-        panel.add(new HTML("<h6 class=\"margin-top-10\">Select the challenge(s) below that you would like to submit to:</h6>"));
-        panel.add(evaluationList.asWidget());
-        panel.add(new HTML("<h6 class=\"margin-top-10\">Submission name (optional):</h6>"));
-        panel.add(submissionName);
-        panel.add(new HTML("<h6 class=\"margin-top-10\">Team name (optional):</h6>"));
-        panel.add(teamName);
-
-        window.add(panel);
-        window.layout(true);
-        window.center();
+        modal.show();
 	}
 	
-	
-	public void initializeWindow() {
-		window = new Dialog();
-        window.setMaximizable(false);
-        
-        window.setPlain(true); 
-        window.setModal(true); 
-        
-        window.setHeading(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION); 
-        window.setButtons(Dialog.OKCANCEL);
-        window.setHideOnButtonClick(false);
-
-        window.setLayout(new FitLayout());
-        
-        //ok button submits if valid
-        Button okButton = window.getButtonById(Dialog.OK);  
-        okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				List<Evaluation> evaluations = evaluationList.getSelectedEvaluations();
-				if (evaluations.size() > 0) {
-					if (showEntityFinder) {
-						if (selectedReference == null || selectedReference.getTargetId() == null) {
-							//invalid, return.
-							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
-							return;
-						}
-					}
-					presenter.submitToEvaluations(selectedReference, submissionName.getValue(), teamName.getValue(), evaluations);
-				} else {
-					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
-				}
-			}
-	    });
-        
-        //cancel button simply hides
-        Button cancelButton = window.getButtonById(Dialog.CANCEL);	    
-	    cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-	    });
-	}
 	
 	@Override
 	public void hideWindow() {
-		window.hide();	
+		modal.hide();	
 	}
 }

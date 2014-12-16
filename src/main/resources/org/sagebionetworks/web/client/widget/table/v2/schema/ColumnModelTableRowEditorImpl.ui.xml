@@ -20,6 +20,7 @@
 				<b.select:Option>Date</b.select:Option>
 				<b.select:Option>File</b.select:Option>
 				<b.select:Option>Entity</b.select:Option>
+				<b.select:Option>Link</b.select:Option>
 			</b.select:Select>
 		</t:TableData>
 		<t:TableData>

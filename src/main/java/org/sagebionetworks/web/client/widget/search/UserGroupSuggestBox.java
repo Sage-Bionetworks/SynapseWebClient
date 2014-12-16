@@ -77,6 +77,10 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		return view.getWidth();
 	}
 	
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+	
 	@Override
 	public void getPrevSuggestions() {
 		offset -= PAGE_SIZE;

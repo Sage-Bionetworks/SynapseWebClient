@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -12,44 +14,37 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.TabPanelEvent;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.TabItem;
-import com.extjs.gxt.ui.client.widget.TabPanel;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigView {
-
-	private static final int DISPLAY_HEIGHT = 250;
+public class ImageConfigViewImpl implements ImageConfigView {
+	public interface ImageConfigViewImplUiBinder extends UiBinder<Widget, ImageConfigViewImpl> {}
+	private Widget widget;
+	
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
 	EntityFinder entityFinder;
@@ -59,15 +54,34 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	private IconsImageBundle iconsImageBundle;
 	private TextField<String> urlField, nameField, entityField;
 	
-	TabItem externalTab,uploadTab, synapseTab;
-	private HTMLPanel uploadStatusPanel;
+	@UiField
+	SimplePanel externalTab;
+	@UiField
+	SimplePanel uploadTab;
+	@UiField
+	SimplePanel synapseTab;
+	@UiField
+	TabListItem uploadTabListItem;
+	@UiField
+	TabListItem externalTabListItem;
+	@UiField
+	TabListItem synapseTabListItem;
+	@UiField
+	FlowPanel uploadSuccessUI;
+	@UiField
+	FlowPanel uploadFailureUI;
+	@UiField
+	Text uploadErrorText;
+	
 	private String uploadedFileHandleName;
 	
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 	
-	TabPanel tabPanel;
 	@Inject
-	public ImageConfigViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils) {
+	public ImageConfigViewImpl(
+			ImageConfigViewImplUiBinder binder,
+			IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils) {
+		widget = binder.createAndBindUi(this);
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.entityFinder = entityFinder;
@@ -77,40 +91,21 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	@Override
 	public void initView() {
-		setLayout(new FitLayout());
 		uploadedFileHandleName = null;
 		VerticalPanel externalLinkPanel = new VerticalPanel();
 		externalLinkPanel.add(getExternalLinkPanel());
 		externalLinkPanel.add(getExternalAltTextPanel());
-		
-		tabPanel = new TabPanel();
-		tabPanel.setPlain(true);
-		this.add(tabPanel);
-		
-		uploadTab = new TabItem(DisplayConstants.IMAGE_CONFIG_UPLOAD);
-		uploadTab.addStyleName("pad-text");
-		uploadTab.setLayout(new FlowLayout());
-		tabPanel.add(uploadTab);
-
-		externalTab = new TabItem(DisplayConstants.IMAGE_CONFIG_FROM_THE_WEB);
-		externalTab.addStyleName("pad-text");
-		externalTab.setLayout(new FlowLayout());
 		externalTab.add(externalLinkPanel);
-		tabPanel.add(externalTab);
 		
-		synapseTab = new TabItem(DisplayConstants.IMAGE_CONFIG_FROM_SYNAPSE);
-		synapseTab.addStyleName("pad-text");
-		synapseTab.setLayout(new FlowLayout());
 		FlowPanel synapseEntityPanel = new FlowPanel();
 		synapseEntityPanel.add(getSynapseEntityPanel());
 		synapseParamsPanel = new ImageParamsPanel();
 		synapseEntityPanel.add(synapseParamsPanel);
 		
 		synapseTab.add(synapseEntityPanel);
-		tabPanel.add(synapseTab);
 		
-		this.setHeight(DISPLAY_HEIGHT);
-		this.layout(true);
+		uploadSuccessUI.setVisible(false);
+		uploadFailureUI.setVisible(false);
 	}
 	
 	private FormPanel getSynapseEntityPanel() {
@@ -138,19 +133,18 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		findEntitiesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				entityFinder.configure(false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
 							entityField.setValue(DisplayUtils.createEntityVersionString(selected));
-							window.hide();
+							entityFinder.hide();
 						} else {
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
 				});
+				entityFinder.show();
 			}
 		});
 		AdapterField buttonField = new AdapterField(findEntitiesButton);
@@ -236,66 +230,39 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Dialog window) {
-		uploadTab.removeAll();
+	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
+		uploadTab.clear();
 		//update the uploadPanel
-		initUploadPanel(wikiKey, window);
-		
-		this.setHeight(DISPLAY_HEIGHT);
-		this.layout(true);
+		initUploadPanel(wikiKey, dialogCallback);
 	}
 	
-	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
+	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
 		
 		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
 		
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
-		Listener uploadTabChangeListener = new Listener<TabPanelEvent>() {
-			@Override
-			public void handleEvent(TabPanelEvent be) {
-				if(uploadedFileHandleName != null) {
-					window.getButtonById(Dialog.OK).enable();
-				} else {
-					window.getButtonById(Dialog.OK).disable();
-				}
-			}
-		};
-		
-		Listener tabChangeListener = new Listener<TabPanelEvent>() {
-			@Override
-			public void handleEvent(TabPanelEvent be) {
-				window.getButtonById(Dialog.OK).enable();
-			}
-		};
-		
-		uploadTab.addListener(Events.Select, uploadTabChangeListener);
-		externalTab.addListener(Events.Select, tabChangeListener);
-		synapseTab.addListener(Events.Select, tabChangeListener);
 		
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 				if(result != null){
-					if (uploadStatusPanel != null)
-						uploadTab.remove(uploadStatusPanel);
 					if(UploadStatus.SUCCESS == result.getUploadStatus()){
-						//save close this dialog with a save
-						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
+						uploadFailureUI.setVisible(false);
+						uploadSuccessUI.setVisible(true);
 						//enable the ok button
-						window.getButtonById(Dialog.OK).enable();
+						dialogCallback.setPrimaryEnabled(true);
 						presenter.addFileHandleId(result.getMessage());
 						//add the local file to the client cache.  May need to fall back to the local reference in the preview (if handle has not yet been saved to the wiki)
 						String fileUrl = synapseJSNIUtils.getFileUrl(AddAttachmentDialog.ATTACHMENT_FILE_FIELD_ID);
 						if (fileUrl != null)
 							clientCache.put(uploadedFileHandleName+WebConstants.TEMP_IMAGE_ATTACHMENT_SUFFIX, fileUrl);
 					}else{
-						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
+						uploadErrorText.setText(result.getMessage());
+						uploadFailureUI.setVisible(true);
+						uploadSuccessUI.setVisible(false);
 					}
-					uploadStatusPanel.addStyleName("margin-left-180");
-					uploadTab.add(uploadStatusPanel);
-					layout(true);
 				}
 			}
 		}, null);
@@ -305,7 +272,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	    uploadParamsPanel = new ImageParamsPanel();
 	    container.add(uploadParamsPanel);
 		uploadTab.add(container);
-		layout(true);
 	}
 	
 	@Override
@@ -335,7 +301,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 
 	@Override 
@@ -360,14 +326,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	@Override
 	public void clear() {
 	}
-	@Override
-	public int getDisplayHeight() {
-		return DISPLAY_HEIGHT;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 130;
-	}
 	
 	@Override
 	public String getImageUrl() {
@@ -390,23 +348,23 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	@Override
 	public void setSynapseId(String synapseId) {
 		entityField.setValue(synapseId);
-		tabPanel.setSelection(synapseTab);
+		synapseTabListItem.showTab();
 	}
 	
 	@Override
 	public boolean isExternal() {
-		return externalTab.equals(tabPanel.getSelectedItem());
+		return externalTabListItem.isActive();
 	}
 	
 	
 	@Override
 	public boolean isSynapseEntity() {
-		return synapseTab.equals(tabPanel.getSelectedItem());
+		return synapseTabListItem.isActive();
 	}
 	
 	@Override
 	public void setExternalVisible(boolean visible) {
-		externalTab.setEnabled(visible);
+		externalTabListItem.setEnabled(visible);
 	}
 	/*
 	 * Private Methods

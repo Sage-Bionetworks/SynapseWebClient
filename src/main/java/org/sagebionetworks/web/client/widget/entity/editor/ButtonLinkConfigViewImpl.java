@@ -104,14 +104,6 @@ public class ButtonLinkConfigViewImpl extends LayoutContainer implements ButtonL
 	}
 
 	@Override
-	public int getDisplayHeight() {
-		return 60;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
-	}
-	@Override
 	public void clear() {
 		if (nameField != null)
 			nameField.setValue("");

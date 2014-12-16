@@ -1,0 +1,43 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder
+  xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  >
+  	<b:Modal title="Submit to Challenge"
+			fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+		<b:ModalBody>
+			<b:Form>
+				<b:FieldSet>
+					<b:FormGroup ui:field="entityFinderUI">
+						<b:FormGroup>
+							<b:FormLabel for="finderButton">Select the Entity that you would like to submit:</b:FormLabel>
+							<g:FlowPanel>
+								<b:Button ui:field="entityFinderButton" icon="SEARCH" size="SMALL" b:id="finderButton">Find Entity</b:Button>
+								<b:Heading ui:field="selectedText" size="H6" addStyleNames="displayInline margin-left-10" />
+							</g:FlowPanel>
+						</b:FormGroup>
+					</b:FormGroup>
+					<b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
+							<g:SimplePanel ui:field="evaluationListContainer" />
+						</b:FormGroup>
+					</b:FormGroup>
+					<b:FormGroup>
+						<b:FormLabel for="submissionName">Submission name (optional)</b:FormLabel>
+						<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
+					</b:FormGroup>
+					<b:FormGroup>
+						<b:FormLabel for="teamName">Team name (optional)</b:FormLabel>
+						<b:TextBox ui:field="teamNameField" b:id="teamName" />
+					</b:FormGroup>
+				</b:FieldSet>
+			</b:Form>
+		</b:ModalBody>
+		<b:ModalFooter>
+			<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button ui:field="okButton" type="PRIMARY">OK</b:Button>
+		</b:ModalFooter>
+	</b:Modal>
+</ui:UiBinder>

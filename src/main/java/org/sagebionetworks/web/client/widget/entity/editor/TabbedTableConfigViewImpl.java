@@ -66,14 +66,6 @@ public class TabbedTableConfigViewImpl extends LayoutContainer implements Tabbed
 	}
 
 	@Override
-	public int getDisplayHeight() {
-		return 400;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 200;
-	}
-	@Override
 	public void clear() {
 		if (tableContents != null)
 			tableContents.setValue("");

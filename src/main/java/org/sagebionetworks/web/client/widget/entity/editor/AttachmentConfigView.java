@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
-import com.extjs.gxt.ui.client.widget.Dialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -16,7 +16,7 @@ public interface AttachmentConfigView extends IsWidget, WidgetEditorView {
 	
 	public String getUploadedFileHandleName();
 	public void setUploadedFileHandleName(String fileHandleName);
-	public void configure(WikiPageKey wikiKey, Dialog window);
+	public void configure(WikiPageKey wikiKey, DialogCallback window);
 	
 	/**
 	 * Presenter interface

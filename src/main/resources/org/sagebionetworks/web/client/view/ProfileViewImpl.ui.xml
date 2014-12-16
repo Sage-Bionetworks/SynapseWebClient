@@ -125,13 +125,15 @@
 		<g:SimplePanel ui:field="footer" />
 		<!-- end footer -->
 		
-		<b:Modal b:id="filtersModal" title="Project Filters" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal b:id="filtersModal" title="Project Filters" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		      <b:FormGroup>
 		      	<g:FlowPanel>
-			        <b:Radio name="filterRadio" ui:field="myProjectsFilter" formValue="myProjectsFilterId" text="My Projects"/>
-			        <bh:Div ui:field="teamFiltersContainer"/>
 			        <b:Radio ui:field="allProjectsFilter" name="filterRadio" formValue="allProjectsFilterId" text="All"/>
+			        <b:Radio name="filterRadio" ui:field="myProjectsFilter" formValue="myProjectsFilterId" text="My Projects"/>
+			        <bh:Hr />
+	        		<b:Heading size="H5" text="Filter projects by team"/>
+	        		<bh:Div ui:field="teamFiltersContainer" />
 			    </g:FlowPanel>
 		    </b:FormGroup>
 		  </b:ModalBody>

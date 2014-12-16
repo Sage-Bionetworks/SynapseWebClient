@@ -221,7 +221,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading4Link.addClickHandler(getClickHandler(MarkdownEditorAction.H4));
 		heading5Link.addClickHandler(getClickHandler(MarkdownEditorAction.H5));
 		heading6Link.addClickHandler(getClickHandler(MarkdownEditorAction.H6));
-		attachmentButton.addClickHandler(getClickHandler(MarkdownEditorAction.ATTACHMENTS));
+		attachmentButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
@@ -229,7 +229,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		attachmentsButton.addClickHandler(getClickHandler(MarkdownEditorAction.ATTACHMENTS));
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
-		
+		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		heading1Link.addStyleName("font-size-36");
 		heading2Link.addStyleName("font-size-30");
 		heading3Link.addStyleName("font-size-24");

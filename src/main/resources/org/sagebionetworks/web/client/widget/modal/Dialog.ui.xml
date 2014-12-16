@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
-		<b:Modal ui:field="modal" title="title" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		<b:Modal ui:field="modal" title="title" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:FlowPanel ui:field="mainContent" />
 		  </b:ModalBody>

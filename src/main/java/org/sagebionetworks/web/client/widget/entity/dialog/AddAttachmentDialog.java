@@ -17,7 +17,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FileUploadField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Encoding;
@@ -25,6 +24,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.google.gwt.user.client.ui.HTML;
 
 /**
  * Add an attachment.
@@ -79,7 +79,8 @@ public class AddAttachmentDialog {
 		/**
 		 * This window is shown while we wait for the file to upload.
 		 */
-		final Window loading = DisplayUtils.createLoadingWindow(images, "Uploading...");
+		final HTML loading = new HTML(DisplayUtils.getLoadingHtml(images, "Uploading..."));
+		loading.setVisible(false);
 		final FileUploadField file = new FileUploadField();
 		
 		final UploadFormPanel panel = new UploadFormPanel() {
@@ -116,9 +117,9 @@ public class AddAttachmentDialog {
 				// normally would submit the form but for example no server set
 				// up to
 				// handle the post
+				btn.disable();
 				panel.submit();
-//				dialog.hide();
-				loading.show();
+				loading.setVisible(true);
 			}
 		});
 		
@@ -141,6 +142,7 @@ public class AddAttachmentDialog {
 		basicFormData.setMargins(margins);
 		
 		panel.add(file, basicFormData);
+		panel.add(loading, basicFormData);
 		// If we do not add this button the panel then it is not part of the form
 		panel.addButton(btn);
 		// Listen to update events
@@ -148,17 +150,14 @@ public class AddAttachmentDialog {
 
 			@Override
 			public void handleEvent(FormEvent event) {
-				loading.hide();
+				btn.enable();
+				loading.setVisible(false);
 				if (dialog != null)
 					dialog.hide();
 				UploadResult result = new UploadResult();
 				result.setUploadStatus(UploadStatus.SUCCESS);
 				if(event != null && event.getResultHtml() != null){
 					result = getUploadResult(event.getResultHtml());
-				}
-				// Disable upload button if this upload was successful
-				if(UploadStatus.SUCCESS == result.getUploadStatus()) {
-					btn.disable();
 				}
 				// Let the caller know we are done.
 				callback.onSaveAttachment(result);

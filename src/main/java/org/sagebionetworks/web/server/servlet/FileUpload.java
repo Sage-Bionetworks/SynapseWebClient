@@ -83,10 +83,10 @@ public class FileUpload extends HttpServlet {
 	@Override
     public void doPost(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {
     	ServletFileUpload upload = new ServletFileUpload();
-        
+    	String entityId = null;
         try{ 
 			FileItemIterator fileItemIterator = upload.getItemIterator(request);
-			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
+			entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 			if(entityId == null) {
 				throw new IllegalArgumentException("entityId is a required parameter");
 			}
@@ -133,6 +133,7 @@ public class FileUpload extends HttpServlet {
 				}
             } // end while
         } catch(Exception e){
+        	logger.severe("EntityID="+entityId + " : " + e.getMessage());
             throw new RuntimeException(e);
         }
 

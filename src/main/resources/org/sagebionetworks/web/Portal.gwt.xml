@@ -45,6 +45,7 @@
 	
 	<add-linker name="xsiframe"/>
 	<set-configuration-property name="devModeRedirectEnabled" value="true"/>
+	<set-property name="compiler.useSourceMaps" value="true"/>
 	
     <!-- Uncomment to limit compilation permutations to FF <set-property name="user.agent" value="gecko1_8" /> -->
 
@@ -64,6 +65,5 @@
 	<!-- Limit build permuatations (testing only) 
 	<set-property name="user.agent" value="safari"/>
 	  -->
-	 
 	
 </module>

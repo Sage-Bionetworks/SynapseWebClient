@@ -121,14 +121,6 @@ public class ShinySiteConfigViewImpl extends LayoutContainer implements ShinySit
 	}
 
 	@Override
-	public int getDisplayHeight() {
-		return 90;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 40;
-	}
-	@Override
 	public void clear() {
 	}
 

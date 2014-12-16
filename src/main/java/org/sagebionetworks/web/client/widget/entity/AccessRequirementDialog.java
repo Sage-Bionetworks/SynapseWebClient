@@ -199,8 +199,10 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	}
 	
 	public boolean isShowRequestAccessFromACTButton() {
-		if (ar instanceof ACTAccessRequirement) 
-			return ((ACTAccessRequirement)ar).getOpenJiraIssue();
+		if (ar instanceof ACTAccessRequirement) {
+			Boolean openJiraIssue = ((ACTAccessRequirement)ar).getOpenJiraIssue();
+			return openJiraIssue == null || openJiraIssue.booleanValue();
+		}
 		return false;
 	}
 

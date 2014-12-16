@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -26,10 +27,10 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 		fileHandleIds = new ArrayList<String>();
-		view.configure(wikiKey, window);
+		view.configure(wikiKey, dialogCallback);
 		//and try to prepopulate with values from the map.  if it fails, ignore
 		try {
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY) || descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
@@ -37,7 +38,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 					view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
 				} else if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)){
 					view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
-					window.getButtonById(Dialog.OK).enable();
+					dialogCallback.setPrimaryEnabled(true);
 				}
 				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
 				view.setScale(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY));
@@ -73,15 +74,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		if (view.isExternal())
 			return "!["+view.getAltText()+"]("+view.getImageUrl()+")";
 		else return null;
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

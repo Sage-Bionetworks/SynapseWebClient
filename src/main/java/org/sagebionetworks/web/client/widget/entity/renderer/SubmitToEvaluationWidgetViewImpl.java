@@ -8,17 +8,17 @@ import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements SubmitToEvaluationWidgetView {
+public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements SubmitToEvaluationWidgetView {
 	private Presenter presenter;
 	
 	@Inject
@@ -27,7 +27,7 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage, String buttonText) {
-		this.removeAll();
+		this.clear();
 		
 		if (isAvailableEvaluation) {
 			String primaryButtonText = buttonText == null ? "Submit To Challenge" : buttonText;
@@ -42,14 +42,11 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 		} else if (unavailableMessage != null && unavailableMessage.trim().length() > 0){
 			add(new HTML(DisplayUtils.getAlertHtmlSpan(SafeHtmlUtils.htmlEscape(unavailableMessage), "", BootstrapAlertType.INFO)));
 		}
-		
-		this.layout(true);
 	}
 	
 	@Override
 	public void showErrorMessage(String error) {
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
-		layout(true);
 	}
 	
 	@Override
@@ -87,16 +84,6 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 
 	@Override
 	public void showLoading() {
-	}
-
-	@Override
-	public void clear() {
-	}
-
-	
-	public Widget wrap(Widget widget) {
-		widget.addStyleName("margin-10");
-		return widget;
 	}
 	
 	/*

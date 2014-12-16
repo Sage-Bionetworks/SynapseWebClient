@@ -10,7 +10,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
@@ -276,24 +276,30 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadStep1Failure() throws Exception {
+		Callback mockCallback = mock(Callback.class);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
-		uploader.directUploadStep1("newFile.txt");
+		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verifyUploadError();
+		verifyZeroInteractions(mockCallback);
 	}
 	
 	@Test
 	public void testDirectUploadStep1SameNameFound() throws Exception {
+		Callback mockCallback = mock(Callback.class);
 		String duplicateNameEntityId = "syn007";
 		AsyncMockStubber.callSuccessWith(duplicateNameEntityId).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
-		uploader.directUploadStep1("newFile.txt");
+		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verify(view).showConfirmDialog(anyString(), any(Callback.class), any(Callback.class));
+		verifyZeroInteractions(mockCallback);
 	}
 	
 	@Test
 	public void testDirectUploadStep1NoParentEntityId() throws Exception {
+		Callback mockCallback = mock(Callback.class);
 		uploader.asWidget(null, null, null, false);
-		uploader.directUploadStep1("newFile.txt");
+		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verify(synapseClient, Mockito.never()).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockCallback).invoke();
 	}
 
 	@Test
@@ -379,7 +385,9 @@ public class UploaderTest {
 		verify(view).showUploadingToExternalStorage(anyString(), anyString());
 		verify(view).enableMultipleFileUploads(false);
 		
+		uploader.setFileNames(new String[] {"test.txt"});
 		uploader.uploadToSftpProxy(url);
+		verify(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		//capture the value sent to the form to submit
 		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
 		verify(view).submitForm(c.capture());

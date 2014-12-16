@@ -36,7 +36,6 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 		clear();
 		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 		suggestBox.setPlaceholderText("Enter name...");
-		suggestBox.setWidth(330 + "px");
 		SimplePanel panel = new SimplePanel();
 		panel.setWidget(suggestBox.asWidget());
 		panel.addStyleName("margin-10");
@@ -83,14 +82,5 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 40;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
 	}
 }

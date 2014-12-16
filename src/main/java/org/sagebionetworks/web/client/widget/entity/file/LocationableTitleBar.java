@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 @Deprecated
@@ -35,7 +34,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle) {		
+	public void configure(EntityBundle bundle) {		
 		//if this isn't locationable, then return an empty panel
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
@@ -44,9 +43,6 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
 		view.createTitlebar(bundle, entityType, authenticationController, bundle.getPermissions().getCanCertifiedUserAddChild());
-		Widget widget =  view.asWidget();
-		widget.setVisible(bundle.getEntity() instanceof Locationable);
-		return widget;
 	}
 	
 	/**
@@ -63,12 +59,9 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		this.entityBundle = null;		
 	}
 
-	/**
-	 * Does nothing. Use asWidget(Entity)
-	 */
 	@Override
 	public Widget asWidget() {
-		return null;
+		return view.asWidget();
 	}
     
 	@Override
