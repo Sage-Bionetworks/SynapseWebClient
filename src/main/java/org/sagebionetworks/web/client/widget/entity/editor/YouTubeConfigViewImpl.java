@@ -28,7 +28,7 @@ public class YouTubeConfigViewImpl implements YouTubeConfigView {
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		String url = getVideoUrl();
-		if (LoginPresenter.isValidUrl(url, false))
+		if (!LoginPresenter.isValidUrl(url, false))
 			throw new IllegalArgumentException("Invalid URL: " + url);
 	}
 	@Override
