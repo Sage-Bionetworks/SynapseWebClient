@@ -5,10 +5,12 @@
 
 	<g:FlowPanel>
 		<g:SimplePanel ui:field="treePanel" />
-		<b:VerticalButtonGroup>
-		    <b:Button ui:field="upButton">UP</b:Button>
-		    <b:Button ui:field="downButton">DOWN</b:Button>
+		<b:VerticalButtonGroup pull="RIGHT">
+		    <b:Button ui:field="upButton" icon="ARROW_UP"></b:Button>
+		    <b:Button ui:field="downButton" icon="ARROW_DOWN"></b:Button>
 		</b:VerticalButtonGroup>
-		<g:SimplePanel ui:field="instructionPanel" />
+		<g:SimplePanel ui:field="instructionPanel" addStyleNames="margin-top-30">
+		    <g:Label>Select a subpage and use the arrows to move it to the desired position.</g:Label>
+		</g:SimplePanel>
 	</g:FlowPanel>
 </ui:UiBinder>

@@ -65,10 +65,12 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/arrow-down-dir-16.png")
 	ImageResource arrowDownDir16();
-	
     
 	@Source("images/icons/arrow-right-dir-16.png")
 	ImageResource arrowRightDir16();
+	
+	@Source("images/icons/transparent-16.png")
+	ImageResource transparent16();
 	
 	@Source("images/icons/document--pencil-16.png")
 	ImageResource documentEdit16();

@@ -21,8 +21,7 @@ import com.google.gwt.user.client.ui.TreeItem;
 
 public class WikiSubpagesTreeUtils {
 	
-	public static Tree copyTree(Tree tree) {
-		Tree newTree = new Tree();
+	public static Tree copyTree(Tree tree, Tree copy) {
 		SubPageTreeItem oldOverallRoot = getOverallRootTreeItem(tree);
 		SubPageTreeItem newOverallRoot = new SubPageTreeItem(null, "Dummy Overall Root", null, false);	// Dummy
 		buildTreeRecurse(oldOverallRoot, newOverallRoot);
@@ -34,10 +33,10 @@ public class WikiSubpagesTreeUtils {
 		
 		// Put new root items into new tree.
 		for (SubPageTreeItem child : newOverallRoot.getChildren()) {
-			newTree.addItem(child);
+			copy.addItem(child);
 		}
 		
-		return newTree;
+		return copy;
 	}
 	
 	public static void buildTreeRecurse(SubPageTreeItem item1, SubPageTreeItem item2) {

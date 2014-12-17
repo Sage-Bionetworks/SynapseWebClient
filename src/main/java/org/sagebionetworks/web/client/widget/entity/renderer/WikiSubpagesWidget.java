@@ -17,12 +17,14 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl.EntityTreeImageBundle;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl.GetOrderHintCallback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -32,6 +34,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -53,16 +56,19 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private Place ownerObjectLink;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
+	private V2WikiOrderHint subpageOrderHint;
+	private IconsImageBundle iconsImageBundle;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
 	
 	@Inject
-	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
+	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory, IconsImageBundle iconsImageBundle) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
+		this.iconsImageBundle = iconsImageBundle;
 		
 		view.setPresenter(this);
 	}	
@@ -144,13 +150,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						@Override
 						public void onSuccess(V2WikiOrderHint result) {
 							// "Sort" stuff'
-							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, result);
+							subpageOrderHint = result;
+							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
 							Tree tree = buildTree(wikiHeaders);
 							view.configure(tree, wikiSubpagesContainer, wikiPageContainer);
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							// Failed to get order hint. Just ignore it?
+							// Failed to get order hint. Just ignore it? TODO
 							Tree tree = buildTree(wikiHeaders);
 							view.configure(tree, wikiSubpagesContainer, wikiPageContainer);
 						}
@@ -207,8 +214,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				parent.addItem(child);
 				parent.setState(true);
 			} else {
-				String styleName = wikiId2TreeItem.get(header.getId()).isCurrentPage() ? "active" : "";
-				
 				tree.addItem(wikiId2TreeItem.get(header.getId()));
 			}
 		}
@@ -221,11 +226,11 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			@Override
 			public void invoke() {
 				final List<String> newOrderHintIdList = getCurrentOrderListCallback.getCurrentOrderHint();
-				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
-					@Override
-					public void onSuccess(V2WikiOrderHint result) {
-						result.setIdList(newOrderHintIdList);
-						synapseClient.updateV2WikiOrderHint(result, new AsyncCallback<V2WikiOrderHint>() {
+//				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
+//					@Override
+//					public void onSuccess(V2WikiOrderHint result) {
+						subpageOrderHint.setIdList(newOrderHintIdList);
+						synapseClient.updateV2WikiOrderHint(subpageOrderHint, new AsyncCallback<V2WikiOrderHint>() {
 							@Override
 							public void onSuccess(V2WikiOrderHint result) {
 								//Window.alert("Updated. Party!");
@@ -237,13 +242,13 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							}
 						});
 					}
-					@Override
-					public void onFailure(Throwable caught) {
-						// Failed to get order hint. Just ignore it?
-						// TODO:
-					}
-				});
-			}
+//					@Override
+//					public void onFailure(Throwable caught) {
+//						// Failed to get order hint. Just ignore it?
+//						// TODO:
+//					}
+//				});
+//			}
 		};
 	}
 	
