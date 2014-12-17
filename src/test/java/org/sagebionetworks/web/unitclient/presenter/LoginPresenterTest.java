@@ -253,4 +253,13 @@ public class LoginPresenterTest {
 		verify(mockView).showLogin(anyString(), anyString());
 	}
 	
+	@Test
+	public void testValidWidgetName() {
+		assertTrue(LoginPresenter.isValidWidgetName("a widget name"));
+		assertTrue(LoginPresenter.isValidWidgetName("special characters allowed (-+) and 01239"));
+		
+		assertFalse(LoginPresenter.isValidWidgetName("special characters disallowed like *$"));
+		assertFalse(LoginPresenter.isValidWidgetName(null));
+		assertFalse(LoginPresenter.isValidWidgetName(""));
+	}
 }
