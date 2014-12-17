@@ -262,4 +262,21 @@ public class LoginPresenterTest {
 		assertFalse(LoginPresenter.isValidWidgetName(null));
 		assertFalse(LoginPresenter.isValidWidgetName(""));
 	}
+
+	@Test
+	public void testIsValidUrl() {
+		assertTrue(LoginPresenter.isValidUrl("https://www.youtube.com/watch?v=m86ae_e_ptU", false));
+		assertTrue(LoginPresenter.isValidUrl("http://www.google.com", false));
+		assertTrue(LoginPresenter.isValidUrl("#!Synapse:syn123", false));
+		
+		assertFalse(LoginPresenter.isValidUrl("http:/www.google.com", false));
+		assertFalse(LoginPresenter.isValidUrl("missingprotocol.com", false));
+		
+		//undefined url handling
+		assertTrue(LoginPresenter.isValidUrl("", true));
+		assertFalse(LoginPresenter.isValidUrl("", false));
+		
+		assertTrue(LoginPresenter.isValidUrl(null, true));
+		assertFalse(LoginPresenter.isValidUrl(null, false));
+	}
 }
