@@ -107,9 +107,9 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	}
 
 	@Override
-	public void queryExecutionFinished(boolean wasSuccessful) {
+	public void queryExecutionFinished(boolean wasSuccessful, boolean resultsEditable) {
 		view.setQueryInputLoading(false);
-		view.setEditEnabled(wasSuccessful);
+		view.setEditEnabled(wasSuccessful && resultsEditable);
 		view.setDownloadEnabled(wasSuccessful);
 	}
 
