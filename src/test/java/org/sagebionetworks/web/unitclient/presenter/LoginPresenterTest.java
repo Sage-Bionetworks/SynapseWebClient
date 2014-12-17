@@ -254,6 +254,16 @@ public class LoginPresenterTest {
 	}
 	
 	@Test
+	public void testValidWidgetName() {
+		assertTrue(LoginPresenter.isValidWidgetName("a widget name"));
+		assertTrue(LoginPresenter.isValidWidgetName("special characters allowed (-+) and 01239"));
+		
+		assertFalse(LoginPresenter.isValidWidgetName("special characters disallowed like *$"));
+		assertFalse(LoginPresenter.isValidWidgetName(null));
+		assertFalse(LoginPresenter.isValidWidgetName(""));
+	}
+
+	@Test
 	public void testIsValidUrl() {
 		assertTrue(LoginPresenter.isValidUrl("https://www.youtube.com/watch?v=m86ae_e_ptU", false));
 		assertTrue(LoginPresenter.isValidUrl("http://www.google.com", false));
