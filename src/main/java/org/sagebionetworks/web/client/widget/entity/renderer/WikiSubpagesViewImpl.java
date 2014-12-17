@@ -58,12 +58,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void configure(final Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
-//		orderEditorModal.configure(WikiSubpagesTreeUtils.copyTree(tree), presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
-//																							@Override
-//																							public List<String> getCurrentOrderHint() {
-//																								return getCurrentOrderHint();
-//																							}
-//																						}));
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
@@ -75,11 +69,11 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (tree.getItemCount() > 0) {
 			//traverse the tree, and create anchors
 			final UnorderedListPanel ul = new UnorderedListPanel();
-			ul.addStyleName("notopmargin nav bs-sidenav");
+			ul.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
 			addTreeItemsRecursive(ul, WikiSubpagesTreeUtils.getTreeRootChildren(tree));
 			showHideButton = DisplayUtils.createButton("");
 			editOrderButton = DisplayUtils.createButton("Edit Order");
-			editOrderButton.addStyleName("btn btn-default btn-xs right");
+			editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
 			ulContainer = new FlowPanel();
 			ulContainer.addStyleName("notopmargin nav bs-sidenav");
 			ulContainer.setVisible(true);
@@ -115,8 +109,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			
-			add(editOrderButton);
 			add(ulContainer);
+			add(editOrderButton);
 			add(showHideButton);
 			
 			showSubpages();
@@ -128,7 +122,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	private Tree getTreeCopy(Tree tree) {
 		Tree treeCopy = new Tree(new SubpagesTreeResources(), true);
-		
+		treeCopy.addStyleName("wikiSubpageOrderEditorTree");
 		// Add handler so clicking transparent image does not close tree.
 		treeCopy.addCloseHandler(new CloseHandler<TreeItem>() {
 			@Override
@@ -224,7 +218,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	private Widget getListItem(final SubPageTreeItem treeItem) {
-		Anchor l = new Anchor(treeItem.getText());
+		final Anchor l = new Anchor(treeItem.getText());
 		l.addStyleName("link");
 		l.addClickHandler(new ClickHandler() {
 			@Override
@@ -275,17 +269,17 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public class  SubpagesTreeResources implements Tree.Resources {
 		@Override
 	    public ImageResource treeClosed() {
-	        return iconsImageBundle.transparent16();
+	        return iconsImageBundle.transparent1();
 	    }
 
 	    @Override
 	    public ImageResource treeOpen() {
-	        return iconsImageBundle.transparent16();
+	        return iconsImageBundle.transparent1();
 	    }
 
 		@Override
 		public ImageResource treeLeaf() {
-			return iconsImageBundle.transparent16();
+			return iconsImageBundle.transparent1();
 		}
 	}
 }

@@ -72,6 +72,9 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/transparent-16.png")
 	ImageResource transparent16();
 	
+	@Source("images/icons/transparent-1.png")
+	ImageResource transparent1();
+	
 	@Source("images/icons/document--pencil-16.png")
 	ImageResource documentEdit16();
 

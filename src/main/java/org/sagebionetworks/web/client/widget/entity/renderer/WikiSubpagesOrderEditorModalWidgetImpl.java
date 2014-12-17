@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEd
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -68,7 +69,7 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	@Override
 	public void hasChanges(boolean hasChanges) {
 		view.setLoading(false);
-		view.setPrimaryButtonEnabled(hasChanges);
+		view.setPrimaryButtonEnabled(hasChanges);	// TODO: This doesn't work??
 	}
 
 	@Override

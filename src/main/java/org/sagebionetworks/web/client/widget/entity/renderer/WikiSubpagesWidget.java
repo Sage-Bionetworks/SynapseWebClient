@@ -264,6 +264,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			this.text = text;
 			this.targetPlace = targetPlace;
 			this.isCurrentPage = isCurrentPage;
+			this.addStyleName("subpageTreeItem");
 			setWidget(new Label(text));	// TODO: Something special = ^ )
 			
 		}
