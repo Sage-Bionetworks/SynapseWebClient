@@ -144,7 +144,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if(selectColums == null){
 			return false;
 		}
-		// If any of the rows have ID then it is editable
+		// Do all columns have IDs?
 		for(SelectColumn col: selectColums){
 			if(col.getId() == null){
 				return false;
