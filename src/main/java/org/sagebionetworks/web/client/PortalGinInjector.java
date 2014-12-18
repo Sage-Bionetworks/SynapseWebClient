@@ -90,13 +90,16 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -244,7 +247,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ColumnModelsView createNewColumnModelsView();
 	public ColumnModelsWidget createNewColumnModelsWidget();
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
-	public ColumnModelTableRowEditor createNewColumnModelTableRowEditor();
+	public ColumnModelTableRowEditorWidget createColumnModelEditorWidget();
 	public TableEntityWidget createNewTableEntityWidget();
 	public RowWidget createRowWidget();
 	public TablePageWidget createNewTablePageWidget();
@@ -259,7 +262,11 @@ public interface PortalGinInjector extends Ginjector {
 	public BooleanCellEditor createBooleanCellEditor();
 	public DateCellEditor createDateCellEditor();
 	public DateCellRenderer createDateCellRenderer();
+	public DoubleCellEditor createDoubleCellEditor();
+	public IntegerCellEditor createIntegerCellEditor();
+	public LinkCellRenderer createLinkCellRenderer();
 	public FileCellEditor createFileCellEditor();
+
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();

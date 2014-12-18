@@ -13,9 +13,13 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -44,6 +48,10 @@ public class TableQueryResultWidgetTest {
 	QueryResultBundle bundle;
 	PartialRowSet delta;
 	SortItem sort;
+	Row row;
+	RowSet rowSet;
+	QueryResult results;
+	SelectColumn select;
 	
 	@Before
 	public void before(){
@@ -61,9 +69,19 @@ public class TableQueryResultWidgetTest {
 		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector);
 		query = new Query();
 		query.setSql("select * from syn123");
+		row = new Row();
+		row.setRowId(123L);
+		select = new SelectColumn();
+		select.setId("123");
+		rowSet = new RowSet();
+		rowSet.setRows(Arrays.asList(row));
+		rowSet.setHeaders(Arrays.asList(select));
+		results = new QueryResult();
+		results.setQueryResults(rowSet);
 		bundle = new QueryResultBundle();
 		bundle.setMaxRowsPerPage(123L);
 		bundle.setQueryCount(88L);
+		bundle.setQueryResult(results);
 		
 		sort = new SortItem();
 		sort.setColumn("a");
@@ -91,7 +109,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
-		verify(mockListner).queryExecutionFinished(true);
+		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 	}
 	
@@ -111,7 +129,29 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
-		verify(mockListner).queryExecutionFinished(true);
+		verify(mockListner).queryExecutionFinished(true, true);
+		verify(mockView).setProgressWidgetVisible(false);	
+	}
+	
+	@Test
+	public void testConfigureSuccessResultsNotEditable(){
+		boolean isEditable = false;
+		// setup a success
+		jobTrackingStub.setResponse(bundle);
+		// Results are only editable if all of the select columns have IDs.
+		select.setId(null);
+		// Make the call that changes it all.
+		widget.configure(query, isEditable, mockListner);
+		verify(mockView, times(2)).setErrorVisible(false);
+		verify(mockView).setProgressWidgetVisible(true);
+		// Hidden while running query.
+		verify(mockView).setTableVisible(false);
+		verify(mockView).hideEditor();
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
+		verify(mockListner).queryExecutionStarted();
+		// Shown on success.
+		verify(mockView).setTableVisible(true);
+		verify(mockListner).queryExecutionFinished(true, false);
 		verify(mockView).setProgressWidgetVisible(false);	
 	}
 	
@@ -129,7 +169,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).hideEditor();
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
-		verify(mockListner).queryExecutionFinished(false);
+		verify(mockListner).queryExecutionFinished(false, false);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
@@ -151,12 +191,14 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).hideEditor();
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
-		verify(mockListner).queryExecutionFinished(false);
+		verify(mockListner).queryExecutionFinished(false, false);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
 		verify(mockView).showError(error.getMessage());
 	}
+	
+	
 	
 	@Test
 	public void testOnSaveSuccessValid(){
@@ -192,7 +234,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
-		verify(mockListner).queryExecutionFinished(true);
+		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 	}
 	

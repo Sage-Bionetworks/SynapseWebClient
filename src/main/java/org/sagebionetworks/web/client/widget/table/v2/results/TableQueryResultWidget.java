@@ -6,7 +6,10 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -129,9 +132,44 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		// configure the page widget
 		this.pageViewerWidget.configure(bundle, this.startingQuery,sort, false, null, this);
 		this.view.setTableVisible(true);
-		fireFinishEvent(true);
+		fireFinishEvent(true, isQueryResultEditable());
 	}
 
+	/**
+	 * The results are editable if all of the select columns have ID
+	 * @return
+	 */
+	public boolean isQueryResultEditable(){
+		List<SelectColumn> selectColums = getSelectFromBundle();
+		if(selectColums == null){
+			return false;
+		}
+		// Do all columns have IDs?
+		for(SelectColumn col: selectColums){
+			if(col.getId() == null){
+				return false;
+			}
+		}
+		// All of the columns have ID so we can edit
+		return true;
+	}
+	/**
+	 * Find the select columns in the bundle.
+	 * @return Null if any parts are null.
+	 */
+	private List<SelectColumn> getSelectFromBundle(){
+		if(this.bundle != null){
+			QueryResult qr = this.bundle.getQueryResult();
+			if(qr != null){
+				RowSet set = qr.getQueryResults();
+				if(set != null){
+					return set.getHeaders();
+				}
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Starting a query.
 	 */
@@ -144,9 +182,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	/**
 	 * Finished a query.
 	 */
-	private void fireFinishEvent(boolean wasSuccessful) {
+	private void fireFinishEvent(boolean wasSuccessful, boolean resultsEditable) {
 		if(this.queryListener != null){
-			this.queryListener.queryExecutionFinished(wasSuccessful);
+			this.queryListener.queryExecutionFinished(wasSuccessful, resultsEditable);
 		}
 	}
 	
@@ -167,7 +205,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setTableVisible(false);
 		this.view.showError(message);
 		this.view.setProgressWidgetVisible(false);
-		fireFinishEvent(false);
+		fireFinishEvent(false, false);
 		this.view.setErrorVisible(true);
 	}
 

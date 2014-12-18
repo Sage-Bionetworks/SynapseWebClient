@@ -5,20 +5,17 @@ import java.util.List;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class APITableConfigViewImpl extends LayoutContainer implements APITableConfigView {
+public class APITableConfigViewImpl extends FlowPanel implements APITableConfigView {
 
 	private Presenter presenter;
 	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField;
@@ -70,25 +67,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		flowpanel.add(columnsManager.asWidget());
 		
 		add(flowpanel);
-	}
-	
-	
-	public static void showDialog(APITableColumnManager columnManager) {
-        final Dialog window = new Dialog();
-        window.setMaximizable(false);
-        window.setSize(400, 400);
-        window.setPlain(true); 
-        window.setModal(true); 
-        
-        window.setHeading("Column Configs"); 
-        window.setButtons(Dialog.OK);
-        window.setHideOnButtonClick(true);
-
-        window.setLayout(new FitLayout());
-        ScrollPanel scrollPanelWrapper = new ScrollPanel();
-        scrollPanelWrapper.add(columnManager.asWidget());
-	    window.add(scrollPanelWrapper);
-	    window.show();		
 	}
 	
 	@Override
@@ -197,15 +175,6 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		DisplayUtils.showInfo(title, message);
 	}
 
-	@Override
-	public int getDisplayHeight() {
-		return 280;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
-	}
-	
 	@Override
 	public void clear() {
 	}

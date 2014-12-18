@@ -41,7 +41,7 @@ public class EntityBundleTransport implements Serializable {
 	private Boolean hasChildren;
 	private AccessControlList acl;
 	private String accessRequirementsJson;
-	private String unmetAccessRequirementsJson;
+	private String unmetDownloadAccessRequirementsJson;
 	private String fileHandlesJson;
 	private TableBundle tableData;
 	
@@ -95,11 +95,11 @@ public class EntityBundleTransport implements Serializable {
 	public void setAccessRequirementsJson(String accessRequirementsJson) {
 		this.accessRequirementsJson = accessRequirementsJson;
 	}
-	public String getUnmetAccessRequirementsJson() {
-		return unmetAccessRequirementsJson;
+	public String getUnmetDownloadAccessRequirementsJson() {
+		return unmetDownloadAccessRequirementsJson;
 	}
-	public void setUnmetAccessRequirementsJson(String unmetAccessRequirementsJson) {
-		this.unmetAccessRequirementsJson = unmetAccessRequirementsJson;
+	public void setUnmetDownloadAccessRequirementsJson(String unmetDownloadAccessRequirementsJson) {
+		this.unmetDownloadAccessRequirementsJson = unmetDownloadAccessRequirementsJson;
 	}
 	
 	public String getFileHandlesJson() {
@@ -137,7 +137,7 @@ public class EntityBundleTransport implements Serializable {
 		result = prime * result + ((isWikiBasedEntity == null) ? 0 : isWikiBasedEntity.hashCode());
 		result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
 		result = prime * result + ((tableData == null) ? 0 : tableData.hashCode());
-		result = prime * result + ((unmetAccessRequirementsJson == null) ? 0 : unmetAccessRequirementsJson.hashCode());
+		result = prime * result + ((unmetDownloadAccessRequirementsJson == null) ? 0 : unmetDownloadAccessRequirementsJson.hashCode());
 		return result;
 	}
 	@Override
@@ -204,16 +204,16 @@ public class EntityBundleTransport implements Serializable {
 				return false;
 		} else if (!tableData.equals(other.tableData))
 			return false;
-		if (unmetAccessRequirementsJson == null) {
-			if (other.unmetAccessRequirementsJson != null)
+		if (unmetDownloadAccessRequirementsJson == null) {
+			if (other.unmetDownloadAccessRequirementsJson != null)
 				return false;
-		} else if (!unmetAccessRequirementsJson.equals(other.unmetAccessRequirementsJson))
+		} else if (!unmetDownloadAccessRequirementsJson.equals(other.unmetDownloadAccessRequirementsJson))
 			return false;
 		return true;
 	}
 	@Override
 	public String toString() {
-		return "EntityBundleTransport [entityJson=" + entityJson + ", annotationsJson=" + annotationsJson + ", permissions=" + permissions + ", entityPath=" + entityPath + ", entityReferencedByJson=" + entityReferencedByJson + ", hasChildren=" + hasChildren + ", acl=" + acl + ", accessRequirementsJson=" + accessRequirementsJson + ", unmetAccessRequirementsJson=" + unmetAccessRequirementsJson + ", fileHandlesJson=" + fileHandlesJson + ", tableData=" + tableData + ", isWikiBasedEntity=" + isWikiBasedEntity + "]";
+		return "EntityBundleTransport [entityJson=" + entityJson + ", annotationsJson=" + annotationsJson + ", permissions=" + permissions + ", entityPath=" + entityPath + ", entityReferencedByJson=" + entityReferencedByJson + ", hasChildren=" + hasChildren + ", acl=" + acl + ", accessRequirementsJson=" + accessRequirementsJson + ", unmetAccessRequirementsJson=" + unmetDownloadAccessRequirementsJson + ", fileHandlesJson=" + fileHandlesJson + ", tableData=" + tableData + ", isWikiBasedEntity=" + isWikiBasedEntity + "]";
 	}
 
 	

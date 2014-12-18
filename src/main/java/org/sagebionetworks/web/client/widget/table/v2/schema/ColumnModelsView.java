@@ -41,7 +41,7 @@ public interface ColumnModelsView extends IsWidget {
 		 * Add a new column to the table.
 		 * @return 
 		 */
-		public ColumnModelTableRowEditor addNewColumn();
+		public ColumnModelTableRowEditorWidget addNewColumn();
 		
 		/**
 		 * Called when the edit button is pressed

@@ -36,9 +36,6 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	
 	public List<String> getNewFileHandleIds();
 	
-	public void showBaseParams(boolean visible);
-	
-	public void setSaveButtonText(String text);
 	public interface Presenter {
 		
 		/**

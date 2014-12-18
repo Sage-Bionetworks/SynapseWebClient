@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReference;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -371,6 +372,23 @@ public class TableModelTestUtils {
 		LinkedList<String> resutls = new LinkedList<String>();
 		for(ColumnModel cm: models){
 			resutls.add(cm.getId());
+		}
+		return resutls;
+	}
+	
+	/**
+	 * Build a list of SelectColumns from a list of ColumnModels.
+	 * @param models
+	 * @return
+	 */
+	public static List<SelectColumn> buildSelectColumns(List<ColumnModel> models){
+		LinkedList<SelectColumn> resutls = new LinkedList<SelectColumn>();
+		for(ColumnModel cm: models){
+			SelectColumn sc = new SelectColumn();
+			sc.setColumnType(cm.getColumnType());
+			sc.setId(cm.getId());
+			sc.setName(cm.getName());
+			resutls.add(sc);
 		}
 		return resutls;
 	}

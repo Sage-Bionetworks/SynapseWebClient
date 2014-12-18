@@ -59,16 +59,6 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 	}
 	
 	@Override
-	public int getDisplayHeight() {
-		return 60;
-	}
-
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
-	}
-
-	@Override
 	public void checkParams() throws IllegalArgumentException {
 		if (!linkTextField.isValid()) {
 			throw new IllegalArgumentException(linkTextField.getErrorMessage());

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.repo.model.table.RowSet;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -85,10 +84,7 @@ public class QueryResultEditorWidget implements
 	 * @return
 	 */
 	public PartialRowSet extractDelta(){
-		RowSet updated = new RowSet();
-		updated.setHeaders(pageWidget.extractHeaders());
-		updated.setRows(pageWidget.extractRowSet());
-		return RowSetUtils.buildDelta(startingBundle.getQueryResult().getQueryResults(), updated);
+		return RowSetUtils.buildDelta(startingBundle.getQueryResult().getQueryResults(), pageWidget.extractRowSet(), pageWidget.extractHeaders());
 	}
 
 	/**

@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, WidgetEditorPresenter {
@@ -21,7 +21,7 @@ public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, Widge
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 		String id = descriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
 		if (id != null)
@@ -45,16 +45,6 @@ public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, Widge
 		descriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, view.isIndividual());
 		descriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, view.getId());
 		descriptor.put(WidgetConstants.INLINE_WIDGET_KEY, Boolean.TRUE.toString());
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

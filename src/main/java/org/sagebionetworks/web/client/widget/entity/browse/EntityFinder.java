@@ -5,34 +5,31 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPresenter {
+public class EntityFinder implements EntityFinderView.Presenter {
 	
 	private EntityFinderView view;	
 	private NodeModelCreator nodeModelCreator;
-	private HandlerManager handlerManager = new HandlerManager(this);
 	private SynapseClientAsync synapseClient;
 	private boolean showVersions = true;
 	private Reference selectedEntity;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
-		
+	private SelectedHandler<Reference> selectedHandler;
+	
 	@Inject
 	public EntityFinder(EntityFinderView view,
 			NodeModelCreator nodeModelCreator,
@@ -51,25 +48,23 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
-		// remove handlers
-		handlerManager = new HandlerManager(this);		
 	}
 
-	public void configure(boolean showVersions) {
-		this.showVersions = showVersions;		
+	public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
+		this.showVersions = showVersions;
+		this.selectedHandler = handler;
 	}
 	
-	@Override
-	public Widget asWidget() {
-		view.setPresenter(this);
-		return view.asWidget();
-	}
-
 	@Override
 	public void setSelectedEntity(Reference selected) {
 		selectedEntity = selected;
 	}
 	
+	@Override
+	public void okClicked() {
+		if (selectedHandler != null)
+			selectedHandler.onSelected(selectedEntity);
+	}
 	public Reference getSelectedEntity() {
 		return selectedEntity;
 	}
@@ -119,21 +114,20 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 			}
 		});
 	}
-
-	public int getViewHeight() {
-		return view.getViewHeight();
-	}
 	
-	public int getViewWidth() {
-		return view.getViewWidth();
-	}
-
 	@Override
 	public boolean showVersions() {
 		return this.showVersions;
 	}
-
-	public void refresh() {
-		view.refresh();
+	
+	@Override
+	public void show() {
+		view.clear();
+		view.show();
+	}
+	
+	@Override
+	public void hide() {
+		view.hide();
 	}
 }

@@ -216,7 +216,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			private void proceed() {
-				setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
 				refreshTeams();
 				if (isOwner) {
 					getFavorites();
@@ -768,6 +768,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 */
 	public void setCurrentUserId(String currentUserId) {
 		this.currentUserId = currentUserId;
+	}
+	
+	/**
+	 * For testing purposes only
+	 */
+	public ProjectFilterEnum getFilterType() {
+		return filterType;
 	}
 }
 

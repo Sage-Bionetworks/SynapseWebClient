@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEditorPresenter {
@@ -22,7 +22,7 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	}		
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;		
 		if (descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY) != null)
 			view.setMp4Entity(descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY));
@@ -55,16 +55,6 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 			descriptor.put(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY, view.getOggEntity());
 		if (!"".equals(view.getWebMEntity()))
 			descriptor.put(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY, view.getWebMEntity());
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

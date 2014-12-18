@@ -1,18 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ButtonLinkWidgetViewImpl extends LayoutContainer implements ButtonLinkWidgetView {
+public class ButtonLinkWidgetViewImpl extends FlowPanel implements ButtonLinkWidgetView {
 
 	private Presenter presenter;
 	private GWTWrapper gwt;
@@ -24,11 +26,11 @@ public class ButtonLinkWidgetViewImpl extends LayoutContainer implements ButtonL
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, String buttonText, final String url, boolean isHighlight, final boolean openInNewWindow) {
-		removeAll();
+		clear();
 		Button button = new Button(buttonText);
-		button.removeStyleName("gwt-Button");
-		String buttonColorStyle = isHighlight ? "btn-info" : "btn-default";
-		button.addStyleName("btn "+buttonColorStyle+" btn-lg");
+		if (isHighlight)
+			button.setType(ButtonType.INFO);
+		button.setSize(ButtonSize.LARGE);
 		button.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -39,13 +41,11 @@ public class ButtonLinkWidgetViewImpl extends LayoutContainer implements ButtonL
 			}
 		});
 		add(button);
-		layout(true);
 	}
 	
 	public void showError(String error) {
-		removeAll();
+		clear();
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
-		layout(true);
 	}
 	
 	@Override

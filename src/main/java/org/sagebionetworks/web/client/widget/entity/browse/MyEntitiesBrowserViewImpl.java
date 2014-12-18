@@ -2,88 +2,78 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 
-import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.TabPanelEvent;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.TabItem;
-import com.extjs.gxt.ui.client.widget.TabPanel;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.dom.client.LIElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEntitiesBrowserView {
+public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 
-	private static final int HEIGHT_PX = 250;
-	private static final int WIDTH_PX = 459;
+	public interface MyEntitiesBrowserViewImplUiBinder extends UiBinder<Widget, MyEntitiesBrowserViewImpl> {}
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private EntityTreeBrowser myTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
 	private EntitySelectedHandler mySelectedHandler;
 	private EntitySelectedHandler favoritesSelectedHandler;
-	private PortalGinInjector ginInjector;
+	@UiField
+	SimplePanel myProjectsContainer;
+	@UiField
+	SimplePanel myFavoritesContainer;
 	
-	private TabPanel panel;
-			
+	@UiField
+	LIElement myProjectsListItem;
+	@UiField
+	LIElement myFavoritesListItem;
+	
+	@UiField
+	Anchor myProjectsLink;
+	@UiField
+	Anchor myFavoritesLink;
+	@UiField
+	Div myProjectsTabContents;
+	@UiField
+	Div myFavoritesTabContents;
+	
+	
+	private Widget widget;
 	@Inject
-	public MyEntitiesBrowserViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
-		this.myTreeBrowser = ginInjector.getEntityTreeBrowser();		
+	public MyEntitiesBrowserViewImpl(MyEntitiesBrowserViewImplUiBinder binder, 
+			PortalGinInjector ginInjector) {
+		widget = binder.createAndBindUi(this);
+		this.myTreeBrowser = ginInjector.getEntityTreeBrowser();
 		this.favoritesTreeBrowser = ginInjector.getEntityTreeBrowser();
-		this.ginInjector = ginInjector;
-	}
-	
-	@Override
-	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
-		super.onRender(parent, index);		
-		panel = new TabPanel();
-		panel.setPlain(true);
-		panel.setHeight(HEIGHT_PX);
-		panel.setAutoWidth(true);
+		myProjectsContainer.setWidget(myTreeBrowser.asWidget());
+		myFavoritesContainer.setWidget(favoritesTreeBrowser.asWidget());
 		
-		final String MY_TAB_ID = "myTab";
-		final String FAVORITE_TAB_ID = "favoriteTab";
-		
-		TabItem myTab = new TabItem(DisplayConstants.MY_PROJECTS);
-		myTab.add(myTreeBrowser.asWidget());
-		myTab.setScrollMode(Scroll.AUTO);	
-		panel.add(myTab);
-			
-		TabItem favoritesTab = new TabItem(DisplayConstants.MY_FAVORITES);
-		favoritesTab.add(favoritesTreeBrowser.asWidget());
-		favoritesTab.setScrollMode(Scroll.AUTO);
-		panel.add(favoritesTab);
-		
-		panel.addListener(Events.Select, new Listener<TabPanelEvent>() {
-			public void handleEvent(TabPanelEvent be) {
-				String tabId = be.getItem().getId();
-				if(MY_TAB_ID.equals(tabId)) {
-					
-				} else if(FAVORITE_TAB_ID.equals(tabId)) {
-					presenter.loadFavorites();
-				}
+		myProjectsLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				setTabSelected(true);
 			}
 		});
 		
-		add(panel);
+		myFavoritesLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				setTabSelected(false);
+			}
+		});
+		setTabSelected(true);
 	}
-
+	
 	@Override
 	public void setUpdatableEntities(List<EntityHeader> rootEntities) {
 		myTreeBrowser.configure(rootEntities, true);		
@@ -96,7 +86,7 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 
 	@Override 
@@ -160,5 +150,34 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 		};
 		favoritesTreeBrowser.addEntitySelectedHandler(favoritesSelectedHandler);
 	}
+	
+	
+
+	/**
+	 * Used only for setting the view's tab display
+	 */
+	private void setTabSelected(boolean isMyProjects) {
+		
+		if (isMyProjects) {
+			setTabActive(myProjectsLink, myProjectsListItem, myProjectsTabContents);
+			setTabInActive(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
+		} else {
+			setTabInActive(myProjectsLink, myProjectsListItem, myProjectsTabContents);
+			setTabActive(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
+		}
+	}
+	
+	private void setTabActive(Anchor tabLink, LIElement tabListItem, Div tabContents) {
+		tabContents.setVisible(true);
+		tabListItem.addClassName("active");
+		tabLink.removeStyleName("link");
+	}
+	
+	private void setTabInActive(Anchor tabLink, LIElement tabListItem, Div tabContents) {
+		tabContents.setVisible(false);
+		tabListItem.removeClassName("active");
+		tabLink.addStyleName("link");
+	}
+
 
 }

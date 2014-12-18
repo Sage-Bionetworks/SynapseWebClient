@@ -293,6 +293,9 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
+		
+		//by default, it should load ALL projects for the current user
+		assertEquals(ProjectFilterEnum.ALL, profilePresenter.getFilterType());
 	}
 	
 	@Test

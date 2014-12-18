@@ -18,10 +18,13 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 
@@ -35,8 +38,10 @@ public class CellFactoryImplTest {
 	BooleanCellEditor mockBooleanCellEditor;
 	DateCellEditor mockDateCellEditor;
 	DateCellRenderer mockDateCellRenderer;
+	DoubleCellEditor mockDoubleCellEditor;
+	IntegerCellEditor mockIntegerCellEditor;
+	LinkCellRenderer mockLinkCellRenderer;
 	FileCellEditor mockFileCellEditor;
-	
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
 
@@ -52,8 +57,11 @@ public class CellFactoryImplTest {
 		mockBooleanCellEditor = Mockito.mock(BooleanCellEditor.class);
 		mockDateCellEditor = Mockito.mock(DateCellEditor.class);
 		mockDateCellRenderer = Mockito.mock(DateCellRenderer.class);
+		mockDoubleCellEditor = Mockito.mock(DoubleCellEditor.class);
+		mockIntegerCellEditor = Mockito.mock(IntegerCellEditor.class);
+		mockLinkCellRenderer = Mockito.mock(LinkCellRenderer.class);
 		mockFileCellEditor= Mockito.mock(FileCellEditor.class);
-		
+
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
 		when(mockInjector.createEntityIdCellEditor()).thenReturn(mockEntityIdCellEditor);
@@ -62,7 +70,11 @@ public class CellFactoryImplTest {
 		when(mockInjector.createBooleanCellEditor()).thenReturn(mockBooleanCellEditor);
 		when(mockInjector.createDateCellEditor()).thenReturn(mockDateCellEditor);
 		when(mockInjector.createDateCellRenderer()).thenReturn(mockDateCellRenderer);
+		when(mockInjector.createDoubleCellEditor()).thenReturn(mockDoubleCellEditor);
+		when(mockInjector.createIntegerCellEditor()).thenReturn(mockIntegerCellEditor);
+		when(mockInjector.createLinkCellRenderer()).thenReturn(mockLinkCellRenderer);
 		when(mockInjector.createFileCellEditor()).thenReturn(mockFileCellEditor);
+
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 
@@ -97,6 +109,13 @@ public class CellFactoryImplTest {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.ENTITYID);
 		assertEquals(mockEntityIdCellRenderer, cellFactory.createRenderer(cm));
+	}
+	
+	@Test
+	public void testGetLinkCellRenderer(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.LINK);
+		assertEquals(mockLinkCellRenderer, cellFactory.createRenderer(cm));
 	}
 	
 	@Test
@@ -155,6 +174,20 @@ public class CellFactoryImplTest {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.DATE);
 		assertEquals(mockDateCellRenderer, cellFactory.createRenderer(cm));
+	}
+	
+	@Test
+	public void testGetDoubleEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.DOUBLE);
+		assertEquals(mockDoubleCellEditor, cellFactory.createEditor(cm));
+	}
+	
+	@Test
+	public void testGetIntegerEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.INTEGER);
+		assertEquals(mockIntegerCellEditor, cellFactory.createEditor(cm));
 	}
 	
 	@Test

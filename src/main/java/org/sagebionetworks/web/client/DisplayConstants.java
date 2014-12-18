@@ -173,7 +173,7 @@ public class DisplayConstants {
 	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
 	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";	
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
-	public static final String ERROR_RESTORING_TRASH_PARENT_NOT_FOUND = "Sorry, you cannot restore this item.";
+	public static final String ERROR_RESTORING_TRASH_PARENT_NOT_FOUND = "Sorry, an error occurred while restoring this item.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";
 	public static final String FORGOT_PASSWORD_MESSAGE = "If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
@@ -574,6 +574,7 @@ public class DisplayConstants {
 	public static final String IMAGE_FILE_ENTITY = "Image File Entity";
 	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
+	public static final String ERROR_ENTER_DEPTH = "Please enter a valid depth";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_VIDEO_FILE = "Please set at least one video file format";
 	public static final String FIND_ENTITIES = "Find Entities";
 	public static final String FIND_ENTITY = "Find Entity";

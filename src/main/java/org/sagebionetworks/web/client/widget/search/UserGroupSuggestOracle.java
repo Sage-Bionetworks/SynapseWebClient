@@ -26,6 +26,7 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 			// query for a single character is still executed. Workaround for this
 			// is to check for an empty string field here.
 			if (!suggestBox.getText().trim().isEmpty()) {
+				suggestBox.setOffset(0);
 				suggestBox.getSuggestions(request, callback);
 			}
 		}

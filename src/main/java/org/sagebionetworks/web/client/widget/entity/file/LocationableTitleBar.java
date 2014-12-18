@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 @Deprecated
@@ -35,7 +34,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle) {		
+	public void configure(EntityBundle bundle) {		
 		//if this isn't locationable, then return an empty panel
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
@@ -44,9 +43,6 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
 		view.createTitlebar(bundle, entityType, authenticationController, bundle.getPermissions().getCanCertifiedUserAddChild());
-		Widget widget =  view.asWidget();
-		widget.setVisible(bundle.getEntity() instanceof Locationable);
-		return widget;
 	}
 	
 	/**
@@ -63,12 +59,9 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		this.entityBundle = null;		
 	}
 
-	/**
-	 * Does nothing. Use asWidget(Entity)
-	 */
 	@Override
 	public Widget asWidget() {
-		return null;
+		return view.asWidget();
 	}
     
 	@Override
@@ -102,7 +95,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		if (!isLoggedIn)
 			hasData = true;
 		//if it has unmet access requirements, then there might be something here
-		else if (bundle.getUnmetAccessRequirements() != null && bundle.getUnmetAccessRequirements().size() > 0)
+		else if (bundle.getUnmetDownloadAccessRequirements() != null && bundle.getUnmetDownloadAccessRequirements().size() > 0)
 			hasData = true;
 		//else, if it has a locations list whose size is > 0
 		else if (((Locationable)bundle.getEntity()).getLocations() != null && ((Locationable)bundle.getEntity()).getLocations().size() > 0)

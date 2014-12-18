@@ -116,17 +116,17 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public void resetAccessRequirementCount() {
 		shownAccessRequirements.clear();
 		allArsIterator = bundle.getAccessRequirements().iterator();
-		unmetArsIterator = bundle.getUnmetAccessRequirements().iterator();
+		unmetArsIterator = bundle.getUnmetDownloadAccessRequirements().iterator();
 		currentAR = selectNextAccessRequirement();
 	}
 	
-	public boolean hasUnmetAccessRequirements() {
-		List<AccessRequirement> unmetArs = bundle.getUnmetAccessRequirements();
+	public boolean hasUnmetDownloadAccessRequirements() {
+		List<AccessRequirement> unmetArs = bundle.getUnmetDownloadAccessRequirements();
 		return (unmetArs != null && !unmetArs.isEmpty());
 	}
 	
 	public boolean isCurrentAccessRequirementUnmet() {
-		return bundle.getUnmetAccessRequirements().contains(currentAR);
+		return bundle.getUnmetDownloadAccessRequirements().contains(currentAR);
 	}
 
 	private UserProfile getUserProfile() {
@@ -166,7 +166,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			case RESTRICTED:
 			case CONTROLLED:
 				view.showControlledUseUI();
-				if (hasUnmetAccessRequirements())
+				if (hasUnmetDownloadAccessRequirements())
 					view.showUnmetRequirementsIcon();
 				else
 					view.showMetRequirementsIcon();

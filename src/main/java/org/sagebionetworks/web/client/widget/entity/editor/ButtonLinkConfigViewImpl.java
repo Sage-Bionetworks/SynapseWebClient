@@ -2,63 +2,35 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ButtonLinkConfigViewImpl extends LayoutContainer implements ButtonLinkConfigView {
+public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
 	private Presenter presenter;
-	private TextField<String> urlField;
-	private TextField<String> nameField;
+	public interface ButtonLinkConfigViewImplUiBinder extends UiBinder<Widget, ButtonLinkConfigViewImpl> {}
+	@UiField
+	TextBox urlField;
+	@UiField
+	TextBox nameField;
+	Widget widget;
 	
 	@Inject
-	public ButtonLinkConfigViewImpl() {
+	public ButtonLinkConfigViewImpl(ButtonLinkConfigViewImplUiBinder binder) {
+		widget = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public void initView() {
-		VerticalPanel vp = new VerticalPanel();
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		urlField = new TextField<String>();
-		urlField.setAllowBlank(false);
-		urlField.setRegex(WebConstants.VALID_URL_REGEX);
-		urlField.getMessages().setRegexText(DisplayConstants.IMAGE_CONFIG_INVALID_URL_MESSAGE);
-		Label urlLabel = new Label(DisplayConstants.URL_LABEL);
-		urlLabel.setWidth(60);
-		urlField.setWidth(270);
-		hp.add(urlLabel);
-		hp.add(urlField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		
-		hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		nameField = new TextField<String>();
-		nameField.setAllowBlank(false);
-		nameField.setName("Text");
-		nameField.setRegex(WebConstants.VALID_WIDGET_NAME_REGEX);
-		nameField.getMessages().setRegexText(DisplayConstants.ERROR_WIDGET_NAME_PATTERN_MISMATCH);
-		Label nameLabel = new Label("Button Text:");
-		nameLabel.setWidth(60);
-		nameField.setWidth(270);
-		hp.add(nameLabel);
-		hp.add(nameField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		
-		add(vp);
+		urlField.setValue("");
+		nameField.setValue("");
 	}
 	
 	@Override
@@ -73,15 +45,15 @@ public class ButtonLinkConfigViewImpl extends LayoutContainer implements ButtonL
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!urlField.isValid())
-			throw new IllegalArgumentException(urlField.getErrorMessage());
-		if (!nameField.isValid())
-			throw new IllegalArgumentException(nameField.getErrorMessage());
+		if (!LoginPresenter.isValidUrl(urlField.getValue(), false))
+			throw new IllegalArgumentException("Invalid URL: " + urlField.getValue());
+		if (!LoginPresenter.isValidWidgetName(nameField.getValue()))
+			throw new IllegalArgumentException("Invalid name: " + nameField.getValue());
 	}
 
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 
 	@Override 
@@ -103,14 +75,6 @@ public class ButtonLinkConfigViewImpl extends LayoutContainer implements ButtonL
 		DisplayUtils.showInfo(title, message);
 	}
 
-	@Override
-	public int getDisplayHeight() {
-		return 60;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
-	}
 	@Override
 	public void clear() {
 		if (nameField != null)

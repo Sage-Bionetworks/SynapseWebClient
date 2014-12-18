@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, WidgetEditorPresenter {
@@ -22,7 +22,7 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
 		int height = ShinySiteWidget.getHeightFromDescriptor(descriptor);
@@ -50,16 +50,6 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		} catch (IllegalArgumentException e) {
 			view.showErrorMessage(e.getMessage());
 		}
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

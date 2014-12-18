@@ -114,8 +114,7 @@ public class EntityPageTopTest {
 				mockSchemaCache,
 				mockEntityTypeProvider,
 				mockIconsImageBundle, 
-				mockWidgetRegistrar, 
-				mockGlobalApplicationState, mockEventBus, new JSONObjectAdapterImpl(), queryTokenProvider);
+				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
 		pageTop.setAreaChangeHandler(areaChangeHandler);
 		
 		// Setup the the entity

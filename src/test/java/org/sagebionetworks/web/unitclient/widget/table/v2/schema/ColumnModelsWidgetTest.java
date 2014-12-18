@@ -33,7 +33,7 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -86,9 +86,9 @@ public class ColumnModelsWidgetTest {
 		when(mockBundle.getEntity()).thenReturn(table);
 		when(mockBundle.getTableBundle()).thenReturn(tableBundle);
 		when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockViewer, mockEditor);
-		when(mockGinInjector.createNewColumnModelTableRowEditor()).thenAnswer(new Answer<ColumnModelTableRowEditor>() {
+		when(mockGinInjector.createColumnModelEditorWidget()).thenAnswer(new Answer<ColumnModelTableRowEditorWidget >() {
 			@Override
-			public ColumnModelTableRowEditor answer(InvocationOnMock invocation)
+			public ColumnModelTableRowEditorWidget answer(InvocationOnMock invocation)
 					throws Throwable {
 				return new ColumnModelTableRowEditorStub();
 			}
@@ -176,7 +176,7 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		// Add a column
-		ColumnModelTableRowEditor editor = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget editor = widget.addNewColumn();
 		editor.setColumnName("a name");
 		List<ColumnModel> expectedNewScheam = new LinkedList<ColumnModel>(schema);
 		expectedNewScheam.add(ColumnModelUtils.extractColumnModel(editor));
@@ -186,8 +186,30 @@ public class ColumnModelsWidgetTest {
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
 		verify(mockBaseView).hideEditor();
+		verify(mockBaseView).hideErrors();
 		// Save success should be called.
 		verify(mockUpdateHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException{
+		boolean isEdtiable = true;
+		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
+		// Show the dialog
+		widget.onEditColumns();
+		// Add a column
+		ColumnModelTableRowEditorStub editor = (ColumnModelTableRowEditorStub) widget.addNewColumn();
+		editor.setValid(false);
+		editor.setColumnName("a name");
+		// Now call save
+		widget.onSave();
+		verify(mockBaseView, never()).setLoading();
+		verify(mockBaseView, never()).hideEditor();
+		verify(mockBaseView, never()).hideErrors();
+		// Save success should be called.
+		verify(mockBaseView).showError(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
 	}
 	
 	@Test
@@ -199,7 +221,7 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		// Add a column
-		ColumnModelTableRowEditor editor = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget editor = widget.addNewColumn();
 		editor.setColumnName("a name");
 		String errorMessage = "Something went wrong";
 		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(any(TableEntity.class), any(List.class), any(AsyncCallback.class));
@@ -227,12 +249,12 @@ public class ColumnModelsWidgetTest {
 		
 		// Add three columns
 		reset(mockEditor);
-		ColumnModelTableRowEditor one = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		verify(mockEditor).setCanDelete(false);
 		verify(mockEditor).setCanMoveUp(false);
 		verify(mockEditor).setCanMoveDown(false);
 		
-		ColumnModelTableRowEditor two = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
 		// Start with two selected
 		reset(mockEditor);
 		two.setSelected(true);
@@ -241,7 +263,7 @@ public class ColumnModelsWidgetTest {
 		verify(mockEditor).setCanMoveDown(false);
 		
 		reset(mockEditor);
-		ColumnModelTableRowEditor three = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget three = widget.addNewColumn();
 		// With a new row the second row can move down.
 		verify(mockEditor).setCanDelete(true);
 		verify(mockEditor).setCanMoveUp(true);
@@ -270,11 +292,11 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		// Add three columns
-		ColumnModelTableRowEditor one = widget.addNewColumn();
-		ColumnModelTableRowEditor two = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
 		// Start with two selected
 		two.setSelected(true);
-		ColumnModelTableRowEditor three = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget three = widget.addNewColumn();
 		// select all
 		widget.selectNone();
 		assertFalse(one.isSelected());
@@ -291,11 +313,11 @@ public class ColumnModelsWidgetTest {
 		// Show the dialog
 		widget.onEditColumns();
 		// Add three columns
-		ColumnModelTableRowEditor one = widget.addNewColumn();
-		ColumnModelTableRowEditor two = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
 		// Start with two selected
 		two.setSelected(true);
-		ColumnModelTableRowEditor three = widget.addNewColumn();
+		ColumnModelTableRowEditorWidget three = widget.addNewColumn();
 		// select all
 		widget.toggleSelect();
 		assertFalse(one.isSelected());
@@ -307,4 +329,5 @@ public class ColumnModelsWidgetTest {
 		assertTrue(two.isSelected());
 		assertTrue(three.isSelected());
 	}
+	
 }

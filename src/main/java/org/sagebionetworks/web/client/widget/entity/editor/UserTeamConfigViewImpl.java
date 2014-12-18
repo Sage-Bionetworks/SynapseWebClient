@@ -5,14 +5,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 
-import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
-import com.extjs.gxt.ui.client.event.SelectionChangedListener;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,7 +28,6 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 		clear();
 		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 		suggestBox.setPlaceholderText("Enter name...");
-		suggestBox.setWidth(330 + "px");
 		SimplePanel panel = new SimplePanel();
 		panel.setWidget(suggestBox.asWidget());
 		panel.addStyleName("margin-10");
@@ -83,14 +74,5 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 40;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 0;
 	}
 }
