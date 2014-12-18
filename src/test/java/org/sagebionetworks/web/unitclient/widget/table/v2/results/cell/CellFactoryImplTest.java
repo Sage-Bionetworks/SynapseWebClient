@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 
@@ -34,6 +35,7 @@ public class CellFactoryImplTest {
 	BooleanCellEditor mockBooleanCellEditor;
 	DateCellEditor mockDateCellEditor;
 	DateCellRenderer mockDateCellRenderer;
+	FileCellEditor mockFileCellEditor;
 	
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
@@ -50,6 +52,7 @@ public class CellFactoryImplTest {
 		mockBooleanCellEditor = Mockito.mock(BooleanCellEditor.class);
 		mockDateCellEditor = Mockito.mock(DateCellEditor.class);
 		mockDateCellRenderer = Mockito.mock(DateCellRenderer.class);
+		mockFileCellEditor= Mockito.mock(FileCellEditor.class);
 		
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
@@ -59,6 +62,7 @@ public class CellFactoryImplTest {
 		when(mockInjector.createBooleanCellEditor()).thenReturn(mockBooleanCellEditor);
 		when(mockInjector.createDateCellEditor()).thenReturn(mockDateCellEditor);
 		when(mockInjector.createDateCellRenderer()).thenReturn(mockDateCellRenderer);
+		when(mockInjector.createFileCellEditor()).thenReturn(mockFileCellEditor);
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
 
@@ -151,5 +155,12 @@ public class CellFactoryImplTest {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.DATE);
 		assertEquals(mockDateCellRenderer, cellFactory.createRenderer(cm));
+	}
+	
+	@Test
+	public void testGetFileCellEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.FILEHANDLEID);
+		assertEquals(mockFileCellEditor, cellFactory.createEditor(cm));
 	}
 }
