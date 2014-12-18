@@ -23,7 +23,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer);
+	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, WikiSubpageOrderEditorTree tree2);	// TODO tree2
 	void hideSubpages();
 	void showSubpages();
 	

@@ -56,7 +56,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(final Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+	public void configure(final Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, WikiSubpageOrderEditorTree tree2) {
 		clear();
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
@@ -112,6 +112,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			add(ulContainer);
 			add(editOrderButton);
 			add(showHideButton);
+			add(tree2.asWidget());
 			
 			showSubpages();
 		} else {
