@@ -27,9 +27,9 @@ public interface WikiSubpagesOrderEditorModalWidget extends IsWidget {
 	 * The widget must be configured before showing the dialog.
 	 * @param subpagesTree
 	 */
-	public void configure(Tree subpagesTree, Callback udpateOrderCallback);
+	public void configure(WikiSubpageOrderEditorTree subpagesTree, Callback udpateOrderCallback);
 	
-	public Tree getTree();
+	public WikiSubpageOrderEditorTree getTree();
 //	public List<String> getCurrentOrderIdList();
 	
 }

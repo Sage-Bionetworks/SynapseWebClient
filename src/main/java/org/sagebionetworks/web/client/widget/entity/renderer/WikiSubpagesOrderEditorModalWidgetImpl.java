@@ -49,7 +49,7 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	}
 
 	@Override
-	public void configure(Tree subpagesTree, Callback updateOrderCallback) {	// TODO: Update order callback?
+	public void configure(WikiSubpageOrderEditorTree subpagesTree, Callback updateOrderCallback) {	// TODO: Update order callback?
 		editor.configure(subpagesTree, this);
 		view.addEditor(editor.asWidget());
 	}
@@ -73,7 +73,7 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	}
 
 	@Override
-	public Tree getTree() {
+	public WikiSubpageOrderEditorTree getTree() {
 		return editor.getTree();
 	}
 	

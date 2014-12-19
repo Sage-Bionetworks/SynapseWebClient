@@ -60,7 +60,8 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private FlowPanel wikiPageContainer;
 	private V2WikiOrderHint subpageOrderHint;
 	private IconsImageBundle iconsImageBundle;
-	private WikiSubpageOrderEditorTree tree;
+	private WikiSubpageNavigationTree tree;
+	private WikiSubpageOrderEditorTree editorTree;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
@@ -68,13 +69,15 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
 							NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
-							IconsImageBundle iconsImageBundle, WikiSubpageOrderEditorTree tree) {
+							IconsImageBundle iconsImageBundle, WikiSubpageNavigationTree tree,
+							WikiSubpageOrderEditorTree editorTree) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.tree = tree;
+		this.editorTree = editorTree;
 		
 		view.setPresenter(this);
 	}	
@@ -127,6 +130,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		}
 	}
 	
+	// TODO: Try to remove.
 	public Place getLinkPlace(String entityId, Long entityVersion, String wikiId) {
 		if (isEmbeddedInOwnerPage)
 			return new Synapse(entityId, entityVersion, Synapse.EntityArea.WIKI, wikiId);
@@ -160,16 +164,17 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
 							
 							// TODO: Testing. Remove tree stuff.
-							tree.buildTree(wikiHeaders.getResults());
+							tree.configureForNavigation(wikiHeaders.getResults(), ownerObjectName, wikiKey, isEmbeddedInOwnerPage);
+							editorTree.configure(wikiHeaders.getResults(), ownerObjectName);
 							
 							Tree tree1 = buildTree(wikiHeaders);
-							view.configure(tree1, wikiSubpagesContainer, wikiPageContainer, tree);
+							view.configure(tree1, wikiSubpagesContainer, wikiPageContainer, tree, editorTree);
 						}
 						@Override
 						public void onFailure(Throwable caught) {
 							// Failed to get order hint. Just ignore it? TODO
 							Tree tree1 = buildTree(wikiHeaders);
-							view.configure(tree1, wikiSubpagesContainer, wikiPageContainer, tree);	// TODO
+							view.configure(tree1, wikiSubpagesContainer, wikiPageContainer, tree, editorTree);	// TODO
 						}
 					});
 					

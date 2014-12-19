@@ -56,11 +56,12 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(final Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, WikiSubpageOrderEditorTree tree2) {
+	public void configure(final Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, WikiSubpageNavigationTree tree2, final WikiSubpageOrderEditorTree editorTree) {
 		clear();
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
+		ulContainer = new FlowPanel();
 		//this widget shows nothing if it doesn't have any pages!
 		if (tree.getItemCount() == 0)
 			return;
@@ -68,22 +69,22 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		//only show the tree if the root has children
 		if (tree.getItemCount() > 0) {
 			//traverse the tree, and create anchors
-			final UnorderedListPanel ul = new UnorderedListPanel();
-			ul.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
-			addTreeItemsRecursive(ul, WikiSubpagesTreeUtils.getTreeRootChildren(tree));
+//			final UnorderedListPanel ul = new UnorderedListPanel();
+//			ul.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
+//			addTreeItemsRecursive(ul, WikiSubpagesTreeUtils.getTreeRootChildren(tree));
 			showHideButton = DisplayUtils.createButton("");
 			editOrderButton = DisplayUtils.createButton("Edit Order");
 			editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
-			ulContainer = new FlowPanel();
-			ulContainer.addStyleName("notopmargin nav bs-sidenav");
-			ulContainer.setVisible(true);
-			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
-			ulContainer.add(ul);
+//			ulContainer = new FlowPanel();
+//			ulContainer.addStyleName("notopmargin nav bs-sidenav");
+//			ulContainer.setVisible(true);
+//			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
+//			ulContainer.add(ul);
 
 			editOrderButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					orderEditorModal.configure(getTreeCopy(tree), presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
+					orderEditorModal.configure(editorTree, presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
 						@Override
 						public List<String> getCurrentOrderHint() {
 							return getCurrentOrderHint();
@@ -109,10 +110,11 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			
+			ulContainer.add(tree2.asWidget());
 			add(ulContainer);
 			add(editOrderButton);
 			add(showHideButton);
-			add(tree2.asWidget());
+			//add(tree2.asWidget());
 			
 			showSubpages();
 		} else {
@@ -256,7 +258,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 
 	@Override
 	public List<String> getCurrentOrderHintIdList() {
-		return WikiSubpagesTreeUtils.getCurrentOrderIdList(orderEditorModal.getTree());
+		//return WikiSubpagesTreeUtils.getCurrentOrderIdList(orderEditorModal.getTree());
+		return null;	// TODO:
 	}
 	
 	public interface GetOrderHintCallback {

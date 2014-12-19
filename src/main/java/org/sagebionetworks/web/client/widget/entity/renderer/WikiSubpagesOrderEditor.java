@@ -8,7 +8,7 @@ import com.google.inject.Inject;
 public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Presenter {
 	
 	private WikiSubpagesOrderEditorView view;
-	private Tree subpageTree;
+	private WikiSubpageOrderEditorTree subpageTree;
 	private HasChangesHandler hasChangesHandler;
 	
 	@Inject
@@ -16,7 +16,7 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 		this.view = view;
 	}
 	
-	public void configure(Tree subpageTree, HasChangesHandler hasChangesHandler) {
+	public void configure(WikiSubpageOrderEditorTree subpageTree, HasChangesHandler hasChangesHandler) {
 		this.subpageTree = subpageTree;
 		this.hasChangesHandler = hasChangesHandler;
 		view.configure(subpageTree, hasChangesHandler);
@@ -33,7 +33,7 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 		changesPushedCallback.invoke();
 	}
 	
-	public Tree getTree() {
+	public WikiSubpageOrderEditorTree getTree() {
 		return subpageTree;
 	}
 	

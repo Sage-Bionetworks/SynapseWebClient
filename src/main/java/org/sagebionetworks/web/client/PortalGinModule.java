@@ -256,6 +256,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTreeView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTreeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTreeView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTreeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
@@ -826,6 +828,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// SubPages Order Editor Tree
 		bind(WikiSubpageOrderEditorTreeView.class).to(WikiSubpageOrderEditorTreeViewImpl.class);
+		
+		// SubPages Navigation Tree
+		bind(WikiSubpageNavigationTreeView.class).to(WikiSubpageNavigationTreeViewImpl.class);
 		
 		//Widget Registration
 		bind(WidgetRegistrarImpl.class).in(Singleton.class);

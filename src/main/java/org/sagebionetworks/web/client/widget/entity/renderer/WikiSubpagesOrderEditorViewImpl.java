@@ -36,7 +36,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	Button downButton;
 	
 	private Presenter presenter;
-	private Tree tree;
+	private WikiSubpageOrderEditorTree tree;
 	private HasChangesHandler hasChangesHandler;
 
 	@Inject
@@ -78,11 +78,12 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	}
 	
 	@Override
-	public void configure(Tree subpageTree, HasChangesHandler hasChangesHandler) {
+	public void configure(WikiSubpageOrderEditorTree subpageTree, HasChangesHandler hasChangesHandler) {
 		this.tree = subpageTree;
 		this.hasChangesHandler = hasChangesHandler;
-		treePanel.setWidget(tree);
-		addTreeSelectionHandler(tree);
+		treePanel.setWidget(tree.asWidget());
+		//addTreeSelectionHandler(tree);
+		subpageTree.setMovabilityCallback(getTreeItemMovabilityCallback());
 	}
 	
 	@Override
@@ -99,66 +100,80 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		upButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				moveItemIfAble(true);
+				tree.moveSelectedItem(true);
 			}
 		});
 		
 		downButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				moveItemIfAble(false);
+				tree.moveSelectedItem(false);
 			}
 		});
 	}
 	
-	private void moveItemIfAble(boolean up) {
-		if (tree != null && tree.getSelectedItem() != null) {
-			TreeItem selectedItem = tree.getSelectedItem();
-			TreeItem parent = selectedItem.getParentItem();
-			int index = -1;
-			int maxIndex = -1;
-			if (parent != null) {
-				maxIndex = parent.getChildCount() - 1;
-				index = parent.getChildIndex(selectedItem);
-				if (up) {
-					if (index > 0) {
-						parent.removeItem(selectedItem);
-						parent.insertItem(index - 1, selectedItem);
-						hasChangesHandler.hasChanges(true);
-					}
-				} else {
-					if (index < maxIndex) {
-						parent.removeItem(selectedItem);
-						parent.insertItem(index + 1, selectedItem);
-						hasChangesHandler.hasChanges(true);
-					}
-				}
-			} else {
-				maxIndex = tree.getItemCount() - 1;
-				for (int i = 0; i < tree.getItemCount(); i++) {
-					if (tree.getItem(i) == selectedItem) {
-						index = i;
-						break;
-					}
-				}
-				if (up) {
-					if (index > 0) {
-						tree.removeItem(selectedItem);
-						tree.insertItem(index - 1, selectedItem);
-						hasChangesHandler.hasChanges(true);
-					}
-				} else {
-					if (index < maxIndex) {
-						tree.removeItem(selectedItem);
-						tree.insertItem(index + 1, selectedItem);
-						hasChangesHandler.hasChanges(true);
-					}
-				}
+//	private void moveItemIfAble(boolean up) {
+//		if (tree != null && tree.getSelectedItem() != null) {
+//			TreeItem selectedItem = tree.getSelectedItem();
+//			TreeItem parent = selectedItem.getParentItem();
+//			int index = -1;
+//			int maxIndex = -1;
+//			if (parent != null) {
+//				maxIndex = parent.getChildCount() - 1;
+//				index = parent.getChildIndex(selectedItem);
+//				if (up) {
+//					if (index > 0) {
+//						parent.removeItem(selectedItem);
+//						parent.insertItem(index - 1, selectedItem);
+//						hasChangesHandler.hasChanges(true);
+//					}
+//				} else {
+//					if (index < maxIndex) {
+//						parent.removeItem(selectedItem);
+//						parent.insertItem(index + 1, selectedItem);
+//						hasChangesHandler.hasChanges(true);
+//					}
+//				}
+//			} else {
+//				maxIndex = tree.getItemCount() - 1;
+//				for (int i = 0; i < tree.getItemCount(); i++) {
+//					if (tree.getItem(i) == selectedItem) {
+//						index = i;
+//						break;
+//					}
+//				}
+//				if (up) {
+//					if (index > 0) {
+//						tree.removeItem(selectedItem);
+//						tree.insertItem(index - 1, selectedItem);
+//						hasChangesHandler.hasChanges(true);
+//					}
+//				} else {
+//					if (index < maxIndex) {
+//						tree.removeItem(selectedItem);
+//						tree.insertItem(index + 1, selectedItem);
+//						hasChangesHandler.hasChanges(true);
+//					}
+//				}
+//			}
+//			tree.setSelectedItem(selectedItem, true);
+//		}
+//	}
+	
+	public TreeItemMovabilityCallback getTreeItemMovabilityCallback() {
+		return new TreeItemMovabilityCallback() {
+			@Override
+			public void invoke(boolean canMoveUp, boolean canMoveDown) {
+				upButton.setEnabled(canMoveUp);
+				downButton.setEnabled(canMoveDown);
 			}
-			tree.setSelectedItem(selectedItem, true);
-		}
+		};
 	}
 
+	public interface TreeItemMovabilityCallback {
+		public void invoke(boolean canMoveUp, boolean canMoveDown);
+	}
+	
 	/********************* TODO *********************/
 	@Override
 	public void showLoading() {
