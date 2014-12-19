@@ -31,8 +31,10 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -46,6 +48,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
+import org.sagebionetworks.web.shared.table.CellAddress;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -389,8 +392,6 @@ public interface SynapseClient extends RemoteService {
 	
 	public String deleteRowsFromTable(String toDelete) throws RestServiceException;
 	
-	public String getTableFileHandle(String fileHandlesToFindRowReferenceSet) throws RestServiceException;
-	
 	/**
 	 * Set a table's schema. Any ColumnModel that does not have an ID will be
 	 * treated as a column add.
@@ -505,4 +506,12 @@ public interface SynapseClient extends RemoteService {
 	ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
 	
 	String getHost(String urlString) throws RestServiceException;
+
+	/**
+	 * Fetch a batch of FileHandles
+	 * @param set
+	 * @return
+	 * @throws RestServiceException
+	 */
+	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
 }

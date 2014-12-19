@@ -29,6 +29,8 @@ public class CellFactoryImpl implements CellFactory {
 			return ginInjector.createDateCellRenderer();
 		case LINK:
 			return ginInjector.createLinkCellRenderer();
+		case FILEHANDLEID:
+			return ginInjector.createFileCellRenderer();
 		default:
 			return ginInjector.createStringRendererCell();
 		}

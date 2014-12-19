@@ -36,6 +36,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	DetailedPaginationWidget paginationWidget;
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
+	String tableId;
+	
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -67,8 +69,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			view.setPaginationWidgetVisible(false);
 		}
 		view.setEditorBufferVisible(isEditable);
+		tableId = QueryBundleUtils.getTableId(bundle);
 		// Map the columns to types
-		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getColumnModels());
+		types = ColumnModelUtils.buildTypesForQueryResults(QueryBundleUtils.getSelectFromBundle(bundle), bundle.getColumnModels());
 		// setup the headers from the types
 		List<IsWidget> headers = new ArrayList<IsWidget>();
 		for (ColumnModel type: types) {
@@ -118,7 +121,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if(rowSelectionListener != null){
 			listner = this;
 		}
-		rowWidget.configure(types, isEditor, row, listner);
+		rowWidget.configure(tableId, types, isEditor, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
 		if(keyboardNavigationHandler != null){

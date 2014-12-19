@@ -9,6 +9,8 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
+import org.sagebionetworks.web.shared.table.CellAddress;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,7 +46,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	 * @param row The row contains the data for this row.
 	 * @param rowSelectionListener A listener to row selection changes. When null, the row will not be selectable.
 	 */
-	public void configure(List<ColumnModel> types, boolean isEditor, Row row, RowSelectionListener rowSelectionListener){
+	public void configure(String tableId, List<ColumnModel> types, boolean isEditor, Row row, RowSelectionListener rowSelectionListener){
 		this.rowSelectionListener = rowSelectionListener;
 		this.view.setSelectVisible(rowSelectionListener != null);
 		this.rowId = row.getRowId();
@@ -61,6 +63,11 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 			}
 			this.cells.add(cell);
 			this.view.addCell(cell);
+			// Pass the address to cells the need it.
+			if(cell instanceof TakesAddressCell){
+				TakesAddressCell takesAddress = (TakesAddressCell) cell;
+				takesAddress.setCellAddresss(new CellAddress(tableId, type.getId(), rowId, rowVersion));
+			}
 		}
 		// Set each cell with the data from the row.
 		if(row.getValues() != null){

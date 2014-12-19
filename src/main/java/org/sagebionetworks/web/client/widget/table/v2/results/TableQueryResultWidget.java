@@ -140,7 +140,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @return
 	 */
 	public boolean isQueryResultEditable(){
-		List<SelectColumn> selectColums = getSelectFromBundle();
+		List<SelectColumn> selectColums = QueryBundleUtils.getSelectFromBundle(this.bundle);
 		if(selectColums == null){
 			return false;
 		}
@@ -152,22 +152,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		}
 		// All of the columns have ID so we can edit
 		return true;
-	}
-	/**
-	 * Find the select columns in the bundle.
-	 * @return Null if any parts are null.
-	 */
-	private List<SelectColumn> getSelectFromBundle(){
-		if(this.bundle != null){
-			QueryResult qr = this.bundle.getQueryResult();
-			if(qr != null){
-				RowSet set = qr.getQueryResults();
-				if(set != null){
-					return set.getHeaders();
-				}
-			}
-		}
-		return null;
 	}
 	
 	/**

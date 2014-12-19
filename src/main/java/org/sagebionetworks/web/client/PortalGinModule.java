@@ -85,6 +85,8 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
+import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
@@ -394,6 +396,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
@@ -656,6 +662,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(NumberFormatProvider.class).to(NumberFormatProviderImpl.class);
 		bind(AsynchronousProgressView.class).to(AsynchronousProgressViewImpl.class);
 		bind(AsynchronousJobTracker.class).to(AsynchronousJobTrackerImpl.class);
+		
+		// This is a singleton
+		bind(AsynchTableFileHandleProviderSingleton.class).in(Singleton.class);
+		bind(AsynchTableFileHandleProvider.class).to(AsynchTableFileHandleProviderSingleton.class);
 		
 		/*
 		 * Widgets
@@ -956,6 +966,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(LinkCellRenderer.class).to(LinkCellRendererImpl.class);
 		bind(FileCellEditorView.class).to(FileCellEditorViewImpl.class);
 		bind(FileCellEditor.class).to(FileCellEditorImpl.class);
+		bind(FileCellRenderer.class).to(FileCellRendererImpl.class);
+		bind(FileCellRendererView.class).to(FileCellRendererViewImpl.class);
 		
 		/*
 		 * Teams Places

@@ -42,8 +42,6 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 	@UiField
 	Button uploadFileButton;
 	@UiField
-	Button cancelUpload;
-	@UiField
 	Alert uploadAlert;
 	
 	Widget widget;
@@ -94,13 +92,6 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onToggleCollapse();
-			}
-		});
-		cancelUpload.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancelUpload();
 			}
 		});
 		uploadFileButton.addClickHandler(new ClickHandler() {

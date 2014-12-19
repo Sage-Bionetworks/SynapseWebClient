@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellE
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
@@ -42,6 +43,7 @@ public class CellFactoryImplTest {
 	IntegerCellEditor mockIntegerCellEditor;
 	LinkCellRenderer mockLinkCellRenderer;
 	FileCellEditor mockFileCellEditor;
+	FileCellRenderer mockFileCellRenderer;
 	PortalGinInjector mockInjector;
 	CellFactoryImpl cellFactory;
 
@@ -61,6 +63,7 @@ public class CellFactoryImplTest {
 		mockIntegerCellEditor = Mockito.mock(IntegerCellEditor.class);
 		mockLinkCellRenderer = Mockito.mock(LinkCellRenderer.class);
 		mockFileCellEditor= Mockito.mock(FileCellEditor.class);
+		mockFileCellRenderer = Mockito.mock(FileCellRenderer.class);
 
 		when(mockInjector.createStringEditorCell()).thenReturn(mockStringEditorCell);
 		when(mockInjector.createStringRendererCell()).thenReturn(mockStringRendererCell);
@@ -74,6 +77,7 @@ public class CellFactoryImplTest {
 		when(mockInjector.createIntegerCellEditor()).thenReturn(mockIntegerCellEditor);
 		when(mockInjector.createLinkCellRenderer()).thenReturn(mockLinkCellRenderer);
 		when(mockInjector.createFileCellEditor()).thenReturn(mockFileCellEditor);
+		when(mockInjector.createFileCellRenderer()).thenReturn(mockFileCellRenderer);
 
 		cellFactory = new CellFactoryImpl(mockInjector);
 	}
@@ -195,5 +199,12 @@ public class CellFactoryImplTest {
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.FILEHANDLEID);
 		assertEquals(mockFileCellEditor, cellFactory.createEditor(cm));
+	}
+	
+	@Test
+	public void testGetFileCellRenderer(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.FILEHANDLEID);
+		assertEquals(mockFileCellRenderer, cellFactory.createRenderer(cm));
 	}
 }

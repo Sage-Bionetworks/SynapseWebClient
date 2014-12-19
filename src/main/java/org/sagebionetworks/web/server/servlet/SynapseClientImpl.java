@@ -167,6 +167,7 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.table.CellAddress;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -3350,20 +3351,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-
-	@Override
-	public String getTableFileHandle(String fileHandlesToFindRowReferenceSet) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			RowReferenceSet fileHandlesToFind = new RowReferenceSet(adapterFactory.createNew(fileHandlesToFindRowReferenceSet));
-			TableFileHandleResults results = synapseClient.getFileHandlesFromTable(fileHandlesToFind);
-			return results.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
 	
 	/**
 	 * Helper to get the entity bundle of a table entity.
@@ -3590,6 +3577,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return url.getHost();
 		} catch (MalformedURLException e) {
 			throw new BadRequestException(e.getMessage());
+		}
+	}
+
+	@Override
+	public TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getFileHandlesFromTable(set);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
