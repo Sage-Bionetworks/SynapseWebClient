@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTree.SubpageNavTreeNode;
@@ -36,24 +37,6 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 	}
 	
 	@Override
-	public void showLoading() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void configure(SubpageNavTreeNode overallRoot) {
 		UnorderedListPanel ul = new UnorderedListPanel();
 		ul.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
@@ -73,6 +56,21 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 				addTreeItemsRecursive(subList, child);
 			}
 		}
+	}
+	
+	@Override
+	public void showLoading() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 	
 	private Widget makeListItem(final SubpageNavTreeNode node) {

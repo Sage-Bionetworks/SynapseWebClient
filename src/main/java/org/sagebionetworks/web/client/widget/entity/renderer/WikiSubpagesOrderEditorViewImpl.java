@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -92,28 +93,23 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		public void invoke(boolean canMoveUp, boolean canMoveDown);
 	}
 	
-	/********************* TODO *********************/
-	@Override
-	public void showLoading() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public void showLoading() {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
 	public void showErrorMessage(String message) {
-		// TODO Auto-generated method stub
-		
+		DisplayUtils.showErrorMessage(message);
 	}
 }
