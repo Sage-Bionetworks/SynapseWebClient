@@ -1,16 +1,19 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.html.Text;
+import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.HelpBlock;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ValidationState;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,11 +28,23 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 	public interface Binder extends UiBinder<Widget, FileCellEditorViewImpl> {}
 	
 	@UiField
-	Text idText;
+	FormGroup formGroup;
 	@UiField
-	Button uploadButton;
+	HelpBlock helpBlock;
 	@UiField
-	Modal modal;
+	TextBox idTextBox;
+	@UiField
+	Button showUploadModalButton;
+	@UiField
+	Collapse collapse;
+	@UiField
+	SimplePanel fileInputWidgetPanel;
+	@UiField
+	Button uploadFileButton;
+	@UiField
+	Button cancelUpload;
+	@UiField
+	Alert uploadAlert;
 	
 	Widget widget;
 	
@@ -45,47 +60,109 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 
 	@Override
 	public void setValue(String value) {
-		idText.setText(value);
+		idTextBox.setText(value);
 	}
 
 	@Override
 	public String getValue() {
-		return idText.getText();
+		return idTextBox.getText();
 	}
 
 	@Override
 	public int getTabIndex() {
-		return uploadButton.getTabIndex();
+		return showUploadModalButton.getTabIndex();
 	}
 
 	@Override
 	public void setAccessKey(char key) {
-		uploadButton.setAccessKey(key);		
+		showUploadModalButton.setAccessKey(key);		
 	}
 
 	@Override
 	public void setFocus(boolean focused) {
-		uploadButton.setFocus(focused);
+		showUploadModalButton.setFocus(focused);
 	}
 
 	@Override
 	public void setTabIndex(int index) {
-		uploadButton.setTabIndex(index);
+		showUploadModalButton.setTabIndex(index);
 	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		uploadButton.addClickHandler(new ClickHandler() {
+		showUploadModalButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onUpload();
+				presenter.onToggleCollapse();
+			}
+		});
+		cancelUpload.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onCancelUpload();
+			}
+		});
+		uploadFileButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onUploadFile();
 			}
 		});
 	}
 
 	@Override
-	public void showModal() {
-		modal.show();
+	public void showCollapse() {
+		collapse.show();
+	}
+
+	@Override
+	public void hideCollapse() {
+		collapse.hide();
+	}
+
+	@Override
+	public void addFileInputWidget(IsWidget fileInputWidget) {
+		fileInputWidgetPanel.add(fileInputWidget);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		uploadAlert.setVisible(true);
+		uploadAlert.setText(message);
+	}
+
+	@Override
+	public void hideErrorMessage() {
+		uploadAlert.setVisible(false);
+	}
+
+	@Override
+	public void setUploadButtonLoading() {
+		this.uploadFileButton.state().loading();
+	}
+
+	@Override
+	public void resetUploadButton() {
+		this.uploadFileButton.state().reset();
+	}
+
+	@Override
+	public void setValueError(String help) {
+		this.formGroup.setValidationState(ValidationState.ERROR);
+		this.helpBlock.setText(help);
+	}
+
+	@Override
+	public void clearValueError() {
+		this.formGroup.setValidationState(ValidationState.NONE);
+		this.helpBlock.setText("");
+	}
+
+	@Override
+	public void toggleCollapse() {
+		this.collapse.toggle();
 	}
 
 }

@@ -4,23 +4,32 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<g:HTMLPanel>
-		<b:InputGroup>
-			<bh:Text ui:field="idText" >no file</bh:Text>
-			<b:Button ui:field="uploadButton" icon="UPLOAD"/>
-		</b:InputGroup>
 
-		<b:Modal ui:field="modal" title="Upload File" closable="true"
-			fade="true" dataBackdrop="STATIC" dataKeyboard="false" size="SMALL">
-			<b:ModalBody>
-
-			</b:ModalBody>
-			<b:ModalFooter>
-				<b:Button ui:field="saveButton" type="PRIMARY"
-					dataLoadingText="Saving...">Save</b:Button>
-				<b:Button ui:field="cancelButton" type="DEFAULT"
-					dataDismiss="MODAL">Cancel</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
+		<b:FormGroup ui:field="formGroup">
+			<b:InputGroup>
+				<b:TextBox ui:field="idTextBox" placeholder="File ID"
+					width="225px" />
+				<b:Button ui:field="showUploadModalButton" icon="UPLOAD"
+					height="34px" />
+			</b:InputGroup>
+			<b:HelpBlock ui:field="helpBlock" />
+		</b:FormGroup>
+		<b:Collapse ui:field="collapse" toggle="false">
+			<b:Panel>
+				<b:ModalBody>
+					<bh:Text>Select a file to upload.</bh:Text>
+					<g:SimplePanel ui:field="fileInputWidgetPanel" />
+					<bh:Div styleName="margin-top-15" />
+					<b:Alert ui:field="uploadAlert" type="DANGER" visible="false"></b:Alert>
+				</b:ModalBody>
+				<b:ModalFooter>
+					<b:Button ui:field="uploadFileButton" type="PRIMARY"
+						dataLoadingText="Uploading...">Upload</b:Button>
+					<b:Button ui:field="cancelUpload" type="DEFAULT">
+						Cancel</b:Button>
+				</b:ModalFooter>
+			</b:Panel>
+		</b:Collapse>
 	</g:HTMLPanel>
 
 </ui:UiBinder>
