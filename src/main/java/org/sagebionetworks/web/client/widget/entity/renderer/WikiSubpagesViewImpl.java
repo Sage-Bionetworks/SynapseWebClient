@@ -52,6 +52,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void clear() {
 		super.clear();
+		if (wikiSubpagesContainer != null) {
+			wikiSubpagesContainer.setStyleName("");
+		}
 	}
 	
 	@Override
@@ -63,7 +66,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		clear();
 		
 		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage);
-		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		navTreeContainer = new FlowPanel();
@@ -128,8 +130,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		isShowingSubpages = false;
 		// This call to layout is necessary to force the scroll bar to appear on page-load
 		if (wikiSubpagesContainer != null){
-			wikiSubpagesContainer.removeStyleName(SHOW_SUBPAGES_STYLE);
-			wikiSubpagesContainer.addStyleName(HIDE_SUBPAGES_STYLE);
+			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);
 		}
 		
 		if (editOrderButton != null) {
