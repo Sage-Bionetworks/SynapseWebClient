@@ -163,4 +163,9 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 		});
 		return l;
 	}
+	
+//	@Override
+//	public void clear() {
+//		super.clear();
+//	}
 }

@@ -56,7 +56,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(final Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, WikiSubpageNavigationTree tree2, final WikiSubpageOrderEditorTree editorTree) {
+	public void configure(WikiSubpageNavigationTree navTree, final WikiSubpageOrderEditorTree editorTree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
@@ -64,24 +64,15 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		navTreeContainer = new FlowPanel();
 		navTreeContainer.addStyleName("margin-bottom-10");
 		//this widget shows nothing if it doesn't have any pages!
-		if (tree.getItemCount() == 0)
+		if (navTree.getRootChildrenCount() == 0)
 			return;
 		
 		//only show the tree if the root has children
-		if (tree.getItemCount() > 0) {
-			//traverse the tree, and create anchors
-//			final UnorderedListPanel ul = new UnorderedListPanel();
-//			ul.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
-//			addTreeItemsRecursive(ul, WikiSubpagesTreeUtils.getTreeRootChildren(tree));
-			
+		if (navTree.getRootChildrenCount() > 0) {
+
 			showHideButton = DisplayUtils.createButton("");
 			editOrderButton = DisplayUtils.createButton("Edit Order");
 			editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
-//			ulContainer = new FlowPanel();
-//			ulContainer.addStyleName("notopmargin nav bs-sidenav");
-//			ulContainer.setVisible(true);
-//			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
-//			ulContainer.add(ul);
 
 			editOrderButton.addClickHandler(new ClickHandler() {
 				@Override
@@ -112,7 +103,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			
-			navTreeContainer.add(tree2.asWidget());
+			navTreeContainer.add(navTree.asWidget());
+			
 			add(navTreeContainer);
 			add(editOrderButton);
 			add(showHideButton);
@@ -122,36 +114,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			hideSubpages();
 		}
 		clearWidths();
-	}
-	
-	private Tree getTreeCopy(Tree tree) {
-		Tree treeCopy = new Tree(new SubpagesTreeResources(), true);
-		treeCopy.addStyleName("wikiSubpageOrderEditorTree");
-		// Add handler so clicking transparent image does not close tree.
-		treeCopy.addCloseHandler(new CloseHandler<TreeItem>() {
-			@Override
-			public void onClose(CloseEvent<TreeItem> event) {
-				event.getTarget().setState(true, false);
-			}
-		});
-		
-		WikiSubpagesTreeUtils.copyTree(tree, treeCopy);
-		
-		return treeCopy;
-	}
-	
-	private void addTreeItemsRecursive(UnorderedListPanel ul, List<SubPageTreeItem> children) {
-		for (SubPageTreeItem child : children) {
-			String styleName = child.isCurrentPage() ? "active" : "";
-			ul.add(getListItem(child), styleName);
-			if (child.getChildCount() > 0){
-				UnorderedListPanel subList = new UnorderedListPanel();
-				subList.addStyleName("nav");
-				subList.setVisible(true);
-				ul.add(subList);
-				addTreeItemsRecursive(subList, child.getChildren());
-			}
-		}
 	}
 	
 	/**

@@ -38,6 +38,8 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	}
 	
 	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName) {
+		view.clear();
+		
 		// Make nodes for each header. Populate id2node map and header2node map.
 		for (JSONEntity headerJSONEntity : wikiHeaders) {
 			V2WikiHeader header = (V2WikiHeader) headerJSONEntity;

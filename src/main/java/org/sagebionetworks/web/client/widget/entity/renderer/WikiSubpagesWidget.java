@@ -60,7 +60,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private FlowPanel wikiPageContainer;
 	private V2WikiOrderHint subpageOrderHint;
 	private IconsImageBundle iconsImageBundle;
-	private WikiSubpageNavigationTree tree;
+	private WikiSubpageNavigationTree navTree;
 	private WikiSubpageOrderEditorTree editorTree;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
@@ -76,7 +76,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
 		this.iconsImageBundle = iconsImageBundle;
-		this.tree = tree;
+		this.navTree = tree;
 		this.editorTree = editorTree;
 		
 		view.setPresenter(this);
@@ -163,18 +163,15 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							subpageOrderHint = result;
 							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
 							
-							// TODO: Testing. Remove tree stuff.
-							tree.configure(wikiHeaders.getResults(), ownerObjectName, ownerObjectLink, wikiKey, isEmbeddedInOwnerPage);
+							navTree.configure(wikiHeaders.getResults(), ownerObjectName, ownerObjectLink, wikiKey, isEmbeddedInOwnerPage);
 							editorTree.configure(wikiHeaders.getResults(), ownerObjectName);
 							
-							Tree tree1 = buildTree(wikiHeaders);
-							view.configure(tree1, wikiSubpagesContainer, wikiPageContainer, tree, editorTree);
+							view.configure(navTree, editorTree, wikiSubpagesContainer, wikiPageContainer);
 						}
 						@Override
 						public void onFailure(Throwable caught) {
 							// Failed to get order hint. Just ignore it? TODO
-							Tree tree1 = buildTree(wikiHeaders);
-							view.configure(tree1, wikiSubpagesContainer, wikiPageContainer, tree, editorTree);	// TODO
+							view.configure(navTree, editorTree, wikiSubpagesContainer, wikiPageContainer);
 						}
 					});
 					
@@ -194,45 +191,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				}
 			}
 		});
-	}
-	
-	private Tree buildTree(PaginatedResults<JSONEntity> wikiHeaders) {
-		Map<String, SubPageTreeItem> wikiId2TreeItem = new HashMap<String, SubPageTreeItem>();
-		
-		//now grab all of the headers associated with this level
-		for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-			V2WikiHeader header = (V2WikiHeader) headerEntity;
-			boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
-			Place targetPlace;
-			String title;
-			if (header.getParentId() == null) {
-				targetPlace = ownerObjectLink;
-				title = ownerObjectName;
-			}
-			else {
-				targetPlace = getLinkPlace(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), header.getId());
-				title = header.getTitle();
-			}
-			
-			SubPageTreeItem item = new SubPageTreeItem(header, title, targetPlace, isCurrentPage);
-			wikiId2TreeItem.put(header.getId(), item);
-		}
-		//now set up the relationships
-		Tree tree = new Tree();
-		
-		for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-			V2WikiHeader header = (V2WikiHeader) headerEntity;
-			if (header.getParentId() != null){
-				//add this as a child							
-				SubPageTreeItem parent = wikiId2TreeItem.get(header.getParentId());
-				SubPageTreeItem child = wikiId2TreeItem.get(header.getId());
-				parent.addItem(child);
-				parent.setState(true);
-			} else {
-				tree.addItem(wikiId2TreeItem.get(header.getId()));
-			}
-		}
-		return tree;
 	}
 	
 	@Override
