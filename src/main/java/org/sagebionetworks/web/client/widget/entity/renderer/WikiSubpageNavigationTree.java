@@ -34,7 +34,7 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		id2node = new HashMap<String, SubpageNavTreeNode>();
 	}
 	
-	public void configureForNavigation(List<JSONEntity> wikiHeaders, String ownerObjectName, WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage) {
+	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName, Place ownerObjectLink, WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage) {
 		// Make nodes for each header. Populate id2node map and header2node map.
 		for (JSONEntity headerJSONEntity : wikiHeaders) {
 			V2WikiHeader header = (V2WikiHeader) headerJSONEntity;
@@ -44,7 +44,7 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 			Place targetPlace = null;
 			String text;
 			if (header.getParentId() == null) {
-				// Won't need to navigate to place.
+				targetPlace = ownerObjectLink;
 				text = ownerObjectName;
 			} else {
 				targetPlace = getLinkPlace(curWikiKey.getOwnerObjectId(), curWikiKey.getVersion(), header.getId(), isEmbeddedInOwnerPage);
@@ -75,6 +75,13 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	/*
+	 * For testing
+	 */
+	public SubpageNavTreeNode getOverallRoot() {
+		return overallRoot;
 	}
 	
 	private Place getLinkPlace(String entityId, Long entityVersion, String wikiId, boolean isEmbeddedInOwnerPage) {

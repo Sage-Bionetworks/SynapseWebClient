@@ -164,7 +164,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
 							
 							// TODO: Testing. Remove tree stuff.
-							tree.configureForNavigation(wikiHeaders.getResults(), ownerObjectName, wikiKey, isEmbeddedInOwnerPage);
+							tree.configure(wikiHeaders.getResults(), ownerObjectName, ownerObjectLink, wikiKey, isEmbeddedInOwnerPage);
 							editorTree.configure(wikiHeaders.getResults(), ownerObjectName);
 							
 							Tree tree1 = buildTree(wikiHeaders);

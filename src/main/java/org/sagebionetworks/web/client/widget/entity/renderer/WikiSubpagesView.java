@@ -27,7 +27,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	void hideSubpages();
 	void showSubpages();
 	
-	List<String> getCurrentOrderHintIdList();
+	// List<String> getCurrentOrderHintIdList();
 	
 	/**
 	 * Presenter interface

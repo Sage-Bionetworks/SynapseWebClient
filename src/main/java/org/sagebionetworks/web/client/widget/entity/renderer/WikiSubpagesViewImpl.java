@@ -37,7 +37,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	private Button showHideButton;
 	private Button editOrderButton;
-	private FlowPanel ulContainer;
+	private FlowPanel navTreeContainer;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
 	boolean isShowingSubpages;
@@ -61,7 +61,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
-		ulContainer = new FlowPanel();
+		navTreeContainer = new FlowPanel();
+		navTreeContainer.addStyleName("margin-bottom-10");
 		//this widget shows nothing if it doesn't have any pages!
 		if (tree.getItemCount() == 0)
 			return;
@@ -72,6 +73,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 //			final UnorderedListPanel ul = new UnorderedListPanel();
 //			ul.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
 //			addTreeItemsRecursive(ul, WikiSubpagesTreeUtils.getTreeRootChildren(tree));
+			
 			showHideButton = DisplayUtils.createButton("");
 			editOrderButton = DisplayUtils.createButton("Edit Order");
 			editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
@@ -86,15 +88,15 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				public void onClick(ClickEvent event) {
 					orderEditorModal.configure(editorTree, presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
 						@Override
-						public List<String> getCurrentOrderHint() {
-							return getCurrentOrderHint();
+						public List<String> getCurrentOrderHint() {	// TODO: redundant?
+							return editorTree.getIdListOrderHint();
 						}
 					}));
 					orderEditorModal.show(
 							presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
 								@Override
 								public List<String> getCurrentOrderHint() {
-									return getCurrentOrderHintIdList();
+									return editorTree.getIdListOrderHint();
 								}
 							}));
 				}
@@ -110,11 +112,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			
-			ulContainer.add(tree2.asWidget());
-			add(ulContainer);
+			navTreeContainer.add(tree2.asWidget());
+			add(navTreeContainer);
 			add(editOrderButton);
 			add(showHideButton);
-			//add(tree2.asWidget());
 			
 			showSubpages();
 		} else {
@@ -160,8 +161,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		DisplayUtils.clearElementWidth(getElement());
 		if (wikiSubpagesContainer != null) 
 			DisplayUtils.clearElementWidth(wikiSubpagesContainer.getElement());
-		if (ulContainer != null)
-			DisplayUtils.clearElementWidth(ulContainer.getElement());
+		if (navTreeContainer != null)
+			DisplayUtils.clearElementWidth(navTreeContainer.getElement());
 		if (wikiPageContainer != null)
 			DisplayUtils.clearElementWidth(wikiPageContainer.getElement());
 	}
@@ -184,8 +185,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			showHideButton.addStyleName("btn btn-default btn-xs left margin-right-40");
 		}
 		
-		if (ulContainer != null)
-			DisplayUtils.hide(ulContainer);
+		if (navTreeContainer != null)
+			DisplayUtils.hide(navTreeContainer);
 		
 		if (wikiPageContainer != null) {
 			wikiPageContainer.removeStyleName(SHOW_SUBPAGES_MD_STYLE);
@@ -216,8 +217,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			showHideButton.addStyleName("btn btn-default btn-xs right");		
 		}
 		
-		if (ulContainer != null)
-			DisplayUtils.show(ulContainer);
+		if (navTreeContainer != null)
+			DisplayUtils.show(navTreeContainer);
 	}
 	
 	private Widget getListItem(final SubPageTreeItem treeItem) {
@@ -256,12 +257,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		DisplayUtils.showInfo(title, message);
 	}
 
-	@Override
-	public List<String> getCurrentOrderHintIdList() {
-		//return WikiSubpagesTreeUtils.getCurrentOrderIdList(orderEditorModal.getTree());
-		return null;	// TODO:
-	}
-	
 	public interface GetOrderHintCallback {
 		public List<String> getCurrentOrderHint();
 	}
