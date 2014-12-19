@@ -34,10 +34,6 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 		return view.asWidget();
 	}
 	
-//	public void pushChangesToSynapse(Callback changesPushedCallback) {
-//		changesPushedCallback.invoke();
-//	}
-	
 	public WikiSubpageOrderEditorTree getTree() {
 		return editorTree;
 	}

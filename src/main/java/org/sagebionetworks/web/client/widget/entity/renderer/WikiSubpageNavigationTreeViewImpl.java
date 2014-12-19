@@ -35,11 +35,6 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 		return this;
 	}
 	
-//	@Override
-//	public void clear() {
-//		super.clear();
-//	}
-	
 	@Override
 	public void showLoading() {
 		// TODO Auto-generated method stub

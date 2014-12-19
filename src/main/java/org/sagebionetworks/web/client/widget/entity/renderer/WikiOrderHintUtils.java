@@ -7,7 +7,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-public class WikiSubpagesTreeUtils {
+public class WikiOrderHintUtils {
 	
 	public static void sortHeadersByOrderHint(PaginatedResults<JSONEntity> wikiHeaders, V2WikiOrderHint orderHint) {
 		List<JSONEntity> headerList = wikiHeaders.getResults();

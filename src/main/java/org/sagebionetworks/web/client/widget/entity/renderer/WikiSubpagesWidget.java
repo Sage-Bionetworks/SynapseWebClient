@@ -141,7 +141,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						public void onSuccess(V2WikiOrderHint result) {
 							// "Sort" stuff'
 							subpageOrderHint = result;
-							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
+							WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
 							
 							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 											ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
