@@ -41,7 +41,7 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 	
 	public void moveTreeItem(SubpageOrderEditorTreeNode node, boolean moveUp) {
 		Widget listItem = headerId2listItem.get(node.getHeader().getId());
-		UnorderedListPanel childrenList = listItem2childrenList.get(node.getHeader());
+		UnorderedListPanel childrenList = listItem2childrenList.get(headerId2listItem.get(node.getHeader().getId()));
 		
 		
 		SubpageOrderEditorTreeNode parent = presenter.getParent(node);
@@ -62,17 +62,20 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 			}
 		}
 		
-		boolean willBeLastItem = insertIndex == parentPanel.getWidgetCount();
-		
 		// Add to insertIndex.
 		
 		swapWidgetInPanel(parentPanel, listItem, insertIndex, moveUp);
 		
 		if (childrenList != null) {
-			parentPanel.remove(childrenList);
 			// After list item, so insertIndex + 1
-			swapWidgetInPanel(parentPanel, childrenList, insertIndex + 1, moveUp);
+			if (moveUp) {
+				swapWidgetInPanel(parentPanel, childrenList, insertIndex + 1, moveUp);
+			} else {
+				swapWidgetInPanel(parentPanel, childrenList, insertIndex, moveUp);
+			}
 		}
+		
+		
 	}
 	
 	private void swapWidgetInPanel(UnorderedListPanel parentPanel, Widget toInsert, int insertIndex, boolean moveUp) {
@@ -163,9 +166,4 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 		});
 		return l;
 	}
-	
-//	@Override
-//	public void clear() {
-//		super.clear();
-//	}
 }
