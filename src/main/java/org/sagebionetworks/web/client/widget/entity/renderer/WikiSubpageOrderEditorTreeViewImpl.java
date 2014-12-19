@@ -67,19 +67,14 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 		swapWidgetInPanel(parentPanel, listItem, insertIndex, moveUp);
 		
 		if (childrenList != null) {
-			// After list item, so insertIndex + 1
-			if (moveUp) {
-				swapWidgetInPanel(parentPanel, childrenList, insertIndex + 1, moveUp);
-			} else {
-				swapWidgetInPanel(parentPanel, childrenList, insertIndex, moveUp);
-			}
+			swapWidgetInPanel(parentPanel, childrenList, insertIndex + 1, moveUp);
 		}
 		
 		
 	}
 	
 	private void swapWidgetInPanel(UnorderedListPanel parentPanel, Widget toInsert, int insertIndex, boolean moveUp) {
-		boolean willBeLastItem = insertIndex == parentPanel.getWidgetCount();
+		boolean willBeLastItem = insertIndex >= parentPanel.getWidgetCount();
 		parentPanel.remove(toInsert);
 		if (moveUp)
 			parentPanel.insert(toInsert, insertIndex);
