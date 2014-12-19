@@ -3,24 +3,19 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.SubPageTreeItem;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -29,7 +24,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private Presenter presenter;
 	WikiSubpagesOrderEditorModalWidget orderEditorModal;
 	private GlobalApplicationState globalAppState;
-	private IconsImageBundle iconsImageBundle;
 	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
 	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
 	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";
@@ -42,11 +36,16 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private FlowPanel wikiPageContainer;
 	boolean isShowingSubpages;
 	
+	private WikiSubpageNavigationTree navTree;
+	
 	@Inject
-	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState, WikiSubpagesOrderEditorModalWidget orderEditorModal, IconsImageBundle iconsImageBundle) {
+	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState,
+								WikiSubpagesOrderEditorModalWidget orderEditorModal,
+								WikiSubpageNavigationTree navTree
+								) {
 		this.globalAppState = globalAppState;
 		this.orderEditorModal = orderEditorModal;
-		this.iconsImageBundle = iconsImageBundle;
+		this.navTree = navTree;
 		orderEditorModal.setSize(ModalSize.SMALL);
 	}
 	
@@ -56,8 +55,14 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(WikiSubpageNavigationTree navTree, final WikiSubpageOrderEditorTree editorTree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+	public void configure(final List<JSONEntity> wikiHeaders,
+						FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
+						final String ownerObjectName, Place ownerObjectLink,
+						WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,
+						final UpdateOrderHintCallback updateOrderHintCallback) {
 		clear();
+		
+		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage);
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
@@ -77,19 +82,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			editOrderButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					orderEditorModal.configure(editorTree, presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
-						@Override
-						public List<String> getCurrentOrderHint() {	// TODO: redundant?
-							return editorTree.getIdListOrderHint();
-						}
-					}));
-					orderEditorModal.show(
-							presenter.getUpdateOrderHintCallback(new GetOrderHintCallback() {
-								@Override
-								public List<String> getCurrentOrderHint() {
-									return editorTree.getIdListOrderHint();
-								}
-							}));
+					orderEditorModal.configure(wikiHeaders, ownerObjectName);
+					orderEditorModal.show(updateOrderHintCallback);
 				}
 			});
 			
@@ -183,18 +177,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			DisplayUtils.show(navTreeContainer);
 	}
 	
-	private Widget getListItem(final SubPageTreeItem treeItem) {
-		final Anchor l = new Anchor(treeItem.getText());
-		l.addStyleName("link");
-		l.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				globalAppState.getPlaceChanger().goTo(treeItem.getTargetPlace());
-			}
-		});
-		return l;
-	}
-	
 	@Override
 	public Widget asWidget() {
 		return this;
@@ -221,26 +203,5 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 
 	public interface GetOrderHintCallback {
 		public List<String> getCurrentOrderHint();
-	}
-	
-	/*
-	 * Image Resources for Tree Expand/Collapse Icons
-	 */
-	
-	public class  SubpagesTreeResources implements Tree.Resources {
-		@Override
-	    public ImageResource treeClosed() {
-	        return iconsImageBundle.transparent1();
-	    }
-
-	    @Override
-	    public ImageResource treeOpen() {
-	        return iconsImageBundle.transparent1();
-	    }
-
-		@Override
-		public ImageResource treeLeaf() {
-			return iconsImageBundle.transparent1();
-		}
 	}
 }

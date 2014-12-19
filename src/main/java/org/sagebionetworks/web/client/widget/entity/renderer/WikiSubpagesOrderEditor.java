@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.List;
+
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -8,18 +12,19 @@ import com.google.inject.Inject;
 public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Presenter {
 	
 	private WikiSubpagesOrderEditorView view;
-	private WikiSubpageOrderEditorTree subpageTree;
+	private WikiSubpageOrderEditorTree editorTree;
 	private HasChangesHandler hasChangesHandler;
 	
 	@Inject
-	public WikiSubpagesOrderEditor(WikiSubpagesOrderEditorView view) {
+	public WikiSubpagesOrderEditor(WikiSubpagesOrderEditorView view, WikiSubpageOrderEditorTree editorTree) {
 		this.view = view;
+		this.editorTree = editorTree;
 	}
 	
-	public void configure(WikiSubpageOrderEditorTree subpageTree, HasChangesHandler hasChangesHandler) {
-		this.subpageTree = subpageTree;
+	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName, HasChangesHandler hasChangesHandler) {
+		editorTree.configure(wikiHeaders, ownerObjectName);
 		this.hasChangesHandler = hasChangesHandler;
-		view.configure(subpageTree, hasChangesHandler);
+		view.configure(editorTree, hasChangesHandler);
 	}
 	
 	/**
@@ -29,12 +34,12 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 		return view.asWidget();
 	}
 	
-	public void pushChangesToSynapse(Callback changesPushedCallback) {
-		changesPushedCallback.invoke();
-	}
+//	public void pushChangesToSynapse(Callback changesPushedCallback) {
+//		changesPushedCallback.invoke();
+//	}
 	
 	public WikiSubpageOrderEditorTree getTree() {
-		return subpageTree;
+		return editorTree;
 	}
 	
 	/**

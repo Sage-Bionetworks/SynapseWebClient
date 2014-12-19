@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Tree;
@@ -15,7 +17,7 @@ public interface WikiSubpagesOrderEditorModalWidget extends IsWidget {
 	 * Show the sharing dialog.
 	 * @param changeCallback
 	 */
-	public void show(Callback changeCallback);
+	public void show(UpdateOrderHintCallback updateOrderHintCallback);
 	
 	/**
 	 * Change the size of the modal.
@@ -23,13 +25,8 @@ public interface WikiSubpagesOrderEditorModalWidget extends IsWidget {
 	 */
 	public void setSize(ModalSize size);
 	
-	/**
-	 * The widget must be configured before showing the dialog.
-	 * @param subpagesTree
-	 */
-	public void configure(WikiSubpageOrderEditorTree subpagesTree, Callback udpateOrderCallback);
-	
 	public WikiSubpageOrderEditorTree getTree();
-//	public List<String> getCurrentOrderIdList();
+
+	void configure(List<JSONEntity> wikiHeaders, String ownerObjectName);
 	
 }

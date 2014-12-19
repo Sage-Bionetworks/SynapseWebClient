@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -26,24 +22,16 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl.EntityTreeImageBundle;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl.GetOrderHintCallback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -59,25 +47,17 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
 	private V2WikiOrderHint subpageOrderHint;
-	private IconsImageBundle iconsImageBundle;
-	private WikiSubpageNavigationTree navTree;
-	private WikiSubpageOrderEditorTree editorTree;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
 	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
-							NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
-							IconsImageBundle iconsImageBundle, WikiSubpageNavigationTree tree,
-							WikiSubpageOrderEditorTree editorTree) {
+							NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
-		this.iconsImageBundle = iconsImageBundle;
-		this.navTree = tree;
-		this.editorTree = editorTree;
 		
 		view.setPresenter(this);
 	}	
@@ -163,15 +143,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							subpageOrderHint = result;
 							WikiSubpagesTreeUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
 							
-							navTree.configure(wikiHeaders.getResults(), ownerObjectName, ownerObjectLink, wikiKey, isEmbeddedInOwnerPage);
-							editorTree.configure(wikiHeaders.getResults(), ownerObjectName);
-							
-							view.configure(navTree, editorTree, wikiSubpagesContainer, wikiPageContainer);
+							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+											ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
 						}
 						@Override
 						public void onFailure(Throwable caught) {
 							// Failed to get order hint. Just ignore it? TODO
-							view.configure(navTree, editorTree, wikiSubpagesContainer, wikiPageContainer);
+							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
 						}
 					});
 					
@@ -193,67 +172,28 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		});
 	}
 	
-	@Override
-	public Callback getUpdateOrderHintCallback(final GetOrderHintCallback getCurrentOrderListCallback) {
-		return new Callback() {
+	
+	private UpdateOrderHintCallback getUpdateOrderHintCallback() {
+		return new UpdateOrderHintCallback() {
 			@Override
-			public void invoke() {
-				final List<String> newOrderHintIdList = getCurrentOrderListCallback.getCurrentOrderHint();
-//				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
-//					@Override
-//					public void onSuccess(V2WikiOrderHint result) {
-						subpageOrderHint.setIdList(newOrderHintIdList);
-						synapseClient.updateV2WikiOrderHint(subpageOrderHint, new AsyncCallback<V2WikiOrderHint>() {
-							@Override
-							public void onSuccess(V2WikiOrderHint result) {
-								//Window.alert("Updated. Party!");
-								refreshTableOfContents();
-							}
-							@Override
-							public void onFailure(Throwable caught) {
-								Window.alert("Not updated. No party = ^ (");
-							}
-						});
-					}
-//					@Override
-//					public void onFailure(Throwable caught) {
-//						// Failed to get order hint. Just ignore it?
-//						// TODO:
-//					}
-//				});
-//			}
+			public void updateOrderHint(List<String> newOrderHintIdList) {
+					subpageOrderHint.setIdList(newOrderHintIdList);
+					synapseClient.updateV2WikiOrderHint(subpageOrderHint, new AsyncCallback<V2WikiOrderHint>() {
+						@Override
+						public void onSuccess(V2WikiOrderHint result) {
+							refreshTableOfContents();
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("Not updated. No party = ^ (");	// TODO
+						}
+					});
+				}
 		};
 	}
 	
-	public static class SubPageTreeItem extends TreeItem {
-		private V2WikiHeader header;
-		private String text;
-		private Place targetPlace;
-		private boolean isCurrentPage;
-		
-		public SubPageTreeItem(V2WikiHeader header, String text, Place targetPlace, boolean isCurrentPage) {
-			super();
-			this.header = header;
-			this.text = text;
-			this.targetPlace = targetPlace;
-			this.isCurrentPage = isCurrentPage;
-			this.addStyleName("subpageTreeItem");
-			setWidget(new Label(text));	// TODO: Something special = ^ )
-			
-		}
-		
-		public List<SubPageTreeItem> getChildren() {
-			List<SubPageTreeItem> children = new LinkedList<SubPageTreeItem>();
-			for (int i = 0; i < getChildCount(); i++) {
-				children.add((SubPageTreeItem) getChild(i));
-			}
-			return children;
-		}
-		
-		public String getText()				{	return text;			}
-		public Place getTargetPlace()		{	return targetPlace;		}
-		public boolean isCurrentPage()		{	return isCurrentPage;	}
-		public V2WikiHeader getHeader()		{	return header;			}
+	public interface UpdateOrderHintCallback {
+		void updateOrderHint(List<String> newOrderHintIdList);
 	}
 	
 }

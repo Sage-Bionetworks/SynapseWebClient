@@ -1,29 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
 
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-// TODO: Generalize entire class with ACLModalWidget??
 public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrderEditorModalWidget,
 																AccessControlListModalWidgetView.Presenter,
 																HasChangesHandler {
 	
 	AccessControlListModalWidgetView view;	// TODO: Generalize this ACLModalWidgetView
 	WikiSubpagesOrderEditor editor;
-	Callback changeCallback;
+	UpdateOrderHintCallback updateOrderHintCallback;
 	
 	@Inject
 	public WikiSubpagesOrderEditorModalWidgetImpl(
@@ -41,35 +35,30 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	}
 
 	@Override
-	public void show(Callback changeCallback) {
-		this.changeCallback = changeCallback;
+	public void show(UpdateOrderHintCallback updateOrderHintCallback) {
+		this.updateOrderHintCallback = updateOrderHintCallback;
 		hasChanges(false);			// TODO: This? Don't yet enable the save button.
 		view.setLoading(false);
 		view.showDialog();
 	}
 
 	@Override
-	public void configure(WikiSubpageOrderEditorTree subpagesTree, Callback updateOrderCallback) {	// TODO: Update order callback?
-		editor.configure(subpagesTree, this);
+	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName) {
+		editor.configure(wikiHeaders, ownerObjectName, this);
 		view.addEditor(editor.asWidget());
 	}
 
 	@Override
 	public void onPrimary() {
 		view.setLoading(true);
-		editor.pushChangesToSynapse(new Callback() {
-			@Override
-			public void invoke() {
-				view.hideDialog();
-				changeCallback.invoke();
-			}
-		});
+		updateOrderHintCallback.updateOrderHint(editor.getTree().getIdListOrderHint());
+		view.hideDialog();
 	}
 
 	@Override
 	public void hasChanges(boolean hasChanges) {
 		view.setLoading(false);
-		view.setPrimaryButtonEnabled(hasChanges);	// TODO: This doesn't work??
+		view.setPrimaryButtonEnabled(hasChanges);
 	}
 
 	@Override

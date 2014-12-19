@@ -2,10 +2,14 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.List;
 
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl.GetOrderHintCallback;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Tree;
@@ -23,7 +27,11 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(WikiSubpageNavigationTree navTree, WikiSubpageOrderEditorTree editorTree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer);
+	public void configure(List<JSONEntity> wikiHeaders, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
+							String ownerObjectName, Place ownerObjectLink,
+							WikiPageKey curWikiKey, boolean isEmbeddedOwnerPage,
+							UpdateOrderHintCallback updateOrderHintCallback);
+	
 	void hideSubpages();
 	void showSubpages();
 	
@@ -33,6 +41,5 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		Callback getUpdateOrderHintCallback(GetOrderHintCallback getCurrentOrderListCallback);
 	}
 }
