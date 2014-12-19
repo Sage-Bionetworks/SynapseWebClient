@@ -5,11 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -49,7 +46,8 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 				targetPlace = ownerObjectLink;
 				text = ownerObjectName;
 			} else {
-				targetPlace = getLinkPlace(curWikiKey.getOwnerObjectId(), curWikiKey.getVersion(), header.getId(), isEmbeddedInOwnerPage);
+				targetPlace = WikiSubpagesWidget.getLinkPlace(curWikiKey.getOwnerObjectId(), curWikiKey.getVersion(),
+											header.getId(), isEmbeddedInOwnerPage);
 				text = header.getTitle();
 			}
 			
@@ -88,13 +86,6 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 	 */
 	public SubpageNavTreeNode getOverallRoot() {
 		return overallRoot;
-	}
-	
-	private Place getLinkPlace(String entityId, Long entityVersion, String wikiId, boolean isEmbeddedInOwnerPage) {
-		if (isEmbeddedInOwnerPage)
-			return new Synapse(entityId, entityVersion, Synapse.EntityArea.WIKI, wikiId);
-		else
-			return new Wiki(entityId, ObjectType.ENTITY.toString(), wikiId);
 	}
 	
 	public class SubpageNavTreeNode {

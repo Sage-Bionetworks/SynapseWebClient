@@ -66,11 +66,11 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null, true);
 	}
 
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean isEmbeddedInOwnerPage) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage) {
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiKey = wikiKey;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.isEmbeddedInOwnerPage = embeddedInOwnerPage;
 		view.clear();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
@@ -91,7 +91,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
-								ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null);
+								ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
 								refreshTableOfContents();
 							}	
 						} catch (JSONObjectAdapterException e) {
@@ -110,8 +110,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		}
 	}
 	
-	// TODO: Try to remove.
-	public Place getLinkPlace(String entityId, Long entityVersion, String wikiId) {
+	public static Place getLinkPlace(String entityId, Long entityVersion, String wikiId, boolean isEmbeddedInOwnerPage) {
 		if (isEmbeddedInOwnerPage)
 			return new Synapse(entityId, entityVersion, Synapse.EntityArea.WIKI, wikiId);
 		else
@@ -148,7 +147,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							// Failed to get order hint. Just ignore it? TODO
+							// Failed to get order hint. Just ignore it.
 							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
 						}
@@ -185,7 +184,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							Window.alert("Not updated. No party = ^ (");	// TODO
+							view.showErrorMessage(caught.getMessage());
 						}
 					});
 				}
