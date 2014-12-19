@@ -27,7 +27,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 	public WikiSubpageNavigationTreeViewImpl(GlobalApplicationState globalAppState) {
 		this.globalAppState = globalAppState;
 		
-		addStyleName("notopmargin nav bs-sidenav");	// TODO: Switch back
+		addStyleName("notopmargin nav bs-sidenav");
 		add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
 	}
 	

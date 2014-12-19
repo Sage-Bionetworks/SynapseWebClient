@@ -209,8 +209,8 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		/*
 		 * Getters
 		 */
-		public V2WikiHeader getHeader()								{		return header;				}
-		public List<SubpageOrderEditorTreeNode> getChildren()		{		return children;			}
-		public String getText()										{		return this.text;			}
+		public V2WikiHeader getHeader()                             {       return header;            }
+		public List<SubpageOrderEditorTreeNode> getChildren()       {       return children;          }
+		public String getText()                                     {       return this.text;         }
 	}
 }
