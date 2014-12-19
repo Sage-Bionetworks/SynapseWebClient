@@ -2,25 +2,28 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.ui.Tree;
 
 public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	AccessControlListModalWidgetView mockView;
 	WikiSubpagesOrderEditor mockEditor;
-	Entity mockEntity;
-	Callback mockCallback;
+	UpdateOrderHintCallback mockCallback;
 	
 	Tree tree;
 	
@@ -30,22 +33,22 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	public void before(){
 		mockView = Mockito.mock(AccessControlListModalWidgetView.class);
 		mockEditor = Mockito.mock(WikiSubpagesOrderEditor.class);
-		mockEntity = Mockito.mock(Entity.class);
-		mockCallback = Mockito.mock(Callback.class);
+		mockCallback = Mockito.mock(UpdateOrderHintCallback.class);
 		
 		modal = new WikiSubpagesOrderEditorModalWidgetImpl(mockView, mockEditor);
 	}
 	
 	@Test
 	public void testConfigure() {
-		modal.configure(null, mockCallback);
-		verify(mockEditor).configure(null,  modal);
+		List<JSONEntity> headers = new ArrayList<JSONEntity>();
+		modal.configure(headers, "A");
+		verify(mockEditor).configure(headers,  "A", modal);
 	}
 	
 	
 	@Test
 	public void testOnChange(){
-		modal.configure(null, mockCallback);
+		modal.configure(new ArrayList<JSONEntity>(), "A");
 		modal.hasChanges(true);
 		verify(mockView).setLoading(false);
 		verify(mockView).setPrimaryButtonEnabled(true);
@@ -53,15 +56,15 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Test
 	public void testOnChangeNoChange(){
-		modal.configure(null, mockCallback);
+		modal.configure(new ArrayList<JSONEntity>(), "A");
 		modal.hasChanges(false);
 		verify(mockView).setLoading(false);
 		verify(mockView).setPrimaryButtonEnabled(false);
 	}
 	
 	@Test
-	public void testShowSharing(){
-		modal.configure(null, mockCallback);
+	public void testShow(){
+		modal.configure(new ArrayList<JSONEntity>(), "A");
 		modal.show(mockCallback);
 		verify(mockView).setLoading(false);
 		verify(mockView).showDialog();
@@ -69,25 +72,28 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Test
 	public void testOnPrimary(){
+		Mockito.doNothing().when(mockCallback).updateOrderHint(any(List.class));
+		WikiSubpageOrderEditorTree mockTree = Mockito.mock(WikiSubpageOrderEditorTree.class);
+		when(mockTree.getIdListOrderHint()).thenReturn(new ArrayList<String>());
+		when(mockEditor.getTree()).thenReturn(mockTree);
 		// Invoke the callback.
-		AsyncMockStubber.callWithInvoke().when(mockEditor).pushChangesToSynapse(any(Callback.class));
-		modal.configure(null, mockCallback);
+		modal.configure(new ArrayList<JSONEntity>(), "A");
 		modal.show(mockCallback);
 		modal.onPrimary();
 		verify(mockView).hideDialog();
-		verify(mockCallback).invoke();
+		verify(mockCallback).updateOrderHint(any(List.class));
 	}
 	
 	@Test
 	public void testGetTree() {
-		modal.configure(null, mockCallback);
+		modal.configure(new ArrayList<JSONEntity>(), "A");
 		modal.getTree();
 		verify(mockEditor).getTree();
 	}
 	
 	@Test
 	public void testSetSize() {
-		modal.configure(null, mockCallback);
+		modal.configure(new ArrayList<JSONEntity>(), "A");
 		modal.setSize(ModalSize.SMALL);
 		verify(mockView).setSize(ModalSize.SMALL);
 	}
