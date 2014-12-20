@@ -12,7 +12,6 @@ import com.google.inject.Inject;
 
 public class FileCellRendererImpl implements FileCellRenderer {
 	
-	private static final String TABLE_FILE_HREF_TEMPLATE = "/Portal/"+WebConstants.FILE_HANDLE_UPLOAD_SERVLET+"?"+WebConstants.ENTITY_PARAM_KEY+"=syn2978985&"+WebConstants.TABLE_COLUMN_ID+"=3617&"+WebConstants.TABLE_ROW_ID+"=0&"+WebConstants.TABLE_ROW_VERSION_NUMBER+"=0";
 	private static final String I_DS_DO_NOT_MATCH = "IDs do not match";
 	private static final String UNABLE_TO_LOAD_FILE_DATA = "Unable to load file data";
 	FileCellRendererView view;
@@ -50,7 +49,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 						}else{
 							String href = "";
 							
-							view.setAnchor()
+							view.setAnchor(result.getFileName(), createAnchorHref());
 						}
 					}
 				}
@@ -67,7 +66,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 	}
 	
 	private String createAnchorHref(){
-		return WebConstants.FIRST_NAME_PARAM
+		return "/Portal/"+WebConstants.FILE_HANDLE_UPLOAD_SERVLET+"?"+WebConstants.ENTITY_PARAM_KEY+"="+address.getTableId()+"&"+WebConstants.TABLE_COLUMN_ID+"="+address.getColumnId()+"&"+WebConstants.TABLE_ROW_ID+"="+address.getRowId()+"&"+WebConstants.TABLE_ROW_VERSION_NUMBER+"="+address.getRowVersion();
 	}
 
 	@Override

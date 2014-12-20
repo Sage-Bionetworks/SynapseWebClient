@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.base.HasTarget;
 import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -46,6 +47,15 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	@Override
 	public boolean isAttached() {
 		return widget.isAttached();
+	}
+
+	@Override
+	public void setAnchor(String fileName, String createAnchorHref) {
+		this.anchor.setVisible(true);
+		this.anchor.setText(fileName);
+		this.anchor.setHref(createAnchorHref);
+		this.anchor.setTarget(HasTarget.BLANK);
+		
 	}
 
 }

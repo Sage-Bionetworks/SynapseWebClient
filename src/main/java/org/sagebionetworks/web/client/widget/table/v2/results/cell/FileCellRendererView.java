@@ -22,4 +22,11 @@ public interface FileCellRendererView extends IsWidget {
 	 */
 	boolean isAttached();
 
+	/**
+	 * Set the anchor value.
+	 * @param fileName
+	 * @param createAnchorHref
+	 */
+	void setAnchor(String fileName, String createAnchorHref);
+
 }
