@@ -14,7 +14,7 @@ public interface FileCellRendererView extends IsWidget {
 	 * Set the File name
 	 * @param fileName
 	 */
-	void setFileName(String fileName);
+	void setErrorText(String fileName);
 
 	/**
 	 * Is this view attached?

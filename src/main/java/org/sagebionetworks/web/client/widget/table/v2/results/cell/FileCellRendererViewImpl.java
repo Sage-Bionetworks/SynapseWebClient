@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,7 +16,9 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	@UiField
 	Image loadingImage;
 	@UiField
-	Text fileName;
+	Text errorText;
+	@UiField
+	Anchor anchor;
 	
 	Widget widget;
 
@@ -35,8 +38,9 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	}
 
 	@Override
-	public void setFileName(String fileName) {
-		this.fileName.setText(fileName);
+	public void setErrorText(String fileName) {
+		this.errorText.setVisible(true);
+		this.errorText.setText(fileName);
 	}
 
 	@Override
