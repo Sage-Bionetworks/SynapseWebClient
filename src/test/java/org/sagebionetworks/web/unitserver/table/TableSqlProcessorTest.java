@@ -16,6 +16,7 @@ import org.sagebionetworks.table.query.model.DerivedColumn;
 import org.sagebionetworks.table.query.model.Identifier;
 import org.sagebionetworks.table.query.model.SelectList;
 import org.sagebionetworks.table.query.model.SortKey;
+import org.sagebionetworks.table.query.model.ValueExpressionPrimary;
 import org.sagebionetworks.web.server.table.TableSqlProcessor;
 
 public class TableSqlProcessorTest {
@@ -30,6 +31,22 @@ public class TableSqlProcessorTest {
 	public void testGetStringValue() throws ParseException{
 		Identifier a = new TableQueryParser("foo").identifier();
 		Identifier b = new TableQueryParser("\"foo\"").identifier();
+		// They should have the same string value even though one is in quotes.
+		assertEquals(TableSqlProcessor.getStringValue(a), TableSqlProcessor.getStringValue(b));
+	}
+	
+	@Test
+	public void testGetStringValueFunction() throws ParseException{
+		ValueExpressionPrimary a = new TableQueryParser("count(*)").valueExpressionPrimary();
+		ValueExpressionPrimary b = new TableQueryParser("COUNT(*)").valueExpressionPrimary();
+		// They should have the same string value even though one is in quotes.
+		assertEquals(TableSqlProcessor.getStringValue(a), TableSqlProcessor.getStringValue(b));
+	}
+	
+	@Test
+	public void testGetStringValueFunction2() throws ParseException{
+		ValueExpressionPrimary a = new TableQueryParser("foo").valueExpressionPrimary();
+		ValueExpressionPrimary b = new TableQueryParser("\"foo\"").valueExpressionPrimary();
 		// They should have the same string value even though one is in quotes.
 		assertEquals(TableSqlProcessor.getStringValue(a), TableSqlProcessor.getStringValue(b));
 	}
@@ -91,6 +108,15 @@ public class TableSqlProcessorTest {
 	@Test
 	public void testToggleSortAlreadySortingMultipleAddNew() throws ParseException{
 		String sql = "select * from syn123 order by bar desc, foofoo ASC";
+		String expected = "SELECT * FROM syn123 ORDER BY \"foo not\" ASC, bar DESC, foofoo ASC";
+		// call under test.
+		String results = TableSqlProcessor.toggleSort(sql, "foo not");
+		assertEquals(expected, results);
+	}
+	
+	@Test
+	public void testToggleSortAlreadySortingMultipleAddNew2() throws ParseException{
+		String sql = "select * from syn123 order by bar desc, foofoo ASC";
 		String expected = "SELECT * FROM syn123 ORDER BY \"foo\" ASC, bar DESC, foofoo ASC";
 		// call under test.
 		String results = TableSqlProcessor.toggleSort(sql, "foo");
@@ -104,7 +130,7 @@ public class TableSqlProcessorTest {
 	@Test
 	public void testToggleSortAggregate() throws ParseException{
 		String sql = "select bar, count(foo) from syn123 group by bar";
-		String expected = "SELECT bar, COUNT(foo) FROM syn123 GROUP BY bar ORDER BY \"count(foo)\" ASC";
+		String expected = "SELECT bar, COUNT(foo) FROM syn123 GROUP BY bar ORDER BY COUNT(foo) ASC";
 		// call under test.
 		String results = TableSqlProcessor.toggleSort(sql, "count(foo)");
 		assertEquals(expected, results);
