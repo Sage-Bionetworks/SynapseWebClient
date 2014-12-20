@@ -7,7 +7,6 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -23,7 +22,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 
 	private Presenter presenter;
 	WikiSubpagesOrderEditorModalWidget orderEditorModal;
-	private GlobalApplicationState globalAppState;
 	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
 	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
 	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";
@@ -39,11 +37,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private WikiSubpageNavigationTree navTree;
 	
 	@Inject
-	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState,
-								WikiSubpagesOrderEditorModalWidget orderEditorModal,
-								WikiSubpageNavigationTree navTree
-								) {
-		this.globalAppState = globalAppState;
+	public WikiSubpagesViewImpl(WikiSubpagesOrderEditorModalWidget orderEditorModal,
+								WikiSubpageNavigationTree navTree) {
 		this.orderEditorModal = orderEditorModal;
 		this.navTree = navTree;
 		orderEditorModal.setSize(ModalSize.SMALL);
