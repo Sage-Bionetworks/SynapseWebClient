@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
@@ -21,6 +22,6 @@ public interface WikiSubpagesOrderEditorModalWidget extends IsWidget {
 	
 	public WikiSubpageOrderEditorTree getTree();
 
-	void configure(List<JSONEntity> wikiHeaders, String ownerObjectName);
+	void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName);
 	
 }

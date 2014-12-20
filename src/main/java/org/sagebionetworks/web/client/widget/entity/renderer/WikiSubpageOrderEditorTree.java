@@ -37,12 +37,11 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		view.setPresenter(this);
 	}
 	
-	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName) {
+	public void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName) {
 		view.clear();
 		
 		// Make nodes for each header. Populate id2node map and header2node map.
-		for (JSONEntity headerJSONEntity : wikiHeaders) {
-			V2WikiHeader header = (V2WikiHeader) headerJSONEntity;
+		for (V2WikiHeader header : wikiHeaders) {
 			
 			String text;
 			if (header.getParentId() == null) {
@@ -57,8 +56,7 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		}
 		
 		// Assign child references.
-		for (JSONEntity headerJSONEntity : wikiHeaders) {
-			V2WikiHeader header = (V2WikiHeader) headerJSONEntity;
+		for (V2WikiHeader header : wikiHeaders) {
 			
 			if (header.getParentId() == null) {
 				overallRoot = header2node.get(header);

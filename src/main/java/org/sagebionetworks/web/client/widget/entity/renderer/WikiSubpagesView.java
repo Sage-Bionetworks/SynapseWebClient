@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -27,7 +28,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(List<JSONEntity> wikiHeaders, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
+	public void configure(List<V2WikiHeader> wikiHeaders, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
 							String ownerObjectName, Place ownerObjectLink,
 							WikiPageKey curWikiKey, boolean isEmbeddedOwnerPage,
 							UpdateOrderHintCallback updateOrderHintCallback);

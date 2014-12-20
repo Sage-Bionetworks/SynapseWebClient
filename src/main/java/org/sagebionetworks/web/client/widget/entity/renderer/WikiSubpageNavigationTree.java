@@ -31,12 +31,11 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		id2node = new HashMap<String, SubpageNavTreeNode>();
 	}
 	
-	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName, Place ownerObjectLink, WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage) {
+	public void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName, Place ownerObjectLink, WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage) {
 		view.clear();
 		
 		// Make nodes for each header. Populate id2node map and header2node map.
-		for (JSONEntity headerJSONEntity : wikiHeaders) {
-			V2WikiHeader header = (V2WikiHeader) headerJSONEntity;
+		for (V2WikiHeader header : wikiHeaders) {
 			
 			boolean isCurrentPage = header.getId().equals(curWikiKey.getWikiPageId());
 			
@@ -57,8 +56,7 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		}
 		
 		// Assign child references.
-		for (JSONEntity headerJSONEntity : wikiHeaders) {
-			V2WikiHeader header = (V2WikiHeader) headerJSONEntity;
+		for (V2WikiHeader header : wikiHeaders) {
 			
 			if (header.getParentId() == null) {
 				overallRoot = header2node.get(header);

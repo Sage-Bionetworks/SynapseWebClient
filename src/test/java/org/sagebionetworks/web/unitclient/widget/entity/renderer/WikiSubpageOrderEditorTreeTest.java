@@ -22,7 +22,7 @@ public class WikiSubpageOrderEditorTreeTest {
 	
 	WikiSubpageOrderEditorTreeView mockView;
 	
-	List<JSONEntity> wikiHeaders;
+	List<V2WikiHeader> wikiHeaders;
 	String ownerObjectName;
 	
 	@Before
@@ -31,7 +31,7 @@ public class WikiSubpageOrderEditorTreeTest {
 		
 		tree = new WikiSubpageOrderEditorTree(mockView);
 		
-		wikiHeaders = new ArrayList<JSONEntity>();
+		wikiHeaders = new ArrayList<V2WikiHeader>();
 		
 		// Set up headers for tree:
 		//	A

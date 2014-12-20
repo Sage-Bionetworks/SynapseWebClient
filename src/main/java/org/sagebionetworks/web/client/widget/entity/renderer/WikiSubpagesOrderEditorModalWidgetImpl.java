@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
@@ -44,7 +45,7 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	}
 
 	@Override
-	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName) {
+	public void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName) {
 		editor.configure(wikiHeaders, ownerObjectName, this);
 		view.addEditor(editor.asWidget());
 	}

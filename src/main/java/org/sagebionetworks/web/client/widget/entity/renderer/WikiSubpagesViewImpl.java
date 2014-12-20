@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -52,7 +53,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(final List<JSONEntity> wikiHeaders,
+	public void configure(final List<V2WikiHeader> wikiHeaders,
 						FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
 						final String ownerObjectName, Place ownerObjectLink,
 						WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,

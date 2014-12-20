@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.ModalSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
@@ -41,7 +42,7 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Test
 	public void testConfigure() {
-		List<JSONEntity> headers = new ArrayList<JSONEntity>();
+		List<V2WikiHeader> headers = new ArrayList<V2WikiHeader>();
 		modal.configure(headers, "A");
 		verify(mockEditor).configure(headers,  "A", modal);
 	}
@@ -49,7 +50,7 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Test
 	public void testOnChange(){
-		modal.configure(new ArrayList<JSONEntity>(), "A");
+		modal.configure(new ArrayList<V2WikiHeader>(), "A");
 		modal.hasChanges(true);
 		verify(mockView).setLoading(false);
 		verify(mockView).setPrimaryButtonEnabled(true);
@@ -57,7 +58,7 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Test
 	public void testOnChangeNoChange(){
-		modal.configure(new ArrayList<JSONEntity>(), "A");
+		modal.configure(new ArrayList<V2WikiHeader>(), "A");
 		modal.hasChanges(false);
 		verify(mockView).setLoading(false);
 		verify(mockView).setPrimaryButtonEnabled(false);
@@ -65,7 +66,7 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Test
 	public void testShow(){
-		modal.configure(new ArrayList<JSONEntity>(), "A");
+		modal.configure(new ArrayList<V2WikiHeader>(), "A");
 		modal.show(mockCallback);
 		verify(mockView).setLoading(false);
 		verify(mockView).showDialog();
@@ -78,7 +79,7 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 		when(mockTree.getIdListOrderHint()).thenReturn(new ArrayList<String>());
 		when(mockEditor.getTree()).thenReturn(mockTree);
 		// Invoke the callback.
-		modal.configure(new ArrayList<JSONEntity>(), "A");
+		modal.configure(new ArrayList<V2WikiHeader>(), "A");
 		modal.show(mockCallback);
 		modal.onPrimary();
 		verify(mockView).hideDialog();
@@ -87,7 +88,7 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Test
 	public void testGetTree() {
-		modal.configure(new ArrayList<JSONEntity>(), "A");
+		modal.configure(new ArrayList<V2WikiHeader>(), "A");
 		modal.getTree();
 		verify(mockEditor).getTree();
 	}

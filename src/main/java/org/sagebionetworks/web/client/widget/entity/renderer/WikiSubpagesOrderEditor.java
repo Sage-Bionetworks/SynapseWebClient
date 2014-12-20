@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -21,7 +22,7 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 		this.editorTree = editorTree;
 	}
 	
-	public void configure(List<JSONEntity> wikiHeaders, String ownerObjectName, HasChangesHandler hasChangesHandler) {
+	public void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName, HasChangesHandler hasChangesHandler) {
 		editorTree.configure(wikiHeaders, ownerObjectName);
 		this.hasChangesHandler = hasChangesHandler;
 		view.configure(editorTree, hasChangesHandler);

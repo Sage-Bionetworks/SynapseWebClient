@@ -9,8 +9,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 
 public class WikiOrderHintUtils {
 	
-	public static void sortHeadersByOrderHint(PaginatedResults<JSONEntity> wikiHeaders, V2WikiOrderHint orderHint) {
-		List<JSONEntity> headerList = wikiHeaders.getResults();
+	public static void sortHeadersByOrderHint(List<V2WikiHeader> headerList, V2WikiOrderHint orderHint) {
 		List<String> idList = orderHint.getIdList();
 		if (idList == null) return;
 		
@@ -24,9 +23,9 @@ public class WikiOrderHintUtils {
 		int insertIndex = 0;
 		for (int i = 0; i < idList.size(); i++) {
 			for (int j = 0; j < headerList.size(); j++) {
-				if (((V2WikiHeader) headerList.get(j)).getId().equals(idList.get(i))) {
+				if ((headerList.get(j)).getId().equals(idList.get(i))) {
 					// The header was in the order hint. Move that header towards the front.
-					JSONEntity toMove = headerList.remove(j);
+					V2WikiHeader toMove = headerList.remove(j);
 					headerList.add(insertIndex, toMove);
 					insertIndex++;
 				}

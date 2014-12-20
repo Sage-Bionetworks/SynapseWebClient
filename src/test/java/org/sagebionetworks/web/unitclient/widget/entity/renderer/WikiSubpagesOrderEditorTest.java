@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
@@ -35,7 +36,7 @@ public class WikiSubpagesOrderEditorTest {
 	
 	@Test
 	public void testConfigure() {
-		List<JSONEntity> wikiHeaders = new ArrayList<JSONEntity>();
+		List<V2WikiHeader> wikiHeaders = new ArrayList<V2WikiHeader>();
 		String ownerObjectName = "A";
 		editor.configure(wikiHeaders, ownerObjectName, mockHandler);
 		
@@ -45,7 +46,7 @@ public class WikiSubpagesOrderEditorTest {
 	
 	@Test
 	public void testGetTree() {
-		editor.configure(new ArrayList<JSONEntity>(), "A", mockHandler);
+		editor.configure(new ArrayList<V2WikiHeader>(), "A", mockHandler);
 		assertEquals(mockEditorTree, editor.getTree());
 	}
 	

@@ -130,14 +130,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			@Override
 			public void onSuccess(String results) {
 				try {
-					final PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
+					final PaginatedResults<V2WikiHeader> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
 					
 					synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
 						@Override
 						public void onSuccess(V2WikiOrderHint result) {
 							// "Sort" stuff'
 							subpageOrderHint = result;
-							WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
+							WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders.getResults(), subpageOrderHint);
 							
 							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 											ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());

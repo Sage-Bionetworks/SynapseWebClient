@@ -23,7 +23,7 @@ public class WikiSubpageNavigationTreeTest {
 	
 	WikiSubpageNavigationTreeView mockView;
 	
-	List<JSONEntity> wikiHeaders;
+	List<V2WikiHeader> wikiHeaders;
 	String ownerObjectName;
 	WikiPageKey curWikiKey;
 	
@@ -35,7 +35,7 @@ public class WikiSubpageNavigationTreeTest {
 		
 		tree = new WikiSubpageNavigationTree(mockView);
 		
-		wikiHeaders = new ArrayList<JSONEntity>();
+		wikiHeaders = new ArrayList<V2WikiHeader>();
 		
 		// Set up headers for tree:
 		//	A
