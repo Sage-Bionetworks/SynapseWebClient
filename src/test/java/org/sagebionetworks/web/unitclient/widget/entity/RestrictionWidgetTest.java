@@ -108,7 +108,7 @@ public class RestrictionWidgetTest {
 		accessRequirement.setTermsOfUse("terms of use");
 		accessRequirements.add(accessRequirement);
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(accessRequirements);
 				
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
@@ -129,7 +129,7 @@ public class RestrictionWidgetTest {
 	private void setupEmptyAccessRequirements() {
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(accessRequirements);
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
 	}
@@ -193,7 +193,7 @@ public class RestrictionWidgetTest {
 	
 	@Test
 	public void testConfigureLoggedInControlledMet() {
-		when(bundle.getUnmetAccessRequirements()).thenReturn(new ArrayList<AccessRequirement>());
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(new ArrayList<AccessRequirement>());
 		
 		//is logged in, with our tou restriction set up in before(), has admin access (can change)
 		widget.configure(bundle, 

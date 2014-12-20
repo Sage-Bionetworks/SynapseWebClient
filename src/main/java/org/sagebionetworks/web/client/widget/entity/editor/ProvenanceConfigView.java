@@ -14,10 +14,10 @@ public interface ProvenanceConfigView extends IsWidget, WidgetEditorView {
 	
 	void setEntityList(String entityList);
 	String getEntityList();
-	void setDepth(Long depth);
-	Long getDepth();
-	void setProvDisplayHeight(int provDisplayHeight);
-	Integer getProvDisplayHeight();
+	void setDepth(String depth);
+	String getDepth();
+	void setProvDisplayHeight(String provDisplayHeight);
+	String getProvDisplayHeight();
 	void setIsExpanded(boolean b);
 	boolean isExpanded();
 	

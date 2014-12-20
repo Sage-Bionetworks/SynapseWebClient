@@ -95,7 +95,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		if (!isLoggedIn)
 			hasData = true;
 		//if it has unmet access requirements, then there might be something here
-		else if (bundle.getUnmetAccessRequirements() != null && bundle.getUnmetAccessRequirements().size() > 0)
+		else if (bundle.getUnmetDownloadAccessRequirements() != null && bundle.getUnmetDownloadAccessRequirements().size() > 0)
 			hasData = true;
 		//else, if it has a locations list whose size is > 0
 		else if (((Locationable)bundle.getEntity()).getLocations() != null && ((Locationable)bundle.getEntity()).getLocations().size() > 0)

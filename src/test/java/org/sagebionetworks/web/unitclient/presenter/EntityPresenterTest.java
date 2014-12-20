@@ -189,11 +189,11 @@ public class EntityPresenterTest {
 		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
 		
 		eb.setAccessRequirements(unfilteredARs);
-		eb.setUnmetAccessRequirements(unfilteredUnmetARs);
+		eb.setUnmetDownloadAccessRequirements(unfilteredUnmetARs);
 		EntityPresenter.filterToDownloadARs(eb);
 		
 		assertEquals(expectedFilteredARs, eb.getAccessRequirements());
-		assertEquals(expectedFilteredUnmetARs, eb.getUnmetAccessRequirements());
+		assertEquals(expectedFilteredUnmetARs, eb.getUnmetDownloadAccessRequirements());
 	}
 	
 }

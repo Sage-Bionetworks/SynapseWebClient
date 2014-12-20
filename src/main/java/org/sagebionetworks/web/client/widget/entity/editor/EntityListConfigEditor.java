@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil.RowL
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 

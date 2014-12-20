@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -159,7 +160,7 @@ public class EvaluationSubmitterTest {
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
 		
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(ACCESS_TYPE.class), any(AsyncCallback.class));
 
 		List<Evaluation> evals = new ArrayList<Evaluation>();
 		evals.add(new Evaluation());

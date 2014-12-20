@@ -154,9 +154,25 @@ public class QueryInputWidgetTest {
 		widget.configure(sql, mockQueryInputListener, editable);
 		reset(mockView);
 		boolean success = true;
-		widget.queryExecutionFinished(success);
+		boolean resultsEditable = true;
+		widget.queryExecutionFinished(success, resultsEditable);
 		verify(mockView).setQueryInputLoading(false);
 		verify(mockView).setEditEnabled(true);
+		verify(mockView).setDownloadEnabled(true);
+	}
+	
+	@Test
+	public void testQueryExecutionFinishedResultsNotEditable(){
+		boolean editable = true;
+		String sql = "select * from syn123";
+		widget.configure(sql, mockQueryInputListener, editable);
+		reset(mockView);
+		boolean success = true;
+		boolean resultsEditable = false;
+		widget.queryExecutionFinished(success, resultsEditable);
+		verify(mockView).setQueryInputLoading(false);
+		verify(mockView).setEditEnabled(false);
+		// donwload should still be enabled for this case
 		verify(mockView).setDownloadEnabled(true);
 	}
 

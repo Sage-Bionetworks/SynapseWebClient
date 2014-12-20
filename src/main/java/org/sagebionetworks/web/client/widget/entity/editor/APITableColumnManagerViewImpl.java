@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 
-import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -50,7 +49,6 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 	FlowPanel columnRenderersTable;
 	
 
-	ColumnModel columnModel;
 	private Presenter presenter;
 	private boolean isEmpty;
 	private Widget widget;

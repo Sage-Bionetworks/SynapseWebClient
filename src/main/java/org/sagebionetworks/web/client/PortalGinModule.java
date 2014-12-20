@@ -379,8 +379,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultVi
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
@@ -401,12 +399,12 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellR
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEdtiorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
@@ -962,7 +960,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityIdCellEditor.class).to(EntityIdCellEditorImpl.class);
 		bind(EntityIdCellRenderer.class).to(EntityIdCellRendererImpl.class);
 		bind(EnumCellEditor.class).to(EnumCellEditorImpl.class);
-		bind(EnumCellEditorView.class).to(EnumCellEditorViewImpl.class);
 		bind(ListCellEdtiorView.class).to(ListCellEditorViewImpl.class);
 		bind(BooleanCellEditor.class).to(BooleanCellEditorImpl.class);
 		bind(DateCellEditorView.class).to(DateCellEditorViewImpl.class);
