@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+
+	<g:FlowPanel>
+		<g:SimplePanel ui:field="treePanel" />
+		<b:VerticalButtonGroup pull="RIGHT">
+		    <b:Button ui:field="upButton" icon="ARROW_UP"></b:Button>
+		    <b:Button ui:field="downButton" icon="ARROW_DOWN"></b:Button>
+		</b:VerticalButtonGroup>
+		<g:SimplePanel ui:field="instructionPanel" addStyleNames="margin-top-30">
+		    <g:Label>Select a subpage and use the arrows to move it to the desired position.</g:Label>
+		</g:SimplePanel>
+	</g:FlowPanel>
+</ui:UiBinder>

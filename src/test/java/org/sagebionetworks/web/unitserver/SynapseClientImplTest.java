@@ -110,6 +110,7 @@ import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -749,6 +750,22 @@ public class SynapseClientImplTest {
          when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
          synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
          verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class));
+     }
+     
+     @Test
+     public void testGetV2WikiOrderHint() throws Exception {
+    	 V2WikiOrderHint orderHint = new V2WikiOrderHint();
+    	 when(mockSynapse.getV2OrderHint(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(orderHint);
+    	 synapseClient.getV2WikiOrderHint(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+    	 verify(mockSynapse).getV2OrderHint(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+     }
+     
+     @Test
+     public void testUpdateV2WikiOrderHint() throws Exception {
+    	 V2WikiOrderHint orderHint = new V2WikiOrderHint();
+    	 when(mockSynapse.updateV2WikiOrderHint(any(V2WikiOrderHint.class))).thenReturn(orderHint);
+    	 synapseClient.updateV2WikiOrderHint(orderHint);
+    	 verify(mockSynapse).updateV2WikiOrderHint(any(V2WikiOrderHint.class));
      }
      
      @Test

@@ -258,6 +258,17 @@ import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTreeView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTreeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTreeView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTreeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
@@ -824,6 +835,17 @@ public class PortalGinModule extends AbstractGinModule {
 		//single subpages view
 		bind(WikiSubpagesViewImpl.class).in(Singleton.class);
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
+		
+		// SubPages Order Editor
+		bind(WikiSubpagesOrderEditorView.class).to(WikiSubpagesOrderEditorViewImpl.class);
+		bind(WikiSubpagesOrderEditorModalWidget.class).to(WikiSubpagesOrderEditorModalWidgetImpl.class);
+		bind(WikiSubpagesOrderEditorModalWidgetView.class).to(WikiSubpagesOrderEditorModalWidgetViewImpl.class);
+		
+		// SubPages Order Editor Tree
+		bind(WikiSubpageOrderEditorTreeView.class).to(WikiSubpageOrderEditorTreeViewImpl.class);
+		
+		// SubPages Navigation Tree
+		bind(WikiSubpageNavigationTreeView.class).to(WikiSubpageNavigationTreeViewImpl.class);
 		
 		//Widget Registration
 		bind(WidgetRegistrarImpl.class).in(Singleton.class);

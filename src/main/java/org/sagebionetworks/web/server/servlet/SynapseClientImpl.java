@@ -125,6 +125,7 @@ import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
+import  org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -1766,6 +1767,37 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			PaginatedResults<V2WikiHeader> results = synapseClient
 					.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
 			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public V2WikiOrderHint getV2WikiOrderHint(org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+				key.getOwnerObjectId(),
+				ObjectType.valueOf(key.getOwnerObjectType()),
+				key.getWikiPageId());
+		try {
+			V2WikiOrderHint orderHint = synapseClient.getV2OrderHint(properKey);
+			return orderHint;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			V2WikiOrderHint orderHint = synapseClient.updateV2WikiOrderHint(toUpdate);
+			return orderHint;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

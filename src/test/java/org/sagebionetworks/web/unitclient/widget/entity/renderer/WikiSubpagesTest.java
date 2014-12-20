@@ -121,7 +121,7 @@ public class WikiSubpagesTest {
 		String targetEntityId = "syn938";
 		Long targetEntityVersion = 4L;
 		String targetWikiId = "888";
-		Place targetPlace = widget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId);
+		Place targetPlace = WikiSubpagesWidget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId, embeddedInOwnerPage);
 		assertTrue(targetPlace instanceof Synapse);
 		Synapse targetSynapsePlace = (Synapse)targetPlace;
 		assertEquals(targetEntityId, targetSynapsePlace.getEntityId());
@@ -137,7 +137,7 @@ public class WikiSubpagesTest {
 		String targetEntityId = "syn938";
 		Long targetEntityVersion = 4L;
 		String targetWikiId = "888";
-		Place targetPlace = widget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId);
+		Place targetPlace = WikiSubpagesWidget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId, embeddedInOwnerPage);
 		assertTrue(targetPlace instanceof Wiki);
 		Wiki targetWikiPlace = (Wiki)targetPlace;
 		assertEquals(targetEntityId, targetWikiPlace.getOwnerId());
