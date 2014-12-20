@@ -48,9 +48,6 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		this.hasChangesHandler = hasChangesHandler;
 		treePanel.setWidget(tree.asWidget());
 		subpageTree.setMovabilityCallback(getTreeItemMovabilityCallback());
-		if (subpageTree.getSelectedTreeItem() == null) {
-			disableUpDownButtons();
-		}
 	}
 	
 	@Override
@@ -79,6 +76,11 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		});
 	}
 	
+	@Override
+	public void initializeState() {
+		disableUpDownButtons();
+	}
+	
 	public TreeItemMovabilityCallback getTreeItemMovabilityCallback() {
 		return new TreeItemMovabilityCallback() {
 			@Override
@@ -88,7 +90,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 			}
 		};
 	}
-
+	
 	public interface TreeItemMovabilityCallback {
 		public void invoke(boolean canMoveUp, boolean canMoveDown);
 	}

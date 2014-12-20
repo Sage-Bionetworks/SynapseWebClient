@@ -27,6 +27,10 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 		view.configure(editorTree, hasChangesHandler);
 	}
 	
+	public void initializeState() {
+		view.initializeState();
+	}
+	
 	/**
 	 * Generate the WikiSubpagesOrderEditor Widget
 	 */

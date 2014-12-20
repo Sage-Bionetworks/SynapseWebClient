@@ -16,5 +16,7 @@ public interface WikiSubpagesOrderEditorView extends IsWidget, SynapseView {
 	
 	void configure(WikiSubpageOrderEditorTree subpageTree, HasChangesHandler hasChangesHandler);
 	
+	void initializeState();
+	
 	interface Presenter {}
 }

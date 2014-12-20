@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView {
 
 	private Presenter presenter;
-	WikiSubpagesOrderEditorModalWidget orderEditorModal;
+	private WikiSubpagesOrderEditorModalWidget orderEditorModal;
 	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
 	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
 	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";

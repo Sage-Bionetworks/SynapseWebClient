@@ -40,6 +40,7 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 		//hasChanges(false);
 		view.setLoading(false);
 		view.showDialog();
+		editor.initializeState();
 	}
 
 	@Override
