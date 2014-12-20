@@ -19,12 +19,6 @@ public interface WikiSubpagesOrderEditorModalWidget extends IsWidget {
 	 */
 	public void show(UpdateOrderHintCallback updateOrderHintCallback);
 	
-	/**
-	 * Change the size of the modal.
-	 * @param size The new size of the modal.
-	 */
-	public void setSize(ModalSize size);
-	
 	public WikiSubpageOrderEditorTree getTree();
 
 	void configure(List<JSONEntity> wikiHeaders, String ownerObjectName);

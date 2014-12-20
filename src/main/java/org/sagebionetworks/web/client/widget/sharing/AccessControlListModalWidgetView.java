@@ -29,12 +29,6 @@ public interface AccessControlListModalWidgetView extends IsWidget {
 	void setDefaultButtonText(String string);
 	
 	/**
-	 * Change the size of the modal.
-	 * @param size The new size of the modal.
-	 */
-	void setSize(ModalSize size);
-	
-	/**
 	 * Show/hide the primary button.
 	 * @param b
 	 */

@@ -40,11 +40,6 @@ public class AccessControlListModalWidgetViewImpl implements
 	public AccessControlListModalWidgetViewImpl(Binder binder) {
 		modal = binder.createAndBindUi(this);
 	}
-	
-	@Override
-	public void setSize(ModalSize size) {
-		uiModal.setSize(size);
-	}
 
 	@Override
 	public void showDialog() {

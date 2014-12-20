@@ -41,7 +41,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 								WikiSubpageNavigationTree navTree) {
 		this.orderEditorModal = orderEditorModal;
 		this.navTree = navTree;
-		orderEditorModal.setSize(ModalSize.SMALL);
 	}
 	
 	@Override

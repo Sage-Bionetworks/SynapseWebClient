@@ -15,13 +15,14 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
 
 import com.google.gwt.user.client.ui.Tree;
 
 public class WikiSubpagesOrderEditorModalWidgetImplTest {
-	AccessControlListModalWidgetView mockView;
+	WikiSubpagesOrderEditorModalWidgetView mockView;
 	WikiSubpagesOrderEditor mockEditor;
 	UpdateOrderHintCallback mockCallback;
 	
@@ -31,7 +32,7 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(AccessControlListModalWidgetView.class);
+		mockView = Mockito.mock(WikiSubpagesOrderEditorModalWidgetView.class);
 		mockEditor = Mockito.mock(WikiSubpagesOrderEditor.class);
 		mockCallback = Mockito.mock(UpdateOrderHintCallback.class);
 		
@@ -89,13 +90,6 @@ public class WikiSubpagesOrderEditorModalWidgetImplTest {
 		modal.configure(new ArrayList<JSONEntity>(), "A");
 		modal.getTree();
 		verify(mockEditor).getTree();
-	}
-	
-	@Test
-	public void testSetSize() {
-		modal.configure(new ArrayList<JSONEntity>(), "A");
-		modal.setSize(ModalSize.SMALL);
-		verify(mockView).setSize(ModalSize.SMALL);
 	}
 	
 }

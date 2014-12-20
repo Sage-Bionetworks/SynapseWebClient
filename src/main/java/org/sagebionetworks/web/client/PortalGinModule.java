@@ -263,6 +263,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEdi
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
@@ -823,6 +825,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// SubPages Order Editor
 		bind(WikiSubpagesOrderEditorView.class).to(WikiSubpagesOrderEditorViewImpl.class);
 		bind(WikiSubpagesOrderEditorModalWidget.class).to(WikiSubpagesOrderEditorModalWidgetImpl.class);
+		bind(WikiSubpagesOrderEditorModalWidgetView.class).to(WikiSubpagesOrderEditorModalWidgetViewImpl.class);
 		
 		// SubPages Order Editor Tree
 		bind(WikiSubpageOrderEditorTreeView.class).to(WikiSubpageOrderEditorTreeViewImpl.class);

@@ -66,8 +66,10 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 		
 		swapWidgetInPanel(parentPanel, listItem, insertIndex, moveUp);
 		
+		int childListIndex = parentPanel.indexOf(listItem) + 1;
+		
 		if (childrenList != null) {
-			swapWidgetInPanel(parentPanel, childrenList, insertIndex + 1, moveUp);
+			swapWidgetInPanel(parentPanel, childrenList, childListIndex, moveUp);
 		}
 		
 		

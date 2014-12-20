@@ -12,16 +12,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrderEditorModalWidget,
-																AccessControlListModalWidgetView.Presenter,
+																WikiSubpagesOrderEditorModalWidgetView.Presenter,
 																HasChangesHandler {
 	
-	AccessControlListModalWidgetView view;	// TODO: Generalize this ACLModalWidgetView
+	WikiSubpagesOrderEditorModalWidgetView view;
 	WikiSubpagesOrderEditor editor;
 	UpdateOrderHintCallback updateOrderHintCallback;
 	
 	@Inject
 	public WikiSubpagesOrderEditorModalWidgetImpl(
-			AccessControlListModalWidgetView view,	
+			WikiSubpagesOrderEditorModalWidgetView view,	
 			WikiSubpagesOrderEditor editor) {
 		super();
 		this.view = view;
@@ -65,11 +65,6 @@ public class WikiSubpagesOrderEditorModalWidgetImpl implements	WikiSubpagesOrder
 	@Override
 	public WikiSubpageOrderEditorTree getTree() {
 		return editor.getTree();
-	}
-	
-	@Override
-	public void setSize(ModalSize size) {
-		view.setSize(size);
 	}
 
 }
