@@ -2,11 +2,13 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalSize;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -23,6 +25,8 @@ public class AccessControlListModalWidgetViewImpl implements
 			UiBinder<Modal, AccessControlListModalWidgetViewImpl> {
 	}
 
+	@UiField
+	Modal uiModal;
 	@UiField
 	SimplePanel editorPanel;
 	@UiField
@@ -64,7 +68,7 @@ public class AccessControlListModalWidgetViewImpl implements
 
 	@Override
 	public void addEditor(IsWidget editor) {
-		this.editorPanel.add(editor);
+		this.editorPanel.setWidget(editor);
 	}
 
 	@Override

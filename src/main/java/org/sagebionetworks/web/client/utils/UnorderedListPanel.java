@@ -36,6 +36,10 @@ public class UnorderedListPanel extends ComplexPanel {
 		li.setClassName(styleName);
 	}
 	
+	public int indexOf(Widget w) {
+		return this.getWidgetIndex(w);
+	}
+	
 	private LIElement addLi(Widget w) {
 		LIElement li = Document.get().createLIElement();		
 		ul.appendChild(li);
@@ -59,5 +63,39 @@ public class UnorderedListPanel extends ComplexPanel {
 			ul.removeChild(li);
 		}
 		return removed;
+	}
+	
+	/**
+	 * Adds the the given style name to the list item that corresponds
+	 * to the given widget.
+	 * @param w
+	 * @param styleName
+	 * @return If there is no list item that corresponds to the given widget
+	 *  or the list item already had the given style name, returns false. 
+	 *  Else, returns true.
+	 */
+	public static boolean addStyleNameToListItem(Widget w, String styleName) {
+		Element li = DOM.getParent(w.getElement());
+		if (li == null) {
+			return false;
+		}
+		return li.addClassName(styleName);
+	}
+	
+	/**
+	 * Removes the the given style name to the list item that corresponds
+	 * to the given widget.
+	 * @param w
+	 * @param styleName
+	 * @return If there is no list item that corresponds to the given widget
+	 *  or the list item already had the given style name, returns false. 
+	 *  Else, returns true.
+	 */
+	public static boolean removeStyleNameFromListItem(Widget w, String styleName) {
+		Element li = DOM.getParent(w.getElement());
+		if (li == null) {
+			return false;
+		}
+		return li.removeClassName(styleName);
 	}
 }
