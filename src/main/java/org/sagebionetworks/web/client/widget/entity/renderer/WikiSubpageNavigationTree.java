@@ -108,7 +108,7 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		 */
 		public V2WikiHeader getHeader()                     {       return header;          }
 		public List<SubpageNavTreeNode> getChildren()       {       return children;        }
-		public String getText()                             {       return this.text;       }
+		public String getText()                             {       return text;            }
 		public Place getTargetPlace()                       {       return targetPlace;	    }
 		public boolean isCurrentPage()                      {       return isCurrentPage;   }
 	}
