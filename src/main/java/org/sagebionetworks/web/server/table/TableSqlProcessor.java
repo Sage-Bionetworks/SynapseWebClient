@@ -21,6 +21,7 @@ import org.sagebionetworks.table.query.model.SortKey;
 import org.sagebionetworks.table.query.model.SortSpecification;
 import org.sagebionetworks.table.query.model.SortSpecificationList;
 import org.sagebionetworks.table.query.model.TableExpression;
+import org.sagebionetworks.table.query.model.ValueExpressionPrimary;
 import org.sagebionetworks.table.query.model.visitors.ToSimpleSqlVisitor;
 
 /**
@@ -116,7 +117,15 @@ public class TableSqlProcessor {
 	 * @return
 	 */
 	private static SortKey createSortKey(String columnName) {
-		return new SortKey(new ColumnReference(new ColumnName(new Identifier(new ActualIdentifier(null, columnName))), null));
+		try {
+			ValueExpressionPrimary primary = new TableQueryParser(columnName).valueExpressionPrimary();
+			if(primary.getSetFunctionSpecification() != null || primary.getSignedValueSpecification() != null){
+				return new SortKey(primary);
+			}
+			return new SortKey(new ValueExpressionPrimary(new ColumnReference(new ColumnName(new Identifier(new ActualIdentifier(null, columnName))), null)));
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -200,9 +209,11 @@ public class TableSqlProcessor {
 	 * @return
 	 */
 	public static boolean isSameColumn(SortKey a, SortKey b){
-		return isSameColumn(a.getColumnReference(), b.getColumnReference());
+		return isSameColumn(a.getValueExpressionPrimary(), b.getValueExpressionPrimary());
 	}
-	
+	public static boolean isSameColumn(ValueExpressionPrimary a, ValueExpressionPrimary b){
+		return getStringValue(a).equals(getStringValue(b));
+	}
 	public static boolean isSameColumn(ColumnReference a, ColumnReference b){
 		return getStringValue(a).equals(getStringValue(b));
 	}
@@ -268,7 +279,7 @@ public class TableSqlProcessor {
 			if(list != null && list.getSortSpecifications() != null){
 				for(SortSpecification sort: list.getSortSpecifications()){
 					SortItem item = new SortItem();
-					item.setColumn(getStringValue(sort.getSortKey().getColumnReference()));
+					item.setColumn(getStringValue(sort.getSortKey().getValueExpressionPrimary()));
 					if(OrderingSpecification.ASC.equals(sort.getOrderingSpecification())){
 						item.setDirection(SortDirection.ASC);
 					}else{
@@ -279,6 +290,17 @@ public class TableSqlProcessor {
 			}
 		}
 		return results;
+	}
+	
+	public static String getStringValue(
+			ValueExpressionPrimary valueExpressionPrimary) {
+		if(valueExpressionPrimary.getColumnReference() != null){
+			return getStringValue(valueExpressionPrimary.getColumnReference());
+		}else{
+			ToSimpleSqlVisitor visitor = new ToSimpleSqlVisitor();
+			valueExpressionPrimary.visit(visitor);
+			return visitor.getSql();
+		}
 	}
 
 }
