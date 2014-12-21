@@ -75,7 +75,7 @@ public class FileHandleServlet extends HttpServlet {
 	/**
 	 * Unit test can override this.
 	 *
-	 * @param provider
+	 * @param fileHandleProvider
 	 */
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
 		this.synapseProvider = synapseProvider;

@@ -20,6 +20,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
+import org.sagebionetworks.web.shared.table.CellAddress;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 /**
@@ -36,7 +38,8 @@ public class RowWidgetTest {
 	RowWidget rowWidget;
 	List<ColumnModel> types;
 	Row aRow;
-	List<CellStub> cellStubs;	
+	List<CellStub> cellStubs;
+	String tableId;
 	
 	@Before
 	public void before(){
@@ -44,6 +47,7 @@ public class RowWidgetTest {
 		mockCellFactory = Mockito.mock(CellFactory.class);
 		mockListner = Mockito.mock(RowSelectionListener.class);
 		cellStubs = new LinkedList<CellStub>();
+		tableId = "syn123";
 		// Use stubs for all cells.
 		Answer<Cell> answer = new Answer<Cell>() {
 			@Override
@@ -68,7 +72,7 @@ public class RowWidgetTest {
 	@Test
 	public void testConfigureAndGet(){
 		boolean isEditor = false;
-		rowWidget.configure(types, isEditor, aRow, null);
+		rowWidget.configure(tableId, types, isEditor, aRow, null);
 		Row extracted = rowWidget.getRow();
 		assertNotNull(extracted);
 		assertFalse("The extracted row must not be same instance as the configured row.", aRow == extracted);
@@ -78,7 +82,7 @@ public class RowWidgetTest {
 	@Test
 	public void testConfgureEditor(){
 		boolean isEditor = true;
-		rowWidget.configure(types, isEditor, aRow, null);
+		rowWidget.configure(tableId, types, isEditor, aRow, null);
 		Row extracted = rowWidget.getRow();
 		assertEquals(aRow, extracted);
 	}
@@ -86,7 +90,7 @@ public class RowWidgetTest {
 	@Test
 	public void testNullSelectionListner(){
 		boolean isEditor = true;
-		rowWidget.configure(types, isEditor, aRow, null);
+		rowWidget.configure(tableId, types, isEditor, aRow, null);
 		// selection should not be shown without a listener.
 		verify(mockView).setSelectVisible(false);
 	}
@@ -94,7 +98,7 @@ public class RowWidgetTest {
 	@Test
 	public void testWithSelectionListner(){
 		boolean isEditor = true;
-		rowWidget.configure(types, isEditor, aRow, mockListner);
+		rowWidget.configure(tableId, types, isEditor, aRow, mockListner);
 		// selection must be shown when given a listener.
 		verify(mockView).setSelectVisible(true);
 	}
@@ -102,10 +106,20 @@ public class RowWidgetTest {
 	@Test
 	public void testIsValid(){
 		boolean isEditor = true;
-		rowWidget.configure(types, isEditor, aRow, mockListner);
+		rowWidget.configure(tableId, types, isEditor, aRow, mockListner);
 		assertTrue(rowWidget.isValid());
 		cellStubs.get(4).setIsValid(false);
 		assertFalse(rowWidget.isValid());
+	}
+	
+	@Test
+	public void testTakesAddressCell(){
+		TakesAddressCell mockTakesAddress = Mockito.mock(TakesAddressCell.class);
+		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenReturn(mockTakesAddress);
+		boolean isEditor = false;
+		rowWidget.configure(tableId, types, isEditor, aRow, mockListner);
+		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(0).getId(), aRow.getRowId(), aRow.getVersionNumber()));
+		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(1).getId(), aRow.getRowId(), aRow.getVersionNumber()));
 	}
 
 }

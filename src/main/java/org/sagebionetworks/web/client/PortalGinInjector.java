@@ -94,6 +94,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEdi
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
@@ -264,6 +266,9 @@ public interface PortalGinInjector extends Ginjector {
 	public DoubleCellEditor createDoubleCellEditor();
 	public IntegerCellEditor createIntegerCellEditor();
 	public LinkCellRenderer createLinkCellRenderer();
+	public FileCellEditor createFileCellEditor();
+	public FileCellRenderer createFileCellRenderer();
+
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();

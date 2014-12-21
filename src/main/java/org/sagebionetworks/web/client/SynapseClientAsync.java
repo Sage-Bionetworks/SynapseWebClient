@@ -29,8 +29,10 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -45,6 +47,7 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.table.CellAddress;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -322,8 +325,6 @@ public interface SynapseClientAsync {
 	void deleteApiKey(AsyncCallback<String> callback);
 
 	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
-
-	void getTableFileHandle(String fileHandlesToFindRowReferenceSet, AsyncCallback<String> callback);
 	
 	/**
 	 * Set a table's schema. Any ColumnModel that does not have an ID will be
@@ -422,5 +423,8 @@ public interface SynapseClientAsync {
 	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
+
+	void getTableFileHandle(RowReferenceSet set,
+			AsyncCallback<TableFileHandleResults> callback);
 
 }
