@@ -17,9 +17,9 @@ public class CellAddress {
 	
 	/**
 	 * Create a new address.
-	 * @param tableId
-	 * @param rowId
-	 * @param rowVersion
+	 * @param tableId The ID of the table.
+	 * @param rowId The ID of the row.
+	 * @param rowVersion The version number of the row.
 	 */
 	public CellAddress(String tableId, String columnId, Long rowId, Long rowVersion) {
 		super();
@@ -88,6 +88,14 @@ public class CellAddress {
 		} else if (!tableId.equals(other.tableId))
 			return false;
 		return true;
+	}
+	
+	/**
+	 * A row key is a concatenation of the rowId and rowVerions;
+	 * @return
+	 */
+	public String getRowKey(){
+		return this.rowId +"-"+this.rowVersion;
 	}
 
 }

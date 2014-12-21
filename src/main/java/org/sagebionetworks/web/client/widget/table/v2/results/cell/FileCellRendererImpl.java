@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
+import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
@@ -12,8 +13,7 @@ import com.google.inject.Inject;
 
 public class FileCellRendererImpl implements FileCellRenderer {
 	
-	private static final String I_DS_DO_NOT_MATCH = "IDs do not match";
-	private static final String UNABLE_TO_LOAD_FILE_DATA = "Unable to load file data";
+	public static final String UNABLE_TO_LOAD_FILE_DATA = "Unable to load file data";
 	FileCellRendererView view;
 	String fileHandleId;
 	CellAddress address;
@@ -38,19 +38,13 @@ public class FileCellRendererImpl implements FileCellRenderer {
 		}else{
 			view.setLoadingVisible(true);
 			// Get the table fileHanle.
-			fileHandleProvider.requestFileHandle(address, new Callback<FileHandle, Throwable>() {
+			fileHandleProvider.requestFileHandle(new TableFileHandleRequest(value, address, new Callback<FileHandle, Throwable>() {
 				
 				@Override
 				public void onSuccess(FileHandle result) {
 					if(view.isAttached()){
 						view.setLoadingVisible(false);
-						if(!value.equals(result.getId())){
-							view.setErrorText(I_DS_DO_NOT_MATCH);
-						}else{
-							String href = "";
-							
-							view.setAnchor(result.getFileName(), createAnchorHref());
-						}
+						view.setAnchor(result.getFileName(), createAnchorHref());
 					}
 				}
 				
@@ -61,12 +55,35 @@ public class FileCellRendererImpl implements FileCellRenderer {
 						view.setErrorText(UNABLE_TO_LOAD_FILE_DATA);
 					}
 				}
-			});
+			}));
 		}
 	}
 	
-	private String createAnchorHref(){
-		return "/Portal/"+WebConstants.FILE_HANDLE_UPLOAD_SERVLET+"?"+WebConstants.ENTITY_PARAM_KEY+"="+address.getTableId()+"&"+WebConstants.TABLE_COLUMN_ID+"="+address.getColumnId()+"&"+WebConstants.TABLE_ROW_ID+"="+address.getRowId()+"&"+WebConstants.TABLE_ROW_VERSION_NUMBER+"="+address.getRowVersion();
+	/**
+	 * Create the href using the address of this renderer.
+	 * @return
+	 */
+	public String createAnchorHref(){
+		StringBuilder builder = new StringBuilder();
+		builder.append("/Portal/");
+		builder.append(WebConstants.FILE_HANDLE_UPLOAD_SERVLET);
+		builder.append("?");
+		builder.append(WebConstants.ENTITY_PARAM_KEY);
+		builder.append("=");
+		builder.append(address.getTableId());
+		builder.append("&");
+		builder.append(WebConstants.TABLE_COLUMN_ID);
+		builder.append("=");
+		builder.append(address.getColumnId());
+		builder.append("&");
+		builder.append(WebConstants.TABLE_ROW_ID);
+		builder.append("=");
+		builder.append(address.getRowId());
+		builder.append("&");
+		builder.append(WebConstants.TABLE_ROW_VERSION_NUMBER);
+		builder.append("=");
+		builder.append(address.getRowVersion());
+		return builder.toString();
 	}
 
 	@Override

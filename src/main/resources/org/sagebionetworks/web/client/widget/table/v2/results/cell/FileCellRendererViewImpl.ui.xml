@@ -7,8 +7,8 @@
 
 	<g:HTMLPanel>
 		<g:Image ui:field="loadingImage" resource='{sageImageBundle.loading16}' />
-		<bh:Text ui:field="errorText" visible="false"></bh:Text>
-		<b:Anchor ui:field="anchor" visible="false"/>
+		<bh:Text ui:field="errorText"></bh:Text>
+		<b:Anchor ui:field="anchor"></b:Anchor>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

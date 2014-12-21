@@ -40,7 +40,6 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 
 	@Override
 	public void setErrorText(String fileName) {
-		this.errorText.setVisible(true);
 		this.errorText.setText(fileName);
 	}
 
@@ -51,7 +50,6 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 
 	@Override
 	public void setAnchor(String fileName, String createAnchorHref) {
-		this.anchor.setVisible(true);
 		this.anchor.setText(fileName);
 		this.anchor.setHref(createAnchorHref);
 		this.anchor.setTarget(HasTarget.BLANK);
