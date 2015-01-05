@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -14,7 +15,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HeadingElement;
-import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -106,7 +106,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	SpanElement storageUsageSpan;
 	@UiField
-	org.gwtbootstrap3.client.ui.TextBox apiKeyContainer;
+	Text apiKeyContainer;
 	
 	@UiField
 	SimplePanel notificationsPanel;
@@ -396,7 +396,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void setApiKey(String apiKey) {
-		apiKeyContainer.setValue(apiKey);
+		apiKeyContainer.setText(apiKey);
 	}
 
 }
