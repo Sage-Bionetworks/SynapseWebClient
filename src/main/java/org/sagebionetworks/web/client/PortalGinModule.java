@@ -262,7 +262,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigati
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTreeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTreeView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTreeViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorModalWidgetView;
@@ -317,8 +316,6 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridViewImpl;
-import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
-import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.FocusSetter;
 import org.sagebionetworks.web.client.widget.table.FocusSetterImpl;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -685,9 +682,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// LoginWidget
 		bind(LoginWidgetViewImpl.class).in(Singleton.class);
 		bind(LoginWidgetView.class).to(LoginWidgetViewImpl.class);
-		
-		// StaticTable
-		bind(StaticTableView.class).to(StaticTableViewImpl.class);
 		
 		// LicenseBox
 		bind(LicensedDownloaderView.class).to(LicensedDownloaderViewImpl.class);
