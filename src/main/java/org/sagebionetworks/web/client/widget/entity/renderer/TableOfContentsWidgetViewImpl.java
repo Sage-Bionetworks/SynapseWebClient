@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
@@ -16,26 +15,16 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TableOfContentsWidgetViewImpl extends LayoutContainer implements TableOfContentsWidgetView {
+public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfContentsWidgetView {
 
 	private Presenter presenter;
-	private boolean hasLoaded;
 	@Inject
 	public TableOfContentsWidgetViewImpl() {
 	}
-	
 	@Override
-	public void configure() {
-		this.removeAll();
-		hasLoaded = false;
-	}	
-	
-	//special component.  The TOC only has the info it needs (which it gets via page reflection) after being rendered!
-	@Override
-	protected void onLoad() {
-		super.onLoad();
-		if (!hasLoaded) {
-			hasLoaded = true;
+	protected void onAttach() {
+		super.onAttach();
+		if (!isLoaded) {
 			FlowPanel linkContainer = new FlowPanel();
 			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
 			//look for these special header ids (that were added by the markdown processor for us), and create links to them
@@ -46,6 +35,7 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 				//no entries.  add an informative message
 				linkContainer.add(new HTML("<p class=\"smallGreyText\">"+DisplayConstants.NO_HEADERS_FOUND+"</p>"));
 			}
+			
 			while (heading != null) {
 				String text = heading.getInnerHTML();
 				//create links to all headers in the page
@@ -69,9 +59,13 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 			}
 			
 			add(linkContainer);
-			layout(true);
 		}
 	}
+	
+	@Override
+	public void configure() {
+		this.clear();
+	}	
 	
 	@Override
 	public Widget asWidget() {

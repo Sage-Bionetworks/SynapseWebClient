@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.utils;
 
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 
-public class DropdownButton extends LayoutContainer {
+public class DropdownButton extends FlowPanel {
 
 	private Button btn;
 	private UnorderedListPanel ul;

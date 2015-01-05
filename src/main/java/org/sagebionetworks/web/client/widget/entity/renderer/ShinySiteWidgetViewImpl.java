@@ -3,12 +3,12 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ShinySiteWidgetViewImpl extends LayoutContainer implements ShinySiteWidgetView {
+public class ShinySiteWidgetViewImpl extends FlowPanel implements ShinySiteWidgetView {
 
 	private Presenter presenter;
 	
@@ -18,7 +18,7 @@ public class ShinySiteWidgetViewImpl extends LayoutContainer implements ShinySit
 	
 	@Override
 	public void configure(String siteUrl, int height) {
-		this.removeAll();
+		this.clear();
 		add(new HTMLPanel(getShinySiteHTML(siteUrl, height)));
 	}	
 	
@@ -44,7 +44,7 @@ public class ShinySiteWidgetViewImpl extends LayoutContainer implements ShinySit
 
 	@Override
 	public void showInvalidSiteUrl(String siteUrl) {
-		this.removeAll();
+		this.clear();
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(siteUrl + DisplayConstants.INVALID_SHINY_SITE)));
 	}		
 	

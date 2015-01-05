@@ -8,17 +8,17 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 public class ProgrammaticClientCode extends Composite implements SynapseWidgetPresenter {
 
 	private static int numSeq = 0;
 	
-	public static LayoutContainer createLoadWidget(String entityId, Long versionNumber, SynapseJSNIUtils synapseJSNIUtils, SageImageBundle sageImageBundle) {
+	public static FlowPanel createLoadWidget(String entityId, Long versionNumber, SynapseJSNIUtils synapseJSNIUtils, SageImageBundle sageImageBundle) {
 		Anchor rLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoR45())));
 		DisplayUtils.addClickPopover(rLink, "Synapse R Client", getRClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
 
@@ -31,7 +31,7 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 		Anchor javaLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoJava45())));
 		DisplayUtils.addClickPopover(javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
 		
-		LayoutContainer lc = new LayoutContainer();
+		FlowPanel lc = new FlowPanel();
 		lc.add(rLink);
 		lc.add(pythonLink);
 		lc.add(shellLink);

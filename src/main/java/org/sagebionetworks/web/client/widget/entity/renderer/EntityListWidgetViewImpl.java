@@ -5,11 +5,11 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityListWidgetViewImpl extends LayoutContainer implements EntityListWidgetView {
+public class EntityListWidgetViewImpl extends FlowPanel implements EntityListWidgetView {
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -26,7 +26,7 @@ public class EntityListWidgetViewImpl extends LayoutContainer implements EntityL
 	
 	@Override
 	public void configure() {
-		this.removeAll();		
+		this.clear();		
 		renderer = new EntityListRenderer(iconsImageBundle, synapseJSNIUtils, ginInjector, false);
 		this.add(renderer);
 	}	

@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,7 +23,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer implements SharingAndDataUseConditionWidgetView {
+public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implements SharingAndDataUseConditionWidgetView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
@@ -138,10 +137,6 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void clear() {
 	}
 
 	@Override

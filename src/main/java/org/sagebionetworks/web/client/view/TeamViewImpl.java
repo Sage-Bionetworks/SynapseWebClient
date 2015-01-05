@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -203,7 +202,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	
 	private void showEditMode() {
 		clear();
-		LayoutContainer form = new LayoutContainer();
+		FlowPanel form = new FlowPanel();
 		form.addStyleName("margin-top-15 margin-bottom-40");
 		
 		final TextBox nameField = new TextBox();
@@ -241,7 +240,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		});
 		cancelButton.addStyleName("right margin-right-15");
 		
-		LayoutContainer buttonsContainer = new LayoutContainer();
+		FlowPanel buttonsContainer = new FlowPanel();
 		buttonsContainer.addStyleName("row");
 		buttonsContainer.add(cancelButton);
 		buttonsContainer.add(saveButton);
