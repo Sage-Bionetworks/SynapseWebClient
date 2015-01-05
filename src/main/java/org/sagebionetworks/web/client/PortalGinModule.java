@@ -284,8 +284,6 @@ import org.sagebionetworks.web.client.widget.login.LoginModalView;
 import org.sagebionetworks.web.client.widget.login.LoginModalViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.modal.ModalWindowView;
-import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
@@ -685,9 +683,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// LicenseBox
 		bind(LicensedDownloaderView.class).to(LicensedDownloaderViewImpl.class);
-		
-		// Modal View
-		bind(ModalWindowView.class).to(ModalWindowViewImpl.class);
 		
 		// Breadcrumb
 		bind(BreadcrumbView.class).to(BreadcrumbViewImpl.class);
