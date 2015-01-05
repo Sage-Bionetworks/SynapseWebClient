@@ -26,16 +26,15 @@ public class ReferenceWidgetViewImpl extends FlowPanel implements ReferenceWidge
 		this.clear();
 		id = footnoteId;
 		
-		
-		HTMLPanel parentPanel = (HTMLPanel)this.getParent();
-		Element heading = parentPanel.getElementById(WidgetConstants.FOOTNOTE_ID_WIDGET_PREFIX + id);
-		final Element scrollToElement = heading;
 		Anchor a = new Anchor();
 		a.setHTML("[" + id + "]");
 		a.addStyleName("link");
 		a.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				HTMLPanel parentPanel = (HTMLPanel)getParent();
+				Element heading = parentPanel.getElementById(WidgetConstants.FOOTNOTE_ID_WIDGET_PREFIX + id);
+				final Element scrollToElement = heading;
 				Window.scrollTo(0, scrollToElement.getOffsetTop());
 			}
 		});

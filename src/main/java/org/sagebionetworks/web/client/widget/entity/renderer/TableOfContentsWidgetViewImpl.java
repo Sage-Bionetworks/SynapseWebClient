@@ -18,13 +18,16 @@ import com.google.inject.Inject;
 public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfContentsWidgetView {
 
 	private Presenter presenter;
+	private boolean hasLoaded;
+	
 	@Inject
 	public TableOfContentsWidgetViewImpl() {
 	}
 	@Override
 	protected void onAttach() {
 		super.onAttach();
-		if (!isLoaded) {
+		if (!hasLoaded) {
+			hasLoaded = true;
 			FlowPanel linkContainer = new FlowPanel();
 			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
 			//look for these special header ids (that were added by the markdown processor for us), and create links to them
@@ -65,6 +68,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	@Override
 	public void configure() {
 		this.clear();
+		hasLoaded = false;
 	}	
 	
 	@Override
