@@ -1,8 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
-	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
+	xmlns:s="urn:import:org.sagebionetworks.web.client.widget">
 
   <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
  
@@ -19,7 +18,7 @@
 		    <g:HTMLPanel ui:field="annotationsPanel" visible="false">
 				<span class="boldText">Annotations</span> (<g:InlineLabel ui:field="showAnnotations" styleName="link" />)<br />			
 			</g:HTMLPanel>
-			<gxt:LayoutContainer ui:field="annotationsContent" visible="false" autoHeight="true" />
+			<g:FlowPanel ui:field="annotationsContent" visible="false" />
 	    </g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

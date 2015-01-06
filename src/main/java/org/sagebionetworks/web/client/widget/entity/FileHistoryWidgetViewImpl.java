@@ -45,7 +45,6 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.PagingToolBar;
 import com.extjs.gxt.ui.client.widget.toolbar.SeparatorToolItem;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -113,7 +112,6 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	 * viewed model in the grid.
 	 */
 	private BaseModelData currentModel;
-	private Element scrollToElement;
 	
 	// Widget variables
 	private PagingToolBar vToolbar;
@@ -202,7 +200,6 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	public void setEntityVersions(final Versionable entity) {
 		// create bottom paging toolbar
 		currentModel = null;
-		scrollToElement = null;
 		RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
 
 			@Override
@@ -270,7 +267,6 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	
 									loadResultData.setOffset(offset);
 									callback.onSuccess(loadResultData);
-									scrollToElement = vGrid.getView().getRow(currentModel);
 									if (isShowingOlderVersion)
 										setFileHistoryVisible(true);
 								}

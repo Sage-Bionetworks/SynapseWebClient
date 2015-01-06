@@ -1,25 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
 public class Md5Link extends SimplePanel {
-	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public Md5Link(SynapseJSNIUtils synapseJSNIUtils) {
-		this.synapseJSNIUtils = synapseJSNIUtils;
+	public Md5Link() {
 		addStyleName("inline-block font-italic");
 	}
 	
@@ -37,21 +32,6 @@ public class Md5Link extends SimplePanel {
 	}
 	
 	private void showMd5Dialog(String md5) {
-		final Dialog window = new Dialog();
-		window.setSize(220, 85);
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading("md5");
-		
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-left: 10px;\">"+md5+"</span>");
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		window.add(htmlPanel);
-		
-	    window.setButtons(Dialog.OK);
-	    window.setButtonAlign(HorizontalAlignment.CENTER);
-	    window.setHideOnButtonClick(true);
-		window.setResizable(false);
-		window.show();
+		Bootbox.alert("<h5>md5</h5>"+SafeHtmlUtils.htmlEscape(md5));
 	}
 }

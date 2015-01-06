@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.user;
 
-import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -10,10 +9,10 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Profile;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -21,7 +20,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView {
+public class UserBadgeViewImpl extends FlowPanel implements UserBadgeView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
@@ -131,9 +130,6 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 	public void showErrorMessage(String message) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	public void clear() {
 	}
 	
 	@Override

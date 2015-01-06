@@ -3,13 +3,13 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OldImageWidgetViewImpl extends LayoutContainer implements OldImageWidgetView {
+public class OldImageWidgetViewImpl extends FlowPanel implements OldImageWidgetView {
 
 	private Presenter presenter;
 	
@@ -19,7 +19,7 @@ public class OldImageWidgetViewImpl extends LayoutContainer implements OldImageW
 	
 	@Override
 	public void configure(String entityId, AttachmentData uploadedAttachmentData, String explicitWidth) {
-		this.removeAll();
+		this.clear();
 		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		//create img
 		String attachmentBaseUrl = GWT.getModuleBaseURL()+"attachment";
@@ -36,7 +36,6 @@ public class OldImageWidgetViewImpl extends LayoutContainer implements OldImageW
 		sb.append("\"></img>");
 		
 		add(new HTMLPanel(sb.toString()));
-		this.layout(true);
 	}
 	
 	/**

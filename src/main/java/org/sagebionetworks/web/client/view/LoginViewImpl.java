@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -14,8 +15,6 @@ import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -122,14 +121,11 @@ public class LoginViewImpl extends Composite implements LoginView {
 		clear();
 		headerWidget.refresh();
 		
-		ContentPanel cp = new ContentPanel();
-		cp.setHeaderVisible(false);
-		cp.setBorders(true);						
-		cp.setBodyStyleName("lightGreyBackground");
-		
+		Panel cp = new Panel();
+		cp.addStyleName("padding-15");
 		HTML message = new HTML();
 		message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
-		cp.add(message, new MarginData(0, 0, 0, 10));
+		cp.add(message);
 		
 		com.google.gwt.user.client.ui.Button loginAgain = DisplayUtils.createButton(DisplayConstants.BUTTON_LOGIN_AGAIN, ButtonType.PRIMARY);
 		loginAgain.getElement().setId(DisplayConstants.ID_BTN_LOGIN_AGAIN);
@@ -139,7 +135,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			}
 		});
-		cp.add(loginAgain, new MarginData(16, 0, 10, 10));
+		cp.add(loginAgain);
 		
 		logoutPanel.add(cp);
 		hideViews();
