@@ -1887,6 +1887,23 @@ ul, ol {
   }
 }
 
+.label-as-badge {
+    border-radius: 1em;
+}
+
+/**
+	The blockquote of a help-panel should also have the "panel" bootstrap class
+**/
+.help-panel blockquote {
+	padding: 0.5em 1em;
+	border-left: 3px solid #5bc0de;
+}
+
+.help-panel blockquote h4, .tip blockquote h3, .tip blockquote h2, .tip blockquote h1 {
+	color: #5bc0de;
+}
+
+
 /* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
 /* By default it's not affixed in mobile views, so undo that */
 
