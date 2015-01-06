@@ -5,11 +5,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -74,7 +73,7 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 					presenter.joinTeam(team.getId());
 				}
 			});
-			LayoutContainer buttonContainer = new LayoutContainer();
+			FlowPanel buttonContainer = new FlowPanel();
 			buttonContainer.addStyleName("col-xs-4 col-sm-3 col-md-2");
 			buttonContainer.add(joinButton);
 			lc.add(teamRendererWidget);

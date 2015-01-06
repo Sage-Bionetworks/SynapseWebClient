@@ -1,20 +1,14 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 
-import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -28,19 +22,17 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	
-	private UrlCache urlCache;
 	private InviteWidgetView.Presenter presenter;
-	private LayoutContainer inviteUIPanel;
+	private FlowPanel inviteUIPanel;
 	private Button inviteButton;
 	private TextArea messageArea;
 	private UserGroupSuggestBox peopleSuggestBox;
 	
 	@Inject
 	public InviteWidgetViewImpl(SageImageBundle sageImageBundle,
-			UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+			SynapseJSNIUtils synapseJSNIUtils,
 			UserGroupSuggestBox peopleSuggestBox) {
 		this.sageImageBundle = sageImageBundle;
-		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.peopleSuggestBox = peopleSuggestBox;
 	}
@@ -57,14 +49,13 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	
 	private void initView() {
 		if (inviteUIPanel == null) {
-			inviteUIPanel = new LayoutContainer();
+			inviteUIPanel = new FlowPanel();
 			inviteUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
 			inviteButton = DisplayUtils.createIconButton("Invite Members", ButtonType.DEFAULT, "glyphicon-plus");
 			inviteButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					inviteUIPanel.setVisible(!inviteUIPanel.isVisible());
-					inviteUIPanel.layout(true);
 				}
 			});
 			
@@ -75,8 +66,8 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 			inviteUIPanel.add(peopleSuggestBox.asWidget());
 			
 			messageArea = new TextArea();
-			messageArea.setWidth(FIELD_WIDTH);
-			messageArea.setEmptyText("Enter invitation message... (optional)");
+			messageArea.setPlaceholder("Enter invitation message... (optional)");
+			messageArea.setWidth(FIELD_WIDTH + "px");
 			messageArea.addStyleName("margin-top-5");
 			inviteUIPanel.add(messageArea);
 			

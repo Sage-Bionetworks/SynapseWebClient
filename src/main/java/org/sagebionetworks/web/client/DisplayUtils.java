@@ -2171,7 +2171,7 @@ public class DisplayUtils {
 		}
 	}
 	
-	public static void configureShowHide(final InlineLabel label, final LayoutContainer content) {
+	public static void configureShowHide(final InlineLabel label, final Widget content) {
 		label.setText(DisplayConstants.SHOW_LC);
 		label.addClickHandler(new ClickHandler() {
 			@Override
@@ -2183,7 +2183,8 @@ public class DisplayUtils {
 					content.setVisible(true);
 					label.setText(DisplayConstants.HIDE_LC);
 				}
-				content.layout(true);
+				if (content instanceof LayoutContainer)
+					((LayoutContainer)content).layout(true);
 			}
 		});
 	}
