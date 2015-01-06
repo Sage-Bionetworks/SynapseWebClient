@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -180,13 +181,14 @@ public interface SynapseClientAsync {
 	
 	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
 	
+	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	//wiki crud
 	public void getWikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
-	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
+	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
 	 // V2 Wiki crud
-    public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
     public void getV2WikiPage(WikiPageKey key, AsyncCallback<String> callback);
     public void getVersionOfV2WikiPage(WikiPageKey key, Long version, AsyncCallback<String> callback);
     public void updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);

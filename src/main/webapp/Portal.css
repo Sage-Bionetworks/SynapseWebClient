@@ -1674,6 +1674,13 @@ a.projectTitle:hover {
 	color: #555;
 } 
 
+.entityBackgroundImage {
+	position: absolute;
+    width: 100%;
+    z-index: -1;
+    opacity: .5;
+}
+
 .dropLargeIconText {
 	position: relative;
 	top: 4px;
