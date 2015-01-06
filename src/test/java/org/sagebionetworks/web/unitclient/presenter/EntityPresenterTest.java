@@ -26,6 +26,8 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -43,6 +45,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
@@ -71,6 +74,8 @@ public class EntityPresenterTest {
 	String areaToken = null;
 	long id;
 	
+	String rootWikiId = "12333";
+	FileHandleResults rootWikiAttachments;
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(EntityView.class);
@@ -95,6 +100,10 @@ public class EntityPresenterTest {
 		when(mockNodeModelCreator.createEntityBundle(eq(ebt))).thenReturn(eb);
 		verify(mockView).setPresenter(entityPresenter);
 		id=0L;
+		
+		AsyncMockStubber.callSuccessWith(rootWikiId).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		rootWikiAttachments = new FileHandleResults();
+		AsyncMockStubber.callSuccessWith(rootWikiAttachments).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 	}	
 	
 	@Test
@@ -102,6 +111,8 @@ public class EntityPresenterTest {
 		Synapse place = Mockito.mock(Synapse.class);
 		entityPresenter.setPlace(place);
 		verify(mockView, times(2)).setPresenter(entityPresenter);
+		//verify that background image is cleared
+		verify(mockView).setBackgroundImageVisible(false);
 	}	
 	
 	@Test
@@ -197,4 +208,60 @@ public class EntityPresenterTest {
 		assertEquals(expectedFilteredUnmetARs, eb.getUnmetDownloadAccessRequirements());
 	}
 	
+	@Test
+	public void testLoadBackgroundImage() {
+		String projectEntityId = "4";
+		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
+		FileHandle backgroundImageFile = mock(FileHandle.class);
+		when(backgroundImageFile.getFileName()).thenReturn(EntityPresenter.ENTITY_BACKGROUND_IMAGE_NAME);
+		fileHandles.add(backgroundImageFile);
+		rootWikiAttachments.setList(fileHandles);
+		entityPresenter.loadBackgroundImage(projectEntityId);
+		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		//and it should have found the background image and decided to show it!
+		verify(mockView).setBackgroundImageVisible(true);
+		verify(mockView).setBackgroundImageUrl(anyString());
+	}
+	
+	@Test
+	public void testLoadBackgroundImageNoMatch() {
+		String projectEntityId = "4";
+		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
+		FileHandle backgroundImageFile = mock(FileHandle.class);
+		when(backgroundImageFile.getFileName()).thenReturn("wrong file name.png");
+		fileHandles.add(backgroundImageFile);
+		rootWikiAttachments.setList(fileHandles);
+		entityPresenter.loadBackgroundImage(projectEntityId);
+		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		//mismatch file name, should not show a background image
+		verify(mockView, never()).setBackgroundImageVisible(true);
+		verify(mockView, never()).setBackgroundImageUrl(anyString());
+	}
+	
+	@Test
+	public void testLoadBackgroundImageNoRootWiki() {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		
+		String projectEntityId = "4";
+		entityPresenter.loadBackgroundImage(projectEntityId);
+		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		//no root wiki
+		verify(mockView, never()).setBackgroundImageVisible(true);
+		verify(mockView, never()).setBackgroundImageUrl(anyString());
+	}
+	
+	@Test
+	public void testLoadBackgroundImageNoAttachments() {
+		String projectEntityId = "4";
+		entityPresenter.loadBackgroundImage(projectEntityId);
+		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		//no attachments
+		verify(mockView, never()).setBackgroundImageVisible(true);
+		verify(mockView, never()).setBackgroundImageUrl(anyString());
+	}
 }

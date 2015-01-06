@@ -63,7 +63,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String areaToken;
 	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJsniUtils;
-	private static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
+	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
@@ -152,7 +152,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						}
 						EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
 						if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-						loadBackgroundImage(projectHeader.getId());
+						if (projectHeader != null)
+							loadBackgroundImage(projectHeader.getId());
 						EntityPresenter.filterToDownloadARs(bundle);
 						view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
 					} catch (JSONObjectAdapterException ex) {					
@@ -185,8 +186,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		synapseClient.getRootWikiId(projectEntityId, ObjectType.ENTITY.toString(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String rootWikiId) {
-				WikiPageKey wikiKey = new WikiPageKey(projectEntityId, ObjectType.ENTITY.toString(), rootWikiId);
-				loadBackgroundImage(wikiKey);
+				if (rootWikiId != null) {
+					WikiPageKey wikiKey = new WikiPageKey(projectEntityId, ObjectType.ENTITY.toString(), rootWikiId);
+					loadBackgroundImage(wikiKey);
+				}
 			}
 			@Override
 			public void onFailure(Throwable e) {
