@@ -14,6 +14,7 @@
 					dataLoadingText="Executing...">Query</b:Button>
 				<b:Button ui:field="editResultsButton" icon="GEAR" height="34px" />
 				<b:Button ui:field="downloadResultsButton" icon="DOWNLOAD" height="34px" />
+				<b:Button ui:field="helpButton" icon="QUESTION" type="LINK"/>
 			</b:InputGroupButton>
 		</b:InputGroup>
 		<b:Alert ui:field="queryResultsMessage" type="DANGER" visible="false">
