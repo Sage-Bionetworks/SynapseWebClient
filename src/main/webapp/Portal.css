@@ -1678,7 +1678,6 @@ a.projectTitle:hover {
 	position: absolute;
     width: 100%;
     z-index: -1;
-    opacity: .5;
 }
 
 .dropLargeIconText {
