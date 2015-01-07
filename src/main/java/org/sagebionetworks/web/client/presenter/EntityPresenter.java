@@ -194,7 +194,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			@Override
 			public void onFailure(Throwable e) {
 				//if anything goes wrong during image load, catch and log to console only
-				onFailure(e);
+				synapseJsniUtils.consoleError(e.getMessage());
 			}
 		});
 	}

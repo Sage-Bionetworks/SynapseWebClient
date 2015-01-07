@@ -264,4 +264,24 @@ public class EntityPresenterTest {
 		verify(mockView, never()).setBackgroundImageVisible(true);
 		verify(mockView, never()).setBackgroundImageUrl(anyString());
 	}
+	
+	@Test
+	public void testLoadBackgroundImageWikiIdFailure() {
+		String projectEntityId = "4";
+		String exceptionMessage= "my test error message";
+		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		entityPresenter.loadBackgroundImage(projectEntityId);
+		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJSNIUtils).consoleError(exceptionMessage);
+	}
+	
+	@Test
+	public void testLoadBackgroundImageAttachmentListFailure() {
+		String projectEntityId = "4";
+		String exceptionMessage= "my test error message while getting wiki attachments";
+		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		entityPresenter.loadBackgroundImage(projectEntityId);
+		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockSynapseJSNIUtils).consoleError(exceptionMessage);
+	}
 }
