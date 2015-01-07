@@ -1675,4 +1675,24 @@ public class SynapseClientImplTest {
 	public void testGetHostBadUrl() throws RestServiceException {
 		synapseClient.getHost("foobar");
 	}
+	@Test
+	public void testGetRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		WikiPage testPage = new WikiPage();
+		String expectedId = "88837";
+		testPage.setId(expectedId);
+		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
+		
+		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
+		assertEquals(expectedId, actualId);
+	}
+	
+	@Test
+	public void testGetNullRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		WikiPage testPage = null;
+		String expectedId = null;
+		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
+		
+		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
+		assertEquals(expectedId, actualId);
+	}
 }

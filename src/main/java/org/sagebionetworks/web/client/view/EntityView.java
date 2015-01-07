@@ -38,4 +38,7 @@ public interface EntityView extends IsWidget, SynapseView {
 	
 	public void show403();
 	
+	void setBackgroundImageVisible(boolean isVisible);
+	void setBackgroundImageUrl(String url);
+	
 }

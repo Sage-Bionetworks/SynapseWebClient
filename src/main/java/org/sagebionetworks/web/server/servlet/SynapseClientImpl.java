@@ -1581,7 +1581,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getWikiAttachmentHandles(
+	public String getRootWikiId(String ownerObjectId, String ownerObjectType) throws RestServiceException{
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			// asking for the root. find the root id first
+			String rootWikiPageId = getRootWikiId(synapseClient,
+					ownerObjectId,
+					ObjectType.valueOf(ownerObjectType));
+			return rootWikiPageId;
+	}
+	
+	@Override
+	public FileHandleResults getWikiAttachmentHandles(
 			org.sagebionetworks.web.shared.WikiPageKey key)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1599,7 +1609,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					key.getWikiPageId());
 			FileHandleResults results = synapseClient
 					.getWikiAttachmenthHandles(properKey);
-			return EntityFactory.createJSONStringForEntity(results);
+			return results;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
