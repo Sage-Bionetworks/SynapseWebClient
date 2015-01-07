@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
@@ -73,6 +74,9 @@ import com.google.inject.Inject;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
 
+	public static final String TABLES_API_DOCS_URL = "http://rest.synapse.org/#org.sagebionetworks.repo.web.controller.TableController";
+	public static final String TABLES_LEARN_MORE_URL = "#!Wiki:syn2305384/ENTITY/61139";
+
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
 	
@@ -94,6 +98,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	LIElement tablesListItem;
 	@UiField
 	LIElement adminListItem;
+	
+	@UiField
+	Button tableLearnMoreButton;
+	@UiField
+	Button tableAPIDocsButton;
 	
 	@UiField
 	Div projectTitleUI;
@@ -248,7 +257,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableListWidgetContainer.add(tableListWidget);
 
 		initProjectLayout();
-		
+
 		initClickHandlers();
 	}
 	
@@ -270,7 +279,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				globalApplicationState.getPlaceChanger().goTo(new Synapse(currentProjectAnchorTargetId, null, null, null));
 			}
 		});
+		
+		tableLearnMoreButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(TABLES_LEARN_MORE_URL, "", "");
+			}
+		});
 
+		tableAPIDocsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(TABLES_API_DOCS_URL, "", "");
+			}
+		});
 	}
 	
 	private ClickHandler getTabClickHandler(final Synapse.EntityArea targetTab) {
@@ -296,9 +318,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.currentArea = area;
 		DisplayUtils.hide(adminListItem);
 		clearContent();
-		
-		// disable tables completely for now
-		if (!DisplayUtils.isInTestWebsite(cookies)) DisplayUtils.hide(tablesListItem);
 		
 		hideTabContent();
 		
