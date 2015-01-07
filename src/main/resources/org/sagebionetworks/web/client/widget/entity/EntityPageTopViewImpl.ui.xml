@@ -28,7 +28,7 @@
 				    <ul class="nav nav-tabs entity-tabs">				        
 					    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
 					    <li class="entity-tab" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
-					    <li class="entity-tab" ui:field="tablesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="tablesLink"/></li>
+					    <li class="entity-tab" ui:field="tablesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="tablesLink"></g:Anchor></li>
 					    <li class="entity-tab" ui:field="adminListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
 				    </ul>
 				</div>
@@ -80,6 +80,13 @@
 						<g:SimplePanel ui:field="tableActionControllerContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
+						<g:FlowPanel addStyleNames="help-panel">
+							<b:BlockQuote styleName="panel">
+								<b:Heading text="What are Tables?" size="H4"></b:Heading>
+								<bh:Text text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris quis suscipit nunc, sed lacinia lacus. Integer nec tortor id dolor aliquet dignissim. Fusce efficitur diam nisi, nec feugiat quam cursus ac. Pellentesque et convallis massa. Etiam ornare arcu elementum euismod cursus. Donec lacinia ligula a luctus tristique. Nulla pharetra ex justo, ut bibendum ex posuere et. Duis semper magna purus, vitae auctor sapien imperdiet at."></bh:Text>
+							</b:BlockQuote>
+						</g:FlowPanel>
+						
 					</b:Column>
 				</b:Row>
 				<b:Row ui:field="adminTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
