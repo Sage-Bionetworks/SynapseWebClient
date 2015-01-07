@@ -3,7 +3,9 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Entity;
@@ -248,7 +250,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableListWidgetContainer.add(tableListWidget);
 
 		initProjectLayout();
-		
+
 		initClickHandlers();
 	}
 	
