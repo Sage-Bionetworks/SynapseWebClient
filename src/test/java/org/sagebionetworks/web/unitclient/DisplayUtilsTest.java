@@ -450,6 +450,11 @@ public class DisplayUtilsTest {
 	public void testCreateEntityVersionString(){
 		assertEquals("", DisplayUtils.createEntityVersionString(null, null));
 		assertEquals("", DisplayUtils.createEntityVersionString("", null));
+		String versioned = DisplayUtils.createEntityVersionString("syn123", null);
+		assertTrue(versioned.contains("syn123"));
+		versioned = DisplayUtils.createEntityVersionString("syn1234", 8888L);
+		assertTrue(versioned.contains("syn1234"));
+		assertTrue(versioned.contains("8888"));
 	}
 }
 
