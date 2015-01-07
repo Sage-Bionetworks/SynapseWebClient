@@ -106,9 +106,9 @@ public class ClientProperties {
 	public static final String REST_API_URL = "http://rest.synapse.org";
 	public static final String CLIENT_R_API_URL = "http://r-docs.synapse.org";
 	public static final String CLIENT_R_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.R_CLIENT;
-	public static final String CLIENT_PYTHON_API_URL = "#!Help:"+WebConstants.PYTHON_CLIENT;
+	public static final String CLIENT_PYTHON_API_URL = "http://python-docs.synapse.org";
 	public static final String CLIENT_PYTHON_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.PYTHON_CLIENT;
-	public static final String CLIENT_CL_API_URL = "#!Help:" + WebConstants.COMMAND_LINE_CLIENT;
+	public static final String CLIENT_CL_API_URL = "http://python-docs.synapse.org/CommandLineClient.html";
 	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.COMMAND_LINE_CLIENT;
 	public static final String CLIENT_JAVA_API_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
 	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";	
