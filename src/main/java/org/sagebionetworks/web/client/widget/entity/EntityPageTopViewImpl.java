@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
@@ -96,6 +97,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	LIElement tablesListItem;
 	@UiField
 	LIElement adminListItem;
+	
+	@UiField
+	Button tableLearnMoreButton;
+	@UiField
+	Button tableAPIDocsButton;
 	
 	@UiField
 	Div projectTitleUI;
@@ -272,7 +278,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				globalApplicationState.getPlaceChanger().goTo(new Synapse(currentProjectAnchorTargetId, null, null, null));
 			}
 		});
+		
+		tableLearnMoreButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("#!Wiki:syn2305384/ENTITY/61139", "", "");
+			}
+		});
 
+		tableAPIDocsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("http://rest.synapse.org/#org.sagebionetworks.repo.web.controller.TableController", "", "");
+			}
+		});
 	}
 	
 	private ClickHandler getTabClickHandler(final Synapse.EntityArea targetTab) {
