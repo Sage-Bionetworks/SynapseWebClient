@@ -446,6 +446,11 @@ public class DisplayUtilsTest {
 		Mockito.verifyZeroInteractions(mockView, mockPlaceChanger);
 	}
 	
+	@Test
+	public void testCreateEntityVersionString(){
+		assertEquals("", DisplayUtils.createEntityVersionString(null, null));
+		assertEquals("", DisplayUtils.createEntityVersionString("", null));
+	}
 }
 
 

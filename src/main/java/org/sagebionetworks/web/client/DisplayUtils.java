@@ -1717,10 +1717,11 @@ public class DisplayUtils {
 	}
 	
 	public static String createEntityVersionString(String id, Long version) {
+		String idNotNull = id == null ? "" : id;
 		if(version != null)
-			return id+WebConstants.ENTITY_VERSION_STRING+version;
+			return idNotNull+WebConstants.ENTITY_VERSION_STRING+version;
 		else 
-			return id;		
+			return idNotNull;		
 	}
 	public static Reference parseEntityVersionString(String entityVersion) {
 		String[] parts = entityVersion.split(WebConstants.ENTITY_VERSION_STRING);
