@@ -319,9 +319,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		DisplayUtils.hide(adminListItem);
 		clearContent();
 		
-		// disable tables completely for now
-		if (!DisplayUtils.isInTestWebsite(cookies)) DisplayUtils.hide(tablesListItem);
-		
 		hideTabContent();
 		
 		// project header
