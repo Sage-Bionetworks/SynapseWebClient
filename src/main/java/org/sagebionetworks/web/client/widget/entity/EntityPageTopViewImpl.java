@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Entity;
@@ -75,6 +73,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
+
+	public static final String TABLES_API_DOCS_URL = "http://rest.synapse.org/#org.sagebionetworks.repo.web.controller.TableController";
+	public static final String TABLES_LEARN_MORE_URL = "#!Wiki:syn2305384/ENTITY/61139";
 
 	public interface Binder extends UiBinder<Widget, EntityPageTopViewImpl> {
 	}
@@ -282,14 +283,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableLearnMoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("#!Wiki:syn2305384/ENTITY/61139", "", "");
+				DisplayUtils.newWindow(TABLES_LEARN_MORE_URL, "", "");
 			}
 		});
 
 		tableAPIDocsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("http://rest.synapse.org/#org.sagebionetworks.repo.web.controller.TableController", "", "");
+				DisplayUtils.newWindow(TABLES_API_DOCS_URL, "", "");
 			}
 		});
 	}
