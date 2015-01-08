@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
@@ -59,7 +58,6 @@ public class HomePresenterTest {
 	PlaceChanger mockPlaceChanger;
 	StackConfigServiceAsync mockStackConfigService;
 	RssServiceAsync mockRssService;
-	RequestBuilderWrapper mockRequestBuilder;
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookies;
@@ -86,7 +84,6 @@ public class HomePresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockGwtWrapper = mock(GWTWrapper.class);
-		mockRequestBuilder = mock(RequestBuilderWrapper.class);
 		mockCookies = mock(CookieProvider.class);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://synapse.org/filehandle/");
 		
@@ -127,8 +124,7 @@ public class HomePresenterTest {
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
 				mockRssService,
-				adapter, 
-				mockRequestBuilder);
+				adapter);
 		verify(mockView).setPresenter(homePresenter);
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 		

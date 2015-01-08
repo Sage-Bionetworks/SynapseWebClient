@@ -87,6 +87,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public final static int PROJECT_PAGE_SIZE=100;
 	public ProjectFilterEnum filterType;
 	public Team filterTeam;
+	public static final String TEAMS_2_CHALLENGE_ENTITIES_COOKIE = "org.sagebionetworks.team.2.challenge.project";
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -336,7 +337,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObjectAdapter> callback) {
-		String responseText = cookies.getCookie(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE);
+		String responseText = cookies.getCookie(ProfilePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE);
 		
 		if (responseText != null) {
 			parseTeam2ChallengeWhitelist(responseText, callback);
@@ -357,7 +358,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	            {
 	            	String responseText = response.getText();
 	            	Date expires = new Date(System.currentTimeMillis() + 1000*60*60*24); // store for a day
-	            	cookies.setCookie(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE, responseText, expires);
+	            	cookies.setCookie(ProfilePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE, responseText, expires);
 	            	parseTeam2ChallengeWhitelist(responseText, callback);
 	            }
 

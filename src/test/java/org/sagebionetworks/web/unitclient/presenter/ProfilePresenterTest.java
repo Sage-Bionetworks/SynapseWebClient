@@ -66,7 +66,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
@@ -684,12 +683,12 @@ public class ProfilePresenterTest {
 			public void invoke(Object param) {
 			}
 		};
-		when(mockCookies.getCookie(eq(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn("{\"1\":\"syn1\", \"2\" : \"syn2\"}");
+		when(mockCookies.getCookie(eq(ProfilePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn("{\"1\":\"syn1\", \"2\" : \"syn2\"}");
 		profilePresenter.getTeamId2ChallengeIdWhitelist(callback);
 		verify(mockRequestBuilder, times(0)).configure(any(RequestBuilder.Method.class), anyString());
 		
 		//but without the cookie, it should be called
-		when(mockCookies.getCookie(eq(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn(null);
+		when(mockCookies.getCookie(eq(ProfilePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn(null);
 		profilePresenter.getTeamId2ChallengeIdWhitelist(callback);
 		verify(mockRequestBuilder, times(1)).configure(any(RequestBuilder.Method.class), anyString());
 	}
