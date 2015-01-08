@@ -10,16 +10,13 @@
 		<div ui:field="headerDiv" class="notopmargin small-header">		    
 			<div class="display-inline last notopmargin margin-top-3">
 			    <div ui:field="headerImageDiv" class="col-md-4 col-sm-4 logo notopmargin">
-			        <a href="#"> 
+			        <a href="#!Home:0"> 
 				    	<g:Image ui:field="logoLarge" resource="{sageImages.synaspseHeader}" styleName="margin-top-4" />					
 						<g:Image ui:field="logoSmall" resource="{sageImages.synapseLogoSmall}" styleName="margin-top-4" />
 					</a>					
 			    </div>
 				<g:FlowPanel styleName="display-inline margin-top-4 col-md-8 col-sm-8 last" ui:field="commandBar" />
 			</div>
-			
-					
 		</div>
-
 	</g:HTMLPanel>
 </ui:UiBinder>

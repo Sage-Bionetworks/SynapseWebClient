@@ -23,11 +23,8 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -40,7 +37,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -48,7 +44,6 @@ public class BreadcrumbTest {
 		
 	Breadcrumb breadcrumb;
 	BreadcrumbView mockView;
-	NodeModelCreator mockNodeModelCreator;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
@@ -58,7 +53,6 @@ public class BreadcrumbTest {
 	@Before
 	public void setup() throws UnsupportedEncodingException, JSONObjectAdapterException{		
 		mockView = Mockito.mock(BreadcrumbView.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -66,7 +60,7 @@ public class BreadcrumbTest {
 						
 		breadcrumb = new Breadcrumb(mockView, mockSynapseClient,
 				mockGlobalApplicationState, mockAuthenticationController,
-				mockNodeModelCreator, mockIconsImageBundle);
+				mockIconsImageBundle);
 		
 		
 		verify(mockView).setPresenter(breadcrumb);
@@ -99,29 +93,8 @@ public class BreadcrumbTest {
 		entityPath.setPath(pathHeaders);
 		JSONObjectAdapter pathAdapter = new JSONObjectAdapterImpl();
 		entityPath.writeToJSONObject(pathAdapter);
-				
-		EntityWrapper entityWrapper = new EntityWrapper(pathAdapter.toJSONString(), EntityPath.class.getName());	
 		
-		// Fail path service call
-//		reset(mockView);		
-//		AsyncMockStubber.callFailureWith(new Throwable("error message")).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class)); // fail for get Path
-//		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class), eq(EntityPath.class))).thenReturn(entityPath);
-//		breadcrumb.asWidget(entityPath);
-//		verify(mockView).showErrorMessage(anyString());
-		
-		// fail model creation
-		reset(mockView);			
-		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(EntityPath.class))).thenReturn(null); // null model return
-		breadcrumb.asWidget((EntityPath)null, EntityArea.FILES, false);
-		verify(mockView).setLinksList(any(List.class));
-		
-		// success test
-		reset(mockView);			
-		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createJSONEntity(entityWrapper.getEntityJson(), EntityPath.class)).thenReturn(entityPath);
-		breadcrumb.asWidget(entityPath, EntityArea.FILES, false);
-		verify(mockView).setLinksList(any(List.class));				
+		//no service calls in BreadCrumb
 	}
 	
 
@@ -135,11 +108,6 @@ public class BreadcrumbTest {
 		String currentPageName  = "CurrentPage";
 		breadcrumb.asWidget(links, currentPageName);
 		verify(mockView).setLinksList(links, currentPageName);
-		
-		//also verify the single page off of home works
-		reset(mockView);
-		breadcrumb.asWidget(currentPageName);
-		verify(mockView).setLinksList(any(List.class), (String)isNotNull());
 	}
 	
 	

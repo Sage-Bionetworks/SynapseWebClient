@@ -68,8 +68,10 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.HomeRedirector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
@@ -2142,7 +2144,7 @@ public class DisplayUtils {
 	public static void goToLastPlace(GlobalApplicationState globalApplicationState) {
 		Place forwardPlace = globalApplicationState.getLastPlace();
 		if(forwardPlace == null) {
-			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+			forwardPlace = new HomeRedirector();
 		}
 		globalApplicationState.getPlaceChanger().goTo(forwardPlace);
 	}

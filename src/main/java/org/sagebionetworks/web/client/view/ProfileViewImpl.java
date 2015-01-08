@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -202,7 +201,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			Header headerWidget, 
 			Footer footerWidget, 
 			SageImageBundle sageImageBundle,
-			Breadcrumb breadcrumb, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,

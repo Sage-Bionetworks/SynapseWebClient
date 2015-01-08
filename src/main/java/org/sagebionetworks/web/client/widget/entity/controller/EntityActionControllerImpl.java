@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -14,7 +13,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -186,7 +185,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
-			gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
 		}
 		return gotoPlace;
 	}

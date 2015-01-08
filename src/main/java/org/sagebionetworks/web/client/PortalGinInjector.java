@@ -130,7 +130,7 @@ public interface PortalGinInjector extends Ginjector {
 	public GlobalApplicationState getGlobalApplicationState();
 	
 	public PresenterProxy<HomePresenter, Home> getHomePresenter();
-
+	
 	public EntityPresenter getEntityPresenter();
 	
 	public ProjectsHomePresenter getProjectsHomePresenter();

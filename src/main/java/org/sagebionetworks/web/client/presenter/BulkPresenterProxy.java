@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.HomeRedirector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
@@ -73,7 +74,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 				// detect prefetch
 				if (panel == null && eventBus == null) return;
 				if (loading != null) loading.hide();
-
 				if (place instanceof Synapse) {
 					EntityPresenter presenter = ginjector.getEntityPresenter();
 					presenter.setPlace((Synapse) place);

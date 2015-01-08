@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.HomeRedirector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
@@ -71,7 +72,8 @@ public class AppActivityMapper implements ActivityMapper {
 		this.loading = loading;
 		
 		openAccessPlaces = new ArrayList<Class>();
-		openAccessPlaces.add(Home.class);		
+		openAccessPlaces.add(Home.class);
+		openAccessPlaces.add(HomeRedirector.class);
 		openAccessPlaces.add(LoginPlace.class);
 		openAccessPlaces.add(PasswordReset.class);
 		openAccessPlaces.add(RegisterAccount.class);
@@ -93,6 +95,8 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Certificate.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
+		excludeFromLastPlace.add(HomeRedirector.class);
+		excludeFromLastPlace.add(Home.class);
 		excludeFromLastPlace.add(LoginPlace.class);
 		excludeFromLastPlace.add(PasswordReset.class);
 		excludeFromLastPlace.add(RegisterAccount.class);
@@ -112,17 +116,27 @@ public class AppActivityMapper implements ActivityMapper {
 	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();		
 		
+		if(place.getClass().equals(HomeRedirector.class)) {
+			// Redirect to appropriate place
+			if (authenticationController.isLoggedIn()) {
+				return getActivity(new Profile(authenticationController.getCurrentUserPrincipalId()));
+			} else {
+				return getActivity(new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
+			}
+		}
+		
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
 		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is  
 		if(storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
-			if (!(isFirstTime && storedCurrentPlace.getClass().equals(AppActivityMapper.getDefaultPlace().getClass())))  //if first load, then do not set the last place (if it's the default place) 
+			if (!(isFirstTime && storedCurrentPlace.getClass().equals(Profile.class)))  //if first load, then do not set the last place (if it's a default place) 
 				globalApplicationState.setLastPlace(storedCurrentPlace);			
 		}
 		
 		isFirstTime = false;
+		
 		globalApplicationState.setCurrentPlace(place);
-				
+		
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {
@@ -130,8 +144,6 @@ public class AppActivityMapper implements ActivityMapper {
 				// Redirect them to the login screen
 				LoginPlace loginPlace = new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN);
 				return getActivity(loginPlace);
-			} else {
-				
 			}
 		}
 		
@@ -164,7 +176,7 @@ public class AppActivityMapper implements ActivityMapper {
 	 * @return
 	 */
 	public static Place getDefaultPlace() {
-		return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+		return new HomeRedirector();
 	}
 	
 }

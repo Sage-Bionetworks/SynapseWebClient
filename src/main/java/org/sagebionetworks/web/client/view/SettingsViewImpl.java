@@ -38,10 +38,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	public interface SettingsViewImplUiBinder extends UiBinder<Widget, SettingsViewImpl> {}
 
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	
 	@UiField
 	DivElement changeSynapsePasswordUI;
@@ -49,15 +45,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	DivElement changeSynapsePasswordHighlightBox;
 	@UiField
 	DivElement apiKeyHighlightBox;
-	@UiField
-	DivElement colorLine;
-	@UiField
-	DivElement separator;
-	
-	@UiField
-	HeadingElement settingsHeading;
-
-	
+		
 	@UiField
 	FlowPanel forgotPasswordContainer;
 	Anchor forgotPasswordLink;
@@ -102,8 +90,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Button changePasswordBtn;
 	
 	@UiField
-	SimplePanel breadcrumbsPanel;
-	@UiField
 	SpanElement storageUsageSpan;
 	@UiField
 	Text apiKeyContainer;
@@ -116,23 +102,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Button changeApiKey;
 	
 	private Presenter presenter;
-	private Header headerWidget;
-	private Breadcrumb breadcrumb;
-	private Footer footerWidget;
 	
 	@Inject
-	public SettingsViewImpl(SettingsViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget, Breadcrumb breadcrumb) {		
+	public SettingsViewImpl(SettingsViewImplUiBinder binder) {		
 		initWidget(binder.createAndBindUi(this));
 		
-		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
-		this.breadcrumb = breadcrumb;
-		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
-		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-	
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 		
@@ -185,34 +159,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
-		header.clear();
-		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
-		headerWidget.refresh();				
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
 	@Override
-	public void render(boolean standAlonePlace) {
-		//set the Settings page breadcrumb
-		breadcrumbsPanel.clear();
-		if (standAlonePlace) {
-			DisplayUtils.show(header);
-			DisplayUtils.show(footer);
-			DisplayUtils.show(colorLine);
-			DisplayUtils.show(settingsHeading);
-			DisplayUtils.show(separator);
-			breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
-		} else {
-			DisplayUtils.hide(header);
-			DisplayUtils.hide(footer);
-			DisplayUtils.hide(colorLine);
-			DisplayUtils.hide(settingsHeading);
-			DisplayUtils.hide(separator);
-		}
-		
+	public void render() {
 		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");
 		password1Field.getElement().setAttribute("placeholder", "Enter new password");
 		password2Field.getElement().setAttribute("placeholder", "Confirm new password");
@@ -233,10 +184,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		DisplayUtils.showFormError(currentPassword, currentPasswordError);
 	}
 
-	@Override
-	public void refreshHeader() {
-		headerWidget.refresh();
-	}
 
 	@Override
 	public void showErrorMessage(String message) {

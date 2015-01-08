@@ -21,7 +21,9 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.HomeRedirector;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
@@ -282,7 +284,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			List<LinkData> links = new ArrayList<LinkData>();
 			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
 				//point to Home
-				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
+				links.add(new LinkData("Home", new HomeRedirector()));
 				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
 			} else {
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
