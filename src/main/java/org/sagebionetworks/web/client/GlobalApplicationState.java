@@ -89,4 +89,9 @@ public interface GlobalApplicationState {
 	void initSynapseProperties(Callback c);
 	
 	String getSynapseProperty(String key);
+	
+	/**
+	 * Return the correct Home place (depends on if the user is logged in)
+	 */
+	Place getHomePlace();
 }

@@ -2142,11 +2142,7 @@ public class DisplayUtils {
 	}
 	
 	public static void goToLastPlace(GlobalApplicationState globalApplicationState) {
-		Place forwardPlace = globalApplicationState.getLastPlace();
-		if(forwardPlace == null) {
-			forwardPlace = new HomeRedirector();
-		}
-		globalApplicationState.getPlaceChanger().goTo(forwardPlace);
+		globalApplicationState.getPlaceChanger().goTo(globalApplicationState.getLastPlace());
 	}
 	
 	public static String getStackTrace(Throwable t) {

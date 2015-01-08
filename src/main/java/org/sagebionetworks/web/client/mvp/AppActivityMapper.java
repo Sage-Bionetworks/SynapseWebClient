@@ -117,12 +117,7 @@ public class AppActivityMapper implements ActivityMapper {
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();		
 		
 		if(place.getClass().equals(HomeRedirector.class)) {
-			// Redirect to appropriate place
-			if (authenticationController.isLoggedIn()) {
-				return getActivity(new Profile(authenticationController.getCurrentUserPrincipalId()));
-			} else {
-				return getActivity(new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
-			}
+			return getActivity(globalApplicationState.getHomePlace());
 		}
 		
 		// set current and last places
