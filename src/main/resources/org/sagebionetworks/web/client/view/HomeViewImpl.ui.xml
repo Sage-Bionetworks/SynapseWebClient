@@ -80,9 +80,6 @@
 						<g:SimplePanel ui:field="dreamBtnPanel"/>
 					</div>
 				</g:HTMLPanel>
-	
-				<!-- START PROJECT & MY PROJECTS -->
-				<g:SimplePanel ui:field="projectPanel" />
 			</div> <!-- end row -->				
 			
 			<!-- SEARCH BOX -->

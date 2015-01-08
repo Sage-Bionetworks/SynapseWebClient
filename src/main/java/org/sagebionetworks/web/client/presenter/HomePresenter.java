@@ -67,39 +67,24 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private RssServiceAsync rssService;
-	private SearchServiceAsync searchService;
-	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private GWTWrapper gwt;
 	private RequestBuilderWrapper requestBuilder;
-	private CookieProvider cookies;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
 			RssServiceAsync rssService,
-			SearchServiceAsync searchService, 
-			SynapseClientAsync synapseClient, 			
 			AdapterFactory adapterFactory,
-			SynapseJSNIUtils synapseJSNIUtils,
-			GWTWrapper gwt,
-			RequestBuilderWrapper requestBuilder,
-			CookieProvider cookies){
+			RequestBuilderWrapper requestBuilder){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.rssService = rssService;
-		this.searchService = searchService;
-		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.authenticationController = authenticationController;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.gwt = gwt;
 		this.requestBuilder = requestBuilder;
-		this.cookies = cookies;
 		this.view.setPresenter(this);
 	}
 
@@ -122,8 +107,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		loadNewsFeed();
 		
 		// Things to load for authenticated users
-		if(showLoggedInDetails()) {
-			loadProjectsAndFavorites();
+		if(authenticationController.isLoggedIn()) {
 			//validate token
 			validateToken();
 		}
@@ -214,205 +198,10 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
         return null;
     }
 
-	@Override
-	public boolean showLoggedInDetails() {
-		return authenticationController.isLoggedIn();
-	}
 	
 	public void checkAcceptToU() {
 		if (authenticationController.isLoggedIn() && !authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
 			authenticationController.logoutUser();
 		}
-	}
-	
-	public void loadProjectsAndFavorites() {
-		//ask for my teams
-		TeamListWidget.getTeams(authenticationController.getCurrentUserPrincipalId(), synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setMyTeamsError("Could not load My Teams");
-			}
-			@Override
-			public void onSuccess(List<Team> myTeams) {
-				view.refreshMyTeams(myTeams);
-				getChallengeProjectIds(myTeams);
-			}
-		});
-		
-		view.showOpenTeamInvitesMessage(false);
-		isOpenTeamInvites(new AsyncCallback<Boolean>() {
-			@Override
-			public void onSuccess(Boolean b) {
-				view.showOpenTeamInvitesMessage(b);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				//do nothing
-			}
-		});
-		
-		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setMyProjects(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setMyProjectsError("Could not load My Projects");
-			}
-		});
-		
-		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setFavorites(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setFavoritesError("Could not load Favorites");
-			}
-		});
-	}
-	
-	public void isOpenTeamInvites(final AsyncCallback<Boolean> callback) {
-		if (!authenticationController.isLoggedIn()) { 
-			callback.onSuccess(false);
-			return;
-		}
-		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<ArrayList<MembershipInvitationBundle>>() {
-			@Override
-			public void onSuccess(ArrayList<MembershipInvitationBundle> result) {
-				callback.onSuccess(result.size() > 0);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});		
-	}
-
-	public void getChallengeProjectIds(final List<Team> myTeams) {
-		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObjectAdapter>() {
-			@Override
-			public void invoke(JSONObjectAdapter mapping) {
-				Set<String> challengeEntities = new HashSet<String>();
-				for (Team team : myTeams) {
-					if (mapping.has(team.getId())) {
-						try {
-							challengeEntities.add(mapping.getString(team.getId()));
-						} catch (JSONObjectAdapterException e) {
-							//problem with one of the mapping entries
-						}
-					}
-				}
-				getChallengeProjectHeaders(challengeEntities);
-			}
-		});
-	}
-	
-	public void getChallengeProjectHeaders(final Set<String> challengeProjectIdsSet) {
-		List<String> challengeProjectIds = new ArrayList<String>();
-		challengeProjectIds.addAll(challengeProjectIdsSet);
-		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<ArrayList<EntityHeader>>() {
-			
-			@Override
-			public void onSuccess(ArrayList<EntityHeader> headers) {
-				//finally, we can tell the view to update the user challenges based on these entity headers
-				EntityBrowserUtils.sortEntityHeadersByName(headers);
-				view.setMyChallenges(headers);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setMyChallengesError("Could not load My Challenges:" + caught.getMessage());
-			}
-		});
-	}
-	
-	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObjectAdapter> callback) {
-		String responseText = cookies.getCookie(TEAMS_2_CHALLENGE_ENTITIES_COOKIE);
-		
-		if (responseText != null) {
-			parseTeam2ChallengeWhitelist(responseText, callback);
-			return;
-		}
-		requestBuilder.configure(RequestBuilder.GET, DisplayUtils.createRedirectUrl(synapseJSNIUtils.getBaseFileHandleUrl(), gwt.encodeQueryString(ClientProperties.TEAM2CHALLENGE_WHITELIST_URL)));
-	     try
-	     {
-	    	 requestBuilder.sendRequest(null, new RequestCallback() {
-	            @Override
-	            public void onError(Request request, Throwable exception) 
-	            {
-	            	//do nothing, may or may not have any challenges
-	            }
-
-	            @Override
-	            public void onResponseReceived(Request request,Response response) 
-	            {
-	            	String responseText = response.getText();
-	            	Date expires = new Date(System.currentTimeMillis() + 1000*60*60*24); // store for a day
-	            	cookies.setCookie(TEAMS_2_CHALLENGE_ENTITIES_COOKIE, responseText, expires);
-	            	parseTeam2ChallengeWhitelist(responseText, callback);
-	            }
-
-	         });
-	     }
-	     catch (Exception e){
-         	//failed to load my challenges
-	    	 view.setMyChallengesError("Could not load My Challenges: " + e.getMessage());
-	     }
-	}
-	
-	private void parseTeam2ChallengeWhitelist(String responseText, CallbackP<JSONObjectAdapter> callback){
-		try {
-			callback.invoke(adapterFactory.createNew(responseText));
-		} catch (Throwable e) {
-			//just in case there is a parsing exception
-		}
-	}
-	
-	@Override
-	public void createProject(final String name) {
-		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String newProjectId) {
-				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(caught instanceof ConflictException) {
-					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
-				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					} 
-				}
-			}
-		});
-	}
-	
-	@Override
-	public void createTeam(final String teamName) {
-		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String newTeamId) {
-				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
-				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(caught instanceof ConflictException) {
-					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
-				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					}
-				}
-			}
-		});
 	}
 }
