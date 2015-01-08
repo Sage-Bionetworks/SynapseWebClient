@@ -125,9 +125,7 @@ public class AppActivityMapperTest {
 	@Test 
 	public void testGetActivityHomeRedirectorNotLoggedIn() {
 		Place homeRedirectorPlace = new HomeRedirector();
-				
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(null);
+		when(mockGlobalApplicationState.getHomePlace()).thenReturn(new Home(""));
 		
 		appActivityMapper.getActivity(homeRedirectorPlace);
 		
@@ -141,11 +139,8 @@ public class AppActivityMapperTest {
 	@Test 
 	public void testGetActivityHomeRedirectorLoggedIn() {
 		Place homeRedirectorPlace = new HomeRedirector();
-				
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		String userId = "8787878";
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		
+		String userId = "2222";
+		when(mockGlobalApplicationState.getHomePlace()).thenReturn(new Profile(userId));
 		appActivityMapper.getActivity(homeRedirectorPlace);
 		
 		ArgumentCaptor<Place> currentPlaceCaptor = ArgumentCaptor.forClass(Place.class);
