@@ -117,6 +117,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
+import org.sagebionetworks.web.client.widget.entity.EntityNameModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
@@ -142,6 +144,8 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetView;
@@ -320,8 +324,6 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandlerImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPage;
@@ -750,6 +752,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AccessRequirementController.class).to(AccessRequirementControllerImpl.class);
 		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
+		bind(EntityNameModalView.class).to(EntityNameModalViewImpl.class);
+		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
 		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
@@ -931,7 +935,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CellFactory.class).to(CellFactoryImpl.class);
 		bind(QueryInputView.class).to(QueryInputViewImpl.class);
 		bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
-		bind(CreateTableModalView.class).to(CreateTableModalViewImpl.class);
 		bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
 		bind(UploadCSVPreviewPage.class).to(UploadCSVPreviewPageImpl.class);
 		bind(CSVOptionsView.class).to(CSVOptionsViewImpl.class);

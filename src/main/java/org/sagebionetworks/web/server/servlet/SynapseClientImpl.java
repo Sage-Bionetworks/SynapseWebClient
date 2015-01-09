@@ -627,6 +627,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	/**
+	 * Update an entity.
+	 */
+	public Entity updateEntity(Entity toUpdate) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return synapseClient.putEntity(toUpdate);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public String createOrUpdateEntity(String entityJson, String annoJson,

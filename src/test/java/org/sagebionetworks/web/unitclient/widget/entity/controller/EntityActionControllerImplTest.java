@@ -7,7 +7,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
@@ -56,6 +57,7 @@ public class EntityActionControllerImplTest {
 	PlaceChanger mockPlaceChanger;
 	AuthenticationController mockAuthenticationController;
 	AccessControlListModalWidget mockAccessControlListModalWidget;
+	RenameEntityModalWidget mockRenameEntityModalWidget;
 	
 	ActionMenuWidget mockActionMenu;
 	EntityUpdatedHandler mockEntityUpdatedHandler;
@@ -75,6 +77,7 @@ public class EntityActionControllerImplTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
+		mockRenameEntityModalWidget = Mockito.mock(RenameEntityModalWidget.class);
 		mockAuthenticationController = Mockito
 				.mock(AuthenticationController.class);
 		mockAccessControlListModalWidget = Mockito
@@ -92,7 +95,8 @@ public class EntityActionControllerImplTest {
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController, mockEntityTypeProvider,
 				mockSynapseClient, mockGlobalApplicationState,
-				mockAuthenticationController, mockAccessControlListModalWidget);
+				mockAuthenticationController, mockAccessControlListModalWidget,
+				mockRenameEntityModalWidget);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -103,6 +107,7 @@ public class EntityActionControllerImplTest {
 		permissions.setCanChangePermissions(true);
 		permissions.setCanDelete(true);
 		permissions.setCanPublicRead(true);
+		permissions.setCanEdit(true);
 		entityBundle = new EntityBundle(table, null, permissions, null, null, null, null, null);
 		
 	}
@@ -120,6 +125,11 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.SHARE, true);
 		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
 		verify(mockActionMenu).addActionListener(Action.SHARE, controller);
+		// Rename
+		verify(mockActionMenu).setActionEnabled(Action.CHANGE_ENTITY_NAME, true);
+		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+entityDispalyType);
+		verify(mockActionMenu).addActionListener(Action.CHANGE_ENTITY_NAME, controller);
 	}
 	
 	@Test
@@ -264,5 +274,38 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.SHARE);
 		verify(mockAccessControlListModalWidget).showSharing(any(Callback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testRenameHappy(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockRenameEntityModalWidget).onRename(any(Entity.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		// method under test
+		controller.onAction(Action.CHANGE_ENTITY_NAME);
+		verify(mockRenameEntityModalWidget).onRename(any(Entity.class), any(Callback.class));
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testRenameNoChange(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockRenameEntityModalWidget).onRename(any(Entity.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		// method under test
+		controller.onAction(Action.CHANGE_ENTITY_NAME);
+		verify(mockRenameEntityModalWidget).onRename(any(Entity.class), any(Callback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testRenameFailedPreFlight(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockRenameEntityModalWidget).onRename(any(Entity.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		// method under test
+		controller.onAction(Action.CHANGE_ENTITY_NAME);
+		verify(mockRenameEntityModalWidget, never()).onRename(any(Entity.class), any(Callback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 }
