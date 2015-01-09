@@ -237,7 +237,7 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
 		uploader.addCancelHandler(cancelHandler);
-		verify(view).showUploadingToSynapseStorage(anyString());
+		verify(view).showUploadingToSynapseStorage();
 		verify(view).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
 		String[] fileNames = {file1};
