@@ -148,7 +148,7 @@ public class Synapse extends Place implements RestartActivityOptional{
     }
 
 	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN }
-	public static enum ProfileArea { PROJECTS, FAVORITES, CHALLENGES, TEAMS, SETTINGS }
+	public static enum ProfileArea { PROJECTS, CHALLENGES, TEAMS, SETTINGS }
 
 	@Override
 	public int hashCode() {

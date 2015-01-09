@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
@@ -32,8 +33,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void refreshHeader();
 	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
-	void setFavorites(List<EntityHeader> headers);
-	void setFavoritesError(String string);
 	void setChallenges(List<EntityHeader> headers);
 	void setChallengesError(String error);
 	void setTeams(List<Team> teams, boolean isOwner);
@@ -47,14 +46,12 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showConfirmDialog(String title, String message, Callback yesCallback);
 	void showProjectsLoading(boolean isLoading);
 	void showProjectFiltersUI();
-	boolean isMyProjectFilterSelected();
-	boolean isAllProjectFilterSelected();
-	void setAllProjectFilterSelected();
-	void setMyProjectFilterSelected();
-	void setTeamProjectFilterSelected(Team team);
-	Team getSelectedTeamFilter();
-	void setProjectHighlightBoxText(String text);
 	void hideLoading();
+	void setTeamsFilterVisible(boolean isVisible);
+	void setTeamsFilterSelected();
+	void setMyProjectsFilterSelected();
+	void setAllProjectsFilterSelected();
+	void setFavoritesFilterSelected();
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -68,7 +65,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();
 		void getMoreProjects();
-		void applyFilterClicked();
-		void cancelFilterClicked();
+		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 	}
 }

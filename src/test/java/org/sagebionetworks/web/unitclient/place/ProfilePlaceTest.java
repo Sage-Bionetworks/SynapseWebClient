@@ -36,16 +36,6 @@ public class ProfilePlaceTest {
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 	
-
-	@Test
-	public void testFavoritesCase() {
-		String testToken = testUserId + Profile.FAVORITES_DELIMITER;
-		Profile place = tokenizer.getPlace(testToken);
-		Assert.assertEquals(testUserId, place.getUserId());
-		Assert.assertEquals(Synapse.ProfileArea.FAVORITES, place.getArea());
-		Assert.assertEquals(testToken, tokenizer.getToken(place));
-	}
-	
 	@Test
 	public void testChallengesCase() {
 		String testToken = testUserId + Profile.CHALLENGES_DELIMITER;
