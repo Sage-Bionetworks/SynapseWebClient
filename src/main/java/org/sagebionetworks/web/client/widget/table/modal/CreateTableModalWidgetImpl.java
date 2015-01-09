@@ -35,7 +35,7 @@ public class CreateTableModalWidgetImpl implements EntityNameModalView.Presenter
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.view.setPresenter(this);
-		this.view.configure(TITLE, LABEL, BUTTON_TEXT, null);
+		this.view.configure(TITLE, LABEL, BUTTON_TEXT, "");
 	}
 	
 	/**

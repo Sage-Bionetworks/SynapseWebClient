@@ -11,8 +11,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * A simple modal dialog for creating a TableEntity.
- * This widget is a bootstrap modal and must be added to the page. 
+ * A simple modal dialog for renaming an entity.
+ * 
  * @author John
  *
  */
@@ -44,7 +44,7 @@ public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presente
 	
 	
 	/**
-	 * Create the table.
+	 * Update entity with a new name.
 	 * @param name
 	 */
 	private void updateEntity(final String name) {
@@ -67,7 +67,7 @@ public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presente
 	}
 
 	/**
-	 * Should be Called when the create button is clicked on the dialog.
+	 * Should be Called when the rename button is clicked on the dialog.
 	 */
 	@Override
 	public void onPrimary() {

@@ -74,6 +74,7 @@ public class RenameEntityModalWidgetTest {
 		when(mockView.getName()).thenReturn(startName);
 		// Calling save with no real change just closes the dialog.
 		widget.onPrimary();
+		verify(mockView, never()).setLoading(true);
 		verify(mockView).hide();
 		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		// should only be called on success
@@ -88,6 +89,7 @@ public class RenameEntityModalWidgetTest {
 		AsyncMockStubber.callSuccessWith(new TableEntity()).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
+		verify(mockView).setLoading(true);
 		verify(mockView).hide();
 		verify(mockCallback).invoke();
 	}
@@ -101,7 +103,9 @@ public class RenameEntityModalWidgetTest {
 		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		// save button
 		widget.onPrimary();
+		verify(mockView).setLoading(true);
 		verify(mockView).showError(error.getMessage());
+		verify(mockView).setLoading(false);
 		verify(mockView, never()).hide();
 		verify(mockCallback, never()).invoke();
 	}
