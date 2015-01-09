@@ -12,6 +12,7 @@ import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Team;
@@ -101,6 +102,14 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public EntityWrapper updateEntity(String entityJson) throws RestServiceException;
+	
+	/**
+	 * Update an entity.
+	 * @param toUpdate
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public Entity updateEntity(Entity toUpdate) throws RestServiceException;
 	
 	/**
 	 * Get a bundle of information about an entity in a single call

@@ -10,6 +10,7 @@ import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Team;
@@ -428,5 +429,7 @@ public interface SynapseClientAsync {
 
 	void getTableFileHandle(RowReferenceSet set,
 			AsyncCallback<TableFileHandleResults> callback);
+
+	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
 
 }
