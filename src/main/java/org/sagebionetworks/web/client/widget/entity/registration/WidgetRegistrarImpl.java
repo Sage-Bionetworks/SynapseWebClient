@@ -146,7 +146,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.TABLE_CONTENT_TYPE)) {
-			presenter = ginInjector.getJoinTeamWidget();
+			presenter = ginInjector.getTableQueryResultWikiWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
