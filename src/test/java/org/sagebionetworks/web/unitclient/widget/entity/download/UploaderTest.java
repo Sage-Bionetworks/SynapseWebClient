@@ -249,6 +249,26 @@ public class UploaderTest {
 	}
 	
 	@Test
+	public void testUpdateS3UploadBannerViewNull() throws Exception {
+		reset(view);
+		uploader.updateS3UploadBannerView(null);
+		verify(view).showUploadingToSynapseStorage();
+	}
+	@Test
+	public void testUpdateS3UploadBannerViewEmpty() throws Exception {
+		reset(view);
+		uploader.updateS3UploadBannerView("");
+		verify(view).showUploadingToSynapseStorage();
+	}
+	@Test
+	public void testUpdateS3UploadBannerViewSet() throws Exception {
+		reset(view);
+		String banner = "this is my test banner";
+		uploader.updateS3UploadBannerView(banner);
+		verify(view).showUploadingBanner(banner);
+	}
+	
+	@Test
 	public void testDirectUploadNoFilesSelected() throws Exception {
 		uploader.setFileNames(null);
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
