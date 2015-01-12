@@ -87,6 +87,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorW
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
@@ -229,6 +230,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EmptyWidget getEmptyWidget();
 	public ButtonLinkWidget getButtonLinkWidget();
 	public VideoWidget getVideoWidget();
+	public TableQueryResultWikiWidget getTableQueryResultWikiWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();

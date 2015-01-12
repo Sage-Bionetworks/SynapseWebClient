@@ -24,6 +24,7 @@ public class WidgetConstants {
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
 
+	public static final String TABLE_CONTENT_TYPE = "synapsetable";
 	
 	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "previewattachment";
 	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment";
@@ -157,5 +158,8 @@ public class WidgetConstants {
 	
 	public static final String MARKDOWN_HEADING_ID_PREFIX = "synapseheading";
 	public static final String MARKDOWN_TABLE_ID_PREFIX = "markdown-table-";
-
+	
+	public static final String TABLE_LIMIT_KEY = "limit";
+	public static final String TABLE_OFFSET_KEY = "offset";
+	public static final String TABLE_SQL_KEY = "sql";
 }
