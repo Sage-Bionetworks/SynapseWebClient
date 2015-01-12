@@ -237,7 +237,7 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
 		uploader.addCancelHandler(cancelHandler);
-		verify(view).showUploadingToSynapseStorage(anyString());
+		verify(view).showUploadingToSynapseStorage();
 		verify(view).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
 		String[] fileNames = {file1};
@@ -246,6 +246,26 @@ public class UploaderTest {
 		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
 		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
+	}
+	
+	@Test
+	public void testUpdateS3UploadBannerViewNull() throws Exception {
+		reset(view);
+		uploader.updateS3UploadBannerView(null);
+		verify(view).showUploadingToSynapseStorage();
+	}
+	@Test
+	public void testUpdateS3UploadBannerViewEmpty() throws Exception {
+		reset(view);
+		uploader.updateS3UploadBannerView("");
+		verify(view).showUploadingToSynapseStorage();
+	}
+	@Test
+	public void testUpdateS3UploadBannerViewSet() throws Exception {
+		reset(view);
+		String banner = "this is my test banner";
+		uploader.updateS3UploadBannerView(banner);
+		verify(view).showUploadingBanner(banner);
 	}
 	
 	@Test

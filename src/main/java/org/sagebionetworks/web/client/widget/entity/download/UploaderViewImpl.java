@@ -559,7 +559,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void showUploadingToSynapseStorage(String banner) {
+	public void showUploadingToSynapseStorage() {
 		uploadDestinationContainer.clear();
 		uploadDestinationContainer.add(new InlineHTML(DisplayConstants.UPLOAD_DESTINATION));
 		Image icon = new Image(sageImageBundle.logoHeader().getURL());
@@ -571,8 +571,12 @@ public class UploaderViewImpl extends FlowPanel implements
 		icon.addStyleName("displayInline margin-right-5");
 		uploadDestinationContainer.add(icon);
 		uploadDestinationContainer.add(new InlineHTML(" storage"));
-		if (banner != null)
-			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+	}
+	
+	@Override
+	public void showUploadingBanner(String banner) {
+		uploadDestinationContainer.clear();
+		uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
 	}
 	
 	private void initExternalPanel() {
