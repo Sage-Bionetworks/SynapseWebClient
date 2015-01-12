@@ -200,7 +200,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		enableMultipleFileUploads();
 		if (parentEntityId == null && entity == null) {
 			currentUploadType = UploadType.S3;
-			view.showUploadingToSynapseStorage("");
+			view.showUploadingToSynapseStorage();
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
 			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
@@ -208,10 +208,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
 						currentUploadType = UploadType.S3;
-						view.showUploadingToSynapseStorage("");
+						view.showUploadingToSynapseStorage();
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
-						view.showUploadingToSynapseStorage(uploadDestinations.get(0).getBanner());
+						view.showUploadingBanner(uploadDestinations.get(0).getBanner());
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
 						if (UploadType.SFTP == d.getUploadType()){
