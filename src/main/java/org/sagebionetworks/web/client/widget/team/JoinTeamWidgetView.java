@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	
@@ -23,6 +24,10 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	void updateWizardProgress(int currentPage, int totalPages);
 	
 	void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback callback);
+	
+	void showWikiAccessRequirement(
+			Widget wikiPageWidget, 
+			Callback touAcceptanceCallback);
 	
 	void showTermsOfUseAccessRequirement(
 			String arText,

@@ -228,21 +228,26 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         currentWizardContent.add(wikiPageWidget);
 		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true);
 	}
-		
+	
+	@Override
+	public void showWikiAccessRequirement(Widget wikiPageWidget, Callback touAcceptanceCallback) {
+		showAccessRequirement(wikiPageWidget, touAcceptanceCallback, DisplayConstants.ACCEPT);
+	}
+	
 	@Override
 	public void showTermsOfUseAccessRequirement(String arText, Callback touAcceptanceCallback) {
-		showAccessRequirement(arText, touAcceptanceCallback, DisplayConstants.ACCEPT);
+		showAccessRequirement(new HTML(arText), touAcceptanceCallback, DisplayConstants.ACCEPT);
 	}
 	
 	@Override
 	public void showACTAccessRequirement(String arText, Callback callback) {
-		showAccessRequirement(arText, callback, DisplayConstants.BUTTON_CONTINUE);
+		showAccessRequirement(new HTML(arText), callback, DisplayConstants.BUTTON_CONTINUE);
 	}
 	
-	private void showAccessRequirement(String arText, Callback callback, String primaryButtonText) {
+	private void showAccessRequirement(Widget arTextWidget, Callback callback, String primaryButtonText) {
 		joinWizard.getPrimaryButton().setText(primaryButtonText);
 		currentWizardContent.clear();
-        currentWizardContent.add(new HTML(arText));
+        currentWizardContent.add(arTextWidget);
         okButtonCallback = callback;
 	}
 	
