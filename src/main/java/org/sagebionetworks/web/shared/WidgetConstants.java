@@ -24,7 +24,7 @@ public class WidgetConstants {
 	public static final String VIDEO_CONTENT_TYPE = "video";
 	public static final String VIDEO_FRIENDLY_NAME ="Video";
 
-	public static final String TABLE_CONTENT_TYPE = "synapsetable";
+	public static final String SYNAPSE_TABLE_CONTENT_TYPE = "synapsetable";
 	
 	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "previewattachment";
 	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment";

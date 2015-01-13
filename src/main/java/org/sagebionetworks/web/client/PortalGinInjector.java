@@ -51,6 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
@@ -208,6 +209,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
 	public UserTeamConfigEditor getUserTeamConfigEditor();
 	public VideoConfigEditor getVideoConfigEditor();
+	public TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -230,7 +232,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EmptyWidget getEmptyWidget();
 	public ButtonLinkWidget getButtonLinkWidget();
 	public VideoWidget getVideoWidget();
-	public TableQueryResultWikiWidget getTableQueryResultWikiWidget();
+	public TableQueryResultWikiWidget getSynapseTableQueryResultWikiWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();

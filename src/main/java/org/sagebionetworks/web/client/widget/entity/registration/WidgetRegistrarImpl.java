@@ -83,6 +83,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getUserTeamConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableQueryResultEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -145,8 +147,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getEmptyWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.TABLE_CONTENT_TYPE)) {
-			presenter = ginInjector.getTableQueryResultWikiWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableQueryResultWikiWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
