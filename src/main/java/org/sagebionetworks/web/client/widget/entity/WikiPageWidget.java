@@ -189,11 +189,11 @@ SynapseWidgetPresenter {
 			} catch (JSONObjectAdapterException e) {
 				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			}
-		}
-		else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
+		} else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString()) 
+				|| wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ACCESS_REQUIREMENT.toString())) {
 			isDescription = true;
 			callback.ownerObjectNameInitialized("", isDescription);
-		}
+		} 
 	}
 	
 	@Override
