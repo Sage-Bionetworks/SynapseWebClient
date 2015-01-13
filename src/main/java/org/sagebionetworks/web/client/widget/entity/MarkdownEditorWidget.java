@@ -270,6 +270,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_BOOKMARK:
 			insertNewWidget(WidgetConstants.BOOKMARK_CONTENT_TYPE);
 			break;
+		case INSERT_SYNAPSE_TABLE:
+			insertNewWidget(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE);
+			break;
 		case INSERT_EXTERNAL_WEBSITE:
 			insertNewWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE);
 			break;

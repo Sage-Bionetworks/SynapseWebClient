@@ -216,6 +216,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiView;
+import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
@@ -861,6 +863,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ShinySiteConfigView.class).to(ShinySiteConfigViewImpl.class);
 		bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);
 		bind(VideoConfigView.class).to(VideoConfigViewImpl.class);
+		bind(TableQueryResultWikiView.class).to(TableQueryResultWikiViewImpl.class);
 		
 		// UI Widget Renderers
 		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);

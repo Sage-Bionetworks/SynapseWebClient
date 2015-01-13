@@ -40,6 +40,7 @@
 				    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="synapseTableLink">Synapse Table</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="wikifilesPreviewLink">Wiki Files Preview</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="tutorialWizardLink">Tutorial Wizard</b:AnchorListItem>
 				  </b:DropDownMenu>
