@@ -14,6 +14,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -35,6 +36,8 @@ public class AccessRequirementDialogViewImpl implements AccessRequirementDialogV
 	Div touHeading;
 	@UiField
 	Div actHeading;
+	@UiField
+	SimplePanel wikiTermsUI;
 	@UiField
 	BlockQuote termsUI;
 	@UiField
@@ -171,6 +174,7 @@ public class AccessRequirementDialogViewImpl implements AccessRequirementDialogV
 		actHeading.setVisible(false);
 		anonymousAccessNote.setVisible(false);
 		termsUI.setVisible(false);
+		wikiTermsUI.setVisible(false);
 		imposeRestrictionsAllowedNote.setVisible(false);
 		imposeRestrictionsNotAllowedNote.setVisible(false);
 		anonymousFlagNote.setVisible(false);
@@ -276,6 +280,16 @@ public class AccessRequirementDialogViewImpl implements AccessRequirementDialogV
 	@Override
 	public void setTerms(String arText) {
 		terms.setHTML(arText);
+	}
+	
+	@Override
+	public void showWikiTermsUI() {
+		wikiTermsUI.setVisible(true);
+	}
+	
+	@Override
+	public void setWikiTermsWidget(Widget wikiWidget) {
+		wikiTermsUI.setWidget(wikiWidget);
 	}
 	/*
 	 * Private Methods
