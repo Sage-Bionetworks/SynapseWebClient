@@ -197,6 +197,11 @@ public class AccessRequirementDialogTest {
 
 	@Test
 	public void testConfigureWikiTou() {
+		//wiki page widget should have been configured to not show created by, modified by, or wiki history in this context
+		verify(mockWikiPageWidget).showCreatedBy(false);
+		verify(mockWikiPageWidget).showModifiedBy(false);
+		verify(mockWikiPageWidget).showWikiHistory(false);
+		
 		touAR.setTermsOfUse(null);
 		widget.configure(touAR, 
 				entityId, 
@@ -214,7 +219,6 @@ public class AccessRequirementDialogTest {
 		verify(mockView, never()).showActHeading();
 		verify(mockView, never()).showTermsUI();
 		verify(mockView).showWikiTermsUI();
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), anyBoolean(), any(WikiPageWidget.Callback.class), anyBoolean());
 		verify(mockView, never()).showAnonymousAccessNote();
 		verify(mockView, never()).showImposeRestrictionsAllowedNote();
 		verify(mockView).showImposeRestrictionsNotAllowedNote();
@@ -226,6 +230,8 @@ public class AccessRequirementDialogTest {
 		verify(mockView, never()).showSignTermsButton();
 		verify(mockView, never()).showRequestAccessFromACTButton();
 		verify(mockView).showCloseButton();
+		
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), anyBoolean(), any(WikiPageWidget.Callback.class), anyBoolean());
 	}
 	
 	@Test

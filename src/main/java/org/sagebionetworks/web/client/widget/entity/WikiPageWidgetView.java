@@ -38,4 +38,8 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void showNoWikiAvailableUI(boolean isDescription);
 	public void show404();
 	public void show403();
+	
+	public void showWikiHistory(boolean isVisible);
+	public void showCreatedBy(boolean isVisible);
+	public void showModifiedBy(boolean isVisible);
 }

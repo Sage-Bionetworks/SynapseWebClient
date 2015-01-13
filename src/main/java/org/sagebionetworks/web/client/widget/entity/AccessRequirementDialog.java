@@ -56,6 +56,9 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraURLHelper = jiraURLHelper;
 		this.wikiPageWidget = wikiPageWidget;
+		wikiPageWidget.showCreatedBy(false);
+		wikiPageWidget.showModifiedBy(false);
+		wikiPageWidget.showWikiHistory(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 	}
