@@ -162,5 +162,5 @@ public class WidgetConstants {
 	
 	public static final String TABLE_LIMIT_KEY = "limit";
 	public static final String TABLE_OFFSET_KEY = "offset";
-	public static final String TABLE_SQL_KEY = "sql";
+	public static final String TABLE_QUERY_KEY = "query";
 }

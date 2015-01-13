@@ -45,7 +45,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
 		Query query = new Query();
 		query.setLimit(limit);
 		query.setOffset(offset);
-		query.setSql(descriptor.get(WidgetConstants.TABLE_SQL_KEY));
+		query.setSql(descriptor.get(WidgetConstants.TABLE_QUERY_KEY));
 		tableQueryResultWidget.configure(query, false, null);
 	}
 	

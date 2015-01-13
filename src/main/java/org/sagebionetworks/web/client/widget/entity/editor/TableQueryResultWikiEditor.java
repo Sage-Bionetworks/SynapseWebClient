@@ -24,7 +24,7 @@ public class TableQueryResultWikiEditor implements TableQueryResultWikiView.Pres
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
-		String sql = descriptor.get(WidgetConstants.TABLE_SQL_KEY);
+		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
 		if (sql != null)
 			view.setSql(sql);
 	}
@@ -45,7 +45,7 @@ public class TableQueryResultWikiEditor implements TableQueryResultWikiView.Pres
 		if (!DisplayUtils.isDefined(sql)) {
 			throw new IllegalArgumentException("Query is required");
 		}
-		descriptor.put(WidgetConstants.TABLE_SQL_KEY, view.getSql());
+		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 	}
 	
 	
