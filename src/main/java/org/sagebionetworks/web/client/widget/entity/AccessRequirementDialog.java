@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,6 +37,7 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	String entityId;
 	Callback finishedCallback;
 	Callback entityUpdated;
+	WikiPageWidget wikiPageWidget;
 	
 	@Inject
 	public AccessRequirementDialog(
@@ -43,7 +46,8 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
-			JiraURLHelper jiraURLHelper
+			JiraURLHelper jiraURLHelper,
+			WikiPageWidget wikiPageWidget
 			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -51,7 +55,12 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraURLHelper = jiraURLHelper;
+		this.wikiPageWidget = wikiPageWidget;
+		wikiPageWidget.showCreatedBy(false);
+		wikiPageWidget.showModifiedBy(false);
+		wikiPageWidget.showWikiHistory(false);
 		view.setPresenter(this);
+		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 	}
 	
 	public void configure(
@@ -98,8 +107,18 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
      			}
       		}
     		// next comes the Terms of Use or ACT info, in its own box
-     		view.showTermsUI();
-     		view.setTerms(GovernanceServiceHelper.getAccessRequirementText(ar));
+     		String terms = GovernanceServiceHelper.getAccessRequirementText(ar);
+     		if (!DisplayUtils.isDefined(terms)) {
+     			//get wiki terms
+     			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
+     			wikiPageWidget.configure(wikiKey, false, null, false);
+     			view.showWikiTermsUI();
+     		} else {
+     			view.setTerms(terms);
+     			view.showTermsUI();
+     		}
+     		
+     		
      		// if not logged in there's an extra line "Note:  You must log in to access restricted data."
            	if (isAnonymous) {
            		view.showAnonymousAccessNote();

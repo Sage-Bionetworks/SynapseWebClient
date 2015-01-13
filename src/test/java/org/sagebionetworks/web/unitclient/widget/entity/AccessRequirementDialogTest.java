@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -34,7 +35,9 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -59,11 +62,13 @@ public class AccessRequirementDialogTest {
 	Callback mockImposeRestrictionCallback;
 	String arText = "some terms of use";
 	String actContactInfo = "shine the governance spotlight into the night sky and the ACT will be there in seconds.";
+	WikiPageWidget mockWikiPageWidget;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockWikiPageWidget = mock(WikiPageWidget.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(AccessRequirementDialogView.class);
@@ -81,7 +86,7 @@ public class AccessRequirementDialogTest {
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		
-		widget = new AccessRequirementDialog(mockView, mockSynapseClient, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockJiraURLHelper);
+		widget = new AccessRequirementDialog(mockView, mockSynapseClient, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockJiraURLHelper, mockWikiPageWidget);
 
 		touAR = new TermsOfUseAccessRequirement();
 		touAR.setId(touAccessRequirementId);
@@ -175,6 +180,7 @@ public class AccessRequirementDialogTest {
 		verify(mockView, never()).showActHeading();
 		verify(mockView).showTermsUI();
 		verify(mockView).setTerms(arText);
+		verify(mockView, never()).showWikiTermsUI();
 		verify(mockView, never()).showAnonymousAccessNote();
 		verify(mockView, never()).showImposeRestrictionsAllowedNote();
 		verify(mockView).showImposeRestrictionsNotAllowedNote();
@@ -186,6 +192,46 @@ public class AccessRequirementDialogTest {
 		verify(mockView, never()).showSignTermsButton();
 		verify(mockView, never()).showRequestAccessFromACTButton();
 		verify(mockView).showCloseButton();
+	}
+	
+
+	@Test
+	public void testConfigureWikiTou() {
+		//wiki page widget should have been configured to not show created by, modified by, or wiki history in this context
+		verify(mockWikiPageWidget).showCreatedBy(false);
+		verify(mockWikiPageWidget).showModifiedBy(false);
+		verify(mockWikiPageWidget).showWikiHistory(false);
+		
+		touAR.setTermsOfUse(null);
+		widget.configure(touAR, 
+				entityId, 
+				true, 							/** hasAdministrativeAccess **/
+				true, 							/** accessApproved **/ 
+				mockImposeRestrictionCallback,	/** imposeRestrictionCallback **/ 
+				mockFinishedCallback			/** finishedCallback **/
+		);
+		verify(mockView).clear();
+		verify(mockView, never()).showNoRestrictionsUI();
+		verify(mockView, never()).showOpenUI();
+		verify(mockView).showControlledUseUI();
+		verify(mockView).showApprovedHeading();
+		verify(mockView, never()).showTouHeading();
+		verify(mockView, never()).showActHeading();
+		verify(mockView, never()).showTermsUI();
+		verify(mockView).showWikiTermsUI();
+		verify(mockView, never()).showAnonymousAccessNote();
+		verify(mockView, never()).showImposeRestrictionsAllowedNote();
+		verify(mockView).showImposeRestrictionsNotAllowedNote();
+		verify(mockView, never()).showAnonymousFlagNote();
+		verify(mockView).showImposeRestrictionsNotAllowedFlagNote();
+		verify(mockView, never()).showImposeRestrictionsButton();
+		verify(mockView, never()).showLoginButton();
+		verify(mockView, never()).showCancelButton();
+		verify(mockView, never()).showSignTermsButton();
+		verify(mockView, never()).showRequestAccessFromACTButton();
+		verify(mockView).showCloseButton();
+		
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), anyBoolean(), any(WikiPageWidget.Callback.class), anyBoolean());
 	}
 	
 	@Test
