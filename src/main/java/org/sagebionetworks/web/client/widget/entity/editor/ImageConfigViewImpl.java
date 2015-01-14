@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -242,7 +242,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
 		
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentHelper.getUploadFormPanel(baseURl, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, new AddAttachmentHelper.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				uploadedFileHandleName = uploadPanel.getFilename();

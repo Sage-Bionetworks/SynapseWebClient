@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
@@ -210,6 +211,7 @@ public interface PortalGinInjector extends Ginjector {
 	public UserTeamConfigEditor getUserTeamConfigEditor();
 	public VideoConfigEditor getVideoConfigEditor();
 	public TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
+	public ProjectBackgroundConfigEditor getProjectBackgroundConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();

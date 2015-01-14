@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -582,7 +582,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		UploadResult uploadResult = null;
 		String detailedErrorMessage = null;
 		try{
-			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
+			uploadResult = AddAttachmentHelper.getUploadResult(resultHtml);
 			handleSubmitResult(uploadResult);
 		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		

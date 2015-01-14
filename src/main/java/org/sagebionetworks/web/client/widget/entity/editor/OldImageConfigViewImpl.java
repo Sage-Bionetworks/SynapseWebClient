@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -132,7 +132,7 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 		String actionUrl;
 		String baseURl = GWT.getModuleBaseURL()+"attachment";
 		actionUrl =  baseURl+ "?" + WebConstants.ENTITY_PARAM_KEY + "=" + wikiKey.getOwnerObjectId();
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentHelper.getUploadFormPanel(actionUrl,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,new AddAttachmentHelper.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){

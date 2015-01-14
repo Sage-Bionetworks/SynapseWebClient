@@ -6,7 +6,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -15,6 +15,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -27,6 +28,7 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	private IconsImageBundle iconsImageBundle;
 	private HTMLPanel uploadStatusPanel;
 	private String uploadedFileHandleName;
+	private FlowPanel uploadNotePanel = new FlowPanel();
 	
 	@Inject
 	public AttachmentConfigViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
@@ -58,11 +60,12 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	
 	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
 		clear();
-		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
 		
+		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
+		add(uploadNotePanel);
 		//The ok/submitting button will be enabled when attachments are uploaded
 		dialogCallback.setPrimaryEnabled(false);
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, DisplayConstants.IMAGE_CONFIG_UPLOAD, new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentHelper.getUploadFormPanel(baseURl, DisplayConstants.IMAGE_CONFIG_UPLOAD, new AddAttachmentHelper.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){
@@ -82,6 +85,11 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 			}
 		});
 		add(uploadPanel);
+	}
+	
+	@Override
+	public void showNote(String note) {
+		uploadNotePanel.add(new HTML(note));
 	}
 	
 	@Override
@@ -117,11 +125,13 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 
 	@Override
 	public void setAccept(String acceptedMimeTypes) {
-		uploadPanel.getFileUploadField().getElement().setAttribute("accept", acceptedMimeTypes);
+		uploadPanel.setAccept(acceptedMimeTypes);
 	}
 	
 	@Override
 	public void clear() {
+		super.clear();
+		uploadNotePanel.clear();
 	}
 	/*
 	 * Private Methods

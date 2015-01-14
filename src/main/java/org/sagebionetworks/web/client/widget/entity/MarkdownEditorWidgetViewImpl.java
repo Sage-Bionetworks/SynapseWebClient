@@ -108,6 +108,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem wikifilesPreviewLink;
 	@UiField
 	public AnchorListItem tutorialWizardLink;
+	@UiField
+	public AnchorListItem entityBackgroundLink;
 	
 	@UiField
 	public Button boldButton;
@@ -233,6 +235,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
+		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		heading1Link.addStyleName("font-size-36");
 		heading2Link.addStyleName("font-size-30");
 		heading3Link.addStyleName("font-size-24");

@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -31,24 +33,16 @@ public class UploadFormPanel extends FormPanel{
 				}
 			}
 		});
+		submitButton.setType(ButtonType.INFO);
 		submitButton.addStyleName("margin-top-10");
 		panel.add(submitButton);
-		
-		
+		file.setName("uploadedfile");
 		addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
 			public void onSubmitComplete(SubmitCompleteEvent event) {
 				submitButton.setText(buttonText);
 				submitButton.setEnabled(true);
 			}
 		});
-	}
-	
-	public Panel getFieldsPanel() {
-		return panel;
-	}
-	
-	public FileUpload getFileUploadField() {
-		return file;
 	}
 	
 	public void setAccept(String acceptedMimeTypes) {

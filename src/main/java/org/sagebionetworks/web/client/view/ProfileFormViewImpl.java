@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
@@ -298,9 +298,9 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 			public void onClick(ClickEvent event) {
 	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
 				uploadPicturePanel.setWidget(
-					AddAttachmentDialog.getUploadFormPanel(actionUrl, 
+					AddAttachmentHelper.getUploadFormPanel(actionUrl, 
 							DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT, 
-							new AddAttachmentDialog.Callback() {
+							new AddAttachmentHelper.Callback() {
 								@Override
 								public void onSaveAttachment(UploadResult result) {
 									if(result != null){
