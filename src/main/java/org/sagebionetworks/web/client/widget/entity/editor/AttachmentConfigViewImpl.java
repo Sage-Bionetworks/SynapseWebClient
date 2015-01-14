@@ -6,9 +6,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,13 +23,21 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	private IconsImageBundle iconsImageBundle;
 	private FlowPanel errorPanel = new FlowPanel();
 	private FlowPanel uploadNotePanel = new FlowPanel();
-	private FileInputWidget fileInputWidget;
-	private String uploadedFilename;
+	private Widget fileInputWidget;
+	Button uploadButton = new Button(DisplayConstants.IMAGE_CONFIG_UPLOAD);
+	private HTMLPanel successPanel;
 	
 	@Inject
-	public AttachmentConfigViewImpl(IconsImageBundle iconsImageBundle, FileInputWidget fileInputWidget) {
+	public AttachmentConfigViewImpl(IconsImageBundle iconsImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
-		this.fileInputWidget = fileInputWidget;
+		uploadButton.setType(ButtonType.INFO);
+		uploadButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.uploadFileClicked();
+			}
+		});
+		successPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
 	}
 	
 	@Override
@@ -41,59 +46,41 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
-		//update the uploadPanel
-		initUploadPanel(wikiKey, dialogCallback);
-	}
-	
-	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
-		uploadedFilename = null;
-		clear();
+		add(successPanel);
 		add(uploadNotePanel);
-		//The ok/submitting button will be enabled when attachments are uploaded
-		dialogCallback.setPrimaryEnabled(false);
-		fileInputWidget.reset();
-		
-		final Button uploadButton = new Button(DisplayConstants.IMAGE_CONFIG_UPLOAD);
-		uploadButton.setType(ButtonType.INFO);
-		
-		uploadButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (validateSelectedFile()) {
-					uploadButton.setEnabled(false);
-					fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
-						@Override
-						public void uploadSuccess(String fileHandleId) {
-							uploadedFilename = fileInputWidget.getSelectedFileMetadata()[0].getFileName();
-							clear();
-							add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT)));
-							//enable the ok button
-							dialogCallback.setPrimaryEnabled(true);
-							presenter.addFileHandleId(fileHandleId);
-						}
-						
-						@Override
-						public void uploadFailed(String error) {
-							uploadButton.setEnabled(true);
-							errorPanel.add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ error)));
-						}
-					});
-				}
-			}
-		});
-
-		add(fileInputWidget.asWidget());
+		add(fileInputWidget);
 		add(uploadButton);
 		add(errorPanel);
+		successPanel.setVisible(false);
+		uploadNotePanel.setVisible(true);
+		fileInputWidget.setVisible(true);
+		uploadButton.setVisible(true);
+		errorPanel.setVisible(true);
 	}
 	
-	public boolean validateSelectedFile() {
-		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
-		if(meta == null || meta.length != 1){
-			showErrorMessage("Please select a file and try again");
-			return false;
-		}
-		return true;
+	@Override
+	public void setUploadButtonEnabled(boolean enabled) {
+		uploadButton.setEnabled(enabled);
+	}
+	@Override
+	public void showUploadSuccessUI() {
+		successPanel.setVisible(true);
+		uploadNotePanel.setVisible(false);
+		fileInputWidget.setVisible(false);
+		uploadButton.setVisible(false);
+		errorPanel.setVisible(false);
+	}
+	
+	@Override
+	public void showUploadFailureUI(String error) {
+		errorPanel.clear();
+		errorPanel.add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ error)));
+	}
+	
+	
+	@Override
+	public void setFileInputWidget(Widget fileInputWidget) {
+		this.fileInputWidget = fileInputWidget;
 	}
 	
 	@Override
@@ -127,11 +114,6 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public String getFileName() {
-		return uploadedFilename;
 	}
 	
 	@Override
