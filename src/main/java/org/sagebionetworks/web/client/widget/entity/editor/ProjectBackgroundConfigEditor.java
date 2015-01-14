@@ -28,7 +28,6 @@ public class ProjectBackgroundConfigEditor implements AttachmentConfigView.Prese
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		fileHandleIds = new ArrayList<String>();
 		view.configure(wikiKey, dialogCallback);
-		view.setAccept("image/png");
 		view.showNote("<blockquote>File must be named <strong>" + EntityPresenter.ENTITY_BACKGROUND_IMAGE_NAME + "</strong></blockquote>");
 	}
 	

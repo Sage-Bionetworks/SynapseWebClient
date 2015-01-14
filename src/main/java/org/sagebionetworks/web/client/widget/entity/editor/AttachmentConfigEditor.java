@@ -32,7 +32,6 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		try {
 			//try to set the image widget file name
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
-				view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
 				dialogCallback.setPrimaryEnabled(true);
 			}
 		} catch (Exception e) {}
@@ -51,7 +50,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	@Override
 	public void updateDescriptorFromView() {
 		view.checkParams();
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, view.getUploadedFileHandleName());
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, view.getFileName());
 	}
 	
 	@Override
