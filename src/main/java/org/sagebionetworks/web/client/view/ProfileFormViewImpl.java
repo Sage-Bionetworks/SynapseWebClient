@@ -299,7 +299,6 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
 				uploadPicturePanel.setWidget(
 					AddAttachmentDialog.getUploadFormPanel(actionUrl, 
-							sageImageBundle, 
 							DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT, 
 							new AddAttachmentDialog.Callback() {
 								@Override

@@ -30,6 +30,7 @@ public class EntityBackgroundConfigEditor implements AttachmentConfigView.Presen
 		descriptor = widgetDescriptor;
 		fileHandleIds = new ArrayList<String>();
 		view.configure(wikiKey, dialogCallback);
+		view.setAccept("image/png");
 	}
 	
 	@SuppressWarnings("unchecked")

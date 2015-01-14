@@ -38,9 +38,7 @@ public class AddAttachmentDialog {
 	 * @param callback
 	 * @return
 	 */
-	public static UploadFormPanel getUploadFormPanel(String actionUrl, SageImageBundle images, String buttonText, final Callback callback) {
-		final HTML loading = new HTML(DisplayUtils.getLoadingHtml(images, "Uploading..."));
-		loading.setVisible(false);
+	public static UploadFormPanel getUploadFormPanel(String actionUrl, String buttonText, final Callback callback) {
 		final UploadFormPanel form = new UploadFormPanel(buttonText);
 		
 		form.setAction(actionUrl);
@@ -48,23 +46,8 @@ public class AddAttachmentDialog {
 	    form.setMethod(FormPanel.METHOD_POST);
 	    form.getFileUploadField().setName("uploadedfile");
 		
-	    // Add an event handler to the form.
-		form.addSubmitHandler(new FormPanel.SubmitHandler() {
-			@Override
-			public void onSubmit(SubmitEvent event) {
-				if (!DisplayUtils.isDefined(form.getFileUploadField().getFilename())) {
-					DisplayUtils.showErrorMessage("Please select a file");
-					event.cancel();
-				} else {
-					form.getSubmitButton().setEnabled(false);
-				}
-			}
-		});
-
 		form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
 			public void onSubmitComplete(SubmitCompleteEvent event) {
-				form.getSubmitButton().setEnabled(true);
-				loading.setVisible(false);
 				UploadResult result = new UploadResult();
 				result.setUploadStatus(UploadStatus.SUCCESS);
 				if(event != null && event.getResults() != null){

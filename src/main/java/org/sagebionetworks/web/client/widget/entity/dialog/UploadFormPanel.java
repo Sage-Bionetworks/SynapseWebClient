@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -14,25 +15,44 @@ public class UploadFormPanel extends FormPanel{
     FileUpload file = new FileUpload();
     Button submitButton;
     
-	public UploadFormPanel(String buttonText) {
+	public UploadFormPanel(final String buttonText) {
 		setWidget(panel);
 		panel.add(file);
 		// Add a 'submit' button.
 		submitButton = new Button(buttonText, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				submit();
+				if (!DisplayUtils.isDefined(file.getFilename())) {
+					DisplayUtils.showErrorMessage("Please select a file");
+				} else {
+					submitButton.setText("Uploading...");
+					submitButton.setEnabled(false);
+					submit();	
+				}
 			}
 		});
 		submitButton.addStyleName("margin-top-10");
 		panel.add(submitButton);
+		
+		
+		addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				submitButton.setText(buttonText);
+				submitButton.setEnabled(true);
+			}
+		});
 	}
 	
 	public Panel getFieldsPanel() {
 		return panel;
 	}
+	
 	public FileUpload getFileUploadField() {
 		return file;
+	}
+	
+	public void setAccept(String acceptedMimeTypes) {
+		file.getElement().setAttribute("accept", acceptedMimeTypes);
 	}
 	
 	public String getFilename() {
@@ -40,8 +60,4 @@ public class UploadFormPanel extends FormPanel{
 		int lastIndex = fullPath.lastIndexOf('\\');
 		return fullPath.substring(lastIndex + 1);
 	};
-	
-	public Button getSubmitButton() {
-		return submitButton;
-	}
 }

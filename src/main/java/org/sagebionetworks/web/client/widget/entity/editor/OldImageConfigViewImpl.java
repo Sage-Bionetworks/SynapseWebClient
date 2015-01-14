@@ -132,7 +132,7 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 		String actionUrl;
 		String baseURl = GWT.getModuleBaseURL()+"attachment";
 		actionUrl =  baseURl+ "?" + WebConstants.ENTITY_PARAM_KEY + "=" + wikiKey.getOwnerObjectId();
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){

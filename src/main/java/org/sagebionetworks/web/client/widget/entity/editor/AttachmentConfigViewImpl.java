@@ -62,7 +62,7 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 		
 		//The ok/submitting button will be enabled when attachments are uploaded
 		dialogCallback.setPrimaryEnabled(false);
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.IMAGE_CONFIG_UPLOAD, new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, DisplayConstants.IMAGE_CONFIG_UPLOAD, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){

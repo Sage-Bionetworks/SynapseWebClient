@@ -242,7 +242,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
 		
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				uploadedFileHandleName = uploadPanel.getFilename();
