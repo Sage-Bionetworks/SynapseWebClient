@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -10,12 +9,11 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.Panel;
 
 public class UploadFormPanel extends FormPanel{
 	FlowPanel panel = new FlowPanel();
-    FileUpload file = new FileUpload();
-    Button submitButton;
+	FileUpload file = new FileUpload();
+	Button submitButton;
     
 	public UploadFormPanel(final String buttonText) {
 		setWidget(panel);
