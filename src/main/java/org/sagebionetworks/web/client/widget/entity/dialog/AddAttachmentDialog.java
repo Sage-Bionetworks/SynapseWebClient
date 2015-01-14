@@ -8,22 +8,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FormEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.FileUploadField;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.Encoding;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTML;
 
 /**
@@ -33,7 +20,7 @@ import com.google.gwt.user.client.ui.HTML;
  * 
  */
 public class AddAttachmentDialog {
-	public static final String ATTACHMENT_FILE_FIELD_ID = "attachmentFileToUpload";
+	
 	public interface Callback {
 		/**
 		 * When the user selects save this will be called.
@@ -44,128 +31,51 @@ public class AddAttachmentDialog {
 	}
 
 	/**
-	 * Show the file attachment dialog
-	 * 
-	 * @param callback
-	 */
-	public static void showAddAttachmentDialog(String actionUrl, SageImageBundle images, String windowTitle, String buttonText, final Callback callback ) {
-		// Show a form for adding an Annotations
-		final Dialog dialog = new Dialog();
-		dialog.setMaximizable(false);
-		dialog.setSize(400, 175);
-		dialog.setPlain(true);
-		dialog.setModal(true);
-		dialog.setButtons(Dialog.CANCEL);
-		dialog.setHideOnButtonClick(true);
-		dialog.setHeading(windowTitle);
-		dialog.setLayout(new FitLayout());
-		dialog.setBorders(false);
-		
-		dialog.add(getUploadFormPanel(actionUrl, images, buttonText, 75, callback, dialog));
-		dialog.show();
-
-	}
-
-	/**
 	 * 
 	 * @param actionUrl
 	 * @param images
 	 * @param buttonText
 	 * @param callback
-	 * @param dialog dialog that will contain this panel (will close automatically if given)
 	 * @return
 	 */
-	public static UploadFormPanel getUploadFormPanel(String actionUrl, SageImageBundle images, String buttonText, int labelWidth, final Callback callback, final Dialog dialog) {
-		/**
-		 * This window is shown while we wait for the file to upload.
-		 */
+	public static UploadFormPanel getUploadFormPanel(String actionUrl, SageImageBundle images, String buttonText, final Callback callback) {
 		final HTML loading = new HTML(DisplayUtils.getLoadingHtml(images, "Uploading..."));
 		loading.setVisible(false);
-		final FileUploadField file = new FileUploadField();
+		final UploadFormPanel form = new UploadFormPanel(buttonText);
 		
-		final UploadFormPanel panel = new UploadFormPanel() {
-			
+		form.setAction(actionUrl);
+		form.setEncoding(FormPanel.ENCODING_MULTIPART);
+	    form.setMethod(FormPanel.METHOD_POST);
+	    form.getFileUploadField().setName("uploadedfile");
+		
+	    // Add an event handler to the form.
+		form.addSubmitHandler(new FormPanel.SubmitHandler() {
 			@Override
-			public FileUploadField getFileUploadField() {
-				return file;
-			}
-		};
-		panel.setHeaderVisible(false);
-		panel.setFrame(false);
-		panel.setBorders(false);
-		panel.setShadow(false);
-		panel.setAction(actionUrl);
-		panel.setEncoding(Encoding.MULTIPART);
-		panel.setMethod(Method.POST);
-		panel.setButtonAlign(HorizontalAlignment.CENTER);
-		panel.setLabelAlign(LabelAlign.RIGHT);
-		panel.setBodyBorder(false);
-		
-		file.setAllowBlank(false);
-		file.setName("uploadedfile");
-		file.setFieldLabel("File");
-		
-		final Button btn = new Button(buttonText);
-		// Disable until file is selected
-		btn.disable();
-		btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (!panel.isValid()) {
-					return;
+			public void onSubmit(SubmitEvent event) {
+				if (!DisplayUtils.isDefined(form.getFileUploadField().getFilename())) {
+					DisplayUtils.showErrorMessage("Please select a file");
+					event.cancel();
+				} else {
+					form.getSubmitButton().setEnabled(false);
 				}
-				// normally would submit the form but for example no server set
-				// up to
-				// handle the post
-				btn.disable();
-				panel.submit();
-				loading.setVisible(true);
 			}
 		});
-		
-		file.addListener(Events.OnChange, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				final String fullPath = file.getValue();
-				final int lastIndex = fullPath.lastIndexOf('\\');
-				final String fileName = fullPath.substring(lastIndex + 1);
-				file.getFileInput().setId(ATTACHMENT_FILE_FIELD_ID);
-				file.setValue(fileName);
-				// Now enable for submission
-				btn.enable();
-			}
-		});
-		file.setWidth(365);
-		
-		FormData basicFormData = new FormData("-50");
-		Margins margins = new Margins(10, 10, 0, 10);
-		basicFormData.setMargins(margins);
-		
-		panel.add(file, basicFormData);
-		panel.add(loading, basicFormData);
-		// If we do not add this button the panel then it is not part of the form
-		panel.addButton(btn);
-		// Listen to update events
-		panel.addListener(Events.Submit, new Listener<FormEvent>() {
 
-			@Override
-			public void handleEvent(FormEvent event) {
-				btn.enable();
+		form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				form.getSubmitButton().setEnabled(true);
 				loading.setVisible(false);
-				if (dialog != null)
-					dialog.hide();
 				UploadResult result = new UploadResult();
 				result.setUploadStatus(UploadStatus.SUCCESS);
-				if(event != null && event.getResultHtml() != null){
-					result = getUploadResult(event.getResultHtml());
+				if(event != null && event.getResults() != null){
+					result = getUploadResult(event.getResults());
 				}
 				// Let the caller know we are done.
 				callback.onSaveAttachment(result);
 			}
 		});
-		
-		panel.setLabelWidth(labelWidth);
-		return panel;
+	    
+	    return form;
 	}
 	
 	public static UploadResult getUploadResult(String html){

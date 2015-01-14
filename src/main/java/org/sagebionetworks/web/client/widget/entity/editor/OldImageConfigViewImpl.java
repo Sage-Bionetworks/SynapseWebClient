@@ -82,9 +82,8 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 	@Override
 	public void setUploadedAttachmentData(AttachmentData uploadedAttachmentData) {
 		this.uploadedAttachmentData = uploadedAttachmentData;
-		if (uploadedAttachmentData != null && uploadPanel != null)
-			uploadPanel.getFileUploadField().setEmptyText(uploadedAttachmentData.getName());
 	}
+	
 	private HorizontalPanel getExternalLinkPanel() {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
@@ -133,7 +132,7 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 		String actionUrl;
 		String baseURl = GWT.getModuleBaseURL()+"attachment";
 		actionUrl =  baseURl+ "?" + WebConstants.ENTITY_PARAM_KEY + "=" + wikiKey.getOwnerObjectId();
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,25,new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){
@@ -151,7 +150,7 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 				}
 				uploadedAttachmentData = result.getAttachmentData();
 			}
-		}, null);
+		});
 		return uploadPanel;
 	}
 	

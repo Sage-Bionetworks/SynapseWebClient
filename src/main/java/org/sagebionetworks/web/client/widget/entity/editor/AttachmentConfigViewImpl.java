@@ -48,7 +48,6 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	@Override
 	public void setUploadedFileHandleName(String fileHandleName) {
 		this.uploadedFileHandleName = fileHandleName;
-		uploadPanel.getFileUploadField().setValue(fileHandleName);
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 		
 		//The ok/submitting button will be enabled when attachments are uploaded
 		dialogCallback.setPrimaryEnabled(false);
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.IMAGE_CONFIG_UPLOAD, 25, new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.IMAGE_CONFIG_UPLOAD, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){
@@ -79,9 +78,9 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 					uploadStatusPanel.addStyleName("margin-left-180");
 					add(uploadStatusPanel);
 				}
-				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
+				uploadedFileHandleName = uploadPanel.getFilename();
 			}
-		}, null);
+		});
 		add(uploadPanel);
 	}
 	
@@ -116,6 +115,11 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 		DisplayUtils.showInfo(title, message);
 	}
 
+	@Override
+	public void setAccept(String acceptedMimeTypes) {
+		uploadPanel.getFileUploadField().getElement().setAttribute("accept", acceptedMimeTypes);
+	}
+	
 	@Override
 	public void clear() {
 	}

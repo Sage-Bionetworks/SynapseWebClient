@@ -40,6 +40,10 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	@UiField
+	Modal uploadPictureDialog;
+	@UiField
+	SimplePanel uploadPicturePanel;
 	
 	@UiField
 	org.gwtbootstrap3.client.ui.Button okButton;
@@ -293,21 +297,25 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 			@Override
 			public void onClick(ClickEvent event) {
 	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
-						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, 
-								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_TITLE,
-								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
-							@Override
-							public void onSaveAttachment(UploadResult result) {
-								if(result != null){
-									if(UploadStatus.SUCCESS == result.getUploadStatus()){
-										showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
-										updateProfilePicture(profile, result.getAttachmentData());
-									}else{
-										showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
+				uploadPicturePanel.setWidget(
+					AddAttachmentDialog.getUploadFormPanel(actionUrl, 
+							sageImageBundle, 
+							DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT, 
+							new AddAttachmentDialog.Callback() {
+								@Override
+								public void onSaveAttachment(UploadResult result) {
+									if(result != null){
+										if(UploadStatus.SUCCESS == result.getUploadStatus()){
+											showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
+											updateProfilePicture(profile, result.getAttachmentData());
+											uploadPictureDialog.hide();
+										}else{
+											showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
+										}
 									}
 								}
-							}
-						});
+							}));
+				uploadPictureDialog.show();
 			}
 		});
 		return editPictureButton;

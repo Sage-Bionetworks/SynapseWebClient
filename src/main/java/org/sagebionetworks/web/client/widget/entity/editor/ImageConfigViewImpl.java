@@ -161,7 +161,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public void setUploadedFileHandleName(String uploadedFileHandleName) {
 		this.uploadedFileHandleName = uploadedFileHandleName;
-		uploadPanel.getFileUploadField().setValue(uploadedFileHandleName);
 	}
 	
 	@Override
@@ -243,10 +242,10 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
 		
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
-				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
+				uploadedFileHandleName = uploadPanel.getFilename();
 				if(result != null){
 					if(UploadStatus.SUCCESS == result.getUploadStatus()){
 						uploadFailureUI.setVisible(false);
@@ -254,10 +253,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 						//enable the ok button
 						dialogCallback.setPrimaryEnabled(true);
 						presenter.addFileHandleId(result.getMessage());
-						//add the local file to the client cache.  May need to fall back to the local reference in the preview (if handle has not yet been saved to the wiki)
-						String fileUrl = synapseJSNIUtils.getFileUrl(AddAttachmentDialog.ATTACHMENT_FILE_FIELD_ID);
-						if (fileUrl != null)
-							clientCache.put(uploadedFileHandleName+WebConstants.TEMP_IMAGE_ATTACHMENT_SUFFIX, fileUrl);
 					}else{
 						uploadErrorText.setText(result.getMessage());
 						uploadFailureUI.setVisible(true);
@@ -265,7 +260,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 					}
 				}
 			}
-		}, null);
+		});
 		
 	    FlowPanel container = new FlowPanel();
 	    container.add(uploadPanel);
