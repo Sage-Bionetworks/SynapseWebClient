@@ -24,8 +24,7 @@
 					<b:ModalFooter>
 						<b:Button ui:field="saveRowsButton" type="PRIMARY"
 							dataLoadingText="Saving...">Save</b:Button>
-						<b:Button ui:field="cancelRowsButton" type="DEFAULT"
-							dataDismiss="MODAL">Cancel</b:Button>
+						<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 					</b:ModalFooter>
 				</b:Modal>
 			</b:PanelBody>

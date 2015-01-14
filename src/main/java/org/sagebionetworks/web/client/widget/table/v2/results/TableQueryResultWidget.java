@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
@@ -13,6 +14,7 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -30,6 +32,7 @@ import com.google.inject.Inject;
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
 	
+	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes on this page. Do you want to leave this page and discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
@@ -288,6 +291,23 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			public void onSuccess(String sql) {
 				runSql(sql);
 			}});
+	}
+
+	@Override
+	public void onCancel() {
+		// Are there changes?
+		PartialRowSet prs = this.queryResultEditor.extractDelta();
+		if(!prs.getRows().isEmpty()){
+			// Confirm close.
+			view.showConfirmDialog(YOU_HAVE_UNSAVED_CHANGES, new Callback() {
+				@Override
+				public void invoke() {
+					view.hideEditor();
+				}
+			});
+		}else{
+			view.hideEditor();
+		}
 	}
 	
 }

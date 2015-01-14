@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 
@@ -18,6 +22,11 @@ public interface TableQueryResultView extends IsWidget {
 		 * Called when the save button is pressed.
 		 */
 		void onSave();
+
+		/**
+		 * Called when the user clicks the close button.
+		 */
+		void onCancel();
 		
 	}
 
@@ -85,5 +94,21 @@ public interface TableQueryResultView extends IsWidget {
 	 * @param visible
 	 */
 	void setProgressWidgetVisible(boolean visible);
+	
+	/**
+	 * Show a confirm dialog.
+	 * @param title
+	 * @param message
+	 * @param okayCallback
+	 */
+	void showConfirmDialog(String message, Callback callback);
+	
+	/**
+	 * Allows the presenter to listen to window close events.
+	 * @param handler
+	 * @return
+	 */
+	HandlerRegistration addWindowClosingHandler(ClosingHandler handler);
+	
 	
 }
