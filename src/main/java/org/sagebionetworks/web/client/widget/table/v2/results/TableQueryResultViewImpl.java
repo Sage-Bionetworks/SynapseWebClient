@@ -10,11 +10,8 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,12 +20,13 @@ import com.google.inject.Inject;
  * A UiBound query results view with zero business logic.
  * 
  * @author John
- *
+ * 
  */
 public class TableQueryResultViewImpl implements TableQueryResultView {
-	
-	public interface Binder extends UiBinder<Widget, TableQueryResultViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, TableQueryResultViewImpl> {
+	}
+
 	@UiField
 	SimplePanel tablePanel;
 	@UiField
@@ -43,20 +41,20 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	Modal editRowsModal;
 	@UiField
 	Button cancelButton;
-	
+
 	Widget widget;
-	
+
 	Presenter presenter;
-	
+
 	@Inject
-	public TableQueryResultViewImpl(Binder binder){
+	public TableQueryResultViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
-		saveRowsButton.addClickHandler(new ClickHandler() {	
+		saveRowsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onSave();
@@ -114,9 +112,9 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 
 	@Override
 	public void setSaveButtonLoading(boolean isLoading) {
-		if(isLoading){
+		if (isLoading) {
 			this.saveRowsButton.state().loading();
-		}else{
+		} else {
 			this.saveRowsButton.state().reset();
 		}
 	}
@@ -137,22 +135,15 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	}
 
 	@Override
-	public void showConfirmDialog(String message, final
-			Callback callback) {
+	public void showConfirmDialog(String message, final Callback callback) {
 		Bootbox.confirm(message, new ConfirmCallback() {
-			
 			@Override
 			public void callback(boolean okay) {
-				if(okay){
+				if (okay) {
 					callback.invoke();
 				}
-				
 			}
 		});
-	}
-
-	public HandlerRegistration addWindowClosingHandler(ClosingHandler handler){
-		return Window.addWindowClosingHandler(handler);
 	}
 
 }

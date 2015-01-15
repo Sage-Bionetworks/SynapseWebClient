@@ -2,16 +2,14 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
-import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,7 +30,7 @@ import com.google.inject.Inject;
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
 	
-	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes on this page. Do you want to leave this page and discard your changes?";
+	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
@@ -47,9 +45,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	boolean isEditable;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
+	GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector){
+	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, GlobalApplicationState globalApplicationState){
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
@@ -58,6 +57,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
+		this.globalApplicationState = globalApplicationState;
 	}
 	
 	/**
@@ -74,7 +74,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 
 	private void runQuery() {
-		this.view.hideEditor();
+		doHideEditor();
 		this.view.setErrorVisible(false);
 		fireStartEvent();
 		this.view.setTableVisible(false);
@@ -207,6 +207,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
+		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);
 		this.queryResultEditor.configure(this.bundle);
 		view.showEditor();
@@ -296,18 +297,37 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	@Override
 	public void onCancel() {
 		// Are there changes?
-		PartialRowSet prs = this.queryResultEditor.extractDelta();
-		if(!prs.getRows().isEmpty()){
+		if(hasUnsavedChanges()){
 			// Confirm close.
 			view.showConfirmDialog(YOU_HAVE_UNSAVED_CHANGES, new Callback() {
 				@Override
 				public void invoke() {
-					view.hideEditor();
+					doHideEditor();
 				}
 			});
 		}else{
-			view.hideEditor();
+			doHideEditor();
 		}
+	}
+	
+	/**
+	 * Does the editor have unsaved changes?
+	 * @return
+	 */
+	public boolean hasUnsavedChanges(){
+		PartialRowSet prs = this.queryResultEditor.extractDelta();
+		if(prs != null && prs.getRows() != null){
+			return !prs.getRows().isEmpty();
+		}
+		return false;
+	}
+	
+	/**
+	 * Hide the modal editor.
+	 */
+	private void doHideEditor(){
+		this.globalApplicationState.setIsEditing(false);
+		this.view.hideEditor();
 	}
 	
 }
