@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 public interface ImageConfigView extends IsWidget, WidgetEditorView {
 
 	/**
@@ -23,7 +24,10 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public String getImageUrl();
 	public String getAltText();
 	public void setImageUrl(String url);
-	public String getUploadedFileHandleName();
+	void setFileInputWidget(Widget fileInputWidget);
+	void showUploadFailureUI(String error);
+	void showUploadSuccessUI();
+	void setUploadButtonEnabled(boolean enabled);
 	public String getAlignment();
 	public String getScale();
 	public String getSynapseId();
@@ -32,7 +36,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback);
 	
 	public void setSynapseId(String synapseId);
-	public void setUploadedFileHandleName(String uploadedFileHandleName);
 	public void setAlignment(String alignment);
 	public void setScale(String scale);
 	
@@ -41,5 +44,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 */
 	public interface Presenter {
 		void addFileHandleId(String fileHandleId);
+		void uploadFileClicked();
 	}
 }

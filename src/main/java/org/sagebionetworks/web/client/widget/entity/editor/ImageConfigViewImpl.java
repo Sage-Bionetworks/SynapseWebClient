@@ -1,40 +1,34 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.attachment.UploadResult;
-import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.AdapterField;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -50,9 +44,9 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	EntityFinder entityFinder;
 	ClientCache clientCache;
 	SynapseJSNIUtils synapseJSNIUtils;
-	private UploadFormPanel uploadPanel;
-	private IconsImageBundle iconsImageBundle;
 	private TextField<String> urlField, nameField, entityField;
+	private Widget fileInputWidget;
+	Button uploadButton = new Button(DisplayConstants.IMAGE_CONFIG_UPLOAD);
 	
 	@UiField
 	SimplePanel externalTab;
@@ -73,25 +67,29 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@UiField
 	Text uploadErrorText;
 	
-	private String uploadedFileHandleName;
-	
 	private ImageParamsPanel uploadParamsPanel, synapseParamsPanel;
 	
 	@Inject
 	public ImageConfigViewImpl(
 			ImageConfigViewImplUiBinder binder,
-			IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils) {
+			SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils) {
 		widget = binder.createAndBindUi(this);
-		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.entityFinder = entityFinder;
 		this.clientCache = clientCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		uploadButton.setType(ButtonType.INFO);
+		uploadButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.uploadFileClicked();				
+			}
+		});
 	}
 	
 	@Override
 	public void initView() {
-		uploadedFileHandleName = null;
 		VerticalPanel externalLinkPanel = new VerticalPanel();
 		externalLinkPanel.add(getExternalLinkPanel());
 		externalLinkPanel.add(getExternalAltTextPanel());
@@ -129,10 +127,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		entityField.getMessages().setRegexText(DisplayConstants.INVALID_SYNAPSE_ID_MESSAGE);
 		
 		panel.add(entityField, basicFormData);
-		Button findEntitiesButton = new Button(DisplayConstants.FIND_IMAGE_ENTITY, AbstractImagePrototype.create(iconsImageBundle.magnify16()));
-		findEntitiesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
+		Button findEntitiesButton = new Button(DisplayConstants.FIND_IMAGE_ENTITY);
+		findEntitiesButton.addClickHandler(new ClickHandler() {
+			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				entityFinder.configure(false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
@@ -151,16 +150,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		buttonField.setLabelSeparator("");
 		panel.add(buttonField, basicFormData);
 		return panel;
-	}
-	
-	@Override
-	public String getUploadedFileHandleName() {
-		return uploadedFileHandleName;
-	}
-	
-	@Override
-	public void setUploadedFileHandleName(String uploadedFileHandleName) {
-		this.uploadedFileHandleName = uploadedFileHandleName;
 	}
 	
 	@Override
@@ -231,43 +220,36 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
 		uploadTab.clear();
-		//update the uploadPanel
-		initUploadPanel(wikiKey, dialogCallback);
-	}
-	
-	private void initUploadPanel(WikiPageKey wikiKey, final DialogCallback dialogCallback) {
-		
-		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
-		
-		//The ok/submitting button will be enabled when required images are uploaded
-		//or when another tab (external or synapse) is viewed
-		
-		uploadPanel = AddAttachmentHelper.getUploadFormPanel(baseURl, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, new AddAttachmentHelper.Callback() {
-			@Override
-			public void onSaveAttachment(UploadResult result) {
-				uploadedFileHandleName = uploadPanel.getFilename();
-				if(result != null){
-					if(UploadStatus.SUCCESS == result.getUploadStatus()){
-						uploadFailureUI.setVisible(false);
-						uploadSuccessUI.setVisible(true);
-						//enable the ok button
-						dialogCallback.setPrimaryEnabled(true);
-						presenter.addFileHandleId(result.getMessage());
-					}else{
-						uploadErrorText.setText(result.getMessage());
-						uploadFailureUI.setVisible(true);
-						uploadSuccessUI.setVisible(false);
-					}
-				}
-			}
-		});
-		
-	    FlowPanel container = new FlowPanel();
-	    container.add(uploadPanel);
+		FlowPanel container = new FlowPanel();
+	    container.add(fileInputWidget);
+	    container.add(uploadButton);
 	    uploadParamsPanel = new ImageParamsPanel();
 	    container.add(uploadParamsPanel);
 		uploadTab.add(container);
 	}
+	
+	@Override
+	public void showUploadFailureUI(String error) {
+		uploadErrorText.setText(error);
+		uploadFailureUI.setVisible(true);
+		uploadSuccessUI.setVisible(false);
+	}
+	@Override
+	public void showUploadSuccessUI() {
+		uploadFailureUI.setVisible(false);
+		uploadSuccessUI.setVisible(true);
+	}
+	
+	@Override
+	public void setFileInputWidget(Widget fileInputWidget) {
+		this.fileInputWidget = fileInputWidget;
+	}
+	
+	@Override
+	public void setUploadButtonEnabled(boolean enabled) {
+		uploadButton.setEnabled(enabled);
+	}
+	
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
@@ -280,18 +262,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		} else if (isSynapseEntity()) {
 			if (!entityField.isValid())
 				throw new IllegalArgumentException(entityField.getErrorMessage());
-		} else {
-			//must have been uploaded
-			if (uploadedFileHandleName == null)
-				throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
-			else {
-				//block if it looks like this is not a valid image type
-				String extension = uploadedFileHandleName.substring(uploadedFileHandleName.lastIndexOf(".")+1);
-				if (!DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
-					throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
-				}
-			}
-		}
+		} 
 	}
 	
 	@Override

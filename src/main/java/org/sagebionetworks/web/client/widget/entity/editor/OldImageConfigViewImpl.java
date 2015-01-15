@@ -32,19 +32,16 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 
 	private Presenter presenter;
 	private UploadFormPanel uploadPanel;
-	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private TextField<String> urlField;
 	private TextField<String> nameField;
-	private HorizontalPanel externalLinkPanel;
 	private AttachmentData uploadedAttachmentData;
 	TabItem externalTab,uploadTab;
 	private HTMLPanel uploadStatusPanel;
 	
 	TabPanel tabPanel;
 	@Inject
-	public OldImageConfigViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
-		this.sageImageBundle = sageImageBundle;
+	public OldImageConfigViewImpl(IconsImageBundle iconsImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
 	}
 	
