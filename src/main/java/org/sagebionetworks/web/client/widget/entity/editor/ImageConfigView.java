@@ -29,7 +29,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	void showUploadSuccessUI();
 	void setUploadButtonEnabled(boolean enabled);
 	public String getAlignment();
-	public String getScale();
 	public String getSynapseId();
 	public void setExternalVisible(boolean visible);
 	
@@ -37,7 +36,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	
 	public void setSynapseId(String synapseId);
 	public void setAlignment(String alignment);
-	public void setScale(String scale);
 	
 	/**
 	 * Presenter interface

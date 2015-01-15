@@ -47,7 +47,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 					view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
 				} 
 				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
-				view.setScale(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY));
 			}
 		} catch (Exception e) {}
 	}
@@ -76,7 +75,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			}
 				
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
-			descriptor.put(WidgetConstants.IMAGE_WIDGET_SCALE_KEY, view.getScale());
 		}
 	}
 	

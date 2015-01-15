@@ -80,7 +80,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		uploadButton.setType(ButtonType.INFO);
 		uploadButton.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.uploadFileClicked();				
@@ -161,28 +160,12 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 	
 	@Override
-	public String getScale() {
-		if (isSynapseEntity())
-			return synapseParamsPanel.getScale();
-		else
-			return uploadParamsPanel.getScale();
-	}
-	
-	@Override
 	public void setAlignment(String alignment) {
 		if (isSynapseEntity())
 			synapseParamsPanel.setAlignment(alignment);
 		else
 			uploadParamsPanel.setAlignment(alignment);
 		
-	}
-	
-	@Override
-	public void setScale(String scale) {
-		if (isSynapseEntity())
-			synapseParamsPanel.setScale(scale);
-		else
-			uploadParamsPanel.setScale(scale);
 	}
 	
 	private HorizontalPanel getExternalLinkPanel() {
@@ -220,6 +203,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
 		uploadTab.clear();
+		fileInputWidget.setVisible(true);
+		uploadButton.setVisible(true);
 		FlowPanel container = new FlowPanel();
 	    container.add(fileInputWidget);
 	    container.add(uploadButton);
@@ -234,8 +219,12 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		uploadFailureUI.setVisible(true);
 		uploadSuccessUI.setVisible(false);
 	}
+	
 	@Override
 	public void showUploadSuccessUI() {
+		fileInputWidget.setVisible(false);
+		uploadButton.setVisible(false);
+
 		uploadFailureUI.setVisible(false);
 		uploadSuccessUI.setVisible(true);
 	}
