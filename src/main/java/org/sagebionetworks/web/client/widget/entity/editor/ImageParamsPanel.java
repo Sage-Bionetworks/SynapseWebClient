@@ -1,61 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
-public class ImageParamsPanel extends FlowPanel{
+public class ImageParamsPanel implements ImageParamsPanelView.Presenter {
 	
-	Button none = new Button("Do not float");
-	Button left = new Button("Float left");
-	Button center = new Button("Float center");
-	Button right = new Button("Float right");
 	String selectedAlignment;
-	public ImageParamsPanel() {
-		init();
-	}
-	
-	public void init() {
+	ImageParamsPanelView view;
+	@Inject
+	public ImageParamsPanel(ImageParamsPanelView view) {
+		this.view = view;
 		setAlignment(WidgetConstants.FLOAT_NONE);
-		
-		ButtonGroup group = new ButtonGroup();
-		group.addStyleName("margin-10");
-		group.add(none);
-		group.add(left);
-		group.add(center);
-		group.add(right);
-		add(group);
-		
-		none.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setAlignment(WidgetConstants.FLOAT_NONE);
-			}
-		});
-		
-		left.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setAlignment(WidgetConstants.FLOAT_LEFT);
-			}
-		});
-		
-		center.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setAlignment(WidgetConstants.FLOAT_CENTER);
-			}
-		});
-		right.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setAlignment(WidgetConstants.FLOAT_RIGHT);
-			}
-		});
 	}
 	
 	public String getAlignment() {
@@ -64,22 +21,39 @@ public class ImageParamsPanel extends FlowPanel{
 
 	public void setAlignment(String alignmentValue) {
 		selectedAlignment = alignmentValue;
-		setActive(false, left, center, right, none);
 		if (WidgetConstants.FLOAT_LEFT.equals(alignmentValue)) {
-			left.setActive(true);
+			view.setLeftButtonActive();
 		} else if (WidgetConstants.FLOAT_CENTER.equals(alignmentValue)) {
-			center.setActive(true);
+			view.setCenterButtonActive();
 		} else if (WidgetConstants.FLOAT_RIGHT.equals(alignmentValue)) {
-			right.setActive(true);
+			view.setRightButtonActive();
 		 }else {
-			none.setActive(true);
+			view.setNoneButtonActive();
 		}
 	}
 	
-	private void setActive(boolean isActive, Button... buttons) {
-		for (Button button : buttons) {
-			button.setActive(isActive);
-		}
+	@Override
+	public void centerButtonClicked() {
+		setAlignment(WidgetConstants.FLOAT_CENTER);
+	}
+	
+	@Override
+	public void leftButtonClicked() {
+		setAlignment(WidgetConstants.FLOAT_LEFT);
+	}
+	
+	@Override
+	public void noneButtonClicked() {
+		setAlignment(WidgetConstants.FLOAT_NONE);
+	}
+	
+	@Override
+	public void rightButtonClicked() {
+		setAlignment(WidgetConstants.FLOAT_RIGHT);		
+	}
+	
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }
 

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Reference;
@@ -16,15 +17,6 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.form.AdapterField;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -44,7 +36,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	EntityFinder entityFinder;
 	ClientCache clientCache;
 	SynapseJSNIUtils synapseJSNIUtils;
-	private TextField<String> urlField, nameField, entityField;
+	private TextBox urlField, nameField, entityField;
 	private Widget fileInputWidget;
 	Button uploadButton = new Button(DisplayConstants.IMAGE_CONFIG_UPLOAD);
 	
@@ -72,12 +64,17 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Inject
 	public ImageConfigViewImpl(
 			ImageConfigViewImplUiBinder binder,
-			SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils) {
+			SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils,
+			ImageParamsPanel synapseParamsPanel,
+			ImageParamsPanel uploadParamsPanel
+			) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.entityFinder = entityFinder;
 		this.clientCache = clientCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.synapseParamsPanel = synapseParamsPanel;
+		this.uploadParamsPanel = uploadParamsPanel;
 		uploadButton.setType(ButtonType.INFO);
 		uploadButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -96,8 +93,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		
 		FlowPanel synapseEntityPanel = new FlowPanel();
 		synapseEntityPanel.add(getSynapseEntityPanel());
-		synapseParamsPanel = new ImageParamsPanel();
-		synapseEntityPanel.add(synapseParamsPanel);
+		synapseEntityPanel.add(synapseParamsPanel.asWidget());
 		
 		synapseTab.add(synapseEntityPanel);
 		
@@ -208,8 +204,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		FlowPanel container = new FlowPanel();
 	    container.add(fileInputWidget);
 	    container.add(uploadButton);
-	    uploadParamsPanel = new ImageParamsPanel();
-	    container.add(uploadParamsPanel);
+	    container.add(uploadParamsPanel.asWidget());
 		uploadTab.add(container);
 	}
 	
