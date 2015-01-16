@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -35,8 +34,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	EntityFinder entityFinder;
 	ClientCache clientCache;
 	SynapseJSNIUtils synapseJSNIUtils;
-	private Widget fileInputWidget;
-	Button uploadButton = new Button(DisplayConstants.IMAGE_CONFIG_UPLOAD);
 	
 	@UiField
 	TextBox nameField;
@@ -49,7 +46,14 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	
 	@UiField
-	SimplePanel uploadTab;
+	Button uploadButton;
+	@UiField
+	SimplePanel fileInputWidgetContainer;
+	@UiField
+	SimplePanel uploadParamsPanelContainer;
+	
+	@UiField
+	SimplePanel synapseParamsPanelContainer;
 	
 	@UiField
 	TabListItem uploadTabListItem;
@@ -80,7 +84,10 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseParamsPanel = synapseParamsPanel;
 		this.uploadParamsPanel = uploadParamsPanel;
-		uploadButton.setType(ButtonType.INFO);
+		
+		uploadParamsPanelContainer.add(uploadParamsPanel.asWidget());
+		synapseParamsPanelContainer.add(synapseParamsPanel.asWidget());
+		
 		initClickHandlers();
 	}
 	
@@ -93,7 +100,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		});
 		
 		findEntitiesButton.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
 				entityFinder.configure(false, new SelectedHandler<Reference>() {					
@@ -137,14 +143,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
-		uploadTab.clear();
-		fileInputWidget.setVisible(true);
+		fileInputWidgetContainer.setVisible(true);
 		uploadButton.setVisible(true);
-		FlowPanel container = new FlowPanel();
-	    container.add(fileInputWidget);
-	    container.add(uploadButton);
-	    container.add(uploadParamsPanel.asWidget());
-		uploadTab.add(container);
 	}
 	
 	@Override
@@ -156,7 +156,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	@Override
 	public void showUploadSuccessUI() {
-		fileInputWidget.setVisible(false);
+		fileInputWidgetContainer.setVisible(false);
 		uploadButton.setVisible(false);
 
 		uploadFailureUI.setVisible(false);
@@ -165,7 +165,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	@Override
 	public void setFileInputWidget(Widget fileInputWidget) {
-		this.fileInputWidget = fileInputWidget;
+		fileInputWidgetContainer.clear();
+		fileInputWidgetContainer.setWidget(fileInputWidget);
 	}
 	
 	@Override
