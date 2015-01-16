@@ -66,8 +66,8 @@ public enum ContentTypeDelimiter {
 			fileName = fileName.toLowerCase().trim();
 			for (ContentTypeDelimiter ctd : values()) {
 				if (ctd.extensions != null) {
-					for (String extention : ctd.extensions) {
-						if (fileName.endsWith(extention)) {
+					for (String extension : ctd.extensions) {
+						if (fileName.endsWith(extension)) {
 							return ctd;
 						}
 					}
