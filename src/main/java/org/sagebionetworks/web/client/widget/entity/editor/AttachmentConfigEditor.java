@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
@@ -64,6 +65,9 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	@Override
 	public void updateDescriptorFromView() {
 		view.checkParams();
+		if (fileHandleIds.isEmpty()) {
+			throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
+		}
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, getFileName());
 	}
 	

@@ -119,9 +119,16 @@ public class AttachmentConfigEditorTest {
 		verify(mockView).clear();
 		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
 		
+		editor.addFileHandleId("123");
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
 		assertEquals(testFileName, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testConfigureFileNotUploaded() {
+		editor.configure(wikiKey, new HashMap<String, String>(), mockCallback);
+		editor.updateDescriptorFromView();
 	}
 	
 	@Test
