@@ -26,10 +26,39 @@
 				</g:FlowPanel>
 			</b:TabPane>
 			<b:TabPane b:id="tab2" addStyleNames="panel margin-top-15">
-				<g:SimplePanel ui:field="externalTab" />
+				<b:Form type="HORIZONTAL">
+					<b:FieldSet>
+						<b:FormGroup>
+							<b:FormLabel for="url" addStyleNames="col-xs-2">Image URL</b:FormLabel>
+							<g:FlowPanel addStyleNames="col-xs-10">
+								<b:TextBox ui:field="urlField" name="url" b:id="url" />
+							</g:FlowPanel>
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel for="linktext" addStyleNames="col-xs-2">Alternate Text</b:FormLabel>
+							<g:FlowPanel addStyleNames="col-xs-10">
+								<b:TextBox ui:field="nameField" name="linktext" b:id="linktext" />
+							</g:FlowPanel>
+						</b:FormGroup>
+					</b:FieldSet>
+				</b:Form>
 			</b:TabPane>
 			<b:TabPane b:id="tab3" addStyleNames="panel margin-top-15">
-				<g:SimplePanel ui:field="synapseTab" />
+				<b:Form type="HORIZONTAL">
+					<b:FieldSet>
+						<b:FormGroup>
+							<b:FormLabel for="url" addStyleNames="col-xs-2">Image file entity</b:FormLabel>
+							<g:FlowPanel addStyleNames="col-xs-10">
+								<b:InputGroup>
+									<b:TextBox ui:field="entityField" name="url" b:id="url" />
+									<b:InputGroupButton>
+										<b:Button ui:field="findEntitiesButton" icon="SEARCH" height="34px"/>
+									</b:InputGroupButton>
+								</b:InputGroup>
+							</g:FlowPanel>
+						</b:FormGroup>
+					</b:FieldSet>
+				</b:Form>
 			</b:TabPane>
 			
 		</b:TabContent>

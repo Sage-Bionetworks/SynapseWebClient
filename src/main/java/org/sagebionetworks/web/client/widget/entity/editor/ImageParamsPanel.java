@@ -12,6 +12,7 @@ public class ImageParamsPanel implements ImageParamsPanelView.Presenter {
 	@Inject
 	public ImageParamsPanel(ImageParamsPanelView view) {
 		this.view = view;
+		view.setPresenter(this);
 		setAlignment(WidgetConstants.FLOAT_NONE);
 	}
 	
