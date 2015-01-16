@@ -11,17 +11,29 @@ public class ContentTypeDelimiterTest {
 	public void testAllTypes(){
 		//  should be able to find all types.
 		for(ContentTypeDelimiter ctd: ContentTypeDelimiter.values()){
-			assertEquals(ctd, ContentTypeDelimiter.findByContentType(ctd.getContentType().toUpperCase()));
+			assertEquals(ctd, ContentTypeDelimiter.findByContentType(ctd.getContentType().toUpperCase(), null));
+		}
+	}
+	
+	@Test
+	public void testAllExtentions(){
+		//  should be able to find all types.
+		for(ContentTypeDelimiter ctd: ContentTypeDelimiter.values()){
+			if(ctd.getExtentions() != null){
+				for(String extention: ctd.getExtentions()){
+					assertEquals(ctd, ContentTypeDelimiter.findByContentType("unknonwn", "foo."+extention.toUpperCase()));
+				}
+			}
 		}
 	}
 
-	@Test (expected=IllegalArgumentException.class)
+	@Test
 	public void testFindNull(){
-		 ContentTypeDelimiter.findByContentType(null);
+		assertEquals(ContentTypeDelimiter.TEXT, ContentTypeDelimiter.findByContentType(null, null));
 	}
 	
-	@Test (expected=IllegalArgumentException.class)
-	public void testFindUnknown(){
-		 ContentTypeDelimiter.findByContentType("some/kind/of/type");
+	@Test
+	public void testFindUnknownNullName(){
+		assertEquals(ContentTypeDelimiter.TEXT, ContentTypeDelimiter.findByContentType("some/kind/of/type", null));
 	}
 }

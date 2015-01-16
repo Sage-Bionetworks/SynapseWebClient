@@ -71,9 +71,7 @@ public class UploadCSVFilePageImplTest {
 	public void testValidateSelecedFileNotCSV(){
 		page.setModalPresenter(mockPresenter);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("a name", "application/binary")});
-		boolean isValid = page.validateSelecedFile();
-		assertFalse(isValid);
-		verify(mockPresenter).setErrorMessage(UploadCSVFilePageImpl.UNKNOWN_TYPE_SLECTED);
+		assertTrue(page.validateSelecedFile());
 	}
 	
 	@Test
