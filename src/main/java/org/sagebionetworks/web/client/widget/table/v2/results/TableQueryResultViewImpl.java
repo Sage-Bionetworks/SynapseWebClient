@@ -61,7 +61,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 			}
 		});
 		// Track clicks to the close button at the top of the dialog
-		editRowsModal.addCloseHanlder(new ClickHandler() {
+		editRowsModal.addCloseHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onCancel();
