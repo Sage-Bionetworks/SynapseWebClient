@@ -10,14 +10,12 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.inject.Inject;
 
 public class ProjectBackgroundConfigEditor extends AttachmentConfigEditor {
-	AttachmentConfigView view;
+	private AttachmentConfigView view;
 	
 	@Inject
 	public ProjectBackgroundConfigEditor(AttachmentConfigView view, FileInputWidget fileInputWidget) {
 		super(view, fileInputWidget);
 		this.view = view;
-		view.setPresenter(this);
-		view.initView();
 	}
 	
 	@Override

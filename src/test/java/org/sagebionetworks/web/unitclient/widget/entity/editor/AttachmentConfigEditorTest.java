@@ -16,8 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
@@ -33,8 +31,7 @@ public class AttachmentConfigEditorTest {
 		
 	AttachmentConfigEditor editor;
 	AttachmentConfigView mockView;
-	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
+	
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null, null);
 	FileInputWidget mockFileInputWidget;
 	String testFileName = "testing.txt";
@@ -44,8 +41,6 @@ public class AttachmentConfigEditorTest {
 	public void setup(){
 		mockFileInputWidget = mock(FileInputWidget.class);
 		mockView = mock(AttachmentConfigView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockCallback = mock(DialogCallback.class);
 		editor = new AttachmentConfigEditor(mockView,mockFileInputWidget);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType())});

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -15,12 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
@@ -31,8 +29,6 @@ public class ImageConfigEditorTest {
 		
 	ImageConfigEditor editor;
 	ImageConfigView mockView;
-	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	FileInputWidget mockFileInputWidget;
 	String testFileName = "testing.png";
@@ -42,8 +38,6 @@ public class ImageConfigEditorTest {
 	public void setup(){
 		mockFileInputWidget = mock(FileInputWidget.class);
 		mockView = mock(ImageConfigView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockCallback = mock(DialogCallback.class);
 		editor = new ImageConfigEditor(mockView, mockFileInputWidget);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, "image/png")});
@@ -135,6 +129,13 @@ public class ImageConfigEditorTest {
 		String textToInsert = editor.getTextToInsert();
 		verify(mockView).getImageUrl();
 		assertTrue(textToInsert != null && textToInsert.length() > 0);
+	}
+	
+	@Test
+	public void testTextToInsertNotExternal() {
+		//the case when there is an external image
+		when(mockView.isExternal()).thenReturn(false);
+		assertNull(editor.getTextToInsert());
 	}
 
 }
