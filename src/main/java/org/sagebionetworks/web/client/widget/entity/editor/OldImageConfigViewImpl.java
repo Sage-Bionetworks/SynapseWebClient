@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -32,19 +32,16 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 
 	private Presenter presenter;
 	private UploadFormPanel uploadPanel;
-	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private TextField<String> urlField;
 	private TextField<String> nameField;
-	private HorizontalPanel externalLinkPanel;
 	private AttachmentData uploadedAttachmentData;
 	TabItem externalTab,uploadTab;
 	private HTMLPanel uploadStatusPanel;
 	
 	TabPanel tabPanel;
 	@Inject
-	public OldImageConfigViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
-		this.sageImageBundle = sageImageBundle;
+	public OldImageConfigViewImpl(IconsImageBundle iconsImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
 	}
 	
@@ -82,9 +79,8 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 	@Override
 	public void setUploadedAttachmentData(AttachmentData uploadedAttachmentData) {
 		this.uploadedAttachmentData = uploadedAttachmentData;
-		if (uploadedAttachmentData != null && uploadPanel != null)
-			uploadPanel.getFileUploadField().setEmptyText(uploadedAttachmentData.getName());
 	}
+	
 	private HorizontalPanel getExternalLinkPanel() {
 		HorizontalPanel hp = new HorizontalPanel();
 		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
@@ -133,7 +129,7 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 		String actionUrl;
 		String baseURl = GWT.getModuleBaseURL()+"attachment";
 		actionUrl =  baseURl+ "?" + WebConstants.ENTITY_PARAM_KEY + "=" + wikiKey.getOwnerObjectId();
-		uploadPanel = AddAttachmentDialog.getUploadFormPanel(actionUrl,sageImageBundle,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,25,new AddAttachmentDialog.Callback() {
+		uploadPanel = AddAttachmentHelper.getUploadFormPanel(actionUrl,DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT,new AddAttachmentHelper.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
 				if(result != null){
@@ -151,7 +147,7 @@ public class OldImageConfigViewImpl extends LayoutContainer implements OldImageC
 				}
 				uploadedAttachmentData = result.getAttachmentData();
 			}
-		}, null);
+		});
 		return uploadPanel;
 	}
 	

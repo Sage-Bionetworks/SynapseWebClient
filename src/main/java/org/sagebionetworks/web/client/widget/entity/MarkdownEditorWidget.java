@@ -340,7 +340,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case DELETE:
 			deleteHandler.invoke();
 			break;
-
+		case SET_PROJECT_BACKGROUND:
+			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
 		default:
 			throw new IllegalArgumentException(
 					"Unrecognized markdown editor action: " + action);

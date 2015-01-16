@@ -85,6 +85,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getVideoConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableQueryResultEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE)) {
+			presenter = ginInjector.getProjectBackgroundConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
