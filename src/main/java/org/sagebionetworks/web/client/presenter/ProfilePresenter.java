@@ -219,9 +219,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			private void proceed() {
 				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
 				refreshTeams();
-				if (isOwner) {
-					getFavorites();
-				}
 			}
 		});
 	}
@@ -240,21 +237,28 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
 		this.filterType =filterType;
 		filterTeam = team;
-		updateFilterView();
 		refreshProjects();
 	}
 
 	public void getMoreProjects() {
 		if (isOwner) {
+			view.showProjectFiltersUI();
 			//this depends on the active filter
 			switch (filterType) {
 				case ALL:
+					view.setAllProjectsFilterSelected();
 					getAllMyProjects(currentOffset);
 					break;
 				case MINE:
+					view.setMyProjectsFilterSelected();
 					getProjectsCreatedByMe(currentOffset);
 					break;
+				case FAVORITES:
+					view.setFavoritesFilterSelected();
+					getFavorites();
+					break;
 				case TEAM:
+					view.setTeamsFilterSelected();
 					getTeamProjects(currentOffset);
 					break;
 				default:
@@ -262,30 +266,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 		} else
 			getUserProjects(currentOffset);
-	}
-	
-	public void updateFilterView() {
-		if (isOwner) {
-			view.showProjectFiltersUI();
-			
-			//this depends on the active filter
-			switch (filterType) {
-				case ALL:
-					view.setAllProjectFilterSelected();
-					view.setProjectHighlightBoxText("All Projects");
-					break;
-				case MINE:
-					view.setMyProjectFilterSelected();
-					view.setProjectHighlightBoxText("My Projects");
-					break;
-				case TEAM:
-					view.setTeamProjectFilterSelected(filterTeam);
-					view.setProjectHighlightBoxText("Team Projects (" + filterTeam.getName() + ")");
-					break;
-				default:
-					break;
-			}
-		}
 	}
 	
 	@Override
@@ -307,6 +287,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(List<Team> teams) {
 				view.setTeams(teams,isOwner);
 				getChallenges(teams);
+				view.setTeamsFilterVisible(!teams.isEmpty());
 			}
 		};
 		TeamListWidget.getTeams(userId, synapseClient, adapterFactory, teamCallback);
@@ -410,7 +391,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults(), projectHeaders.getTotalNumberOfResults());
+				addProjectResults(projectHeaders.getResults());
+				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -425,7 +407,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults(), projectHeaders.getTotalNumberOfResults());
+				addProjectResults(projectHeaders.getResults());
+				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -443,7 +426,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(EntityQueryResults results) {
 				List<ProjectHeader> headers = getHeadersFromQueryResults(results);
-				addProjectResults(headers, results.getTotalEntityCount().intValue());
+				addProjectResults(headers);
+				projectPageAdded(results.getTotalEntityCount().intValue());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -459,7 +443,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				List<ProjectHeader> headers = projectHeaders.getResults();
-				addProjectResults(headers, projectHeaders.getTotalNumberOfResults());
+				addProjectResults(headers);
+				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -469,10 +454,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> headers, int totalCount) {
+	public void addProjectResults(List<ProjectHeader> headers) {
 		view.showProjectsLoading(false);
 		view.addProjects(headers);
-		projectPageAdded(totalCount);
 	}
 	
 	public void projectPageAdded(int totalNumberOfResults) {
@@ -481,17 +465,29 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getFavorites() {
+		view.showProjectsLoading(true);
 		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
-				view.setFavorites(result);
+				//convert to Project Headers
+				List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
+				for (EntityHeader header : result) {
+					ProjectHeader projectHeader = new ProjectHeader();
+					projectHeader.setId(header.getId());
+					projectHeader.setName(header.getName());
+					headers.add(projectHeader);
+				}
+				addProjectResults(headers);
+				view.setIsMoreProjectsVisible(false);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setFavoritesError("Could not load Favorites: " + caught.getMessage());
+				view.showProjectsLoading(false);
+				view.setProjectsError("Could not load user favorites:" + caught.getMessage());
 			}
 		});
 	}
+	
 	
 	@Override
 	public void createProject(final String name) {
@@ -721,21 +717,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void applyFilterClicked() {
-		if (view.isAllProjectFilterSelected()) {
-			setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
-		} else if (view.isMyProjectFilterSelected()) {
-			setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
-		} else {
-			//must be a team filter
-			setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, view.getSelectedTeamFilter());
-		}
-	}
-	
-	@Override
-	public void cancelFilterClicked() {
-		//update the filter in the view based on the previously selected filter
-		updateFilterView();
+	public void applyFilterClicked(ProjectFilterEnum filterType, Team team) {
+		setProjectFilterAndRefresh(filterType, team);
 	}
 	
 	public EntityQuery createGetProjectsQuery(String creatorUserId, long limit, long offset) {

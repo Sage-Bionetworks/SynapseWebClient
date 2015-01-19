@@ -103,9 +103,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem supertableLink;
 	@UiField
+	public AnchorListItem synapseTableLink;
+	@UiField
 	public AnchorListItem wikifilesPreviewLink;
 	@UiField
 	public AnchorListItem tutorialWizardLink;
+	@UiField
+	public AnchorListItem entityBackgroundLink;
 	
 	@UiField
 	public Button boldButton;
@@ -204,6 +208,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		youTubeLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_YOU_TUBE));
 		bookmarkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BOOKMARK));
+		synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));
 		externalWebsiteLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE));
 		supertableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERTABLE));
 		wikifilesPreviewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW));
@@ -230,6 +235,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
+		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		heading1Link.addStyleName("font-size-36");
 		heading2Link.addStyleName("font-size-30");
 		heading3Link.addStyleName("font-size-24");

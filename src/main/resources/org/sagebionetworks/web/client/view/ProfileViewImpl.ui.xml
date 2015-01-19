@@ -33,9 +33,8 @@
 						</b:Column>
 					</b:Row>
 				    <div class="row" ui:field="navtabContainer">
-					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
+					    <ul class="nav nav-tabs entity-tabs margin-top-15">
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>
-						    <li class="entity-tab" ui:field="favoritesListItem"><g:Anchor styleName="text-align-center link no-background" text="Favorites" ui:field="favoritesLink"/></li>
 						    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" text="Challenges" ui:field="challengesLink"/></li>
 						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" text="Teams" ui:field="teamsLink"/></li>
 						    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" text="Settings" ui:field="settingsLink"/></li>
@@ -46,10 +45,19 @@
 							<div class="highlight-box" ui:field="projectsHighlightBox" highlight-box-title="Projects">
 								<b:Row>
 									<b:Column size="XS_12">
-										<b:Button ui:field="projectFiltersUI" dataTarget="#filtersModal" dataToggle="MODAL" icon="FILTER" pull="RIGHT" addStyleNames="margin-right-10 moveup-35">Filters...</b:Button>
+										<b:ButtonGroup ui:field="projectFiltersUI">
+											<b:Button ui:field="allProjectsFilter">All</b:Button>
+											<b:Button ui:field="myProjectsFilter">My Projects</b:Button>
+											<b:Button ui:field="favoritesFilter">Favorites</b:Button>
+											<b:ButtonGroup>
+												<b:Button ui:field="teamFilters" dataToggle="DROPDOWN">Team Filters</b:Button>
+												<b:DropDownMenu ui:field="teamFiltersDropDownMenu">
+												</b:DropDownMenu>
+											</b:ButtonGroup>
+										</b:ButtonGroup>
 									</b:Column>
 								</b:Row>
-								<g:FlowPanel ui:field="projectsTabContent" addStyleNames="moveup-8" />
+								<g:FlowPanel ui:field="projectsTabContent" addStyleNames="margin-top-10" />
 								<div ui:field="projectsLoadingUI" >
 									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 									&nbsp;Loading...
@@ -73,12 +81,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="favoritesTabContainer">
-					    	<div class="highlight-box" ui:field="favoritesHighlightBox" highlight-box-title="Favorites">
-					    		<g:FlowPanel ui:field="favoritesTabContent" styleName="margin-10" />
-					    	</div>
-					    </div>
-					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer">
+						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer">
 					    	<div class="highlight-box" ui:field="challengesHighlightBox" highlight-box-title="Challenges">
 					    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
 					    	</div>
@@ -124,24 +127,5 @@
 		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
 		<!-- end footer -->
-		
-		<b:Modal b:id="filtersModal" title="Project Filters" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
-		  <b:ModalBody>
-		      <b:FormGroup>
-		      	<g:FlowPanel>
-			        <b:Radio ui:field="allProjectsFilter" name="filterRadio" formValue="allProjectsFilterId" text="All"/>
-			        <b:Radio name="filterRadio" ui:field="myProjectsFilter" formValue="myProjectsFilterId" text="My Projects"/>
-			        <bh:Hr />
-	        		<b:Heading size="H5" text="Filter projects by team"/>
-	        		<bh:Div ui:field="teamFiltersContainer" />
-			    </g:FlowPanel>
-		    </b:FormGroup>
-		  </b:ModalBody>
-		  <b:ModalFooter>
-			<b:Button ui:field="filterCancelButton" type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-			<b:Button ui:field="filterOkButton" dataDismiss="MODAL" type="PRIMARY" >Apply</b:Button>
-		  </b:ModalFooter>
-		</b:Modal>
-		
 	</g:HTMLPanel>
 </ui:UiBinder> 

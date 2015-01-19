@@ -11,16 +11,17 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import static org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl.*;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class CreateTableModalWidgetTest {
 
-	CreateTableModalView mockView;
+	EntityNameModalView mockView;
 	SynapseClientAsync mockSynapseClient;
 	TableCreatedHandler mockHandler;
 	
@@ -29,12 +30,13 @@ public class CreateTableModalWidgetTest {
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(CreateTableModalView.class);
+		mockView = Mockito.mock(EntityNameModalView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockHandler = Mockito.mock(TableCreatedHandler.class);
 		widget = new CreateTableModalWidgetImpl(mockView, mockSynapseClient);
 		parentId = "syn123";
 		widget.configure(parentId, mockHandler);
+		verify(mockView).configure(TITLE, LABEL, BUTTON_TEXT, "");
 	}
 	
 	@Test
@@ -47,8 +49,8 @@ public class CreateTableModalWidgetTest {
 	@Test
 	public void testNullName(){
 		widget.showCreateModal();
-		when(mockView.getTableName()).thenReturn(null);
-		widget.onCreateTable();
+		when(mockView.getName()).thenReturn(null);
+		widget.onPrimary();
 		verify(mockView).showError(CreateTableModalWidgetImpl.TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		verify(mockSynapseClient, never()).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
 	}
@@ -61,8 +63,8 @@ public class CreateTableModalWidgetTest {
 		table.setId("syn57");
 		AsyncMockStubber.callSuccessWith(table).when(mockSynapseClient).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
 		widget.showCreateModal();
-		when(mockView.getTableName()).thenReturn(tableName);
-		widget.onCreateTable();
+		when(mockView.getName()).thenReturn(tableName);
+		widget.onPrimary();
 		verify(mockView, never()).showError(anyString());
 		verify(mockView).hide();
 		verify(mockHandler).tableCreated();
@@ -77,8 +79,8 @@ public class CreateTableModalWidgetTest {
 		String error = "name already exists";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
 		widget.showCreateModal();
-		when(mockView.getTableName()).thenReturn(tableName);
-		widget.onCreateTable();
+		when(mockView.getName()).thenReturn(tableName);
+		widget.onPrimary();
 		verify(mockView).showError(error);
 		verify(mockView).setLoading(false);
 		// Should not hide with error.

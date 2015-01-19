@@ -6,19 +6,19 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<!-- Dialog for creating a new table -->
-	<b:Modal title="Create Table" closable="true" fade="true"
+	<b:Modal ui:field="modal" title="Title goes here" closable="true" fade="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 			<b:Form>
 				<b:FormGroup>
-					<b:FormLabel for="formName">Table Name</b:FormLabel>
-					<b:TextBox b:id="formName" ui:field="tableNameField" />
+					<b:FormLabel ui:field="nameLabel" for="formName">Label goes here</b:FormLabel>
+					<b:TextBox b:id="formName" ui:field="nameField" />
 				</b:FormGroup>
 			</b:Form>
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="createButton" type="PRIMARY" dataLoadingText="Creating..." >Create</b:Button>
+			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Saving..." >Button text goes here</b:Button>
 			<b:Button ui:field="defaultButton" type="DEFAULT"
 				dataDismiss="MODAL">Cancel</b:Button>
 		</b:ModalFooter>

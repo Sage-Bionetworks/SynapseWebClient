@@ -253,6 +253,24 @@ public class WikiPageWidgetTest {
 		presenter.editClicked();
 		verify(mockGlobalApplicationState).setIsEditing(eq(true));
 	}
+	
+	@Test
+	public void testShowCreatedBy(){
+		presenter.showCreatedBy(false);
+		verify(mockView).showCreatedBy(false);
+	}
+	
+	@Test
+	public void testShowModifiedBy(){
+		presenter.showModifiedBy(false);
+		verify(mockView).showModifiedBy(false);
+	}
+	
+	@Test
+	public void testShowWikiHistory(){
+		presenter.showWikiHistory(false);
+		verify(mockView).showWikiHistory(false);
+	}
 
 	
 }

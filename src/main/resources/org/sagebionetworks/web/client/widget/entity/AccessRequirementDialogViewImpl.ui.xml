@@ -33,6 +33,7 @@
 		    <g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and fulfill the following requirements:" />
 		</bh:Div>
 		<!-- terms -->
+		<g:SimplePanel ui:field="wikiTermsUI"></g:SimplePanel>
 		<b:BlockQuote ui:field="termsUI">
 		    <bh:Paragraph>
 		    	<g:HTML ui:field="terms" styleName="font-size-14" />

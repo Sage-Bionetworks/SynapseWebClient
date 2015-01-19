@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -42,6 +43,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	public static final String DELETE_PREFIX = "Delete ";
 	
+	public static final String RENAME_PREFIX = "Rename ";
+	
 	EntityActionControllerView view;
 	PreflightController preflightController;
 	EntityTypeProvider entityTypeProvider;
@@ -49,6 +52,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
+	RenameEntityModalWidget renameEntityModalWidget;
 	
 	EntityBundle entityBundle;
 	Entity entity;
@@ -66,7 +70,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			AccessControlListModalWidget accessControlListModalWidget) {
+			AccessControlListModalWidget accessControlListModalWidget,
+			RenameEntityModalWidget renameEntityModalWidget) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -76,6 +81,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.renameEntityModalWidget = renameEntityModalWidget;
 	}
 
 	@Override
@@ -92,6 +98,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();
+		configureRenameAction();
+	}
+	
+	private void configureRenameAction(){
+		actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
+		actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
+		actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+enityTypeDisplay);
+		actionMenu.addActionListener(Action.CHANGE_ENTITY_NAME, this);
 	}
 	
 	private void configureDeleteAction(){
@@ -120,10 +134,34 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case SHARE:
 			onShare();
+			break;
+		case CHANGE_ENTITY_NAME:
+			onRename();
 			break;	
 		default:
 			break;
 		}
+	}
+
+	private void onRename() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckRename();
+			}
+		});
+	}
+	/**
+	 * Called if the preflight check for a rename passes.
+	 */
+	private void postCheckRename(){
+		renameEntityModalWidget.onRename(this.entity, new Callback() {
+			@Override
+			public void invoke() {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+		});
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -11,14 +10,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -34,7 +30,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
@@ -73,7 +68,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
-import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -335,9 +329,8 @@ public class ProfilePresenterTest {
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
 		verify(mockView).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setAllProjectsFilterSelected();
 		verify(mockView).showProjectFiltersUI();
-		verify(mockView).setAllProjectFilterSelected();
-		verify(mockView).setProjectHighlightBoxText(anyString());
 		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
 	}
@@ -358,9 +351,22 @@ public class ProfilePresenterTest {
 		verify(mockView).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
-		verify(mockView).setMyProjectFilterSelected();
-		verify(mockView).setProjectHighlightBoxText(anyString());
+		verify(mockView).setMyProjectsFilterSelected();
 		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockView).addProjects(anyList());
+	}
+	
+
+	@Test
+	public void testGetFavorites() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).showProjectFiltersUI();
+		verify(mockView).setFavoritesFilterSelected();
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(anyList());
 	}
 	
@@ -376,8 +382,7 @@ public class ProfilePresenterTest {
 		verify(mockView).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
-		verify(mockView).setTeamProjectFilterSelected(testTeam);
-		verify(mockView).setProjectHighlightBoxText(anyString());
+		verify(mockView).setTeamsFilterSelected();
 		verify(mockSynapseClient).getProjectsForTeam(eq(teamId), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
 	}
@@ -402,10 +407,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testApplyFilterClickedAll() {
 		profilePresenter.setIsOwner(true);
-		when(mockView.isAllProjectFilterSelected()).thenReturn(true);
-		when(mockView.isMyProjectFilterSelected()).thenReturn(false);
-		when(mockView.getSelectedTeamFilter()).thenReturn(null);
-		profilePresenter.applyFilterClicked();
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
 		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
@@ -413,11 +415,16 @@ public class ProfilePresenterTest {
 	public void testApplyFilterClickedMine() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
-		when(mockView.isAllProjectFilterSelected()).thenReturn(false);
-		when(mockView.isMyProjectFilterSelected()).thenReturn(true);
-		when(mockView.getSelectedTeamFilter()).thenReturn(null);
-		profilePresenter.applyFilterClicked();
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
 		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testApplyFilterClickedFavorites() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("007");
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -456,24 +463,6 @@ public class ProfilePresenterTest {
 		ProjectHeader header1 = projectHeaders.get(0);
 		assertEquals(id1, header1.getId());
 		assertEquals(name1, header1.getName());
-	}
-	
-	@Test
-	public void testApplyFilterClickedTeam() {
-		profilePresenter.setIsOwner(true);
-		when(mockView.isAllProjectFilterSelected()).thenReturn(false);
-		when(mockView.isMyProjectFilterSelected()).thenReturn(false);
-		when(mockView.getSelectedTeamFilter()).thenReturn(new Team());
-		profilePresenter.applyFilterClicked();
-		verify(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testUpdateFilterUiNotOwner() {
-		profilePresenter.setIsOwner(false);
-		reset(mockView);
-		profilePresenter.updateFilterView();
-		verifyZeroInteractions(mockView);
 	}
 	
 	@Test
@@ -709,20 +698,6 @@ public class ProfilePresenterTest {
 		verify(mockView).setTeamsError(errorMessage);
 	}
 	
-	@Test
-	public void testGetFavorites() {
-		profilePresenter.getFavorites();
-		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setFavorites(eq(myFavorites));
-	}
-	
-	@Test
-	public void testGetFavoritesError() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
-		profilePresenter.getFavorites();
-		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setFavoritesError(anyString());
-	}
 	
 	
 	@Test
@@ -874,7 +849,7 @@ public class ProfilePresenterTest {
 	public void testUpdateArea() {
 		profilePresenter.setPlace(place);
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
-		profilePresenter.updateArea(ProfileArea.FAVORITES);
+		profilePresenter.updateArea(ProfileArea.CHALLENGES);
 		verify(mockPlaceChanger).goTo(any(Profile.class));
 	}
 

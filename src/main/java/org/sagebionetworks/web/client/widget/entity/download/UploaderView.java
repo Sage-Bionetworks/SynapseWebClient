@@ -28,7 +28,8 @@ public interface UploaderView extends IsWidget, SynapseView {
 	
 	void showErrorMessage(String title, String details);
 	
-	void showUploadingToSynapseStorage(String banner);
+	void showUploadingToSynapseStorage();
+	void showUploadingBanner(String banner);
 	void showUploadingToExternalStorage(String host, String banner);
 	
 	/**

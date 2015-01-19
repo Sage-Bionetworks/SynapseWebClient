@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -196,11 +196,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		uploadBasedOnConfiguration();
 	}
 	
+	public void updateS3UploadBannerView(String banner) {
+		if (DisplayUtils.isDefined(banner))
+			view.showUploadingBanner(banner);
+		else
+			view.showUploadingToSynapseStorage();	
+	}
+	
 	public void queryForUploadDestination() {
 		enableMultipleFileUploads();
 		if (parentEntityId == null && entity == null) {
 			currentUploadType = UploadType.S3;
-			view.showUploadingToSynapseStorage("");
+			view.showUploadingToSynapseStorage();
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
 			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
@@ -208,10 +215,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
 						currentUploadType = UploadType.S3;
-						view.showUploadingToSynapseStorage("");
+						view.showUploadingToSynapseStorage();
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
-						view.showUploadingToSynapseStorage(uploadDestinations.get(0).getBanner());
+						updateS3UploadBannerView(uploadDestinations.get(0).getBanner());
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
 						if (UploadType.SFTP == d.getUploadType()){
@@ -575,7 +582,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		UploadResult uploadResult = null;
 		String detailedErrorMessage = null;
 		try{
-			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
+			uploadResult = AddAttachmentHelper.getUploadResult(resultHtml);
 			handleSubmitResult(uploadResult);
 		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		

@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.table.modal;
 
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -15,22 +15,27 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class CreateTableModalWidgetImpl implements CreateTableModalView.Presenter, CreateTableModalWidget {
+public class CreateTableModalWidgetImpl implements EntityNameModalView.Presenter, CreateTableModalWidget {
+
+	public static final String BUTTON_TEXT = "Create";
+	public static final String LABEL = "Table name";
+	public static final String TITLE = "Create Table";
 
 	public static final String TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Table name must include at least one character.";
 	
-	CreateTableModalView view;
+	EntityNameModalView view;
 	SynapseClientAsync synapseClient;
 	String parentId;
 	TableCreatedHandler handler;
 	
 	@Inject
-	public CreateTableModalWidgetImpl(CreateTableModalView view,
+	public CreateTableModalWidgetImpl(EntityNameModalView view,
 			SynapseClientAsync synapseClient) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.view.setPresenter(this);
+		this.view.configure(TITLE, LABEL, BUTTON_TEXT, "");
 	}
 	
 	/**
@@ -73,8 +78,8 @@ public class CreateTableModalWidgetImpl implements CreateTableModalView.Presente
 	 * Should be Called when the create button is clicked on the dialog.
 	 */
 	@Override
-	public void onCreateTable() {
-		String tableName = view.getTableName();
+	public void onPrimary() {
+		String tableName = view.getName();
 		if(tableName == null || "".equals(tableName)){
 			view.showError(TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		}else{
@@ -96,5 +101,6 @@ public class CreateTableModalWidgetImpl implements CreateTableModalView.Presente
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+
 
 }

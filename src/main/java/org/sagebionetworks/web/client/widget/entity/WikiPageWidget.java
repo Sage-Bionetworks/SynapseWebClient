@@ -88,6 +88,16 @@ SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 	
+	public void showWikiHistory(boolean isVisible) {
+		view.showWikiHistory(isVisible);
+	}
+	public void showCreatedBy(boolean isVisible) {
+		view.showCreatedBy(isVisible);
+	}
+	public void showModifiedBy(boolean isVisible) {
+		view.showModifiedBy(isVisible);
+	}
+	
 	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage) {
 		view.showLoading();
 		this.canEdit = canEdit;
@@ -189,11 +199,11 @@ SynapseWidgetPresenter {
 			} catch (JSONObjectAdapterException e) {
 				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			}
-		}
-		else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
+		} else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString()) 
+				|| wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ACCESS_REQUIREMENT.toString())) {
 			isDescription = true;
 			callback.ownerObjectNameInitialized("", isDescription);
-		}
+		} 
 	}
 	
 	@Override
