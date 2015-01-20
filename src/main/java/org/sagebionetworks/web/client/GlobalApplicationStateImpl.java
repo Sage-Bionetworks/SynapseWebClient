@@ -90,9 +90,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Override
-	public Place getLastPlace() {		
+	public Place getLastPlace() {
+		return getLastPlace(AppActivityMapper.getDefaultPlace());
+	}
+	
+	@Override
+	public Place getLastPlace(Place defaultPlace) {
 		String historyValue = cookieProvider.getCookie(CookieKeys.LAST_PLACE);
-		return getPlaceFromHistoryValue(historyValue);		
+		return getPlaceFromHistoryValue(historyValue, defaultPlace);
 	}
 
 	@Override
@@ -104,7 +109,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public Place getCurrentPlace() {
 		String historyValue = cookieProvider.getCookie(CookieKeys.CURRENT_PLACE);
-		return getPlaceFromHistoryValue(historyValue);		
+		return getPlaceFromHistoryValue(historyValue, AppActivityMapper.getDefaultPlace());		
 	}
 
 	@Override
@@ -126,11 +131,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	/*
 	 * Private Methods
 	 */
-	private Place getPlaceFromHistoryValue(String historyValue) {
+	private Place getPlaceFromHistoryValue(String historyValue, Place defaultPlace) {
 		if(historyValue != null) {
 			Place place = appPlaceHistoryMapper.getPlace(historyValue);
 			return place;
-		} else return AppActivityMapper.getDefaultPlace();
+		} else return defaultPlace;
 	}
 
 	@Override

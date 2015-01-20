@@ -46,6 +46,12 @@ public interface GlobalApplicationState {
 	public Place getLastPlace();
 	
 	/**
+	 * Holds the last visited place.  Return the given default place if no last place is available.
+	 * @return
+	 */
+	public Place getLastPlace(Place defaultPlace);
+	
+	/**
 	 * Sets the last visited place (should only used in the AppActivityMapper) 
 	 * @param lastPlace
 	 */

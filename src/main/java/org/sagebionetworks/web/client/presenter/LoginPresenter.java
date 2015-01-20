@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -171,7 +172,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void goToLastPlace() {
 		view.hideLoggingInLoader();
-		DisplayUtils.goToLastPlace(globalApplicationState);
+		Place defaultPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
+		Place lastPlace = globalApplicationState.getLastPlace(defaultPlace);
+		globalApplicationState.getPlaceChanger().goTo(lastPlace);
 	}
 	
 	/*
