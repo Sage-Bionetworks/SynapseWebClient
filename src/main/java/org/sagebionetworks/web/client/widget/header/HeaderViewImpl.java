@@ -3,6 +3,11 @@ package org.sagebionetworks.web.client.widget.header;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.base.button.AbstractToggleButton;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Styles;
+import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -23,6 +28,7 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -92,6 +98,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Anchor goToStandardSite;
 	@UiField
 	SimplePanel searchBoxContainer;
+	SimplePanel userPicturePanel;
 	
 	private Presenter presenter;
 	private AuthenticationController authenticationController;	
@@ -117,11 +124,27 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.sageImageBundle = sageImageBundle;
 		// add search panel first
 		searchBox.setVisible(true);
-		
 		searchBoxContainer.setWidget(searchBox.asWidget());
+		userButton.setSize("30px", "26px");
+		userPicturePanel = new SimplePanel();
+		clearUserButton();
 		showLargeLogo = false; // default
 		initClickHandlers();
 		refreshTestSiteHeader();
+	}
+	
+	/**
+	 * Clear the divider/caret from the user button, and add the picture container
+	 * @param button
+	 */
+	public void clearUserButton() {
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+            @Override
+            public void execute() {
+            	userButton.clear();
+            	userButton.add(userPicturePanel);
+            }
+        });
 	}
 	
 	public void initClickHandlers() {
@@ -191,7 +214,31 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				DisplayUtils.newWindow("http://support.sagebase.org", "", "");
 			}
 		});
-
+		rLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(ClientProperties.CLIENT_R_API_URL, "", "");
+			}
+		});
+		
+		pythonLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(ClientProperties.CLIENT_PYTHON_API_URL, "", "");
+			}
+		});
+		commandLineLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(ClientProperties.CLIENT_CL_API_URL, "", "");
+			}
+		});
+		restAPILink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(ClientProperties.REST_API_URL, "", "");
+			}
+		});
 	}
 	
 	
@@ -239,9 +286,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private void setUser(UserSessionData userData) {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
-	 		
-		
-		if (userData != null && userData.getProfile() != null) {
+	 	if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			UserProfile profile = userData.getProfile();
 			String displayName = DisplayUtils.getDisplayName(profile);
@@ -249,14 +294,18 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				displayName = displayName.substring(0, MAX_DISPLAY_NAME_CHARACTER_COUNT - 1) + "...";
 			}
 			usernameLink.setText(displayName);
+			userPicturePanel.clear();
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
+				userButton.setIcon(null);
 				Image profilePicture = new Image();
 				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-				profilePicture.setWidth("20px");
-				profilePicture.setHeight("20px");
+				profilePicture.setWidth("22px");
+				profilePicture.setHeight("22px");
 				profilePicture.addStyleName("userProfileImage");
-				userButton.clear();
-				userButton.add(profilePicture);
+				userPicturePanel.setWidget(profilePicture);
+			} else {
+				userButton.setIcon(IconType.USER);
+				userButton.setIconSize(IconSize.LARGE);
 			}
 			userButton.setVisible(true);
 			loginLink.setVisible(false);
