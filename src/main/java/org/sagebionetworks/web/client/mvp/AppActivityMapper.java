@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.HomeRedirector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
@@ -73,7 +72,6 @@ public class AppActivityMapper implements ActivityMapper {
 		
 		openAccessPlaces = new ArrayList<Class>();
 		openAccessPlaces.add(Home.class);
-		openAccessPlaces.add(HomeRedirector.class);
 		openAccessPlaces.add(LoginPlace.class);
 		openAccessPlaces.add(PasswordReset.class);
 		openAccessPlaces.add(RegisterAccount.class);
@@ -95,7 +93,6 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Certificate.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
-		excludeFromLastPlace.add(HomeRedirector.class);
 		excludeFromLastPlace.add(Home.class);
 		excludeFromLastPlace.add(LoginPlace.class);
 		excludeFromLastPlace.add(PasswordReset.class);
@@ -115,10 +112,6 @@ public class AppActivityMapper implements ActivityMapper {
 	    
 	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();		
-		
-		if(place.getClass().equals(HomeRedirector.class)) {
-			return getActivity(globalApplicationState.getHomePlace());
-		}
 		
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
@@ -171,7 +164,7 @@ public class AppActivityMapper implements ActivityMapper {
 	 * @return
 	 */
 	public static Place getDefaultPlace() {
-		return new HomeRedirector();
+		return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 	}
 	
 }

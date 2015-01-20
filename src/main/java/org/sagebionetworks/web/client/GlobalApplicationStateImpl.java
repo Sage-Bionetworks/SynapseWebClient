@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.HomeRedirector;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -67,11 +66,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			placeChanger = new PlaceChanger() {			
 				@Override
 				public void goTo(Place place) {
-					//resolve target place if HomeRedirector
-					if(place.getClass().equals(HomeRedirector.class)) {
-						place = getHomePlace();
-					}
-					
 					// If we are not already on this page, go there.
 					if(!placeController.getWhere().equals(place)){
 						placeController.goTo(place);

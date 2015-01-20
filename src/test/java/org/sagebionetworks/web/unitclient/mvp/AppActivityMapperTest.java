@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.mvp;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
@@ -11,16 +11,13 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.HomeRedirector;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
@@ -120,35 +117,5 @@ public class AppActivityMapperTest {
 		appActivityMapper.getActivity(loginPlace2);		
 		verify(mockGlobalApplicationState, times(0)).setLastPlace(any(Place.class));
 		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace2);
-	}
-
-	@Test 
-	public void testGetActivityHomeRedirectorNotLoggedIn() {
-		Place homeRedirectorPlace = new HomeRedirector();
-		when(mockGlobalApplicationState.getHomePlace()).thenReturn(new Home(""));
-		
-		appActivityMapper.getActivity(homeRedirectorPlace);
-		
-		ArgumentCaptor<Place> currentPlaceCaptor = ArgumentCaptor.forClass(Place.class);
-		verify(mockGlobalApplicationState).setCurrentPlace(currentPlaceCaptor.capture());
-		
-		//should be sent to Home in this case
-		assertTrue(currentPlaceCaptor.getValue() instanceof Home);
-	}
-	
-	@Test 
-	public void testGetActivityHomeRedirectorLoggedIn() {
-		Place homeRedirectorPlace = new HomeRedirector();
-		String userId = "2222";
-		when(mockGlobalApplicationState.getHomePlace()).thenReturn(new Profile(userId));
-		appActivityMapper.getActivity(homeRedirectorPlace);
-		
-		ArgumentCaptor<Place> currentPlaceCaptor = ArgumentCaptor.forClass(Place.class);
-		verify(mockGlobalApplicationState).setCurrentPlace(currentPlaceCaptor.capture());
-		
-		//should be sent to Profile in this case
-		Place destination = currentPlaceCaptor.getValue();
-		assertTrue(destination instanceof Profile);
-		assertEquals(userId, ((Profile)destination).getUserId());
 	}
 }
