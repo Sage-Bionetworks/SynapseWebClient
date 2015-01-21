@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
@@ -45,11 +46,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel newsFeed;
 	@UiField
-	SimplePanel loginBtnPanel;
+	org.gwtbootstrap3.client.ui.Button loginBtn;
 	@UiField
-	SimplePanel registerBtnPanel;		
+	org.gwtbootstrap3.client.ui.Button registerBtn;
 	@UiField
-	SimplePanel dreamBtnPanel;
+	org.gwtbootstrap3.client.ui.Button dreamBtn;
+	@UiField
+	org.gwtbootstrap3.client.ui.Button dashboardBtn;
+	
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
@@ -119,38 +123,30 @@ public class HomeViewImpl extends Composite implements HomeView {
 		bigSearchBox.clear();
 		bigSearchBox.add(homeSearchBox.asWidget());
 		
-		Button loginBtn = new Button(DisplayConstants.BUTTON_LOGIN);
-		loginBtn.removeStyleName("gwt-Button");
-		loginBtn.addStyleName("btn btn-default btn-lg btn-block");
 		loginBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
-		loginBtnPanel.setWidget(loginBtn);
-		
-		Button registerBtn = new Button(DisplayConstants.REGISTER_BUTTON);
-		registerBtn.removeStyleName("gwt-Button");
-		registerBtn.addStyleName("btn btn-default btn-lg btn-block");
 		registerBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
-		registerBtnPanel.setWidget(registerBtn);
-		
-		Button dreamBtn = new Button(DisplayConstants.BUTTON_DREAM);
-		dreamBtn.removeStyleName("gwt-Button");
-		dreamBtn.addStyleName("btn btn-default btn-lg btn-block");
 		dreamBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
 			}
 		});
-		dreamBtnPanel.setWidget(dreamBtn);
+		dashboardBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
+			}
+		});
 		
 		// Programmatic Clients
 		fillProgrammaticClientInstallCode();
@@ -160,6 +156,19 @@ public class HomeViewImpl extends Composite implements HomeView {
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
 	}
 
+	@Override
+	public void showLoggedInUI() {
+		loginBtn.setVisible(false);
+		registerBtn.setVisible(false);
+		dashboardBtn.setVisible(true);
+	}
+	@Override
+	public void showAnonymousUI() {
+		loginBtn.setVisible(true);
+		registerBtn.setVisible(true);
+		dashboardBtn.setVisible(false);
+	}
+	
 	@Override
 	public void onAttach() {
 		super.onAttach();

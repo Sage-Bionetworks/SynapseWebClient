@@ -16,6 +16,8 @@ public interface HomeView extends IsWidget, SynapseView {
 	public void refresh();
 	
 	public void showNews(String html);
+	public void showLoggedInUI();
+	public void showAnonymousUI();
 	
 	public interface Presenter extends SynapsePresenter {
 

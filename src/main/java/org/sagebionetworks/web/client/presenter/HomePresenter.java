@@ -64,8 +64,11 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		loadNewsFeed();
 		// Things to load for authenticated users
 		if(authenticationController.isLoggedIn()) {
+			view.showLoggedInUI();
 			//validate token
 			validateToken();
+		} else {
+			view.showAnonymousUI();
 		}
 	}
 		
