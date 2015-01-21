@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.extras.select.client.ui.Option;
+import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -14,12 +17,8 @@ import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 
-import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
-import com.extjs.gxt.ui.client.event.SelectionChangedListener;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboValue;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -36,7 +35,7 @@ import com.google.inject.Inject;
 
 public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWidgetView {
 	public static final String MEMBER_ACCESS = "Member";
-	public static final String ADMIN_ACCESS = "Admin";
+	public static final String ADMIN_ACCESS = "Captain";
 	
 	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	private Presenter presenter;
@@ -81,8 +80,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	private void configureSearchBox() {
 		memberSearchContainer.clear();
 		SimplePanel container;
-		LayoutContainer horizontalTable = new LayoutContainer();
-		horizontalTable.addStyleName("row");
+		Row horizontalTable = new Row();
 		
 	    searchField = new TextBox();
 	    searchField.setWidth("300px");
@@ -142,9 +140,8 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			left.add(userBadgeView);
 			if (isAdmin) {
 				//add simple combo
-				SimpleComboBox combo = getAccessCombo(member.getOwnerId(), teamMember.getIsAdmin());
+				Select combo = getAccessCombo(member.getOwnerId(), teamMember.getIsAdmin());
 				SimplePanel wrap = new SimplePanel();
-				combo.setWidth(70);
 				wrap.addStyleName("margin-top-5");
 				wrap.add(combo);
 				left.add(wrap);
@@ -166,7 +163,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				right.add(leaveButton);
 			} else if (teamMember.getIsAdmin()) {
 				//otherwise, indicate that this row user is an admin (via label)
-				left.add(new HTML("<span class=\"margin-left-15\">Admin</span>"));
+				left.add(new HTML("<span class=\"margin-left-15\">"+ADMIN_ACCESS+"</span>"));
 			}
 			
 			singleRow.add(mediaContainer);
@@ -198,24 +195,30 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			mainContainer.add(lc);
 	}
 	
-	private SimpleComboBox getAccessCombo(final String ownerId, boolean isAdmin) {
-		final SimpleComboBox accessCombo = new SimpleComboBox<String>();
-		accessCombo.setTypeAhead(false);
-		accessCombo.setEditable(false);
-		accessCombo.setForceSelection(true);
-		accessCombo.setTriggerAction(TriggerAction.ALL);
-		accessCombo.add(MEMBER_ACCESS);
-		accessCombo.add(ADMIN_ACCESS);
-		String currentValue = isAdmin ? ADMIN_ACCESS : MEMBER_ACCESS;
-		accessCombo.setSimpleValue(currentValue);
+	private Select getAccessCombo(final String ownerId, boolean isAdmin) {
+		final Select accessCombo = new Select();
+		Option memberOption = new Option();
+		memberOption.setText(MEMBER_ACCESS);
+		accessCombo.add(memberOption);
 		
-		accessCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<String>>() {				
+		Option adminOption = new Option();
+		adminOption.setText(ADMIN_ACCESS);
+		accessCombo.add(adminOption);
+		accessCombo.setWidth("100px");
+		accessCombo.addChangeHandler(new ChangeHandler() {
+			boolean initializing = true;
 			@Override
-			public void selectionChanged(SelectionChangedEvent<SimpleComboValue<String>> se) {
-				boolean isAdmin = ADMIN_ACCESS.equals(accessCombo.getSimpleValue());
+			public void onChange(ChangeEvent event) {
+				if (initializing) {
+					initializing = false;
+					return;
+				}
+				boolean isAdmin = ADMIN_ACCESS.equals(accessCombo.getValue());
 				presenter.setIsAdmin(ownerId, isAdmin);
 			}
 		});
+		accessCombo.setValue(isAdmin ? adminOption : memberOption);
+		
 		return accessCombo;
 	}
 	
