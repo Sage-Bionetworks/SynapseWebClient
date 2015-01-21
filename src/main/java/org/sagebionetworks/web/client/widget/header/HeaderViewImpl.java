@@ -270,18 +270,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 	if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			UserProfile profile = userData.getProfile();
-			String displayName = DisplayUtils.getDisplayName(profile);
-			if (displayName.length() > MAX_DISPLAY_NAME_CHARACTER_COUNT) { 
-				displayName = displayName.substring(0, MAX_DISPLAY_NAME_CHARACTER_COUNT - 1) + "...";
-			}
-			userPicturePanel.clear();
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				dashboardButton.setIcon(null);
 				Image profilePicture = new Image();
 				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-				profilePicture.setWidth("18px");
-				profilePicture.setHeight("18px");
-				profilePicture.addStyleName("userProfileImage");
+				profilePicture.setWidth("25px");
+				profilePicture.setHeight("25px");
+				profilePicture.addStyleName("userProfileImage moveup-2");
 				userPicturePanel.setWidget(profilePicture);
 			}
 			loginLink.setVisible(false);

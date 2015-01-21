@@ -1,13 +1,18 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -19,6 +24,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -29,6 +35,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -95,8 +102,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private GlobalApplicationState globalApplicationState;
 	private HomeSearchBox homeSearchBox;	
 	IconsImageBundle iconsImageBundle;
-	
+	SimplePanel userPicturePanel;
 	private CookieProvider cookies;
+	SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -107,7 +115,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 			final GlobalApplicationState globalApplicationState,
 			HomeSearchBox homeSearchBox, 
 			CookieProvider cookies,
-			final AuthenticationController authController) {
+			final AuthenticationController authController,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -115,6 +124,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.iconsImageBundle = icons;
 		this.cookies = cookies;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		userPicturePanel = new SimplePanel();
+		userPicturePanel.addStyleName("displayInline margin-right-5");
+		addUserPicturePanel();
 		
 		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
@@ -156,18 +169,57 @@ public class HomeViewImpl extends Composite implements HomeView {
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
 	}
 
+	/**
+	 * Clear the divider/caret from the user button, and add the picture container
+	 * @param button
+	 */
+	public void addUserPicturePanel() {
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+            @Override
+            public void execute() {
+            	dashboardBtn.add(userPicturePanel);
+            }
+        });
+	}
+	
 	@Override
-	public void showLoggedInUI() {
+	public void showLoggedInUI(UserSessionData userData) {
+		clearUserProfilePicture();
+		setUserProfilePicture(userData);
+		
 		loginBtn.setVisible(false);
 		registerBtn.setVisible(false);
 		dashboardBtn.setVisible(true);
 	}
 	@Override
 	public void showAnonymousUI() {
+		clearUserProfilePicture();
 		loginBtn.setVisible(true);
 		registerBtn.setVisible(true);
 		dashboardBtn.setVisible(false);
 	}
+	
+	private void clearUserProfilePicture() {
+		userPicturePanel.clear();
+		dashboardBtn.setIcon(IconType.USER);
+		dashboardBtn.setIconSize(IconSize.LARGE);
+	}
+	
+	private void setUserProfilePicture(UserSessionData userData) {
+		if (userData != null && userData.getProfile() != null) {
+			UserProfile profile = userData.getProfile();
+			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
+				dashboardBtn.setIcon(null);
+				Image profilePicture = new Image();
+				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
+				profilePicture.setWidth("18px");
+				profilePicture.setHeight("18px");
+				profilePicture.addStyleName("userProfileImage moveup-2");
+				userPicturePanel.setWidget(profilePicture);
+			}
+		}
+	}
+
 	
 	@Override
 	public void onAttach() {
