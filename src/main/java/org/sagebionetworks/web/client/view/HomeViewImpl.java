@@ -212,8 +212,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 				dashboardBtn.setIcon(null);
 				Image profilePicture = new Image();
 				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-				profilePicture.setWidth("18px");
-				profilePicture.setHeight("18px");
+				profilePicture.setWidth("25px");
+				profilePicture.setHeight("25px");
 				profilePicture.addStyleName("userProfileImage moveup-2");
 				userPicturePanel.setWidget(profilePicture);
 			}
