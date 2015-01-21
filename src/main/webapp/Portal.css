@@ -620,6 +620,9 @@ a.shortBtn {
 .margin-top-15 {
 	margin-top: 15px;
 }
+.margin-top-20-imp {
+	margin-top: 20px !important;
+}
 
 .margin-top-30 {
 	margin-top: 30px;

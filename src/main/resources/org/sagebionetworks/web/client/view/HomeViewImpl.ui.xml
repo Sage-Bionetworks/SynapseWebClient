@@ -74,10 +74,10 @@
 					<div class="col-md-4 ">
 						<h3>Get Started</h3>
 						Synapse is free to use as a service.
-						<b:Button ui:field="dashboardBtn" size="LARGE" visible="false" text="My Dashboard" block="true" addStyleNames="margin-top-15" />
-						<b:Button ui:field="loginBtn" size="LARGE" text="Login" block="true" addStyleNames="margin-top-15" />
-						<b:Button ui:field="registerBtn" size="LARGE" text="Register for a Synapse Account" block="true" addStyleNames="margin-top-15" />
-						<b:Button ui:field="dreamBtn" size="LARGE" text="DREAM Challenges" block="true" addStyleNames="margin-top-15" /> 
+						<b:Button ui:field="dashboardBtn" size="LARGE" visible="false" text="My Dashboard" block="true" addStyleNames="margin-top-20-imp" />
+						<b:Button ui:field="loginBtn" size="LARGE" text="Login" block="true" addStyleNames="margin-top-20-imp" />
+						<b:Button ui:field="registerBtn" size="LARGE" text="Register for a Synapse Account" block="true" addStyleNames="margin-top-20-imp" />
+						<b:Button ui:field="dreamBtn" size="LARGE" text="DREAM Challenges" block="true" addStyleNames="margin-top-20-imp" /> 
 					</div>
 				</g:HTMLPanel>
 			</div> <!-- end row -->				
