@@ -40,7 +40,7 @@
 				</b:ButtonGroup>
 			    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-5"/>
 				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-5">
-			    	<bh:Span addStyleNames="smallerText">Alpha features on </bh:Span>
+			    	<bh:Span addStyleNames="smallerText">Alpha features on&nbsp;</bh:Span>
 			    	<b:Anchor addStyleNames="smallerText displayInline" ui:field="goToStandardSite">off</b:Anchor>
 			    </g:FlowPanel>
 			</div>
