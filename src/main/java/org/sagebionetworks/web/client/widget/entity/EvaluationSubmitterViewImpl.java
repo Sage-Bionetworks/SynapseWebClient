@@ -167,4 +167,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	public void hideModal2() {
 		modal2.hide();
 	}
+	
+	@Override
+	public Widget asWidget() {
+		return widget;
+	}
 }

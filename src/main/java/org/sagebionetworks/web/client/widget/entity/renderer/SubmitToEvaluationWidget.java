@@ -52,6 +52,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
 		this.evaluationSubmitter = evaluationSubmitter;
+		view.setEvaluationSubmitterWidget(evaluationSubmitter.asWidget());
 	}
 	
 	@Override

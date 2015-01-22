@@ -24,6 +24,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationSubmitter implements Presenter {
@@ -165,7 +166,6 @@ public class EvaluationSubmitter implements Presenter {
 						v = 1L;
 					 }
 						 
-					view.hideModal2();
 					submitToEvaluations(id, v, entity.getEtag(), selectedTeamId, evaluations);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -211,7 +211,7 @@ public class EvaluationSubmitter implements Presenter {
 								message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
 							replyMessages.add(message);
 						}
-						
+						view.hideModal2();
 						view.showSubmissionAcceptedDialogs(replyMessages);
 					} else {
 						submitToEvaluations(newSubmission, etag, evaluations, index+1);
@@ -229,4 +229,7 @@ public class EvaluationSubmitter implements Presenter {
 		}
 	}
 	
+	public Widget asWidget() {
+		return view.asWidget();
+	}
 }

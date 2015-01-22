@@ -53,7 +53,7 @@
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-				<b:Button ui:field="okButton" type="PRIMARY">OK</b:Button>
+				<b:Button ui:field="okButton" type="PRIMARY">Submit</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 	</g:FlowPanel>

@@ -101,6 +101,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookieProvider = cookieProvider;
 		this.evaluationSubmitter = evaluationSubmitter;
+		view.setEvaluationSubmitterWidget(evaluationSubmitter.asWidget());
 		view.setPresenter(this);
 	}	
 	

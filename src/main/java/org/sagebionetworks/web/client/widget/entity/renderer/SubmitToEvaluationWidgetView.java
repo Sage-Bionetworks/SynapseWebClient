@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface SubmitToEvaluationWidgetView extends IsWidget, SynapseView {
 
@@ -18,6 +19,7 @@ public interface SubmitToEvaluationWidgetView extends IsWidget, SynapseView {
 	void showAnonymousRegistrationMessage();
 	
 	void showInfo(String title, String message);
+	void setEvaluationSubmitterWidget(Widget widget);
 	
 	/**
 	 * Presenter interface

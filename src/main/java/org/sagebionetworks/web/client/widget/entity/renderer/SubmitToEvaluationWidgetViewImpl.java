@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 
 public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements SubmitToEvaluationWidgetView {
 	private Presenter presenter;
+	private Widget evaluationSubmitterWidget;
 	
 	@Inject
 	public SubmitToEvaluationWidgetViewImpl() {
@@ -28,6 +29,8 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	@Override
 	public void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage, String buttonText) {
 		this.clear();
+		//include the evaluation submitter widget on the page
+		add(evaluationSubmitterWidget);
 		
 		if (isAvailableEvaluation) {
 			String primaryButtonText = buttonText == null ? "Submit To Challenge" : buttonText;
@@ -44,6 +47,10 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 		}
 	}
 	
+	@Override
+	public void setEvaluationSubmitterWidget(Widget widget) {
+		evaluationSubmitterWidget = widget;
+	}
 	@Override
 	public void showErrorMessage(String error) {
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));

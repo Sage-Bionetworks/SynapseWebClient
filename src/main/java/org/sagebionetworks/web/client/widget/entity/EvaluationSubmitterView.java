@@ -5,11 +5,12 @@ import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamHeader;
 import org.sagebionetworks.web.client.SynapseView;
 
-public interface EvaluationSubmitterView extends SynapseView {
+import com.google.gwt.user.client.ui.IsWidget;
+
+public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 
 	void setPresenter(Presenter presenter);
 	void showModal1(boolean showEntityFinder, List<Evaluation> evaluations);

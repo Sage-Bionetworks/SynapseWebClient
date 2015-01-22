@@ -91,7 +91,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		this.accessControlListModalWidget = accessControlListModalWidget;
 		add(uploader.asWidget()); //add uploader dialog to page
 	}
-
 	@Override
 	public void createMenu(
 			EntityBundle entityBundle, 
@@ -446,6 +445,15 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		});
 		menuBtn.addMenuItem(addDescriptionCommand);
 	}
+
+	/**
+	 * Add the evaluation submitter widget to the page
+	 */
+	@Override
+	public void setEvaluationSubmitterWidget(Widget widget) {
+		add(widget);
+	}
+
 }
 
 
