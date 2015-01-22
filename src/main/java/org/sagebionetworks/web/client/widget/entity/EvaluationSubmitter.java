@@ -6,12 +6,10 @@ import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.TeamHeader;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -19,9 +17,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -36,25 +31,23 @@ public class EvaluationSubmitter implements Presenter {
 	private EvaluationSubmitterView view;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private Entity submissionEntity;
-	private String submissionEntityId, submissionName, teamName;
+	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
+	private List<Evaluation> evaluations;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 	}
@@ -89,7 +82,7 @@ public class EvaluationSubmitter implements Presenter {
 						view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 					} 
 					else {
-						view.popupSelector(submissionEntity == null, evaluations);
+						view.showModal1(submissionEntity == null, evaluations);
 					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -106,7 +99,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 		
 	@Override
-	public void submitToEvaluations(Reference selectedReference, String submissionName, String teamName, List<Evaluation> evaluations) {
+	public void nextClicked(Reference selectedReference, String submissionName, List<Evaluation> evaluations) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
 		submissionEntityVersion = null;
 		if (submissionEntity != null) {
@@ -119,90 +112,43 @@ public class EvaluationSubmitter implements Presenter {
 			submissionEntityVersion = selectedReference.getTargetVersionNumber();
 		}
 		this.submissionName = submissionName;
-		this.teamName = teamName;
-		
-		 //Check access requirements for evaluations before moving on with submission
-		 try {
-			 checkForUnmetRequirements(0, evaluations);
-		 } catch(RestServiceException e) {
-			 view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
-		 }
+		this.evaluations = evaluations;
+		//The standard is to attach access requirements to the associated team, and show them when joining the team.
+		//So access requirements are not checked here.
+		view.hideModal1();
+		getAvailableTeams();
 	}
 	
-	/**
-	* Check for unmet access restrictions. As long as more exist, it will not move onto submissions.
-	* @throws RestServiceException
-	*/
-	public void checkForUnmetRequirements(final int evalIndex, final List<Evaluation> evaluations) throws RestServiceException {
-		synapseClient.getUnmetEvaluationAccessRequirements(evaluations.get(evalIndex).getId(), new AsyncCallback<String>() {
+	public void getAvailableTeams() {
+		synapseClient.getTeamsICanSubmitTo(getTeamsCallback());
+	}
+	
+	private AsyncCallback<String> getTeamsCallback() {
+		return new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(String jsonString) {
 				try {
-					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
-					if (ar.getTotalNumberOfResults() > 0) {
-						//there are unmet access requirements.  user must accept all
-						List<TermsOfUseAccessRequirement> unmetRequirements = ar.getResults();
-						final AccessRequirement firstUnmetAccessRequirement = unmetRequirements.get(0);
-						String text = GovernanceServiceHelper.getAccessRequirementText(firstUnmetAccessRequirement);
-						Callback termsOfUseCallback = new Callback() {
-							@Override
-							public void invoke() {
-								//agreed to terms of use.
-								setLicenseAccepted(firstUnmetAccessRequirement, evalIndex, evaluations);
-							}
-						};
-						//pop up the requirement
-						view.showAccessRequirement(text, termsOfUseCallback);
-					} else {
-						if (evalIndex != evaluations.size() - 1) {
-							checkForUnmetRequirements(evalIndex+1, evaluations);
-						} else {
-							//we have gone through all unmet access requirements for all evaluations.
-							lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations);
-						}
-					}
-				} catch(Throwable e) {
-					onFailure(e);
+					PaginatedResults<TeamHeader> results = nodeModelCreator.createPaginatedResults(jsonString, TeamHeader.class);
+					List<TeamHeader> teams = results.getResults();
+					view.showModal2(teams);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
 			}
-
+			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR+ caught.getMessage());
-			}
-		});
-	}
-	
-	public void setLicenseAccepted(AccessRequirement ar, final int evalIndex, final List<Evaluation> evaluations) {	
-		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
-			@Override
-			public void invoke(Throwable t) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + t.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
 			}
 		};
-		
-		Callback onSuccess = new Callback() {
-			@Override
-			public void invoke() {
-				//ToU signed, now try to submit evaluations (checks for other unmet access restrictions before submission)
-				try {
-					checkForUnmetRequirements(evalIndex, evaluations);
-				} catch (RestServiceException e) {
-					onFailure.invoke(e);
-				}
-			}
-		};
-		
-		GovernanceServiceHelper.signTermsOfUse(
-				authenticationController.getCurrentUserPrincipalId(), 
-				ar, 
-				onSuccess, 
-				onFailure, 
-				synapseClient, 
-				jsonObjectAdapter);
 	}
 	
-	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations) {
+	@Override
+	public void doneClicked(String selectedTeamId) {
+		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations, selectedTeamId);
+	}
+	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations, final String selectedTeamId) {
 		//look up entity for the current etag
 		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
@@ -219,9 +165,8 @@ public class EvaluationSubmitter implements Presenter {
 						v = 1L;
 					 }
 						 
-					
-					view.hideWindow();
-					submitToEvaluations(id, v, entity.getEtag(), evaluations);
+					view.hideModal2();
+					submitToEvaluations(id, v, entity.getEtag(), selectedTeamId, evaluations);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -235,17 +180,16 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void submitToEvaluations(String entityId, Long versionNumber, String etag, List<Evaluation> evaluations) {
+	public void submitToEvaluations(String entityId, Long versionNumber, String etag, String selectedTeamId, List<Evaluation> evaluations) {
 		//set up shared values across all submissions
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entityId);
 		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
+		newSubmission.setTeamId(selectedTeamId);
 		newSubmission.setVersionNumber(versionNumber);
 		if (submissionName != null && submissionName.trim().length() > 0)
 			newSubmission.setName(submissionName);
-		if (teamName != null && teamName.trim().length() > 0)
-			newSubmission.setSubmitterAlias(teamName);
-
+		
 		if (evaluations.size() > 0)
 			submitToEvaluations(newSubmission, etag, evaluations, 0);
 	}

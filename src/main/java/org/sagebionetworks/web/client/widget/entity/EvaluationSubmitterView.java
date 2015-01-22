@@ -5,20 +5,25 @@ import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamHeader;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.Callback;
 
 public interface EvaluationSubmitterView extends SynapseView {
 
 	void setPresenter(Presenter presenter);
-	void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations);
-	void hideWindow();
+	void showModal1(boolean showEntityFinder, List<Evaluation> evaluations);
+	void hideModal1();
+	void showModal2(List<TeamHeader> availableTeams);
+	void hideModal2();
 	void showSubmissionAcceptedDialogs(HashSet<String> receiptMessages);
-	void showAccessRequirement(
-			String arText,
-			final Callback touAcceptanceCallback);
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation Ids (will not be empty)
-		void submitToEvaluations(Reference selectedEntity, String submissionName, String teamName, List<Evaluation> evaluationIds);
+		void nextClicked(Reference selectedEntity, String submissionName, List<Evaluation> evaluationIds);
+		/**
+		 * 
+		 * @param selectedTeam If set, is the team selected to be associated with the submission.  If null, it is a submission from an individual.
+		 */
+		void doneClicked(String teamId);
 	}
 }

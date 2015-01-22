@@ -4,40 +4,57 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   >
-  	<b:Modal title="Submit to Challenge"
-			fade="true" dataBackdrop="STATIC" dataKeyboard="false">
-		<b:ModalBody>
-			<b:Form>
-				<b:FieldSet>
-					<b:FormGroup ui:field="entityFinderUI">
-						<b:FormGroup>
-							<b:FormLabel for="finderButton">Select the Entity that you would like to submit:</b:FormLabel>
-							<g:FlowPanel>
-								<b:Button ui:field="entityFinderButton" icon="SEARCH" size="SMALL" b:id="finderButton">Find Entity</b:Button>
-								<b:Heading ui:field="selectedText" size="H6" addStyleNames="displayInline margin-left-10" />
-							</g:FlowPanel>
+  	<g:FlowPanel>
+	  	<b:Modal title="Submit to Challenge"
+				fade="true" dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
+			<b:ModalBody>
+				<b:Form>
+					<b:FieldSet>
+						<b:FormGroup ui:field="entityFinderUI">
+							<b:FormGroup>
+								<b:FormLabel for="finderButton">Select the Entity that you would like to submit:</b:FormLabel>
+								<g:FlowPanel>
+									<b:Button ui:field="entityFinderButton" icon="SEARCH" size="SMALL" b:id="finderButton">Find Entity</b:Button>
+									<b:Heading ui:field="selectedText" size="H6" addStyleNames="displayInline margin-left-10" />
+								</g:FlowPanel>
+							</b:FormGroup>
 						</b:FormGroup>
-					</b:FormGroup>
-					<b:FormGroup>
 						<b:FormGroup>
-							<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
-							<g:SimplePanel ui:field="evaluationListContainer" />
+							<b:FormGroup>
+								<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
+								<g:SimplePanel ui:field="evaluationListContainer" />
+							</b:FormGroup>
 						</b:FormGroup>
-					</b:FormGroup>
-					<b:FormGroup>
-						<b:FormLabel for="submissionName">Submission name (optional)</b:FormLabel>
-						<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
-					</b:FormGroup>
-					<b:FormGroup>
-						<b:FormLabel for="teamName">Team name (optional)</b:FormLabel>
-						<b:TextBox ui:field="teamNameField" b:id="teamName" />
-					</b:FormGroup>
-				</b:FieldSet>
-			</b:Form>
-		</b:ModalBody>
-		<b:ModalFooter>
-			<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-			<b:Button ui:field="okButton" type="PRIMARY">OK</b:Button>
-		</b:ModalFooter>
-	</b:Modal>
+						<b:FormGroup>
+							<b:FormLabel for="submissionName">Submission name (optional)</b:FormLabel>
+							<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
+						</b:FormGroup>
+					</b:FieldSet>
+				</b:Form>
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="nextButton" type="PRIMARY">Next</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+		<b:Modal title="Submit to Challenge"
+				fade="true" dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
+			<b:ModalBody>
+				<b:Form>
+					<b:FieldSet>
+						<b:FormGroup>
+							<b:ButtonGroup>
+								<b:RadioButton text="I am submitting as an individual"/>
+								<b:RadioButton text="I am submitting as part of a team:"/>
+							</b:ButtonGroup>
+						</b:FormGroup>
+					</b:FieldSet>
+				</b:Form>
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="okButton" type="PRIMARY">OK</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+	</g:FlowPanel>
 </ui:UiBinder>
