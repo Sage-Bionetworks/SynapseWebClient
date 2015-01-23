@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -21,16 +20,14 @@ import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
@@ -42,26 +39,23 @@ public class GlobalApplicationStateImplTest {
 	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookieProvider;
 	PlaceController mockPlaceController;
-	AuthenticationController mockAuthenticationController;
-	ActivityMapper mockMapper;
 	EventBus mockEventBus;
 	GlobalApplicationStateImpl globalApplicationState;
 	JiraURLHelper mockJiraURLHelper;
+	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
 	
 	@Before
 	public void before(){
 		mockCookieProvider = Mockito.mock(CookieProvider.class);
 		mockPlaceController = Mockito.mock(PlaceController.class);
-		mockMapper = Mockito.mock(ActivityMapper.class);
 		mockEventBus = Mockito.mock(EventBus.class);
 		mockJiraURLHelper = Mockito.mock(JiraURLHelper.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
+		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockAuthenticationController);
+		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient);
 		globalApplicationState.setPlaceController(mockPlaceController);
-		globalApplicationState.setActivityMapper(mockMapper);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
 	
 	/**
@@ -77,7 +71,6 @@ public class GlobalApplicationStateImplTest {
 		assertNotNull(changer);
 		// 
 		Synapse newPlace = new Synapse("syn456");
-		when(mockMapper.getActivity(newPlace)).thenThrow(new RuntimeException("For this the controller.gotPlace should have been called"));
 		changer.goTo(newPlace);
 		// Since this is not the current place it should actaully go there.
 		verify(mockPlaceController).goTo(newPlace);
@@ -130,28 +123,26 @@ public class GlobalApplicationStateImplTest {
 		verify(mockCallback).invoke();
 	}
 	
-	
-	@Test 
-	public void testGetHomePlaceNotLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(null);
-		Place result = globalApplicationState.getHomePlace();
+	@Test
+	public void testGetLastPlaceWhenSet() {
+		//history value is set in the cookies
+		when(mockCookieProvider.getCookie(CookieKeys.LAST_PLACE)).thenReturn("a history value");
+		//and the history value resolves to a place
+		Place mockPlace = mock(Place.class);
+		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
 		
-		//should be sent to Home in this case
-		assertTrue(result instanceof Home);
+		Place lastPlace = globalApplicationState.getLastPlace();
+		assertEquals(mockPlace, lastPlace);
 	}
 	
-	@Test 
-	public void testGetHomePlaceLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		String userId = "8787878";
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		
-		Place result = globalApplicationState.getHomePlace();
-		
-		//should be sent to Profile in this case
-		assertTrue(result instanceof Profile);
-		assertEquals(userId, ((Profile)result).getUserId());
+
+	@Test
+	public void testGetLastPlaceDefaultPlace() {
+		//next line is not really necessary, but to make this explicit
+		when(mockCookieProvider.getCookie(CookieKeys.LAST_PLACE)).thenReturn(null);
+		//and the history value resolves to a place
+		Place mockDefaultPlace = mock(Place.class);
+		Place returnedPlace = globalApplicationState.getLastPlace(mockDefaultPlace);
+		assertEquals(mockDefaultPlace, returnedPlace);
 	}
-	
 }

@@ -9,13 +9,9 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
-import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
@@ -30,34 +26,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private SynapseClientAsync synapseClient;
-	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
 	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
-	private AuthenticationController authController;
 	private List<EntityHeader> favorites;
 	private String synapseVersion;
 	private boolean isEditing;
 	private HashMap<String, String> synapseProperties;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient, AuthenticationController authController) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
-		this.authController = authController;
 		isEditing = false;
-	}
-	
-	@Override
-	public Place getHomePlace() {
-		// Redirect to appropriate place
-		if (authController.isLoggedIn()) {
-			return new Profile(authController.getCurrentUserPrincipalId());
-		} else {
-			return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-		}
 	}
 	
 	@Override
@@ -136,11 +119,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			Place place = appPlaceHistoryMapper.getPlace(historyValue);
 			return place;
 		} else return defaultPlace;
-	}
-
-	@Override
-	public void setActivityMapper(ActivityMapper mapper) {
-		this.directMapper = mapper;
 	}
 
 	@Override
