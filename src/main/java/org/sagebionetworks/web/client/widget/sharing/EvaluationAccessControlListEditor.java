@@ -52,7 +52,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private JSONObjectAdapter jsonObjectAdapter;
 	
 	private boolean unsavedViewChanges;
-	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
 	
@@ -193,7 +192,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 						// update the view
 						setViewDetails();
 						hasChangesHandler.hasChanges(false);
-						hasLocalACL_inRepo = (acl.getId().equals(evaluation.getId()));
 						callback.onSuccess(null);
 					};
 					public void onFailure(Throwable caught) {
@@ -369,13 +367,12 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	public void deleteAcl() {
 	}
 	
-	public void pushChangesToSynapse(final boolean recursive, final Callback changesPushedCallback) {
+	public void pushChangesToSynapse(final Callback changesPushedCallback) {
 		if(unsavedViewChanges) {
 			view.alertUnsavedViewChanges(new Callback() {
-				
 				@Override
 				public void invoke() {
-					pushChangesToSynapse(recursive, changesPushedCallback);
+					pushChangesToSynapse(changesPushedCallback);
 				}
 			});
 			return;
@@ -388,7 +385,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			@Override
 			public void onSuccess(AccessControlList result) {
 				acl = result;
-				hasLocalACL_inRepo = (acl.getId().equals(evaluation.getId()));				
 				setViewDetails();
 				view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
 				changesPushedCallback.invoke();
@@ -401,10 +397,10 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			}
 		};
 		
-		applyChanges(recursive, callback);
+		applyChanges(callback);
 	}
 	
-	protected void applyChanges(boolean recursive, AsyncCallback<AccessControlList> callback) {
+	protected void applyChanges(AsyncCallback<AccessControlList> callback) {
 		// Apply changes
 		synapseClient.updateEvaluationAcl(acl, callback);
 	}
@@ -457,6 +453,10 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		 */
 		void hasChanges(boolean hasChanges);
 		
+	}
+	
+	public UserEvaluationPermissions getUserEvaluationPermissions() {
+		return uep;
 	}
 	
 }

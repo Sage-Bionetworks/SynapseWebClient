@@ -49,7 +49,7 @@ public class EvaluationAccessControlListModalWidgetImpl implements EvaluationAcc
 	@Override
 	public void onPrimary() {
 		view.setLoading(true);
-		editor.pushChangesToSynapse(false, new Callback() {
+		editor.pushChangesToSynapse(new Callback() {
 			@Override
 			public void invoke() {
 				view.hideDialog();
