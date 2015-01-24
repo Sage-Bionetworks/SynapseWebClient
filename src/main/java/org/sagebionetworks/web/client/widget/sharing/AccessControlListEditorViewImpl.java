@@ -42,6 +42,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private AclAddPeoplePanel addPeoplePanel;
 	
 	private PermissionLevel[] permList;	// To enforce order.
+	private Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
+	private Tooltip toolTipAndDeleteAclButton;
 	
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
@@ -49,6 +51,21 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.sageImageBundle = sageImageBundle;
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
+		
+		// 'Delete ACL' button
+		deleteAclButton.setType(ButtonType.DANGER);
+		deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
+		deleteAclButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent ce) {
+				presenter.deleteAcl();					
+			}
+		});
+			
+		toolTipAndDeleteAclButton = new Tooltip();
+		toolTipAndDeleteAclButton.setWidget(deleteAclButton);
+		toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
+		toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
 	}
 	
 	public void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay) {
@@ -185,22 +202,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				
 				addPeoplePanel.configure(permList, permissionDisplay, selectPermissionCallback, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
-				
-				// 'Delete ACL' button
-				Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
-				deleteAclButton.setType(ButtonType.DANGER);
-				deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
-				deleteAclButton.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent ce) {
-						presenter.deleteAcl();					
-					}
-				});
-					
-				Tooltip toolTipAndDeleteAclButton = new Tooltip();
-				toolTipAndDeleteAclButton.setWidget(deleteAclButton);
-				toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
-				toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
 				deleteAclButton.setEnabled(canEnableInheritance);
 				add(toolTipAndDeleteAclButton);
 			}
@@ -216,7 +217,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void setNotifyCheckboxVisible(boolean isVisible) {
 		addPeoplePanel.getNotifyPeopleCheckBox().setVisible(isVisible);
 	}
-	
+	@Override
+	public void setDeleteLocalACLButtonVisible(boolean isVisible) {
+		deleteAclButton.setVisible(isVisible);
+	}
 	@Override
 	public void setIsNotifyPeople(Boolean value) {
 		if (value != null)
