@@ -213,6 +213,11 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
+	public void setNotifyCheckboxVisible(boolean isVisible) {
+		addPeoplePanel.getNotifyPeopleCheckBox().setVisible(isVisible);
+	}
+	
+	@Override
 	public void setIsNotifyPeople(Boolean value) {
 		if (value != null)
 			addPeoplePanel.getNotifyPeopleCheckBox().setValue(value);

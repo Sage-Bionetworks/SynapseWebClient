@@ -41,7 +41,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void showLoading();
 	
 	void showInfoError(String title, String message);
-
+	void setNotifyCheckboxVisible(boolean isVisible);
 	void showInfoSuccess(String title, String message);
 	
 	void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay);

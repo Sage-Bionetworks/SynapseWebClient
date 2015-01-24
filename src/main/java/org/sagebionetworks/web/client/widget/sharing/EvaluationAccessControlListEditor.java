@@ -80,6 +80,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
 		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
+		view.setNotifyCheckboxVisible(false);
 		
 		publicPrincipalIds = new PublicPrincipalIds();
 		publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
