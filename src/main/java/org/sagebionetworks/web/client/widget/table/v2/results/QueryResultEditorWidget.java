@@ -108,4 +108,8 @@ public class QueryResultEditorWidget implements
 		return pageWidget.isValid();
 	}
 
+	public void setApplyProgressWidget(IsWidget progress) {
+		this.view.setProgressWidget(progress);
+	}
+
 }

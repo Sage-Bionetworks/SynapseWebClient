@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
@@ -30,6 +31,7 @@ import com.google.inject.Inject;
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
 	
+	public static final String CREATING_THE_FILE = "Applying changes...";
 	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
 	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	public static final String QUERY_CANCELED = "Query canceled";
@@ -45,7 +47,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	boolean isEditable;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
+	JobTrackingWidget editJobTrackingWidget;
 	GlobalApplicationState globalApplicationState;
+
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, GlobalApplicationState globalApplicationState){
@@ -54,6 +58,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
+		this.editJobTrackingWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
@@ -205,6 +210,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public void onEditRows() {
 		if(this.queryResultEditor == null){
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
+			this.queryResultEditor.setApplyProgressWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
 		this.globalApplicationState.setIsEditing(true);
@@ -232,17 +238,24 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	private void saveValidChanges() {
 		queryResultEditor.hideError();
 		PartialRowSet prs = this.queryResultEditor.extractDelta();
-		synapseClient.applyTableDelta(prs, new AsyncCallback<Void>() {
+		AppendableRowSetRequest request = new AppendableRowSetRequest();
+		request.setToAppend(prs);
+		editJobTrackingWidget.startAndTrackJob("Applying changes...", false, AsynchType.TableAppend, request, new AsynchronousProgressHandler() {
 			
 			@Override
-			public void onSuccess(Void result) {
+			public void onFailure(Throwable failure) {
+				showEditError(failure.getMessage());
+			}
+			
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
 				// If the save was success full then re-run the query.
 				runQuery();
 			}
 			
 			@Override
-			public void onFailure(Throwable caught) {
-				showEditError(caught.getMessage());
+			public void onCancel() {
+				doHideEditor();
 			}
 		});
 	}

@@ -75,4 +75,10 @@ public interface QueryResultEditorView extends IsWidget {
 	 */
 	public void setErrorMessageVisible(boolean visible);
 
+	/**
+	 * Widget that displays append progress.
+	 * @param progress
+	 */
+	public void setProgressWidget(IsWidget progress);
+
 }

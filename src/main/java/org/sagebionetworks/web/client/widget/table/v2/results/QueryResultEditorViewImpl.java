@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,6 +30,8 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	ButtonToolBar buttonToolbar;
 	@UiField
 	SimplePanel tablePanel;
+	@UiField
+	SimplePanel progressPanel;
 	@UiField
 	Button addRowButton;
 	@UiField
@@ -125,6 +128,11 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	@Override
 	public void setErrorMessageVisible(boolean visible) {
 		errorAlert.setVisible(visible);
+	}
+
+	@Override
+	public void setProgressWidget(IsWidget progress) {
+		progressPanel.add(progress);
 	}
 
 }

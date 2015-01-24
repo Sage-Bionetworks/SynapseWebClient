@@ -321,8 +321,6 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
-	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
@@ -339,13 +337,6 @@ public interface SynapseClientAsync {
 	 */
 	void setTableSchema(TableEntity entity, List<ColumnModel> newSchema,
 			AsyncCallback<Void> callback);
-	
-	/**
-	 * Apply a PartialRowSet to a table.
-	 * @param deltaJson
-	 * @param callback
-	 */
-	void applyTableDelta(PartialRowSet delta, AsyncCallback<Void> callback);
 	
 	/**
 	 * Validate a table query.

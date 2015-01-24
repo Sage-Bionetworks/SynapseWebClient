@@ -26,6 +26,7 @@
 		<b:Button ui:field="addRowButton" icon="PLUS" type="INFO">Add
 			Row</b:Button>
 		<b:Alert ui:field="errorAlert"  type="DANGER"/>
+		<g:SimplePanel ui:field="progressPanel"/>
 	</g:HTMLPanel>
 
 </ui:UiBinder>
