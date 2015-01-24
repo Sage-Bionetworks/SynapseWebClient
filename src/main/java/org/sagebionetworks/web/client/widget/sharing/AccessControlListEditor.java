@@ -78,7 +78,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
-		
+		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
 		publicPrincipalIds = new PublicPrincipalIds();
 		publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
 		publicPrincipalIds.setAnonymousUserId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
@@ -122,6 +122,18 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		if (publicPrincipalIds != null) {
 			view.setPublicAclPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
 		}
+	}
+	public PermissionLevel[] getPermList() {
+		return new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	}
+	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
+		HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
+		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
+		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
+		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
+		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
+		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
+		return permissionDisplay;
 	}
 	
 	/**
@@ -393,6 +405,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		};
 		
+		applyChanges(recursive, callback);
+	}
+	
+	protected void applyChanges(boolean recursive, AsyncCallback<AccessControlList> callback) {
 		// Apply changes
 		boolean hasLocalACL_inPortal = (acl.getId().equals(entity.getId()));
 		
@@ -416,7 +432,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			throw new IllegalStateException("Cannot modify an inherited ACL.");
 		}
 	}
-	
 	public void notifyNewUsers() {
 		if (view.isNotifyPeople()) {
 			//create the principal id set

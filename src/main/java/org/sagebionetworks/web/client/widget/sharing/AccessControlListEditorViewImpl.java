@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -42,7 +41,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private AclAddPeoplePanel addPeoplePanel;
 	
-	private PermissionLevel[] permList = {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};	// To enforce order.
+	private PermissionLevel[] permList;	// To enforce order.
 	
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
@@ -50,12 +49,11 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.sageImageBundle = sageImageBundle;
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
-		permissionDisplay = new HashMap<PermissionLevel, String>();
-		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
-		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
-		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
-		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
-		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
+	}
+	
+	public void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay) {
+		this.permList = permList;
+		this.permissionDisplay = permissionsDisplay;
 	}
 	
 	@Override

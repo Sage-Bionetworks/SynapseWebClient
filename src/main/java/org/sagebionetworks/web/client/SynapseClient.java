@@ -378,7 +378,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
 	public String getEvaluationAcl(String evalId) throws RestServiceException;
-	public String updateEvaluationAcl(String aclJson) throws RestServiceException;
+	public AccessControlList updateEvaluationAcl(AccessControlList acl) throws RestServiceException;
 	
 	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
 
