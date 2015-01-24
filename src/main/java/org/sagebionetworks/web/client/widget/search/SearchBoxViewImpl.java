@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.search;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+
 
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -29,8 +29,7 @@ public class SearchBoxViewImpl extends Composite implements SearchBoxView {
 	
 	@Inject
 	public SearchBoxViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, 
-			AccessControlListEditor accessControlListEditor) {
+			IconsImageBundle iconsImageBundle) {
 				
 		createSearchBox();
 	}
