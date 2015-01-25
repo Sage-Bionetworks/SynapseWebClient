@@ -582,7 +582,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			new PortalVersionHolder();
 			entry.setLabel("SWC/" + PortalVersionHolder.getVersionInfo() + "/" + outputLabel);
-			entry.setMessage(message);
+			String userId = "";
+			UserProfile profile = synapseClient.getMyProfile();
+			if (profile != null) {
+				userId = "userId="+profile.getOwnerId()+" ";
+			}
+			entry.setMessage(userId+message);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
