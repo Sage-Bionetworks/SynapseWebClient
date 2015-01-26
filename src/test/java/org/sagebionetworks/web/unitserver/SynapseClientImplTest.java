@@ -40,7 +40,6 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
@@ -74,7 +73,6 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
@@ -115,7 +113,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -125,7 +122,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
@@ -136,7 +132,6 @@ import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -156,6 +151,7 @@ import com.google.common.cache.Cache;
 public class SynapseClientImplTest {
 	
 	
+	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	ServiceUrlProvider mockUrlProvider;
@@ -343,10 +339,11 @@ public class SynapseClientImplTest {
 		mockUserProfile = Mockito.mock(UserProfile.class);
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
-		when(mockUserProfile.getOwnerId()).thenReturn("MyOwnerID");
+		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
 		mockParticipant = Mockito.mock(Participant.class);
 		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(mockParticipant);
 		
+		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
 		when(mockSynapse.createParticipant(anyString())).thenReturn(mockParticipant);
 		
 		UploadDaemonStatus status = new UploadDaemonStatus();
@@ -1584,6 +1581,7 @@ public class SynapseClientImplTest {
 	public void testLogErrorToRepositoryServices() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String errorMessage = "error has occurred";
 		synapseClient.logErrorToRepositoryServices(errorMessage, null);
+		verify(mockSynapse).getMyProfile();
 		verify(mockSynapse).logError(any(LogEntry.class));
 	}
 	
@@ -1600,7 +1598,8 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).logError(captor.capture());
 		LogEntry logEntry = captor.getValue();
 		assertTrue(logEntry.getLabel().length() < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE+100);
-		assertEquals(errorMessage, logEntry.getMessage());
+		assertTrue(logEntry.getMessage().contains(errorMessage));
+		assertTrue(logEntry.getMessage().contains(MY_USER_PROFILE_OWNER_ID));
 	}
 
 	@Test

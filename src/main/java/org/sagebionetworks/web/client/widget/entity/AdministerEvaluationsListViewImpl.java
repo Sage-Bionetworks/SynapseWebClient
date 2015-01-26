@@ -3,19 +3,11 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
+import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitData;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -23,10 +15,10 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 
 	private Presenter presenter;
 	private EvaluationLinksList evalList;
-	private EvaluationAccessControlListEditor aclEditor;
+	private EvaluationAccessControlListModalWidget aclEditor;
 	
 	@Inject
-	public AdministerEvaluationsListViewImpl(EvaluationLinksList evalList, EvaluationAccessControlListEditor aclEditor) {
+	public AdministerEvaluationsListViewImpl(EvaluationLinksList evalList, EvaluationAccessControlListModalWidget aclEditor) {
 		this.evalList = evalList;
 		this.aclEditor = aclEditor;
 	}
@@ -41,61 +33,13 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 			@Override
 			public void invoke(Evaluation evaluation) {
 				//evaluation clicked.
-				//TODO: go to a new Evaluation Admin page (show submissions, and other info, with a share button)?
-				//for now, pop up a share dialog for the selected Evaluation
-				aclEditor.setResource(evaluation);
+				aclEditor.configure(evaluation);
 				
-				final Dialog window = new Dialog();
-				
-				// configure layout
-				window.setSize(560, 465);
-				window.setPlain(true);
-				window.setModal(true);
-				window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
-				window.setLayout(new FitLayout());
-				window.add(aclEditor.asWidget(), new FitData(4));			    
-			    
-				// configure buttons
-				window.okText = "Save";
-				window.cancelText = "Cancel";
-			    window.setButtons(Dialog.OKCANCEL);
-			    window.setButtonAlign(HorizontalAlignment.RIGHT);
-			    window.setHideOnButtonClick(false);
-				window.setResizable(false);
-				
-				// "Apply" button
-				// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-				Button applyButton = window.getButtonById(Dialog.OK);
-				applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				aclEditor.showSharing(new Callback() {
 					@Override
-					public void componentSelected(ButtonEvent ce) {
-						// confirm close action if there are unsaved changes
-						if (aclEditor.hasUnsavedChanges()) {
-							aclEditor.pushChangesToSynapse(new AsyncCallback<Void>() {
-								@Override
-								public void onSuccess(Void result) {
-									//acl editor view handled notification
-								}
-								@Override
-								public void onFailure(Throwable caught) {
-									//failure notification is handled by the acl editor view.
-								}
-							});
-						}
-						window.hide();
+					public void invoke() {
 					}
-			    });
-				
-				// "Close" button				
-				Button closeButton = window.getButtonById(Dialog.CANCEL);
-			    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						window.hide();
-					}
-			    });
-				
-				window.show();
+				});
 			}
 		};
 	}

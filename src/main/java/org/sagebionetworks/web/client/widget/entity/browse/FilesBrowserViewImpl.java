@@ -15,6 +15,9 @@ import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -65,7 +68,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		this.entityTreeBrowser = entityTreeBrowser;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.quizInfoDialog = quizInfoDialog;
-		
 		uploaderContainer.setWidget(uploader.asWidget());
 		quizInfoDialogContainer.setWidget(quizInfoDialog.asWidget());
 		sharingAndDataUseContainer.setWidget(sharingAndDataUseWidget.asWidget());
@@ -87,6 +89,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		okNewFolderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				newFolderDialog.hide();
 				presenter.updateFolderName(folderNameField.getText());
 			}
 		});
@@ -96,7 +99,14 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 				presenter.deleteFolder(true);	
 			}
 		});
-		
+		folderNameField.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					okNewFolderButton.click();
+		        }
+			}
+		});
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);

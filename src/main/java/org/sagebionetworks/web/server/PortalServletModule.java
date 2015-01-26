@@ -35,6 +35,7 @@ import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
+import org.sagebionetworks.web.server.servlet.filter.CRCSCFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
@@ -80,6 +81,9 @@ public class PortalServletModule extends ServletModule {
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
 		
+		bind(CRCSCFilter.class).in(Singleton.class);
+		filter("/crcsc").through(CRCSCFilter.class);
+
 		// Setup the Search service
 		bind(SynapseClientImpl.class).in(Singleton.class);
 		serve("/Portal/synapse").with(SynapseClientImpl.class);
