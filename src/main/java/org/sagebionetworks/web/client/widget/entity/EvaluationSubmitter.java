@@ -121,7 +121,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void getAvailableTeams() {
-		synapseClient.getTeamsICanSubmitTo(getTeamsCallback());
+		synapseClient.getAvailableSubmissionTeams(getTeamsCallback());
 	}
 	
 	private AsyncCallback<String> getTeamsCallback() {
