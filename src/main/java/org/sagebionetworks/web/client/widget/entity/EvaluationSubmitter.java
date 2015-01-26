@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +39,7 @@ public class EvaluationSubmitter implements Presenter {
 	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
 	private List<Evaluation> evaluations;
+	List<TeamHeader> teams;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
@@ -121,6 +123,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void getAvailableTeams() {
+		teams = new ArrayList<TeamHeader>();
 		synapseClient.getAvailableSubmissionTeams(getTeamsCallback());
 	}
 	
@@ -130,7 +133,7 @@ public class EvaluationSubmitter implements Presenter {
 			public void onSuccess(String jsonString) {
 				try {
 					PaginatedResults<TeamHeader> results = nodeModelCreator.createPaginatedResults(jsonString, TeamHeader.class);
-					List<TeamHeader> teams = results.getResults();
+					teams = results.getResults();
 					view.showModal2(teams);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -146,7 +149,28 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	@Override
-	public void doneClicked(String selectedTeamId) {
+	public void doneClicked(String selectedTeamName) {
+		//resolve team id from the selected team name
+		String selectedTeamId = null;
+		if (!view.isIndividual()) {
+			//team
+			if (selectedTeamName == null) {
+				view.showErrorMessage("Please select a team.");
+				return;
+			}
+			//resolve team name
+			for (TeamHeader team : teams) {
+				if(selectedTeamName.equals(team.getName())) {
+					selectedTeamId = team.getId();
+					break;
+				}
+			}
+
+			if (selectedTeamId == null) {
+				view.showErrorMessage("Unable to find the team in the team list: " + selectedTeamName);
+				return;
+			}
+		}
 		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations, selectedTeamId);
 	}
 	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations, final String selectedTeamId) {

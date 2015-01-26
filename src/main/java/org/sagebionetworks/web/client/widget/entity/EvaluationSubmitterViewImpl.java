@@ -7,7 +7,10 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.extras.select.client.ui.Option;
+import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TeamHeader;
@@ -52,13 +55,16 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Heading selectedText;
 	@UiField
 	FormGroup entityFinderUI;
+	@UiField
+	Select teamComboBox;
+	@UiField
+	Radio isIndividualRadioButton;
 	
 	@Inject
 	public EvaluationSubmitterViewImpl(EvaluationSubmitterViewImplUiBinder binder, EntityFinder entityFinder, EvaluationList evaluationList) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
-		
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
 	}
@@ -86,7 +92,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.doneClicked(selectedTeamId);
+				presenter.doneClicked(teamComboBox.getValue());
 			}
 		});
 		
@@ -109,6 +115,11 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				entityFinder.show();
 			}
 		});
+	}
+	
+	@Override
+	public boolean isIndividual() {
+		return isIndividualRadioButton.isActive();
 	}
 	
 	@Override
@@ -160,7 +171,14 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	@Override
 	public void showModal2(List<TeamHeader> availableTeams) {
-		initialize Select component with available teams, and show page 2
+		teamComboBox.clear();
+		isIndividualRadioButton.setActive(true);
+		
+		for (TeamHeader teamHeader : availableTeams) {
+			Option teamOption = new Option();
+			teamOption.setText(teamHeader.getName());
+			teamComboBox.add(teamOption);
+		}
 		modal2.show();
 	}
 	@Override
