@@ -103,7 +103,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					event.preventDefault();
 					okNewFolderButton.click();
 		        }
 			}

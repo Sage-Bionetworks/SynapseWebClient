@@ -25,14 +25,10 @@
 			closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false"
 			size="LARGE">
 			<b:ModalBody>
-				<b:Form>
-					<b:FieldSet>
-						<b:FormGroup>
-							<b:FormLabel for="folderName">Name</b:FormLabel>
-							<b:TextBox ui:field="folderNameField" name="foldername" b:id="folderName" />
-						</b:FormGroup>
-					</b:FieldSet>
-				</b:Form>
+				<b:FormGroup>
+					<b:FormLabel for="folderName">Name</b:FormLabel>
+					<b:TextBox ui:field="folderNameField" name="foldername" b:id="folderName" />
+				</b:FormGroup>
 				<g:SimplePanel ui:field="sharingAndDataUseContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
