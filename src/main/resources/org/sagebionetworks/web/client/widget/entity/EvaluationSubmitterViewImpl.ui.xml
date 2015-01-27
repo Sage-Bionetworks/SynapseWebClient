@@ -49,7 +49,7 @@
 						</b:ButtonGroup>
 					</b:FormGroup>
 					<be:Select ui:field="teamComboBox" />
-					
+					<div class="highlight-box" ui:field="contributorsPanel" highlight-box-title="Contributors" />
 				</b:FieldSet>
 			</b:ModalBody>
 			<b:ModalFooter>

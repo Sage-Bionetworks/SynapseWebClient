@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -17,12 +16,12 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void hideModal1();
 	void showModal2(List<TeamHeader> availableTeams);
 	void hideModal2();
-	void showSubmissionAcceptedDialogs(HashSet<String> receiptMessages);
+	void showSubmissionAcceptedDialogs(String receiptMessage);
 	boolean isIndividual();
 	
 	public interface Presenter {
-		//view sends back the selected entity, selected evaluation Ids (will not be empty)
-		void nextClicked(Reference selectedEntity, String submissionName, List<Evaluation> evaluationIds);
+		//view sends back the selected entity, selected evaluation
+		void nextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
 		/**
 		 * 
 		 * @param selectedTeam If set, is the team selected to be associated with the submission.  If null, it is a submission from an individual.

@@ -38,8 +38,9 @@ public class EvaluationSubmitter implements Presenter {
 	private Entity submissionEntity;
 	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
-	private List<Evaluation> evaluations;
-	List<TeamHeader> teams;
+	List<SubmissionTeam> teams;
+	private Evaluation evaluation;
+	private Challenge challenge;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
@@ -61,6 +62,9 @@ public class EvaluationSubmitter implements Presenter {
 	 * @param evaluationIds set to null if we should query for all available evaluations
 	 */
 	public void configure(Entity submissionEntity, Set<String> evaluationIds) {
+		challenge = null;
+		evaluation = null;
+		teams = new ArrayList<SubmissionTeam>();
 		view.showLoading();
 		this.submissionEntity = submissionEntity;
 		try {
@@ -102,7 +106,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 		
 	@Override
-	public void nextClicked(Reference selectedReference, String submissionName, List<Evaluation> evaluations) {
+	public void nextClicked(Reference selectedReference, String submissionName, Evaluation evaluation) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
 		submissionEntityVersion = null;
 		if (submissionEntity != null) {
@@ -115,16 +119,34 @@ public class EvaluationSubmitter implements Presenter {
 			submissionEntityVersion = selectedReference.getTargetVersionNumber();
 		}
 		this.submissionName = submissionName;
-		this.evaluations = evaluations;
+		this.evaluation = evaluation;
 		//The standard is to attach access requirements to the associated team, and show them when joining the team.
-		//So access requirements are not checked here.
+		//So access requirements are not checked again here.
 		view.hideModal1();
-		getAvailableTeams();
+		if (evaluation.getContentSource() == null) {
+			//no need to show second page, this is a submission to a non-challenge eval queue.
+			doneClicked(null);
+		} else {
+			queryForChallenge();
+		}
+	}
+	
+	public void queryForChallenge() {
+		synapseClient.getChallenge(evaluation.getContentSource(), new AsyncCallback<Challenge>() {
+			@Override
+			public void onSuccess(Challenge result) {
+				challenge = result;
+				getAvailableTeams();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage("Unable to find associated challenge: " + caught.getMessage());
+			}
+		});
 	}
 	
 	public void getAvailableTeams() {
-		teams = new ArrayList<TeamHeader>();
-		synapseClient.getAvailableSubmissionTeams(getTeamsCallback());
+		synapseClient.getSubmissionTeams(challenge.getId(), getTeamsCallback());
 	}
 	
 	private AsyncCallback<String> getTeamsCallback() {
@@ -132,7 +154,7 @@ public class EvaluationSubmitter implements Presenter {
 			@Override
 			public void onSuccess(String jsonString) {
 				try {
-					PaginatedResults<TeamHeader> results = nodeModelCreator.createPaginatedResults(jsonString, TeamHeader.class);
+					PaginatedResults<SubmissionTeam> results = nodeModelCreator.createPaginatedResults(jsonString, SubmissionTeam.class);
 					teams = results.getResults();
 					view.showModal2(teams);
 				} catch (JSONObjectAdapterException e) {
@@ -151,7 +173,7 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void doneClicked(String selectedTeamName) {
 		//resolve team id from the selected team name
-		String selectedTeamId = null;
+		SubmissionTeam selectedTeam = null;
 		if (!view.isIndividual()) {
 			//team
 			if (selectedTeamName == null) {
@@ -159,21 +181,22 @@ public class EvaluationSubmitter implements Presenter {
 				return;
 			}
 			//resolve team name
-			for (TeamHeader team : teams) {
+			for (SubmissionTeam team : teams) {
 				if(selectedTeamName.equals(team.getName())) {
-					selectedTeamId = team.getId();
-					break;
+					selectedTeam = team;
 				}
 			}
 
-			if (selectedTeamId == null) {
+			if (selectedTeam == null) {
 				view.showErrorMessage("Unable to find the team in the team list: " + selectedTeamName);
 				return;
 			}
 		}
-		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations, selectedTeamId);
+		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, selectedTeam);
 	}
-	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations, final String selectedTeamId) {
+	
+	
+	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final SubmissionTeam selectedTeam) {
 		//look up entity for the current etag
 		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
@@ -190,7 +213,7 @@ public class EvaluationSubmitter implements Presenter {
 						v = 1L;
 					 }
 						 
-					submitToEvaluations(id, v, entity.getEtag(), selectedTeamId, evaluations);
+					submitToEvaluation(id, v, entity.getEtag(), selectedTeam);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -204,42 +227,53 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void submitToEvaluations(String entityId, Long versionNumber, String etag, String selectedTeamId, List<Evaluation> evaluations) {
-		//set up shared values across all submissions
-		Submission newSubmission = new Submission();
-		newSubmission.setEntityId(entityId);
-		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
-		newSubmission.setTeamId(selectedTeamId);
-		newSubmission.setVersionNumber(versionNumber);
-		if (submissionName != null && submissionName.trim().length() > 0)
-			newSubmission.setName(submissionName);
+	public void submitToEvaluation(final String entityId, final Long versionNumber, final String etag, final SubmissionTeam selectedTeam) {
+		AsyncCallback<Void> registerTeamCallback = new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				//set up shared values across all submissions
+				Submission newSubmission = new Submission();
+				newSubmission.setEntityId(entityId);
+				newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
+				if (selectedTeam != null && selectedTeam.getTeamId())
+					newSubmission.setTeamId(selectedTeam.getTeamId());
+				newSubmission.setVersionNumber(versionNumber);
+				if (submissionName != null && submissionName.trim().length() > 0)
+					newSubmission.setName(submissionName);
+				
+				submitToEvaluation(newSubmission, etag);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		};
 		
-		if (evaluations.size() > 0)
-			submitToEvaluations(newSubmission, etag, evaluations, 0);
+		if (selectedTeam == null || selectedTeam.isRegistered()) {
+			//no need to try to register, go on to create the submission
+			registerTeamCallback.onSuccess(null);
+		} else {
+			ChallengeTeam challengeTeam = new ChallengeTeam();
+			challengeTeam.setChallengeId(challenge.getId());
+			challengeTeam.setTeamId(selectedTeam.getTeamId());
+			synapseClient.registerTeamForChallenge(challengeTeam, registerTeamCallback);
+		}
 	}
 	
-	public void submitToEvaluations(final Submission newSubmission, final String etag, final List<Evaluation> evaluations, final int index) {
+	public void submitToEvaluation(final Submission newSubmission, final String etag) {
 		//and create a new submission for each evaluation
-		Evaluation evaluation = evaluations.get(index);
 		newSubmission.setEvaluationId(evaluation.getId());
 		try {
 			synapseClient.createSubmission(newSubmission, etag, new AsyncCallback<Submission>() {			
 				@Override
 				public void onSuccess(Submission result) {
 					//result is the updated submission
-					if (index == evaluations.size()-1) {
-						HashSet<String> replyMessages = new HashSet<String>();
-						for (Evaluation eval : evaluations) {
-							String message = eval.getSubmissionReceiptMessage();
-							if (message == null || message.length()==0)
-								message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
-							replyMessages.add(message);
-						}
-						view.hideModal2();
-						view.showSubmissionAcceptedDialogs(replyMessages);
-					} else {
-						submitToEvaluations(newSubmission, etag, evaluations, index+1);
-					}
+					String message = evaluation.getSubmissionReceiptMessage();
+					if (message == null || message.length()==0)
+						message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
+					view.hideModal2();
+					view.showSubmissionAcceptedDialogs(message);
 				}
 				
 				@Override

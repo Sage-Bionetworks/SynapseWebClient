@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.HashSet;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -73,8 +72,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		nextButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				List<Evaluation> evaluations = evaluationList.getSelectedEvaluations();
-				if (evaluations.size() > 0) {
+				Evaluation evaluation = evaluationList.getSelectedEvaluation();
+				if (evaluation != null) {
 					if (showEntityFinder) {
 						if (selectedReference == null || selectedReference.getTargetId() == null) {
 							//invalid, return.
@@ -82,7 +81,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 							return;
 						}
 					}
-					presenter.nextClicked(selectedReference, submissionNameField.getValue(), evaluations);
+					presenter.nextClicked(selectedReference, submissionNameField.getValue(), evaluation);
 				} else {
 					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
 				}
@@ -138,10 +137,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void showSubmissionAcceptedDialogs(HashSet<String> receiptMessages) {
-		for (String message : receiptMessages) {
-			DisplayUtils.showInfoDialog(DisplayConstants.THANK_YOU_FOR_SUBMISSION, SafeHtmlUtils.htmlEscape(message), null);
-		}
+	public void showSubmissionAcceptedDialogs(String message) {
+		DisplayUtils.showInfoDialog(DisplayConstants.THANK_YOU_FOR_SUBMISSION, SafeHtmlUtils.htmlEscape(message), null);
 	}
 	
 	@Override

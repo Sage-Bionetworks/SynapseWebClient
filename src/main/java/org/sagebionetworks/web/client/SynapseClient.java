@@ -528,4 +528,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
+
+	String getSubmissionTeams(String challengeId);
+	ChallengeTeam registerChallengeTeam(ChallengeTeam challengeTeam);
 }
