@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,7 +10,6 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResult;
@@ -23,10 +19,8 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
@@ -45,7 +39,6 @@ public class TableQueryResultWidgetTest {
 	TableQueryResultView mockView;
 	SynapseClientAsync mockSynapseClient;
 	QueryResultEditorWidget mockQueryResultEditor;
-	GlobalApplicationState mockGlobalState;
 	PortalGinInjector mockGinInjector;
 	TableQueryResultWidget widget;
 	Query query;
@@ -66,12 +59,10 @@ public class TableQueryResultWidgetTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockQueryResultEditor = Mockito.mock(QueryResultEditorWidget.class);
-		mockGlobalState = Mockito.mock(GlobalApplicationState.class);
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(jobTrackingStub);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		when(mockQueryResultEditor.isValid()).thenReturn(true);
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockGlobalState);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector);
 		query = new Query();
 		query.setSql("select * from syn123");
 		row = new Row();
@@ -109,7 +100,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockView).hideEditor();
 		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
@@ -129,7 +119,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockView).hideEditor();
 		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
@@ -151,7 +140,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockView).hideEditor();
 		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
@@ -171,7 +159,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView).hideEditor();
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
 		verify(mockListner).queryExecutionFinished(false, false);
@@ -193,7 +180,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView).hideEditor();
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
 		verify(mockListner).queryExecutionFinished(false, false);
@@ -203,182 +189,4 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).showError(error.getMessage());
 	}
 	
-	
-	
-	@Test
-	public void testOnSaveSuccessValid(){
-		boolean isEditable = true;
-		// setup a success
-		jobTrackingStub.setResponse(bundle);
-		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
-		widget.onEditRows();
-		verify(mockGlobalState).setIsEditing(true);
-		verify(mockView).setEditorWidget(mockQueryResultEditor);
-		verify(mockQueryResultEditor).configure(bundle);
-		verify(mockView).setSaveButtonLoading(false);
-		verify(mockView).showEditor();
-		// Setup success
-		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
-		// use valid results.
-		when(mockQueryResultEditor.isValid()).thenReturn(true);
-		// reset mocks
-		reset(mockView);
-		reset(mockPageWidget);
-		reset(mockListner);
-		reset(mockGlobalState);
-		// Now save
-		widget.onSave();
-		// It should re-run the query.
-		verify(mockView, times(2)).setErrorVisible(false);
-		verify(mockView).setProgressWidgetVisible(true);
-		verify(mockGlobalState).setIsEditing(false);
-		verify(mockQueryResultEditor).hideError();
-		// Hidden while running query.
-		verify(mockView).setTableVisible(false);
-		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), sort, false, null, widget);
-		verify(mockListner).queryExecutionStarted();
-		// Shown on success.
-		verify(mockView).setTableVisible(true);
-		verify(mockListner).queryExecutionFinished(true, true);
-		verify(mockView).setProgressWidgetVisible(false);
-	}
-	
-	
-	@Test
-	public void testOnSaveSuccessNotValid(){
-		boolean isEditable = true;
-		// setup a success
-		jobTrackingStub.setResponse(bundle);
-		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
-		widget.onEditRows();
-		verify(mockGlobalState).setIsEditing(true);
-		verify(mockView).setEditorWidget(mockQueryResultEditor);
-		verify(mockQueryResultEditor).configure(bundle);
-		verify(mockView).setSaveButtonLoading(false);
-		verify(mockView).showEditor();
-		// Setup success
-		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
-		// use valid results.
-		when(mockQueryResultEditor.isValid()).thenReturn(false);
-		// reset mocks
-		reset(mockView);
-		reset(mockPageWidget);
-		reset(mockListner);
-		reset(mockGlobalState);
-		// Now save
-		widget.onSave();
-		// should show the error message
-		verify(mockView).setSaveButtonLoading(false);
-		verify(mockQueryResultEditor).showError(TableQueryResultWidget.SEE_THE_ERRORS_ABOVE);
-		verify(mockQueryResultEditor, never()).hideError();
-		verify(mockGlobalState, never()).setIsEditing(false);
-		verify(mockSynapseClient, never()).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testOnSaveFailure(){
-		boolean isEditable = true;
-		// setup a success
-		jobTrackingStub.setResponse(bundle);
-		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
-		widget.onEditRows();
-		verify(mockGlobalState).setIsEditing(true);
-		verify(mockView).setEditorWidget(mockQueryResultEditor);
-		verify(mockQueryResultEditor).configure(bundle);
-		verify(mockView).setSaveButtonLoading(false);
-		verify(mockView).showEditor();
-		// Setup success
-		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		Throwable error = new Throwable("Things went bad!");
-		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
-		// reset mocks
-		reset(mockView);
-		reset(mockPageWidget);
-		reset(mockListner);
-		reset(mockGlobalState);
-		// Now save
-		widget.onSave();
-		// Failures should not close the editor.
-		verify(mockView, never()).hideEditor();
-		verify(mockView).setSaveButtonLoading(false);
-		verify(mockGlobalState, never()).setIsEditing(false);
-		// the editor should show 
-		verify(mockQueryResultEditor).showError(error.getMessage());
-		// The error message goes to the dialog.
-		verify(mockView, never()).showError(anyString());
-	}
-	
-	@Test
-	public void testOnCancelWithChangesConfirmOkay(){
-		boolean isEditable = true;
-		// setup a success
-		jobTrackingStub.setResponse(bundle);
-		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
-		widget.onEditRows();
-		verify(mockGlobalState).setIsEditing(true);
-		// A change includes at least one row.
-		delta.setRows(Arrays.asList(new PartialRow()));
-		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		// Start clean
-		reset(mockView);
-		reset(mockGlobalState);
-		// Invoking the callback occurs on okay;
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), any(Callback.class));
-		widget.onCancel();
-		verify(mockView).showConfirmDialog(anyString(), any(Callback.class));
-		verify(mockGlobalState).setIsEditing(false);
-		verify(mockView).hideEditor();
-	}
-	
-	@Test
-	public void testOnCancelWithChangesConfirmCancel(){
-		boolean isEditable = true;
-		// setup a success
-		jobTrackingStub.setResponse(bundle);
-		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
-		widget.onEditRows();
-		verify(mockGlobalState).setIsEditing(true);
-		// A change includes at least one row.
-		delta.setRows(Arrays.asList(new PartialRow()));
-		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		// Start clean
-		reset(mockView);
-		reset(mockGlobalState);
-		// Invoking the callback occurs on okay;
-		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), any(Callback.class));
-		widget.onCancel();
-		verify(mockView).showConfirmDialog(anyString(), any(Callback.class));
-		verify(mockGlobalState, never()).setIsEditing(false);
-		verify(mockView, never()).hideEditor();
-	}
-	
-	@Test
-	public void testOnCancelNoChanges(){
-		boolean isEditable = true;
-		// setup a success
-		jobTrackingStub.setResponse(bundle);
-		// Make the call that changes it all.
-		widget.configure(query, isEditable, mockListner);
-		widget.onEditRows();
-		verify(mockGlobalState).setIsEditing(true);
-		// No rows means no changes.
-		delta.setRows(null);
-		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		// Start clean
-		reset(mockView);
-		reset(mockGlobalState);
-		// cancel
-		widget.onCancel();
-		verify(mockView, never()).showConfirmDialog(anyString(), any(Callback.class));
-		verify(mockGlobalState).setIsEditing(false);
-		verify(mockView).hideEditor();
-	}
 }

@@ -14,16 +14,6 @@ public interface TableQueryResultView extends IsWidget {
 		 */
 		void onEditRows();
 
-		/**
-		 * Called when the save button is pressed.
-		 */
-		void onSave();
-
-		/**
-		 * Called when the user clicks the close button.
-		 */
-		void onCancel();
-
 	}
 
 	/**
@@ -69,24 +59,6 @@ public interface TableQueryResultView extends IsWidget {
 	void setEditorWidget(QueryResultEditorWidget queryResultEditor);
 
 	/**
-	 * Show the editor dialog.
-	 * 
-	 */
-	void showEditor();
-
-	/**
-	 * Change the state of the save button while saving.
-	 * 
-	 * @param b
-	 */
-	void setSaveButtonLoading(boolean b);
-
-	/**
-	 * Hide the editor.
-	 */
-	void hideEditor();
-
-	/**
 	 * The progress widget shows query progress.s
 	 * 
 	 * @param progressWidget
@@ -100,13 +72,5 @@ public interface TableQueryResultView extends IsWidget {
 	 */
 	void setProgressWidgetVisible(boolean visible);
 
-	/**
-	 * Show a confirm dialog.
-	 * 
-	 * @param title
-	 * @param message
-	 * @param okayCallback
-	 */
-	void showConfirmDialog(String message, Callback callback);
 
 }
