@@ -41,7 +41,8 @@ public class EvaluationSubmitter implements Presenter {
 	List<SubmissionTeam> teams;
 	private Evaluation evaluation;
 	private Challenge challenge;
-	
+	private SubmissionTeam selectedTeam;
+	private String selectedTeamMemberStateHash;
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
 			SynapseClientAsync synapseClient,
@@ -64,6 +65,7 @@ public class EvaluationSubmitter implements Presenter {
 	public void configure(Entity submissionEntity, Set<String> evaluationIds) {
 		challenge = null;
 		evaluation = null;
+		selectedTeam = null;
 		teams = new ArrayList<SubmissionTeam>();
 		view.showLoading();
 		this.submissionEntity = submissionEntity;
@@ -125,7 +127,7 @@ public class EvaluationSubmitter implements Presenter {
 		view.hideModal1();
 		if (evaluation.getContentSource() == null) {
 			//no need to show second page, this is a submission to a non-challenge eval queue.
-			doneClicked(null);
+			doneClicked();
 		} else {
 			queryForChallenge();
 		}
@@ -171,32 +173,58 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	@Override
-	public void doneClicked(String selectedTeamName) {
-		//resolve team id from the selected team name
-		SubmissionTeam selectedTeam = null;
+	public void doneClicked() {
 		if (!view.isIndividual()) {
-			//team
-			if (selectedTeamName == null) {
-				view.showErrorMessage("Please select a team.");
-				return;
-			}
-			//resolve team name
-			for (SubmissionTeam team : teams) {
-				if(selectedTeamName.equals(team.getName())) {
-					selectedTeam = team;
-				}
-			}
-
+			//team submission
 			if (selectedTeam == null) {
-				view.showErrorMessage("Unable to find the team in the team list: " + selectedTeamName);
+				view.showErrorMessage("Please select a team");
 				return;
 			}
 		}
-		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, selectedTeam);
+		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion);
+	}
+	@Override
+	public void teamSelected(String selectedTeamName) {
+		selectedTeam = null;
+		selectedTeamMemberStateHash = null;
+		view.clearContributors();
+		//resolve team from team name
+		for (SubmissionTeam team : teams) {
+			if(selectedTeamName.equals(team.getName())) {
+				selectedTeam = team;
+				break;
+			}
+		}
+		if (selectedTeam != null) {
+			//get contributor list for this team
+			synapseClient.getTeamState(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamState>() {
+				@Override
+				public void onSuccess(TeamState teamState) {
+					selectedTeamMemberStateHash = teamState.getMemberStateHash();
+					for (TeamMemberState memberState : teamState.getTeamMemberStates()) {
+						if (memberState.isEligible()) {
+							view.addEligibleContributor(memberState.getPrincipalId());
+						} else {
+							String reason = ""; //unknown reason
+							if (!memberState.isRegistered()) {
+								reason = "Not registered for the challenge.";
+							} else if (memberState.isQuotaFilled) {
+								reason = "Exceeded the submission quota.";
+							}
+							view.addInEligibleContributor(memberState.getPrincipalId(), reason);
+						}
+					}
+				};
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(caught.getMessage());
+				}
+			});
+		}
 	}
 	
-	
-	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final SubmissionTeam selectedTeam) {
+	public void lookupEtagAndCreateSubmission(final String id, final Long ver) {
 		//look up entity for the current etag
 		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
@@ -213,7 +241,7 @@ public class EvaluationSubmitter implements Presenter {
 						v = 1L;
 					 }
 						 
-					submitToEvaluation(id, v, entity.getEtag(), selectedTeam);
+					submitToEvaluation(id, v, entity.getEtag());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -227,7 +255,7 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void submitToEvaluation(final String entityId, final Long versionNumber, final String etag, final SubmissionTeam selectedTeam) {
+	public void submitToEvaluation(final String entityId, final Long versionNumber, final String etag) {
 		AsyncCallback<Void> registerTeamCallback = new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -235,8 +263,6 @@ public class EvaluationSubmitter implements Presenter {
 				Submission newSubmission = new Submission();
 				newSubmission.setEntityId(entityId);
 				newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
-				if (selectedTeam != null && selectedTeam.getTeamId())
-					newSubmission.setTeamId(selectedTeam.getTeamId());
 				newSubmission.setVersionNumber(versionNumber);
 				if (submissionName != null && submissionName.trim().length() > 0)
 					newSubmission.setName(submissionName);
@@ -250,7 +276,7 @@ public class EvaluationSubmitter implements Presenter {
 			}
 		};
 		
-		if (selectedTeam == null || selectedTeam.isRegistered()) {
+		if (view.isIndividual() || selectedTeam.isRegistered()) {
 			//no need to try to register, go on to create the submission
 			registerTeamCallback.onSuccess(null);
 		} else {
@@ -265,7 +291,15 @@ public class EvaluationSubmitter implements Presenter {
 		//and create a new submission for each evaluation
 		newSubmission.setEvaluationId(evaluation.getId());
 		try {
-			synapseClient.createSubmission(newSubmission, etag, new AsyncCallback<Submission>() {			
+			String teamId = null;
+			String memberStateHash = null;
+			if (!view.isIndividual()) {
+				//team is selected
+				teamId = selectedTeam.getId();
+				memberStateHash = selectedTeamMemberStateHash;
+			}
+			
+			synapseClient.createSubmission(newSubmission, etag, teamId, memberStateHash, new AsyncCallback<Submission>() {			
 				@Override
 				public void onSuccess(Submission result) {
 					//result is the updated submission
@@ -286,6 +320,7 @@ public class EvaluationSubmitter implements Presenter {
 			view.showErrorMessage(e.getMessage());
 		}
 	}
+	
 	
 	public Widget asWidget() {
 		return view.asWidget();

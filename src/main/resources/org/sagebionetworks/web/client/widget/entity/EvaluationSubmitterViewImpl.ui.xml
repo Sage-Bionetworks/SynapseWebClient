@@ -3,6 +3,7 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:be="urn:import:org.gwtbootstrap3.extras.select.client.ui"
   >
   	<g:FlowPanel>
@@ -49,7 +50,7 @@
 						</b:ButtonGroup>
 					</b:FormGroup>
 					<be:Select ui:field="teamComboBox" />
-					<div class="highlight-box" ui:field="contributorsPanel" highlight-box-title="Contributors" />
+					<bh:Div addStyleNames="highlight-box" ui:field="contributorsPanel" />
 				</b:FieldSet>
 			</b:ModalBody>
 			<b:ModalFooter>

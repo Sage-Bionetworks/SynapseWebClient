@@ -18,14 +18,16 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void hideModal2();
 	void showSubmissionAcceptedDialogs(String receiptMessage);
 	boolean isIndividual();
-	
+	void setContributorsListVisible(boolean isVisible);
+	void addEligibleContributor(String principalId);
+	void addInEligibleContributor(String principalId, String reason);
+	void clearContributors();
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation
 		void nextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
-		/**
-		 * 
-		 * @param selectedTeam If set, is the team selected to be associated with the submission.  If null, it is a submission from an individual.
-		 */
-		void doneClicked(String teamName);
+		
+		void doneClicked();
+		
+		void teamSelected(String teamName);
 	}
 }

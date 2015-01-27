@@ -5,9 +5,12 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -16,8 +19,12 @@ import org.sagebionetworks.repo.model.TeamHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -58,12 +65,17 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Select teamComboBox;
 	@UiField
 	Radio isIndividualRadioButton;
+	@UiField
+	Div contributorsPanel;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
-	public EvaluationSubmitterViewImpl(EvaluationSubmitterViewImplUiBinder binder, EntityFinder entityFinder, EvaluationList evaluationList) {
+	public EvaluationSubmitterViewImpl(EvaluationSubmitterViewImplUiBinder binder, EntityFinder entityFinder, EvaluationList evaluationList, PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
+		this.ginInjector = ginInjector;
+		contributorsPanel.getElement().setAttribute("highlight-box-title", "Contributors");
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
 	}
@@ -91,7 +103,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.doneClicked(teamComboBox.getValue());
+				presenter.doneClicked();
 			}
 		});
 		
@@ -112,6 +124,13 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 					}
 				});
 				entityFinder.show();
+			}
+		});
+		
+		teamComboBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.teamSelected(teamComboBox.getValue());
 			}
 		});
 	}
@@ -186,5 +205,46 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+	
+	@Override
+	public void setContributorsListVisible(boolean isVisible) {
+		contributorsPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void clearContributors() {
+		contributorsPanel.clear();
+	}
+	
+	@Override
+	public void addEligibleContributor(String principalId) {
+		contributorsPanel.add(getContributorRow(principalId, true));
+	}
+	
+	@Override
+	public void addInEligibleContributor(String principalId, String reason) {
+		Div row = getContributorRow(principalId, false);
+		//also add the reason
+		Span span = new Span();
+		span.addStyleName("greyText-imp");
+		span.setText(reason);
+		row.add(span);
+		
+		contributorsPanel.add(row);
+	}
+	
+	private Div getContributorRow(String principalId, boolean selectCheckbox) {
+		Div row = new Div();
+		InlineCheckBox cb = new InlineCheckBox();
+		cb.setValue(selectCheckbox);
+		cb.setEnabled(false);
+		row.add(cb);
+		
+		UserBadge badge = ginInjector.getUserBadgeWidget();
+		badge.configure(principalId);
+		row.add(badge.asWidget());
+		
+		return row;
 	}
 }

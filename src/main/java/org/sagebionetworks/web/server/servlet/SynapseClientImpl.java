@@ -2949,11 +2949,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public Submission createSubmission(Submission submission, String etag)
+	public Submission createSubmission(Submission submission, String etag, String teamId, String memberStateHash)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createSubmission(submission, etag);
+			return synapseClient.createSubmission(submission, etag, teamId, memberStateHash);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}

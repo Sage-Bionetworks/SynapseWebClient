@@ -281,7 +281,7 @@ public interface SynapseClientAsync {
 	 * @param etag
 	 * @param callback
 	 */
-	void createSubmission(Submission submission, String etag, AsyncCallback<Submission> callback) throws RestServiceException;
+	void createSubmission(Submission submission, String etag, String teamId, String memberStateHash, AsyncCallback<Submission> callback) throws RestServiceException;
 	void getSubmissionTeams(String challengeId, AsyncCallback<String> submissionTeamJson);
 	
 	void registerChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);

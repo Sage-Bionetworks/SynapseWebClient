@@ -374,7 +374,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
 	
-	public Submission createSubmission(Submission submission, String etag) throws RestServiceException;
+	public Submission createSubmission(Submission submission, String etag, String teamId, String memberStateHash) throws RestServiceException;
 	
 	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
 	public String getEvaluationAcl(String evalId) throws RestServiceException;
