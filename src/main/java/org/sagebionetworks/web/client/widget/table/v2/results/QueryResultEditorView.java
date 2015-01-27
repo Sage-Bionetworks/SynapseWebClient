@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -40,6 +42,16 @@ public interface QueryResultEditorView extends IsWidget {
 		 * Delete the selected rows.
 		 */
 		void onDeleteSelected();
+
+		/**
+		 * Called when the save button is pressed.
+		 */
+		void onSave();
+
+		/**
+		 * Called when the user clicks the close button.
+		 */
+		void onCancel();
 		
 	}
 	
@@ -74,5 +86,50 @@ public interface QueryResultEditorView extends IsWidget {
 	 * @param b
 	 */
 	public void setErrorMessageVisible(boolean visible);
+
+	/**
+	 * Widget that displays append progress.
+	 * @param progress
+	 */
+	public void setProgressWidget(IsWidget progress);
+
+	/**
+	 * Show/hide the editor panel.
+	 * @param b
+	 */
+	public void setEditorPanelVisible(boolean visible);
+
+	/**
+	 * Show/hide the editor panel.
+	 * @param visible
+	 */
+	public void setProgressPanelVisible(boolean visible);
+	
+	/**
+	 * Show a confirm dialog.
+	 * 
+	 * @param title
+	 * @param message
+	 * @param okayCallback
+	 */
+	void showConfirmDialog(String message, Callback callback);
+	
+	/**
+	 * Show the editor dialog.
+	 * 
+	 */
+	void showEditor();
+
+	/**
+	 * Change the state of the save button while saving.
+	 * 
+	 * @param b
+	 */
+	void setSaveButtonLoading(boolean b);
+
+	/**
+	 * Hide the editor.
+	 */
+	void hideEditor();
 
 }

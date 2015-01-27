@@ -65,7 +65,9 @@ public class CellFactoryImpl implements CellFactory {
 				editor = ginInjector.createFileCellEditor();
 				break;		
 			default:
-				editor = ginInjector.createStringEditorCell();
+				StringEditorCell stringEditor = ginInjector.createStringEditorCell();
+				stringEditor.setMaxSize(model.getMaximumSize());
+				editor = stringEditor;
 			}
 		}
 		// Configure each editor with the default value.
