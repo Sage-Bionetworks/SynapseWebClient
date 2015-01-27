@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.ShowsErrors;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
+public interface EditRegisteredTeamDialogView extends IsWidget, ShowsErrors {
 	/**
 	 * Set the presenter.
 	 * @param presenter
@@ -15,8 +15,6 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	void setPresenter(Presenter presenter);
 	void setRecruitmentMessage(String message);
 	String getRecruitmentMessage();
-	void clearTeams();
-	void setTeams(List<Team> teams);
 	void showModal();
 	void hideModal();
 	
@@ -24,7 +22,7 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void teamSelected(String teamName);
 		void onOk();
+		void onUnregister();
 	}
 }

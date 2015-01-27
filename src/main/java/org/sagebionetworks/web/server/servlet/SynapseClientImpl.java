@@ -3669,4 +3669,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@Override
+	public ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam) {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.updateRegisteredChallengeTeam(challengeTeam);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 }

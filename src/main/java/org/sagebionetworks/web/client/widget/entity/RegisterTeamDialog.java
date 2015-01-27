@@ -34,7 +34,6 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		this.globalAppState = globalAppState;
 		this.authController = authController;
 		
-		view.showTeamSelector(true);
 		view.setRecruitmentMessage("");
 		view.setPresenter(this);
 	}		
@@ -49,14 +48,12 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		challengeId = null;
 	}
 	
-	public void showTeamSelector(String challengeId, Callback callback) {
+	public void configure(String challengeId, Callback callback) {
 		clearState();
 		this.callback = callback;
 		this.challengeId = challengeId;
 		view.setRecruitmentMessage("");
 		view.clearTeams();
-		view.showTeamSelector(true);
-		view.showUnregisterButton(false);
 		getRegistratableTeams();
 		view.showModal();
 	}
@@ -74,17 +71,6 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 					view.showErrorMessage(caught.getMessage());
 			}
 		});
-	}
-	
-	public void showChallengeTeamEditor(String challengeId, String recruitmentMessage, String selectedTeamId, Callback callback) {
-		clearState();
-		this.challengeId = challengeId;
-		this.selectedTeamId = selectedTeamId;
-		this.callback = callback;
-		view.setRecruitmentMessage(recruitmentMessage);
-		view.showTeamSelector(false);
-		view.showUnregisterButton(true);
-		view.showModal();
 	}
 	
 	public boolean isValid() {
@@ -105,26 +91,6 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 			synapseClient.registerChallengeTeam(challengeTeam, new AsyncCallback<ChallengeTeam>() {
 				@Override
 				public void onSuccess(ChallengeTeam result) {
-					if (callback != null) {
-						callback.invoke();
-					}
-					view.hideModal();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
-				}
-			});
-		}
-	}
-	
-	@Override
-	public void onUnregister() {
-		if (isValid()) {
-			synapseClient.unregisterChallengeTeam(challengeId, selectedTeamId, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
 					if (callback != null) {
 						callback.invoke();
 					}

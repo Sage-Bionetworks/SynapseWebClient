@@ -110,6 +110,8 @@ import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView;
+import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
@@ -144,6 +146,8 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
+import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
@@ -1051,6 +1055,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AccessRequirementDialogView.class).to(AccessRequirementDialogViewImpl.class);
 		
 		bind(ImageParamsPanelView.class).to(ImageParamsPanelViewImpl.class);
+		bind(RegisterTeamDialogView.class).to(RegisterTeamDialogViewImpl.class);
+		bind(EditRegisteredTeamDialogView.class).to(EditRegisteredTeamDialogViewImpl.class);
 	}
 
 }
