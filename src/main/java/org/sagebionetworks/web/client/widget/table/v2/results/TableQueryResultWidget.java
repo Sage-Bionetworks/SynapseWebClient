@@ -31,9 +31,6 @@ import com.google.inject.Inject;
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
 	
-	public static final String CREATING_THE_FILE = "Applying changes...";
-	public static final String YOU_HAVE_UNSAVED_CHANGES = "You have unsaved changes. Do you want to discard your changes?";
-	public static final String SEE_THE_ERRORS_ABOVE = "See the error(s) above.";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -47,22 +44,17 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	boolean isEditable;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
-	JobTrackingWidget editJobTrackingWidget;
-	GlobalApplicationState globalApplicationState;
-
 	
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, GlobalApplicationState globalApplicationState){
+	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector){
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
-		this.editJobTrackingWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
-		this.globalApplicationState = globalApplicationState;
 	}
 	
 	/**
@@ -79,7 +71,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 
 	private void runQuery() {
-		doHideEditor();
 		this.view.setErrorVisible(false);
 		fireStartEvent();
 		this.view.setTableVisible(false);
@@ -210,64 +201,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public void onEditRows() {
 		if(this.queryResultEditor == null){
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
-			this.queryResultEditor.setApplyProgressWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.globalApplicationState.setIsEditing(true);
-		this.view.setSaveButtonLoading(false);
-		this.queryResultEditor.configure(this.bundle);
-		view.showEditor();
-	}
-
-	@Override
-	public void onSave() {
-		view.setSaveButtonLoading(true);
-		// Extract the delta
-		if(!this.queryResultEditor.isValid()){
-			showEditError(SEE_THE_ERRORS_ABOVE);
-		}else{
-			// Changes are valid so proceed with the save.
-			saveValidChanges();
-		}
-
-	}
-
-	/**
-	 * Save after validating the changes in the editor.
-	 */
-	private void saveValidChanges() {
-		queryResultEditor.hideError();
-		PartialRowSet prs = this.queryResultEditor.extractDelta();
-		AppendableRowSetRequest request = new AppendableRowSetRequest();
-		request.setToAppend(prs);
-		editJobTrackingWidget.startAndTrackJob("Applying changes...", false, AsynchType.TableAppend, request, new AsynchronousProgressHandler() {
-			
+		this.queryResultEditor.showEditor(bundle, new Callback() {
 			@Override
-			public void onFailure(Throwable failure) {
-				showEditError(failure.getMessage());
-			}
-			
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				// If the save was success full then re-run the query.
+			public void invoke() {
 				runQuery();
-			}
-			
-			@Override
-			public void onCancel() {
-				doHideEditor();
 			}
 		});
 	}
-	/**
-	 * Show an error in the editor.
-	 * @param message
-	 */
-	private void showEditError(String message){
-		view.setSaveButtonLoading(false);
-		queryResultEditor.showError(message);
-	}
-	
 
 	@Override
 	public void onPageChange(Long newOffset) {
@@ -305,42 +247,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			public void onSuccess(String sql) {
 				runSql(sql);
 			}});
-	}
-
-	@Override
-	public void onCancel() {
-		// Are there changes?
-		if(hasUnsavedChanges()){
-			// Confirm close.
-			view.showConfirmDialog(YOU_HAVE_UNSAVED_CHANGES, new Callback() {
-				@Override
-				public void invoke() {
-					doHideEditor();
-				}
-			});
-		}else{
-			doHideEditor();
-		}
-	}
-	
-	/**
-	 * Does the editor have unsaved changes?
-	 * @return
-	 */
-	public boolean hasUnsavedChanges(){
-		PartialRowSet prs = this.queryResultEditor.extractDelta();
-		if(prs != null && prs.getRows() != null){
-			return !prs.getRows().isEmpty();
-		}
-		return false;
-	}
-	
-	/**
-	 * Hide the modal editor.
-	 */
-	private void doHideEditor(){
-		this.globalApplicationState.setIsEditing(false);
-		this.view.hideEditor();
 	}
 	
 }

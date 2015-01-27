@@ -207,4 +207,15 @@ public class CellFactoryImplTest {
 		cm.setColumnType(ColumnType.FILEHANDLEID);
 		assertEquals(mockFileCellRenderer, cellFactory.createRenderer(cm));
 	}
+	
+	@Test
+	public void testGetStringCellEditor(){
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.STRING);
+		Long maxSize = 13L;
+		cm.setMaximumSize(maxSize);
+		assertEquals(mockStringEditorCell, cellFactory.createEditor(cm));
+		// The max size must get passed to the editor
+		verify(mockStringEditorCell).setMaxSize(maxSize);
+	}
 }
