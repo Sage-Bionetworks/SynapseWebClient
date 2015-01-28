@@ -73,6 +73,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.RegisterChallengeTeamWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
@@ -235,6 +236,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ButtonLinkWidget getButtonLinkWidget();
 	public VideoWidget getVideoWidget();
 	public TableQueryResultWikiWidget getSynapseTableQueryResultWikiWidget();
+	public RegisterChallengeTeamWidget getRegisterChallengeTeamWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();

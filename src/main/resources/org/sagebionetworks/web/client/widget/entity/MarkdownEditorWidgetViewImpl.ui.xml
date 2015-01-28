@@ -39,6 +39,7 @@
 				  <b:DropDownMenu>
 				    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="registerChallengeTeamLink">Register Challenge Team Button</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="synapseTableLink">Synapse Table</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="entityBackgroundLink">Set Project Background Image</b:AnchorListItem>

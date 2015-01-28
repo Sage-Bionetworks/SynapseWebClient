@@ -147,6 +147,9 @@ public class WidgetConstants {
 	public static final String LINK_URL_KEY = "url";
 	public static final String TEXT_KEY = "text";
 	
+	public static final String REGISTER_CHALLENGE_TEAM_CONTENT_TYPE="registerChallengeTeam";
+	public static final String CHALLENGE_ID_KEY = "challengeId";
+	
 	public static final String BOOKMARK_KEY = "bookmarkID";
 	public static final String REFERENCE_FOOTNOTE_KEY = "footnoteId";
 	public static final String INLINE_WIDGET_KEY = "inlineWidget";	/**

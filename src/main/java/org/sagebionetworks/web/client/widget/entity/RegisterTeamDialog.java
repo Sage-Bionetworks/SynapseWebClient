@@ -54,6 +54,9 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		this.challengeId = challengeId;
 		view.setRecruitmentMessage("");
 		view.clearTeams();
+	}
+	
+	public void showModal() {
 		getRegistratableTeams();
 		view.showModal();
 	}

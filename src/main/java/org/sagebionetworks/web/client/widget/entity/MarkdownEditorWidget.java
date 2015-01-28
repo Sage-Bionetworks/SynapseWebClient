@@ -285,6 +285,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_TUTORIAL_WIZARD:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=syn123&" +WidgetConstants.TEXT_KEY + "=Tutorial"+ WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
+		case INSERT_REGISTER_CHALLENGE_TEAM:
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.REGISTER_CHALLENGE_TEAM_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_ID_KEY + "=123&" +WidgetConstants.BUTTON_TEXT_KEY + "=Register team" + WidgetConstants.WIDGET_END_MARKDOWN);
+			break;
 		case BOLD:
 			surroundWithTag("**");
 			break;
