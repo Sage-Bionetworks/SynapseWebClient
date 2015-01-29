@@ -287,6 +287,8 @@ public interface SynapseClientAsync {
 	void registerChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);
 	void unregisterChallengeTeam(String challengeId, String teamId, AsyncCallback<Void> callback);
 	void updateRegisteredChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);
+	void getChallengeTeams(String challengeId, String userId, Integer limit, Integer offset, AsyncCallback<String> callback);
+	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
 	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
 	void updateEvaluationAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);

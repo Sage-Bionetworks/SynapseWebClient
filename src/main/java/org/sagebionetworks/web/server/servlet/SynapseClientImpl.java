@@ -3678,4 +3678,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public String getChallengeTeams(String challengeId, String userId, Integer limit, Integer offset)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<ChallengeSummary> favorites = synapseClient
+					.getChallengeSummaries(challengeId, userId, limit, offset);
+			return EntityFactory.createJSONStringForEntity(favorites);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 }

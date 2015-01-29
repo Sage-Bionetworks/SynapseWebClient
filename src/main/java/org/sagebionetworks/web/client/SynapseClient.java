@@ -533,4 +533,5 @@ public interface SynapseClient extends RemoteService {
 	ChallengeTeam registerChallengeTeam(ChallengeTeam challengeTeam);
 	void unregisterChallengeTeam(String challengeId, String teamId);
 	ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam);
+	String getChallengeTeams(String challengeId, String userId, Integer limit, Integer offset);
 }
