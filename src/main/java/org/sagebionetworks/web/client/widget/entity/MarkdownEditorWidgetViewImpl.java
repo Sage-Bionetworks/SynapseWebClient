@@ -105,6 +105,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem registerChallengeTeamLink;
 	@UiField
+	public AnchorListItem challengeTeamsLink;
+	@UiField
 	public AnchorListItem synapseTableLink;
 	@UiField
 	public AnchorListItem wikifilesPreviewLink;
@@ -216,6 +218,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		wikifilesPreviewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW));
 		tutorialWizardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD));
 		registerChallengeTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REGISTER_CHALLENGE_TEAM));
+		challengeTeamsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CHALLENGE_TEAMS));
 		boldButton.addClickHandler(getClickHandler(MarkdownEditorAction.BOLD));
 		italicButton.addClickHandler(getClickHandler(MarkdownEditorAction.ITALIC));
 		strikeButton.addClickHandler(getClickHandler(MarkdownEditorAction.STRIKETHROUGH));
