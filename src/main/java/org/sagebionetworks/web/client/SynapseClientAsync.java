@@ -30,7 +30,6 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -370,10 +369,10 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void startAsynchJob(AsynchType type, AsynchronousRequestBody body,
+	void startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId,
 			AsyncCallback<String> callback);
 
-	void getAsynchJobResults(AsynchType type, String jobId,
+	void getAsynchJobResults(AsynchType type, String jobId, String tableId,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
 	void executeEntityQuery(EntityQuery query,

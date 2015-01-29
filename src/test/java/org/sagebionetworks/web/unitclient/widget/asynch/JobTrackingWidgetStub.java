@@ -28,7 +28,7 @@ public class JobTrackingWidgetStub implements JobTrackingWidget {
 
 	@Override
 	public void startAndTrackJob(String title, boolean isDeterminate,
-			AsynchType type, AsynchronousRequestBody requestBody,
+			AsynchType type, AsynchronousRequestBody requestBody, String tableId,
 			AsynchronousProgressHandler handler) {
 		if(this.onCancel){
 			handler.onCancel();
