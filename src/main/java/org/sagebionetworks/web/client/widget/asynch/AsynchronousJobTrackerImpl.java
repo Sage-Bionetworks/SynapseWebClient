@@ -28,7 +28,6 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	private UpdatingAsynchProgressHandler handler;
 	private OneTimeReference<AsynchronousProgressHandler> oneTimeReference;
 	private boolean isCanceled;
-	private String tableId;
 
 	@Inject
 	public AsynchronousJobTrackerImpl(SynapseClientAsync synapseClient,
@@ -42,12 +41,11 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * Start the job then start tracking the job
 	 */
 	public void startAndTrack(AsynchType type,
-			AsynchronousRequestBody requestBody, String tableId, final int waitTimeMS,
+			AsynchronousRequestBody requestBody, final int waitTimeMS,
 			final UpdatingAsynchProgressHandler handler) {
 		this.isCanceled = false;
 		this.handler = handler;
 		this.type = type;
-		this.tableId = tableId;
 		/*
 		 * While update can be called many times we only want to call
 		 * onComplete(), onFailure() and onCancel() once. For example, it would
@@ -57,7 +55,7 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		this.oneTimeReference = new OneTimeReference<AsynchronousProgressHandler>(
 				handler);
 		// Start the job.
-		synapseClient.startAsynchJob(type, requestBody, tableId,
+		synapseClient.startAsynchJob(type, requestBody,
 				new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String jobId) {
@@ -109,7 +107,7 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 */
 	private void checkAndWait() {
 		// Get the current status
-		synapseClient.getAsynchJobResults(this.type, this.jobId, this.tableId,
+		synapseClient.getAsynchJobResults(this.type, this.jobId,
 				new AsyncCallback<AsynchronousResponseBody>() {
 					@Override
 					public void onSuccess(AsynchronousResponseBody response) {

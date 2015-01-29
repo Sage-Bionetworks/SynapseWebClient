@@ -3,11 +3,14 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -76,7 +79,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
 		qbr.setQuery(this.startingQuery);
-		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, QueryBundleUtils.getTableId(this.bundle), new AsynchronousProgressHandler() {
+		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {

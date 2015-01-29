@@ -25,7 +25,6 @@ public class CreateDownloadPageImplTest {
 	ModalPresenter mockModalPresenter;
 	CreateDownloadPageImpl page;
 	String sql;
-	String tableId;
 	
 	@Before
 	public void before(){
@@ -34,9 +33,8 @@ public class CreateDownloadPageImplTest {
 		mockNextPage = Mockito.mock(DownloadFilePage.class);
 		mockModalPresenter = Mockito.mock(ModalPresenter.class);
 		page = new CreateDownloadPageImpl(mockView, jobTrackingWidgetStub, mockNextPage);
-		tableId = "syn123";
-		sql = "select * from " + tableId;
-		page.configure(sql, tableId);
+		sql = "select * from syn123";
+		page.configure(sql);
 	}
 	
 	@Test

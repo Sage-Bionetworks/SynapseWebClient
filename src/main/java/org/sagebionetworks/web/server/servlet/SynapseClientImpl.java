@@ -111,6 +111,7 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -3449,22 +3450,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	
 	@Override
-	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId )
+	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body )
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body, tableId);
+			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	@Override
-	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, String tableId)
+	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId)
 			throws RestServiceException, ResultNotReadyException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId, tableId);
+			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId);
 		} catch (SynapseResultNotReadyException e){
 			// This occurs when the job is not ready.
 			// Re-throw the ResultNotReadyException with the status JSON.

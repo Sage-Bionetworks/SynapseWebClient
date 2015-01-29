@@ -33,7 +33,6 @@ public class QueryResultEditorWidget implements
 	JobTrackingWidget editJobTrackingWidget;
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
-	String tableId;
 
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -69,7 +68,6 @@ public class QueryResultEditorWidget implements
 		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);
 		view.showEditor();
-		this.tableId = QueryBundleUtils.getTableId(bundle);
 	}
 
 	@Override
@@ -177,7 +175,7 @@ public class QueryResultEditorWidget implements
 		AppendableRowSetRequest request = new AppendableRowSetRequest();
 		request.setToAppend(prs);
 		editJobTrackingWidget.startAndTrackJob("Applying changes...", false,
-				AsynchType.TableAppendRowSet, request, this.tableId,
+				AsynchType.TableAppendRowSet, request,
 				new AsynchronousProgressHandler() {
 
 					@Override

@@ -40,7 +40,6 @@ public class AsynchronousProgressWidgetTest {
 	DownloadFromTableRequest requestBody;
 	DownloadFromTableResult responseBody;
 	AsynchType type;
-	String tableId;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
@@ -50,9 +49,8 @@ public class AsynchronousProgressWidgetTest {
 		states = new LinkedList<AsynchronousJobStatus>();
 		requestBody = new DownloadFromTableRequest();
 		responseBody = new DownloadFromTableResult();
-		tableId = "syn123";
 		type = AsynchType.TableCSVDownload;
-		requestBody.setSql("select * from " + tableId);
+		requestBody.setSql("select * from syn123");
 		// Setup three phases for a job.
 		String jobId = "123";
 		// This job will have three phases.
@@ -92,7 +90,7 @@ public class AsynchronousProgressWidgetTest {
 	@Test
 	public void testHappy(){
 		String title = "title";
-		widget.startAndTrackJob(title, true, type, requestBody, tableId, mockHandler);
+		widget.startAndTrackJob(title, true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -105,7 +103,7 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(null);
 		start.setProgressTotal(null);
-		widget.startAndTrackJob(title, true, type, requestBody, tableId, mockHandler);
+		widget.startAndTrackJob(title, true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -118,7 +116,7 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(1l);
 		start.setProgressTotal(0l);
-		widget.startAndTrackJob(title, true, type, requestBody, tableId, mockHandler);
+		widget.startAndTrackJob(title, true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -131,7 +129,7 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(1l);
 		start.setProgressTotal(0l);
-		widget.startAndTrackJob(title,true, type, requestBody, tableId,  mockHandler);
+		widget.startAndTrackJob(title,true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -145,7 +143,7 @@ public class AsynchronousProgressWidgetTest {
 		Throwable error = new Throwable("some error");
 		trackerStub = new AsynchronousJobTrackerStub(states, error, responseBody);
 		widget = new AsynchronousProgressWidget(mockView, numberFormatProvider, trackerStub);
-		widget.startAndTrackJob("title", true, type, requestBody, tableId, mockHandler);
+		widget.startAndTrackJob("title", true, type, requestBody, mockHandler);
 		verify(mockHandler).onFailure(error);
 	}
 	
@@ -154,7 +152,7 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(1l);
 		start.setProgressTotal(0l);
-		widget.startAndTrackJob(title,false, type, requestBody, tableId, mockHandler);
+		widget.startAndTrackJob(title,false, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setIndetermianteProgress(start.getProgressMessage());
 		verify(mockView).setIndetermianteProgress(middle.getProgressMessage());
