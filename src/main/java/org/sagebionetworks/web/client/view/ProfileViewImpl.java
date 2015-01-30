@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -435,24 +436,24 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
-	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
+	private void addChallengeBadges(List<ChallengeSummary> headers, FlowPanel targetPanel) {
 		targetPanel.clear();
-		for (EntityHeader entityHeader : projectHeaders) {
-			EntityBadge badge = ginInjector.getEntityBadgeWidget();
-			badge.configure(entityHeader);
+		for (ChallengeSummary header : headers) {
+			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
+			badge.configure(header);
 			Widget widget = badge.asWidget();
 			widget.addStyleName("margin-top-5");
 			targetPanel.add(widget);
 		}
-		if (projectHeaders.isEmpty())
+		if (headers.isEmpty())
 			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
 	}
 	
 	@Override
-	public void setChallenges(List<EntityHeader> projectHeaders) {
-		if (projectHeaders.size() > 0) {
+	public void addChallenges(List<ChallengeSummary> challenges) {
+		if (challenges.size() > 0) {
 			DisplayUtils.show(challengesListItem);
-			addEntityBadges(projectHeaders, challengesTabContent);
+			addChallengeBadges(challenges, challengesTabContent);
 		}
 	}
 	

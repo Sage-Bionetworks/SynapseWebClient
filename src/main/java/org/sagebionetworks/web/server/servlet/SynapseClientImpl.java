@@ -136,7 +136,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
-import org.sagebionetworks.web.client.ChallengeTeam;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -3646,7 +3645,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-
 	}
 
 	@Override
@@ -3680,20 +3678,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getChallengeTeams(String challengeId, String userId, Integer limit, Integer offset)
+	public String getChallengeTeamSummaries(String challengeId, String userId, Integer limit, Integer offset)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<ChallengeSummary> favorites = synapseClient
-					.getChallengeSummaries(challengeId, userId, limit, offset);
-			return EntityFactory.createJSONStringForEntity(favorites);
+			PaginatedResults<ChallengeTeamSummary> teams = synapseClient
+					.getChallengeTeamSummaries(challengeId, userId, limit, offset);
+			return EntityFactory.createJSONStringForEntity(teams);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
 	
 	@Override
 	public String getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) 
@@ -3705,4 +3702,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getChallenges(userId, limit, offset);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
 }

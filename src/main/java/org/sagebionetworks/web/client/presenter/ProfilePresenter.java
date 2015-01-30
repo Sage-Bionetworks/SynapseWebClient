@@ -74,17 +74,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private GlobalApplicationState globalApplicationState;
 	
 	private ProfileFormWidget profileForm;
-	private GWTWrapper gwt;
 	private AdapterFactory adapterFactory;
 	private ProfileUpdatedCallback profileUpdatedCallback;
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private CookieProvider cookies;
-	private RequestBuilderWrapper requestBuilder;
 	private int teamNotificationCount;
 	private String currentUserId;
 	private boolean isOwner;
-	private int currentOffset;
+	private int currentProjectOffset, currentChallengeOffset;
 	public final static int PROJECT_PAGE_SIZE=100;
+	public final static int CHALLENGE_PAGE_SIZE=100;
 	public ProjectFilterEnum filterType;
 	public Team filterTeam;
 	
@@ -93,22 +90,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			CookieProvider cookieProvider,
-			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
 			ProfileFormWidget profileForm,
-			AdapterFactory adapterFactory,
-			SynapseJSNIUtils synapseJSNIUtils, 
-			RequestBuilderWrapper requestBuilder) {
+			AdapterFactory adapterFactory
+			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.gwt = gwt;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.requestBuilder = requestBuilder;
-		this.cookies = cookieProvider;
 		view.setPresenter(this);
 	}
 
@@ -218,14 +208,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			private void proceed() {
 				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
 				refreshTeams();
+				refreshChallenges();
 			}
 		});
 	}
 	
 	public void refreshProjects() {
-		currentOffset = 0;
+		currentProjectOffset = 0;
 		view.clearProjects();
 		getMoreProjects();
+	}
+	
+	public void refreshChallenges() {
+		currentChallengeOffset = 0;
+		view.clearChallenges();
+		getMoreChallenges();
 	}
 	
 	/**
@@ -246,11 +243,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			switch (filterType) {
 				case ALL:
 					view.setAllProjectsFilterSelected();
-					getAllMyProjects(currentOffset);
+					getAllMyProjects(currentProjectOffset);
 					break;
 				case MINE:
 					view.setMyProjectsFilterSelected();
-					getProjectsCreatedByMe(currentOffset);
+					getProjectsCreatedByMe(currentProjectOffset);
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
@@ -258,13 +255,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					break;
 				case TEAM:
 					view.setTeamsFilterSelected();
-					getTeamProjects(currentOffset);
+					getTeamProjects(currentProjectOffset);
 					break;
 				default:
 					break;
 			}
 		} else
-			getUserProjects(currentOffset);
+			getUserProjects(currentProjectOffset);
 	}
 	
 	@Override
@@ -273,10 +270,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clearTeamNotificationCount();
 		if (isOwner)
 			view.refreshTeamInvites();
-		getTeamsAndChallenges(currentUserId);
+		getTeams(currentUserId);
 	}
 	
-	public void getTeamsAndChallenges(String userId) {
+	public void getTeams(String userId) {
 		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -285,102 +282,25 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(List<Team> teams) {
 				view.setTeams(teams,isOwner);
-				getChallenges(teams);
 				view.setTeamsFilterVisible(!teams.isEmpty());
 			}
 		};
 		TeamListWidget.getTeams(userId, synapseClient, adapterFactory, teamCallback);
 	}
 	
-	public void getChallenges(List<Team> teams) {
-		//show challenges associated with the user
-		getChallengeProjectIds(teams);
-	}
 	
-	public void getChallengeProjectIds(final List<Team> myTeams) {
-		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObjectAdapter>() {
+	public void getMoreChallenges() {
+		view.showChallengesLoading(true);
+		synapseClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<ChallengePagedResults>() {
 			@Override
-			public void invoke(JSONObjectAdapter mapping) {
-				Set<String> challengeEntities = new HashSet<String>();
-				for (Team team : myTeams) {
-					if (mapping.has(team.getId())) {
-						try {
-							challengeEntities.add(mapping.getString(team.getId()));
-						} catch (JSONObjectAdapterException e) {
-							//problem with one of the mapping entries
-						}
-					}
-				}
-				getChallengeProjectHeaders(challengeEntities);
+			public void onSuccess(ChallengePagedResults challengeResults) {
+				addChallengeResults(challengeResults.getResults());
+				challengePageAdded(challengeResults.getTotalNumberOfResults());
 			}
-		});
-	}
-	
-	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObjectAdapter> callback) {
-		String responseText = cookies.getCookie(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE);
-		
-		if (responseText != null) {
-			parseTeam2ChallengeWhitelist(responseText, callback);
-			return;
-		}
-		requestBuilder.configure(RequestBuilder.GET, DisplayUtils.createRedirectUrl(synapseJSNIUtils.getBaseFileHandleUrl(), gwt.encodeQueryString(ClientProperties.TEAM2CHALLENGE_WHITELIST_URL)));
-	     try
-	     {
-	    	 requestBuilder.sendRequest(null, new RequestCallback() {
-	            @Override
-	            public void onError(Request request, Throwable exception) 
-	            {
-	            	//do nothing, may or may not have any challenges
-	            }
-
-	            @Override
-	            public void onResponseReceived(Request request,Response response) 
-	            {
-	            	String responseText = response.getText();
-	            	Date expires = new Date(System.currentTimeMillis() + 1000*60*60*24); // store for a day
-	            	cookies.setCookie(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE, responseText, expires);
-	            	parseTeam2ChallengeWhitelist(responseText, callback);
-	            }
-
-	         });
-	     }
-	     catch (Exception e){
-         	//failed to load my challenges
-	    	 view.setChallengesError("Could not load Challenges: " + e.getMessage());
-	     }
-	}
-	
-	private void parseTeam2ChallengeWhitelist(String responseText, CallbackP<JSONObjectAdapter> callback){
-		try {
-			callback.invoke(adapterFactory.createNew(responseText));
-		} catch (Throwable e) {
-			//just in case there is a parsing exception
-		}
-	}
-	
-	public void getChallengeProjectHeaders(final Set<String> challengeProjectIdsSet) {
-		List<String> challengeProjectIds = new ArrayList<String>();
-		challengeProjectIds.addAll(challengeProjectIdsSet);
-		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<ArrayList<EntityHeader>>() {
-			
-			@Override
-			public void onSuccess(ArrayList<EntityHeader> headers) {
-					//finally, we can tell the view to update the user challenges based on these entity headers
-					
-					//sort by name
-					Collections.sort(headers, new Comparator<EntityHeader>() {
-				        @Override
-				        public int compare(EntityHeader o1, EntityHeader o2) {
-				        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-				        }
-					});
-					
-					view.setChallenges(headers);
-				}	
-			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setChallengesError("Could not load Challenges:" + caught.getMessage());
+				view.showChallengesLoading(false);
+				view.setChallengesError("Could not load challenges:" + caught.getMessage());
 			}
 		});
 	}
@@ -458,10 +378,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.addProjects(headers);
 	}
 	
-	public void projectPageAdded(int totalNumberOfResults) {
-		currentOffset += PROJECT_PAGE_SIZE;
-		view.setIsMoreProjectsVisible(currentOffset < totalNumberOfResults);
+	public void addChallengeResults(List<ChallengeSummary> headers) {
+		view.showChallengesLoading(false);
+		view.addChallenges(headers);
 	}
+	
+	public void projectPageAdded(int totalNumberOfResults) {
+		currentProjectOffset += PROJECT_PAGE_SIZE;
+		view.setIsMoreProjectsVisible(currentProjectOffset < totalNumberOfResults);
+	}
+	
+	public void challengePageAdded(int totalNumberOfResults) {
+		currentChallengeOffset += CHALLENGE_PAGE_SIZE;
+		view.setIsMoreChallengesVisible(currentChallengeOffset < totalNumberOfResults);
+	}
+
 	
 	public void getFavorites() {
 		view.showProjectsLoading(true);
@@ -637,7 +568,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			//update team notification count
 			if (teamNotificationCount > 0)
 				view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
-}
+		}
 	}
 
 	@Override
@@ -663,7 +594,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @return
 	 */
 	public int getCurrentOffset() {
-		return currentOffset;
+		return currentProjectOffset;
 	}
 
 	/**
@@ -671,7 +602,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @return
 	 */
 	public void setCurrentOffset(int currentOffset) {
-		this.currentOffset = currentOffset;
+		this.currentProjectOffset = currentOffset;
 	}
 	
 	/**

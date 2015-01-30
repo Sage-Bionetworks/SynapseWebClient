@@ -77,11 +77,11 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 			public void onSuccess(String result) {
 				try {
 					view.hideLoading();
-					PaginatedResults<ChallengeSummary> challenges = nodeModelCreator.createPaginatedResults(result, ChallengeSummary.class);
+					PaginatedResults<ChallengeTeamSummary> challenges = nodeModelCreator.createPaginatedResults(result, ChallengeTeamSummary.class);
 					if (challenges.getTotalNumberOfResults() > 0) {
 						//configure the pager, and the challenge list
 						paginationWidget.configure(DEFAULT_TEAM_LIMIT, newOffset, challenges.getTotalNumberOfResults(), ChallengeTeamsWidget.this);
-						for (ChallengeSummary challenge : challenges.getResults()) {
+						for (ChallengeTeamSummary challenge : challenges.getResults()) {
 							view.addChallengeTeam(challenge.getTeamId(), 
 								DisplayUtils.replaceWithEmptyStringIfNull(challenge.getMessage()), 
 								challenge.getCanUserEdit());

@@ -533,6 +533,7 @@ public interface SynapseClient extends RemoteService {
 	ChallengeTeam registerChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException;
 	void unregisterChallengeTeam(String challengeId, String teamId) throws RestServiceException;
 	ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException;
-	String getChallengeTeams(String challengeId, String userId, Integer limit, Integer offset) throws RestServiceException;
+	String getChallengeTeamSummaries(String challengeId, String userId, Integer limit, Integer offset) throws RestServiceException;
 	String getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) throws RestServiceException;
+	ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset) throws RestServiceException;
 }

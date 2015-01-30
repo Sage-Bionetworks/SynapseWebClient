@@ -108,6 +108,8 @@ import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView;
@@ -1060,5 +1062,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RegisterTeamDialogView.class).to(RegisterTeamDialogViewImpl.class);
 		bind(EditRegisteredTeamDialogView.class).to(EditRegisteredTeamDialogViewImpl.class);
 		bind(ChallengeTeamsView.class).to(ChallengeTeamsViewImpl.class);
+		bind(ChallengeBadgeView.class).to(ChallengeBadgeViewImpl.class);
 	}
 }
