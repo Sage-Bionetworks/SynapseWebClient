@@ -40,6 +40,9 @@ import com.google.inject.Inject;
 
 public class TeamViewImpl extends Composite implements TeamView {
 
+	private static final String PUBLIC_JOIN_TEXT = "People can join this team without team captain authorization";
+
+
 	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
 
 	@UiField
@@ -216,7 +219,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		descriptionField.getElement().setAttribute("placeholder", DisplayConstants.SHORT_TEAM_DESCRIPTION);
 		descriptionField.addStyleName("col-md-12 margin-left-10 margin-bottom-10");
 		form.add(DisplayUtils.wrap(descriptionField));
-		final CheckBox publicJoinCb = new CheckBox("People can join this team without team administrator authorization");
+		final CheckBox publicJoinCb = new CheckBox(PUBLIC_JOIN_TEXT);
 		boolean isPublicJoin = TeamSearchPresenter.getCanPublicJoin(team);
 		publicJoinCb.setValue(isPublicJoin);
 		FlowPanel cbPanel = new FlowPanel();
