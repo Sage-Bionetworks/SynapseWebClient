@@ -36,6 +36,8 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	Anchor anchor;
 	@UiField
 	Span additionalText;
+	@UiField
+	Span additionalTextUI;
 	
 	boolean isPopoverInitialized;
 	boolean isPopover;
@@ -76,12 +78,16 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	}
 	
 	@Override
-	public void setProject(String projectName, String projectId, String text) {
+	public void setProject(String projectName, String projectId) {
 		isPopoverInitialized = false;
 		tooltip.setIsHtml(true);
 		tooltip.setTitle(projectName);
 		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 		anchor.setText(projectName);
+	}
+	
+	@Override
+	public void setLastActivityText(String text) {
 		additionalText.setText(text);
 	}
 	
@@ -113,6 +119,11 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 			});
 		}
 		tooltip.show();
+	}
+	
+	@Override
+	public void setLastActivityVisible(boolean isVisible) {
+		additionalTextUI.setVisible(isVisible);
 	}
 	
 	@Override

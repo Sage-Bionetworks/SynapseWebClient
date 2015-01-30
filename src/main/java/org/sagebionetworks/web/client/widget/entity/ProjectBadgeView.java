@@ -13,7 +13,9 @@ public interface ProjectBadgeView extends IsWidget {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-	void setProject(String projectName, String projectId, String text);
+	void setProject(String projectName, String projectId);
+	void setLastActivityText(String text);
+	void setLastActivityVisible(boolean isVisible);
 	
 	/**
 	 * Presenter interface

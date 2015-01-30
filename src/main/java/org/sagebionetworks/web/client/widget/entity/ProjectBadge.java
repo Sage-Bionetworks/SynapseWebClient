@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Date;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -51,14 +49,16 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 	
 	public void configure(ProjectHeader header) {
 		this.header = header;
+		view.setLastActivityVisible(false);
 		if (header != null) {
-			String lastActivityDateString = "";
 			if (header.getLastActivity() != null) {
 				try {
-					lastActivityDateString = DisplayUtils.converDateaToSimpleString(header.getLastActivity());
+					String dateString = DisplayUtils.converDateaToSimpleString(header.getLastActivity());
+					view.setLastActivityVisible(true);
+					view.setLastActivityText(dateString);
 				} catch(Exception e) {};
 			}
-			view.setProject(header.getName(), header.getId(), lastActivityDateString);
+			view.setProject(header.getName(), header.getId());
 		}
 	}
 	

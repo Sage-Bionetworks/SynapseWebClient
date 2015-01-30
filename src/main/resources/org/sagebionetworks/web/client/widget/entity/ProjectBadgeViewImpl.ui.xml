@@ -9,8 +9,11 @@
 	<bh:Div>
 		<g:Image resource='{iconsImageBundle.synapseProject16}' addStyleNames="displayInline margin-right-5" />
 		<b:Tooltip text="..." placement="RIGHT" ui:field="tooltip" trigger="MANUAL" container="body">
-			<g:Anchor ui:field="anchor" styleName="displayInline"/>
+			<g:Anchor ui:field="anchor" addStyleNames="displayInline"/>
 		</b:Tooltip>
-		<bh:Span ui:field="additionalText" addStyleNames="smallGreyText"></bh:Span>
+		<bh:Span ui:field="additionalTextUI" addStyleNames="margin-left-5">
+			<bh:Span addStyleNames="smallGreyText">Last activity on: </bh:Span>
+			<bh:Span ui:field="additionalText" addStyleNames="smallGreyText"></bh:Span>
+		</bh:Span>
 	</bh:Div>
 </ui:UiBinder>
