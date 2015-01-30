@@ -2,30 +2,25 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.widget.team.TeamBadge;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * View that contains a list of challenge teams
+ * View that contains a list of challenge participants
  * @author jayhodgson
  *
  */
-public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
+public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView {
 	
-	public interface Binder extends	UiBinder<Widget, ChallengeTeamsViewImpl> {}
+	public interface Binder extends	UiBinder<Widget, ChallengeParticipantsViewImpl> {}
 
 	private Presenter presenter;
 	PortalGinInjector ginInjector;
@@ -33,9 +28,7 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 	@UiField
 	Div paginationWidgetContainer;
 	@UiField
-	Div dialogWidgetContainer;
-	@UiField
-	Div challengeTeamsContainer;
+	Div participantsContainer;
 	
 	@UiField
 	Div loadingUI;
@@ -48,7 +41,7 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 	Widget widget;
 	
 	@Inject
-	public ChallengeTeamsViewImpl(Binder binder, PortalGinInjector ginInjector) {
+	public ChallengeParticipantsViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
 	}
@@ -63,38 +56,16 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 		return widget;
 	}
 	@Override
-	public void clearTeams() {
-		challengeTeamsContainer.clear();
+	public void clearParticipants() {
+		participantsContainer.clear();
 	}
-	
 	@Override
-	public void addChallengeTeam(final String teamId, final String message, boolean showEditButton) {
-		Div div = new Div();
-		TeamBadge newTeamBadge = ginInjector.getTeamBadgeWidget();
-		newTeamBadge.configure(teamId);
-		Span messageSpan = new Span();
-		messageSpan.addStyleName("greyText-imp");
-		messageSpan.setText(DisplayUtils.replaceWithEmptyStringIfNull(message));
-		
-		div.add(newTeamBadge.asWidget());
-		div.add(messageSpan.asWidget());
-		if (showEditButton) {
-			Button editButton = new Button("", IconType.EDIT, new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.onEdit(teamId, message);
-				}
-			});
-			div.add(editButton);
-		}
-		challengeTeamsContainer.add(div);
+	public void addParticipant(String userId) {
+		UserBadge userBadge = ginInjector.getUserBadgeWidget();
+		userBadge.configure(userId);
+		participantsContainer.add(userBadge.asWidget());
 	}
-	
-	@Override
-	public void setEditRegisteredTeamDialog(Widget dialogWidget) {
-		dialogWidgetContainer.clear();
-		dialogWidgetContainer.add(dialogWidget);
-	}
+
 	@Override
 	public void setPaginationWidget(Widget paginationWidget) {
 		paginationWidgetContainer.clear();
@@ -103,7 +74,7 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 	
 	@Override
 	public void clear() {
-		clearTeams();
+		clearParticipants();
 		hideErrors();
 	}
 	

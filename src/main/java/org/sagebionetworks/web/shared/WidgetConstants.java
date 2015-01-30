@@ -149,7 +149,9 @@ public class WidgetConstants {
 	
 	public static final String REGISTER_CHALLENGE_TEAM_CONTENT_TYPE="registerChallengeTeam";
 	public static final String CHALLENGE_TEAMS_CONTENT_TYPE = "challengeTeams";
+	public static final String CHALLENGE_PARTICIPANTS_CONTENT_TYPE = "challengeParticipants";
 	public static final String CHALLENGE_ID_KEY = "challengeId";
+	public static final String IS_IN_CHALLENGE_TEAM_KEY = "isInTeam";
 	
 	public static final String BOOKMARK_KEY = "bookmarkID";
 	public static final String REFERENCE_FOOTNOTE_KEY = "footnoteId";

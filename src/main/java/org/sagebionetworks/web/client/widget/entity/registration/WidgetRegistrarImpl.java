@@ -155,6 +155,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getRegisterChallengeTeamWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_TEAMS_CONTENT_TYPE)) {
 			presenter = ginInjector.getChallengeTeamsWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
+			presenter = ginInjector.getChallengeParticipantsWidget();
 		}	 
 		//TODO: add other widget descriptors to this mapping as they become available
 		

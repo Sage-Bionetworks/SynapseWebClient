@@ -239,6 +239,7 @@ public interface PortalGinInjector extends Ginjector {
 	public TableQueryResultWikiWidget getSynapseTableQueryResultWikiWidget();
 	public RegisterChallengeTeamWidget getRegisterChallengeTeamWidget();
 	public ChallengeTeamsWidget getChallengeTeamsWidget();
+	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();

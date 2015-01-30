@@ -3693,4 +3693,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	
+	@Override
+	public String getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) 
+			throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return synapseClient.getChallengeParticipants(affiliated, challengeId, limit, offset);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 }
