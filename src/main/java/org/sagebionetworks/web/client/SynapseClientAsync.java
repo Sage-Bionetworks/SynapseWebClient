@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -53,6 +54,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface SynapseClientAsync {
 
 	void getEntity(String entityId, AsyncCallback<EntityWrapper> callback);
+	
+	void getProject(String projectId,AsyncCallback<Project> callback);
 	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<EntityWrapper> callback);
 	

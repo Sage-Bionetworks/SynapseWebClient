@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -58,6 +59,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface SynapseClient extends RemoteService {
 
 	public EntityWrapper getEntity(String entityId) throws RestServiceException;
+	
+	public Project getProject(String projectId) throws RestServiceException;
 	
 	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
 		
