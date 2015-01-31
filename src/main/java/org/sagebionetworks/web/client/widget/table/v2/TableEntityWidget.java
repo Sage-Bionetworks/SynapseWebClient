@@ -287,7 +287,7 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onDownloadResults() {
-		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL());
+		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL(), this.tableId);
 		downloadTableQueryModalWidget.showModal();
 	}
 	

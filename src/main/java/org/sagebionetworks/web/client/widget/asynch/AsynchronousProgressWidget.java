@@ -49,12 +49,12 @@ public class AsynchronousProgressWidget implements
 	 */
 	@Override
 	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody,
-			final AsynchronousProgressHandler handler) {
+			String tableId, final AsynchronousProgressHandler handler) {
 		this.isDeterminate = isDeterminate;
 		view.setTitle(title);
 		view.setIsDetermiante(isDeterminate);
 		// Configure this job
-		jobTracker.startAndTrack(type, requestBody, WAIT_MS, new UpdatingAsynchProgressHandler() {
+		jobTracker.startAndTrack(type, requestBody, tableId, WAIT_MS, new UpdatingAsynchProgressHandler() {
 					@Override
 					public void onFailure(Throwable failure) {
 						handler.onFailure(failure);

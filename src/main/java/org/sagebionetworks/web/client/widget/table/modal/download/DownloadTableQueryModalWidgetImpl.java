@@ -27,8 +27,8 @@ public class DownloadTableQueryModalWidgetImpl implements DownloadTableQueryModa
 
 
 	@Override
-	public void configure(String sql) {
-		this.createDownloadPage.configure(sql);
+	public void configure(String sql, String tableId) {
+		this.createDownloadPage.configure(sql, tableId);
 	}
 
 

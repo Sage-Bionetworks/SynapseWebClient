@@ -20,5 +20,5 @@ public interface JobTrackingWidget extends IsWidget {
 	 * @param requestBody  The body of the job request.
 	 * @param handler Handles the job results.
 	 */
-	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody,	AsynchronousProgressHandler handler);
+	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody,	String tableId, AsynchronousProgressHandler handler);
 }
