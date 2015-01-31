@@ -79,26 +79,19 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback) {
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+		synapseClient.getProject(entityId, new AsyncCallback<Project>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					final Project entity = new Project(adapterFactory.createNew(result.getEntityJson()));
-					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-						@Override
-						public void onSuccess(UserProfile profile) {
-							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile), false));		
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-					});
-						
-					
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(final Project result) {
+				UserBadge.getUserProfile(result.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+					@Override
+					public void onSuccess(UserProfile profile) {
+						callback.onSuccess(ProvUtils.entityToKeyValueDisplay(result, DisplayUtils.getDisplayName(profile), false));		
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);
+					}
+				});
 			}
 			@Override
 			public void onFailure(Throwable caught) {
