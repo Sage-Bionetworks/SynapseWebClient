@@ -66,11 +66,7 @@ public class ProjectBadgeTest {
 	}
 	
 	private void setupEntity(Project entity, Date lastActivityDate) throws JSONObjectAdapterException {
-		EntityWrapper wrapper = new EntityWrapper();
-		String entityJson = entity.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		wrapper.setEntityJson(entityJson);
-		wrapper.setEntityClassName(entity.getClass().getName());
-		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getProject(anyString(), any(AsyncCallback.class));
 		ProjectHeader header = new ProjectHeader();
 		header.setId(entity.getId());
 		header.setName(entity.getName());
@@ -123,7 +119,7 @@ public class ProjectBadgeTest {
 		setupEntity(new Project(), null);
 		//failure to get entity
 		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getProject(anyString(), any(AsyncCallback.class));
 		widget.getInfo(getInfoCallback);
 		//exception should be passed back to callback
 		verify(getInfoCallback).onFailure(eq(ex));
