@@ -23,6 +23,7 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 	// Configured values
 	String sql;
 	ModalPresenter presenter;
+	String tableId;
 	
 	@Inject
 	public CreateDownloadPageImpl(CreateDownloadPageView view, JobTrackingWidget jobTrackingWidget, DownloadFilePage nextPage) {
@@ -40,7 +41,7 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 		
 		DownloadFromTableRequest request = getDownloadFromTableRequest();
 		
-		this.jobTrackingWidget.startAndTrackJob(CREATING_THE_FILE, false, AsynchType.TableCSVDownload, request, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob(CREATING_THE_FILE, false, AsynchType.TableCSVDownload, request, tableId, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {
@@ -86,8 +87,9 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 	}
 
 	@Override
-	public void configure(String sql) {
+	public void configure(String sql, String tableId) {
 		this.sql = sql;
+		this.tableId = tableId;
 	}
 	
 	/**
