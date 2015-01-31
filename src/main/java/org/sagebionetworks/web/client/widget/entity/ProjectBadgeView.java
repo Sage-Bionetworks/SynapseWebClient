@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Date;
+
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
@@ -16,6 +18,7 @@ public interface ProjectBadgeView extends IsWidget {
 	void setProject(String projectName, String projectId);
 	void setLastActivityText(String text);
 	void setLastActivityVisible(boolean isVisible);
+	String getSimpleDateString(Date date);
 	
 	/**
 	 * Presenter interface

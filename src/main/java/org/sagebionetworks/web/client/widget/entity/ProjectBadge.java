@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -53,7 +54,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		if (header != null) {
 			if (header.getLastActivity() != null) {
 				try {
-					String dateString = DisplayUtils.converDateaToSimpleString(header.getLastActivity());
+					String dateString = view.getSimpleDateString(header.getLastActivity());
 					view.setLastActivityVisible(true);
 					view.setLastActivityText(dateString);
 				} catch(Exception e) {};
@@ -82,12 +83,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				try {
-					final Entity entity = AdapterUtils.getEntityForBadgeInfo(adapterFactory, result.getEntityClassName(), result.getEntityJson());
-					if (entity == null) {
-						callback.onFailure(new IllegalArgumentException("The class " + result.getEntityClassName() + " is not supported for entity badge detailed information."));
-						return;
-					}
-					
+					final Project entity = new Project(adapterFactory.createNew(result.getEntityJson()));
 					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 						@Override
 						public void onSuccess(UserProfile profile) {

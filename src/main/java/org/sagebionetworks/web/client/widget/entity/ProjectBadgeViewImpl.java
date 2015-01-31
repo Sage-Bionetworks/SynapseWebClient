@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Date;
+
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -84,6 +86,11 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 		tooltip.setTitle(projectName);
 		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 		anchor.setText(projectName);
+	}
+	
+	@Override
+	public String getSimpleDateString(Date date) {
+		return DisplayUtils.converDateaToSimpleString(date);
 	}
 	
 	@Override
