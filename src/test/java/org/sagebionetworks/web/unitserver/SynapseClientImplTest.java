@@ -73,6 +73,7 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
@@ -669,6 +670,17 @@ public class SynapseClientImplTest {
 		ExampleEntity updatedEntity = arg.getValue();
 		List<AttachmentData> attachments = updatedEntity.getAttachments();
 		assertTrue(attachments.size() == 1 && attachments.get(0).equals(attachment1));
+	}
+	
+	@Test
+	public void testGetProjectById() throws Exception {
+		String projectId = "syn1029";
+		Project project =  new Project();
+		project.setId(projectId);
+		when(mockSynapse.getEntityById(projectId)).thenReturn(project);
+		
+		Project actualProject = synapseClient.getProject(projectId);
+		assertEquals(project, actualProject);
 	}
 	
 	@Test

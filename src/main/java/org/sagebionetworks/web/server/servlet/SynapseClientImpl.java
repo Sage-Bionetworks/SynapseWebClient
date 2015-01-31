@@ -64,6 +64,7 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
@@ -285,9 +286,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/*
 	 * SynapseClient Service Methods
 	 */
+	@Deprecated
 	@Override
 	public EntityWrapper getEntity(String entityId) throws RestServiceException {
 		return getEntityForVersion(entityId, null);
+	}
+	
+	public Project getProject(String projectId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return (Project) synapseClient.getEntityById(projectId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 
 	@Override

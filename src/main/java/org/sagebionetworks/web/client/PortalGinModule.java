@@ -144,6 +144,8 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
@@ -1051,6 +1053,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AccessRequirementDialogView.class).to(AccessRequirementDialogViewImpl.class);
 		
 		bind(ImageParamsPanelView.class).to(ImageParamsPanelViewImpl.class);
+		bind(ProjectBadgeView.class).to(ProjectBadgeViewImpl.class);
 	}
 
 }
