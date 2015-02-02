@@ -3,8 +3,15 @@ package org.sagebionetworks.web.client.widget.header;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.place.Help;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.http.client.URL;
@@ -21,13 +28,12 @@ public class Header implements HeaderView.Presenter {
 	
 	private HeaderView view;
 	private AuthenticationController authenticationController;
-	private UserAccountServiceAsync userAccountService;
-	
+	private GlobalApplicationState globalApplicationState;
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController, UserAccountServiceAsync userAccountService) {
+	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.userAccountService = userAccountService;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}
 	
@@ -60,5 +66,33 @@ public class Header implements HeaderView.Presenter {
 	@Override
 	public UserSessionData getUser() {
 		return authenticationController.getCurrentUserSessionData(); 
+	}
+	@Override
+	public void onGettingStartedClick() {
+		globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));	
+	}
+	@Override
+	public void onTrashClick() {
+		globalApplicationState.getPlaceChanger().goTo(new Trash(ClientProperties.DEFAULT_PLACE_TOKEN));	
+	}
+	@Override
+	public void onLogoutClick() {
+		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));	
+	}
+	@Override
+	public void onDashboardClick() {
+		if (authenticationController.isLoggedIn()) {
+			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+		} else {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		}	
+	}
+	@Override
+	public void onLoginClick() {
+		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
+	}
+	@Override
+	public void onRegisterClick() {
+		globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));	
 	}
 }

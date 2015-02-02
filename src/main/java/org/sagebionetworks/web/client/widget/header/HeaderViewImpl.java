@@ -9,20 +9,13 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Help;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.DivElement;
@@ -42,7 +35,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
-	private static final int MAX_DISPLAY_NAME_CHARACTER_COUNT = 35;
 	private static final String HEADER_LARGE_STYLE = "largeHeader";
 	private static final String HEADER_SMALL_STYLE = "smallHeader";
 
@@ -92,7 +84,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	private Presenter presenter;
 	private AuthenticationController authenticationController;	
-	private GlobalApplicationState globalApplicationState;
 	private SearchBox searchBox;	
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
@@ -103,11 +94,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public HeaderViewImpl(Binder binder,
 			AuthenticationControllerImpl authenticationController,
 			SageImageBundle sageImageBundle,
-			GlobalApplicationState globalApplicationState, SearchBox searchBox,
+			SearchBox searchBox,
 			SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.searchBox = searchBox;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
@@ -147,43 +137,39 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		gettingStartedLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));
+				presenter.onGettingStartedClick();
 			}
 		});
 		trashLink.addClickHandler(new ClickHandler() {
     		@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Trash(ClientProperties.DEFAULT_PLACE_TOKEN));
+    			presenter.onTrashClick();
 			}
     	});
 		
 		logoutLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
+				presenter.onLogoutClick();
 			}
 		});
 		
 		dashboardButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (authenticationController.isLoggedIn()) {
-					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
-				} else {
-					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-				}
+				presenter.onDashboardClick();
 			}
 		});
 		loginLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				presenter.onLoginClick();
 			}
 		});
 		registerLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
+				presenter.onRegisterClick();
 			}
 		});
 		forumLink.addClickHandler(new ClickHandler() {
