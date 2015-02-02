@@ -197,7 +197,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Long versionNumber;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
-	private FilesBrowser filesBrowser;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
@@ -208,6 +207,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private AdministerEvaluationsList evaluationList;
 	private static int WIDGET_HEIGHT_PX = 270;
 	private String currentProjectAnchorTargetId;
+	private EntityUpdatedHandler fileBrowserUpdateHandler;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -223,7 +223,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			SynapseJSNIUtils synapseJSNIUtils,
 			AdministerEvaluationsList evaluationList,
 			PortalGinInjector ginInjector, 
-			FilesBrowser filesBrowser, 
 			MarkdownWidget markdownWidget, 
 			WikiPageWidget wikiPageWidget,
 			TableListWidget tableListWidget,
@@ -240,7 +239,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.locationableTitleBar = locationableTitleBar;
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
-		this.filesBrowser = filesBrowser;
 		this.previewWidget = previewWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
@@ -412,7 +410,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.setEntityUpdatedHandler(handler);
 		locationableTitleBar.setEntityUpdatedHandler(handler);
 		fileTitleBar.setEntityUpdatedHandler(handler);
-		EntityUpdatedHandler fileBrowserUpdateHandler = new EntityUpdatedHandler() {
+		fileBrowserUpdateHandler = new EntityUpdatedHandler() {
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 //				if (isProject)
@@ -422,7 +420,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		};
 		
-		filesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		entityMetadata.setEntityUpdatedHandler(handler);
 		fileHistoryWidget.setEntityUpdatedHandler(handler);
 		actionMenu.setEntityDeletedHandler(new EntityDeletedHandler() {			
@@ -634,7 +631,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			tab = filesListItem;
 			link = fileLink;
 			filesTabContainer.setVisible(true);
-			filesBrowser.refresh();
 		} else if(targetTab == Synapse.EntityArea.TABLES) {
 			tab = tablesListItem;
 			link = tablesLink;
@@ -802,6 +798,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private Widget createEntityFilesBrowserWidget(Entity entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
+		FilesBrowser filesBrowser = ginInjector.getFilesBrowser();
+		filesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		filesBrowser.configure(entity.getId(), canCertifiedUserAddChild, isCertifiedUser);
 		return filesBrowser.asWidget();
 	}

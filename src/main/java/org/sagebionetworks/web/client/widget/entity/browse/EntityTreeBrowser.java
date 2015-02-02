@@ -17,8 +17,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -28,7 +26,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,11 +37,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private SearchServiceAsync searchService;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private HandlerManager handlerManager = new HandlerManager(this);
 	private IconsImageBundle iconsImageBundle;
 	AdapterFactory adapterFactory;
 	EntityTypeProvider entityTypeProvider;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
+	EntitySelectedHandler handler;
 	
 	private String currentSelection;
 	
@@ -66,14 +63,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		this.iconsImageBundle = iconsImageBundle;
 		this.adapterFactory = adapterFactory;
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
-		
+		handler = null;
 		view.setPresenter(this);
 	}	
 	
 	public void clearState() {
 		view.clear();
-		// remove handlers
-		handlerManager = new HandlerManager(this);		
+		handler = null;
 	}
 	
 	public void clear() {
@@ -162,23 +158,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 		
 	@SuppressWarnings("unchecked")
-	public void addEntitySelectedHandler(EntitySelectedHandler handler) {
-		handlerManager.addHandler(EntitySelectedEvent.getType(), handler);		
-	}
-
-	@SuppressWarnings("unchecked")
-	public void removeEntitySelectedHandler(EntitySelectedHandler handler) {
-		handlerManager.removeHandler(EntitySelectedEvent.getType(), handler);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);		
-	}
-
-	@SuppressWarnings("unchecked")
-	public void removeEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.removeHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntitySelectedHandler(EntitySelectedHandler handler) {
+		this.handler = handler;
 	}
 	
 	@Override
@@ -246,7 +227,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 * Private Methods
 	 */
 	private void fireEntitySelectedEvent() {
-		handlerManager.fireEvent(new EntitySelectedEvent());
+		if (handler != null)
+			handler.onSelection(new EntitySelectedEvent());
 	}
 
 	@Override
