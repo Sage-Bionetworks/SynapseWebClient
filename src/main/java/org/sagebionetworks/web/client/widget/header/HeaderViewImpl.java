@@ -12,8 +12,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 
@@ -65,9 +63,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem restAPILink;
 	
 	@UiField
-	Anchor registerLink;
+	SimplePanel registerLinkUI;
 	@UiField
-	Anchor loginLink;
+	Button registerLink;
+	@UiField
+	SimplePanel loginLinkUI;
+	@UiField
+	Button loginLink;
 	
 	@UiField
 	Button trashLink;
@@ -83,7 +85,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SimplePanel userPicturePanel;
 	
 	private Presenter presenter;
-	private AuthenticationController authenticationController;	
 	private SearchBox searchBox;	
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
@@ -92,12 +93,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Inject
 	public HeaderViewImpl(Binder binder,
-			AuthenticationControllerImpl authenticationController,
 			SageImageBundle sageImageBundle,
 			SearchBox searchBox,
-			SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
+			SynapseJSNIUtils synapseJSNIUtils, 
+			CookieProvider cookies) {
 		this.initWidget(binder.createAndBindUi(this));
-		this.authenticationController = authenticationController;
 		this.searchBox = searchBox;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
@@ -265,12 +265,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				profilePicture.addStyleName("userProfileImage moveup-2");
 				userPicturePanel.setWidget(profilePicture);
 			}
-			loginLink.setVisible(false);
-			registerLink.setVisible(false);
+			loginLinkUI.setVisible(false);
+			registerLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 		} else {
-			loginLink.setVisible(true);
-			registerLink.setVisible(true);
+			loginLinkUI.setVisible(true);
+			registerLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
 		}
 	}

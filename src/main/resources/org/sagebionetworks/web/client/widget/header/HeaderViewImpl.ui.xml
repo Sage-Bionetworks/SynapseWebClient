@@ -18,8 +18,12 @@
 					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" addStyleNames="right margin-5" height="26px" />	
 				</b:Tooltip>
 			    <b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-5" height="26px" >@ Trash can</b:Button>
-			    <b:Anchor ui:field="loginLink" text="Log in" addStyleNames="right margin-5"/>
-				<b:Anchor ui:field="registerLink" text="Register" addStyleNames="right margin-5"/>
+			    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-5">
+					<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="26px">Log in</b:Button>
+				</g:SimplePanel>
+			    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-5">
+					<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="26px">Register</b:Button>
+				</g:SimplePanel>
 				<g:SimplePanel addStyleNames="right margin-5">
 					<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="26px">My Dashboard</b:Button>
 				</g:SimplePanel>
