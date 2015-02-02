@@ -7,10 +7,9 @@
 	<bh:Div>
 		<b:FieldSet>
 			<b:FormGroup>
-				<b:FormLabel for="url">Video URL</b:FormLabel>
-				<b:TextBox ui:field="urlField" name="url" b:id="url" />
+				<b:FormLabel for="linktext">Link text</b:FormLabel>
+				<b:TextBox ui:field="linkTextField" name="linktext" b:id="linktext" />
 			</b:FormGroup>
 		</b:FieldSet>
 	</bh:Div>
-	
 </ui:UiBinder>

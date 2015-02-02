@@ -1,76 +1,39 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.client.presenter.LoginPresenter;
 
-import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ShinySiteConfigViewImpl extends LayoutContainer implements ShinySiteConfigView {
-
+public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
+	public interface ShinySiteConfigViewImplUiBinder extends UiBinder<Widget, ShinySiteConfigViewImpl> {}
+	
 	private Presenter presenter;
-	private TextField<String> urlField;
-	private TextField<String> heightField;
+	@UiField
+	public TextBox urlField;
+	@UiField
+	public TextBox heightField;
+	
+	Widget widget;
 	
 	@Inject
-	public ShinySiteConfigViewImpl() {
+	public ShinySiteConfigViewImpl(ShinySiteConfigViewImplUiBinder binder) {
+		widget = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public void initView() {
-		//build the view
-		this.setLayout(new FlowLayout());
-		final FormPanel panel = new FormPanel();
-		panel.setHeaderVisible(false);
-		panel.setFrame(false);
-		panel.setBorders(false);
-		panel.setShadow(false);
-		panel.setLabelAlign(LabelAlign.RIGHT);
-		panel.setBodyBorder(false);
-		panel.setLabelWidth(104);
-				
-		FormData basicFormData = new FormData();
-		basicFormData.setWidth(250);
-		Margins margins = new Margins(10, 10, 0, 10);
-		basicFormData.setMargins(margins);
-
-		urlField = new TextField<String>();
-		urlField.setAllowBlank(false);
-		urlField.setRegex(WebConstants.VALID_URL_REGEX);
-		urlField.getMessages().setRegexText(DisplayConstants.INVALID_URL_MESSAGE);
-		urlField.setFieldLabel(DisplayConstants.SHINYSITE_SITE_LABEL);
-		panel.add(urlField, basicFormData);
-		
-		heightField = new TextField<String>();
-		heightField.setValue(null);
-		heightField.setEmptyText(WidgetConstants.SHINYSITE_DEFAULT_HEIGHT_PX + " (" + DisplayConstants.DEFAULT + ")");
-		heightField.setFieldLabel(DisplayConstants.DISPLAY_HEIGHT + " (px)");
-		heightField.setRegex(WebConstants.VALID_POSITIVE_NUMBER_REGEX);
-		heightField.getMessages().setRegexText(DisplayConstants.INVALID_NUMBER_MESSAGE);
-		heightField.setAllowBlank(true);
-	    panel.add(heightField, basicFormData);
-		
-		
-		add(panel);
 	}
+	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!urlField.isValid())
-			throw new IllegalArgumentException(urlField.getErrorMessage());
-		if(!ShinySiteWidget.isValidShinySite(urlField.getValue()))
-			throw new IllegalArgumentException(urlField.getValue() + DisplayConstants.INVALID_SHINY_SITE);
-		if(!heightField.isValid())
-			throw new IllegalArgumentException(heightField.getErrorMessage());
+		if (!LoginPresenter.isValidUrl(urlField.getValue(), false))
+			throw new IllegalArgumentException(DisplayConstants.INVALID_URL_MESSAGE);
 	}
 	@Override
 	public String getSiteUrl() {
@@ -98,7 +61,7 @@ public class ShinySiteConfigViewImpl extends LayoutContainer implements ShinySit
 	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 	
 	@Override 
