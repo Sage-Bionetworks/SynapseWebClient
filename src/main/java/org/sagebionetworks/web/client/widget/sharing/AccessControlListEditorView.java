@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import java.util.Map;
+
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -39,9 +41,11 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void showLoading();
 	
 	void showInfoError(String title, String message);
-
+	void setNotifyCheckboxVisible(boolean isVisible);
+	void setDeleteLocalACLButtonVisible(boolean isVisible);
 	void showInfoSuccess(String title, String message);
 	
+	void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay);
 	/**
 	 * Prompt about unsaved view changes
 	 * @param saveCallback 

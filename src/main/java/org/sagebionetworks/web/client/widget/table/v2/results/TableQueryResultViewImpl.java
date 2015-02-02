@@ -35,12 +35,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	SimplePanel rowEditorModalPanel;
 	@UiField
 	Alert errorAlert;
-	@UiField
-	Button saveRowsButton;
-	@UiField
-	Modal editRowsModal;
-	@UiField
-	Button cancelButton;
+
 
 	Widget widget;
 
@@ -54,25 +49,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
-		saveRowsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSave();
-			}
-		});
-		// Track clicks to the close button at the top of the dialog
-		editRowsModal.addCloseHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancel();
-			}
-		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancel();
-			}
-		});
 	}
 
 	@Override
@@ -106,25 +82,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	}
 
 	@Override
-	public void showEditor() {
-		editRowsModal.show();
-	}
-
-	@Override
-	public void setSaveButtonLoading(boolean isLoading) {
-		if (isLoading) {
-			this.saveRowsButton.state().loading();
-		} else {
-			this.saveRowsButton.state().reset();
-		}
-	}
-
-	@Override
-	public void hideEditor() {
-		editRowsModal.hide();
-	}
-
-	@Override
 	public void setProgressWidget(JobTrackingWidget progressWidget) {
 		this.progressPanel.add(progressWidget);
 	}
@@ -133,17 +90,4 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public void setProgressWidgetVisible(boolean visible) {
 		this.progressPanel.setVisible(visible);
 	}
-
-	@Override
-	public void showConfirmDialog(String message, final Callback callback) {
-		Bootbox.confirm(message, new ConfirmCallback() {
-			@Override
-			public void callback(boolean okay) {
-				if (okay) {
-					callback.invoke();
-				}
-			}
-		});
-	}
-
 }

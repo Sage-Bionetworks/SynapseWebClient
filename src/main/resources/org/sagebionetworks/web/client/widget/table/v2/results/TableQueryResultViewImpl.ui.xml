@@ -13,20 +13,10 @@
 				<g:SimplePanel ui:field="tablePanel" />
 				
 				<g:SimplePanel ui:field="progressPanel" />
+				
+				<g:SimplePanel ui:field="rowEditorModalPanel"/>
 
-				<!-- This modal dialog will contain the editor for query results -->
-				<b:Modal ui:field="editRowsModal" title="Edit Rows"
-					closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false"
-					b:id="editRowsModal" size="LARGE">
-					<b:ModalBody>
-						<g:SimplePanel ui:field="rowEditorModalPanel" />
-					</b:ModalBody>
-					<b:ModalFooter>
-						<b:Button ui:field="saveRowsButton" type="PRIMARY"
-							dataLoadingText="Saving...">Save</b:Button>
-						<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
-					</b:ModalFooter>
-				</b:Modal>
+
 			</b:PanelBody>
 		</b:Panel>
 	</g:HTMLPanel>

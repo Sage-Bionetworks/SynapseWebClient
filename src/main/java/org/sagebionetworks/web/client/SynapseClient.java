@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -32,7 +33,6 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -52,7 +52,6 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -60,6 +59,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface SynapseClient extends RemoteService {
 
 	public EntityWrapper getEntity(String entityId) throws RestServiceException;
+	
+	public Project getProject(String projectId) throws RestServiceException;
 	
 	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
 		
@@ -378,7 +379,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
 	public String getEvaluationAcl(String evalId) throws RestServiceException;
-	public String updateEvaluationAcl(String aclJson) throws RestServiceException;
+	public AccessControlList updateEvaluationAcl(AccessControlList acl) throws RestServiceException;
 	
 	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
 
@@ -397,8 +398,6 @@ public interface SynapseClient extends RemoteService {
 	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
-		
-	public String sendRowsToTable(String rowSet) throws RestServiceException;
 	
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
 
@@ -440,13 +439,6 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public List<SortItem> getSortFromTableQuery(String sql) throws RestServiceException;
-	/**
-	 * Apply PartialRowSet to a table entity.
-	 * 
-	 * @param deltaJson
-	 * @throws RestServiceException 
-	 */
-	public void applyTableDelta(PartialRowSet delta) throws RestServiceException;
 	
 	/**
 	 * Start a new Asynchronous job of a the given type with the provided request JSON.
@@ -455,7 +447,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body) throws RestServiceException;
+	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId) throws RestServiceException;
 	
 	/**
 	 * Get the results of an Asynchronous job identified by the provided jobId.
@@ -466,7 +458,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws ResultNotReadyException Thrown when the job is not ready.  The status JOSN of this exception
 	 * is of type AsynchronousJobStatus.
 	 */
-	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId) throws RestServiceException, ResultNotReadyException;
+	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, String tableId) throws RestServiceException, ResultNotReadyException;
 
 	/**
 	 * Execute a generic entity entity query.

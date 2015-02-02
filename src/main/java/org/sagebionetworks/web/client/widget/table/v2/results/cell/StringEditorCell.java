@@ -7,4 +7,10 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
  */
 public interface StringEditorCell extends CellEditor {
 
+	/**
+	 * The max size of a string.
+	 * @param maximumSize
+	 */
+	void setMaxSize(Long maximumSize);
+
 }

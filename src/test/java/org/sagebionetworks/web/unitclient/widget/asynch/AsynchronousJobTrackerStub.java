@@ -36,7 +36,7 @@ public class AsynchronousJobTrackerStub implements AsynchronousJobTracker {
 	}
 
 	@Override
-	public void startAndTrack(AsynchType type, AsynchronousRequestBody requestBody,
+	public void startAndTrack(AsynchType type, AsynchronousRequestBody requestBody, String tableId,
 			int waitTimeMS, UpdatingAsynchProgressHandler handler) {
 		this.waitTimeMS = waitTimeMS;
 		this.handler = handler;

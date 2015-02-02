@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -28,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,6 +64,7 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
@@ -115,17 +112,15 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
-import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import  org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -153,7 +148,6 @@ import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -168,7 +162,6 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.table.CellAddress;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -292,9 +285,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/*
 	 * SynapseClient Service Methods
 	 */
+	@Deprecated
 	@Override
 	public EntityWrapper getEntity(String entityId) throws RestServiceException {
 		return getEntityForVersion(entityId, null);
+	}
+	
+	public Project getProject(String projectId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return (Project) synapseClient.getEntityById(projectId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 
 	@Override
@@ -588,7 +591,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			new PortalVersionHolder();
 			entry.setLabel("SWC/" + PortalVersionHolder.getVersionInfo() + "/" + outputLabel);
-			entry.setMessage(message);
+			String userId = "";
+			UserProfile profile = synapseClient.getMyProfile();
+			if (profile != null) {
+				userId = "userId="+profile.getOwnerId()+" ";
+			}
+			entry.setMessage(userId+message);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2985,19 +2993,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public String updateEvaluationAcl(String aclJson)
+	public AccessControlList updateEvaluationAcl(AccessControlList acl)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			AccessControlList acl = jsonEntityFactory.createEntity(aclJson,
-					AccessControlList.class);
-			AccessControlList updatedacl = synapseClient
-					.updateEvaluationAcl(acl);
-			JSONObjectAdapter json = updatedacl
-					.writeToJSONObject(adapterFactory.createNew());
-			return json.toJSONString();
+			return synapseClient.updateEvaluationAcl(acl);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -3250,21 +3250,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String sendRowsToTable(String rowSet) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			RowSet toAppend = new RowSet(adapterFactory.createNew(rowSet));
-			RowReferenceSet refSet = synapseClient.appendRowsToTable(toAppend);
-			return refSet.writeToJSONObject(adapterFactory.createNew())
-					.toJSONString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	@Override
 	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
 			throws RestServiceException {
 		initHelpPagesMap();
@@ -3446,16 +3431,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public void applyTableDelta(PartialRowSet delta) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try{
-			synapseClient.appendPartialRowsToTable(delta);
-		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
 	public void validateTableQuery(String sql) throws RestServiceException {
 		try {
 			TableQueryParser.parserQuery(sql);
@@ -3485,22 +3460,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	
 	@Override
-	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body )
+	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId )
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body);
+			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body, tableId);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	@Override
-	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId)
+	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, String tableId)
 			throws RestServiceException, ResultNotReadyException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId);
+			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId, tableId);
 		} catch (SynapseResultNotReadyException e){
 			// This occurs when the job is not ready.
 			// Re-throw the ResultNotReadyException with the status JSON.

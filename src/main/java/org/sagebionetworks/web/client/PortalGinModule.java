@@ -144,6 +144,8 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
@@ -316,8 +318,8 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorView;
-import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorViewImpl;
+import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
@@ -722,11 +724,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AccessControlListModalWidget.class).to(AccessControlListModalWidgetImpl.class);
 		bind(AccessControlListModalWidgetView.class).to(AccessControlListModalWidgetViewImpl.class);
 		
+		bind(EvaluationAccessControlListModalWidget.class).to(EvaluationAccessControlListModalWidgetImpl.class);
+		
 		// Sharing Permissions Grid
 		bind(SharingPermissionsGridView.class).to(SharingPermissionsGridViewImpl.class);
 		
-		// Evaluation ACL Editor
-		bind(EvaluationAccessControlListEditorView.class).to(EvaluationAccessControlListEditorViewImpl.class);
 		
 		// basic pagination
 		bind(BasicPaginationView.class).to(BasicPaginationViewImpl.class);
@@ -1051,6 +1053,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AccessRequirementDialogView.class).to(AccessRequirementDialogViewImpl.class);
 		
 		bind(ImageParamsPanelView.class).to(ImageParamsPanelViewImpl.class);
+		bind(ProjectBadgeView.class).to(ProjectBadgeViewImpl.class);
 	}
 
 }
