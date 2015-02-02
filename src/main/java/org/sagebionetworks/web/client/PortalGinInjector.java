@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -293,6 +294,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeBadge getChallengeBadgeWidget();
 	
 	public EntityBadge getEntityBadgeWidget();
+	public ProjectBadge getProjectBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
 
 	public UserGroupListWidget getUserGroupListWidget();

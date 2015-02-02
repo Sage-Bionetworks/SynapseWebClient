@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -30,7 +31,6 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -54,6 +54,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface SynapseClientAsync {
 
 	void getEntity(String entityId, AsyncCallback<EntityWrapper> callback);
+	
+	void getProject(String projectId,AsyncCallback<Project> callback);
 	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<EntityWrapper> callback);
 	
@@ -326,8 +328,6 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
-	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
@@ -344,13 +344,6 @@ public interface SynapseClientAsync {
 	 */
 	void setTableSchema(TableEntity entity, List<ColumnModel> newSchema,
 			AsyncCallback<Void> callback);
-	
-	/**
-	 * Apply a PartialRowSet to a table.
-	 * @param deltaJson
-	 * @param callback
-	 */
-	void applyTableDelta(PartialRowSet delta, AsyncCallback<Void> callback);
 	
 	/**
 	 * Validate a table query.
@@ -386,10 +379,10 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void startAsynchJob(AsynchType type, AsynchronousRequestBody body,
+	void startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId,
 			AsyncCallback<String> callback);
 
-	void getAsynchJobResults(AsynchType type, String jobId,
+	void getAsynchJobResults(AsynchType type, String jobId, String tableId,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
 	void executeEntityQuery(EntityQuery query,

@@ -15,6 +15,6 @@ public interface CreateDownloadPage extends ModalPage {
 	 * Configure this widget before using it.
 	 * @param sql
 	 */
-	public void configure(String sql);
+	public void configure(String sql, String tableId);
 
 }

@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -419,15 +420,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
-		//TODO: replace with ProjectBadges that will show more information (once additional information is available in the ProjectHeader)
+		//uses ProjectBadge to show more information (additional info available from ProjectHeader)
 		for (ProjectHeader projectHeader : projectHeaders) {
-			EntityHeader entityHeaderWrapper = new EntityHeader();
-			entityHeaderWrapper.setId(projectHeader.getId());
-			entityHeaderWrapper.setName(projectHeader.getName());
-			entityHeaderWrapper.setType("project");
-			
-			EntityBadge badge = ginInjector.getEntityBadgeWidget();
-			badge.configure(entityHeaderWrapper);
+			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
+			badge.configure(projectHeader);
 			Widget widget = badge.asWidget();
 			widget.addStyleName("margin-bottom-10 col-xs-12");
 			targetPanel.add(widget);

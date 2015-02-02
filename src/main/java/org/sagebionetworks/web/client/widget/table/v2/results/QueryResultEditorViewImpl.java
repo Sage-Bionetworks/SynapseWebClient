@@ -4,12 +4,18 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -24,11 +30,14 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	
 	public interface Binder extends UiBinder<Widget, QueryResultEditorViewImpl> {}
 
-	
+	@UiField
+	HTMLPanel editorPanel;
 	@UiField
 	ButtonToolBar buttonToolbar;
 	@UiField
 	SimplePanel tablePanel;
+	@UiField
+	SimplePanel progressPanel;
 	@UiField
 	Button addRowButton;
 	@UiField
@@ -45,8 +54,14 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	Button deleteSelectedButton;
 	@UiField
 	Alert errorAlert;
-	Presenter presenter;
+	@UiField
+	Button saveRowsButton;
+	@UiField
+	Modal editRowsModal;
+	@UiField
+	Button cancelButton;
 	
+	Presenter presenter;
 	Widget widget;
 	
 	@Inject
@@ -99,6 +114,25 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 				presenter.onDeleteSelected();
 			}
 		});
+		saveRowsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onSave();
+			}
+		});
+		// Track clicks to the close button at the top of the dialog
+		editRowsModal.addCloseHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onCancel();
+			}
+		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onCancel();
+			}
+		});
 	}
 
 	@Override
@@ -125,6 +159,52 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	@Override
 	public void setErrorMessageVisible(boolean visible) {
 		errorAlert.setVisible(visible);
+	}
+
+	@Override
+	public void setProgressWidget(IsWidget progress) {
+		progressPanel.add(progress);
+	}
+
+	@Override
+	public void setEditorPanelVisible(boolean visible) {
+		this.editorPanel.setVisible(visible);
+	}
+
+	@Override
+	public void setProgressPanelVisible(boolean visible) {
+		this.progressPanel.setVisible(visible);
+	}
+	
+	@Override
+	public void showConfirmDialog(String message, final Callback callback) {
+		Bootbox.confirm(message, new ConfirmCallback() {
+			@Override
+			public void callback(boolean okay) {
+				if (okay) {
+					callback.invoke();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void showEditor() {
+		editRowsModal.show();
+	}
+
+	@Override
+	public void setSaveButtonLoading(boolean isLoading) {
+		if (isLoading) {
+			this.saveRowsButton.state().loading();
+		} else {
+			this.saveRowsButton.state().reset();
+		}
+	}
+
+	@Override
+	public void hideEditor() {
+		editRowsModal.hide();
 	}
 
 }
