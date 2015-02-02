@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
@@ -298,4 +299,5 @@ public interface PortalGinInjector extends Ginjector {
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 
 	public SortableTableHeader createSortableTableHeader();
+	public FilesBrowser getFilesBrowser();
 }
