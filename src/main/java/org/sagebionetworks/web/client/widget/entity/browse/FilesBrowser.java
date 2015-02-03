@@ -70,11 +70,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		currentFolderEntityId = null;
 	}
 	
-	public void refresh() {
-		if (configuredEntityId != null)
-			view.configure(configuredEntityId, canCertifiedUserAddChild);
-	}
-	
 	@Override
 	public void fireEntityUpdatedEvent() {
 		if (entityUpdatedHandler != null)

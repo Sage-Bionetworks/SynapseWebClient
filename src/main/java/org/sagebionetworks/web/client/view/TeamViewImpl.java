@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
@@ -40,7 +39,7 @@ import com.google.inject.Inject;
 
 public class TeamViewImpl extends Composite implements TeamView {
 
-	private static final String PUBLIC_JOIN_TEXT = "People can join this team without team captain authorization";
+	private static final String PUBLIC_JOIN_TEXT = "People can join this team without team manager authorization";
 
 
 	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
