@@ -197,7 +197,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Long versionNumber;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityMetadata entityMetadata;
-	private FilesBrowser filesBrowser;
+	private FilesBrowser projectFilesBrowser;
+	private FilesBrowser folderFilesBrowser;
 	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
@@ -223,7 +224,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			SynapseJSNIUtils synapseJSNIUtils,
 			AdministerEvaluationsList evaluationList,
 			PortalGinInjector ginInjector, 
-			FilesBrowser filesBrowser, 
+			FilesBrowser projectFilesBrowser,
+			FilesBrowser folderFilesBrowser,
 			MarkdownWidget markdownWidget, 
 			WikiPageWidget wikiPageWidget,
 			TableListWidget tableListWidget,
@@ -240,7 +242,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.locationableTitleBar = locationableTitleBar;
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
-		this.filesBrowser = filesBrowser;
+		this.folderFilesBrowser = folderFilesBrowser;
+		this.projectFilesBrowser = projectFilesBrowser;
 		this.previewWidget = previewWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
@@ -421,8 +424,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					presenter.fireEntityUpdatedEvent();
 			}
 		};
-		
-		filesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
+		projectFilesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
+		folderFilesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		entityMetadata.setEntityUpdatedHandler(handler);
 		fileHistoryWidget.setEntityUpdatedHandler(handler);
 		actionMenu.setEntityDeletedHandler(new EntityDeletedHandler() {			
@@ -558,7 +561,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Wiki		
 		addWikiPageWidget(filesWikiPageContainer, bundle, wikiPageId,  null);
 		// Child Browser
-		fileBrowserContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
+		fileBrowserContainer.add(configureFilesBrowser(folderFilesBrowser, bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 	}
@@ -582,7 +585,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(wikiPageContainer, bundle, wikiPageId, area);
 		
 		// File Tab: Files, Annotations & old
-		fileBrowserContainer.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
+		fileBrowserContainer.add(configureFilesBrowser(projectFilesBrowser, bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
 		fileAttachmentsContainer.add(createAttachmentsWidget(bundle)); // Attachments (TODO : this should eventually be removed)
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
@@ -634,7 +637,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			tab = filesListItem;
 			link = fileLink;
 			filesTabContainer.setVisible(true);
-			filesBrowser.refresh();
 		} else if(targetTab == Synapse.EntityArea.TABLES) {
 			tab = tablesListItem;
 			link = tablesLink;
@@ -801,7 +803,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), versionNumber, synapseJSNIUtils, sageImageBundle);
 	}
 
-	private Widget createEntityFilesBrowserWidget(Entity entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
+	private Widget configureFilesBrowser(FilesBrowser filesBrowser, Entity entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
 		filesBrowser.configure(entity.getId(), canCertifiedUserAddChild, isCertifiedUser);
 		return filesBrowser.asWidget();
 	}
