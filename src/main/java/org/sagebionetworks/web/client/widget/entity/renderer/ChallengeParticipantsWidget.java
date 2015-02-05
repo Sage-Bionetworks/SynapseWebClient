@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -70,7 +69,7 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 		view.hideErrors();
 		view.showLoading();
 		view.clearParticipants();
-		synapseClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT, newOffset, new AsyncCallback<String>() {
+		synapseClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {

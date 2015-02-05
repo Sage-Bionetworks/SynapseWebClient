@@ -73,7 +73,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 		view.hideErrors();
 		view.showLoading();
 		view.clearTeams();
-		synapseClient.getChallengeTeamSummaries(challengeId, authController.getCurrentUserPrincipalId(),DEFAULT_TEAM_LIMIT, newOffset, new AsyncCallback<String>() {
+		synapseClient.getChallengeTeamSummaries(challengeId, authController.getCurrentUserPrincipalId(),DEFAULT_TEAM_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
