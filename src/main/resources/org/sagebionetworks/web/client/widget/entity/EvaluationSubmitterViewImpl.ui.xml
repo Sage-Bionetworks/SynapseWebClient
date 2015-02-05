@@ -33,6 +33,9 @@
 						</b:FormGroup>
 					</b:FieldSet>
 				</b:Form>
+				<b:Anchor ui:field="createNewTeamLink" text="Create a new team"/>
+				<b:Anchor ui:field="registerMyTeamLink" text="Register my team for this challenge."/>
+				<g:SimplePanel ui:field="registerTeamDialogContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>

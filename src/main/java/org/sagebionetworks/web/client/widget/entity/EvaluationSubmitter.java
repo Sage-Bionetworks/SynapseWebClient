@@ -9,13 +9,17 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamHeader;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.table.PaginatedIds;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
@@ -38,10 +42,10 @@ public class EvaluationSubmitter implements Presenter {
 	private Entity submissionEntity;
 	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
-	List<SubmissionTeam> teams;
+	List<Team> teams;
 	private Evaluation evaluation;
 	private Challenge challenge;
-	private SubmissionTeam selectedTeam;
+	private Team selectedTeam;
 	private String selectedTeamMemberStateHash;
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
@@ -66,7 +70,7 @@ public class EvaluationSubmitter implements Presenter {
 		challenge = null;
 		evaluation = null;
 		selectedTeam = null;
-		teams = new ArrayList<SubmissionTeam>();
+		teams = new ArrayList<Team>();
 		view.showLoading();
 		this.submissionEntity = submissionEntity;
 		try {
@@ -151,14 +155,34 @@ public class EvaluationSubmitter implements Presenter {
 		synapseClient.getSubmissionTeams(challenge.getId(), getTeamsCallback());
 	}
 	
-	private AsyncCallback<String> getTeamsCallback() {
-		return new AsyncCallback<String>() {
+	@Override
+	public void teamAdded() {
+		//when a team is added, we need to refresh the teams list
+		getAvailableTeams();
+	}
+	
+	@Override
+	public void createNewTeamClicked() {
+		if (authenticationController.isLoggedIn())
+			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+		else {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		}
+	}
+	
+	@Override
+	public void registerMyTeamLinkClicked() {
+		view.showRegisterTeamDialog(challenge.getId());
+	}
+	
+	private AsyncCallback<List<Team>> getTeamsCallback() {
+		return new AsyncCallback<List<Team>>() {
 			@Override
-			public void onSuccess(String jsonString) {
+			public void onSuccess(List<Team> results) {
 				try {
-					PaginatedResults<SubmissionTeam> results = nodeModelCreator.createPaginatedResults(jsonString, SubmissionTeam.class);
-					teams = results.getResults();
-					view.showModal2(teams);
+					teams = results;
+					view.setTeams(teams);
+					view.showModal2();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -189,7 +213,7 @@ public class EvaluationSubmitter implements Presenter {
 		selectedTeamMemberStateHash = null;
 		view.clearContributors();
 		//resolve team from team name
-		for (SubmissionTeam team : teams) {
+		for (Team team : teams) {
 			if(selectedTeamName.equals(team.getName())) {
 				selectedTeam = team;
 				break;
@@ -256,35 +280,15 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void submitToEvaluation(final String entityId, final Long versionNumber, final String etag) {
-		AsyncCallback<Void> registerTeamCallback = new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				//set up shared values across all submissions
-				Submission newSubmission = new Submission();
-				newSubmission.setEntityId(entityId);
-				newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
-				newSubmission.setVersionNumber(versionNumber);
-				if (submissionName != null && submissionName.trim().length() > 0)
-					newSubmission.setName(submissionName);
-				
-				submitToEvaluation(newSubmission, etag);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		};
+		//set up shared values across all submissions
+		Submission newSubmission = new Submission();
+		newSubmission.setEntityId(entityId);
+		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
+		newSubmission.setVersionNumber(versionNumber);
+		if (submissionName != null && submissionName.trim().length() > 0)
+			newSubmission.setName(submissionName);
 		
-		if (view.isIndividual() || selectedTeam.isRegistered()) {
-			//no need to try to register, go on to create the submission
-			registerTeamCallback.onSuccess(null);
-		} else {
-			ChallengeTeam challengeTeam = new ChallengeTeam();
-			challengeTeam.setChallengeId(challenge.getId());
-			challengeTeam.setTeamId(selectedTeam.getTeamId());
-			synapseClient.registerTeamForChallenge(challengeTeam, registerTeamCallback);
-		}
+		submitToEvaluation(newSubmission, etag);
 	}
 	
 	public void submitToEvaluation(final Submission newSubmission, final String etag) {

@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -112,6 +113,7 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.PaginatedIds;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -3620,12 +3622,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getSubmissionTeams(String challengeId) {
+	public List<Team> getSubmissionTeams(String challengeId) {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<SubmissionTeam> results = synapseClient
-					.getSubmissionTeams(challengeId, GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
-			return EntityFactory.createJSONStringForEntity(results);
+			PaginatedIds results = synapseClient.getSubmissionTeams(challengeId, GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
+			List<String> teamIds = results.getResults();
+			//TODO: get teams in bulk
+			List<Team> teamList = new ArrayList<Team>(teamIds.size());
+			for (String teamId : teamIds) {
+				teamList.add(synapseClient.getTeam(teamId));
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

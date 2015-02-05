@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
@@ -15,11 +16,12 @@ import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.TeamHeader;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -67,16 +69,32 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Radio isIndividualRadioButton;
 	@UiField
 	Div contributorsPanel;
+	@UiField
+	SimplePanel registerTeamDialogContainer;
+	@UiField
+	Anchor registerMyTeamLink;
+	@UiField
+	Anchor createNewTeamLink;
+	
 	private PortalGinInjector ginInjector;
+	private RegisterTeamDialog registerTeamDialog;
 	
 	@Inject
-	public EvaluationSubmitterViewImpl(EvaluationSubmitterViewImplUiBinder binder, EntityFinder entityFinder, EvaluationList evaluationList, PortalGinInjector ginInjector) {
+	public EvaluationSubmitterViewImpl(
+			EvaluationSubmitterViewImplUiBinder binder, 
+			EntityFinder entityFinder, 
+			EvaluationList evaluationList, 
+			PortalGinInjector ginInjector,
+			RegisterTeamDialog registerTeamDialog) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
+		this.registerTeamDialog = registerTeamDialog;
+		
 		contributorsPanel.getElement().setAttribute("highlight-box-title", "Contributors");
 		evaluationListContainer.setWidget(evaluationList.asWidget());
+		registerTeamDialogContainer.setWidget(registerTeamDialog.asWidget());
 		initClickHandlers();
 	}
 	
@@ -133,6 +151,29 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				presenter.teamSelected(teamComboBox.getValue());
 			}
 		});
+		registerMyTeamLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.registerMyTeamLinkClicked();
+			}
+		});
+		
+		createNewTeamLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createNewTeamClicked();
+			}
+		});
+	}
+	
+	@Override
+	public void showRegisterTeamDialog(String challengeId) {
+		registerTeamDialog.configure(challengeId, new Callback() {
+			@Override
+			public void invoke() {
+				presenter.teamAdded();
+			}
+		});
 	}
 	
 	@Override
@@ -186,15 +227,19 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void showModal2(List<TeamHeader> availableTeams) {
+	public void setTeams(List<Team> registeredTeams) {
 		teamComboBox.clear();
 		isIndividualRadioButton.setActive(true);
 		
-		for (TeamHeader teamHeader : availableTeams) {
+		for (Team teamHeader : registeredTeams) {
 			Option teamOption = new Option();
 			teamOption.setText(teamHeader.getName());
 			teamComboBox.add(teamOption);
 		}
+	}
+	
+	@Override
+	public void showModal2() {
 		modal2.show();
 	}
 	@Override

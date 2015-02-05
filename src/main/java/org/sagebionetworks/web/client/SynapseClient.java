@@ -521,7 +521,7 @@ public interface SynapseClient extends RemoteService {
 	 */
 	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
 
-	String getSubmissionTeams(String challengeId) throws RestServiceException;
+	List<Team> getSubmissionTeams(String challengeId) throws RestServiceException;
 	ChallengeTeam registerChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException;
 	void unregisterChallengeTeam(String challengeId, String teamId) throws RestServiceException;
 	ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException;
