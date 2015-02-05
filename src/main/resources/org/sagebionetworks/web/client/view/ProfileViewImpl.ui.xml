@@ -85,6 +85,13 @@
 					    	<div class="highlight-box" ui:field="challengesHighlightBox" highlight-box-title="Challenges">
 					    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
 					    	</div>
+					    	<div ui:field="challengesLoadingUI" >
+									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+									&nbsp;Loading...
+							</div>
+							<div class="clearfix">
+							    <b:Button ui:field="moreChallengesButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
+							</div>
 					    </div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="teamsTabContainer">
 							<g:FlowPanel ui:field="openInvitesContainer" />

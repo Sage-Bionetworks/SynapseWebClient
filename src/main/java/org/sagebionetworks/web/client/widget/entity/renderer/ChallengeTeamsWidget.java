@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.ChallengeTeamSummary;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -84,7 +85,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 						for (ChallengeTeamSummary challenge : challenges.getResults()) {
 							view.addChallengeTeam(challenge.getTeamId(), 
 								DisplayUtils.replaceWithEmptyStringIfNull(challenge.getMessage()), 
-								challenge.getCanUserEdit());
+								challenge.getUserIsAdmin());
 						}
 					} 
 				} catch (JSONObjectAdapterException e) {

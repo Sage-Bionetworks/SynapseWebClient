@@ -12,6 +12,8 @@ import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -528,6 +530,7 @@ public interface SynapseClient extends RemoteService {
 	ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException;
 	String getChallengeTeamSummaries(String challengeId, String userId, Integer limit, Integer offset) throws RestServiceException;
 	String getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) throws RestServiceException;
+	Challenge getChallenge(String projectId) throws RestServiceException;
 	ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset) throws RestServiceException;
 	List<Team> getRegistratableTeams() throws RestServiceException;
 }

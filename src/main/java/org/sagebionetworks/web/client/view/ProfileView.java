@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ChallengeSummary;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -68,6 +68,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();
 		void getMoreProjects();
+		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 	}
 }

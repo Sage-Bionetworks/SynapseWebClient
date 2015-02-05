@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
@@ -179,13 +180,9 @@ public class EvaluationSubmitter implements Presenter {
 		return new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> results) {
-				try {
-					teams = results;
-					view.setTeams(teams);
-					view.showModal2();
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+				teams = results;
+				view.setTeams(teams);
+				view.showModal2();
 			}
 			
 			@Override

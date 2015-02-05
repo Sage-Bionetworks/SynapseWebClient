@@ -9,7 +9,7 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ChallengeSummary;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
-import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -151,7 +150,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//Challenges
 	@UiField
 	FlowPanel challengesTabContent;
-	
+	@UiField
+	Button moreChallengesButton;
+
 	//Settings
 	@UiField
 	FlowPanel settingsTabContent;
@@ -167,6 +168,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@UiField 
 	DivElement projectsLoadingUI;
+	@UiField 
+	DivElement challengesLoadingUI;
 	@UiField 
 	Row profilePictureLoadingUI;
 	@UiField 
@@ -244,6 +247,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		showProjectsLoading(false);
+		
+		moreChallengesButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getMoreChallenges();
+			}
+		});
+		showChallengesLoading(false);
+		
 		favoritesFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -413,6 +425,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		projectsTabContent.clear();
 		setIsMoreProjectsVisible(false);
 	}
+	@Override
+	public void clearChallenges() {
+		challengesTabContent.clear();
+		setIsMoreChallengesVisible(false);
+	}
 	
 	@Override
 	public void setIsMoreProjectsVisible(boolean isVisible) {
@@ -452,7 +469,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			addChallengeBadges(challenges, challengesTabContent);
 		}
 	}
+	@Override
+	public void showChallengesLoading(boolean isVisible) {
+		UIObject.setVisible(challengesLoadingUI, isVisible);
+	}
 	
+	@Override
+	public void setIsMoreChallengesVisible(boolean isVisible) {
+		moreChallengesButton.setVisible(isVisible);
+	}
 	@Override
 	public void setChallengesError(String error) {
 		DisplayUtils.showErrorMessage(error);

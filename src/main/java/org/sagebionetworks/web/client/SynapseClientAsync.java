@@ -10,6 +10,8 @@ import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -291,7 +293,8 @@ public interface SynapseClientAsync {
 	void updateRegisteredChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);
 	void getChallengeTeamSummaries(String challengeId, String userId, Integer limit, Integer offset, AsyncCallback<String> callback);
 	void getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset, AsyncCallback<String> callback);
-	void getChallenges(String userId, Integer limit, Integer offset, AsyncCallback<ChallengePagedResults> callback);
+	void getChallenge(String projectId, AsyncCallback<Challenge> callback);
+	void getChallenges(String userId, Integer limit, Integer offset, AsyncCallback<ChallengePagedResult> callback);
 	void getRegistratableTeams(AsyncCallback<List<Team>> callback);
 	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
