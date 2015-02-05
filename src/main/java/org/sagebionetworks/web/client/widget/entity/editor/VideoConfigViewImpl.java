@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
@@ -30,6 +32,8 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	Button oggButton;
 	@UiField
 	Button webmButton;
+	@UiField
+	Anchor moreInfoLink;
 	
 	EntityFinder entityFinder;
 	
@@ -43,6 +47,12 @@ public class VideoConfigViewImpl implements VideoConfigView {
 		mp4Button.addClickHandler(getClickHandler(mp4Entity));
 		oggButton.addClickHandler(getClickHandler(oggEntity));
 		webmButton.addClickHandler(getClickHandler(webmEntity));
+		moreInfoLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(ClientProperties.VIDEO_HTML5_BROWSER_LINK, "", "");
+			}
+		});
 	}
 	
 	@Override

@@ -8,7 +8,7 @@
 		<b:FieldSet>
 			<b:FormGroup>
 				<b:FormLabel for="tabTable">Tab delimitted table contents</b:FormLabel>
-				<b:TextArea ui:field="tableContents" name="tabTable" b:id="tabTable" />
+				<b:TextArea ui:field="tableContents" name="tabTable" b:id="tabTable" height="250px" />
 			</b:FormGroup>
 		</b:FieldSet>
 	</bh:Div>

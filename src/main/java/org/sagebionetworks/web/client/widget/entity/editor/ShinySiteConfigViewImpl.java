@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -34,6 +35,8 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 	public void checkParams() throws IllegalArgumentException {
 		if (!LoginPresenter.isValidUrl(urlField.getValue(), false))
 			throw new IllegalArgumentException(DisplayConstants.INVALID_URL_MESSAGE);
+		if(!ShinySiteWidget.isValidShinySite(urlField.getValue()))
+			throw new IllegalArgumentException(urlField.getValue() + DisplayConstants.INVALID_SHINY_SITE);
 	}
 	@Override
 	public String getSiteUrl() {
