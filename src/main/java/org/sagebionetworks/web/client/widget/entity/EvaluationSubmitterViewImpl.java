@@ -174,6 +174,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				presenter.teamAdded();
 			}
 		});
+		registerTeamDialog.showModal();
 	}
 	
 	@Override
