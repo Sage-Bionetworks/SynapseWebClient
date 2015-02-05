@@ -7,10 +7,13 @@
 	<bh:Div>
 		<b:FieldSet>
 			<b:FormGroup>
-				<b:FormLabel for="url">Video URL</b:FormLabel>
+				<b:FormLabel for="url">Site URL</b:FormLabel>
 				<b:TextBox ui:field="urlField" name="url" b:id="url" />
+			</b:FormGroup>
+			<b:FormGroup>
+				<b:FormLabel for="heightField">Display height (px)</b:FormLabel>
+				<b:TextBox ui:field="heightField" name="heightField" b:id="heightField" placeholder="400 (Default)" />
 			</b:FormGroup>
 		</b:FieldSet>
 	</bh:Div>
-	
 </ui:UiBinder>
