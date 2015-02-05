@@ -3,44 +3,34 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.Date;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkConfigView {
+public class BookmarkConfigViewImpl implements BookmarkConfigView {
 	private Presenter presenter;
-	private TextField<String> linkTextField;
 	private String bookmarkId;
 	
+	public interface BookmarkConfigViewImplUiBinder extends UiBinder<Widget, BookmarkConfigViewImpl> {}
+	
+	private Widget widget;
+	@UiField
+	TextBox linkTextField;
+
+	
 	@Inject
-	public BookmarkConfigViewImpl() {
+	public BookmarkConfigViewImpl(BookmarkConfigViewImplUiBinder binder) {
+		widget = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public void initView() {
-		VerticalPanel vp = new VerticalPanel();
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setVerticalAlign(VerticalAlignment.MIDDLE);
-		linkTextField = new TextField<String>();
-		linkTextField.setAllowBlank(false);
-		Label linkTextLabel = new Label(DisplayConstants.LINK_TEXT_LABEL);
-		linkTextLabel.setWidth(70);
-		linkTextField.setWidth(270);
-		hp.add(linkTextLabel);
-		hp.add(linkTextField);
-		hp.addStyleName("margin-top-left-10");
-		vp.add(hp);
-		add(vp);
-		
 		Date time = new Date();
 		bookmarkId = String.valueOf(time.getTime());
 	}
@@ -60,8 +50,8 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!linkTextField.isValid()) {
-			throw new IllegalArgumentException(linkTextField.getErrorMessage());
+		if (!DisplayUtils.isDefined(linkTextField.getValue())) {
+			throw new IllegalArgumentException("Please fill in the link text");
 		} 
 	}
 
@@ -110,6 +100,11 @@ public class BookmarkConfigViewImpl extends LayoutContainer implements BookmarkC
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public Widget asWidget() {
+		return widget;
 	}
 
 }

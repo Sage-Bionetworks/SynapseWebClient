@@ -415,7 +415,6 @@ public class DisplayConstants {
 	public static final String URL_LABEL = "URL:";
 	public static final String EQUATION_LABEL = "TeX:";
 	public static final String LINK_TEXT_LABEL = "Link Text:";
-	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
 	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
@@ -598,7 +597,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String EXTERNAL_URL = "External URL";
 	public static final String ADD_ENTITY = "Add Entity";
-	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please " + ClientProperties.HELP_EMAIL_ADDRESS_LINK + " if you would like your Server added to our white list.";
+	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please contact us at " + ClientProperties.HELP_EMAIL_ADDRESS + " if you would like your Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
