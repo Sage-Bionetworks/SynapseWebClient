@@ -3626,15 +3626,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			PaginatedIds results = synapseClient.getSubmissionTeams(challengeId, GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT);
-			List<String> teamIds = results.getResults();
-			//TODO: get teams in bulk
-			List<Team> teamList = new ArrayList<Team>(teamIds.size());
-			for (String teamId : teamIds) {
-				teamList.add(synapseClient.getTeam(teamId));
-			}
+			return getTeams(results.getResults(), synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	public List<Team> getTeams(List<String> teamIds, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		//TODO: get teams in bulk
+		List<Team> teamList = new ArrayList<Team>(teamIds.size());
+		for (String teamId : teamIds) {
+			teamList.add(synapseClient.getTeam(teamId));
+		}
+		return teamList;
 	}
 
 	@Override
@@ -3699,6 +3703,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getChallenges(userId, limit, offset);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public List<Team> getRegistratableTeams() throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedIds results = synapseClient.getRegistratableTeams(GROUPS_PAGINATION_OFFSET, GROUPS_PAGINATION_LIMIT); 
+			return getTeams(results.getResults(), synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

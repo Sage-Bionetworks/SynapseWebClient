@@ -292,6 +292,7 @@ public interface SynapseClientAsync {
 	void getChallengeTeamSummaries(String challengeId, String userId, Integer limit, Integer offset, AsyncCallback<String> callback);
 	void getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset, AsyncCallback<String> callback);
 	void getChallenges(String userId, Integer limit, Integer offset, AsyncCallback<ChallengePagedResults> callback);
+	void getRegistratableTeams(AsyncCallback<List<Team>> callback);
 	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
 	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);

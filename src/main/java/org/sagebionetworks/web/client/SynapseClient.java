@@ -52,6 +52,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -528,4 +529,5 @@ public interface SynapseClient extends RemoteService {
 	String getChallengeTeamSummaries(String challengeId, String userId, Integer limit, Integer offset) throws RestServiceException;
 	String getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) throws RestServiceException;
 	ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset) throws RestServiceException;
+	List<Team> getRegistratableTeams() throws RestServiceException;
 }
