@@ -52,7 +52,6 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
 		query.setOffset(offset);
 		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
 		query.setSql(sql);
-		view.setTooltip(sql);
 		tableQueryResultWidget.configure(query, false, null);
 	}
 	
