@@ -3,18 +3,22 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	
 	<bh:Div>
-		<b:Form type="HORIZONTAL">
+		<b:Form>
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel for="url" addStyleNames="col-xs-2">Query</b:FormLabel>
-					<g:FlowPanel addStyleNames="col-xs-10">
-						<b:TextBox ui:field="queryField" name="query" b:id="query" />
+					<b:FormLabel for="url">Query</b:FormLabel>
+					<g:FlowPanel>
+						<b:TextBox ui:field="queryField" name="query" b:id="query" placeholder="SELECT * FROM syn12345"/>
 					</g:FlowPanel>
 				</b:FormGroup>
 			</b:FieldSet>
 		</b:Form>
+		<g:FlowPanel addStyleNames="help-panel">
+			<b:BlockQuote styleName="panel">
+				<bh:Text text="Provide a Query for any Synapse Table. Only users who have access to the Table being queried will be able to see the Table in the Wiki page."></bh:Text>
+			</b:BlockQuote>
+		</g:FlowPanel>
 	</bh:Div>
 	
 </ui:UiBinder>

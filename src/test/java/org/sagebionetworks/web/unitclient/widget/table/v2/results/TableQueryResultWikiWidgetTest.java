@@ -21,12 +21,14 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class TableQueryResultWikiWidgetTest {
 	TableQueryResultWikiWidget widget;
 	TableQueryResultWidget mockTableQueryResultWidget;
+	TableQueryResultWikiWidgetView mockView;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
@@ -34,14 +36,15 @@ public class TableQueryResultWikiWidgetTest {
 	public void before(){
 		mockTableQueryResultWidget = mock(TableQueryResultWidget.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		widget = new TableQueryResultWikiWidget(mockTableQueryResultWidget, mockSynapseJSNIUtils);
+		mockView = mock(TableQueryResultWikiWidgetView.class);
+		widget = new TableQueryResultWikiWidget(mockView, mockTableQueryResultWidget, mockSynapseJSNIUtils);
 	}
 	
 	
 	@Test
 	public void testAsWidget() {
 		widget.asWidget();
-		verify(mockTableQueryResultWidget).asWidget();
+		verify(mockView).asWidget();
 	}
 	
 	@Test
@@ -57,6 +60,7 @@ public class TableQueryResultWikiWidgetTest {
 		assertEquals(sql, capturedQuery.getSql());
 		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, capturedQuery.getLimit());
 		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, capturedQuery.getOffset());
+		verify(mockView).setTooltip(sql);
 	}
 	
 	@Test
