@@ -27,7 +27,7 @@ import com.google.inject.Inject;
  */
 public class QueryInputViewImpl implements QueryInputView{
 
-	private static final String REST_DOC_URL = "http://rest.synapse.org/org/sagebionetworks/repo/web/controller/TableExamples.html";
+	public static final String REST_DOC_URL = "http://rest.synapse.org/org/sagebionetworks/repo/web/controller/TableExamples.html";
 
 	public interface Binder extends UiBinder<HTMLPanel, QueryInputViewImpl> {
 	}
