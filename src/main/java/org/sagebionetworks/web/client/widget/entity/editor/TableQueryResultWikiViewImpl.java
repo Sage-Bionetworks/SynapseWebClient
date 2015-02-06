@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -14,10 +18,18 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	private Presenter presenter;
 	@UiField
 	TextBox queryField;
+	@UiField
+	Button helpButton;
 	
 	@Inject
 	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder) {
 		widget = binder.createAndBindUi(this);
+		helpButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(QueryInputViewImpl.REST_DOC_URL, "", "");
+			}
+		});
 	}
 	
 	@Override

@@ -7,7 +7,8 @@
 		<b:Form>
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel for="url">Query</b:FormLabel>
+					<b:FormLabel for="url" addStyleNames="displayInline">Query</b:FormLabel>
+					<b:Button ui:field="helpButton" addStyleNames="displayInline" icon="QUESTION_CIRCLE" type="LINK"/>
 					<g:FlowPanel>
 						<b:TextBox ui:field="queryField" name="query" b:id="query" placeholder="SELECT * FROM syn12345"/>
 					</g:FlowPanel>

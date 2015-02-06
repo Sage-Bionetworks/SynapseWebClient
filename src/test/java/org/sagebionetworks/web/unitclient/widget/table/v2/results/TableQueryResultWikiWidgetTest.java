@@ -60,7 +60,6 @@ public class TableQueryResultWikiWidgetTest {
 		assertEquals(sql, capturedQuery.getSql());
 		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, capturedQuery.getLimit());
 		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, capturedQuery.getOffset());
-		verify(mockView).setTooltip(sql);
 	}
 	
 	@Test
