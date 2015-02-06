@@ -29,6 +29,7 @@
 								<div class="img-thumbnail margin-bottom-5"><a href="http://www.sloan.org/" target="_new"><g:Image resource='{sageImageBundle.sloanLogo}' styleName='padding-5' /></a></div>                                                       
 								<div class="img-thumbnail margin-bottom-5"><a href="http://www.nia.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.niaLogo}' styleName='padding-5' /></a></div>
 								<div class="img-thumbnail margin-bottom-5"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nimhLogo}' styleName='padding-5' /></a></div>
+								<div class="img-thumbnail margin-bottom-5"><a href="http://www.ctf.org/" target="_new"><g:Image resource='{sageImageBundle.ctfLogo}' styleName='padding-5' /></a></div>
 							</div>
 		                </div>
 		                <div class="col-md-2 col-sm-12">
