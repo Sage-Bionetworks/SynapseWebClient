@@ -106,13 +106,5 @@ public class APITableColumnRendererUserIDTest {
 		renderer.init(columnData, config, mockCallback);
 		verify(mockCallback).onFailure(eq(thrownException));
 	}
-	
-	@Test
-	public void testInputError() {
-		HashSet<String> inputColumnNames = new HashSet<String>();
-		inputColumnNames.add("missing_column");
-		config.setInputColumnNames(inputColumnNames);
-		renderer.init(columnData, config, mockCallback);
-		verify(mockCallback).onFailure(any(IllegalArgumentException.class));
-	}
+	//Callback.onFailure is never called.  An empty column is shown if the data are unavailable for the specified column.
 }
