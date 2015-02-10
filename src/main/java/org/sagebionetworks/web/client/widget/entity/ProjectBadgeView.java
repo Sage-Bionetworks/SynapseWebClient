@@ -20,6 +20,8 @@ public interface ProjectBadgeView extends IsWidget {
 	void setLastActivityVisible(boolean isVisible);
 	String getSimpleDateString(Date date);
 	void setFavoritesWidget(Widget widget);
+	boolean isAttached();
+	
 	/**
 	 * Presenter interface
 	 */

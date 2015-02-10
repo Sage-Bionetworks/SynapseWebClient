@@ -67,34 +67,28 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		return view.asWidget();
 	}
 	
-	
 	@Override
-	public void getInfo(AsyncCallback<KeyValueDisplay<String>> callback) {
-		getInfoEntity(header.getId(), synapseClient, adapterFactory, clientCache, callback);
-	}
-	
-	private static void getInfoEntity(String entityId, 
-			final SynapseClientAsync synapseClient,
-			final AdapterFactory adapterFactory,
-			final ClientCache clientCache,
-			final AsyncCallback<KeyValueDisplay<String>> callback) {
-		synapseClient.getProject(entityId, new AsyncCallback<Project>() {
+	public void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback) {
+		synapseClient.getProject(header.getId(), new AsyncCallback<Project>() {
 			@Override
 			public void onSuccess(final Project result) {
 				UserBadge.getUserProfile(result.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
-						callback.onSuccess(ProvUtils.entityToKeyValueDisplay(result, DisplayUtils.getDisplayName(profile), false));		
+						if (view.isAttached())
+							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(result, DisplayUtils.getDisplayName(profile), false));		
 					}
 					@Override
 					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
+						if (view.isAttached())
+							callback.onFailure(caught);
 					}
 				});
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
+				if (view.isAttached())
+					callback.onFailure(caught);
 			}
 		});
 	}

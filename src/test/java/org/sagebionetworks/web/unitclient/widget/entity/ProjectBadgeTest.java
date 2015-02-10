@@ -58,6 +58,8 @@ public class ProjectBadgeTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockFavoriteWidget = mock(FavoriteWidget.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		//by default, the view is attached
+		when(mockView.isAttached()).thenReturn(true);
 		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget);
 		
 		//set up user profile
@@ -118,7 +120,20 @@ public class ProjectBadgeTest {
 		widget.getInfo(getInfoCallback);
 		verify(getInfoCallback).onSuccess(any(KeyValueDisplay.class));
 	}
-
+	
+	@Test
+	public void testGetInfoNotAttached() throws Exception {
+		//same as happy case, but now the view reports that it is not attached
+		when(mockView.isAttached()).thenReturn(false);
+		String entityId = "syn12345";
+		Project testProject = new Project();
+		testProject.setModifiedBy("4444");
+		testProject.setId(entityId);
+		setupEntity(testProject, null);
+		widget.getInfo(getInfoCallback);
+		verify(getInfoCallback, never()).onSuccess(any(KeyValueDisplay.class));
+	}
+	
 	@Test
 	public void testGetInfoFailure() throws Exception {
 		setupEntity(new Project(), null);

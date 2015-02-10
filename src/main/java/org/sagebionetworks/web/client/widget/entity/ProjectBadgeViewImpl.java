@@ -151,6 +151,10 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 		return widget;
 	}
 	
+	@Override
+	public boolean isAttached() {
+		return widget.isAttached();
+	}
 	/*
 	 * Private Methods
 	 */
