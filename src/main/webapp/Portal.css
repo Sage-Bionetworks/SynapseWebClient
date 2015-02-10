@@ -388,8 +388,8 @@
 	font-size: 1.2em;
 }
 
-.favoriteIcon {
-	color:#f0ad4e !important;
+i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover {
+	color:#f0ad4e;
 }
 
 .resultssearchbox {

@@ -367,7 +367,6 @@ public class ProfilePresenterTest {
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
-		verify(mockView).setFavoritesHelpPanelVisible(false);
 		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(anyList());
 	}
@@ -381,7 +380,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).setFavoritesFilterSelected();
-		verify(mockView, Mockito.times(2)).setFavoritesHelpPanelVisible(anyBoolean());
+		verify(mockView).setFavoritesHelpPanelVisible(true);
 		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView, never()).addProjects(anyList());
 	}
