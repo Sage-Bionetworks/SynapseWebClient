@@ -61,15 +61,7 @@ public class APITableColumnRendererNoneTest {
 		//null value should be rendered as an empty string
 		assertEquals("", initializedRenderer.getColumnData().get(inputColumnName).get(0));
 	}
-	
-	@Test
-	public void testInputError() {
-		HashSet<String> inputColumnNames = new HashSet<String>();
-		inputColumnNames.add("missing_column");
-		config.setInputColumnNames(inputColumnNames);
-		renderer.init(columnData, config, mockCallback);
-		verify(mockCallback).onFailure(any(IllegalArgumentException.class));
-	}
+	//Callback.onFailure is never called.  An empty column is shown if the data are unavailable for the specified column.
 	
 	/**  NumberFormat is gwt client specific, so testDecimalNumberFormat and testGetColumnValue are in GwtTestSuite **/
 }

@@ -175,6 +175,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField 
 	Row profileInfoLoadingUI;
 	
+	@UiField
+	FlowPanel favoritesHelpPanel;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
@@ -309,6 +312,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setFavoritesHelpPanelVisible(boolean isVisible) {
+		favoritesHelpPanel.setVisible(isVisible);
+	}
+	
+	@Override
 	public void setTeamNotificationCount(String count) {
 		teamsLink.setHTML(DisplayConstants.TEAMS + "&nbsp" + DisplayUtils.getBadgeHtml(count));
 	}
@@ -424,6 +432,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void clearProjects() {
 		projectsTabContent.clear();
 		setIsMoreProjectsVisible(false);
+		favoritesHelpPanel.setVisible(false);
 	}
 	@Override
 	public void clearChallenges() {

@@ -388,6 +388,10 @@
 	font-size: 1.2em;
 }
 
+i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover {
+	color:#f0ad4e;
+}
+
 .resultssearchbox {
 	width: 500px;
 	margin: 0px 0 0 0;

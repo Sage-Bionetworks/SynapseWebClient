@@ -70,6 +70,9 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("images/NCI_logo.jpg")
 	ImageResource nciLogo();
+	
+	@Source("images/CTF_logo.png")
+	ImageResource ctfLogo();
 
 	@Source("images/LSDF_logo.jpg")
 	ImageResource lsdfLogo();

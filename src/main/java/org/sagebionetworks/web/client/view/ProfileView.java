@@ -55,7 +55,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setMyProjectsFilterSelected();
 	void setAllProjectsFilterSelected();
 	void setFavoritesFilterSelected();
-	
+	void setFavoritesHelpPanelVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
 		void createProject(String name);

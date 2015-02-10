@@ -311,8 +311,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults());
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				if (filterType == ProjectFilterEnum.ALL) {
+					addProjectResults(projectHeaders.getResults());
+					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -327,8 +329,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults());
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				if (filterType == ProjectFilterEnum.TEAM) {
+					addProjectResults(projectHeaders.getResults());
+					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -345,9 +349,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
 			public void onSuccess(EntityQueryResults results) {
-				List<ProjectHeader> headers = getHeadersFromQueryResults(results);
-				addProjectResults(headers);
-				projectPageAdded(results.getTotalEntityCount().intValue());
+				if (filterType == ProjectFilterEnum.MINE) {
+					List<ProjectHeader> headers = getHeadersFromQueryResults(results);
+					addProjectResults(headers);
+					projectPageAdded(results.getTotalEntityCount().intValue());
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -400,16 +406,23 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
-				//convert to Project Headers
-				List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
-				for (EntityHeader header : result) {
-					ProjectHeader projectHeader = new ProjectHeader();
-					projectHeader.setId(header.getId());
-					projectHeader.setName(header.getName());
-					headers.add(projectHeader);
+				if (filterType == ProjectFilterEnum.FAVORITES) {
+					//convert to Project Headers
+					if (result.size() == 0) {
+						view.showProjectsLoading(false);
+						view.setFavoritesHelpPanelVisible(true);
+					} else {
+						List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
+						for (EntityHeader header : result) {
+							ProjectHeader projectHeader = new ProjectHeader();
+							projectHeader.setId(header.getId());
+							projectHeader.setName(header.getName());
+							headers.add(projectHeader);
+						}
+						addProjectResults(headers);
+						view.setIsMoreProjectsVisible(false);	
+					}
 				}
-				addProjectResults(headers);
-				view.setIsMoreProjectsVisible(false);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

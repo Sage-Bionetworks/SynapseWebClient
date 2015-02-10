@@ -8,12 +8,10 @@ public interface FavoriteWidgetView extends IsWidget, SynapseView {
 
 	void setPresenter(Presenter presenter);
 
-	void showIsFavorite(boolean isFavorite);
-	void showFavoritesReminder();
+	void showIsFavorite();
+	void showIsNotFavorite();
+	void hideLoading();
 	public interface Presenter {
-
-		void setIsFavorite(boolean isFavorite);
-		
+		void favoriteClicked();
 	}
-
 }

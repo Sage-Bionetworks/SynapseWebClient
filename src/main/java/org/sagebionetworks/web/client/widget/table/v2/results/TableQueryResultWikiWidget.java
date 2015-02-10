@@ -17,10 +17,15 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
 
 	TableQueryResultWidget tableQueryResultWidget;
 	SynapseJSNIUtils synapseJsniUtils;
+	TableQueryResultWikiWidgetView view;
 	
 	@Inject
-	public TableQueryResultWikiWidget(TableQueryResultWidget tableQueryResultWidget, SynapseJSNIUtils synapseJsniUtils) {
+	public TableQueryResultWikiWidget(TableQueryResultWikiWidgetView view, 
+			TableQueryResultWidget tableQueryResultWidget, 
+			SynapseJSNIUtils synapseJsniUtils) {
+		this.view = view;
 		this.tableQueryResultWidget = tableQueryResultWidget;
+		view.setTableQueryResultWidget(tableQueryResultWidget.asWidget());
 		this.synapseJsniUtils = synapseJsniUtils;
 	}
 	
@@ -45,13 +50,14 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
 		Query query = new Query();
 		query.setLimit(limit);
 		query.setOffset(offset);
-		query.setSql(descriptor.get(WidgetConstants.TABLE_QUERY_KEY));
+		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
+		query.setSql(sql);
 		tableQueryResultWidget.configure(query, false, null);
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return tableQueryResultWidget.asWidget();
+		return view.asWidget();
 	}
 
 }

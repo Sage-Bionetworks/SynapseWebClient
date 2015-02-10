@@ -24,13 +24,14 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class ProjectBadgeTest {
 
@@ -44,7 +45,7 @@ public class ProjectBadgeTest {
 	ProjectBadgeView mockView;
 	String entityId = "syn123";
 	ProjectBadge widget;
-	
+	FavoriteWidget mockFavoriteWidget;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -55,8 +56,11 @@ public class ProjectBadgeTest {
 		mockEntityIconsCache = mock(EntityIconsCache.class);
 		getInfoCallback = mock(AsyncCallback.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockFavoriteWidget = mock(FavoriteWidget.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache);
+		//by default, the view is attached
+		when(mockView.isAttached()).thenReturn(true);
+		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget);
 		
 		//set up user profile
 		UserProfile userProfile =  new UserProfile();
@@ -83,10 +87,13 @@ public class ProjectBadgeTest {
 		header.setId(id);
 		header.setName(name);
 		header.setLastActivity(lastActivity);
+		
 		widget.configure(header);
 		verify(mockView).setProject(name, id);
 		verify(mockView).setLastActivityVisible(true);
 		verify(mockView).setLastActivityText(anyString());
+		verify(mockView).setFavoritesWidget(any(Widget.class));
+		verify(mockFavoriteWidget).asWidget();
 	}
 	
 	@Test
@@ -113,7 +120,20 @@ public class ProjectBadgeTest {
 		widget.getInfo(getInfoCallback);
 		verify(getInfoCallback).onSuccess(any(KeyValueDisplay.class));
 	}
-
+	
+	@Test
+	public void testGetInfoNotAttached() throws Exception {
+		//same as happy case, but now the view reports that it is not attached
+		when(mockView.isAttached()).thenReturn(false);
+		String entityId = "syn12345";
+		Project testProject = new Project();
+		testProject.setModifiedBy("4444");
+		testProject.setId(entityId);
+		setupEntity(testProject, null);
+		widget.getInfo(getInfoCallback);
+		verify(getInfoCallback, never()).onSuccess(any(KeyValueDisplay.class));
+	}
+	
 	@Test
 	public void testGetInfoFailure() throws Exception {
 		setupEntity(new Project(), null);
