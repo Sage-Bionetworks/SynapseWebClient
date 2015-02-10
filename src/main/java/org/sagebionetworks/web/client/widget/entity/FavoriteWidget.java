@@ -46,12 +46,13 @@ public class FavoriteWidget implements Presenter {
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
 	@Override
 	public void favoriteClicked() {
-		favoriteEntity(!isFavorite(entityId));
+		setIsFavorite(!isFavorite(entityId));
 	}
 	
-	public void favoriteEntity(boolean favorite) {
+	public void setIsFavorite(boolean favorite) {
 		view.showLoading();
 		setIsFavorite(entityId, favorite, new AsyncCallback<Void>() {
 			@Override

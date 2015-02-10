@@ -32,10 +32,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class FavoriteWidgetTest {
 
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	FavoriteWidgetView mockView;
-	JSONObjectAdapter jsonObjectAdapter;
 	String entityId = "syn123";
 	FavoriteWidget favoriteWidget;
 	CookieProvider mockCookies;
@@ -43,18 +41,16 @@ public class FavoriteWidgetTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);		
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(FavoriteWidgetView.class);
 		mockCookies = mock(CookieProvider.class);
-		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		when(mockCookies.getCookie(FavoriteWidget.FAVORITES_REMINDER)).thenReturn("true");
 		List<EntityHeader> favs = new ArrayList<EntityHeader>();
 		EntityHeader fav = new EntityHeader();
 		fav.setId("syn456");
 		favs.add(fav);
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(favs);
-		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockNodeModelCreator, jsonObjectAdapter, mockGlobalApplicationState, mockCookies);
+		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockCookies);
 		favoriteWidget.configure(entityId);
 	}
 	
@@ -64,12 +60,8 @@ public class FavoriteWidgetTest {
 		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
 		favorites.setResults(results);
-		EntityHeader added = new EntityHeader();
-		String getFavoritesJson = favorites.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		String addedJson = added.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(getFavoritesJson).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(addedJson).when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
-		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(EntityHeader.class))).thenReturn(favorites);
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(true);
 				
@@ -81,15 +73,9 @@ public class FavoriteWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetIsFavoriteUnset() throws Exception {
-		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
-		favorites.setResults(results);
-		EntityHeader added = new EntityHeader();
-		String getFavoritesJson = favorites.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		String addedJson = added.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(getFavoritesJson).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeFavorite(anyString(), any(AsyncCallback.class));
-		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(EntityHeader.class))).thenReturn(favorites);
 				
 		favoriteWidget.setIsFavorite(false);
 				
