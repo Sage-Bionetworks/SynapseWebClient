@@ -4,24 +4,20 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -36,21 +32,18 @@ public class FavoriteWidgetTest {
 	FavoriteWidgetView mockView;
 	String entityId = "syn123";
 	FavoriteWidget favoriteWidget;
-	CookieProvider mockCookies;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(FavoriteWidgetView.class);
-		mockCookies = mock(CookieProvider.class);
-		when(mockCookies.getCookie(FavoriteWidget.FAVORITES_REMINDER)).thenReturn("true");
 		List<EntityHeader> favs = new ArrayList<EntityHeader>();
 		EntityHeader fav = new EntityHeader();
 		fav.setId("syn456");
 		favs.add(fav);
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(favs);
-		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockCookies);
+		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockGlobalApplicationState);
 		favoriteWidget.configure(entityId);
 		reset(mockView);
 	}
@@ -85,29 +78,6 @@ public class FavoriteWidgetTest {
 		verify(mockGlobalApplicationState).setFavorites(results);
 	}
 	
-	@Test
-	public void testFavoritesReminderCookieSetNoFavs() {
-		when(mockGlobalApplicationState.getFavorites()).thenReturn(new ArrayList<EntityHeader>());
-		favoriteWidget.showReminder();
-		verify(mockView, times(0)).showFavoritesReminder();
-	}
-	
-	@Test
-	public void testFavoritesReminderNoCookieHaveFavs() {
-		when(mockCookies.getCookie(FavoriteWidget.FAVORITES_REMINDER)).thenReturn(null);
-		favoriteWidget.showReminder();
-		verify(mockView, times(0)).showFavoritesReminder();
-	}
-	
-	@Test
-	public void testFavoritesReminderNoCookieNoFavs() {
-		when(mockGlobalApplicationState.getFavorites()).thenReturn(new ArrayList<EntityHeader>());
-		when(mockCookies.getCookie(FavoriteWidget.FAVORITES_REMINDER)).thenReturn(null);
-		favoriteWidget.showReminder();
-		verify(mockView).showFavoritesReminder();
-		verify(mockCookies).setCookie(eq(FavoriteWidget.FAVORITES_REMINDER), anyString(), any(Date.class));
-	}
-
 	@Test
 	public void testUpdateIsFavoriteViewNotAFavorite() {
 		//test when current entity is not a favorite

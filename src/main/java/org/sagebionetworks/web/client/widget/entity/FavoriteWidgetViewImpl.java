@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -39,28 +40,17 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 			}
 		});
 	}
-
-	@Override
-	public void showFavoritesReminder() {
-		tip.show();
-		Timer t = new Timer() {
-			@Override
-			public void run() {
-				tip.hide();
-			}
-		};
-		// Schedule the timer to hide in 5 seconds.
-		t.schedule(5000);
-	}
 	
 	@Override
 	public void showIsFavorite() {
+		favoriteIcon.setIcon(IconType.STAR);
 		favoriteIcon.removeStyleName("greyText-imp");
 		favoriteIcon.addStyleName("favoriteIcon");
 	}
 	
 	@Override
 	public void showIsNotFavorite() {
+		favoriteIcon.setIcon(IconType.STAR_O);
 		favoriteIcon.removeStyleName("favoriteIcon");
 		favoriteIcon.addStyleName("greyText-imp");
 	}

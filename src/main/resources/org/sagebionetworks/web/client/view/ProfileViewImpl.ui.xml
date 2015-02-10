@@ -65,6 +65,13 @@
 								<div class="clearfix">
 								    <b:Button ui:field="moreProjectsButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
 								</div>
+								<g:FlowPanel ui:field="favoritesHelpPanel" addStyleNames="help-panel" visible="false">
+									<b:BlockQuote styleName="panel">
+										<b:Icon type="STAR" pull="LEFT" addStyleNames="font-size-90 favoriteIcon" />
+										<b:Heading text="Favorites" size="H4"></b:Heading>
+										<bh:Text text="Save the entity you’d like to revisit by marking it as a favorite. To mark an entity as a favorite, click the star icon next to its name."></bh:Text>
+									</b:BlockQuote>
+								</g:FlowPanel>
 							</div>
 							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-12 col-sm-6">
