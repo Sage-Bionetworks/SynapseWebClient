@@ -52,6 +52,7 @@ public class FavoriteWidgetTest {
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(favs);
 		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockCookies);
 		favoriteWidget.configure(entityId);
+		reset(mockView);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -64,7 +65,7 @@ public class FavoriteWidgetTest {
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(true);
-				
+		verify(mockView).showLoading();
 		verify(mockSynapseClient).addFavorite(eq(entityId), any(AsyncCallback.class));
 		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
@@ -78,7 +79,7 @@ public class FavoriteWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(false);
-				
+		verify(mockView).showLoading();
 		verify(mockSynapseClient).removeFavorite(eq(entityId), any(AsyncCallback.class));
 		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
@@ -107,6 +108,27 @@ public class FavoriteWidgetTest {
 		verify(mockCookies).setCookie(eq(FavoriteWidget.FAVORITES_REMINDER), anyString(), any(Date.class));
 	}
 
+	@Test
+	public void testUpdateIsFavoriteViewNotAFavorite() {
+		//test when current entity is not a favorite
+		when(mockGlobalApplicationState.getFavorites()).thenReturn(new ArrayList<EntityHeader>());
+		favoriteWidget.updateIsFavoriteView();
+		verify(mockView).hideLoading();
+		verify(mockView).showIsNotFavorite();
+	}
+	
+	@Test
+	public void testUpdateIsFavoriteViewIsFavorite() {
+		//test when current entity is a favorite
+		ArrayList<EntityHeader> favorites = new ArrayList<EntityHeader>();
+		EntityHeader fav = new EntityHeader();
+		fav.setId(entityId);
+		favorites.add(fav);
+		when(mockGlobalApplicationState.getFavorites()).thenReturn(favorites);
+		favoriteWidget.updateIsFavoriteView();
+		verify(mockView).hideLoading();
+		verify(mockView).showIsFavorite();
+	}
 
 	
 }
