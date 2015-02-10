@@ -372,6 +372,21 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testGetFavoritesEmpty() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		myFavorites.clear();
+		myFavoritesJson.clear();
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setFavoritesFilterSelected();
+		verify(mockView).setFavoritesHelpPanelVisible(true);
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView, never()).addProjects(anyList());
+	}
+
+	
+	@Test
 	public void testGetProjectsByTeam() {
 		profilePresenter.setIsOwner(true);
 		Team testTeam = new Team();

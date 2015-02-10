@@ -476,15 +476,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(List<EntityHeader> result) {
 				if (filterType == ProjectFilterEnum.FAVORITES) {
 					//convert to Project Headers
-					List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
-					for (EntityHeader header : result) {
-						ProjectHeader projectHeader = new ProjectHeader();
-						projectHeader.setId(header.getId());
-						projectHeader.setName(header.getName());
-						headers.add(projectHeader);
+					if (result.size() == 0) {
+						view.showProjectsLoading(false);
+						view.setFavoritesHelpPanelVisible(true);
+					} else {
+						List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
+						for (EntityHeader header : result) {
+							ProjectHeader projectHeader = new ProjectHeader();
+							projectHeader.setId(header.getId());
+							projectHeader.setName(header.getName());
+							headers.add(projectHeader);
+						}
+						addProjectResults(headers);
+						view.setIsMoreProjectsVisible(false);	
 					}
-					addProjectResults(headers);
-					view.setIsMoreProjectsVisible(false);
 				}
 			}
 			@Override
