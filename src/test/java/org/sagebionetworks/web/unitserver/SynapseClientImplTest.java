@@ -1706,4 +1706,13 @@ public class SynapseClientImplTest {
 		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
 		assertEquals(expectedId, actualId);
 	}
+	
+	@Test
+	public void testGetFavorites() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		PaginatedResults<EntityHeader> pagedResults = new PaginatedResults<EntityHeader>();
+		pagedResults.setResults(batchHeaderResults);
+		when(mockSynapse.getFavorites(anyInt(), anyInt())).thenReturn(pagedResults);
+		List<EntityHeader> actualList = synapseClient.getFavorites(1, 2);
+		assertEquals(batchHeaderResults, actualList);
+	}
 }
