@@ -105,6 +105,7 @@
 			        <li data-target="#myCarousel" data-slide-to="2"></li>
 			        <li data-target="#myCarousel" data-slide-to="3"></li>
    			        <li data-target="#myCarousel" data-slide-to="4"></li>
+   			        <li data-target="#myCarousel" data-slide-to="5"></li>
 				  </ol>
 			      <div class="carousel-inner">
 			        <div class="item active">
@@ -114,6 +115,9 @@
 			              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM">Learn More</a></p>
 			            </div>
 			          </div>
+			        </div>
+			        <div class="item">
+			          <a href="#!Synapse:syn2580853"><g:Image resource='{sageImageBundle.ampAd}' /></a>
 			        </div>
 			        <div class="item">
 			          <a href="#!Synapse:syn2813589"><g:Image resource='{sageImageBundle.dreamSMCRNA}' /></a>
