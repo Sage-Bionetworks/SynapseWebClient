@@ -4,16 +4,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView.Presenter;
-import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -23,8 +19,6 @@ public class FavoriteWidget implements Presenter {
 
 	private FavoriteWidgetView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookies;
 
@@ -35,15 +29,11 @@ public class FavoriteWidget implements Presenter {
 	@Inject
 	public FavoriteWidget(FavoriteWidgetView view,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
 			CookieProvider cookies) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;
 		this.cookies = cookies;
 	}
@@ -56,18 +46,21 @@ public class FavoriteWidget implements Presenter {
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
 	@Override
-	public void setIsFavorite(final boolean isFavorite) {
-		setIsFavorite(entityId, isFavorite, new AsyncCallback<Void>() {
+	public void favoriteClicked() {
+		favoriteEntity(!isFavorite(entityId));
+	}
+	
+	public void favoriteEntity(boolean favorite) {
+		view.showLoading();
+		setIsFavorite(entityId, favorite, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
+				updateIsFavoriteView();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				// revert view
-				boolean revert = isFavorite ? false : true;
-				view.showIsFavorite(revert);
+				updateIsFavoriteView();
 				view.showErrorMessage(DisplayConstants.ERROR_SAVE_FAVORITE_MESSAGE);
 			}
 		});
@@ -75,12 +68,12 @@ public class FavoriteWidget implements Presenter {
 	
 	public void configureIsFavorite() {
 		if(globalApplicationState.getFavorites() != null) {
-			view.showIsFavorite(isFavorite(entityId));
+			updateIsFavoriteView();
 		} else { 
 			updateStoredFavorites(new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.showIsFavorite(isFavorite(entityId));
+					updateIsFavoriteView();
 					showReminder();
 				}
 				@Override
@@ -90,6 +83,13 @@ public class FavoriteWidget implements Presenter {
 		}
 	}
 
+	public void updateIsFavoriteView() {
+		view.hideLoading();
+		if (isFavorite(entityId))
+			view.showIsFavorite();
+		else
+			view.showIsNotFavorite();
+	}
 	/**
 	 * If the user has no favorites (and we have not reminded them lately), then pop up a reminder
 	 */
@@ -129,16 +129,11 @@ public class FavoriteWidget implements Presenter {
 	}
 
 	private void updateStoredFavorites(final AsyncCallback<Void> callback) {
-		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
+		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<List<EntityHeader>>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					PaginatedResults<EntityHeader> favorites = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
-					globalApplicationState.setFavorites(favorites.getResults());
-					callback.onSuccess(null);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void onSuccess(List<EntityHeader> favorites) {
+				globalApplicationState.setFavorites(favorites);
+				callback.onSuccess(null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

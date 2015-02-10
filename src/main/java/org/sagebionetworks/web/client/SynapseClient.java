@@ -327,7 +327,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public void removeFavorite(String entityId) throws RestServiceException;
 	
-	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
+	public List<EntityHeader> getFavorites(Integer limit, Integer offset) throws RestServiceException;
 	
 	public String createTeam(String teamName) throws RestServiceException;
 	public void deleteTeam(String teamId) throws RestServiceException;

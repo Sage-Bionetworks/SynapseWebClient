@@ -40,6 +40,8 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	Span additionalText;
 	@UiField
 	Span additionalTextUI;
+	@UiField
+	Span favoritesWidgetContainer;
 	
 	boolean isPopoverInitialized;
 	boolean isPopover;
@@ -49,7 +51,7 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	@Inject
 	public ProjectBadgeViewImpl(final Binder uiBinder,
 			SynapseJSNIUtils synapseJSNIUtils,
-			SageImageBundle sageImageBundle 
+			SageImageBundle sageImageBundle
 			) {
 		widget = uiBinder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
@@ -131,6 +133,12 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	@Override
 	public void setLastActivityVisible(boolean isVisible) {
 		additionalTextUI.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setFavoritesWidget(Widget widget) {
+		favoritesWidgetContainer.clear();
+		favoritesWidgetContainer.add(widget);
 	}
 	
 	@Override
