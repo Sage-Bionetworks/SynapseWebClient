@@ -301,7 +301,9 @@ public class EvaluationSubmitter implements Presenter {
 		newSubmission.setVersionNumber(versionNumber);
 		if (submissionName != null && submissionName.trim().length() > 0)
 			newSubmission.setName(submissionName);
-		
+		if (!selectedTeamEligibleMembers.isEmpty()) {
+			newSubmission.setContributors(selectedTeamEligibleMembers);
+		}
 		submitToEvaluation(newSubmission, etag);
 	}
 	
