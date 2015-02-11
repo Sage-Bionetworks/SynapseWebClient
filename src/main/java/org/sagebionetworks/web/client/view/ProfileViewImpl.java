@@ -9,7 +9,6 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
-import org.sagebionetworks.repo.model.ChallengeSummary;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -36,6 +35,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.google.gwt.dom.client.DivElement;
@@ -458,21 +458,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
-	private void addChallengeBadges(List<ChallengeSummary> headers, FlowPanel targetPanel) {
+	private void addChallengeBadges(List<ChallengeBundle> challenges, FlowPanel targetPanel) {
 		targetPanel.clear();
-		for (ChallengeSummary header : headers) {
+		for (ChallengeBundle challenge : challenges) {
 			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
-			badge.configure(header);
+			badge.configure(challenge);
 			Widget widget = badge.asWidget();
 			widget.addStyleName("margin-top-5");
 			targetPanel.add(widget);
 		}
-		if (headers.isEmpty())
+		if (challenges.isEmpty())
 			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
 	}
 	
 	@Override
-	public void addChallenges(List<ChallengeSummary> challenges) {
+	public void addChallenges(List<ChallengeBundle> challenges) {
 		if (challenges.size() > 0) {
 			DisplayUtils.show(challengesListItem);
 			addChallengeBadges(challenges, challengesTabContent);

@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.ChallengeSummary;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.ChallengeBundle;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -13,7 +13,7 @@ public class ChallengeBadge implements ChallengeBadgeView.Presenter, SynapseWidg
 	
 	private ChallengeBadgeView view;
 	private GlobalApplicationState globalAppState;
-	private ChallengeSummary header;
+	private ChallengeBundle challenge;
 	
 	@Inject
 	public ChallengeBadge(ChallengeBadgeView view, 
@@ -24,9 +24,9 @@ public class ChallengeBadge implements ChallengeBadgeView.Presenter, SynapseWidg
 		view.setPresenter(this);
 	}
 	
-	public void configure(ChallengeSummary header) {
-		this.header = header;
-		view.setChallenge(header);
+	public void configure(ChallengeBundle challenge) {
+		this.challenge = challenge;
+		view.setChallenge(challenge);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -40,11 +40,11 @@ public class ChallengeBadge implements ChallengeBadgeView.Presenter, SynapseWidg
 	
 	@Override
 	public void onClick() {
-		globalAppState.getPlaceChanger().goTo(new Synapse(header.getProjectId()));
+		globalAppState.getPlaceChanger().goTo(new Synapse(challenge.getChallenge().getProjectId()));
 	}
 	
 	@Override
 	public void onParticipantsClick() {
-		globalAppState.getPlaceChanger().goTo(new Team(header.getParticipantTeamId()));
+		globalAppState.getPlaceChanger().goTo(new Team(challenge.getChallenge().getParticipantTeamId()));
 	}
 }

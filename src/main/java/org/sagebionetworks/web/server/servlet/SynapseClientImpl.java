@@ -68,6 +68,7 @@ import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -117,7 +118,6 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.PaginatedIds;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -149,6 +149,8 @@ import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.server.table.TableSqlProcessor;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.ChallengeBundle;
+import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -3668,7 +3670,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void unregisterChallengeTeam(String challengeId, String teamId) {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.deleteChallengeTeam(challengeId), teamId);
+			synapseClient.deleteChallengeTeam(challengeId, teamId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -3689,7 +3691,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			org.sagebionetworks.repo.model.ChallengePagedResults pagedResults = synapseClient.listChallengeTeams(challengeId, limit, offset);
+			org.sagebionetworks.repo.model.ChallengeTeamPagedResults pagedResults = synapseClient.listChallengeTeams(challengeId, limit.longValue(), offset.longValue());
 			Long totalCount = pagedResults.getTotalNumberOfResults();
 			List<ChallengeTeamBundle> challengeTeamList = new ArrayList<ChallengeTeamBundle>();
 			IdList currentUserIdList = new IdList();
@@ -3745,7 +3747,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.listChallengesForParticipant(userId, limit.longValue(), offset.longValue());
+			org.sagebionetworks.repo.model.ChallengePagedResults pagedResults = synapseClient.listChallengesForParticipant(userId, limit.longValue(), offset.longValue());
+			List<Challenge> challenges = pagedResults.getResults();
+			
+			//gather all project ids
+			List<Reference> references = new ArrayList<Reference>();
+			for (Challenge challenge : challenges) {
+				Reference ref = new Reference();
+				ref.setTargetId(challenge.getProjectId());
+				references.add(ref);
+			}
+			BatchResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
+			List<EntityHeader> projectHeaders = headers.getResults();
+			
+			List<ChallengeBundle> results = new ArrayList<ChallengeBundle>(pagedResults.getResults().size());
+			for (int i = 0; i < challenges.size(); i++) {
+				results.add(new ChallengeBundle(challenges.get(i), projectHeaders.get(i).getName()));
+			}
+			ChallengePagedResults challengeBundles = new ChallengePagedResults(results, pagedResults.getTotalNumberOfResults());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

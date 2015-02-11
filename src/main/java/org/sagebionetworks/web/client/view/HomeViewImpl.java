@@ -53,7 +53,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
-
+	public static final String FAVORITE_STAR_HTML = "<span style=\"font-size:19px;color:#f0ad4e\" class=\"fa fa-star\"></span>";
+	
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
 	
 	@UiField
@@ -394,7 +395,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	private FlowPanel getFavoritesContainer() {
 		FlowPanel myFavPanel = new FlowPanel();
-		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
+		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FAVORITE_STAR_HTML + "</h3>")));
 		ScrollPanel favoritesScrollPanel = new ScrollPanel();
 		favoritesScrollPanel.addStyleName("panel panel-default");
 		favoritesScrollPanel.setHeight("180px");

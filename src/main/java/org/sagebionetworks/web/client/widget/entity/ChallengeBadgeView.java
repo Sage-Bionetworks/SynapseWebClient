@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.ChallengeSummary;
+import org.sagebionetworks.web.shared.ChallengeBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -12,7 +12,7 @@ public interface ChallengeBadgeView extends IsWidget {
 	 */
 	void setPresenter(Presenter presenter);
 	
-	void setChallenge(ChallengeSummary header);
+	void setChallenge(ChallengeBundle header);
 		
 	/**
 	 * Presenter interface

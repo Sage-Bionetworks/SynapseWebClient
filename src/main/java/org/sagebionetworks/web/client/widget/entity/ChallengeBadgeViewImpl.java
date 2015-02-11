@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.ChallengeSummary;
+import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.web.shared.ChallengeBundle;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -48,8 +49,8 @@ public class ChallengeBadgeViewImpl implements ChallengeBadgeView {
 		this.presenter = presenter;		
 	}
 	
-	public void setChallenge(ChallengeSummary header) {
-		link.setText(header.getName());
+	public void setChallenge(ChallengeBundle challenge) {
+		link.setText(challenge.getProjectName());
 	};
 	
 	@Override
