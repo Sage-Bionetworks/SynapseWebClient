@@ -2136,13 +2136,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public List<EntityHeader> getFavorites(Integer limit, Integer offset)
+	public List<EntityHeader> getFavorites()
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			PaginatedResults<EntityHeader> favorites = synapseClient
-					.getFavorites(limit, offset);
-			return favorites.getResults();
+					.getFavorites(MAX_LIMIT, ZERO_OFFSET);
+			List<EntityHeader> headers = favorites.getResults();
+			//sort by name
+			Collections.sort(headers, new Comparator<EntityHeader>() {
+		        @Override
+		        public int compare(EntityHeader o1, EntityHeader o2) {
+		        	return o1.getName().compareToIgnoreCase(o2.getName());
+		        }
+			});
+			return headers;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

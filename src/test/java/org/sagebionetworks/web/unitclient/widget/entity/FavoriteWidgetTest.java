@@ -54,13 +54,13 @@ public class FavoriteWidgetTest {
 		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
 		favorites.setResults(results);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(true);
 		verify(mockView).showLoading();
 		verify(mockSynapseClient).addFavorite(eq(entityId), any(AsyncCallback.class));
-		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
 	}
 
@@ -68,13 +68,13 @@ public class FavoriteWidgetTest {
 	@Test
 	public void testSetIsFavoriteUnset() throws Exception {
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(false);
 		verify(mockView).showLoading();
 		verify(mockSynapseClient).removeFavorite(eq(entityId), any(AsyncCallback.class));
-		verify(mockSynapseClient).getFavorites(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
 	}
 	
