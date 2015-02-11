@@ -219,7 +219,7 @@ public interface SynapseClientAsync {
 
 	void removeFavorite(String entityId, AsyncCallback<Void> callback);
 
-	void getFavorites(Integer limit, Integer offset, AsyncCallback<List<EntityHeader>> callback);
+	void getFavorites(AsyncCallback<List<EntityHeader>> callback);
 	
 	/**
 	 * TEAMS
