@@ -113,7 +113,7 @@ public class FavoriteWidget implements Presenter {
 	}
 
 	private void updateStoredFavorites(final AsyncCallback<Void> callback) {
-		synapseClient.getFavorites(Integer.MAX_VALUE, 0, new AsyncCallback<List<EntityHeader>>() {
+		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
 				globalApplicationState.setFavorites(favorites);
