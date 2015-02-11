@@ -2147,7 +2147,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Collections.sort(headers, new Comparator<EntityHeader>() {
 		        @Override
 		        public int compare(EntityHeader o1, EntityHeader o2) {
-		        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+		        	return o1.getName().compareToIgnoreCase(o2.getName());
 		        }
 			});
 			return headers;
