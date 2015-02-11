@@ -2,16 +2,13 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -24,7 +21,6 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 	private ChallengeParticipantsView view;
 	private Map<String,String> descriptor;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private String challengeId;
 	private boolean isInTeam;
 	private Callback widgetRefreshRequired;
@@ -35,12 +31,10 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 	@Inject
 	public ChallengeParticipantsWidget(ChallengeParticipantsView view, 
 			DetailedPaginationWidget paginationWidget, 
-			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.paginationWidget = paginationWidget;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setPresenter(this);
 	}
@@ -69,24 +63,17 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 		view.hideErrors();
 		view.showLoading();
 		view.clearParticipants();
-		synapseClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<String>() {
+		synapseClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<UserProfilePagedResults>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					view.hideLoading();
-					PaginatedResults<UserGroupHeader> users = nodeModelCreator.createPaginatedResults(result, UserGroupHeader.class);
-					if (users.getTotalNumberOfResults() > 0) {
-						//configure the pager, and the participant list
-						paginationWidget.configure(DEFAULT_PARTICIPANT_LIMIT, newOffset, users.getTotalNumberOfResults(), ChallengeParticipantsWidget.this);
-						for (UserGroupHeader header : users.getResults()) {
-							view.addParticipant(header.getOwnerId());
-						}
-					} 
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
-
-				
+			public void onSuccess(UserProfilePagedResults results) {
+				view.hideLoading();
+				if (results.getTotalNumberOfResults() > 0) {
+					//configure the pager, and the participant list
+					paginationWidget.configure(DEFAULT_PARTICIPANT_LIMIT, newOffset, results.getTotalNumberOfResults(), ChallengeParticipantsWidget.this);
+					for (UserProfile userProfile : results.getResults()) {
+						view.addParticipant(userProfile);
+					}
+				} 
 			}
 			@Override
 			public void onFailure(Throwable caught) {

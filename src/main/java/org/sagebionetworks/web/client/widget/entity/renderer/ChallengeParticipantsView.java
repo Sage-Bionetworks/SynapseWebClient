@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -15,7 +16,7 @@ public interface ChallengeParticipantsView extends IsWidget, SynapseView {
 	 */
 	void setPaginationWidget(Widget paginationWidget);
 	void clearParticipants();
-	void addParticipant(String userId);
+	void addParticipant(UserProfile profile);
 	void hideErrors();
 	void hideLoading();
 	

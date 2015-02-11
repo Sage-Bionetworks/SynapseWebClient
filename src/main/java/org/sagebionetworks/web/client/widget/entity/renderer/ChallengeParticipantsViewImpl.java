@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -60,9 +61,9 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 		participantsContainer.clear();
 	}
 	@Override
-	public void addParticipant(String userId) {
+	public void addParticipant(UserProfile profile) {
 		UserBadge userBadge = ginInjector.getUserBadgeWidget();
-		userBadge.configure(userId);
+		userBadge.configure(profile);
 		participantsContainer.add(userBadge.asWidget());
 	}
 

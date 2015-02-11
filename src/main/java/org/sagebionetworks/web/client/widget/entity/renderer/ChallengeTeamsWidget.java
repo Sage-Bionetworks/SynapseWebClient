@@ -2,19 +2,16 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.ChallengeTeamSummary;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialog;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ChallengeTeamBundle;
+import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -27,28 +24,24 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	private ChallengeTeamsView view;
 	private Map<String,String> descriptor;
 	private EditRegisteredTeamDialog dialog;
-	private AuthenticationController authController;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private String challengeId;
 	private Callback widgetRefreshRequired;
 	private DetailedPaginationWidget paginationWidget;
 	public static final Long DEFAULT_TEAM_LIMIT = 50L;
 	public static final Long DEFAULT_OFFSET = 0L;
-	
+	private AuthenticationController authController;
 	@Inject
 	public ChallengeTeamsWidget(ChallengeTeamsView view, 
 			EditRegisteredTeamDialog dialog, 
 			DetailedPaginationWidget paginationWidget, 
-			AuthenticationController authController,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator) {
+			AuthenticationController authController) {
 		this.view = view;
 		this.dialog = dialog;
 		this.paginationWidget = paginationWidget;
-		this.authController = authController;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
+		this.authController = authController;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setEditRegisteredTeamDialog(dialog.asWidget());
 		view.setPresenter(this);
@@ -73,26 +66,19 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 		view.hideErrors();
 		view.showLoading();
 		view.clearTeams();
-		synapseClient.getChallengeTeamSummaries(challengeId, authController.getCurrentUserPrincipalId(),DEFAULT_TEAM_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<String>() {
+		synapseClient.getChallengeTeams(authController.getCurrentUserPrincipalId(), challengeId,DEFAULT_TEAM_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<ChallengeTeamPagedResults>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					view.hideLoading();
-					PaginatedResults<ChallengeTeamSummary> challenges = nodeModelCreator.createPaginatedResults(result, ChallengeTeamSummary.class);
-					if (challenges.getTotalNumberOfResults() > 0) {
-						//configure the pager, and the challenge list
-						paginationWidget.configure(DEFAULT_TEAM_LIMIT, newOffset, challenges.getTotalNumberOfResults(), ChallengeTeamsWidget.this);
-						for (ChallengeTeamSummary challenge : challenges.getResults()) {
-							view.addChallengeTeam(challenge.getTeamId(), 
-								DisplayUtils.replaceWithEmptyStringIfNull(challenge.getMessage()), 
-								challenge.getUserIsAdmin());
-						}
-					} 
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
-
-				
+			public void onSuccess(ChallengeTeamPagedResults results) {
+				view.hideLoading();
+				if (results.getTotalNumberOfResults() > 0) {
+					//configure the pager, and the challenge list
+					paginationWidget.configure(DEFAULT_TEAM_LIMIT, newOffset, results.getTotalNumberOfResults(), ChallengeTeamsWidget.this);
+					for (ChallengeTeamBundle challenge : results.getResults()) {
+						view.addChallengeTeam(challenge.getChallengeTeam().getTeamId(), 
+							DisplayUtils.replaceWithEmptyStringIfNull(challenge.getChallengeTeam().getMessage()), 
+							challenge.isAdmin());
+					}
+				} 
 			}
 			@Override
 			public void onFailure(Throwable caught) {
