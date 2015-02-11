@@ -21,6 +21,7 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void setContributorsListVisible(boolean isVisible);
 	void addEligibleContributor(String principalId);
 	void addInEligibleContributor(String principalId, String reason);
+	void setTeamInEligibleErrorVisible(boolean isVisible, String error);
 	void clearContributors();
 	void setTeams(List<Team> registeredTeams);
 	void showRegisterTeamDialog(String challengeId);

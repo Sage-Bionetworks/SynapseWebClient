@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
@@ -75,6 +76,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Anchor registerMyTeamLink;
 	@UiField
 	Anchor createNewTeamLink;
+	@UiField
+	Paragraph teamIneligibleHtml;
 	
 	private PortalGinInjector ginInjector;
 	private RegisterTeamDialog registerTeamDialog;
@@ -278,6 +281,12 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		row.add(span);
 		
 		contributorsPanel.add(row);
+	}
+	
+	@Override
+	public void setTeamInEligibleErrorVisible(boolean isVisible, String error) {
+		teamIneligibleHtml.setVisible(isVisible);
+		teamIneligibleHtml.setText(error);
 	}
 	
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {

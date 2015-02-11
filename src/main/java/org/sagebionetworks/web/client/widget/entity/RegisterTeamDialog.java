@@ -62,7 +62,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	}
 	
 	public void getRegistratableTeams() {
-		synapseClient.getRegistratableTeams(new AsyncCallback<List<Team>>() {
+		synapseClient.getRegistratableTeams(challengeId, new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> result) {
 				teams = result;

@@ -54,6 +54,7 @@
 					</b:FormGroup>
 					<be:Select ui:field="teamComboBox" />
 					<bh:Div addStyleNames="highlight-box" ui:field="contributorsPanel" />
+					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
 				</b:FieldSet>
 			</b:ModalBody>
 			<b:ModalFooter>

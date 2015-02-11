@@ -48,6 +48,7 @@ public class EvaluationSubmitter implements Presenter {
 	private Challenge challenge;
 	private Team selectedTeam;
 	private String selectedTeamMemberStateHash;
+	private List<Long> selectedTeamEligibleMembers;
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
 			SynapseClientAsync synapseClient,
@@ -72,6 +73,7 @@ public class EvaluationSubmitter implements Presenter {
 		evaluation = null;
 		selectedTeam = null;
 		teams = new ArrayList<Team>();
+		selectedTeamEligibleMembers = new ArrayList<Long>();
 		view.showLoading();
 		this.submissionEntity = submissionEntity;
 		try {
@@ -153,7 +155,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void getAvailableTeams() {
-		synapseClient.getSubmissionTeams(challenge.getId(), getTeamsCallback());
+		synapseClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
 	}
 	
 	@Override
@@ -208,7 +210,9 @@ public class EvaluationSubmitter implements Presenter {
 	public void teamSelected(String selectedTeamName) {
 		selectedTeam = null;
 		selectedTeamMemberStateHash = null;
+		selectedTeamEligibleMembers.clear();
 		view.clearContributors();
+		view.setTeamInEligibleErrorVisible(false, "");
 		//resolve team from team name
 		for (Team team : teams) {
 			if(selectedTeamName.equals(team.getName())) {
@@ -218,21 +222,34 @@ public class EvaluationSubmitter implements Presenter {
 		}
 		if (selectedTeam != null) {
 			//get contributor list for this team
-			synapseClient.getTeamState(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamState>() {
+			synapseClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
 				@Override
-				public void onSuccess(TeamState teamState) {
-					selectedTeamMemberStateHash = teamState.getMemberStateHash();
-					for (TeamMemberState memberState : teamState.getTeamMemberStates()) {
-						if (memberState.isEligible()) {
-							view.addEligibleContributor(memberState.getPrincipalId());
-						} else {
-							String reason = ""; //unknown reason
-							if (!memberState.isRegistered()) {
-								reason = "Not registered for the challenge.";
-							} else if (memberState.isQuotaFilled) {
-								reason = "Exceeded the submission quota.";
+				public void onSuccess(TeamSubmissionEligibility teamState) {
+					//is the team eligible???
+					if (!teamState.isEligible()) {
+						//show the error
+						String reason = ""; //unknown reason
+						if (!teamState.isRegistered()) {
+							reason = selectedTeam.getName() + " is not registered for this challenge. Please register this team, or select a different team.";
+						} else if (teamState.isQuotaFilled) {
+							reason = selectedTeam.getName() + " has exceeded the submission quota.";
+						}
+						view.setTeamInEligibleErrorVisible(true, reason);
+					} else {
+						selectedTeamMemberStateHash = teamState.getMemberStateHash();
+						for (MemberSubmissionEligibility memberState : teamState.getTeamMemberEligibilityList()) {
+							if (memberState.isEligible()) {
+								selectedTeamEligibleMembers.add(memberState.getPrincipalId());
+								view.addEligibleContributor(memberState.getPrincipalId());
+							} else {
+								String reason = ""; //unknown reason
+								if (!memberState.isRegistered()) {
+									reason = "Not registered for the challenge.";
+								} else if (memberState.isQuotaFilled) {
+									reason = "Exceeded the submission quota.";
+								}
+								view.addInEligibleContributor(memberState.getPrincipalId(), reason);
 							}
-							view.addInEligibleContributor(memberState.getPrincipalId(), reason);
 						}
 					}
 				};
