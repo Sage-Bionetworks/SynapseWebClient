@@ -7,7 +7,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class ChallengeTeamPagedResults implements IsSerializable {
 	private Long totalNumberOfResults;
 	private List<ChallengeTeamBundle> results;
-	private boolean isAdmin;
 	/**
 	 * Default constructor is required
 	 */
@@ -37,24 +36,11 @@ public class ChallengeTeamPagedResults implements IsSerializable {
 		this.results = results;
 	}
 
-	
-
-
-	public boolean isAdmin() {
-		return isAdmin;
-	}
-
-
-	public void setAdmin(boolean isAdmin) {
-		this.isAdmin = isAdmin;
-	}
-
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (isAdmin ? 1231 : 1237);
 		result = prime * result + ((results == null) ? 0 : results.hashCode());
 		result = prime * result + ((totalNumberOfResults == null) ? 0 : totalNumberOfResults.hashCode());
 		return result;
@@ -70,8 +56,6 @@ public class ChallengeTeamPagedResults implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ChallengeTeamPagedResults other = (ChallengeTeamPagedResults) obj;
-		if (isAdmin != other.isAdmin)
-			return false;
 		if (results == null) {
 			if (other.results != null)
 				return false;
@@ -85,11 +69,10 @@ public class ChallengeTeamPagedResults implements IsSerializable {
 		return true;
 	}
 
+
 	@Override
 	public String toString() {
-		return "ChallengeTeamPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + ", isAdmin=" + isAdmin + "]";
+		return "ChallengeTeamPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + "]";
 	}
-
-	
 	
 }
