@@ -76,6 +76,7 @@ public class EvaluationSubmitter implements Presenter {
 		teams = new ArrayList<Team>();
 		selectedTeamEligibleMembers = new ArrayList<Long>();
 		view.showLoading();
+		view.setContributorsListVisible(false);
 		this.submissionEntity = submissionEntity;
 		try {
 			if (evaluationIds == null)
@@ -168,7 +169,7 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void createNewTeamClicked() {
 		if (authenticationController.isLoggedIn())
-			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.TEAMS_DELIMITER));
 		else {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
@@ -221,6 +222,7 @@ public class EvaluationSubmitter implements Presenter {
 				break;
 			}
 		}
+		view.setContributorsListVisible(false);
 		if (selectedTeam != null) {
 			//TODO: get contributor list for this team
 //			challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
@@ -252,6 +254,7 @@ public class EvaluationSubmitter implements Presenter {
 //								view.addInEligibleContributor(memberState.getPrincipalId(), reason);
 //							}
 //						}
+//						view.setContributorsListVisible(true);
 //					}
 //				};
 //				@Override

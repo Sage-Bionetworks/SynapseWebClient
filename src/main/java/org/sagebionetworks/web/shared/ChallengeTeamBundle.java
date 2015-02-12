@@ -8,6 +8,9 @@ public class ChallengeTeamBundle implements IsSerializable{
 	
 	private ChallengeTeam challengeTeam;
 	private boolean isAdmin;
+	public ChallengeTeamBundle() {
+	}
+	
 	public ChallengeTeamBundle(ChallengeTeam challengeTeam, boolean isAdmin) {
 		super();
 		this.challengeTeam = challengeTeam;

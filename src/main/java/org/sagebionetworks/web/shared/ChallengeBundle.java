@@ -9,6 +9,9 @@ public class ChallengeBundle implements IsSerializable{
 	private Challenge challenge;
 	private String projectName;
 	
+	public ChallengeBundle() {
+	}
+	
 	public ChallengeBundle(Challenge challenge, String projectName) {
 		super();
 		this.challenge = challenge;

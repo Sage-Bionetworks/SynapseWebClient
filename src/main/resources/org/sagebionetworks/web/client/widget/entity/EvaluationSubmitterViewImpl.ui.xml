@@ -33,9 +33,6 @@
 						</b:FormGroup>
 					</b:FieldSet>
 				</b:Form>
-				<b:Anchor ui:field="createNewTeamLink" text="Create a new team"/>
-				<b:Anchor ui:field="registerMyTeamLink" text="Register my team for this challenge."/>
-				<g:SimplePanel ui:field="registerTeamDialogContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
@@ -46,16 +43,21 @@
 				fade="true" dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
 			<b:ModalBody>
 				<b:FieldSet>
-					<b:FormGroup>
-						<b:ButtonGroup>
-							<b:RadioButton ui:field="isIndividualRadioButton" text="I am submitting as an individual"/>
-							<b:RadioButton text="I am submitting as part of a team:"/>
-						</b:ButtonGroup>
-					</b:FormGroup>
+					<b:ButtonGroup>
+						<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
+						<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
+					</b:ButtonGroup>
 					<be:Select ui:field="teamComboBox" />
-					<bh:Div addStyleNames="highlight-box" ui:field="contributorsPanel" />
+					<bh:Div addStyleNames="highlight-box" ui:field="contributorsPanel" visible="false"/>
 					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
 				</b:FieldSet>
+				<bh:Div>
+					<b:Anchor ui:field="createNewTeamLink" text="Create a new team"/>
+				</bh:Div>
+				<bh:Div>
+					<b:Anchor ui:field="registerMyTeamLink" text="Register my team for this challenge"/>
+				</bh:Div>
+				<g:SimplePanel ui:field="registerTeamDialogContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>

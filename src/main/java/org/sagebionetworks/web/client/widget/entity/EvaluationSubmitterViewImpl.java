@@ -8,7 +8,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.RadioButton;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -67,7 +67,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	Select teamComboBox;
 	@UiField
-	RadioButton isIndividualRadioButton;
+	Radio isIndividualRadioButton;
+	@UiField
+	Radio isTeamRadioButton;
 	@UiField
 	Div contributorsPanel;
 	@UiField
@@ -165,6 +167,18 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.createNewTeamClicked();
+			}
+		});
+		isIndividualRadioButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				teamComboBox.setEnabled(false);
+			}
+		});
+		isTeamRadioButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				teamComboBox.setEnabled(true);
 			}
 		});
 	}
