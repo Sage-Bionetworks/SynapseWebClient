@@ -61,7 +61,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		private static String versionInfo = "";
 
 		static {
-			InputStream s = SynapseClientImpl.class
+			InputStream s = ChallengeClientImpl.class
 					.getResourceAsStream("/version-info.properties");
 			Properties prop = new Properties();
 			try {
