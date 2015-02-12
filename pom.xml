@@ -16,12 +16,12 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2015-01-30-1577-40e5630</synapse.version>
+ 		<synapse.version>77.0-6-g5871d0f</synapse.version>
 		<gwtVersion>2.5.1</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
 		<xstream.version>1.3.1</xstream.version>
-		<schema-to-pojo.version>0.3.5</schema-to-pojo.version>
+		<schema-to-pojo.version>0.3.10</schema-to-pojo.version>
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.0-beta8</log4j.version>
