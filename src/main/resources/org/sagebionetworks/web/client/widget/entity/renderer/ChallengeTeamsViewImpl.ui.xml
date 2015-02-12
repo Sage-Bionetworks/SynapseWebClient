@@ -9,7 +9,7 @@
 	<bh:Div>
 		<bh:Div ui:field="loadingUI" >
 			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-			&nbsp;Loading...
+			<bh:Text>&nbsp; Loading...</bh:Text>
 		</bh:Div>
 
 		<b:Alert type="WARNING" ui:field="errorUI">

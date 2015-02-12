@@ -8,7 +8,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
-	public interface EvaluationSubmitterViewImplUiBinder extends UiBinder<Widget, EvaluationSubmitterViewImpl> {}
+	public interface Binder extends UiBinder<Widget, EvaluationSubmitterViewImpl> {}
 	private Presenter presenter;
 	private EvaluationList evaluationList;
 	private EntityFinder entityFinder;
@@ -67,7 +67,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	Select teamComboBox;
 	@UiField
-	Radio isIndividualRadioButton;
+	RadioButton isIndividualRadioButton;
 	@UiField
 	Div contributorsPanel;
 	@UiField
@@ -84,7 +84,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	@Inject
 	public EvaluationSubmitterViewImpl(
-			EvaluationSubmitterViewImplUiBinder binder, 
+			Binder binder, 
 			EntityFinder entityFinder, 
 			EvaluationList evaluationList, 
 			PortalGinInjector ginInjector,

@@ -7,8 +7,8 @@
   >
 	<bh:Div>
 		<b:Anchor ui:field="link" addStyleNames="displayInline"></b:Anchor>
-		<b:Tooltip title="Participants" addStyleNames="displayInline">
-			<b:Anchor ui:field="participantsLink" icon="GROUP" />
+		<b:Tooltip title="Participants">
+			<b:Anchor ui:field="participantsLink" icon="GROUP" addStyleNames="displayInline"/>
 		</b:Tooltip>
 		
 	</bh:Div>

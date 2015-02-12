@@ -254,6 +254,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsView;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
@@ -268,6 +270,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
+import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
@@ -1069,5 +1073,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeBadgeView.class).to(ChallengeBadgeViewImpl.class);
 		bind(ProjectBadgeView.class).to(ProjectBadgeViewImpl.class);
 		bind(TableQueryResultWikiWidgetView.class).to(TableQueryResultWikiWidgetViewImpl.class);
+		
+		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
+		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
 	}
 }
