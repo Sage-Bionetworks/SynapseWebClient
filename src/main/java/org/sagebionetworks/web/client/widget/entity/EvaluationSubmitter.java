@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,7 +10,6 @@ import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamHeader;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -224,44 +222,44 @@ public class EvaluationSubmitter implements Presenter {
 			}
 		}
 		if (selectedTeam != null) {
-			//get contributor list for this team
-			challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
-				@Override
-				public void onSuccess(TeamSubmissionEligibility teamState) {
-					//is the team eligible???
-					if (!teamState.isEligible()) {
-						//show the error
-						String reason = ""; //unknown reason
-						if (!teamState.isRegistered()) {
-							reason = selectedTeam.getName() + " is not registered for this challenge. Please register this team, or select a different team.";
-						} else if (teamState.isQuotaFilled) {
-							reason = selectedTeam.getName() + " has exceeded the submission quota.";
-						}
-						view.setTeamInEligibleErrorVisible(true, reason);
-					} else {
-						selectedTeamMemberStateHash = teamState.getMemberStateHash();
-						for (MemberSubmissionEligibility memberState : teamState.getTeamMemberEligibilityList()) {
-							if (memberState.isEligible()) {
-								selectedTeamEligibleMembers.add(memberState.getPrincipalId());
-								view.addEligibleContributor(memberState.getPrincipalId());
-							} else {
-								String reason = ""; //unknown reason
-								if (!memberState.isRegistered()) {
-									reason = "Not registered for the challenge.";
-								} else if (memberState.isQuotaFilled) {
-									reason = "Exceeded the submission quota.";
-								}
-								view.addInEligibleContributor(memberState.getPrincipalId(), reason);
-							}
-						}
-					}
-				};
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
-				}
-			});
+			//TODO: get contributor list for this team
+//			challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
+//				@Override
+//				public void onSuccess(TeamSubmissionEligibility teamState) {
+//					//is the team eligible???
+//					if (!teamState.isEligible()) {
+//						//show the error
+//						String reason = ""; //unknown reason
+//						if (!teamState.isRegistered()) {
+//							reason = selectedTeam.getName() + " is not registered for this challenge. Please register this team, or select a different team.";
+//						} else if (teamState.isQuotaFilled) {
+//							reason = selectedTeam.getName() + " has exceeded the submission quota.";
+//						}
+//						view.setTeamInEligibleErrorVisible(true, reason);
+//					} else {
+//						selectedTeamMemberStateHash = teamState.getMemberStateHash();
+//						for (MemberSubmissionEligibility memberState : teamState.getTeamMemberEligibilityList()) {
+//							if (memberState.isEligible()) {
+//								selectedTeamEligibleMembers.add(memberState.getPrincipalId());
+//								view.addEligibleContributor(memberState.getPrincipalId());
+//							} else {
+//								String reason = ""; //unknown reason
+//								if (!memberState.isRegistered()) {
+//									reason = "Not registered for the challenge.";
+//								} else if (memberState.isQuotaFilled) {
+//									reason = "Exceeded the submission quota.";
+//								}
+//								view.addInEligibleContributor(memberState.getPrincipalId(), reason);
+//							}
+//						}
+//					}
+//				};
+//				@Override
+//				public void onFailure(Throwable caught) {
+//					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+//						view.showErrorMessage(caught.getMessage());
+//				}
+//			});
 		}
 	}
 	
@@ -305,7 +303,8 @@ public class EvaluationSubmitter implements Presenter {
 		if (submissionName != null && submissionName.trim().length() > 0)
 			newSubmission.setName(submissionName);
 		if (!selectedTeamEligibleMembers.isEmpty()) {
-			newSubmission.setContributors(selectedTeamEligibleMembers);
+			//TODO: set contributors
+//			newSubmission.setContributors(selectedTeamEligibleMembers);
 		}
 		submitToEvaluation(newSubmission, etag);
 	}

@@ -1,183 +1,49 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.AsynchJobType;
-import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
-import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
-import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityIdList;
-import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.ListWrapper;
-import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.MembershipInvitation;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
-import org.sagebionetworks.repo.model.MembershipRequest;
-import org.sagebionetworks.repo.model.MembershipRqstSubmission;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
-import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
-import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.attachment.PresignedUrl;
-import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
-import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.file.ChunkRequest;
-import org.sagebionetworks.repo.model.file.ChunkedFileToken;
-import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
-import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
-import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.file.State;
-import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
-import org.sagebionetworks.repo.model.file.UploadDestination;
-import org.sagebionetworks.repo.model.message.MessageToUser;
-import org.sagebionetworks.repo.model.principal.AddEmailInfo;
-import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
-import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
-import org.sagebionetworks.repo.model.principal.AliasType;
-import org.sagebionetworks.repo.model.provenance.Activity;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
-import org.sagebionetworks.repo.model.quiz.Quiz;
-import org.sagebionetworks.repo.model.quiz.QuizResponse;
-import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.repo.model.search.SearchResults;
-import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.RowReferenceSet;
-import org.sagebionetworks.repo.model.table.RowSelection;
-import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.repo.model.table.TableFileHandleResults;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.table.query.ParseException;
-import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.web.client.ChallengeClient;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClient;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
-import org.sagebionetworks.web.server.table.TableSqlProcessor;
-import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityConstants;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
-import org.sagebionetworks.web.shared.MembershipRequestBundle;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
-import org.sagebionetworks.web.shared.SerializableWhitelist;
-import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
-import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
-import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -413,7 +279,8 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createSubmission(submission, etag, teamId, memberStateHash);
+			//TODO: use new submission method that uses team id and member state hash
+			return synapseClient.createSubmission(submission, etag);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -529,10 +396,13 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public List<Team> getSubmissionTeams(String userId, String challengeId) {
+	public List<Team> getSubmissionTeams(String userId, String challengeId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedIds results = synapseClient.listSubmissionTeams(challengeId, userId, GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET);
+			//TODO: use new listSubmissionTeams
+			PaginatedIds results = new PaginatedIds();
+			results.setResults(new ArrayList<String>());
+//			PaginatedIds results = synapseClient.listSubmissionTeams(challengeId, userId, GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET);
 			return getTeams(results.getResults(), synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -549,7 +419,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ChallengeTeam registerChallengeTeam(ChallengeTeam challengeTeam) {
+	public ChallengeTeam registerChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.createChallengeTeam(challengeTeam);
@@ -559,17 +429,17 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public void unregisterChallengeTeam(String challengeId, String teamId) {
+	public void unregisterChallengeTeam(String challengeId, String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.deleteChallengeTeam(challengeId, teamId);
+			synapseClient.deleteChallengeTeam(Long.parseLong(challengeId), Long.parseLong(teamId));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	@Override
-	public ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam) {
+	public ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.updateChallengeTeam(challengeTeam);
@@ -583,7 +453,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			org.sagebionetworks.repo.model.ChallengeTeamPagedResults pagedResults = synapseClient.listChallengeTeams(challengeId, limit.longValue(), offset.longValue());
+			org.sagebionetworks.repo.model.ChallengeTeamPagedResults pagedResults = synapseClient.listChallengeTeams(Long.parseLong(challengeId), limit.longValue(), offset.longValue());
 			Long totalCount = pagedResults.getTotalNumberOfResults();
 			List<ChallengeTeamBundle> challengeTeamList = new ArrayList<ChallengeTeamBundle>();
 			IdList currentUserIdList = new IdList();
@@ -610,7 +480,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			PaginatedIds paginatedIds = synapseClient.listChallengeParticipants(challengeId, affiliated, limit.longValue(), offset.longValue());
+			PaginatedIds paginatedIds = synapseClient.listChallengeParticipants(Long.parseLong(challengeId), affiliated, limit.longValue(), offset.longValue());
 			//TODO: get all user profiles in a single batch call when that service is available
 			UserProfilePagedResults userProfiles = new UserProfilePagedResults();
 			List<UserProfile> userProfileResults = new ArrayList<UserProfile>();
@@ -619,6 +489,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			}
 			userProfiles.setTotalNumberOfResults(paginatedIds.getTotalNumberOfResults());
 			userProfiles.setResults(userProfileResults);
+			return userProfiles;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -628,7 +499,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	public Challenge getChallenge(String projectId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getChallenge(projectId);
+			return synapseClient.getChallengeForProject(projectId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -639,7 +510,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			org.sagebionetworks.repo.model.ChallengePagedResults pagedResults = synapseClient.listChallengesForParticipant(userId, limit.longValue(), offset.longValue());
+			org.sagebionetworks.repo.model.ChallengePagedResults pagedResults = synapseClient.listChallengesForParticipant(Long.parseLong(userId), limit.longValue(), offset.longValue());
 			List<Challenge> challenges = pagedResults.getResults();
 			
 			//gather all project ids
@@ -657,6 +528,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 				results.add(new ChallengeBundle(challenges.get(i), projectHeaders.get(i).getName()));
 			}
 			ChallengePagedResults challengeBundles = new ChallengePagedResults(results, pagedResults.getTotalNumberOfResults());
+			return challengeBundles;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -666,7 +538,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	public List<Team> getRegistratableTeams(String challengeId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedIds results = synapseClient.listRegistratableTeams(challengeId, GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET); 
+			PaginatedIds results = synapseClient.listRegistratableTeams(Long.parseLong(challengeId), GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET); 
 			return getTeams(results.getResults(), synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
