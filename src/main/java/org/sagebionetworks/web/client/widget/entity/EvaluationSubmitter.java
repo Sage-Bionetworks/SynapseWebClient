@@ -13,8 +13,8 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamHeader;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.table.PaginatedIds;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -37,6 +37,7 @@ public class EvaluationSubmitter implements Presenter {
 
 	private EvaluationSubmitterView view;
 	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
@@ -54,13 +55,15 @@ public class EvaluationSubmitter implements Presenter {
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			ChallengeClientAsync challengeClient) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.challengeClient = challengeClient;
 	}
 	
 	/**
@@ -78,9 +81,9 @@ public class EvaluationSubmitter implements Presenter {
 		this.submissionEntity = submissionEntity;
 		try {
 			if (evaluationIds == null)
-				synapseClient.getAvailableEvaluations(getEvalCallback());
+				challengeClient.getAvailableEvaluations(getEvalCallback());
 			else
-				synapseClient.getAvailableEvaluations(evaluationIds, getEvalCallback());
+				challengeClient.getAvailableEvaluations(evaluationIds, getEvalCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
@@ -141,7 +144,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void queryForChallenge() {
-		synapseClient.getChallenge(evaluation.getContentSource(), new AsyncCallback<Challenge>() {
+		challengeClient.getChallenge(evaluation.getContentSource(), new AsyncCallback<Challenge>() {
 			@Override
 			public void onSuccess(Challenge result) {
 				challenge = result;
@@ -155,7 +158,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void getAvailableTeams() {
-		synapseClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
+		challengeClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
 	}
 	
 	@Override
@@ -222,7 +225,7 @@ public class EvaluationSubmitter implements Presenter {
 		}
 		if (selectedTeam != null) {
 			//get contributor list for this team
-			synapseClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
+			challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
 				@Override
 				public void onSuccess(TeamSubmissionEligibility teamState) {
 					//is the team eligible???
@@ -319,7 +322,7 @@ public class EvaluationSubmitter implements Presenter {
 				memberStateHash = selectedTeamMemberStateHash;
 			}
 			
-			synapseClient.createSubmission(newSubmission, etag, teamId, memberStateHash, new AsyncCallback<Submission>() {			
+			challengeClient.createSubmission(newSubmission, etag, teamId, memberStateHash, new AsyncCallback<Submission>() {			
 				@Override
 				public void onSuccess(Submission result) {
 					//result is the updated submission

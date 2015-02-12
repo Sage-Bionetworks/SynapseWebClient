@@ -6,9 +6,9 @@ import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -32,21 +32,21 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private Map<String,String> descriptor;
 	private WikiPageKey wikiKey;
 	private AuthenticationController authenticationController;
-	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
 	private EvaluationSubmitter evaluationSubmitter;
 	private String[] evaluationIds;
 	
 	@Inject
-	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, SynapseClientAsync synapseClient,
+	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, ChallengeClientAsync challengeClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			NodeModelCreator nodeModelCreator,
 			EvaluationSubmitter evaluationSubmitter) {
 		this.view = view;
 		view.setPresenter(this);
-		this.synapseClient = synapseClient;
+		this.challengeClient = challengeClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
@@ -78,7 +78,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 			for (int i = 0; i < evaluationIds.length; i++) {
 				targetEvaluations.add(evaluationIds[i]);
 			}
-			synapseClient.getAvailableEvaluations(targetEvaluations, new AsyncCallback<String>() {
+			challengeClient.getAvailableEvaluations(targetEvaluations, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String jsonString) {
 					try {

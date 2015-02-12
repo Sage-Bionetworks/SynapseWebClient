@@ -29,6 +29,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -55,6 +56,7 @@ public class EvaluationSubmitterTest {
 	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapseClient;
+	ChallengeClientAsync mockChallengeClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	JSONObjectAdapter jSONObjectAdapter = new JSONObjectAdapterImpl();
 	EvaluationSubmitter mockEvaluationSubmitter;
@@ -72,8 +74,9 @@ public class EvaluationSubmitterTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockNodeModelCreator, jSONObjectAdapter, mockGlobalApplicationState, mockAuthenticationController);
+		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockNodeModelCreator, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient);
 		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");
@@ -83,9 +86,8 @@ public class EvaluationSubmitterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		returnSubmission = new Submission();
 		returnSubmission.setId("363636");
-		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockSynapseClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUnmetEvaluationAccessRequirements(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(2);
@@ -125,7 +127,6 @@ public class EvaluationSubmitterTest {
 		submitter.configure(entity, null);
 		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
-		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient, times(2)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 
 		ArgumentCaptor<HashSet> captor = ArgumentCaptor.forClass(HashSet.class);
@@ -145,7 +146,6 @@ public class EvaluationSubmitterTest {
 		submitter.configure(entity, null);
 		submitter.submitToEvaluations(null, submissionName, teamName, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
-		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
 		verify(mockSynapseClient, times(2)).createSubmission(captor.capture(), anyString(), any(AsyncCallback.class));
 		Submission submission = captor.getValue();
@@ -186,7 +186,6 @@ public class EvaluationSubmitterTest {
 		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
 		
 		//should show terms of use for the requirement, view does not call back so submission should not be created
-		verify(mockView, times(1)).showAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient, times(0)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 	}
 	

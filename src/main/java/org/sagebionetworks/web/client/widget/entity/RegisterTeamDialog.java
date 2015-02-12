@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -19,18 +19,18 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	private String challengeId;
 	private String selectedTeamId;
 	private List<Team> teams;
-	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private Callback callback;
 	
 	@Inject
 	public RegisterTeamDialog(RegisterTeamDialogView view, 
-			SynapseClientAsync synapseClient,
+			ChallengeClientAsync challengeClient,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authController) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.challengeClient = challengeClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
 		
@@ -62,7 +62,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	}
 	
 	public void getRegistratableTeams() {
-		synapseClient.getRegistratableTeams(challengeId, new AsyncCallback<List<Team>>() {
+		challengeClient.getRegistratableTeams(challengeId, new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> result) {
 				teams = result;
@@ -91,7 +91,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 			challengeTeam.setTeamId(selectedTeamId);
 			challengeTeam.setChallengeId(challengeId);
 			challengeTeam.setMessage(view.getRecruitmentMessage());
-			synapseClient.registerChallengeTeam(challengeTeam, new AsyncCallback<ChallengeTeam>() {
+			challengeClient.registerChallengeTeam(challengeTeam, new AsyncCallback<ChallengeTeam>() {
 				@Override
 				public void onSuccess(ChallengeTeam result) {
 					if (callback != null) {

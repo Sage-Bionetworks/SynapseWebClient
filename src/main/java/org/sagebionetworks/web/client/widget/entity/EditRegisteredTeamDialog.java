@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.ChallengeTeam;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -15,18 +15,18 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 	private EditRegisteredTeamDialogView view;
 	private String challengeId;
 	private String selectedTeamId;
-	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private Callback callback;
 	
 	@Inject
 	public EditRegisteredTeamDialog(EditRegisteredTeamDialogView view, 
-			SynapseClientAsync synapseClient,
+			ChallengeClientAsync challengeClient,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authController) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.challengeClient = challengeClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
 		
@@ -58,7 +58,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 		challengeTeam.setTeamId(selectedTeamId);
 		challengeTeam.setChallengeId(challengeId);
 		challengeTeam.setMessage(view.getRecruitmentMessage());
-		synapseClient.updateRegisteredChallengeTeam(challengeTeam, new AsyncCallback<ChallengeTeam>() {
+		challengeClient.updateRegisteredChallengeTeam(challengeTeam, new AsyncCallback<ChallengeTeam>() {
 			@Override
 			public void onSuccess(ChallengeTeam result) {
 				if (callback != null) {
@@ -76,7 +76,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 	
 	@Override
 	public void onUnregister() {
-		synapseClient.unregisterChallengeTeam(challengeId, selectedTeamId, new AsyncCallback<Void>() {
+		challengeClient.unregisterChallengeTeam(challengeId, selectedTeamId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				if (callback != null) {

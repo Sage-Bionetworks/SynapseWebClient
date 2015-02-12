@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -20,7 +21,7 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 	
 	private ChallengeParticipantsView view;
 	private Map<String,String> descriptor;
-	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private String challengeId;
 	private boolean isInTeam;
 	private Callback widgetRefreshRequired;
@@ -31,10 +32,10 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 	@Inject
 	public ChallengeParticipantsWidget(ChallengeParticipantsView view, 
 			DetailedPaginationWidget paginationWidget, 
-			SynapseClientAsync synapseClient) {
+			ChallengeClientAsync synapseClient) {
 		this.view = view;
 		this.paginationWidget = paginationWidget;
-		this.synapseClient = synapseClient;
+		this.challengeClient = synapseClient;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setPresenter(this);
 	}
@@ -63,7 +64,7 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 		view.hideErrors();
 		view.showLoading();
 		view.clearParticipants();
-		synapseClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<UserProfilePagedResults>() {
+		challengeClient.getChallengeParticipants(isInTeam, challengeId, DEFAULT_PARTICIPANT_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<UserProfilePagedResults>() {
 			@Override
 			public void onSuccess(UserProfilePagedResults results) {
 				view.hideLoading();

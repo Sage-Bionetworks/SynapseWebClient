@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -24,7 +25,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	private ChallengeTeamsView view;
 	private Map<String,String> descriptor;
 	private EditRegisteredTeamDialog dialog;
-	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private String challengeId;
 	private Callback widgetRefreshRequired;
 	private DetailedPaginationWidget paginationWidget;
@@ -35,12 +36,12 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	public ChallengeTeamsWidget(ChallengeTeamsView view, 
 			EditRegisteredTeamDialog dialog, 
 			DetailedPaginationWidget paginationWidget, 
-			SynapseClientAsync synapseClient,
+			ChallengeClientAsync challengeClient,
 			AuthenticationController authController) {
 		this.view = view;
 		this.dialog = dialog;
 		this.paginationWidget = paginationWidget;
-		this.synapseClient = synapseClient;
+		this.challengeClient = challengeClient;
 		this.authController = authController;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setEditRegisteredTeamDialog(dialog.asWidget());
@@ -66,7 +67,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 		view.hideErrors();
 		view.showLoading();
 		view.clearTeams();
-		synapseClient.getChallengeTeams(authController.getCurrentUserPrincipalId(), challengeId,DEFAULT_TEAM_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<ChallengeTeamPagedResults>() {
+		challengeClient.getChallengeTeams(authController.getCurrentUserPrincipalId(), challengeId,DEFAULT_TEAM_LIMIT.intValue(), newOffset.intValue(), new AsyncCallback<ChallengeTeamPagedResults>() {
 			@Override
 			public void onSuccess(ChallengeTeamPagedResults results) {
 				view.hideLoading();

@@ -4,12 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,14 +30,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
@@ -63,6 +61,7 @@ public class EvaluationAccessControlListEditorTest {
 
 	// Mock components
 	private SynapseClientAsync mockSynapseClient;
+	private ChallengeClientAsync mockChallengeClient;
 	private AuthenticationController mockAuthenticationController;
 	private AccessControlListEditorView mockACLEView;
 	private UserAccountServiceAsync mockUserAccountService;
@@ -99,6 +98,7 @@ public class EvaluationAccessControlListEditorTest {
 		
 		// set up mocks
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
@@ -106,9 +106,9 @@ public class EvaluationAccessControlListEditorTest {
 		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(TEST_PUBLIC_PRINCIPAL_ID + "");
-		AsyncMockStubber.callSuccessWith(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockSynapseClient).getEvaluationAcl(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getEvaluationAcl(anyString(), any(AsyncCallback.class));
 		
-		AsyncMockStubber.callSuccessWith(uep.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockSynapseClient).getUserEvaluationPermissions(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(uep.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getUserEvaluationPermissions(anyString(), any(AsyncCallback.class));
 		
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
@@ -120,7 +120,8 @@ public class EvaluationAccessControlListEditorTest {
 				mockSynapseClient,
 				mockAuthenticationController,
 				mockGlobalApplicationState,
-				new JSONObjectAdapterImpl()
+				new JSONObjectAdapterImpl(),
+				mockChallengeClient
 		);
 		
 		mockHasChangesHandler = mock(EvaluationAccessControlListEditor.HasChangesHandler.class);
@@ -179,7 +180,7 @@ public class EvaluationAccessControlListEditorTest {
 		acl.getResourceAccess().add(ra);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
 		// update
@@ -188,7 +189,7 @@ public class EvaluationAccessControlListEditorTest {
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 		
-		verify(mockSynapseClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
+		verify(mockChallengeClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		acl.setCreationDate(returnedACL.getCreationDate());
 		
@@ -216,7 +217,7 @@ public class EvaluationAccessControlListEditorTest {
 				resourceAccess.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
 		// update
@@ -225,7 +226,7 @@ public class EvaluationAccessControlListEditorTest {
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 		
-		verify(mockSynapseClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
+		verify(mockChallengeClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		acl.setCreationDate(returnedACL.getCreationDate());
 		
@@ -254,7 +255,7 @@ public class EvaluationAccessControlListEditorTest {
 				AccessControlList.class.getName());
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
 		// update
@@ -263,7 +264,7 @@ public class EvaluationAccessControlListEditorTest {
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 		
-		verify(mockSynapseClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
+		verify(mockChallengeClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		acl.setCreationDate(returnedACL.getCreationDate());
 		
@@ -276,7 +277,7 @@ public class EvaluationAccessControlListEditorTest {
 	@Test
 	public void setAdminAccessTest() throws Exception {
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		
 		// update
 		acle.asWidget();
@@ -290,7 +291,7 @@ public class EvaluationAccessControlListEditorTest {
 	@Test
 	public void pushNoChangesTest() throws Exception {		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		
 		// attempt to push changes when none have been made
 		acle.asWidget();
@@ -301,7 +302,7 @@ public class EvaluationAccessControlListEditorTest {
 	@Test
 	public void removeAccessNotFoundTest() throws Exception {		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		
 		// attempt to remove permissions for user not on ACL
 		acle.asWidget();

@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -26,13 +26,13 @@ public class AdministerEvaluationsListTest {
 	AdministerEvaluationsList evalList;
 	AdministerEvaluationsListView mockView;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	SynapseClientAsync mockSynapseClient;
+	ChallengeClientAsync mockChallengeClient;
 	
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(AdministerEvaluationsListView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		evalList = new AdministerEvaluationsList(mockView, mockSynapseClient, adapterFactory);
+		mockChallengeClient = mock(ChallengeClientAsync.class);
+		evalList = new AdministerEvaluationsList(mockView, mockChallengeClient, adapterFactory);
 		
 		ArrayList<String> evaluationResults = new ArrayList<String>();
 		
@@ -43,7 +43,7 @@ public class AdministerEvaluationsListTest {
 		Evaluation e2 = new Evaluation();
 		e1.setId("102");
 		evaluationResults.add(e2.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-		AsyncMockStubber.callSuccessWith(evaluationResults).when(mockSynapseClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(evaluationResults).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 	}	
 	
 	@Test
@@ -54,7 +54,7 @@ public class AdministerEvaluationsListTest {
 	
 	@Test
 	public void testConfigureFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockChallengeClient).getSharableEvaluations(anyString(), any(AsyncCallback.class));
 		evalList.configure("syn100", null);
 		verify(mockView).showErrorMessage(anyString());
 	}

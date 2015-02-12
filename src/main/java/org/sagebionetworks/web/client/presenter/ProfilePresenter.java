@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -56,6 +57,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	
@@ -77,7 +79,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			ProfileFormWidget profileForm,
-			AdapterFactory adapterFactory
+			AdapterFactory adapterFactory,
+			ChallengeClientAsync challengeClient
 			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -85,6 +88,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
+		this.challengeClient = challengeClient;
 		view.setPresenter(this);
 	}
 
@@ -277,7 +281,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMoreChallenges() {
 		view.showChallengesLoading(true);
-		synapseClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<ChallengePagedResults>() {
+		challengeClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<ChallengePagedResults>() {
 			@Override
 			public void onSuccess(ChallengePagedResults challengeResults) {
 				addChallengeResults(challengeResults.getResults());
