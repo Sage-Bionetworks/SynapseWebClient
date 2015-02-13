@@ -17,7 +17,6 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void showModal2();
 	void hideModal2();
 	void showSubmissionAcceptedDialogs(String receiptMessage);
-	boolean isIndividual();
 	void setContributorsListVisible(boolean isVisible);
 	void addEligibleContributor(String principalId);
 	void addInEligibleContributor(String principalId, String reason);
@@ -25,7 +24,7 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void clearContributors();
 	void setTeams(List<Team> registeredTeams);
 	void showRegisterTeamDialog(String challengeId);
-	
+	void setTeamComboBoxEnabled(boolean isEnabled);
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation
 		void nextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
@@ -34,5 +33,7 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 		void teamAdded();
 		void registerMyTeamLinkClicked();
 		void createNewTeamClicked();
+		void individualSubmissionOptionClicked();
+		void teamSubmissionOptionClicked();
 	}
 }

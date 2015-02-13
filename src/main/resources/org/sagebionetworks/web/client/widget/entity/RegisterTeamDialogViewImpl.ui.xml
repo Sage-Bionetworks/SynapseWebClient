@@ -7,8 +7,8 @@
 		dataKeyboard="false">
 		<b:ModalBody>
 			<b:FormGroup ui:field="teamSelectionUI">
-				<b:FormLabel>Select Team</b:FormLabel>
-				<be:Select ui:field="teamComboBox" />	
+				<b:FormLabel addStyleNames="margin-right-10">Select Team: </b:FormLabel>
+				<bh:Span ui:field="teamComboBoxContainer"></bh:Span>	
 			</b:FormGroup>
 			<b:FormGroup>
 				<b:FormLabel for="recruitment">Team recruitment message</b:FormLabel>
@@ -17,7 +17,7 @@
 			</b:FormGroup>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button type="DEFAULT" >Cancel</b:Button>
 			<b:Button ui:field="okButton" type="PRIMARY">Register</b:Button>
 		</b:ModalFooter>
 	</b:Modal>

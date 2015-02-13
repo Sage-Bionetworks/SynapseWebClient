@@ -48,6 +48,8 @@ public class EvaluationSubmitter implements Presenter {
 	private Team selectedTeam;
 	private String selectedTeamMemberStateHash;
 	private List<Long> selectedTeamEligibleMembers;
+	boolean isIndividualSubmission;
+	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
 			SynapseClientAsync synapseClient,
@@ -73,6 +75,8 @@ public class EvaluationSubmitter implements Presenter {
 		challenge = null;
 		evaluation = null;
 		selectedTeam = null;
+		//initialize as an individual submission
+		isIndividualSubmission = true;
 		teams = new ArrayList<Team>();
 		selectedTeamEligibleMembers = new ArrayList<Long>();
 		view.showLoading();
@@ -86,6 +90,18 @@ public class EvaluationSubmitter implements Presenter {
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
+	}
+	
+	@Override
+	public void individualSubmissionOptionClicked() {
+		isIndividualSubmission = true;
+		view.setTeamComboBoxEnabled(false);
+	}
+	
+	@Override
+	public void teamSubmissionOptionClicked() {
+		isIndividualSubmission = false;
+		view.setTeamComboBoxEnabled(true);
 	}
 	
 	private AsyncCallback<String> getEvalCallback() {
@@ -186,6 +202,7 @@ public class EvaluationSubmitter implements Presenter {
 			public void onSuccess(List<Team> results) {
 				teams = results;
 				view.setTeams(teams);
+				individualSubmissionOptionClicked();
 				view.showModal2();
 			}
 			
@@ -199,7 +216,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 	@Override
 	public void doneClicked() {
-		if (!view.isIndividual()) {
+		if (!isIndividualSubmission) {
 			//team submission
 			if (selectedTeam == null) {
 				view.showErrorMessage("Please select a team");
@@ -318,7 +335,7 @@ public class EvaluationSubmitter implements Presenter {
 		try {
 			String teamId = null;
 			String memberStateHash = null;
-			if (!view.isIndividual()) {
+			if (!isIndividualSubmission) {
 				//team is selected
 				teamId = selectedTeam.getId();
 				memberStateHash = selectedTeamMemberStateHash;

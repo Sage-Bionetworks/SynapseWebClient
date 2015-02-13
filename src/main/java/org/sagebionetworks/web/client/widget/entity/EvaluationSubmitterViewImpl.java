@@ -65,7 +65,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	FormGroup entityFinderUI;
 	@UiField
-	Select teamComboBox;
+	Div teamComboBoxContainer;
 	@UiField
 	Radio isIndividualRadioButton;
 	@UiField
@@ -83,7 +83,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	private PortalGinInjector ginInjector;
 	private RegisterTeamDialog registerTeamDialog;
-	
+	private Select teamComboBox;
 	@Inject
 	public EvaluationSubmitterViewImpl(
 			Binder binder, 
@@ -150,12 +150,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			}
 		});
 		
-		teamComboBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.teamSelected(teamComboBox.getValue());
-			}
-		});
 		registerMyTeamLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -172,13 +166,13 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		isIndividualRadioButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				teamComboBox.setEnabled(false);
+				presenter.individualSubmissionOptionClicked();
 			}
 		});
 		isTeamRadioButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				teamComboBox.setEnabled(true);
+				presenter.teamSubmissionOptionClicked();
 			}
 		});
 	}
@@ -192,11 +186,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			}
 		});
 		registerTeamDialog.showModal();
-	}
-	
-	@Override
-	public boolean isIndividual() {
-		return isIndividualRadioButton.isActive();
 	}
 	
 	@Override
@@ -246,7 +235,16 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	@Override
 	public void setTeams(List<Team> registeredTeams) {
-		teamComboBox.clear();
+		teamComboBoxContainer.clear();
+		
+		teamComboBox = new Select();
+		teamComboBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.teamSelected(teamComboBox.getValue());
+			}
+		});
+		
 		isIndividualRadioButton.setActive(true);
 		
 		for (Team teamHeader : registeredTeams) {
@@ -254,6 +252,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			teamOption.setText(teamHeader.getName());
 			teamComboBox.add(teamOption);
 		}
+		teamComboBoxContainer.add(teamComboBox);
 	}
 	
 	@Override
@@ -315,5 +314,10 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		row.add(badge.asWidget());
 		
 		return row;
+	}
+	
+	@Override
+	public void setTeamComboBoxEnabled(boolean isEnabled) {
+		teamComboBox.setEnabled(isEnabled);
 	}
 }

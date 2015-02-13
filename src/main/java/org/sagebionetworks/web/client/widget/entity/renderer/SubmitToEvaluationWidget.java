@@ -9,6 +9,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -35,23 +36,22 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
-	private EvaluationSubmitter evaluationSubmitter;
 	private String[] evaluationIds;
+	PortalGinInjector ginInjector;
 	
 	@Inject
 	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, ChallengeClientAsync challengeClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			NodeModelCreator nodeModelCreator,
-			EvaluationSubmitter evaluationSubmitter) {
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.challengeClient = challengeClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
-		this.evaluationSubmitter = evaluationSubmitter;
-		view.setEvaluationSubmitterWidget(evaluationSubmitter.asWidget());
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
@@ -132,11 +132,13 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	}
 	
 	public void showSubmissionDialog() {
+		EvaluationSubmitter submitter = ginInjector.getEvaluationSubmitter();
+		view.setEvaluationSubmitterWidget(submitter.asWidget());
 		Set<String> evaluationIdsList = new HashSet<String>();
 		for (int i = 0; i < evaluationIds.length; i++) {
 			evaluationIdsList.add(evaluationIds[i]);
 		}
-		evaluationSubmitter.configure(null, evaluationIdsList);
+		submitter.configure(null, evaluationIdsList);
 	}
 	
 }

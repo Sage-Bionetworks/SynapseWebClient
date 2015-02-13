@@ -15,7 +15,6 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	void setPresenter(Presenter presenter);
 	void setRecruitmentMessage(String message);
 	String getRecruitmentMessage();
-	void clearTeams();
 	void setTeams(List<Team> teams);
 	void showModal();
 	void hideModal();

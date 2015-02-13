@@ -47,7 +47,7 @@
 						<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
 						<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
 					</b:ButtonGroup>
-					<be:Select ui:field="teamComboBox" />
+					<bh:Div ui:field="teamComboBoxContainer" />
 					<bh:Div addStyleNames="highlight-box" ui:field="contributorsPanel" visible="false"/>
 					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
 				</b:FieldSet>

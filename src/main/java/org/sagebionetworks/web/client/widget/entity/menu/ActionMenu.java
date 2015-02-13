@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -62,7 +63,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private EntityDeletedHandler entityDeletedHandler;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
-	private EvaluationSubmitter evaluationSubmitter;
+	private PortalGinInjector ginInjector;
 	private Long versionNumber;
 	
 	public interface EvaluationsCallback {
@@ -88,7 +89,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor,
 			AutoGenFactory entityFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
-			CookieProvider cookieProvider, EvaluationSubmitter evaluationSubmitter
+			CookieProvider cookieProvider, PortalGinInjector ginInjector
 			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -100,8 +101,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.entityFactory = entityFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookieProvider = cookieProvider;
-		this.evaluationSubmitter = evaluationSubmitter;
-		view.setEvaluationSubmitterWidget(evaluationSubmitter.asWidget());
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
 	}	
 	
@@ -356,7 +356,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	
 	@Override
 	public void showAvailableEvaluations() {
-		evaluationSubmitter.configure(entityBundle.getEntity(), null);
+		EvaluationSubmitter submitter = ginInjector.getEvaluationSubmitter();
+		view.setEvaluationSubmitterWidget(submitter.asWidget());
+		submitter.configure(entityBundle.getEntity(), null);
 	}
 	
 }

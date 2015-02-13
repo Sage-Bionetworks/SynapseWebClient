@@ -53,7 +53,6 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		this.callback = callback;
 		this.challengeId = challengeId;
 		view.setRecruitmentMessage("");
-		view.clearTeams();
 		getRegistratableTeams();
 	}
 	

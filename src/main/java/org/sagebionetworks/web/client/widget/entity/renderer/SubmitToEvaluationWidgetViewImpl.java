@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
@@ -20,8 +21,7 @@ import com.google.inject.Inject;
 
 public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements SubmitToEvaluationWidgetView {
 	private Presenter presenter;
-	private Widget evaluationSubmitterWidget;
-	
+	private Div evaluationSubmitterContainer = new Div();
 	@Inject
 	public SubmitToEvaluationWidgetViewImpl() {
 	}
@@ -30,7 +30,7 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	public void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage, String buttonText) {
 		this.clear();
 		//include the evaluation submitter widget on the page
-		add(evaluationSubmitterWidget);
+		add(evaluationSubmitterContainer);
 		
 		if (isAvailableEvaluation) {
 			String primaryButtonText = buttonText == null ? "Submit To Challenge" : buttonText;
@@ -49,7 +49,8 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	
 	@Override
 	public void setEvaluationSubmitterWidget(Widget widget) {
-		evaluationSubmitterWidget = widget;
+		evaluationSubmitterContainer.clear();
+		evaluationSubmitterContainer.add(widget);
 	}
 	@Override
 	public void showErrorMessage(String error) {

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -16,14 +17,16 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 	
 	private SingleButtonView view;
 	private Map<String,String> descriptor;
-	private RegisterTeamDialog dialog;
+	private PortalGinInjector ginInjector;
 	private AuthenticationController authController;
 	public static final String DEFAULT_BUTTON_TEXT = "Register a Team";
+	String challengeId;
+	Callback widgetRefreshRequired;
 	
 	@Inject
-	public RegisterChallengeTeamWidget(SingleButtonView view, RegisterTeamDialog dialog, AuthenticationController authController) {
+	public RegisterChallengeTeamWidget(SingleButtonView view, PortalGinInjector ginInjector, AuthenticationController authController) {
 		this.view = view;
-		this.dialog = dialog;
+		this.ginInjector = ginInjector;
 		this.authController = authController;
 		view.setPresenter(this);
 	}
@@ -31,19 +34,21 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
-		String challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
+		this.widgetRefreshRequired = widgetRefreshRequired;
+		challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
 		String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 		if (buttonText == null)
 			buttonText = DEFAULT_BUTTON_TEXT;
 		
 		view.setButtonText(buttonText);
 		descriptor = widgetDescriptor;
-		dialog.configure(challengeId, widgetRefreshRequired);
 		view.setButtonVisible(authController.isLoggedIn());
 	}
 	
 	@Override
 	public void onClick() {
+		RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
+		dialog.configure(challengeId, widgetRefreshRequired);
 		dialog.showModal();
 	}
 	

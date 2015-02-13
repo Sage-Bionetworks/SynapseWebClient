@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
@@ -62,7 +63,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private Callback addDescriptionCallback;
 	private EntityBundle entityBundle;
 	private AccessControlListModalWidget accessControlListModalWidget;
-	
+	private Div evaluationSubmitterContainer;
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
 			UploadDialogWidget locationableUploader, 
@@ -98,6 +99,9 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			boolean isInTestMode) {
 		if(toolsButton != null) this.remove(toolsButton);
 		if(shareButton != null) this.remove(shareButton);
+		if (evaluationSubmitterContainer != null) this.remove(evaluationSubmitterContainer);
+		evaluationSubmitterContainer = new Div();
+		
 		Entity entity = entityBundle.getEntity();
 		typeDisplay = typeProvider.getEntityDispalyName(entityType);
 				
@@ -114,7 +118,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 		this.add(toolsButton);	
 		this.add(shareButton);
-		
+		this.add(evaluationSubmitterContainer);
 		//add quiz info dialog to the DOM
 		toolsButton.add(quizInfoDialog.asWidget());
 	}
@@ -449,7 +453,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 */
 	@Override
 	public void setEvaluationSubmitterWidget(Widget widget) {
-		add(widget);
+		evaluationSubmitterContainer.clear();
+		evaluationSubmitterContainer.add(widget);
 	}
 
 }

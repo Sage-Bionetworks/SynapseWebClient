@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.Team;
@@ -25,24 +26,20 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	public interface RegisterTeamDialogViewImplUiBinder extends UiBinder<Widget, RegisterTeamDialogViewImpl> {}
 	@UiField
 	TextBox recruitmentMessageField;
-	@UiField
-	Select teamComboBox;
+	
 	@UiField
 	FormGroup teamSelectionUI;
 	@UiField
 	Button okButton;
+	@UiField
+	Span teamComboBoxContainer;
 	
 	Modal modal;
+	Select teamComboBox;
 	
 	@Inject
 	public RegisterTeamDialogViewImpl(RegisterTeamDialogViewImplUiBinder binder) {
 		modal = (Modal)binder.createAndBindUi(this);
-		teamComboBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.teamSelected(teamComboBox.getValue());
-			}
-		});
 		
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -72,17 +69,23 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	}
 	
 	@Override
-	public void clearTeams() {
-		teamComboBox.clear();
-	}
-	
-	@Override
 	public void setTeams(List<Team> teams) {
+		teamComboBoxContainer.clear();
+		
+		teamComboBox = new Select();
+		teamComboBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.teamSelected(teamComboBox.getValue());
+			}
+		});
+		
 		for (Team team : teams) {
 			Option teamOption = new Option();
 			teamOption.setText(team.getName());
 			teamComboBox.add(teamOption);
 		}
+		teamComboBoxContainer.add(teamComboBox);
 	}
 	
 	@Override
