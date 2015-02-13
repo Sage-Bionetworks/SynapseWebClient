@@ -49,7 +49,6 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 	public void onClick() {
 		RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
 		dialog.configure(challengeId, widgetRefreshRequired);
-		dialog.showModal();
 	}
 	
 	@Override
