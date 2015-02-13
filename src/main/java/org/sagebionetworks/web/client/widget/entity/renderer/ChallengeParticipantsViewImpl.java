@@ -64,7 +64,10 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 	public void addParticipant(UserProfile profile) {
 		UserBadge userBadge = ginInjector.getUserBadgeWidget();
 		userBadge.configure(profile);
-		participantsContainer.add(userBadge.asWidget());
+		Div userBadgeContainer = new Div();
+		userBadgeContainer.addStyleName("margin-bottom-5");
+		userBadgeContainer.add(userBadge.asWidget());
+		participantsContainer.add(userBadgeContainer);
 	}
 
 	@Override

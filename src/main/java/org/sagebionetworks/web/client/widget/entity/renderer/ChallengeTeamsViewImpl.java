@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -70,16 +70,22 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 	@Override
 	public void addChallengeTeam(final String teamId, final String message, boolean showEditButton) {
 		Div div = new Div();
+		div.addStyleName("margin-bottom-5");
 		TeamBadge newTeamBadge = ginInjector.getTeamBadgeWidget();
 		newTeamBadge.configure(teamId);
 		Span messageSpan = new Span();
-		messageSpan.addStyleName("greyText-imp");
+		messageSpan.addStyleName("greyText-imp margin-left-5");
 		messageSpan.setText(DisplayUtils.replaceWithEmptyStringIfNull(message));
 		
-		div.add(newTeamBadge.asWidget());
+		Widget teamBadgeWidget = newTeamBadge.asWidget();
+		teamBadgeWidget.addStyleName("displayInline");
+		div.add(teamBadgeWidget);
 		div.add(messageSpan.asWidget());
 		if (showEditButton) {
-			Button editButton = new Button("", IconType.EDIT, new ClickHandler() {
+			Anchor editButton = new Anchor();
+			editButton.setIcon(IconType.EDIT);
+			editButton.addStyleName("margin-left-5");
+			editButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.onEdit(teamId, message);

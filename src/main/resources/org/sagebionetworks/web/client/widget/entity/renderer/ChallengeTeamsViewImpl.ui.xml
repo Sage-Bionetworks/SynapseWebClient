@@ -16,8 +16,12 @@
 			<bh:Strong text="Markdown Widget Warning: "/>
 			<bh:Text ui:field="errorText" text=""/>
 		</b:Alert>
-				
-		<bh:Div ui:field="challengeTeamsContainer" />
+
+		<b:Panel addStyleNames="margin-bottom-0-imp">
+			<b:PanelBody>
+				<bh:Div ui:field="challengeTeamsContainer" />
+			</b:PanelBody>
+		</b:Panel>
 		<bh:Div ui:field="paginationWidgetContainer" />
 		<bh:Div ui:field="dialogWidgetContainer" />
 	</bh:Div>

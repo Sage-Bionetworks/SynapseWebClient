@@ -203,6 +203,10 @@ public class EvaluationSubmitter implements Presenter {
 				teams = results;
 				view.setTeams(teams);
 				individualSubmissionOptionClicked();
+				if (!teams.isEmpty()) {
+					//select the first
+					teamSelected(teams.get(0).getName());
+				}
 				view.showModal2();
 			}
 			

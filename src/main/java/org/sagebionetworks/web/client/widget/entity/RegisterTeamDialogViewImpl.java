@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
@@ -32,7 +33,9 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	@UiField
 	Button okButton;
 	@UiField
-	Span teamComboBoxContainer;
+	Button cancelButton;
+	@UiField
+	Div teamComboBoxContainer;
 	
 	Modal modal;
 	Select teamComboBox;
@@ -45,6 +48,12 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onOk();
+			}
+		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				modal.hide();
 			}
 		});
 	}
