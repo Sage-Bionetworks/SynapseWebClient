@@ -102,7 +102,6 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		widgetDescriptor = descriptor;
 		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki);
 		view.show();
-		view.setSaveButtonText(DisplayConstants.INSERT_BUTTON_LABEL);
 	}
 	
 	private void cleanInit() {

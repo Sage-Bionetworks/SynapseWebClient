@@ -7,7 +7,7 @@
 
 	<!-- Dialog for gathering user credentials -->
 	<b:Modal closable="true" fade="true"
-		dataBackdrop="STATIC" dataKeyboard="true">
+		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 		    <bh:Text ui:field="instructions"></bh:Text>
 			<b:Form ui:field="formPanel">

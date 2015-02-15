@@ -1,43 +1,156 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.InlineRadio;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
-	IconsImageBundle iconsImageBundle;
-	SynapseJSNIUtils synapseJSNIUtils;
-	SageImageBundle sageImageBundle;
+	public interface Binder extends UiBinder<Widget, RestrictionWidgetViewImpl> {}
+	
+	@UiField
+	Div loadingUI;
+	
+	@UiField
+	Span controlledUseUI;
+	@UiField
+	Image unmetRequirementsIcon;
+	@UiField
+	Image metRequirementsIcon;
+	
+	@UiField
+	Span noneUI;
+	
+	@UiField
+	Span linkUI;
+	
+	@UiField
+	Anchor changeLink;
+	@UiField
+	Anchor showLink;
+	
+	@UiField
+	Span flagUI;
+	@UiField
+	Anchor reportIssueLink;
+	
+	@UiField
+	Span anonymousFlagUI;
+	@UiField
+	Anchor anonymousReportIssueLink;
+
+	
+	@UiField
+	Modal imposeRestrictionModal;
+	@UiField
+	InlineRadio yesHumanDataRadio;
+	@UiField
+	InlineRadio noHumanDataRadio;
+	@UiField
+	Alert notSensitiveHumanDataMessage;
+	
+	@UiField
+	Button imposeRestrictionOkButton;
+	
+	@UiField
+	Modal flagModal;
+	@UiField
+	Button flagModalOkButton;
+	
+	@UiField
+	Modal anonymousFlagModal;
+	@UiField
+	Button anonymousFlagModalOkButton;
+	
+	@UiField
+	Div accessRestrictionDialogContainer;
+	
 	Presenter presenter;
-	FlowPanel container;
+	
+	//this UI widget
+	Widget widget;
+	
+	private ClickHandler changeLinkClickHandler, showLinkClickHandler;
+	
+	
 	@Inject
-	public RestrictionWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		container = new FlowPanel();
-		container.addStyleName("inline-block");
+	public RestrictionWidgetViewImpl(Binder binder) {
+		this.widget = binder.createAndBindUi(this);
+		yesHumanDataRadio.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.yesHumanDataClicked();
+			}
+		});
+		noHumanDataRadio.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.notHumanDataClicked();
+			}
+		});
+
+		imposeRestrictionOkButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.imposeRestrictionClicked();
+			}
+		});
+		
+		changeLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				changeLinkClickHandler.onClick(event);
+			}
+		});
+		
+		showLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showLinkClickHandler.onClick(event);
+			}
+		});
+		
+		flagModalOkButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.flagData();
+			}
+		});
+		
+		anonymousFlagModalOkButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.anonymousFlagModalOkClicked();
+			}
+		});
+		
+		reportIssueLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.reportIssueClicked();
+			}
+		});
+		
+		anonymousReportIssueLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.anonymousReportIssueClicked();
+			}
+		});
 	}
 
 	@Override
@@ -46,144 +159,14 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 
 	@Override
-	public Widget asWidget(String jiraFlagLink,
-			boolean isAnonymous, 
-			boolean hasAdministrativeAccess,
-			Callback loginCallback, 
-			RESTRICTION_LEVEL restrictionLevel,
-			ClickHandler aboutLinkClickHandler,
-			boolean showFlagLink, 
-			boolean showChangeLink) {
-		container.clear();
-		container.add(EntityViewUtils.createRestrictionsWidget(
-				jiraFlagLink,
-				isAnonymous,
-				hasAdministrativeAccess,
-				loginCallback,
-				restrictionLevel,
-				iconsImageBundle,
-				synapseJSNIUtils,
-				aboutLinkClickHandler,
-				showFlagLink,
-				showChangeLink));
-		return container;
+	public Widget asWidget() {
+		return widget;
 	}
 	
 	@Override
-	public void showAccessRequirement(RESTRICTION_LEVEL restrictionLevel,
-			APPROVAL_TYPE approvalType, 
-			boolean isAnonymous,
-			boolean hasAdministrativeAccess,
-			boolean hasFulfilledAccessRequirements,
-			IconsImageBundle iconsImageBundle, 
-			String accessRequirementText,
-			Callback imposeRestrictionsCallback,
-			Callback touAcceptanceCallback, 
-			Callback requestACTCallback,
-			Callback loginCallback, 
-			String jiraFlagLink, 
-			Callback onHideCallback) {
-		GovernanceDialogHelper.showAccessRequirement(
-				restrictionLevel,
-				approvalType,
-				isAnonymous,
-				hasAdministrativeAccess,
-				hasFulfilledAccessRequirements,
-				iconsImageBundle,
-				accessRequirementText,
-				imposeRestrictionsCallback,
-				touAcceptanceCallback,
-				requestACTCallback,
-				loginCallback,
-				jiraFlagLink, 
-				onHideCallback);	
-	}
-	
-	@Override
-	public void showVerifyDataSensitiveDialog(
-			final Callback imposeRestrictionsCallback) {
-		
-		final Dialog window = new Dialog();
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeaderVisible(true);
-		InlineHTML question = new InlineHTML(DisplayConstants.IS_SENSITIVE_DATA_MESSAGE);
-		question.addStyleName("margin-left-10");
-		window.add(question);
-		final RadioButton yesButton = new RadioButton(Dialog.YES);
-		yesButton.addStyleName("margin-left-5");
-		final RadioButton noButton = new RadioButton(Dialog.NO);
-		noButton.addStyleName("margin-left-5");
-		window.add(yesButton);
-		InlineHTML label = new InlineHTML("Yes");
-		label.addStyleName("margin-left-5");
-		window.add(label);
-		window.add(noButton);
-		label = new InlineHTML("No");
-		label.addStyleName("margin-left-5");
-		window.add(label);
-		
-		
-		window.setSize(430, 100);
-		// configure buttons
-	    window.setButtons(Dialog.OKCANCEL);
-	    window.setButtonAlign(HorizontalAlignment.RIGHT);
-	    window.setHideOnButtonClick(false);
-		window.setResizable(true);
-		
-		//when yes is clicked, hide DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE.  when no is clicked, show DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE
-		final FlowPanel messageContainer = new FlowPanel();
-		messageContainer.addStyleName("margin-top-10 margin-left-15 margin-right-15");
-		final HTML message = new HTML(DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE);
-		
-		window.add(messageContainer);
-		
-		yesButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				noButton.setValue(false);
-				messageContainer.clear();
-				window.setHeight(100);
-				window.layout(true);
-			}
-		});
-		
-		noButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				yesButton.setValue(false);
-				if (messageContainer.getWidgetCount() == 0) {
-					messageContainer.add(message);
-					window.setHeight(200);
-					window.layout(true);
-				}
-			}
-		});
-		//define button listeners.		
-		final Button okButton = window.getButtonById(Dialog.OK);
-		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (yesButton.getValue()) {
-					window.hide();
-					imposeRestrictionsCallback.invoke();
-				} else if (noButton.getValue()) {
-					window.hide();
-				} else {
-					//no selection
-					DisplayUtils.showErrorMessage("You must make a selection before continuing.");
-				}
-			}
-		});
-		
-		Button cancelButton = window.getButtonById(Dialog.CANCEL);
-		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-		});
-		window.show();
+	public void showVerifyDataSensitiveDialog() {
+		resetImposeRestrictionModal();
+		imposeRestrictionModal.show();
 	}
 	
 	@Override
@@ -199,21 +182,111 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
+	
 	@Override
 	public void showLoading() {
-		container.clear();
-		container.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		loadingUI.setVisible(true);
+	}
+	@Override
+	public void showControlledUseUI() {
+		controlledUseUI.setVisible(true);
+	}
+	
+	@Override
+	public void showUnmetRequirementsIcon() {
+		unmetRequirementsIcon.setVisible(true);
+	}
+	
+	@Override
+	public void showMetRequirementsIcon() {
+		metRequirementsIcon.setVisible(true);
+	}
 
+
+	@Override
+	public void showFlagUI() {
+		flagUI.setVisible(true);
+	}
+	@Override
+	public void showAnonymousFlagUI() {
+		anonymousFlagUI.setVisible(true);
+	}
+	
+	@Override
+	public void showChangeLink(ClickHandler changeLinkClickHandler) {
+		linkUI.setVisible(true);
+		changeLink.setVisible(true);
+		this.changeLinkClickHandler = changeLinkClickHandler;
+	}
+	@Override
+	public void showShowLink(ClickHandler showLinkClickHandler) {
+		linkUI.setVisible(true);
+		showLink.setVisible(true);
+		this.showLinkClickHandler = showLinkClickHandler;
+	}
+	@Override
+	public void showNoRestrictionsUI() {
+		noneUI.setVisible(true);
 	}
 	
 	@Override
 	public void clear() {
-		container.clear();
+		loadingUI.setVisible(false);
+		controlledUseUI.setVisible(false);
+		noneUI.setVisible(false);
+		linkUI.setVisible(false);
+		flagUI.setVisible(false);
+		anonymousFlagUI.setVisible(false);
+		showLink.setVisible(false);
+		changeLink.setVisible(false);
+		showLinkClickHandler = null;
+		changeLinkClickHandler = null;
+		resetImposeRestrictionModal();
+		unmetRequirementsIcon.setVisible(false);
+		metRequirementsIcon.setVisible(false);
+	}
+	
+	private void resetImposeRestrictionModal() {
+		yesHumanDataRadio.setValue(false);
+		noHumanDataRadio.setValue(false);
+		notSensitiveHumanDataMessage.setVisible(false);
+		imposeRestrictionOkButton.setEnabled(true);
 	}
 	
 	@Override
-	public Widget asWidget() {
-		return null;
+	public void showFlagModal() {
+		flagModal.show();
+	}
+	
+	@Override
+	public void showAnonymousFlagModal() {
+		anonymousFlagModal.show();
+	}
+	
+	@Override
+	public void setAccessRequirementDialog(Widget dialog) {
+		accessRestrictionDialogContainer.clear();
+		accessRestrictionDialogContainer.add(dialog);
+	}
+	
+	@Override
+	public void setImposeRestrictionOkButtonEnabled(boolean enable) {
+		imposeRestrictionOkButton.setEnabled(enable);
+	}
+	
+	@Override
+	public void setNotSensitiveHumanDataMessageVisible(boolean visible) {
+		notSensitiveHumanDataMessage.setVisible(visible);
+	}
+	
+	@Override
+	public Boolean isNoHumanDataRadioSelected() {
+		return noHumanDataRadio.getValue();
+	}
+	
+	@Override
+	public Boolean isYesHumanDataRadioSelected() {
+		return yesHumanDataRadio.getValue();
 	}
 	/*
 	 * Private Methods

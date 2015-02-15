@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -43,6 +45,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JoinTeamWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private WikiPageWidget wikiPageWidget;
 	private GWTWrapper gwt;
 	private String teamId;
 	private boolean isChallengeSignup;
@@ -70,7 +73,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			AuthenticationController authenticationController, 
 			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			WikiPageWidget wikiPageWidget
 			) {
 		this.view = view;
 		view.setPresenter(this);
@@ -80,6 +84,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
+		this.wikiPageWidget = wikiPageWidget;
+		wikiPageWidget.showCreatedBy(false);
+		wikiPageWidget.showModifiedBy(false);
+		wikiPageWidget.showWikiHistory(false);
 	}
 
 	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
@@ -207,7 +215,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				callback.invoke(null);
 			}
 		});
-		
 	}
 
 	public int getTotalPageCount() {
@@ -256,7 +263,14 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			view.updateWizardProgress(currentPage, getTotalPageCount());
 			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-				view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);
+				if (!DisplayUtils.isDefined(text)) {
+					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
+					wikiPageWidget.configure(wikiKey, false, null, false);
+					view.showWikiAccessRequirement(wikiPageWidget.asWidget(), termsOfUseCallback);
+				} else {
+					view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);	
+				}
+				
 			} else if (accessRequirement instanceof ACTAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 				view.showACTAccessRequirement(text, termsOfUseCallback);

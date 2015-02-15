@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -28,13 +27,10 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.extjs.gxt.ui.client.widget.Window;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -222,7 +218,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		
 		// put delete last
 		if(permissions.getCanDelete()) {
-			addDeleteItem(toolsButton, typeDisplay);
+			addDeleteItem(toolsButton, entity, typeDisplay);
 		}
 		
 		toolsButton.setVisible(toolsButton.getCount() > 0);
@@ -232,13 +228,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * 'Delete Entity' item
 	 * @param entityType 
 	 */	
-	private void addDeleteItem(DropdownButton menuBtn, final String typeDisplay) {
+	private void addDeleteItem(DropdownButton menuBtn, final Entity entity, final String typeDisplay) {
 		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-trash") + " "
 						+ DisplayConstants.LABEL_DELETE + " " + typeDisplay));
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Callback() {
+				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay + " \"" + entity.getName() + "\"?", new Callback() {
 					
 					@Override
 					public void invoke() {
@@ -284,8 +280,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 						@Override
 						public void invoke() {
 							UserEntityPermissions permissions = entityBundle.getPermissions();
-							boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
-							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, isCertificationRequired);
+							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, permissions.getIsCertifiedUser());
 						}
 					});
 				}
@@ -303,12 +298,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		};
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null, true);
+		uploader.disableMultipleFileUploads();
 		uploader.show();
 	}
 	
 	@Override
-	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
-		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
+	public void showQuizInfoDialog() {
+		quizInfoDialog.show();
 	}
 		
 	/**
@@ -336,20 +332,18 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	}
 	
 	private void createShortcut() {
-		entityFinder.configure(false);				
-		final Window window = new Window();
-		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+		entityFinder.configure(false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				if(selected.getTargetId() != null) {
 					presenter.createLink(selected.getTargetId());
-					window.hide();
+					entityFinder.hide();
 				} else {
 					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 				}
 			}
 		});					
-
+		entityFinder.show();
 	}
 	
 	private void addSubmitToEvaluationItem(DropdownButton menuBtn, Entity entity,EntityType entityType) {
@@ -395,19 +389,18 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	}
 
 	private void moveItem() {
-		entityFinder.configure(false);				
-		final Window window = new Window();
-		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+		entityFinder.configure(false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				if(selected.getTargetId() != null) {
 					presenter.moveEntity(selected.getTargetId());
-					window.hide();
+					entityFinder.hide();
 				} else {
 					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 				}
 			}
-		});	
+		});
+		entityFinder.show();
 	}
 	
 	private void addUploadToGenomeSpace(final DropdownButton menuBtn, final EntityBundle bundle) {

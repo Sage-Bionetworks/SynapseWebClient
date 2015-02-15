@@ -18,12 +18,15 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -34,6 +37,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -58,13 +62,15 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private Synapse.EntityArea area;
 	private String areaToken;
 	private CookieProvider cookies;
-	
+	private SynapseJSNIUtils synapseJsniUtils;
+	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			AdapterFactory adapterFactory, CookieProvider cookies) {
+			AdapterFactory adapterFactory, CookieProvider cookies,
+			SynapseJSNIUtils synapseJsniUtils) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
@@ -72,6 +78,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
 		this.cookies = cookies;
+		this.synapseJsniUtils = synapseJsniUtils;
 		view.setPresenter(this);
 	}
 
@@ -110,7 +117,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void refresh() {
-		
+		view.setBackgroundImageVisible(false);
 		// Hide the view panel contents until async callback completes
 		view.showLoading();
 		
@@ -145,8 +152,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						}
 						EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
 						if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+						if (projectHeader != null)
+							loadBackgroundImage(projectHeader.getId());
 						EntityPresenter.filterToDownloadARs(bundle);
-						view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);					
+						view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
 					} catch (JSONObjectAdapterException ex) {					
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 					}
@@ -171,11 +180,60 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		}
 	}
 	
+	public void loadBackgroundImage(final String projectEntityId) {
+		//if an attachment is found that has a particular name, then it is set to the background.
+		//get the root wiki id
+		synapseClient.getRootWikiId(projectEntityId, ObjectType.ENTITY.toString(), new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String rootWikiId) {
+				if (rootWikiId != null) {
+					WikiPageKey wikiKey = new WikiPageKey(projectEntityId, ObjectType.ENTITY.toString(), rootWikiId);
+					loadBackgroundImage(wikiKey);
+				}
+			}
+			@Override
+			public void onFailure(Throwable e) {
+				//if anything goes wrong during image load, catch and log to console only
+				synapseJsniUtils.consoleError(e.getMessage());
+			}
+		});
+	}
+	
+	public void loadBackgroundImage(final WikiPageKey rootPageKey) {
+		synapseClient.getWikiAttachmentHandles(rootPageKey, new AsyncCallback<FileHandleResults>() {
+			@Override
+			public void onSuccess(FileHandleResults fileHandleResults) {
+				try {
+					if (fileHandleResults != null && fileHandleResults.getList() != null && !fileHandleResults.getList().isEmpty()) {
+						//look for special file name
+						for (FileHandle handle : fileHandleResults.getList()) {
+							if (ENTITY_BACKGROUND_IMAGE_NAME.equalsIgnoreCase(handle.getFileName())) {
+								String url = DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), rootPageKey, handle.getFileName(),false);
+								view.setBackgroundImageUrl(url);
+								view.setBackgroundImageVisible(true);
+								break;
+							}
+						}
+					}
+				} catch (Exception e) {
+					//if anything goes wrong during image load, catch and log to console only
+					onFailure(e);
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//failed to load background image.  log in console only
+				synapseJsniUtils.consoleError(caught.getMessage());
+			}
+		});
+	}
+	
 	public static void filterToDownloadARs(EntityBundle bundle) {
 		List<AccessRequirement> filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
 		bundle.setAccessRequirements(filteredList);
 		
-		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
-		bundle.setUnmetAccessRequirements(filteredList);
+		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetDownloadAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
+		bundle.setUnmetDownloadAccessRequirements(filteredList);
 	}
 }

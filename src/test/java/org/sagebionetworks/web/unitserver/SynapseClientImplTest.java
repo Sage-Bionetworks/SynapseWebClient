@@ -40,7 +40,6 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
@@ -110,11 +109,11 @@ import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -124,7 +123,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
@@ -135,7 +133,6 @@ import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -155,6 +152,7 @@ import com.google.common.cache.Cache;
 public class SynapseClientImplTest {
 	
 	
+	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	ServiceUrlProvider mockUrlProvider;
@@ -334,7 +332,7 @@ public class SynapseClientImplTest {
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
-		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
+		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class))).thenReturn(ars);
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -342,10 +340,11 @@ public class SynapseClientImplTest {
 		mockUserProfile = Mockito.mock(UserProfile.class);
 		when(mockSynapse.getUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
-		when(mockUserProfile.getOwnerId()).thenReturn("MyOwnerID");
+		when(mockUserProfile.getOwnerId()).thenReturn(MY_USER_PROFILE_OWNER_ID);
 		mockParticipant = Mockito.mock(Participant.class);
 		when(mockSynapse.getParticipant(anyString(), anyString())).thenReturn(mockParticipant);
 		
+		when(mockSynapse.getMyProfile()).thenReturn(mockUserProfile);
 		when(mockSynapse.createParticipant(anyString())).thenReturn(mockParticipant);
 		
 		UploadDaemonStatus status = new UploadDaemonStatus();
@@ -387,6 +386,7 @@ public class SynapseClientImplTest {
 		headers.setResults(projectHeaders);
 		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
 		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsForTeam(anyLong(), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -431,7 +431,7 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle.getPermissions());
 		assertNotNull(bundle.getHasChildren());
 		assertNotNull(bundle.getAccessRequirementsJson());
-		assertNotNull(bundle.getUnmetAccessRequirementsJson());
+		assertNotNull(bundle.getUnmetDownloadAccessRequirementsJson());
 	}
 	
 	@Test
@@ -447,7 +447,7 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getPermissions());
 		assertNull(bundle.getHasChildren());
 		assertNull(bundle.getAccessRequirementsJson());
-		assertNull(bundle.getUnmetAccessRequirementsJson());
+		assertNull(bundle.getUnmetDownloadAccessRequirementsJson());
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
@@ -673,6 +673,17 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
+	public void testGetProjectById() throws Exception {
+		String projectId = "syn1029";
+		Project project =  new Project();
+		project.setId(projectId);
+		when(mockSynapse.getEntityById(projectId)).thenReturn(project);
+		
+		Project actualProject = synapseClient.getProject(projectId);
+		assertEquals(project, actualProject);
+	}
+	
+	@Test
 	public void testGetJSONEntity() throws Exception {
 
 		JSONObject json = EntityFactory.createJSONObjectForEntity(entity);
@@ -748,6 +759,22 @@ public class SynapseClientImplTest {
          when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
          synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
          verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class));
+     }
+     
+     @Test
+     public void testGetV2WikiOrderHint() throws Exception {
+    	 V2WikiOrderHint orderHint = new V2WikiOrderHint();
+    	 when(mockSynapse.getV2OrderHint(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(orderHint);
+    	 synapseClient.getV2WikiOrderHint(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+    	 verify(mockSynapse).getV2OrderHint(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+     }
+     
+     @Test
+     public void testUpdateV2WikiOrderHint() throws Exception {
+    	 V2WikiOrderHint orderHint = new V2WikiOrderHint();
+    	 when(mockSynapse.updateV2WikiOrderHint(any(V2WikiOrderHint.class))).thenReturn(orderHint);
+    	 synapseClient.updateV2WikiOrderHint(orderHint);
+    	 verify(mockSynapse).updateV2WikiOrderHint(any(V2WikiOrderHint.class));
      }
      
      @Test
@@ -878,6 +905,24 @@ public class SynapseClientImplTest {
 		file.setName(newName);
 		verify(mockSynapse).putEntity(eq(file));  //should equal the previous file but with the new name
 	}
+	
+	@Test
+	public void testCreateExternalFile() throws Exception {
+		//test setting file handle name
+		String parentEntityId = "syn123333";
+		String externalUrl = "sftp://foobar.edu/b/test.txt";
+		String fileName = "testing.txt";
+		when(mockSynapse.createExternalFileHandle(any(ExternalFileHandle.class))).thenReturn(new ExternalFileHandle());
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(new FileEntity());
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName);
+		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
+		verify(mockSynapse).createExternalFileHandle(captor.capture());
+		ExternalFileHandle handle = captor.getValue();
+		//verify name is set
+		assertEquals(fileName, handle.getFileName());
+		assertEquals(externalUrl, handle.getExternalURL());
+	}
+	
 	
 	@Test
 	public void testGetEntityDoi() throws Exception {
@@ -1503,7 +1548,7 @@ public class SynapseClientImplTest {
 	public void testGetEntityUnmetAccessRequirements() throws Exception {
 		//verify it calls getUnmetAccessRequirements when unmet is true
 		synapseClient.getEntityAccessRequirements(entityId, true, null);
-		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class));
+		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class), any(ACCESS_TYPE.class));
 	}
 	
 	@Test
@@ -1548,6 +1593,7 @@ public class SynapseClientImplTest {
 	public void testLogErrorToRepositoryServices() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String errorMessage = "error has occurred";
 		synapseClient.logErrorToRepositoryServices(errorMessage, null);
+		verify(mockSynapse).getMyProfile();
 		verify(mockSynapse).logError(any(LogEntry.class));
 	}
 	
@@ -1563,11 +1609,12 @@ public class SynapseClientImplTest {
 		ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
 		verify(mockSynapse).logError(captor.capture());
 		LogEntry logEntry = captor.getValue();
-		assertTrue(logEntry.getLabel().length() - "SWC: ".length() <= SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE);
-		assertEquals(errorMessage, logEntry.getMessage());
+		assertTrue(logEntry.getLabel().length() < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE+100);
+		assertTrue(logEntry.getMessage().contains(errorMessage));
+		assertTrue(logEntry.getMessage().contains(MY_USER_PROFILE_OWNER_ID));
 	}
 
-@Test
+	@Test
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
@@ -1584,6 +1631,17 @@ public class SynapseClientImplTest {
 		synapseClient.getUserProjects(userIdString, limit, offset);
 		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
 	}
+	
+	@Test
+	public void testGetProjectsForTeam() throws Exception {
+		int limit = 13;
+		int offset = 40;
+		Long teamId = 144l;
+		String teamIdString = teamId.toString();
+		synapseClient.getProjectsForTeam(teamIdString, limit, offset);
+		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(limit), eq(offset));
+	}
+
 	
 	@Test
 	public void testSafeLongToInt() {
@@ -1627,5 +1685,54 @@ public class SynapseClientImplTest {
 	@Test (expected=BadRequestException.class)
 	public void testGetHostBadUrl() throws RestServiceException {
 		synapseClient.getHost("foobar");
+	}
+	@Test
+	public void testGetRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		WikiPage testPage = new WikiPage();
+		String expectedId = "88837";
+		testPage.setId(expectedId);
+		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
+		
+		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
+		assertEquals(expectedId, actualId);
+	}
+	
+	@Test
+	public void testGetNullRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		WikiPage testPage = null;
+		String expectedId = null;
+		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
+		
+		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
+		assertEquals(expectedId, actualId);
+	}
+	
+	@Test
+	public void testGetFavorites() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		PaginatedResults<EntityHeader> pagedResults = new PaginatedResults<EntityHeader>();
+		List<EntityHeader> unsortedResults = new ArrayList<EntityHeader>();
+		pagedResults.setResults(unsortedResults);
+		when(mockSynapse.getFavorites(anyInt(), anyInt())).thenReturn(pagedResults);
+		
+		//test empty favorites
+		List<EntityHeader> actualList = synapseClient.getFavorites();
+		assertTrue(actualList.isEmpty());
+		
+		//test a few unsorted favorites
+		EntityHeader favZ = new EntityHeader();
+		favZ.setName("Z");
+		unsortedResults.add(favZ);
+		EntityHeader favA = new EntityHeader();
+		favA.setName("A");
+		unsortedResults.add(favA);
+		EntityHeader favQ = new EntityHeader();
+		favQ.setName("q");
+		unsortedResults.add(favQ);
+		
+		actualList = synapseClient.getFavorites();
+		assertEquals(3, actualList.size());
+		assertEquals(favA, actualList.get(0));
+		assertEquals(favQ, actualList.get(1));
+		assertEquals(favZ, actualList.get(2));
 	}
 }

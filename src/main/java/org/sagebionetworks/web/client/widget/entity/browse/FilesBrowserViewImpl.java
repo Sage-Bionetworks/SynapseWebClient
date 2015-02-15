@@ -1,114 +1,128 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
-import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.WindowEvent;
-import com.extjs.gxt.ui.client.util.KeyNav;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView {
+public class FilesBrowserViewImpl implements FilesBrowserView {
 
+	public interface FilesBrowserViewImplUiBinder extends UiBinder<Widget, FilesBrowserViewImpl> {}
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
 	private UploadDialogWidget uploader;
 	private QuizInfoDialog quizInfoDialog;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
-	private PortalGinInjector ginInjector;
+	private Widget widget;
+	
+	@UiField
+	SimplePanel uploaderContainer;
+	@UiField
+	SimplePanel quizInfoDialogContainer;
+	@UiField
+	ButtonToolBar topBar;
+	@UiField
+	Button uploadButton;
+	@UiField
+	Button addFolderButton;
+	@UiField
+	SimplePanel files;
+	@UiField
+	Modal newFolderDialog;
+	@UiField
+	TextBox folderNameField;
+	@UiField
+	SimplePanel sharingAndDataUseContainer;
+	@UiField
+	Button cancelNewFolderButton;
+	@UiField
+	Button okNewFolderButton;
 	
 	@Inject
-	public FilesBrowserViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle,
+	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
 			UploadDialogWidget uploader,
-			CookieProvider cookies,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
 			QuizInfoDialog quizInfoDialog,
-			PortalGinInjector ginInjector) {
+			EntityTreeBrowser entityTreeBrowser) {
+		widget = binder.createAndBindUi(this);
 		this.uploader = uploader;
-		this.ginInjector = ginInjector;
+		this.entityTreeBrowser = entityTreeBrowser;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.quizInfoDialog = quizInfoDialog;
+		uploaderContainer.setWidget(uploader.asWidget());
+		quizInfoDialogContainer.setWidget(quizInfoDialog.asWidget());
+		sharingAndDataUseContainer.setWidget(sharingAndDataUseWidget.asWidget());
+		addFolderButton.addClickHandler(new ClickHandler() {				
+			@Override
+			public void onClick(ClickEvent event) {
+				//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
+				presenter.addFolderClicked();
+			}
+		});
+		
+		uploadButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.uploadButtonClicked();
+			}
+		});
+		
+		okNewFolderButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				newFolderDialog.hide();
+				presenter.updateFolderName(folderNameField.getText());
+			}
+		});
+		cancelNewFolderButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.deleteFolder(true);	
+			}
+		});
+		folderNameField.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					okNewFolderButton.click();
+		        }
+			}
+		});
+		Widget etbW = entityTreeBrowser.asWidget();
+		etbW.addStyleName("margin-top-10");
+		files.setWidget(etbW);
 	}
 
 	@Override
 	public void configure(String entityId, boolean canCertifiedUserAddChild) {
-		this.clear();
-		this.add(uploader.asWidget());	//add the upload dialog
-		this.add(quizInfoDialog.asWidget()); //and the certification dialog
-		entityTreeBrowser = ginInjector.getEntityTreeBrowser();
-		FlowPanel fp = new FlowPanel();
-		FlowPanel topbar = new FlowPanel();
-		
-		if(canCertifiedUserAddChild) {
-			Button upload = getUploadButton(entityId);
-			upload.addStyleName("margin-right-5");
-			// AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16())
-			Button addFolder = DisplayUtils.createIconButton(DisplayConstants.ADD_FOLDER, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
-			addFolder.addClickHandler(new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
-					presenter.callbackIfCertifiedIfEnabled(new Callback() {
-						@Override
-						public void invoke() {
-							presenter.addFolderClicked();
-						}
-					});
-				}
-			});
-		
-			topbar.add(upload);
-			topbar.add(addFolder);
-		}
-		
-		SimplePanel files = new SimplePanel();
-		files.addStyleName("highlight-box padding-top-0-imp");
 		entityTreeBrowser.configure(entityId, true);
-		Widget etbW = entityTreeBrowser.asWidget();
-		etbW.addStyleName("margin-top-10");
-		files.setWidget(etbW);
-		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
 		if (canCertifiedUserAddChild) {
-			fp.add(topbar);
+			topBar.setVisible(true);
 		}
-		fp.add(files);
-		this.add(fp);
 	}
 	
 	@Override
-	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
-		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
+	public void showQuizInfoDialog() {
+		quizInfoDialog.show();
 	}
 	
 	@Override
@@ -125,7 +139,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	
 	@Override
 	public void showFolderEditDialog(final String folderEntityId) {
-		SimplePanel sharingAndDataUseContainer = new SimplePanel();
+		folderNameField.setText("");
 		Callback refreshSharingAndDataUseWidget = new Callback() {
 			@Override
 			public void invoke() {
@@ -134,85 +148,12 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 			}
 		};
 		sharingAndDataUseWidget.configure(folderEntityId, true, refreshSharingAndDataUseWidget);
-		sharingAndDataUseContainer.add(sharingAndDataUseWidget.asWidget());
-
-		final Dialog dialog = new Dialog();
-		dialog.setMaximizable(false);
-		dialog.setSize(460, 260);
-		dialog.setPlain(true);
-		dialog.setModal(true);
-		dialog.setHideOnButtonClick(true);
-		dialog.setLayout(new FitLayout());
-		dialog.setBorders(false);
-		dialog.setButtons(Dialog.OKCANCEL);
-		dialog.setHeading("New Folder");
-
-		final FormPanel panel = new FormPanel();
-		panel.setHeaderVisible(false);
-		panel.setFrame(false);
-		panel.setBorders(false);
-		panel.setShadow(false);
-		panel.setBodyBorder(false);
-		panel.setFieldWidth(345);
-
-		final TextField<String> nameField = new TextField<String>();
-				nameField.setFieldLabel(DisplayConstants.LABEL_NAME);
-		panel.add(nameField);			
-		panel.add(sharingAndDataUseContainer);
-		dialog.getButtonBar().removeAll();
-		final com.extjs.gxt.ui.client.widget.button.Button okButton = new com.extjs.gxt.ui.client.widget.button.Button(DisplayConstants.OK);
-		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				dialog.hide(okButton);
-				String nameVal = nameField.getValue();
-				nameField.clear();
-				presenter.updateFolderName(nameVal, folderEntityId);
-			}
-		});
-		dialog.addButton(okButton);
-		
-		final com.extjs.gxt.ui.client.widget.button.Button cancelButton = new com.extjs.gxt.ui.client.widget.button.Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				dialog.hide();
-			}
-		});
-		dialog.addButton(cancelButton);
-		
-		dialog.addListener(Events.Hide, new Listener<BaseEvent>() {
-			public void handleEvent(BaseEvent be) {
-				//window is hiding.  if it was because of any reason other than the ok button being clicked, then cancel folder creation (delete it)
-				if (be instanceof WindowEvent && ((WindowEvent)be).getButtonClicked() != okButton) {
-					cancelFolderCreation(dialog, nameField, folderEntityId);
-				}
-			};
-		});
-		// Enter key in name field submits
-		new KeyNav<ComponentEvent>(nameField) {
-			@Override
-			public void onEnter(ComponentEvent ce) {
-				super.onEnter(ce);
-				if(okButton.isEnabled())
-					okButton.fireEvent(Events.Select);
-			}
-		};
-
-		//and name textfield should have focus by default
-		nameField.focus();
-		
-		dialog.add(panel);
-		dialog.show();
+		newFolderDialog.show();
 	}
 
-	private void cancelFolderCreation(Dialog dialog, TextField<String> nameField, String folderEntityId){
-		nameField.clear();
-		presenter.deleteFolder(folderEntityId, true);
-	}
-	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 
 	@Override 
@@ -236,37 +177,12 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 
 	@Override
 	public void clear() {
-		super.clear();
+		topBar.setVisible(false);
 	}
 
 	@Override
 	public void refreshTreeView(String entityId) {
 		entityTreeBrowser.configure(entityId, true);
 	}
-	
-	/**
-	 * TODO : this should be replaced by DisplayUtils.getUploadButton with the locationable uploader able to create 
-	 * an entity and upload file in a single transaction it modified to create a new 
-	 */
-	private Button getUploadButton(final String entityId) {
-		Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayUtils.ButtonType.DEFAULT, "glyphicon-arrow-up");
-		uploadButton.addStyleName("left display-inline");
-		uploadButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.callbackIfCertifiedIfEnabled(new Callback() {
-					@Override
-					public void invoke() {
-						presenter.uploadButtonClicked();
-					}
-				});
-				
-			}
-		});
-		return uploadButton;
-	}
-	
-	
 
 }

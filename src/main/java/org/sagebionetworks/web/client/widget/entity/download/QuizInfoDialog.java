@@ -25,14 +25,12 @@ public class QuizInfoDialog implements SynapseWidgetPresenter {
 	private Dialog modal;
 	private QuizInfoWidget widget;
 	private GlobalApplicationState globalApplicationState;
-	private CookieProvider cookies;
 	
 	@Inject
-	public QuizInfoDialog(Dialog modal, QuizInfoWidget widget, GlobalApplicationState globalApplicationState, CookieProvider cookies) {
+	public QuizInfoDialog(Dialog modal, QuizInfoWidget widget, GlobalApplicationState globalApplicationState) {
 		this.modal = modal;
 		this.widget = widget;
 		this.globalApplicationState = globalApplicationState;
-		this.cookies = cookies;
 	}
 	
 	/**
@@ -42,25 +40,10 @@ public class QuizInfoDialog implements SynapseWidgetPresenter {
 		return modal.asWidget();
 	}
 
-	public void show(boolean isCertificationRequired, final org.sagebionetworks.web.client.utils.Callback remindMeLaterCallback) {
-		//are we ignoring (for a day)?
-		if (!isCertificationRequired && cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) != null) {
-			//bail
-			if (remindMeLaterCallback != null)
-				remindMeLaterCallback.invoke();
-			return;
-		}
-		
+	public void show() {
 		Callback callback = new Callback() {
 			@Override
 			public void onDefault() {
-				//remind me later clicked
-				//ignore for a day
-				Date date = new Date();
-				CalendarUtil.addDaysToDate(date, 1);
-				cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
-				if (remindMeLaterCallback != null)
-					remindMeLaterCallback.invoke();
 			}
 			@Override
 			public void onPrimary() {
@@ -69,10 +52,9 @@ public class QuizInfoDialog implements SynapseWidgetPresenter {
 			}
 		};
 		
-		widget.configure(isCertificationRequired);
+		widget.configure();
 		//if certification is required, then show the remind me later button.
-		String remindMeLaterButtonText = isCertificationRequired ? null : "Remind me later";
-		modal.configure("Join the Synapse Certified User Community", widget.asWidget(), "Become Certified today!", remindMeLaterButtonText, callback, true);
+		modal.configure("Join the Synapse Certified User Community", widget.asWidget(), "Become Certified today!", null, callback, true);
 		modal.show();
 	}
 }

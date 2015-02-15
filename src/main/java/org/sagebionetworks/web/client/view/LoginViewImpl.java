@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.Row;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -14,9 +15,6 @@ import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -66,12 +64,15 @@ public class LoginViewImpl extends Composite implements LoginView {
 	Anchor viewToULink;
 	@UiField
 	Button takePledgeButton;
+	@UiField
+	Row loadingUi;
+	@UiField
+	Modal termsOfUseDialog;
+	@UiField
+	SimplePanel termsOfUseContainer;
 	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
-	private IconsImageBundle iconsImageBundle;
-	private SageImageBundle sageImageBundle;
-	private Window loggingInWindow;
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
@@ -79,13 +80,11 @@ public class LoginViewImpl extends Composite implements LoginView {
 	
 	
 	@Inject
-	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons,
+	public LoginViewImpl(Binder uiBinder,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle, LoginWidget loginWidget) {
+			LoginWidget loginWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
-		this.iconsImageBundle = icons;
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
@@ -108,15 +107,13 @@ public class LoginViewImpl extends Composite implements LoginView {
 
 	@Override
 	public void showLoggingInLoader() {
-		if(loggingInWindow == null) {
-			loggingInWindow = DisplayUtils.createLoadingWindow(sageImageBundle, DisplayConstants.LABEL_SINGLE_SIGN_ON_LOGGING_IN);
-		}
-		loggingInWindow.show();
+		hideViews();
+		loadingUi.setVisible(true);
 	}
 
 	@Override
 	public void hideLoggingInLoader() {
-		loggingInWindow.hide();
+		loadingUi.setVisible(false);
 	}
 
 	@Override
@@ -124,14 +121,11 @@ public class LoginViewImpl extends Composite implements LoginView {
 		clear();
 		headerWidget.refresh();
 		
-		ContentPanel cp = new ContentPanel();
-		cp.setHeaderVisible(false);
-		cp.setBorders(true);						
-		cp.setBodyStyleName("lightGreyBackground");
-		
+		Panel cp = new Panel();
+		cp.addStyleName("padding-15");
 		HTML message = new HTML();
 		message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
-		cp.add(message, new MarginData(0, 0, 0, 10));
+		cp.add(message);
 		
 		com.google.gwt.user.client.ui.Button loginAgain = DisplayUtils.createButton(DisplayConstants.BUTTON_LOGIN_AGAIN, ButtonType.PRIMARY);
 		loginAgain.getElement().setId(DisplayConstants.ID_BTN_LOGIN_AGAIN);
@@ -141,7 +135,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			}
 		});
-		cp.add(loginAgain, new MarginData(16, 0, 10, 10));
+		cp.add(loginAgain);
 		
 		logoutPanel.add(cp);
 		hideViews();
@@ -186,7 +180,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 
 	@Override
 	public void clear() {
-		if(loggingInWindow != null) loggingInWindow.hide();
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 		logoutPanel.clear();
@@ -220,7 +213,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 			viewToULink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					TermsOfUseHelper.showTermsOfUse(content, null);
+					termsOfUseContainer.setWidget(new HTML(content));
+					termsOfUseDialog.show();
 				}
 			});
 		}
@@ -230,6 +224,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue();
 	}
 	private void hideViews() {
+		loadingUi.setVisible(false);
 		loginView.setVisible(false);
 		termsOfServiceView.setVisible(false);
 	}

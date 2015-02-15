@@ -2,7 +2,11 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -18,12 +22,14 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -87,19 +93,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Anchor challengesLink;
 	@UiField
 	LIElement challengesListItem;
-	@UiField
-	Anchor favoritesLink;
-	@UiField
-	LIElement favoritesListItem;
-
+	
 
 	@UiField
 	DivElement navtabContainer;
 	
 	@UiField
 	DivElement projectsTabContainer;
-	@UiField
-	DivElement favoritesTabContainer;
 	@UiField
 	DivElement challengesTabContainer;
 	@UiField
@@ -108,6 +108,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement settingsTabContainer;
 	
 	//Project tab
+	//filters
+	@UiField
+	ButtonGroup projectFiltersUI;
+	@UiField
+	Button allProjectsFilter;
+	@UiField
+	Button myProjectsFilter;
+	@UiField
+	Button favoritesFilter;
+	@UiField
+	Button teamFilters;
+	@UiField
+	DropDownMenu teamFiltersDropDownMenu;
+	
 	@UiField
 	TextBox createProjectTextBox;
 	@UiField
@@ -137,10 +151,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	FlowPanel challengesTabContent;
 	
-	//Favorites
-	@UiField
-	FlowPanel favoritesTabContent;
-	
 	//Settings
 	@UiField
 	FlowPanel settingsTabContent;
@@ -152,12 +162,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField 
 	DivElement challengesHighlightBox;
 	@UiField 
-	DivElement favoritesHighlightBox;
-	@UiField 
 	DivElement teamsHighlightBox;
 
 	@UiField 
 	DivElement projectsLoadingUI;
+	@UiField 
+	Row profilePictureLoadingUI;
+	@UiField 
+	Row profileInfoLoadingUI;
+	
+	@UiField
+	FlowPanel favoritesHelpPanel;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -231,6 +246,24 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		showProjectsLoading(false);
+		favoritesFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
+			}
+		});
+		allProjectsFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
+			}
+		});
+		myProjectsFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
+			}
+		});
 	}
 	
 	private void initCertificationBadge() {
@@ -243,7 +276,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10");
 		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
 		certifiedUserImage.addClickHandler(new ClickHandler() {
-	@Override
+			@Override
 			public void onClick(ClickEvent event) {
 				clear();
 				tooltip.hide();
@@ -266,6 +299,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setFavoritesHelpPanelVisible(boolean isVisible) {
+		favoritesHelpPanel.setVisible(isVisible);
+	}
+	
+	@Override
 	public void setTeamNotificationCount(String count) {
 		teamsLink.setHTML(DisplayConstants.TEAMS + "&nbsp" + DisplayUtils.getBadgeHtml(count));
 	}
@@ -283,7 +321,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		if (isOwner) {
 			resetHighlightBoxes();
-			DisplayUtils.show(favoritesListItem);
 			DisplayUtils.show(settingsListItem);
 			
 			openInvitesContainer.add(openInvitesWidget.asWidget());
@@ -311,7 +348,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
 		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
 		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
-		DisplayUtils.setHighlightBoxUser(favoritesHighlightBox, displayName, "Favorites");
 	}
 	
 	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
@@ -319,13 +355,32 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams, boolean showNotifications) {
-		myTeamsWidget.configure(teams, true, showNotifications, new TeamListWidget.RequestCountCallback() {
+	public void setTeams(List<Team> teams, boolean isOwner) {
+		myTeamsWidget.configure(teams, true, isOwner, new TeamListWidget.RequestCountCallback() {
 			@Override
 			public void invoke(String teamId, Long requestCount) {
 				presenter.addMembershipRequests(requestCount.intValue());
 			}
 		});
+		
+		if (isOwner) {
+			//also create a link for each team in the project filters
+			for (final Team team : teams) {
+				AnchorListItem teamFilter = new AnchorListItem(team.getName());
+				teamFilter.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.applyFilterClicked(ProjectFilterEnum.TEAM, team);
+					}
+				});
+				teamFiltersDropDownMenu.add(teamFilter);
+			}
+		}
+	}
+	
+	@Override
+	public void setTeamsFilterVisible(boolean isVisible) {
+		teamFilters.setVisible(isVisible);	
 	}
 	
 	@Override
@@ -364,6 +419,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void clearProjects() {
 		projectsTabContent.clear();
 		setIsMoreProjectsVisible(false);
+		favoritesHelpPanel.setVisible(false);
 	}
 	
 	@Override
@@ -372,17 +428,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
-		//TODO: replace with ProjectBadges that will show more information (once additional information is available in the ProjectHeader)
+		//uses ProjectBadge to show more information (additional info available from ProjectHeader)
 		for (ProjectHeader projectHeader : projectHeaders) {
-			EntityHeader entityHeaderWrapper = new EntityHeader();
-			entityHeaderWrapper.setId(projectHeader.getId());
-			entityHeaderWrapper.setName(projectHeader.getName());
-			entityHeaderWrapper.setType("project");
-			
-			EntityBadge badge = ginInjector.getEntityBadgeWidget();
-			badge.configure(entityHeaderWrapper);
+			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
+			badge.configure(projectHeader);
 			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-bottom-10 col-xs-12 col-lg-6");
+			widget.addStyleName("margin-bottom-10 col-xs-12");
 			targetPanel.add(widget);
 		}
 		if (projectHeaders.isEmpty())
@@ -415,17 +466,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
-	@Override
-	public void setFavorites(List<EntityHeader> headers) {
-		addEntityBadges(headers, favoritesTabContent);
-	}
-	
-	@Override
-	public void setFavoritesError(String error) {
-		DisplayUtils.showErrorMessage(error);
-	}
-	
-	 public static Widget getProfilePicture(UserProfile profile, AttachmentData pic, SynapseJSNIUtils synapseJSNIUtils) {
+	public static Widget getProfilePicture(UserProfile profile, AttachmentData pic, SynapseJSNIUtils synapseJSNIUtils) {
 		 Widget profilePicture; 
 		 if (pic != null && pic.getPreviewId() != null && pic.getPreviewId().length() > 0) {
 			 //use preview
@@ -514,8 +555,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@Override
 	public void showLoading() {
+		profilePictureLoadingUI.setVisible(true);
+		profileInfoLoadingUI.setVisible(true);
 	}
 
+	@Override
+	public void hideLoading() {
+		profilePictureLoadingUI.setVisible(false);
+		profileInfoLoadingUI.setVisible(false);
+	}
+	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
@@ -536,9 +585,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		//init with loading widget
 		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		
-		favoritesTabContent.clear();
-		favoritesTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
-		
 		settingsTabContent.clear();
 		
 		challengesTabContent.clear();
@@ -546,7 +592,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
-		DisplayUtils.hide(favoritesListItem);
 		createTeamTextBox.setValue("");
 		createProjectTextBox.setValue("");
 		
@@ -555,6 +600,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
+		projectFiltersUI.setVisible(false);
+		teamFiltersDropDownMenu.clear();
 	}
 	
 	@Override
@@ -565,7 +612,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private void hideTabContainers() {
 		//hide all tab containers
 		DisplayUtils.hide(projectsTabContainer);
-		DisplayUtils.hide(favoritesTabContainer);
 		DisplayUtils.hide(challengesTabContainer);
 		DisplayUtils.hide(teamsTabContainer);
 		DisplayUtils.hide(settingsTabContainer);
@@ -582,7 +628,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		// tell presenter what tab we're on only if the user clicked
 		if(targetTab == null) targetTab = Synapse.ProfileArea.PROJECTS; // select tab, set default if needed
 		hideTabContainers();
-		removeClass("active", projectsListItem, teamsListItem, settingsListItem, challengesListItem, favoritesListItem);
+		removeClass("active", projectsListItem, teamsListItem, settingsListItem, challengesListItem);
 		
 		if (targetTab == Synapse.ProfileArea.PROJECTS) {
 			setTabSelected(projectsListItem, projectsTabContainer);
@@ -592,8 +638,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			setTabSelected(settingsListItem, settingsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
 			setTabSelected(challengesListItem, challengesTabContainer);
-		} else if (targetTab == Synapse.ProfileArea.FAVORITES) {
-			setTabSelected(favoritesListItem, favoritesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
@@ -624,7 +668,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
 		settingsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
 		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
-		favoritesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.FAVORITES));
 	}
 	
 	private ClickHandler getTabClickHandler(final Synapse.ProfileArea targetTab) {
@@ -643,5 +686,38 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			Callback yesCallback
 			) {
 		DisplayUtils.showConfirmDialog(title, message, yesCallback);
+	}
+	
+	@Override
+	public void showProjectFiltersUI() {
+		projectFiltersUI.setVisible(true);
+	}
+	
+	@Override
+	public void setAllProjectsFilterSelected() {
+		clearFiltersSelected();
+		allProjectsFilter.setActive(true);
+	}
+	@Override
+	public void setFavoritesFilterSelected() {
+		clearFiltersSelected();
+		favoritesFilter.setActive(true);
+	}
+	@Override
+	public void setMyProjectsFilterSelected() {
+		clearFiltersSelected();
+		myProjectsFilter.setActive(true);
+	}
+	@Override
+	public void setTeamsFilterSelected() {
+		clearFiltersSelected();
+		teamFilters.setActive(true);
+	}
+	
+	private void clearFiltersSelected() {
+		allProjectsFilter.setActive(false);
+		favoritesFilter.setActive(false);
+		myProjectsFilter.setActive(false);
+		teamFilters.setActive(false);
 	}
 }

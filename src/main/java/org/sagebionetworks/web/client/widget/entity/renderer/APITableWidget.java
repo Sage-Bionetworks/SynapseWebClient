@@ -385,6 +385,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					tableColumnRendererInit(columnData, columnNames, renderers, initializedRenderers, currentIndex+1);
 			}
 		};
+
 		APITableColumnConfig config = tableConfig.getColumnConfigs().get(currentIndex);
 		renderers[currentIndex].init(columnData, config, callback);
 	}
@@ -512,6 +513,16 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		if (colValues == null) {
 			//try to find using the fixed column value
 			colValues = columnData.get(removeFirstToken(inputColumnName));
+		}
+		if (colValues == null) {
+			//column not found in the data.  return an empty column
+			if (!columnData.values().isEmpty()) {
+				colValues = new ArrayList<String>();
+				List<String> aColumn = columnData.values().iterator().next();
+				for (int i = 0; i < aColumn.size(); i++) {
+					colValues.add(null);
+				}
+			}
 		}
 		return colValues;
 	}

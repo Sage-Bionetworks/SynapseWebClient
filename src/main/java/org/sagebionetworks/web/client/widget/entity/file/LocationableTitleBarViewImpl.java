@@ -6,8 +6,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -149,9 +147,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 
 		favoriteWidget.configure(entity.getId());
 		
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-		licensedDownloader.configure(entityBundle, userProfile);
+		licensedDownloader.configure(entityBundle);
 		downloadButton = licensedDownloader.asWidget();
 		DisplayUtils.addTooltip(downloadButton, DisplayConstants.BUTTON_DOWNLOAD, Placement.BOTTOM);
 		downloadButtonContainer.clear();
@@ -214,7 +210,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		}
 		
 		// Configure the button
-		licensedDownloader.configure(entityBundle, userProfile);
+		licensedDownloader.configure(entityBundle);
 		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
 		licensedDownloader.clearHandlers();
 		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			

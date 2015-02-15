@@ -3,11 +3,12 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, WidgetEditorPresenter {
@@ -22,7 +23,7 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 		// Prepopulate reference text from the map.  
 		if(widgetDescriptor.containsKey(WidgetConstants.TEXT_KEY)) {
@@ -37,21 +38,13 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 	
 	@Override
 	public void updateDescriptorFromView() {
-		view.checkParams();
+		if(!DisplayUtils.isDefined(view.getReference())) {
+			throw new IllegalArgumentException("A reference is required.");
+		}
 		
 		//Add the inline parameter to make the widget render inline
 		descriptor.put(WidgetConstants.INLINE_WIDGET_KEY, "true");
 		descriptor.put(WidgetConstants.TEXT_KEY, view.getReference());
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 
 	@Override

@@ -167,14 +167,13 @@ public class DisplayConstants {
 	public static final String BUTTON_CHANGE_PASSWORD = "Change Password";
 	public static final String BUTTON_UPDATE_WITH_LINKED_IN = "Update With LinkedIn";
 	public static final String BUTTON_CHANGE_USER_INFO = "Update Profile";
-	public static final String LABEL_SINGLE_SIGN_ON_LOGGING_IN = "Logging you in.";
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
 	public static final String LABEL_ENTITY_NOT_FOUND = "Sorry, that Synapse Id could not be located.";
 	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
 	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";	
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
-	public static final String ERROR_RESTORING_TRASH_PARENT_NOT_FOUND = "Sorry, you cannot restore this item because the original parent cannot be found.";
+	public static final String ERROR_RESTORING_TRASH_PARENT_NOT_FOUND = "Sorry, an error occurred while restoring this item.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";
 	public static final String FORGOT_PASSWORD_MESSAGE = "If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
@@ -273,7 +272,7 @@ public class DisplayConstants {
  	public static final String TEXT_UPLOAD_SUCCESS = "File Uploaded to Synapse";
 	public static final String TEXT_ATTACHMENT_SUCCESS = "Attachment Uploaded to Synapse";
 	public static final String TEXT_PROFILE_PICTURE_SUCCESS = "Profile Photo Uploaded to Synapse";
-	public static final String ERROR_UPLOAD = "An error occurred during upload. Please try again.";
+	public static final String ERROR_UPLOAD_TITLE = "Upload Error";
 	public static final String LABEL_UPLOADING = "Uploading...";
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_FINISHING = "Finishing...";
@@ -282,7 +281,6 @@ public class DisplayConstants {
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
 	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
-	public static final String FAVORITES_REMINDER_TOOLTIP_MESSAGE = "Click the star to add this to your favorites!";
 	public static final String SUBMITTED_TITLE = "Submitted";
 	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
 	
@@ -416,7 +414,6 @@ public class DisplayConstants {
 	public static final String URL_LABEL = "URL:";
 	public static final String EQUATION_LABEL = "TeX:";
 	public static final String LINK_TEXT_LABEL = "Link Text:";
-	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
 	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
@@ -481,59 +478,22 @@ public class DisplayConstants {
 	public static final String ID_BTN_SHARE = "id_btn_share";
 	public static final String ID_BTN_ADD = "id_btn_add";
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
-
-	// constants used in GovernanceDialogHelper	
-//	public static final String RESTRICTED_USE = "Restricted Use";
-	public static final String CONTROLLED_USE = "Controlled Use";
-	public static final String MODIFY = "modify";
 	public static final String CHANGE = "change";
-	public static final String INFO = "info";
-	public static final String GAIN_ACCESS = "gain access";
-	public static final String FLAG_DIALOG_PREFIX = 
-		"If you think this data is posted inappropriately or should have different access conditions, please ";
-	public static final String FLAG_DIALOG_ANONYMOUS_SUFFIX = "<span class=\"strong\">log in</span> to alert the Synapse Access and Compliance Team (ACT).";
-	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX = "alert the Synapse Access and Compliance Team (ACT) by clicking below.";
-	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_1 = "alert the Synapse Access and Compliance Team (ACT) by clicking <a href=\"";
-	public static final String FLAG_DIALOG_LOGGED_IN_SUFFIX_WITH_HYPERLINK_2 = "\" target=\"_blank\" class=\"link\">here</a>.";
-	public static final String BUTTON_TEXT_FLAG_DATA = "Flag Data";
-	public static final String BUTTON_TEXT_RESTRICT_DATA = "Add Restrictions";
+	
 	public static final String TEXT_ADD_ANNOTATION = "Add Annotation";
 	public static final String TEXT_DELETE_ANNOTATION = "Delete Annotation";
 	public static final String TEXT_EDIT_ANNOTATION = "Edit Annotation";
-	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
 	public static final String SEND_BUG_REPORT = "Send Error Report";
 	public static final String DO_NOT_SEND_BUG_REPORT = "Don't Send";
 	public static final String BUTTON_TEXT_LOGIN = "Login";
 	public static final String FLAG_DIALOG_TITLE = "Flag Data";
-	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";
-	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";
-	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
-	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
-
-	public static final String SYNAPSE_GUIDELINES_MORE_INFO_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">more about data use sharing</a>";
-
+	
 	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Use of the content of this folder requires agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
 	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Use of the content of this folder does not require agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
 	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
 	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view content in this folder.";
 	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view content in this folder.";
-	
-	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Conditions for using Human Data in Synapse</a>";
-	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "For more information on use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
-	
-	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
-	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
-	public static String RESTRICTION_DIALOG_TEXT_3 = "To add data restrictions, contact the Access and Compliance Team (ACT), by clicking below.</p>";
-	public static String RESTRICTION_DIALOG_TEXT_4 = "<p class=\"strong\">NOTE:  If you continue, data access to all registered Synapse users will be temporarily restricted pending review by the ACT.</p>";
-	
-	public static final String TOU_RESTRICTION_HEADER = "In order to access these data you must be a registered Synapse user and agree to the following terms:";
-	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
-	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
-	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
-	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
@@ -599,6 +559,7 @@ public class DisplayConstants {
 	public static final String ALWAYS_CURRENT_VERSION = "Always refer to the most current version";
 	public static final String BROWSE_MY_ENTITIES = "Browse My Entities";
 	public static final String ENTER_SYNAPSE_ID = "Enter Synapse Id";
+	public static final String ENTER_PAGE_TITLE = "Enter Page Title";
 	public static final String REFER_TO_SPECIFIC_VERSION = "Refer to a Specific Version";
 	public static final String CURRENT = "Current";
 	public static final String CURRENTLY_SELCTED = "Currently Selected";
@@ -611,6 +572,7 @@ public class DisplayConstants {
 	public static final String IMAGE_FILE_ENTITY = "Image File Entity";
 	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
+	public static final String ERROR_ENTER_DEPTH = "Please enter a valid depth";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_VIDEO_FILE = "Please set at least one video file format";
 	public static final String FIND_ENTITIES = "Find Entities";
 	public static final String FIND_ENTITY = "Find Entity";
@@ -634,7 +596,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String EXTERNAL_URL = "External URL";
 	public static final String ADD_ENTITY = "Add Entity";
-	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please " + ClientProperties.HELP_EMAIL_ADDRESS_LINK + " if you would like your Server added to our white list.";
+	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please contact us at " + ClientProperties.HELP_EMAIL_ADDRESS + " if you would like your Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
@@ -655,7 +617,7 @@ public class DisplayConstants {
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
 	public static final String SYNAPSE_TUTORIAL = "Synapse Tutorial";
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
-	
+	public static final String INVALID_USERNAME_OR_PASSWORD = "The user name or password is incorrect.  Please try again.";
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
 	public static final String EVALUATION_JOIN_TEAM_ERROR = "Unable to join team associated with the evaluation: ";
 	public static final String JOIN_TEAM_ERROR = "Unable to request membership to the team: ";
@@ -699,6 +661,7 @@ public class DisplayConstants {
 	public static final String COLUMN_DETAILS = "Column Details";
 	public static final String ADD_COLUMN = "Add Column";
 	public static final String TABLES = "Tables";
+	public static final String BETA_BADGE_HTML="<span class=\"smallerText\"><span class=\"label label-warning label-as-badge moveup-8 margin-left-5\">beta</span></span>";
 	public static final String TABLE_COLUMNS = "Table Columns";
 	public static final String ON_CAP = "On";
 	public static final String OFF = "Off";	

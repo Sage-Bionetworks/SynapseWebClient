@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.ObjectSchema;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -40,13 +38,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntitySchemaCache schemaCache;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
-	private WidgetRegistrar widgetRegistrar;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private GlobalApplicationState globalApplicationState;
 	private EntityBundle bundle;
 	private String entityTypeDisplay;
 	private EventBus bus;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
 	private String areaToken;
@@ -65,18 +61,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntitySchemaCache schemaCache,
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
-			WidgetRegistrar widgetRegistrar,
 			GlobalApplicationState globalApplicationState,
-			EventBus bus, JSONObjectAdapter jsonObjectAdapter,
+			EventBus bus,
 			QueryTokenProvider queryTokenProvider) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.schemaCache = schemaCache;
 		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
-		this.widgetRegistrar = widgetRegistrar;
 		this.bus = bus;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;	
 		this.queryTokenProvider = queryTokenProvider;
 		this.projectAreaState = new ProjectAreaState();

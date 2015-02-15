@@ -3,14 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,13 +17,11 @@ public class WikiFilesPreviewWidget implements WikiFilesPreviewWidgetView.Presen
 	private WikiFilesPreviewWidgetView view;
 	private Map<String, String> descriptor;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	
 	@Inject
-	public WikiFilesPreviewWidget(WikiFilesPreviewWidgetView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public WikiFilesPreviewWidget(WikiFilesPreviewWidgetView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	
@@ -36,17 +30,11 @@ public class WikiFilesPreviewWidget implements WikiFilesPreviewWidgetView.Presen
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		//get all of the file attachments for this wiki page
-		synapseClient.getWikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getWikiAttachmentHandles(wikiKey, new AsyncCallback<FileHandleResults>() {
 			@Override
-			public void onSuccess(String results) {
-				try {
-					FileHandleResults fileHandleResults = nodeModelCreator.createJSONEntity(results, FileHandleResults.class);
+			public void onSuccess(FileHandleResults fileHandleResults) {
 					//and grab the file endpoint from the global app state
-					
 					view.configure(wikiKey, fileHandleResults.getList());
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
 			}
 			
 			@Override

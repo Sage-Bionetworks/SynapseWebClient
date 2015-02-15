@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -40,6 +38,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TeamViewImpl extends Composite implements TeamView {
+
+	private static final String PUBLIC_JOIN_TEXT = "People can join this team without team manager authorization";
+
 
 	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
 
@@ -203,7 +204,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	
 	private void showEditMode() {
 		clear();
-		LayoutContainer form = new LayoutContainer();
+		FlowPanel form = new FlowPanel();
 		form.addStyleName("margin-top-15 margin-bottom-40");
 		
 		final TextBox nameField = new TextBox();
@@ -217,7 +218,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		descriptionField.getElement().setAttribute("placeholder", DisplayConstants.SHORT_TEAM_DESCRIPTION);
 		descriptionField.addStyleName("col-md-12 margin-left-10 margin-bottom-10");
 		form.add(DisplayUtils.wrap(descriptionField));
-		final CheckBox publicJoinCb = new CheckBox("People can join this team without team administrator authorization");
+		final CheckBox publicJoinCb = new CheckBox(PUBLIC_JOIN_TEXT);
 		boolean isPublicJoin = TeamSearchPresenter.getCanPublicJoin(team);
 		publicJoinCb.setValue(isPublicJoin);
 		FlowPanel cbPanel = new FlowPanel();
@@ -241,7 +242,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		});
 		cancelButton.addStyleName("right margin-right-15");
 		
-		LayoutContainer buttonsContainer = new LayoutContainer();
+		FlowPanel buttonsContainer = new FlowPanel();
 		buttonsContainer.addStyleName("row");
 		buttonsContainer.add(cancelButton);
 		buttonsContainer.add(saveButton);

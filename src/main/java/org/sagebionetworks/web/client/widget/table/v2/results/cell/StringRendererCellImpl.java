@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
-import org.gwtbootstrap3.client.ui.FormControlStatic;
+import org.gwtbootstrap3.client.ui.html.Text;
 
 /**
  * A non editable renderer for a string.
@@ -8,7 +8,7 @@ import org.gwtbootstrap3.client.ui.FormControlStatic;
  * @author John
  *
  */
-public class StringRendererCellImpl extends FormControlStatic implements StringRendererCell {
+public class StringRendererCellImpl extends Text implements StringRendererCell {
 	
 	public StringRendererCellImpl(){
 		super();

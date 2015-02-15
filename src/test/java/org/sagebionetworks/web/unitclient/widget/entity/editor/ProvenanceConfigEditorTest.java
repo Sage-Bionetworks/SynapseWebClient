@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
@@ -26,6 +26,9 @@ public class ProvenanceConfigEditorTest {
 	public void setup(){
 		mockView = mock(ProvenanceConfigView.class);
 		editor = new ProvenanceConfigEditor(mockView);
+		when(mockView.getEntityList()).thenReturn("syn123");
+		when(mockView.getDepth()).thenReturn("1");
+		when(mockView.getProvDisplayHeight()).thenReturn("256");
 	}
 	
 	@Test
@@ -47,14 +50,45 @@ public class ProvenanceConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		verify(mockView).setEntityList(eq(entityToGraph));
 		verify(mockView).setIsExpanded(eq(Boolean.valueOf(showExpand)));
-		verify(mockView).setDepth(eq(Long.parseLong(d)));
-		verify(mockView).setProvDisplayHeight(Integer.parseInt(displayHeight));
+		verify(mockView).setDepth(eq(d));
+		verify(mockView).setProvDisplayHeight(displayHeight);
 		
 		editor.updateDescriptorFromView();
-		verify(mockView).checkParams();
 		verify(mockView).getDepth();
 		verify(mockView).getEntityList();
 		verify(mockView).isExpanded();
 		verify(mockView, atLeastOnce()).getProvDisplayHeight();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testUpdateDescriptorFromViewInvalidDepth() {
+		when(mockView.getDepth()).thenReturn("not a number");
+		editor.updateDescriptorFromView();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testUpdateDescriptorFromViewInvalidDepth2() {
+		when(mockView.getDepth()).thenReturn("22.3");
+		editor.updateDescriptorFromView();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testUpdateDescriptorFromViewInvalidEntityList() {
+		when(mockView.getEntityList()).thenReturn(null);
+		editor.updateDescriptorFromView();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testUpdateDescriptorFromViewInvalidEntityList2() {
+		when(mockView.getEntityList()).thenReturn("");
+		editor.updateDescriptorFromView();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testUpdateDescriptorFromViewInvalidDisplayHeight() {
+		when(mockView.getEntityList()).thenReturn(null);
+		when(mockView.getDepth()).thenReturn("1");
+		when(mockView.getProvDisplayHeight()).thenReturn("abc");
+		editor.updateDescriptorFromView();
 	}
 }

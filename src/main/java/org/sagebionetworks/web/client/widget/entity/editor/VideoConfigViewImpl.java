@@ -1,86 +1,82 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
+public class VideoConfigViewImpl implements VideoConfigView {
+	public interface VideoConfigViewImplUiBinder extends UiBinder<Widget, VideoConfigViewImpl> {}
 	private Presenter presenter;
-	TextBox mp4Entity, oggEntity, webmEntity;
-	IconsImageBundle iconsImageBundle;
+	@UiField
+	TextBox mp4Entity;
+	@UiField
+	TextBox oggEntity;
+	@UiField
+	TextBox webmEntity;
+	@UiField
+	Button mp4Button;
+	@UiField
+	Button oggButton;
+	@UiField
+	Button webmButton;
+	@UiField
+	Anchor moreInfoLink;
+	
 	EntityFinder entityFinder;
 	
+	Widget widget;
+	
 	@Inject
-	public VideoConfigViewImpl(IconsImageBundle iconsImageBundle, EntityFinder entityFinder) {
-		this.iconsImageBundle = iconsImageBundle;
+	public VideoConfigViewImpl(VideoConfigViewImplUiBinder binder, 
+			EntityFinder entityFinder) {
+		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
+		mp4Button.addClickHandler(getClickHandler(mp4Entity));
+		oggButton.addClickHandler(getClickHandler(oggEntity));
+		webmButton.addClickHandler(getClickHandler(webmEntity));
+		moreInfoLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(ClientProperties.VIDEO_HTML5_BROWSER_LINK, "", "");
+			}
+		});
 	}
 	
 	@Override
 	public void initView() {
-		clear();
-		mp4Entity = new TextBox();
-		oggEntity = new TextBox();
-		webmEntity = new TextBox();
-		add(new HTML("<h5 class=\"margin-10\">The browser viewing the video will use the first format that it recognizes. "+
-				"<small>(<a class=\"link\" target=\"_blank\" href=\""+ClientProperties.VIDEO_HTML5_BROWSER_LINK+"\">more information</a>)</small></h5>"));
-		
-		add(initTextBox(mp4Entity, "Find MP4", "MPEG 4 files with H264 video codec and AAC audio codec"));
-		add(initTextBox(oggEntity, "Find Ogg", "Ogg files with Theora video codec and Vorbis audio codec"));
-		add(initTextBox(webmEntity, "Find WebM", "WebM files with VP8 video codec and Vorbis audio codec"));
 	}
 
-	private Widget initTextBox(final TextBox textBox, String label, String tooltip){
-		LayoutContainer horizontalTable = new LayoutContainer();
-		horizontalTable.addStyleName("margin-top-left-10");
-		
-		textBox.addStyleName("form-control inline-block");
-		textBox.setWidth("200px");
-		DisplayUtils.addToolTip(horizontalTable, tooltip);
-		textBox.setEnabled(false);
-		ClickHandler clickHandler = new ClickHandler() {
+	public ClickHandler getClickHandler(final TextBox textBox) {
+		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				entityFinder.configure(false, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {					
 							textBox.setValue(selected.getTargetId());
-							window.hide();
+							entityFinder.hide();
 						} else {
 							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
 					}
 				});
+				entityFinder.show();
 			}
 		};
-		textBox.addClickHandler(clickHandler);
-		Button searchButton = DisplayUtils.createButton(label);
-		searchButton.addClickHandler(clickHandler);
-		
-		// add to table and page
-		horizontalTable.add(textBox);
-		horizontalTable.add(searchButton);
-		
-		return horizontalTable;
-		
 	}
 	
 	@Override
@@ -91,7 +87,7 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 
 	@Override 
@@ -111,15 +107,6 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public int getDisplayHeight() {
-		return 250;
-	}
-	@Override
-	public int getAdditionalWidth() {
-		return 20;
 	}
 	
 	@Override
@@ -150,6 +137,13 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 	@Override
 	public void setWebMEntity(String webMEntityString) {
 		webmEntity.setValue(webMEntityString);
+	}
+	
+	@Override
+	public void clear() {
+		mp4Entity.setValue("");
+		oggEntity.setValue("");
+		webmEntity.setValue("");
 	}
 	
 }

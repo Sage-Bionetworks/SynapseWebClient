@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -15,12 +13,10 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,19 +29,19 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
-	private AutoGenFactory autogenFactory;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	CookieProvider cookies;
 	EntityAccessRequirementsWidget accessRequirementsWidget;
-	boolean canAddChild, canCertifiedUserAddChild;
+	boolean isCertifiedUser,canCertifiedUserAddChild;
+	private String currentFolderEntityId;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
-			AutoGenFactory autogenFactory,
+			NodeModelCreator nodeModelCreator, 
+			AdapterFactory adapterFactory,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			CookieProvider cookies,
@@ -54,7 +50,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
-		this.autogenFactory = autogenFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
@@ -66,22 +61,13 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	 * Configure tree view with given entityId's children as start set
 	 * @param entityId
 	 */
-	public void configure(String entityId, boolean canAddChild, boolean canCertifiedUserAddChild) {
+	public void configure(String entityId, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
+		view.clear();
 		this.configuredEntityId = entityId;
-		this.canAddChild = canAddChild;
+		this.isCertifiedUser = isCertifiedUser;
 		this.canCertifiedUserAddChild = canCertifiedUserAddChild;
 		view.configure(entityId, canCertifiedUserAddChild);
-	}
-	
-	public void refresh() {
-		if (configuredEntityId != null)
-			view.configure(configuredEntityId, canCertifiedUserAddChild);
-	}
-	
-	public void clearState() {
-		view.clear();
-		// remove handlers
-		this.entityUpdatedHandler = null;		
+		currentFolderEntityId = null;
 	}
 	
 	@Override
@@ -94,7 +80,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.entityUpdatedHandler = handler;
 	}
 
-	
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);		
@@ -103,11 +88,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, authenticationController, isCertificationRequired(canAddChild, canCertifiedUserAddChild));
-	}
-	
-	public static boolean isCertificationRequired(boolean canAddChild, boolean canCertifiedUserAddChild) {
-		return !canAddChild && canCertifiedUserAddChild;
+		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, authenticationController, isCertifiedUser);
 	}
 	
 	//any access requirements to accept?
@@ -117,30 +98,17 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			final UploadView view,
 			final SynapseClientAsync synapseClient,
 			final AuthenticationController authenticationController,
-			final boolean isCertificationRequired) {
+			final boolean isCertifiedUser) {
 		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean accepted) {
 				if (accepted)
-					uploadButtonClickedStep2(entityId, view, synapseClient, authenticationController, isCertificationRequired);
+					uploadButtonClickedStep2(entityId, view, synapseClient, authenticationController, isCertifiedUser);
 			}
 		};
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
-	/**
-	 * Invokes the callback iff the user certification feature is enabled on the backend AND certification requirements have been met.
-	 * Otherwise, it will pop up the "get certified" dialog
-	 * @return
-	 */
-	@Override
-	public void callbackIfCertifiedIfEnabled(Callback callback) {
-		if (FilesBrowser.isCertificationRequired(canAddChild, canCertifiedUserAddChild)) {
-			view.showQuizInfoDialog(true, null);
-		} else
-			callback.invoke();
-	}
-  
 	/**
 	 * Check for user certification passing record.  NOTE: This should be removed after certification is required 
 	 * (we will check the permissions up front and block on click), 
@@ -157,44 +125,33 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			final UploadView view,
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
-			final boolean isCertificationRequired) {
-
-		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String passingRecord) {
-				view.showUploadDialog(entityId);
-			}
-
-			@Override
-			public void onFailure(Throwable t) {
-				if (t instanceof NotFoundException) {
-					view.showQuizInfoDialog(isCertificationRequired, new Callback() {
-						@Override
-						public void invoke() {
-							// remind me later clicked
-							view.showUploadDialog(entityId);
-						}
-					});
-				} else
-					view.showErrorMessage(t.getMessage());
-			}
-		};
-		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+			final boolean isCertifiedUser) {
+		if (isCertifiedUser)
+			view.showUploadDialog(entityId);
+		else
+			view.showQuizInfoDialog();
 	}
 	
 	@Override
 	public void addFolderClicked() {
-		createFolder();
+		if (isCertifiedUser)
+			createFolder();
+		else
+			view.showQuizInfoDialog();
 	}
 	
+	
 	public void createFolder() {
-		Entity folder = createNewEntity(Folder.class.getName(), configuredEntityId);
+		Folder folder = new Folder();
+		folder.setParentId(configuredEntityId);
+		folder.setEntityType(Folder.class.getName());
 		String entityJson;
 		try {
 			entityJson = folder.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String newId) {
+					currentFolderEntityId = newId;
 					view.showFolderEditDialog(newId);
 				}
 				
@@ -210,8 +167,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}
 	
 	@Override
-	public void deleteFolder(String folderEntityId, boolean skipTrashCan) {
-		synapseClient.deleteEntityById(folderEntityId, skipTrashCan, new AsyncCallback<Void>() {
+	public void deleteFolder(boolean skipTrashCan) {
+		synapseClient.deleteEntityById(currentFolderEntityId, skipTrashCan, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void na) {
 				//folder is deleted when folder creation is canceled.  refresh the tree for updated information 
@@ -246,8 +203,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}
 	
 	@Override
-	public void updateFolderName(final String newFolderName, String folderEntityId) {
-		synapseClient.getEntity(folderEntityId, new AsyncCallback<EntityWrapper>() {
+	public void updateFolderName(final String newFolderName) {
+		synapseClient.getEntity(currentFolderEntityId, new AsyncCallback<EntityWrapper>() {
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				try {
@@ -267,15 +224,19 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		});
 	}
 	
-	
-	/*
-	 * Private Methods
+	/**
+	 * For testing purposes
+	 * @return
 	 */
-	private Entity createNewEntity(String className, String parentId) {
-		Entity entity = (Entity) autogenFactory.newInstance(className);
-		entity.setParentId(parentId);
-		entity.setEntityType(className);		
-		return entity;
+	public String getCurrentFolderEntityId() {
+		return currentFolderEntityId;
+	};
+	
+	/**
+	 * For testing purposes
+	 * @return
+	 */
+	public void setCurrentFolderEntityId(String currentFolderEntityId) {
+		this.currentFolderEntityId = currentFolderEntityId;
 	}
-
 }

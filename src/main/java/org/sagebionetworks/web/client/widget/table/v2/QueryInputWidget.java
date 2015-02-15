@@ -68,18 +68,35 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 			synapseClient.validateTableQuery(sql, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.showInputError(false);
-					queryInputListener.onExecuteQuery(sql);
+					setQuery(sql);
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.setQueryInputLoading(false);
-					view.showInputError(true);
-					view.setInputErrorMessage(caught.getMessage());
+					setFailed(caught);
 				}
+
 			});
 		}
+	}
+	
+	/**
+	 * Set a valid or modified query
+	 * @param sql
+	 */
+	private void setQuery(String sql){
+		view.showInputError(false);
+		queryInputListener.onExecuteQuery(sql);
+	}
+	
+	/**
+	 * Service failure
+	 * @param caught
+	 */
+	private void setFailed(Throwable caught) {
+		view.setQueryInputLoading(false);
+		view.showInputError(true);
+		view.setInputErrorMessage(caught.getMessage());
 	}
 	
 	@Override
@@ -90,9 +107,9 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	}
 
 	@Override
-	public void queryExecutionFinished(boolean wasSuccessful) {
+	public void queryExecutionFinished(boolean wasSuccessful, boolean resultsEditable) {
 		view.setQueryInputLoading(false);
-		view.setEditEnabled(wasSuccessful);
+		view.setEditEnabled(wasSuccessful && resultsEditable);
 		view.setDownloadEnabled(wasSuccessful);
 	}
 

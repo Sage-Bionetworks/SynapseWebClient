@@ -1,25 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.view.HomeViewImpl;
-
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	private Presenter presenter;
-	
-	@UiField
-	SpanElement beforeLockdownMessage;
-	@UiField
-	SpanElement lockdownDate1;
-	@UiField
-	SpanElement lockdownDate2;
-	
 	public interface Binder extends UiBinder<Widget, QuizInfoViewImpl> {}
 	
 	@Inject
@@ -32,15 +19,7 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	}
 	
 	@Override
-	public void configure(boolean isCertificationRequired) {
-		clear();
-		if (!isCertificationRequired) {
-			DisplayUtils.show(beforeLockdownMessage);
-			lockdownDate1.setInnerHTML(HomeViewImpl.LOCKDOWN_DATE_STRING);
-			lockdownDate2.setInnerHTML(HomeViewImpl.LOCKDOWN_DATE_STRING);
-		} else {
-			DisplayUtils.hide(beforeLockdownMessage);
-		}
+	public void configure() {
 	}
 
 	@Override

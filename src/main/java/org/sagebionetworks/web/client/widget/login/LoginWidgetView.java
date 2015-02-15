@@ -30,8 +30,6 @@ public interface LoginWidgetView extends IsWidget {
 	
 	public void showTermsOfUseDownloadFailed();
 	
-	public void showTermsOfUse(String content, AcceptTermsOfUseCallback callback);
-	
 	public void showError(String message);
 	
 	public void clear();

@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,6 +27,8 @@ import com.google.inject.Inject;
  */
 public class QueryInputViewImpl implements QueryInputView{
 
+	public static final String REST_DOC_URL = "http://rest.synapse.org/org/sagebionetworks/repo/web/controller/TableExamples.html";
+
 	public interface Binder extends UiBinder<HTMLPanel, QueryInputViewImpl> {
 	}
 	
@@ -45,6 +48,8 @@ public class QueryInputViewImpl implements QueryInputView{
 	Button editResultsButton;
 	@UiField
 	Button downloadResultsButton;
+	@UiField
+	Button helpButton;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -90,6 +95,13 @@ public class QueryInputViewImpl implements QueryInputView{
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onDownloadResults();
+			}
+		});
+		helpButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(REST_DOC_URL, "", "");
 			}
 		});
 	}

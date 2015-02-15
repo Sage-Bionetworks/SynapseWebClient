@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -42,6 +43,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
@@ -51,6 +53,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
@@ -85,10 +88,23 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EnumCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -195,6 +211,8 @@ public interface PortalGinInjector extends Ginjector {
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
 	public UserTeamConfigEditor getUserTeamConfigEditor();
 	public VideoConfigEditor getVideoConfigEditor();
+	public TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
+	public ProjectBackgroundConfigEditor getProjectBackgroundConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -217,6 +235,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EmptyWidget getEmptyWidget();
 	public ButtonLinkWidget getButtonLinkWidget();
 	public VideoWidget getVideoWidget();
+	public TableQueryResultWikiWidget getSynapseTableQueryResultWikiWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -236,7 +255,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ColumnModelsView createNewColumnModelsView();
 	public ColumnModelsWidget createNewColumnModelsWidget();
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
-	public ColumnModelTableRowEditor createNewColumnModelTableRowEditor();
+	public ColumnModelTableRowEditorWidget createColumnModelEditorWidget();
 	public TableEntityWidget createNewTableEntityWidget();
 	public RowWidget createRowWidget();
 	public TablePageWidget createNewTablePageWidget();
@@ -245,6 +264,18 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	public StringRendererCell createStringRendererCell();
 	public StringEditorCell createStringEditorCell();
+	public EntityIdCellEditor createEntityIdCellEditor();
+	public EntityIdCellRenderer createEntityIdCellRenderer();
+	public EnumCellEditor createEnumCellEditor();
+	public BooleanCellEditor createBooleanCellEditor();
+	public DateCellEditor createDateCellEditor();
+	public DateCellRenderer createDateCellRenderer();
+	public DoubleCellEditor createDoubleCellEditor();
+	public IntegerCellEditor createIntegerCellEditor();
+	public LinkCellRenderer createLinkCellRenderer();
+	public FileCellEditor createFileCellEditor();
+	public FileCellRenderer createFileCellRenderer();
+
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();
@@ -254,6 +285,7 @@ public interface PortalGinInjector extends Ginjector {
 	public BigTeamBadge getBigTeamBadgeWidget();
 	
 	public EntityBadge getEntityBadgeWidget();
+	public ProjectBadge getProjectBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
 
 	public UserGroupListWidget getUserGroupListWidget();
@@ -266,4 +298,6 @@ public interface PortalGinInjector extends Ginjector {
 
 
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
+
+	public SortableTableHeader createSortableTableHeader();
 }

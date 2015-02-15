@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidge
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -208,13 +209,14 @@ public class TableEntityWidgetTest {
 	public void testQueryExecutionFinishedSuccess(){
 		boolean canEdit = true;
 		boolean wasExecutionSuccess = true;
+		boolean resultsEditable = true;
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		reset(mockActionMenu);
-		widget.queryExecutionFinished(wasExecutionSuccess);
-		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
+		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
+		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
@@ -224,13 +226,14 @@ public class TableEntityWidgetTest {
 	public void testQueryExecutionFinishedSuccessNoEdit(){
 		boolean canEdit = false;
 		boolean wasExecutionSuccess = true;
+		boolean resultsEditable = true;
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		reset(mockActionMenu);
-		widget.queryExecutionFinished(wasExecutionSuccess);
-		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
+		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
+		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_TABLE_DATA, true);
 		verify(mockActionMenu, never()).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
@@ -240,13 +243,14 @@ public class TableEntityWidgetTest {
 	public void testQueryExecutionFinishedFailed(){
 		boolean canEdit = true;
 		boolean wasExecutionSuccess = false;
+		boolean resultsEditable = true;
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		reset(mockActionMenu);
-		widget.queryExecutionFinished(wasExecutionSuccess);
-		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
+		widget.queryExecutionFinished(wasExecutionSuccess, resultsEditable);
+		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess, resultsEditable);
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
 		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_TABLE_DATA, true);
 		verify(mockActionMenu, never()).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
@@ -334,5 +338,26 @@ public class TableEntityWidgetTest {
 		widget.onEditResults();
 		// proceed to edit
 		verify(mockQueryResultsWidget).onEditRows();
+	}
+	
+	@Test
+	public void testOnStartingnewQuery(){
+		boolean canEdit = true;
+		// Start with a query that is not on the first page
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		startQuery.setLimit(100L);
+		startQuery.setOffset(101L);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		reset(mockQueryResultsWidget);
+		// Set new sql
+		Query newQuery = new Query();
+		newQuery.setSql("select 1,2,3 from syn123");
+		widget.onStartingNewQuery(newQuery);
+		// Should get passed to the input widget
+		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget, canEdit);
+		// Should not be sent to the results as that is where it came from.
+		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), any(QueryResultsListener.class));
 	}
 }

@@ -398,6 +398,13 @@ public class MarkdownEditorWidgetTest {
 		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
 	}
 	@Test
+	public void testHandleCommandInsertSynapseTable(){
+		String contentType = WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_SYNAPSE_TABLE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	
+	@Test
 	public void testHandleCommandInsertReference(){
 		String contentType = WidgetConstants.REFERENCE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_REFERENCE);

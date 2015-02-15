@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -17,12 +20,13 @@ import com.google.inject.Inject;
  * A UiBound query results view with zero business logic.
  * 
  * @author John
- *
+ * 
  */
 public class TableQueryResultViewImpl implements TableQueryResultView {
-	
-	public interface Binder extends UiBinder<Widget, TableQueryResultViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, TableQueryResultViewImpl> {
+	}
+
 	@UiField
 	SimplePanel tablePanel;
 	@UiField
@@ -31,29 +35,20 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	SimplePanel rowEditorModalPanel;
 	@UiField
 	Alert errorAlert;
-	@UiField
-	Button saveRowsButton;
-	@UiField
-	Modal editRowsModal;
-	
+
+
 	Widget widget;
-	
+
 	Presenter presenter;
-	
+
 	@Inject
-	public TableQueryResultViewImpl(Binder binder){
+	public TableQueryResultViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
-		saveRowsButton.addClickHandler(new ClickHandler() {	
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSave();
-			}
-		});
 	}
 
 	@Override
@@ -87,25 +82,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	}
 
 	@Override
-	public void showEditor() {
-		editRowsModal.show();
-	}
-
-	@Override
-	public void setSaveButtonLoading(boolean isLoading) {
-		if(isLoading){
-			this.saveRowsButton.state().loading();
-		}else{
-			this.saveRowsButton.state().reset();
-		}
-	}
-
-	@Override
-	public void hideEditor() {
-		editRowsModal.hide();
-	}
-
-	@Override
 	public void setProgressWidget(JobTrackingWidget progressWidget) {
 		this.progressPanel.add(progressWidget);
 	}
@@ -114,5 +90,4 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public void setProgressWidgetVisible(boolean visible) {
 		this.progressPanel.setVisible(visible);
 	}
-
 }

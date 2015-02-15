@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.Date;
 import java.util.List;
 
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -20,11 +19,10 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
-import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -34,16 +32,12 @@ import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -54,11 +48,10 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
-
+	public static final String FAVORITE_STAR_HTML = "<span style=\"font-size:19px;color:#f0ad4e\" class=\"fa fa-star\"></span>";
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
 	
 	@UiField
@@ -112,13 +105,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	Anchor restApiLink;
 	
-	@UiField
-	DivElement certificationReminderUI;
-	@UiField
-	SpanElement lockdownDate1;
-	@UiField
-	SpanElement lockdownDate2;
-	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -131,9 +117,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private CookieProvider cookies;
 	private FlowPanel openTeamInvitesPanel;
 	private MyEvaluationEntitiesList myEvaluationsList;
-	
-	private static final Date LOCKDOWN = new Date(114, 10, 10);
-	public static final String LOCKDOWN_DATE_STRING = DateTimeFormat.getFormat("MMMM d").format(LOCKDOWN);
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -250,7 +233,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-		showCertificationReminder(false);
 		myProjectsTreeBrowser.clear();
 		favoritesTreeBrowser.clear();
 		teamsListWidget.clear();
@@ -266,10 +248,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			getStartedContainer.setVisible(true);
 			projectPanel.clear();
 		}
-	}
-
-	public static int getDaysRemaining() {
-		return CalendarUtil.getDaysBetween(new Date(), LOCKDOWN);
 	}
 	
 	@Override
@@ -413,7 +391,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	private FlowPanel getFavoritesContainer() {
 		FlowPanel myFavPanel = new FlowPanel();
-		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
+		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FAVORITE_STAR_HTML + "</h3>")));
 		ScrollPanel favoritesScrollPanel = new ScrollPanel();
 		favoritesScrollPanel.addStyleName("panel panel-default");
 		favoritesScrollPanel.setHeight("180px");
@@ -486,18 +464,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void setFavoritesError(String string) {
-	}
-	
-	@Override
-	public void showCertificationReminder(boolean visible) {
-		if (visible && 
-			getDaysRemaining() > 0) {
-			DisplayUtils.show(certificationReminderUI);
-			lockdownDate1.setInnerHTML(LOCKDOWN_DATE_STRING);
-			lockdownDate2.setInnerHTML(LOCKDOWN_DATE_STRING);
-		} else {
-			DisplayUtils.hide(certificationReminderUI);
-		}
 	}
 	
 	private void fillProgrammaticClientInstallCode() {

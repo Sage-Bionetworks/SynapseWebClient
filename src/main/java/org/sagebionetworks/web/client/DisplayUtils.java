@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -35,8 +33,6 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
-import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
@@ -68,10 +64,6 @@ import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.CancelEvent;
-import org.sagebionetworks.web.client.events.CancelHandler;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Help;
@@ -85,19 +77,14 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -126,7 +113,6 @@ import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
-import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -156,7 +142,6 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -576,6 +561,11 @@ public class DisplayUtils {
 	public static void showErrorMessage(String message) {
 		showPopup("", message, MessagePopup.WARNING, null, null);
 	}
+	
+	public static void showErrorMessage(String title, String message) {
+		showPopup(title, message, MessagePopup.WARNING, null, null);
+	}
+
 
 	/**
 	 * @param t
@@ -1727,10 +1717,11 @@ public class DisplayUtils {
 	}
 	
 	public static String createEntityVersionString(String id, Long version) {
+		String idNotNull = id == null ? "" : id;
 		if(version != null)
-			return id+WebConstants.ENTITY_VERSION_STRING+version;
+			return idNotNull+WebConstants.ENTITY_VERSION_STRING+version;
 		else 
-			return id;		
+			return idNotNull;		
 	}
 	public static Reference parseEntityVersionString(String entityVersion) {
 		String[] parts = entityVersion.split(WebConstants.ENTITY_VERSION_STRING);
@@ -1811,31 +1802,6 @@ public class DisplayUtils {
 		public void onSelected(T selected);		
 	}
 	
-	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading(DisplayConstants.FIND_ENTITIES);
-		window.setLayout(new FitLayout());
-		window.add(entityFinder.asWidget(), new FitData(4));				
-		window.addButton(new Button(DisplayConstants.SELECT, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				Reference selected = entityFinder.getSelectedEntity();
-				handler.onSelected(selected);
-			}
-		}));
-		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-		}));
-		window.setButtonAlign(HorizontalAlignment.RIGHT);
-		window.show();
-		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
-		entityFinder.refresh();
-	}
-
 	public static void loadTableSorters(final HTMLPanel panel, SynapseJSNIUtils synapseJSNIUtils) {
 		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
 		int i = 0;
@@ -2206,7 +2172,7 @@ public class DisplayUtils {
 		}
 	}
 	
-	public static void configureShowHide(final InlineLabel label, final LayoutContainer content) {
+	public static void configureShowHide(final InlineLabel label, final Widget content) {
 		label.setText(DisplayConstants.SHOW_LC);
 		label.addClickHandler(new ClickHandler() {
 			@Override
@@ -2218,7 +2184,8 @@ public class DisplayUtils {
 					content.setVisible(true);
 					label.setText(DisplayConstants.HIDE_LC);
 				}
-				content.layout(true);
+				if (content instanceof LayoutContainer)
+					((LayoutContainer)content).layout(true);
 			}
 		});
 	}

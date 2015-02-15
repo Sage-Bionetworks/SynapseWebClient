@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.web.client.ClientLoggerImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -27,7 +28,7 @@ public class ClientLoggerImplTest {
 	@Test
 	public void testErrorToRepositoryServices() {
 		String exceptionMessage = "syn1234";
-		Exception e = new Exception(exceptionMessage);
+		ConflictException e = new ConflictException(exceptionMessage);
 		String errorMessage = "Unable to upload a file for some specific reason.";
 		clientLogger.errorToRepositoryServices(errorMessage, e);
 		
@@ -42,6 +43,7 @@ public class ClientLoggerImplTest {
 		//the message should contain the error message and stack trace message
 		assertTrue(message.contains(exceptionMessage));
 		assertTrue(message.contains(errorMessage));
+		assertTrue(label.contains(ConflictException.class.getName()));
 	}
 	
 	@Test

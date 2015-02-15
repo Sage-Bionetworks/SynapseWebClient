@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.UploadView;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -22,7 +21,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 
 	public void refreshTreeView(String entityId);
 	
-	public void showFolderEditDialog(String folderEntityId);
+	public void showFolderEditDialog(final String folderEntityId);
 	
 	/**
 	 * Presenter interface
@@ -30,10 +29,9 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 	public interface Presenter {
 		void addFolderClicked();
 		void uploadButtonClicked();
-		void updateFolderName(String newFolderName, String folderEntityId);
-		void deleteFolder(String folderEntityId, boolean skipTrashCan);
+		void updateFolderName(String newFolderName);
+		void deleteFolder(boolean skipTrashCan);
 		void fireEntityUpdatedEvent();
-		void callbackIfCertifiedIfEnabled(Callback callback);
 	}
 
 }

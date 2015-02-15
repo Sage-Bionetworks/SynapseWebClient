@@ -20,12 +20,7 @@ public class QuizInfoWidget implements Presenter, SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 
-	/**
-	 * 
-	 * @param callback invoked when cancel or continue is clicked.
-	 * Will return true clicked continue, false if cancel.  
-	 */
-	public void configure(boolean isCertificationRequired){
-		view.configure(isCertificationRequired);
+	public void configure(){
+		view.configure();
 	}
 }

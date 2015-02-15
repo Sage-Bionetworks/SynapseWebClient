@@ -21,7 +21,8 @@ public class ProfilePlaceTest {
 		Profile place = tokenizer.getPlace(testToken);
 		
 		Assert.assertEquals(testUserId, place.getUserId());
-		Assert.assertNull(place.getArea());
+		//default area is projects
+		Assert.assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 	
@@ -32,16 +33,6 @@ public class ProfilePlaceTest {
 		Profile place = tokenizer.getPlace(testToken);
 		Assert.assertEquals(testUserId, place.getUserId());
 		Assert.assertEquals(Synapse.ProfileArea.PROJECTS, place.getArea());
-		Assert.assertEquals(testToken, tokenizer.getToken(place));
-	}
-	
-
-	@Test
-	public void testFavoritesCase() {
-		String testToken = testUserId + Profile.FAVORITES_DELIMITER;
-		Profile place = tokenizer.getPlace(testToken);
-		Assert.assertEquals(testUserId, place.getUserId());
-		Assert.assertEquals(Synapse.ProfileArea.FAVORITES, place.getArea());
 		Assert.assertEquals(testToken, tokenizer.getToken(place));
 	}
 	

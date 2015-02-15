@@ -49,7 +49,7 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 		presenter.setLoading(true);
 		view.setTrackingWidgetVisible(true);
 		// Start the job.
-		this.jobTrackingWidget.startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableCSVUpload, this.request, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableCSVUpload, this.request, this.request.getTableId(), new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {

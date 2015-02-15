@@ -7,8 +7,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -54,7 +54,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	HTMLPanel annotationsPanel;
 	@UiField
-	LayoutContainer annotationsContent;
+	FlowPanel annotationsContent;
 	@UiField
 	InlineLabel showAnnotations;
 
@@ -95,14 +95,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		clearmeta();
 		
 		Entity e = bundle.getEntity();
-		restrictionWidget.configure(bundle, true, false, true, new com.google.gwt.core.client.Callback<Void, Throwable>() {
+		restrictionWidget.configure(bundle, true, false, true, new Callback() {
 			@Override
-			public void onSuccess(Void result) {
+			public void invoke() {
 				presenter.fireEntityUpdatedEvent();
-			}
-			@Override
-			public void onFailure(Throwable reason) {
-				showErrorMessage(reason.getMessage());
 			}
 		});
 		
@@ -149,7 +145,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		// reset view
 		showAnnotations.setText(DisplayConstants.SHOW_LC);
 		annotationsContent.setVisible(false);
-		annotationsContent.layout(true);
 		if(!annotationsFilled) {
 			DisplayUtils.configureShowHide(showAnnotations, annotationsContent);
 			FlowPanel wrap = new FlowPanel();

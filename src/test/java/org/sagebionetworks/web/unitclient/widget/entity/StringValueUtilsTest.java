@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.sagebionetworks.web.client.widget.entity.GridStoreFactory;
 import org.sagebionetworks.web.client.widget.entity.StringValueUtils;
 /**
  * Test for the grid store factory

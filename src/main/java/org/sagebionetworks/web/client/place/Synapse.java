@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.client.place;
 
+import org.sagebionetworks.web.client.StringUtils;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
 public class Synapse extends Place implements RestartActivityOptional{
+	public static final String DOT_REGEX = "\\.";
+	public static final String SYNAPSE_ENTITY_PREFIX = "#!Synapse:";
 	public static final String VERSION_DELIMITER = "/version/";
 	
 	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
@@ -144,7 +148,7 @@ public class Synapse extends Place implements RestartActivityOptional{
     }
 
 	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN }
-	public static enum ProfileArea { PROJECTS, FAVORITES, CHALLENGES, TEAMS, SETTINGS }
+	public static enum ProfileArea { PROJECTS, CHALLENGES, TEAMS, SETTINGS }
 
 	@Override
 	public int hashCode() {
@@ -181,4 +185,16 @@ public class Synapse extends Place implements RestartActivityOptional{
 		return noRestartActivity;
 	}
 	
+	/**
+	 * Given a string where the version number is delimited with a dot (.) convert to a valid token.
+	 * @param dotNotation
+	 * @return
+	 */
+	public static String getHrefForDotVersion(String dotNotation){
+		dotNotation = StringUtils.trimWithEmptyAsNull(dotNotation);
+		if(dotNotation == null){
+			return null;
+		}
+		return SYNAPSE_ENTITY_PREFIX+dotNotation.replaceAll(DOT_REGEX, VERSION_DELIMITER).toLowerCase();
+	}
 }

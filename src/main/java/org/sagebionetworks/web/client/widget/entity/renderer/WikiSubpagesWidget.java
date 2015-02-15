@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +10,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -27,7 +26,6 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -45,12 +43,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private Place ownerObjectLink;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
+	private V2WikiOrderHint subpageOrderHint;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
 	
 	@Inject
-	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
+	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
+							NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -63,11 +63,11 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null, true);
 	}
 
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean isEmbeddedInOwnerPage) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage) {
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiKey = wikiKey;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.isEmbeddedInOwnerPage = embeddedInOwnerPage;
 		view.clear();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
@@ -77,7 +77,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			List<Reference> allRefs = new ArrayList<Reference>();
 			allRefs.add(ref);
 			ReferenceList list = new ReferenceList();
-			list.setReferences(allRefs);		
+			list.setReferences(allRefs);	
 			try {
 				synapseClient.getEntityHeaderBatch(list.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
 					@Override
@@ -88,7 +88,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
-								ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null);
+								ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
 								refreshTableOfContents();
 							}	
 						} catch (JSONObjectAdapterException e) {
@@ -107,7 +107,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		}
 	}
 	
-	public Place getLinkPlace(String entityId, Long entityVersion, String wikiId) {
+	public static Place getLinkPlace(String entityId, Long entityVersion, String wikiId, boolean isEmbeddedInOwnerPage) {
 		if (isEmbeddedInOwnerPage)
 			return new Synapse(entityId, entityVersion, Synapse.EntityArea.WIKI, wikiId);
 		else
@@ -130,43 +130,26 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			@Override
 			public void onSuccess(String results) {
 				try {
-					PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
-					Map<String, TocItem> wikiId2TreeItem = new HashMap<String, TocItem>();
+					final PaginatedResults<V2WikiHeader> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
 					
-					//now grab all of the headers associated with this level
-					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-						V2WikiHeader header = (V2WikiHeader) headerEntity;
-						boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
-						Place targetPlace;
-						String title;
-						if (header.getParentId() == null) {
-							targetPlace = ownerObjectLink;
-							title = ownerObjectName;
+					synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
+						@Override
+						public void onSuccess(V2WikiOrderHint result) {
+							// "Sort" stuff'
+							subpageOrderHint = result;
+							WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders.getResults(), subpageOrderHint);
+							
+							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+											ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
 						}
-						else {
-							targetPlace = getLinkPlace(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), header.getId());
-							title = header.getTitle();
+						@Override
+						public void onFailure(Throwable caught) {
+							// Failed to get order hint. Just ignore it.
+							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
 						}
-						
-						TocItem item = new TocItem(title, targetPlace, isCurrentPage);
-						wikiId2TreeItem.put(header.getId(), item);
-					}
-					//now set up the relationships
-					TocItem root = new TocItem();
+					});
 					
-					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-						V2WikiHeader header = (V2WikiHeader) headerEntity;
-						if (header.getParentId() != null){
-							//add this as a child							
-							TocItem parent = wikiId2TreeItem.get(header.getParentId());
-							TocItem child = wikiId2TreeItem.get(header.getId());
-							parent.add(child);
-						} else {
-							root.add(wikiId2TreeItem.get(header.getId()));
-						}
-					}
-					
-					view.configure(root, wikiSubpagesContainer, wikiPageContainer);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -178,59 +161,35 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				if (caught instanceof NotFoundException) {
 					//do nothing, show nothing
 					view.clear();
-				}
-				else
+				} else {
 					view.showErrorMessage(caught.getMessage());
+				}
 			}
 		});
 	}
-}
-
-class TocItem extends BaseTreeModel implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-	private static int ID = 0;
-	private String text;
-	private Place targetPlace;
-	private boolean isCurrentPage;
 	
-	public TocItem() {
-		set("id", ID++);
+	
+	private UpdateOrderHintCallback getUpdateOrderHintCallback() {
+		return new UpdateOrderHintCallback() {
+			@Override
+			public void updateOrderHint(List<String> newOrderHintIdList) {
+					subpageOrderHint.setIdList(newOrderHintIdList);
+					synapseClient.updateV2WikiOrderHint(subpageOrderHint, new AsyncCallback<V2WikiOrderHint>() {
+						@Override
+						public void onSuccess(V2WikiOrderHint result) {
+							refreshTableOfContents();
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(caught.getMessage());
+						}
+					});
+				}
+		};
 	}
 	
-	public TocItem(String text, Place targetPlace, boolean isCurrentPage) {
-		super();
-		set("id", ID++);
-		this.text = text;
-		this.targetPlace = targetPlace;
-		this.isCurrentPage = isCurrentPage;
+	public interface UpdateOrderHintCallback {
+		void updateOrderHint(List<String> newOrderHintIdList);
 	}
 	
-	public Integer getId() {
-		return (Integer) get("id");
-	}
-	
-	public TocItem(String text, Synapse targetPlace, boolean isCurrentPage, BaseTreeModel[] children) {
-		this(text, targetPlace, isCurrentPage);
-		for(int i = 0; i < children.length; i++) {
-			add(children[i]);
-		}
-	}
-	
-	public Place getTargetPlace() {
-		return targetPlace;
-	}
-	
-	public String getText() {
-		return text;
-	}
-	
-	public boolean isCurrentPage() {
-		return isCurrentPage;
-	}
-	
-	@Override
-	public String toString() {
-		return "<span> " + getText() + "</span>";
-	}
 }

@@ -12,11 +12,10 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.inject.Inject;
 
 
@@ -48,7 +47,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, Dialog window) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, DialogCallback dialogCallback) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -84,10 +83,14 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getUserTeamConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableQueryResultEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE)) {
+			presenter = ginInjector.getProjectBackgroundConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(wikiKey, model, window);
+			presenter.configure(wikiKey, model, dialogCallback);
 		return presenter;
 	}
 
@@ -146,6 +149,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getEmptyWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableQueryResultWikiWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -225,6 +230,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.QUERY_TABLE_CONTENT_TYPE, WidgetConstants.QUERY_TABLE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ENTITYLIST_CONTENT_TYPE, WidgetConstants.ENTITYLIST_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE, WidgetConstants.SHINYSITE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE, WidgetConstants.SYNAPSE_TABLE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE, WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);

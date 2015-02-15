@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQ
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -33,7 +33,7 @@ import com.google.inject.Inject;
  * 
  */
 public class TableEntityWidget implements IsWidget,
-		TableEntityWidgetView.Presenter, QueryResultsListner,
+		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
 	public static final String HIDE_SCHEMA = "Hide Schema";
@@ -43,6 +43,7 @@ public class TableEntityWidget implements IsWidget,
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Show Schema' to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
 	public static final long DEFAULT_LIMIT = 25;
+	public static final int MAX_SORT_COLUMNS = 3;
 
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
@@ -158,7 +159,7 @@ public class TableEntityWidget implements IsWidget,
 				// use a default query
 				startQuery = getDefaultQuery();
 			}
-			setQuery(startQuery);
+			setQuery(startQuery, false);
 		}
 	}
 
@@ -167,12 +168,14 @@ public class TableEntityWidget implements IsWidget,
 	 * 
 	 * @param sql
 	 */
-	private void setQuery(Query query) {
+	private void setQuery(Query query, boolean isFromResults) {
 		this.currentQuery = query;
 		this.queryInputWidget.configure(query.getSql(), this, this.canEdit);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
-		this.queryResultsWidget.configure(query, this.canEdit, this);
+		if(!isFromResults){
+			this.queryResultsWidget.configure(query, this.canEdit, this);
+		}
 	}
 
 	/**
@@ -241,10 +244,10 @@ public class TableEntityWidget implements IsWidget,
 	}
 
 	@Override
-	public void queryExecutionFinished(boolean wasSuccessful) {
+	public void queryExecutionFinished(boolean wasSuccessful, boolean resultsEditable) {
 		// Pass this along to the input widget.
-		this.queryInputWidget.queryExecutionFinished(wasSuccessful);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEdit);
+		this.queryInputWidget.queryExecutionFinished(wasSuccessful, resultsEditable);
+		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEdit && resultsEditable);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, wasSuccessful && canEdit);
 	
 		// Set this as the query if it was successful
@@ -262,13 +265,7 @@ public class TableEntityWidget implements IsWidget,
 		this.currentQuery.setSql(sql);
 		this.currentQuery.setLimit(DEFAULT_LIMIT);
 		this.currentQuery.setOffset(DEFAULT_OFFSET);
-		setQuery(this.currentQuery);
-	}
-
-	@Override
-	public void onPageChange(Long newOffset) {
-		this.currentQuery.setOffset(newOffset);
-		setQuery(this.currentQuery);
+		setQuery(this.currentQuery, false);
 	}
 
 	@Override
@@ -290,7 +287,7 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onDownloadResults() {
-		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL());
+		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL(), this.tableId);
 		downloadTableQueryModalWidget.showModal();
 	}
 	
@@ -327,5 +324,10 @@ public class TableEntityWidget implements IsWidget,
 			actionMenu.setActionText(Action.TOGGLE_TABLE_SCHEMA, SHOW_SCHEMA);
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 		}
+	}
+
+	@Override
+	public void onStartingNewQuery(Query newQuery) {
+		setQuery(newQuery, true);
 	}
 }

@@ -40,6 +40,8 @@
 				    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="synapseTableLink">Synapse Table</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="entityBackgroundLink">Set Project Background Image</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="wikifilesPreviewLink">Wiki Files Preview</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="tutorialWizardLink">Tutorial Wizard</b:AnchorListItem>
 				  </b:DropDownMenu>
@@ -112,7 +114,7 @@
 				</bh:Div>
 			</b:Column>
 		</b:Row>
-	    <b:Modal b:id="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+	    <b:Modal b:id="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:FlowPanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>
@@ -121,7 +123,7 @@
 		  </b:ModalFooter>
 		</b:Modal>
 		
-	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:FlowPanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
 		  </b:ModalBody>

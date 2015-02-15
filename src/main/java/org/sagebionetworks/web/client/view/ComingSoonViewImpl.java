@@ -20,12 +20,10 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -80,7 +78,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		//provenanceWidget.setHeight(400);
-		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
+//		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
 		
 		header.clear();
 		headerWidget.configure(false);

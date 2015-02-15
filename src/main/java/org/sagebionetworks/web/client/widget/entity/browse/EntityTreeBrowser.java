@@ -2,15 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,7 +15,6 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SearchServiceAsync;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -53,6 +49,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private String currentSelection;
 	
 	private final int MAX_FOLDER_LIMIT = 500;
+	private String currentFolderChildrenEntityId;
 	
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
@@ -74,7 +71,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		view.setPresenter(this);
 	}	
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 		// remove handlers
@@ -123,9 +119,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 	
 	@Override
-	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
-		
+	public void getFolderChildren(final String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
+		this.currentFolderChildrenEntityId = entityId;
 		// NOTE: this is fragile, but there doesn't seem to be a way around querying by nodeType. 
 		// a query on concreteType!=org...TableEntity eliminates nodes who do not have concreteType defined
 		final String TABLE_ENTITY_NODE_TYPE_ID = "17"; 
@@ -138,15 +133,18 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {
-					List<EntityHeader> headers = new ArrayList<EntityHeader>();
-					for(String entityHeaderJson : result) {
-						try {
-							headers.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+					//only process results if these are for the currently requested entity id
+					if (currentFolderChildrenEntityId.equals(entityId)) {
+						List<EntityHeader> headers = new ArrayList<EntityHeader>();
+						for(String entityHeaderJson : result) {
+							try {
+								headers.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
+							} catch (JSONObjectAdapterException e) {
+								onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+							}
 						}
+						asyncCallback.onSuccess(headers);
 					}
-					asyncCallback.onSuccess(headers);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -268,4 +266,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return DisplayUtils.getSynapseIconForEntityClassName(entityType.getClassName(), DisplayUtils.IconSize.PX16, iconsImageBundle);
 	}
 
+	/**
+	 * For testing purposes only
+	 * @param currentFolderChildrenEntityId
+	 */
+	public void setCurrentFolderChildrenEntityId(String currentFolderChildrenEntityId) {
+		this.currentFolderChildrenEntityId = currentFolderChildrenEntityId;
+	}
 }

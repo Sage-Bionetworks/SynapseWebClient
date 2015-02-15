@@ -1,22 +1,26 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.search.Hit;
+import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,34 +32,30 @@ import com.google.inject.Inject;
  */
 public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget {
 	
-	private AdapterFactory adapterFactory;
+	public static final int DELAY = 750;	// milliseconds
+	public static final long PAGE_SIZE = 10;
 	private EntitySearchBoxView view;
 	private EntitySelectedHandler handler;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
-
+	private EntitySearchBoxOracle oracle;
 	private boolean retrieveVersions = false;
+	private EntitySearchBoxSuggestion selectedSuggestion;
+	private long offset;
 	
 	/**
 	 * 
-	 * @param factory
 	 * @param cache
 	 * @param propertyView
 	 */
 	@Inject
-	public EntitySearchBox(AdapterFactory factory, EntitySearchBoxView view,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+	public EntitySearchBox(EntitySearchBoxView view,
+			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
 		super();		
-		this.adapterFactory = factory;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
+		oracle = view.getOracle();
 		view.setPresenter(this);
 	}
 
@@ -65,18 +65,13 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	 * @return
 	 */	
 	public Widget asWidget(int width) {
-		this.view.build(width);
-		return this.view.asWidget();
+		view.setDisplayWidth(width);
+		return asWidget();
 	}
 
-	/**
-	 * Default size
-	 * @param DIALOG_WIDTH
-	 * @return
-	 */
 	@Override
 	public Widget asWidget() {
-		return asWidget(300);
+		return view.asWidget();
 	}
 	
 	public void setEntitySelectedHandler(EntitySelectedHandler handler, boolean retrieveVersions) {
@@ -85,6 +80,12 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	}
 
 	@Override
+	public void setSelectedSuggestion(EntitySearchBoxSuggestion suggestion) {
+		selectedSuggestion = suggestion;
+		if (suggestion != null)
+			entitySelected(selectedSuggestion.getHit().getId(), selectedSuggestion.getHit().getName());
+	}
+	
 	public void entitySelected(final String entityId, final String name) {
 		if(handler != null) {
 			List<VersionInfo> versions = null;
@@ -115,16 +116,83 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 		public void onSelected(String entityId, String name, List<VersionInfo> versions);
 	}
 
-	@Override
-	public void search(String search) {
-		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
+	
+	public void getSuggestions(final SuggestOracle.Request request, final SuggestOracle.Callback callback) {
+		view.showLoading();
 		
+		final String prefix = request.getQuery();
+		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
+		query.setStart(offset);
+		query.setSize(PAGE_SIZE);
+		query.setQueryTerm(Arrays.asList(prefix.split(" ")));
+		
+		final List<Suggestion> suggestions = new LinkedList<Suggestion>();
+		synapseClient.search(query, new AsyncCallback<SearchResults>() {
+			@Override
+			public void onSuccess(SearchResults result) {
+				// Update view fields.
+				view.updateFieldStateForSuggestions(result, offset);
+				
+				// Load suggestions.
+				for (Hit hit : result.getHits()) {
+					suggestions.add(oracle.makeEntitySuggestion(hit, prefix));
+				}
+
+				// Set up response
+				SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
+				callback.onSuggestionsReady(request, response);
+				
+				view.hideLoading();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+
+		});
 	}
+	
+	@Override
+	public EntitySearchBoxSuggestion getSelectedSuggestion() {
+		return selectedSuggestion;
+	}
+	
 	
 	/**
 	 * Clears out the state of the searchbox
 	 */
 	public void clearSelection() {
-		this.view.clearSelection();
+		this.view.clear();
 	}
+	
+	public String getText() {
+		return view.getText();
+	}
+	
+	@Override
+	public void getPrevSuggestions() {
+		offset -= PAGE_SIZE;
+		getSuggestions(oracle.getRequest(), oracle.getCallback());
+	}
+
+	@Override
+	public void getNextSuggestions() {
+		offset += PAGE_SIZE;
+		getSuggestions(oracle.getRequest(), oracle.getCallback());
+	}
+	
+	public void setOffset(long offset) {
+		this.offset = offset;
+	}
+	
+	/**
+	 * For testing. This would break the suggest box, as it does
+	 * not update the view's oracle.
+	 * @param oracle
+	 */
+	public void setOracle(EntitySearchBoxOracle oracle) {
+		this.oracle = oracle;
+	}
+
 }

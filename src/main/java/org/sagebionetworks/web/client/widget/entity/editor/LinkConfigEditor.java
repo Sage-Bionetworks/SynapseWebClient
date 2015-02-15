@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 import java.util.Map;
-import com.extjs.gxt.ui.client.widget.Dialog;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -20,7 +20,7 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 		view.initView();
 	}		
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		//no way to edit an existing link
 	}
 	
@@ -38,17 +38,6 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

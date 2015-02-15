@@ -2,66 +2,87 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.utils.UnorderedListPanel;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.data.ModelData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView {
 
 	private Presenter presenter;
-	private GlobalApplicationState globalAppState;
+	private WikiSubpagesOrderEditorModalWidget orderEditorModal;
 	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
 	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
 	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";
 	private static final String HIDE_SUBPAGES_MD_STYLE="col-xs-12";
 	
 	private Button showHideButton;
-	private FlowPanel ulContainer;
+	private Button editOrderButton;
+	private FlowPanel navTreeContainer;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
 	boolean isShowingSubpages;
 	
+	private WikiSubpageNavigationTree navTree;
+	
 	@Inject
-	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
-		this.globalAppState = globalAppState;
-	}
-	@Override
-	public void clear() {
-		super.clear();
+	public WikiSubpagesViewImpl(WikiSubpagesOrderEditorModalWidget orderEditorModal,
+								WikiSubpageNavigationTree navTree) {
+		this.orderEditorModal = orderEditorModal;
+		this.navTree = navTree;
 	}
 	
 	@Override
-	public void configure(TocItem root, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+	public void clear() {
+		super.clear();
+		if (wikiSubpagesContainer != null) {
+			wikiSubpagesContainer.setStyleName("");
+		}
+	}
+	
+	@Override
+	public void configure(final List<V2WikiHeader> wikiHeaders,
+						FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
+						final String ownerObjectName, Place ownerObjectLink,
+						WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,
+						final UpdateOrderHintCallback updateOrderHintCallback) {
 		clear();
 		
+		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage);
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
+		navTreeContainer = new FlowPanel();
+		navTreeContainer.addStyleName("margin-bottom-10");
 		//this widget shows nothing if it doesn't have any pages!
-		TocItem mainPage = (TocItem) root.getChild(0);
-		if (mainPage.getChildCount() == 0)
+		if (navTree.getRootChildrenCount() == 0)
 			return;
+		
 		//only show the tree if the root has children
-		if (mainPage.getChildCount() > 0) {
-			//traverse the tree, and create anchors
-			final UnorderedListPanel ul = new UnorderedListPanel();
-			ul.addStyleName("notopmargin nav bs-sidenav");
-			addTreeItemsRecursive(ul, root.getChildren());
+		if (navTree.getRootChildrenCount() > 0) {
+
 			showHideButton = DisplayUtils.createButton("");
-			ulContainer = new FlowPanel();
-			ulContainer.setVisible(true);
-			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
-			ulContainer.add(ul);
+			editOrderButton = DisplayUtils.createButton("Edit Order");
+			editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
+
+			editOrderButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					orderEditorModal.configure(wikiHeaders, ownerObjectName);
+					orderEditorModal.show(updateOrderHintCallback);
+				}
+			});
 			
 			showHideButton.addClickHandler(new ClickHandler() {
 				@Override
@@ -73,7 +94,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			
-			add(ulContainer);
+			navTreeContainer.add(navTree.asWidget());
+			
+			add(navTreeContainer);
+			add(editOrderButton);
 			add(showHideButton);
 			
 			showSubpages();
@@ -90,8 +114,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		DisplayUtils.clearElementWidth(getElement());
 		if (wikiSubpagesContainer != null) 
 			DisplayUtils.clearElementWidth(wikiSubpagesContainer.getElement());
-		if (ulContainer != null)
-			DisplayUtils.clearElementWidth(ulContainer.getElement());
+		if (navTreeContainer != null)
+			DisplayUtils.clearElementWidth(navTreeContainer.getElement());
 		if (wikiPageContainer != null)
 			DisplayUtils.clearElementWidth(wikiPageContainer.getElement());
 	}
@@ -101,8 +125,11 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		isShowingSubpages = false;
 		// This call to layout is necessary to force the scroll bar to appear on page-load
 		if (wikiSubpagesContainer != null){
-			wikiSubpagesContainer.removeStyleName(SHOW_SUBPAGES_STYLE);
-			wikiSubpagesContainer.addStyleName(HIDE_SUBPAGES_STYLE);
+			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);
+		}
+		
+		if (editOrderButton != null) {
+			editOrderButton.setVisible(false);
 		}
 				
 		if (showHideButton != null) {
@@ -110,8 +137,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			showHideButton.addStyleName("btn btn-default btn-xs left margin-right-40");
 		}
 		
-		if (ulContainer != null)
-			DisplayUtils.hide(ulContainer);
+		if (navTreeContainer != null)
+			DisplayUtils.hide(navTreeContainer);
 		
 		if (wikiPageContainer != null) {
 			wikiPageContainer.removeStyleName(SHOW_SUBPAGES_MD_STYLE);
@@ -127,6 +154,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			wikiSubpagesContainer.removeStyleName(HIDE_SUBPAGES_STYLE);
 			wikiSubpagesContainer.addStyleName(SHOW_SUBPAGES_STYLE);
 		}
+		
+		if (editOrderButton != null) {
+			editOrderButton.setVisible(true);
+		}
 			
 		if (wikiPageContainer != null) {
 			wikiPageContainer.removeStyleName(HIDE_SUBPAGES_MD_STYLE);
@@ -138,35 +169,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			showHideButton.addStyleName("btn btn-default btn-xs right");		
 		}
 		
-		if (ulContainer != null)
-			DisplayUtils.show(ulContainer);
-	}
-	
-	private void addTreeItemsRecursive(UnorderedListPanel ul, List<ModelData> children) {
-		for (ModelData modelData : children) {
-			TocItem treeItem = (TocItem)modelData;
-			String styleName = treeItem.isCurrentPage() ? "active" : "";
-			ul.add(getListItem(treeItem), styleName);
-			if (treeItem.getChildCount() > 0){
-				UnorderedListPanel subList = new UnorderedListPanel();
-				subList.addStyleName("nav");
-				subList.setVisible(true);
-				ul.add(subList);
-				addTreeItemsRecursive(subList, treeItem.getChildren());
-			}
-		}
-	}
-	
-	private Widget getListItem(final TocItem treeItem) {
-		Anchor l = new Anchor(treeItem.getText());
-		l.addStyleName("link");
-		l.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				globalAppState.getPlaceChanger().goTo(treeItem.getTargetPlace());
-			}
-		});
-		return l;
+		if (navTreeContainer != null)
+			DisplayUtils.show(navTreeContainer);
 	}
 	
 	@Override
@@ -191,5 +195,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+
+	public interface GetOrderHintCallback {
+		public List<String> getCurrentOrderHint();
 	}
 }

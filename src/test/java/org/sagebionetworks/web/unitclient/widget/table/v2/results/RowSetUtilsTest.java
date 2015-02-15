@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -17,6 +16,7 @@ import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils;
@@ -27,12 +27,12 @@ public class RowSetUtilsTest {
 	Row rowOne;
 	Row rowTwo;
 	List<ColumnModel> schema;
-	List<String> headers;
+	List<SelectColumn> headers;
 	
 	@Before
 	public void before(){
 		schema = TableModelTestUtils.createColumsWithNames("one", "two");
-		headers = TableModelTestUtils.getColumnModelIds(schema);
+		headers = TableModelTestUtils.buildSelectColumns(schema);
 		rowOne = new Row();
 		rowOne.setValues(Arrays.asList("1,1","1,2"));
 		rowTwo = new Row();
@@ -44,10 +44,7 @@ public class RowSetUtilsTest {
 		RowSet original = new RowSet();
 		original.setTableId("syn999");
 		List<Row> updateRows = Arrays.asList(rowOne, rowTwo);
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updateRows);
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updateRows, schema);
 		assertNotNull(prs);
 		assertEquals(original.getTableId(), prs.getTableId());
 		List<PartialRow> delta = prs.getRows();
@@ -59,16 +56,16 @@ public class RowSetUtilsTest {
 		assertNotNull(pr.getValues());
 		assertEquals(headers.size(), pr.getValues().size());
 		assertEquals(rowOne.getRowId(), pr.getRowId());
-		assertEquals("1,1", pr.getValues().get(headers.get(0)));
-		assertEquals("1,2", pr.getValues().get(headers.get(1)));
+		assertEquals("1,1", pr.getValues().get(headers.get(0).getId()));
+		assertEquals("1,2", pr.getValues().get(headers.get(1).getId()));
 		// two
 		pr = delta.get(1);
 		assertEquals(null, pr.getRowId());
 		assertNotNull(pr.getValues());
 		assertEquals(headers.size(), pr.getValues().size());
 		assertEquals(rowTwo.getRowId(), pr.getRowId());
-		assertEquals("2,1", pr.getValues().get(headers.get(0)));
-		assertEquals("2,2", pr.getValues().get(headers.get(1)));
+		assertEquals("2,1", pr.getValues().get(headers.get(0).getId()));
+		assertEquals("2,2", pr.getValues().get(headers.get(1).getId()));
 	}
 	
 	@Test
@@ -79,10 +76,7 @@ public class RowSetUtilsTest {
 		original.setRows(Arrays.asList(rowOne, rowTwo));
 		// Clone the data.
 		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updates);
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		List<PartialRow> delta = prs.getRows();
 		assertNotNull(delta);
 		assertEquals(0, delta.size());
@@ -99,10 +93,7 @@ public class RowSetUtilsTest {
 		// Change some values
 		updates.get(0).getValues().set(0, "new");
 		updates.get(1).getValues().set(1, "newTwo");
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updates);
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		List<PartialRow> delta = prs.getRows();
 		assertNotNull(delta);
 		assertEquals(2, delta.size());
@@ -111,13 +102,13 @@ public class RowSetUtilsTest {
 		assertNotNull(pr.getValues());
 		assertEquals(1, pr.getValues().size());
 		assertEquals(rowOne.getRowId(), pr.getRowId());
-		assertEquals("new", pr.getValues().get(headers.get(0)));
+		assertEquals("new", pr.getValues().get(headers.get(0).getId()));
 		// two
 		pr = delta.get(1);
 		assertNotNull(pr.getValues());
 		assertEquals(1, pr.getValues().size());
 		assertEquals(rowTwo.getRowId(), pr.getRowId());
-		assertEquals("newTwo", pr.getValues().get(headers.get(1)));
+		assertEquals("newTwo", pr.getValues().get(headers.get(1).getId()));
 	}
 	
 	@Test
@@ -130,10 +121,7 @@ public class RowSetUtilsTest {
 		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
 		// remove the first row
 		updates.remove(0);
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updates);
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		List<PartialRow> delta = prs.getRows();
 		assertNotNull(delta);
 		assertEquals(1, delta.size());
@@ -163,7 +151,7 @@ public class RowSetUtilsTest {
 		newRow.setRowId(null);
 		newRow.setValues(Arrays.asList("a", "b"));
 		updates.add(newRow);
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		List<PartialRow> delta = prs.getRows();
 		assertNotNull(delta);
 		assertEquals(3, delta.size());
@@ -175,13 +163,13 @@ public class RowSetUtilsTest {
 		pr = delta.get(1);
 		assertEquals(rowTwo.getRowId(), pr.getRowId());
 		assertEquals(1, pr.getValues().size());
-		assertEquals("updated", pr.getValues().get(headers.get(0)));
+		assertEquals("updated", pr.getValues().get(headers.get(0).getId()));
 		// added
 		pr = delta.get(2);
 		assertEquals(null, pr.getRowId());
 		assertEquals(2, pr.getValues().size());
-		assertEquals("a", pr.getValues().get(headers.get(0)));
-		assertEquals("b", pr.getValues().get(headers.get(1)));
+		assertEquals("a", pr.getValues().get(headers.get(0).getId()));
+		assertEquals("b", pr.getValues().get(headers.get(1).getId()));
 	}
 	
 	/**
@@ -198,12 +186,9 @@ public class RowSetUtilsTest {
 		original.setRows(Arrays.asList(rowOne));
 		// Clone the data.
 		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updates);
 		// set the value of the one row to also be an empty string.
 		updates.get(0).setValues(Arrays.asList("", ""));
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		assertTrue(prs.getRows().isEmpty());
 	}
 	
@@ -221,11 +206,8 @@ public class RowSetUtilsTest {
 		original.setRows(Arrays.asList(rowOne));
 		// Clone the data.
 		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updates);
 		updates.get(0).setValues(Arrays.asList("", ""));
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		assertTrue(prs.getRows().isEmpty());
 	}
 	
@@ -243,11 +225,8 @@ public class RowSetUtilsTest {
 		original.setRows(Arrays.asList(rowOne));
 		// Clone the data.
 		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updates);
 		updates.get(0).setValues(Arrays.asList((String)null,(String)null));
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updates, schema);
 		assertTrue(prs.getRows().isEmpty());
 	}
 	
@@ -262,10 +241,7 @@ public class RowSetUtilsTest {
 		Row emptyRow = new Row();
 		emptyRow.setValues(Arrays.asList("",null));
 		List<Row> updateRows = Arrays.asList(emptyRow);
-		RowSet update = new RowSet();
-		update.setHeaders(headers);
-		update.setRows(updateRows);
-		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, updateRows, schema);
 		assertNotNull(prs);
 		assertNotNull(prs.getRows());
 		PartialRow pr = prs.getRows().get(0);
@@ -273,75 +249,9 @@ public class RowSetUtilsTest {
 		assertEquals(null, pr.getValues().get(headers.get(1)));
 	}
 	
-	@Test
-	public void testIsValueChangedNullNull(){
-		assertFalse(RowSetUtils.isValueChanged(null, null));
-	}
+
 	
-	@Test
-	public void testIsValueChangedEmptyNull(){
-		assertFalse(RowSetUtils.isValueChanged(" ", null));
-	}
-	
-	@Test
-	public void testIsValueChangedNullEmpty(){
-		assertFalse(RowSetUtils.isValueChanged(null, "\t"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealNull(){
-		assertTrue(RowSetUtils.isValueChanged("a", null));
-	}
-	
-	@Test
-	public void testIsValueChangedNullReal(){
-		assertTrue(RowSetUtils.isValueChanged(null, "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealEmpty(){
-		assertTrue(RowSetUtils.isValueChanged("a", ""));
-	}
-	
-	@Test
-	public void testIsValueChangedEmptyReal(){
-		assertTrue(RowSetUtils.isValueChanged("", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealRealDifferent(){
-		assertTrue(RowSetUtils.isValueChanged("b", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealRealSame(){
-		assertFalse(RowSetUtils.isValueChanged("a", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealSpaceRealSame(){
-		assertFalse(RowSetUtils.isValueChanged(" a ", "a"));
-	}
-	
-	@Test
-	public void testIsValueChangedRealRealSpaceSame(){
-		assertFalse(RowSetUtils.isValueChanged(" a ", " a\t"));
-	}
-	
-	@Test
-	public void testTrimWithEmptyAsNull_Null(){
-		assertEquals(null, RowSetUtils.trimWithEmptyAsNull(null));
-	}
-	
-	@Test
-	public void testTrimWithEmptyAsNullOkay(){
-		assertEquals("a", RowSetUtils.trimWithEmptyAsNull("a"));
-	}
-	
-	@Test
-	public void testTrimWithEmptyAsNull_Trim(){
-		assertEquals("a", RowSetUtils.trimWithEmptyAsNull(" a\n "));
-	}
+
 	/**
 	 * This is currently throwing an exception.
 	 * @throws JSONObjectAdapterException

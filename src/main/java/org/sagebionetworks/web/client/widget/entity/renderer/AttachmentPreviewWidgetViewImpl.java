@@ -4,13 +4,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements AttachmentPreviewWidgetView {
+public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements AttachmentPreviewWidgetView {
 
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
@@ -21,7 +20,7 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, String fileName) {
-		this.removeAll();
+		this.clear();
 		//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		//create img
 		this.setStyleName("displayInline");
@@ -48,7 +47,6 @@ public class AttachmentPreviewWidgetViewImpl extends LayoutContainer implements 
 		HTMLPanel htmlPanel = new HTMLPanel(sb.toString());
 		htmlPanel.setStyleName("displayInline");
 		add(htmlPanel);
-		this.layout(true);
 	}
 	
 	@Override

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -42,7 +41,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private AclAddPeoplePanel addPeoplePanel;
 	
-	private PermissionLevel[] permList = {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};	// To enforce order.
+	private PermissionLevel[] permList;	// To enforce order.
+	private Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
+	private Tooltip toolTipAndDeleteAclButton;
 	
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
@@ -50,12 +51,26 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.sageImageBundle = sageImageBundle;
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
-		permissionDisplay = new HashMap<PermissionLevel, String>();
-		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
-		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
-		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
-		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
-		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
+		
+		// 'Delete ACL' button
+		deleteAclButton.setType(ButtonType.DANGER);
+		deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
+		deleteAclButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent ce) {
+				presenter.deleteAcl();					
+			}
+		});
+			
+		toolTipAndDeleteAclButton = new Tooltip();
+		toolTipAndDeleteAclButton.setWidget(deleteAclButton);
+		toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
+		toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
+	}
+	
+	public void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay) {
+		this.permList = permList;
+		this.permissionDisplay = permissionsDisplay;
 	}
 	
 	@Override
@@ -135,7 +150,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		} else {
 			if(isInherited) {
 				// Notify user of inherited sharing settings.
-				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
+				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);
 				add(readOnly);
 				
 				// 'Create ACL' button
@@ -187,22 +202,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				
 				addPeoplePanel.configure(permList, permissionDisplay, selectPermissionCallback, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
-				
-				// 'Delete ACL' button
-				Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
-				deleteAclButton.setType(ButtonType.DANGER);
-				deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
-				deleteAclButton.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent ce) {
-						presenter.deleteAcl();					
-					}
-				});
-					
-				Tooltip toolTipAndDeleteAclButton = new Tooltip();
-				toolTipAndDeleteAclButton.setWidget(deleteAclButton);
-				toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
-				toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
 				deleteAclButton.setEnabled(canEnableInheritance);
 				add(toolTipAndDeleteAclButton);
 			}
@@ -214,6 +213,14 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		return addPeoplePanel.getNotifyPeopleCheckBox().getValue();
 	}
 	
+	@Override
+	public void setNotifyCheckboxVisible(boolean isVisible) {
+		addPeoplePanel.getNotifyPeopleCheckBox().setVisible(isVisible);
+	}
+	@Override
+	public void setDeleteLocalACLButtonVisible(boolean isVisible) {
+		deleteAclButton.setVisible(isVisible);
+	}
 	@Override
 	public void setIsNotifyPeople(Boolean value) {
 		if (value != null)

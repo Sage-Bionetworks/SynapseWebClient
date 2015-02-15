@@ -65,7 +65,6 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/arrow-down-dir-16.png")
 	ImageResource arrowDownDir16();
-	
     
 	@Source("images/icons/arrow-right-dir-16.png")
 	ImageResource arrowRightDir16();
@@ -120,7 +119,10 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/shield-red-16.png")
 	ImageResource shieldRed16();
-
+	
+	@Source("images/icons/shield-red-16-with-green-checkmark.png")
+	ImageResource shieldRed16WithGreenCheckmark();
+	
 	@Source("images/icons/flag-small-16.png")
 	ImageResource flagSmall16();
 

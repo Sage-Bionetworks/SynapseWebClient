@@ -16,7 +16,9 @@ a:focus{color:#3a5bdc; text-decoration:underline;}
 	background-color: #3a5bdc;
 	border-color:#3a5bdc;
 }
-
+.btn-link {
+	color: #3a5bdc;
+}
 .color-line { background:#FFCC00;}
 a.button_readmore:hover {
 	background-color:#ffcc00;

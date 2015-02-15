@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -21,16 +24,19 @@ import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -48,6 +54,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface SynapseClientAsync {
 
 	void getEntity(String entityId, AsyncCallback<EntityWrapper> callback);
+	
+	void getProject(String projectId,AsyncCallback<Project> callback);
 	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<EntityWrapper> callback);
 	
@@ -142,7 +150,7 @@ public interface SynapseClientAsync {
 
 	public void createLockAccessRequirement(String entityId, AsyncCallback<EntityWrapper> callback);
 	
-	public void getUnmetAccessRequirements(String entityId, AsyncCallback<AccessRequirementsTransport> callback);
+	public void getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType, AsyncCallback<AccessRequirementsTransport> callback);
 	
 	/**
 	 * 
@@ -174,19 +182,22 @@ public interface SynapseClientAsync {
 	
 	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
 	
+	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	//wiki crud
 	public void getWikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
-	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
+	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
 	 // V2 Wiki crud
-    public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
     public void getV2WikiPage(WikiPageKey key, AsyncCallback<String> callback);
     public void getVersionOfV2WikiPage(WikiPageKey key, Long version, AsyncCallback<String> callback);
     public void updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
     public void restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate, AsyncCallback<String> callback);
     public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
     public void getV2WikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+    public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
+    public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
     public void getV2WikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
     public void getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version, AsyncCallback<String> callback);
     public void getV2WikiHistory(WikiPageKey key, Long limit, Long offset, AsyncCallback<String> callback);
@@ -208,7 +219,7 @@ public interface SynapseClientAsync {
 
 	void removeFavorite(String entityId, AsyncCallback<Void> callback);
 
-	void getFavorites(Integer limit, Integer offset, AsyncCallback<String> callback);
+	void getFavorites(AsyncCallback<List<EntityHeader>> callback);
 	
 	/**
 	 * TEAMS
@@ -277,7 +288,7 @@ public interface SynapseClientAsync {
 	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
 	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
-	void updateEvaluationAcl(String aclJson, AsyncCallback<String> callback);
+	void updateEvaluationAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
 	
 	
 	/**
@@ -310,15 +321,11 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
-	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
 
 	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
-
-	void getTableFileHandle(String fileHandlesToFindRowReferenceSet, AsyncCallback<String> callback);
 	
 	/**
 	 * Set a table's schema. Any ColumnModel that does not have an ID will be
@@ -332,18 +339,25 @@ public interface SynapseClientAsync {
 			AsyncCallback<Void> callback);
 	
 	/**
-	 * Apply a PartialRowSet to a table.
-	 * @param deltaJson
-	 * @param callback
-	 */
-	void applyTableDelta(PartialRowSet delta, AsyncCallback<Void> callback);
-	
-	/**
 	 * Validate a table query.
 	 * @param sql
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
+	/**
+	 * For the given table SQL toggle the sort on the given column and return the modified SQL.
+	 * @param sql
+	 * @param header
+	 * @param callback
+	 */
+	void toggleSortOnTableQuery(String sql, String header, AsyncCallback<String> callback);
+	
+	/**
+	 * Parse the query and determine the sort columns.
+	 * @param sql
+	 * @param callback
+	 */
+	void getSortFromTableQuery(String sql, AsyncCallback<List<SortItem>> callback);
 
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
@@ -358,10 +372,10 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void startAsynchJob(AsynchType type, AsynchronousRequestBody body,
+	void startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId,
 			AsyncCallback<String> callback);
 
-	void getAsynchJobResults(AsynchType type, String jobId,
+	void getAsynchJobResults(AsynchType type, String jobId, String tableId,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
 	void executeEntityQuery(EntityQuery query,
@@ -385,9 +399,28 @@ public interface SynapseClientAsync {
 	 */
 	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
 
+	/**
+	 * Return all projects that the current user can access, sorted by access time
+	 * @param limit
+	 * @param offset
+	 * @param projectHeaders
+	 */
 	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	/**
+	 * Return projects that the current user can access due to being on a particular team. 
+	 * @param teamId
+	 * @param limit
+	 * @param offset
+	 * @param projectHeaders
+	 */
+	void getProjectsForTeam(String teamId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
+
+	void getTableFileHandle(RowReferenceSet set,
+			AsyncCallback<TableFileHandleResults> callback);
+
+	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
 
 }

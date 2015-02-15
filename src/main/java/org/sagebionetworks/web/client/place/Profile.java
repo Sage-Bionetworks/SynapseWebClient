@@ -11,7 +11,6 @@ public class Profile extends Place implements RestartActivityOptional{
 	public static final String DELIMITER = "/"; 
 	public static final String SETTINGS_DELIMITER = getDelimiter(Synapse.ProfileArea.SETTINGS);
 	public static final String PROJECTS_DELIMITER = getDelimiter(Synapse.ProfileArea.PROJECTS);
-	public static final String FAVORITES_DELIMITER = getDelimiter(Synapse.ProfileArea.FAVORITES);
 	public static final String CHALLENGES_DELIMITER = getDelimiter(Synapse.ProfileArea.CHALLENGES);
 	public static final String TEAMS_DELIMITER = getDelimiter(Synapse.ProfileArea.TEAMS);
 	
@@ -34,9 +33,6 @@ public class Profile extends Place implements RestartActivityOptional{
 			} else if(toProcess.contains(PROJECTS_DELIMITER)) {
 				area = Synapse.ProfileArea.PROJECTS;
 				return;
-			} else if(toProcess.contains(FAVORITES_DELIMITER)) {
-				area = Synapse.ProfileArea.FAVORITES;
-				return;
 			} else if(toProcess.contains(CHALLENGES_DELIMITER)) {
 				area = Synapse.ProfileArea.CHALLENGES;
 				return;
@@ -46,6 +42,8 @@ public class Profile extends Place implements RestartActivityOptional{
 			}
 		} else {
 			userId = token;
+			//and by default go to the projects tab
+			area = Synapse.ProfileArea.PROJECTS;
 		}
 	}
 	

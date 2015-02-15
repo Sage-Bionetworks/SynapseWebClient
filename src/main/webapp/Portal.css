@@ -8,8 +8,8 @@
 	text-align: center;
 } */
 
-.overflow-y-scroll-imp {
-	overflow-y: scroll !important;
+.overflow-y-auto-imp {
+	overflow-y: auto !important;
 }
 
 .sf-j-menu {
@@ -125,7 +125,7 @@
 .downloadLink,.downloadLink:hover,.downloadLink:visited { text-decoration:underline; margin-left:5px;}
 
 /* header links. transition from grey to black on hover, don't underline */
-.headerLink { line-height: 25px; font-size: 13px; font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
+.headerLink { line-height: 25px; font-size: 13px; font-weight: bold; padding: 0px 2px 0px 4px;
   -o-transition:.2s;
   -ms-transition:.2s;
   -moz-transition:.2s;
@@ -388,6 +388,10 @@
 	font-size: 1.2em;
 }
 
+i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover {
+	color:#f0ad4e;
+}
+
 .resultssearchbox {
 	width: 500px;
 	margin: 0px 0 0 0;
@@ -634,6 +638,9 @@ a.shortBtn {
 .margin-top-100 {
 	margin-top: 100px;
 }
+.margin-top-300 {
+	margin-top: 300px;
+}
 
 .margin-left-180 {
 	margin-left: 180px;
@@ -747,10 +754,12 @@ a.shortBtn {
 .dragAndDropUploadBox {
 	width: 100%;
 	padding: 3em 0 6em 38%;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+.dragAndDropBorder {
 	border: 2px dashed;
-	margin-bottom: 12px;
 	border-radius: 3em;
-	display: inline !important;
 }
 
 
@@ -1429,6 +1438,12 @@ ol.lowerroman {
 	top: -35px;
 }
 
+.moveup-70 {
+	position: relative;
+	top: -70px;
+}
+
+
 .moveup-8 {
 	position: relative;
 	top: -8px;
@@ -1468,6 +1483,10 @@ ol.lowerroman {
 	top: 4px;
 }
 
+.moveright-5 {
+	position: relative;
+	left: 5px;
+}
 
 .highlight-box {
     position: relative;
@@ -1659,6 +1678,12 @@ a.projectTitle:hover {
 	color: #555;
 } 
 
+.entityBackgroundImage {
+	position: absolute;
+    width: 100%;
+    z-index: -1;
+}
+
 .dropLargeIconText {
 	position: relative;
 	top: 4px;
@@ -1805,7 +1830,10 @@ iframe[seamless] {
 /*
  * Bootstrap Overrides 
  */
- 
+.modal {
+    overflow-y: auto !important;
+}
+
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,
 .x-menu-list-item>a:visited>* {
@@ -1868,6 +1896,23 @@ ul, ol {
     width: 50%; /* 6 columns */
   }
 }
+
+.label-as-badge {
+    border-radius: 1em;
+}
+
+/**
+	The blockquote of a help-panel should also have the "panel" bootstrap class
+**/
+.help-panel blockquote {
+	padding: 0.5em 1em;
+	border-left: 3px solid #5bc0de;
+}
+
+.help-panel blockquote h4, .tip blockquote h3, .tip blockquote h2, .tip blockquote h1 {
+	color: #5bc0de;
+}
+
 
 /* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
 /* By default it's not affixed in mobile views, so undo that */

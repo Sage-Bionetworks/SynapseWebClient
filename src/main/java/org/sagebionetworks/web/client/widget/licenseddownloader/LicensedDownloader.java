@@ -7,16 +7,13 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -25,17 +22,13 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.shared.LicenseAgreement;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -49,40 +42,30 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private LicensedDownloaderView view;
 	
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private GWTWrapper gwt;
 	private AccessRequirement accessRequirementToDisplay;
 	private String entityId;
-	private UserProfile userProfile;
-	
+	private APPROVAL_TYPE approvalType;
 	private HandlerManager handlerManager;
 	
-	private JiraURLHelper jiraUrlHelper;
 	private boolean isDirectDownloadSupported;
 	private AuthenticationController authenticationController;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private AccessRequirementDialog accessRequirementDialog;
 	
-	// for testing
-	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
-
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			JSONObjectAdapter jsonObjectAdapter,
-			SynapseClientAsync synapseClient,
-			JiraURLHelper jiraUrlHelper,
 			SynapseJSNIUtils synapseJSNIUtils,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			AccessRequirementDialog accessRequirementDialog) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.jiraUrlHelper=jiraUrlHelper;
 		this.authenticationController = authenticationController;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
+		this.accessRequirementDialog = accessRequirementDialog;
 		view.setPresenter(this);		
 		clearHandlers();
 	}
@@ -111,17 +94,16 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param entity
 	 * @param showDownloadLocations
 	 */
-	public void configure(EntityBundle entityBundle, UserProfile userProfile) {
+	public void configure(EntityBundle entityBundle) {
 		view.setPresenter(this);
 		this.entityId = entityBundle.getEntity().getId();
-		extractBundle(entityBundle, userProfile);
+		extractBundle(entityBundle);
 	}
 	
-	private void extractBundle(EntityBundle entityBundle, UserProfile userProfile) {
+	private void extractBundle(EntityBundle entityBundle) {
 		loadDownloadUrl(entityBundle);		
 		List<AccessRequirement> ars = entityBundle.getAccessRequirements();
-		List<AccessRequirement> unmetARs = entityBundle.getUnmetAccessRequirements();
-		this.userProfile = userProfile;
+		List<AccessRequirement> unmetARs = entityBundle.getUnmetDownloadAccessRequirements();
 		// first, clear license agreement.  then, if there is an agreement required, set it below
 		setLicenseAgreement(ars, unmetARs);
 	}
@@ -198,27 +180,41 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 		return false;
 	}
-		
+
 	public void showWindow() {
-		this.view.showWindow();
+		if (!isDownloadAllowed()) return;
+		
+		if (approvalType != APPROVAL_TYPE.NONE){
+			//show access restrictions dialog
+			Callback finishedCallback = new Callback() {
+				@Override
+				public void invoke() {
+					accessRequirementDialog.hide();
+					fireEntityUpdatedEvent();
+				}
+			};
+			
+			accessRequirementDialog.configure(
+					accessRequirementToDisplay, 
+					entityId, 
+					false, /*hasAdministrativeAccess*/
+					false, /*accessApproved*/
+					null,
+					finishedCallback /*on hide dialog callback*/);
+			accessRequirementDialog.show();
+		} else {
+			this.view.showWindow();	
+		}
 	}
 	
 	public void setLicenseAgreement(Collection<AccessRequirement> allARs, Collection<AccessRequirement> unmetARs) {
 		accessRequirementToDisplay = GovernanceServiceHelper.selectAccessRequirement(allARs, unmetARs);
-		setRestrictionLevel(GovernanceServiceHelper.entityRestrictionLevel(allARs));
 		if (unmetARs==null || unmetARs.isEmpty()) {
-			isDirectDownloadSupported = true; 
-			setApprovalType(APPROVAL_TYPE.NONE);
+			isDirectDownloadSupported = true;
+			approvalType = APPROVAL_TYPE.NONE; 
 		} else {
-			isDirectDownloadSupported = false; 
-			setApprovalType(GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay));
-		}
-		
-		if (accessRequirementToDisplay!=null) {
-			String licenseAgreementText = GovernanceServiceHelper.getAccessRequirementText(accessRequirementToDisplay);
-			LicenseAgreement licenseAgreement = new LicenseAgreement();
-			licenseAgreement.setLicenseHtml(licenseAgreementText);
-			view.setLicenseHtml(licenseAgreement.getLicenseHtml());
+			isDirectDownloadSupported = false;
+			approvalType = GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay);
 		}
 	}
 	
@@ -230,63 +226,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		view.clear();
 	}
 	
-	public void setRestrictionLevel(RESTRICTION_LEVEL restrictionLevel) {
-		this.view.setRestrictionLevel(restrictionLevel);
-	}
-	
-	/**
-	 * set the approval type (USER_AGREEMENT or ACT_APPROVAL) or NONE if access is allowed with no add'l approval
-	 * @param approvalType
-	 */
-	public void setApprovalType(APPROVAL_TYPE approvalType) {
-		this.view.setApprovalType(approvalType);
-	}
-	
-	@Override
-	public Callback getTermsOfUseCallback() {
-		return new Callback() {public void invoke() {setLicenseAccepted();}};
-	}
-	
-	@Override
-	public void setLicenseAccepted() {	
-		Callback onSuccess = new Callback() {
-			@Override
-			public void invoke() {
-				fireEntityUpdatedEvent();
-			}
-		};
-		CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
-			@Override
-			public void invoke(Throwable t) {
-				view.showInfo("Error", t.getMessage());
-			}
-		};
-		GovernanceServiceHelper.signTermsOfUse(
-				userProfile.getOwnerId(), 
-				accessRequirementToDisplay, 
-				onSuccess, 
-				onFailure, 
-				synapseClient, 
-				jsonObjectAdapter);
-	}
-	
-	@Override
-	public Callback getRequestAccessCallback() {
-		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
-		final String jiraLink = jiraUrlHelper.createRequestAccessIssue(
-				userProfile.getOwnerId(), 
-				DisplayUtils.getDisplayName(userProfile), 
-				primaryEmail,
-				entityId, 
-				accessRequirementToDisplay.getId().toString());
-		
-		return new Callback() {
-			@Override
-			public void invoke() {
-				Window.open(jiraLink, "_blank", "");
-			}};
-	}
-
 	public String getDirectDownloadURL(FileEntity fileEntity, FileHandle fileHandle) {
 		String externalUrl = null;
 		if (fileHandle instanceof ExternalFileHandle) {

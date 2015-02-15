@@ -21,13 +21,15 @@ public interface UploaderView extends IsWidget, SynapseView {
 	public void showProgressBar();
 	public void showConfirmDialog(String message, Callback yesCallback, Callback noCallback);
 	void resetToInitialState();
-	void showNoFilesSelectedForUpload();
 	void enableMultipleFileUploads(boolean isEnabled);
 	void setShowCancelButton(boolean showCancel);
 	void showUploaderUI();
 	void triggerUpload();
 	
-	void showUploadingToSynapseStorage(String banner);
+	void showErrorMessage(String title, String details);
+	
+	void showUploadingToSynapseStorage();
+	void showUploadingBanner(String banner);
 	void showUploadingToExternalStorage(String host, String banner);
 	
 	/**
@@ -41,7 +43,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	String getExternalPassword();
 	
-	void showExternalCredentialsRequiredMessage();
+	void enableUpload();
 	
 	/**
 	 * Presenter interface
@@ -65,5 +67,6 @@ public interface UploaderView extends IsWidget, SynapseView {
 		void cancelClicked();
 		
 		void disableMultipleFileUploads();
+		String getSelectedFilesText();
 	}
 }

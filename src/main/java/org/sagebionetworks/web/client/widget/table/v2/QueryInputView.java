@@ -25,8 +25,14 @@ public interface QueryInputView extends IsWidget {
 		 */
 		void onReset();
 
+		/**
+		 * Called when the user clicks edit results.
+		 */
 		void onEditResults();
 
+		/**
+		 * Called when the user clicks download results.
+		 */
 		void onDownloadResults();
 		
 	}

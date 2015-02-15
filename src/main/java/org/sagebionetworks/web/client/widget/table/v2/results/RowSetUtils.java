@@ -1,15 +1,20 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.StringUtils.isValueChanged;
+import static org.sagebionetworks.web.client.StringUtils.trimWithEmptyAsNull;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.SelectColumn;
 
 /**
  * Functional utilities for the complex operations on RowSets.
@@ -28,13 +33,12 @@ public class RowSetUtils {
 	 * @param updateRows
 	 * @return
 	 */
-	public static PartialRowSet buildDelta(RowSet original, RowSet update) {
+	public static PartialRowSet buildDelta(RowSet original, List<Row> updateRows, List<ColumnModel> selectData) {
 		List<PartialRow> delta = new LinkedList<PartialRow>();
 		// Map the all rows with IDs
 		LinkedHashMap<Long, Row> originalRowMap = buildRowIdToRowMap(original
 				.getRows());
-		LinkedHashMap<Long, Row> updateRowMap = buildRowIdToRowMap(update
-				.getRows());
+		LinkedHashMap<Long, Row> updateRowMap = buildRowIdToRowMap(updateRows);
 		// Delete are any row from the original that is no longer in the update
 		Iterator<Long> it = originalRowMap.keySet().iterator();
 		while (it.hasNext()) {
@@ -48,7 +52,7 @@ public class RowSetUtils {
 		}
 		// Updates are rows in the updated with an ID. Creates are rows with no
 		// rowId.
-		for (Row toUpdate : update.getRows()) {
+		for (Row toUpdate : updateRows) {
 			PartialRow pr = null;
 			if (toUpdate.getRowId() != null) {
 				// update
@@ -61,12 +65,12 @@ public class RowSetUtils {
 									+ " that does not match any row from the original results set.");
 				}
 				// Build the delta
-				pr = buildPartialRow(update.getHeaders(), toUpdate, originalRow);
+				pr = buildPartialRow(selectData, toUpdate, originalRow);
 				// map the changes
 			} else {
 				// create
 				if (toUpdate.getValues() != null) {
-					pr = buildPartialRow(update.getHeaders(), toUpdate, null);
+					pr = buildPartialRow(selectData, toUpdate, null);
 				}
 			}
 			if (pr != null) {
@@ -91,7 +95,7 @@ public class RowSetUtils {
 	 *            updated.
 	 * @return A new PartialRow will be returned if the 
 	 */
-	private static PartialRow buildPartialRow(List<String> headers,
+	private static PartialRow buildPartialRow(List<ColumnModel> headers,
 			Row toUpdate, Row original) {
 		if (toUpdate.getValues() == null) {
 			return null;
@@ -102,15 +106,15 @@ public class RowSetUtils {
 		}
 		HashMap<String, String> map = new HashMap<String, String>(toUpdate.getValues().size());
 		for (int i = 0; i < toUpdate.getValues().size(); i++) {
-			String header = headers.get(i);
+			ColumnModel header = headers.get(i);
 			// aggregate rows can have null headers so skip them.
-			if (header != null) {
+			if (header != null && header.getId() != null) {
 				String updateValue =  toUpdate.getValues().get(i);
 				if(original == null){
-					map.put(header, trimWithEmptyAsNull(updateValue));
+					map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 				}else{
 					if(isValueChanged(original.getValues().get(i), updateValue)){
-						map.put(header, trimWithEmptyAsNull(updateValue));
+						map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 					}
 				}
 			}
@@ -127,42 +131,7 @@ public class RowSetUtils {
 			return pr;
 		}
 	}
-	/**
-	 * Compare two cell values and decide if there is a change.
-	 * This method will treat empty string and null as equal.
-	 * Also non-null strings are trimmed before compared.
-	 * @param original
-	 * @param changed
-	 * @return
-	 */
-	public static boolean isValueChanged(String inOriginal, String inChanged){
-		String tOriginal = trimWithEmptyAsNull(inOriginal);
-		String tChanged = trimWithEmptyAsNull(inChanged);
-		if(tOriginal == null){
-			if(tChanged == null){
-				return false;
-			}
-			return true;
-		}else{
-			return !tOriginal.equals(tChanged);
-		}
-	}
-	/**
-	 * @return Returns null if the passed value is null.  Returns null if the trimmed string is empty else the trimmed string.  
-	 */
-	public static String trimWithEmptyAsNull(String toUpdate){
-		if(toUpdate == null){
-			return null;
-		}else{
-			String trim = toUpdate.trim();
-			if(trim.isEmpty()){
-				return null;
-			}else{
-				return trim;
-			}
-		}
-	}
-	
+
 
 	/**
 	 * Build up a map of rowIds to rows. Any row without a RowID will no be

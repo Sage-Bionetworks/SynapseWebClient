@@ -106,7 +106,7 @@ public class FileHistoryWidgetTest {
 		accessRequirement.setTermsOfUse("terms of use");
 		accessRequirements.add(accessRequirement);
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(accessRequirements);
 				
 		fileHistoryWidget.setEntityBundle(bundle, 1l);
 		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));

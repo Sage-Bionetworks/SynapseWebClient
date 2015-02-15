@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.widget.WidgetMenu;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -23,10 +22,11 @@ import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
-public class EntityListRenderer extends LayoutContainer {		
+public class EntityListRenderer extends SimplePanel {		
 	
 	private static final String HEADER_NAME = "Name";
 	private static final String HEADER_DOWNLOAD = " ";
@@ -52,8 +52,6 @@ public class EntityListRenderer extends LayoutContainer {
 	PortalGinInjector ginInjector;
 	
 	BootstrapTable table;
-	LayoutContainer nameContainer;
-	LayoutContainer descriptionContainer;
 	int uniqueId;
 		
 	public int getRowIndexForEvent(ClickEvent event) {
@@ -65,11 +63,8 @@ public class EntityListRenderer extends LayoutContainer {
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
-		this.nameContainer = new LayoutContainer();
-		this.descriptionContainer = new LayoutContainer();			
 		
-		LayoutContainer tableContainer = initTable(canEdit);						
-		this.add(tableContainer);
+		setWidget(initTable(canEdit));
 				
 		uniqueId = Random.nextInt();
 	}
@@ -86,7 +81,6 @@ public class EntityListRenderer extends LayoutContainer {
 		} else {
 			name = new HTML(display.getName());
 		}
-		name.setWidth("212px");
 		name.addStyleName(ClientProperties.STYLE_BREAK_WORD);
 		
 		// create download link
@@ -107,8 +101,6 @@ public class EntityListRenderer extends LayoutContainer {
 		
 		// wrap description
 		HTML description = new HTML(display.getDescription());
-		description.setWidth("375px");
-		//description.setHeight("63px");
 		description.addStyleName(ClientProperties.STYLE_BREAK_WORD);		
 		
 		// set row in table
@@ -116,8 +108,6 @@ public class EntityListRenderer extends LayoutContainer {
 				display.getVersion(), description,
 				display.getModifienOn(), display.getCreatedByPrincipalId(),
 				display.getNote());
-
-		this.layout();
 	}
 
 	
@@ -138,7 +128,6 @@ public class EntityListRenderer extends LayoutContainer {
 	
 	public void updateRowNote(int rowIndex, SafeHtml note) {
 		HTML noteDiv = new HTML(note);
-		noteDiv.setWidth("100px");
 		noteDiv.addStyleName(ClientProperties.STYLE_BREAK_WORD);			
 		table.setWidget(rowIndex, HEADER_NOTE_IDX, noteDiv);
 	}
@@ -162,8 +151,7 @@ public class EntityListRenderer extends LayoutContainer {
 	/*
 	 * Private Methods
 	 */
-	private LayoutContainer initTable(boolean canEdit) {
-
+	private Widget initTable(boolean canEdit) {
 		table = new BootstrapTable();
 		table.addStyleName("table-striped table-bordered table-condensed");
 		List<String> headerRow = new ArrayList<String>();
@@ -200,10 +188,8 @@ public class EntityListRenderer extends LayoutContainer {
 			table.getColumnFormatter().setWidth(6, "20%");				
 			table.getColumnFormatter().setWidth(7, "6%"); // edit column
 		}
-
-		LayoutContainer tbl = new LayoutContainer();		
-		tbl.add(table);
-		return tbl;
+		
+		return table;
 	}
 
 }

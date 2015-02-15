@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -24,7 +26,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
-import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
@@ -83,6 +84,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private FlowPanel wikiPagePanel;
 	private boolean isEmbeddedInOwnerPage;
 	private boolean isAttachmentsWidgetConfigured;
+	private HorizontalPanel modifiedPanel, createdPanel;
+	private SimplePanel historyPanel;
 	
 	public interface OwnerObjectNameCallback{
 		public void ownerObjectNameInitialized();
@@ -107,6 +110,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.widgetRegistrar = widgetRegistrar;
 		this.historyWidget = historyWidget;
 		this.ginInjector = ginInjector;
+		modifiedPanel = new HorizontalPanel();
+		createdPanel = new HorizontalPanel();
+		historyPanel = new SimplePanel();
 	}
 	
 	@Override
@@ -214,12 +220,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		UserBadge createdBy = ginInjector.getUserBadgeWidget();
 		createdBy.configure(presenter.getWikiPage().getCreatedBy());
 		
-		HorizontalPanel modifiedPanel = new HorizontalPanel();
+		modifiedPanel.clear();
 		modifiedPanel.add(modifiedText);
 		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
 		modifiedPanel.add(modifiedOnText);
 		
-		HorizontalPanel createdPanel = new HorizontalPanel();
+		createdPanel.clear();
 		createdPanel.add(createdText);
 		createdPanel.add(wrapWidget(createdBy.asWidget(), "padding-left-5"));
 		createdPanel.add(createdOnText);
@@ -227,7 +233,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		FlowPanel modifiedAndCreatedSection = new FlowPanel();
 		modifiedAndCreatedSection.add(modifiedPanel);
 		modifiedAndCreatedSection.add(createdPanel);
-		modifiedAndCreatedSection.add(wrapWidget(createHistoryButton(), "margin-top-5"));
+		
+		historyPanel.clear();
+		historyPanel.add(wrapWidget(createHistoryButton(), "margin-top-5"));
+		modifiedAndCreatedSection.add(historyPanel);
 		return modifiedAndCreatedSection;
 	}
 	
@@ -460,14 +469,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
 				}
 				else {
-					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
+					Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
 						@Override
-						public void onSave(String name, String description) {
+						public void callback(String name) {
 							presenter.createPage(name);
 						}
 					});
 				}
-				
 			}
 		});
 		return btn;
@@ -592,5 +600,18 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public Widget asWidget() {
 		return this;
+	}
+	
+	@Override
+	public void showCreatedBy(boolean isVisible) {
+		createdPanel.setVisible(isVisible);
+	}
+	@Override
+	public void showModifiedBy(boolean isVisible) {
+		modifiedPanel.setVisible(isVisible);
+	}
+	@Override
+	public void showWikiHistory(boolean isVisible) {
+		historyPanel.setVisible(isVisible);
 	}
 }

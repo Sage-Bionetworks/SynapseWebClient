@@ -14,7 +14,7 @@ public interface DownloadTableQueryModalWidget extends IsWidget {
 	 * Configure this widget before using it.
 	 * @param sql The SQL to use to create the file download.
 	 */
-	public void configure(String sql);
+	public void configure(String sql, String tableId);
 	
 	/**
 	 * After configuring the widget call this method to show the dialog.

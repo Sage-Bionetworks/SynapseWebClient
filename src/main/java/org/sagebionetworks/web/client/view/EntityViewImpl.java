@@ -26,6 +26,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,7 +44,9 @@ public class EntityViewImpl extends Composite implements EntityView {
 	SimplePanel footer;
 	@UiField
 	SimplePanel entityPageTopPanel;
-		
+	@UiField
+	Image entityBackgroundImage;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
@@ -168,7 +171,15 @@ public class EntityViewImpl extends Composite implements EntityView {
 		openTeamInvites.addStyleName("margin-left-10 margin-bottom-10 margin-right-10");
 		panel.add(openTeamInvites);
 		entityPageTopPanel.setWidget(panel);
-		
+	}
+	
+	@Override
+	public void setBackgroundImageVisible(boolean isVisible) {
+		entityBackgroundImage.setVisible(isVisible);
 	}
 
+	@Override
+	public void setBackgroundImageUrl(String url) {
+		entityBackgroundImage.setUrl(url);
+	}
 }

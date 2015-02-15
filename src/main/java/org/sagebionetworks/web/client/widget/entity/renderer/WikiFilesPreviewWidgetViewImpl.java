@@ -10,12 +10,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiFilesPreviewWidgetViewImpl extends LayoutContainer implements WikiFilesPreviewWidgetView {
+public class WikiFilesPreviewWidgetViewImpl extends FlowPanel implements WikiFilesPreviewWidgetView {
 
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
@@ -27,7 +27,7 @@ public class WikiFilesPreviewWidgetViewImpl extends LayoutContainer implements W
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, List<FileHandle> list) {
-		this.removeAll();
+		this.clear();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h5>Wiki Attachments</h5>");
 		sb.append("<div>");
@@ -59,7 +59,6 @@ public class WikiFilesPreviewWidgetViewImpl extends LayoutContainer implements W
 		}
 		sb.append("</div>");
 		add(new HTMLPanel(sb.toString()));
-		this.layout(true);
 	}
 	@Override
 	public void showErrorMessage(String error) {

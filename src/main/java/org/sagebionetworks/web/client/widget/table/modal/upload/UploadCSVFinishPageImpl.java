@@ -13,8 +13,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorPresenter;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -87,13 +86,10 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		List<ColumnModel> columns = preProcessColumns(suggestedSchema);
 		editors = new ArrayList<ColumnModelTableRow>(columns.size());
 		for (ColumnModel cm : columns) {
-			ColumnModelTableRowEditor editor = portalGinInjector
-					.createNewColumnModelTableRowEditor();
-			ColumnModelUtils.applyColumnModelToRow(cm, editor);
+			ColumnModelTableRowEditorWidget editor = portalGinInjector.createColumnModelEditorWidget();
 			editors.add(editor);
 			this.keyboardNavigationHandler.bindRow(editor);
-			// Setup a presenter for this row
-			new ColumnModelTableRowEditorPresenter(editor);
+			editor.configure(cm, null);
 			editor.setSelectVisible(false);
 		}
 		view.setColumnEditor(editors);
@@ -159,7 +155,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		this.uploadtoTableRequest.setTableId(table.getId());
 		this.view.setTrackerVisible(true);
 		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
-				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
+				AsynchType.TableCSVUpload, this.uploadtoTableRequest, table.getId(),
 				new AsynchronousProgressHandler() {
 
 					@Override

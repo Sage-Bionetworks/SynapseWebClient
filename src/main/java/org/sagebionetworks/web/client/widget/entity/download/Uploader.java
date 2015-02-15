@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -37,6 +37,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -115,6 +116,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public Widget asWidget(Entity entity, String parentEntityId, CallbackP<String> fileHandleIdCallback, boolean isEntity) {
 		this.view.setPresenter(this);
 		this.entity = entity;
+		this.entityId = entity != null ? entity.getId() : null;
 		this.parentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.view.createUploadForm(isEntity, parentEntityId);
@@ -147,6 +149,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.triggerUpload();
 	}
 	
+	public String[] getSelectedFileNames() {
+		return synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID);
+	}
+	
+	@Override
+	public String getSelectedFilesText() {
+		String[] selectedFiles = getSelectedFileNames();
+		if (selectedFiles == null)
+			return UploaderViewImpl.DRAG_AND_DROP;
+		else if (selectedFiles.length == 1) {
+			return selectedFiles[0];
+		} else {
+			return selectedFiles.length + " files";
+		}
+	}
+	
 	@Override
 	public void handleUploads() {
 		//field validation
@@ -154,9 +172,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			//setup upload process.
 			fileHasBeenUploaded = false;
 			currIndex = 0;
-			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
+			if ((fileNames = getSelectedFileNames()) == null) {
 				//no files selected.
-				view.showNoFilesSelectedForUpload();
+				view.hideLoading();
+				view.showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
+				view.enableUpload();
 				return;
 			}
 		}
@@ -166,24 +186,28 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			String username = view.getExternalUsername();
 			String password = view.getExternalPassword();
 			if (!DisplayUtils.isDefined(username) || !DisplayUtils.isDefined(password)) {
-				view.showExternalCredentialsRequiredMessage();
+				view.hideLoading();
+				view.showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+				view.enableUpload();
 				return;
 			}
 		}
 		
-		entityId = null;
-		if (entity != null) {
-			entityId = entity.getId();
-		}
-		
 		uploadBasedOnConfiguration();
+	}
+	
+	public void updateS3UploadBannerView(String banner) {
+		if (DisplayUtils.isDefined(banner))
+			view.showUploadingBanner(banner);
+		else
+			view.showUploadingToSynapseStorage();	
 	}
 	
 	public void queryForUploadDestination() {
 		enableMultipleFileUploads();
 		if (parentEntityId == null && entity == null) {
 			currentUploadType = UploadType.S3;
-			view.showUploadingToSynapseStorage("");
+			view.showUploadingToSynapseStorage();
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
 			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
@@ -191,10 +215,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
 						currentUploadType = UploadType.S3;
-						view.showUploadingToSynapseStorage("");
+						view.showUploadingToSynapseStorage();
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
-						view.showUploadingToSynapseStorage(uploadDestinations.get(0).getBanner());
+						updateS3UploadBannerView(uploadDestinations.get(0).getBanner());
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
 						if (UploadType.SFTP == d.getUploadType()){
@@ -267,7 +291,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void uploadToSftpProxy(final String url) {
 		try {
-			view.submitForm(getSftpProxyLink(url, globalAppState, gwt));
+			Callback callback = new Callback() {
+				@Override
+				public void invoke() {
+					view.submitForm(getSftpProxyLink(url, globalAppState, gwt));		
+				}
+			};
+			checkForExistingFileName(fileNames[currIndex], callback);
 		} catch (Exception e) {
 			uploadError(e.getMessage(), e);
 		}
@@ -277,7 +307,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity) {
 			//use case B from above
-			directUploadStep1(fileNames[currIndex]);
+			Callback callback = new Callback() {
+				@Override
+				public void invoke() {
+					directUploadStep2(fileNames[currIndex]);
+				}
+			};
+			checkForExistingFileName(fileNames[currIndex], callback);
 		} else {
 			//use case A from above
 			//uses the default action url
@@ -336,10 +372,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	/**
 	 * Look for a file with the same name (if we aren't uploading to an existing File already).
 	 * @param fileName
+	 * @param callback Called when upload should continue.  Otherwise, it is not called.
 	 */
-	public void directUploadStep1(final String fileName) {
+	public void checkForExistingFileName(final String fileName, final Callback callback) {
 		if (entity != null || parentEntityId == null) {
-			directUploadStep2(fileName);
+			callback.invoke();
 		} else {
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
 				@Override
@@ -353,7 +390,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								public void invoke() {
 									//yes, override
 									entityId = result;
-									directUploadStep2(fileName);
+									callback.invoke();
 								}
 							},
 							new Callback() {
@@ -367,7 +404,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onFailure(Throwable caught) {
 					if (caught instanceof NotFoundException) {
 						//there was not already a file with this name in this directory.
-						directUploadStep2(fileName);
+						callback.invoke();
 					} else if (caught instanceof ConflictException) {
 						//there was an entity found with same parent ID and name, but
 						//it was not a File Entity.
@@ -438,29 +475,25 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void setExternalFilePath(String path, String name) {
-		if (entity==null || entity instanceof FileEntity) {
+		boolean isUpdating = entityId != null || entity != null;
+		if (isUpdating) {
+			//existing entity
+			if (entity==null || entity instanceof FileEntity) {
+				updateExternalFileEntity(entityId, path, name);
+			} else {
+				synapseClient.updateExternalLocationable(entityId, path, name, new AsyncCallback<EntityWrapper>() {
+					public void onSuccess(EntityWrapper result) {
+						externalLinkUpdated(result, entity.getClass());
+					};
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+					}
+				} );
+			}
+		} else {
 			//new data, use the appropriate synapse call
-			//if we haven't created the entity yet, do that first
-			if (entity == null) {
-				createNewExternalFileEntity(path, name);
-			}
-			else {
-				updateExternalFileEntity(entity.getId(), path, name);
-			}
-		}
-		else {
-			//old data
-			String entityId = entity.getId();
-			synapseClient.updateExternalLocationable(entityId, path, name, new AsyncCallback<EntityWrapper>() {
-				
-				public void onSuccess(EntityWrapper result) {
-					externalLinkUpdated(result, entity.getClass());
-				};
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
-				}
-			} );
+			createNewExternalFileEntity(path, name);
 		}
 	}
 	
@@ -549,7 +582,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		UploadResult uploadResult = null;
 		String detailedErrorMessage = null;
 		try{
-			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
+			uploadResult = AddAttachmentHelper.getUploadResult(resultHtml);
 			handleSubmitResult(uploadResult);
 		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		
@@ -575,8 +608,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				setExternalFilePath(path, fileName);
 			}
 		}else {
-			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));
+			if (isJschAuthorizationError(uploadResult.getMessage())) {
+				uploadError(DisplayConstants.INVALID_USERNAME_OR_PASSWORD, new UnauthorizedException(uploadResult.getMessage()));
+			} else {
+				uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));	
+			}
 		}
+	}
+	
+	public boolean isJschAuthorizationError(String message) {
+		if (message != null) {
+			String lowerCaseMessage = message.toLowerCase();
+			if (lowerCaseMessage.contains("jschexception") && lowerCaseMessage.contains("auth fail")) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void showCancelButton(boolean showCancel) {
@@ -609,10 +656,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		});
 	}
 	private void uploadError(String message, Throwable t) {
-		String details = "";
-		if (message != null && message.length() > 0)
-			details = "  \n" + message;
-		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
+		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, message);
 		logger.errorToRepositoryServices(message, t);
 		fireCancelEvent();
 	}
@@ -643,14 +687,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		fileNames = null;
 		fileHasBeenUploaded = false;
 		currIndex = 0;
-	}
-
-	/**
-	 * For testing purposes
-	 * @return
-	 */
-	public String getDirectUploadFileEntityId() {
-		return entityId;
 	}
 	
 	/**

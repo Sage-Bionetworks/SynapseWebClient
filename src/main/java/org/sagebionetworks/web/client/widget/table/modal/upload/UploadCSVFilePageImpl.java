@@ -72,7 +72,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	 * @return
 	 */
 	public boolean validateSelecedFile(){
-		// Frist validate the input
+		// first validate the input
 		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
 		if(meta == null || meta.length != 1){
 			presenter.setErrorMessage(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
@@ -80,8 +80,8 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 		}
 		String contentType = meta[0].getContentType();
 		try{
-			this.type = ContentTypeDelimiter.findByContentType(contentType);
 			this.fileName =  meta[0].getFileName();
+			this.type = ContentTypeDelimiter.findByContentType(contentType, this.fileName);
 			return true;
 		}catch(IllegalArgumentException e){
 			presenter.setErrorMessage(UNKNOWN_TYPE_SLECTED);

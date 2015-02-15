@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -48,6 +49,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class JoinTeamWidgetTest {
 
@@ -64,6 +66,7 @@ public class JoinTeamWidgetTest {
 	PlaceChanger mockPlaceChanger;
 	List<AccessRequirement> ars;
 	UserProfile currentUserProfile;
+	WikiPageWidget mockWikiPageWidget;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -74,6 +77,7 @@ public class JoinTeamWidgetTest {
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockGwt = mock(GWTWrapper.class);
+		mockWikiPageWidget = mock(WikiPageWidget.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -90,7 +94,7 @@ public class JoinTeamWidgetTest {
         AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, jsonObjectAdapter, mockGwt);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, jsonObjectAdapter, mockGwt, mockWikiPageWidget);
 		TeamMembershipStatus status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
@@ -135,12 +139,28 @@ public class JoinTeamWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2WithRestriction() throws Exception {
-		ars.add(new TermsOfUseAccessRequirement());
+		TermsOfUseAccessRequirement terms = new TermsOfUseAccessRequirement();
+		terms.setTermsOfUse("terms have been set");
+		ars.add(terms);
         
         joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
 	}
+	
+	@Test
+	public void testJoinRequestStep2WithNullRestrictionText() throws Exception {
+		verify(mockWikiPageWidget).showCreatedBy(false);
+		verify(mockWikiPageWidget).showModifiedBy(false);
+		verify(mockWikiPageWidget).showWikiHistory(false);
+		TermsOfUseAccessRequirement terms = new TermsOfUseAccessRequirement();
+		terms.setId(1L);
+		ars.add(terms);
+		joinWidget.sendJoinRequestStep0();
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		verify(mockView).showWikiAccessRequirement(any(Widget.class), any(Callback.class));
+	}
+
 	
 	@SuppressWarnings("unchecked")
 	@Test
@@ -179,7 +199,9 @@ public class JoinTeamWidgetTest {
 		
 
         //Now test with an access requirement.  First as part of a challenge, then outside of challenge 
-        ars.add(new TermsOfUseAccessRequirement());
+        TermsOfUseAccessRequirement terms = new TermsOfUseAccessRequirement();
+        terms.setTermsOfUse("terms of use");
+        ars.add(terms);
         
         isChallengeSignup = true;
         joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
@@ -266,7 +288,8 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testSetLicenseAccepted() throws Exception {
 		//single ToU
-		AccessRequirement ar = new TermsOfUseAccessRequirement();
+		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
+		ar.setTermsOfUse("some terms");
 		ars.add(ar);
 		joinWidget.sendJoinRequestStep0();
 		//verify we showTermsOfUseAccessRequirement

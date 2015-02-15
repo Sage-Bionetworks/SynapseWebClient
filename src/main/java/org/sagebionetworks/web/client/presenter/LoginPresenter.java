@@ -121,6 +121,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		return (matchResult != null && email.equals(matchResult.getGroup(0))); 
 	}
 	
+	public static boolean isValidWidgetName(String name) {
+		if (name == null || name.trim().length() == 0) return false;
+		RegExp regEx = RegExp.compile(WebConstants.VALID_WIDGET_NAME_REGEX, "gm");
+		MatchResult matchResult = regEx.exec(name);
+		//the entire string must match (group 0 is the whole matched string)
+		return (matchResult != null && name.equals(matchResult.getGroup(0))); 
+	}
+	
 	public static boolean isValidUrl(String url, boolean isUndefinedUrlValid) {
 		if (url == null || url.trim().length() == 0) {
 			//url is undefined

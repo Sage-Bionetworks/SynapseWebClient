@@ -7,7 +7,7 @@
 
 	<!-- Dialog for creating a new table -->
 	<b:Modal closable="true" fade="true"
-		dataBackdrop="STATIC" dataKeyboard="true">
+		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 			<bh:Text ui:field="instructions"></bh:Text>
 			<g:SimplePanel ui:field="bodyPanel"/>

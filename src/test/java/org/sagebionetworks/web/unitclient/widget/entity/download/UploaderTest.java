@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -9,7 +9,8 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
@@ -41,6 +42,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -57,6 +59,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -234,7 +237,7 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
 		uploader.addCancelHandler(cancelHandler);
-		verify(view).showUploadingToSynapseStorage(anyString());
+		verify(view).showUploadingToSynapseStorage();
 		verify(view).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
 		String[] fileNames = {file1};
@@ -242,6 +245,38 @@ public class UploaderTest {
 		uploader.handleUploads();
 		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
+		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
+	}
+	
+	@Test
+	public void testUpdateS3UploadBannerViewNull() throws Exception {
+		reset(view);
+		uploader.updateS3UploadBannerView(null);
+		verify(view).showUploadingToSynapseStorage();
+	}
+	@Test
+	public void testUpdateS3UploadBannerViewEmpty() throws Exception {
+		reset(view);
+		uploader.updateS3UploadBannerView("");
+		verify(view).showUploadingToSynapseStorage();
+	}
+	@Test
+	public void testUpdateS3UploadBannerViewSet() throws Exception {
+		reset(view);
+		String banner = "this is my test banner";
+		uploader.updateS3UploadBannerView(banner);
+		verify(view).showUploadingBanner(banner);
+	}
+	
+	@Test
+	public void testDirectUploadNoFilesSelected() throws Exception {
+		uploader.setFileNames(null);
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		uploader.handleUploads();
+		verify(view).hideLoading();
+		verify(view).showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
+		verify(view).enableUpload();
+		
 		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
 	}
 	
@@ -254,31 +289,37 @@ public class UploaderTest {
 	}
 	
 	private void verifyUploadError() {
-		verify(view).showErrorMessage(anyString());
+		verify(view).showErrorMessage(anyString(), anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
 		verify(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
 	}
 	
 	@Test
 	public void testDirectUploadStep1Failure() throws Exception {
+		Callback mockCallback = mock(Callback.class);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
-		uploader.directUploadStep1("newFile.txt");
+		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verifyUploadError();
+		verifyZeroInteractions(mockCallback);
 	}
 	
 	@Test
 	public void testDirectUploadStep1SameNameFound() throws Exception {
+		Callback mockCallback = mock(Callback.class);
 		String duplicateNameEntityId = "syn007";
 		AsyncMockStubber.callSuccessWith(duplicateNameEntityId).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
-		uploader.directUploadStep1("newFile.txt");
+		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verify(view).showConfirmDialog(anyString(), any(Callback.class), any(Callback.class));
+		verifyZeroInteractions(mockCallback);
 	}
 	
 	@Test
 	public void testDirectUploadStep1NoParentEntityId() throws Exception {
+		Callback mockCallback = mock(Callback.class);
 		uploader.asWidget(null, null, null, false);
-		uploader.directUploadStep1("newFile.txt");
+		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verify(synapseClient, Mockito.never()).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockCallback).invoke();
 	}
 
 	@Test
@@ -364,7 +405,9 @@ public class UploaderTest {
 		verify(view).showUploadingToExternalStorage(anyString(), anyString());
 		verify(view).enableMultipleFileUploads(false);
 		
+		uploader.setFileNames(new String[] {"test.txt"});
 		uploader.uploadToSftpProxy(url);
+		verify(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		//capture the value sent to the form to submit
 		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
 		verify(view).submitForm(c.capture());
@@ -398,11 +441,13 @@ public class UploaderTest {
 		uploader.setCurrentUploadType(UploadType.S3);
 		uploader.handleUploads();
 		
-		verify(view, Mockito.never()).showExternalCredentialsRequiredMessage();
-		
+		verify(view, Mockito.never()).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+		reset(view);
 		uploader.setCurrentUploadType(UploadType.SFTP);
 		uploader.handleUploads();
-		verify(view).showExternalCredentialsRequiredMessage();
+		verify(view).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+		verify(view).hideLoading();
+		verify(view).enableUpload();
 	}
 	
 	@Test
@@ -412,7 +457,7 @@ public class UploaderTest {
 		
 		uploader.setCurrentUploadType(UploadType.SFTP);
 		uploader.handleUploads();
-		verify(view, Mockito.never()).showExternalCredentialsRequiredMessage();
+		verify(view, Mockito.never()).showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
 	}
 	
 	@Test
@@ -494,4 +539,33 @@ public class UploaderTest {
 		assertNull(uploader.getCurrentExternalUploadUrl());
 		assertNull(uploader.getCurrentUploadType());
 	}
+	
+	@Test
+	public void testIsJschAuthorizationError() {
+		assertFalse(uploader.isJschAuthorizationError(""));
+		assertFalse(uploader.isJschAuthorizationError(null));
+		assertFalse(uploader.isJschAuthorizationError("Bad request."));
+		assertTrue(uploader.isJschAuthorizationError("com.jcraft.jsch.JSchException: Auth fail"));
+		assertTrue(uploader.isJschAuthorizationError("com.JCRAFT.jsch.jschexception: Auth FAIL"));
+	}
+	
+	@Test
+	public void testGetSelectedFilesText() {
+		String fileName = "single file.txt";
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{fileName});
+		assertEquals(fileName, uploader.getSelectedFilesText());
+	}
+	
+	@Test
+	public void testGetSelectedFilesTextNoFiles() {
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		assertEquals(UploaderViewImpl.DRAG_AND_DROP, uploader.getSelectedFilesText());
+	}
+	
+	@Test
+	public void testGetSelectedFilesTextMultipleFiles() {
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"file1", "file2"});
+		assertEquals("2 files", uploader.getSelectedFilesText());
+	}
+
 }

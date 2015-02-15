@@ -70,6 +70,9 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("images/NCI_logo.jpg")
 	ImageResource nciLogo();
+	
+	@Source("images/CTF_logo.png")
+	ImageResource ctfLogo();
 
 	@Source("images/LSDF_logo.jpg")
 	ImageResource lsdfLogo();
@@ -79,6 +82,12 @@ public interface SageImageBundle extends ClientBundle {
 
 	@Source("images/Sloan_logo.jpg")
 	ImageResource sloanLogo();
+	
+	@Source("images/NIA_logo.jpg")
+	ImageResource niaLogo();
+	
+	@Source("images/NIMH_logo.jpg")
+	ImageResource nimhLogo();
 
 	@Source("images/spotlight/Dream85_Banner.jpg")
 	ImageResource dream85Banner();

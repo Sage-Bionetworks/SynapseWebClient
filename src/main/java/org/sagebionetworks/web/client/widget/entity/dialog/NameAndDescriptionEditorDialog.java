@@ -29,24 +29,8 @@ public class NameAndDescriptionEditorDialog {
 		showNameAndDescriptionDialog(null, null, true, true, null, null, callback);
 	}
 	
-	public static void showNameAndDescriptionDialog(String nameLabel, String descLabel, Callback callback) {
-		showNameAndDescriptionDialog(null, null, true, true, nameLabel, descLabel, callback);
-	}
-	
 	public static void showNameAndDescriptionDialog(String name, String description, String nameLabel, String descLabel, Callback callback) {
 		showNameAndDescriptionDialog(name, description, true, true, nameLabel, descLabel, callback);
-	}
-	
-	public static void showNameDialog(String nameLabel, Callback callback) {
-		showNameAndDescriptionDialog(null, null, true, false, nameLabel, null, callback);
-	}
-	
-	public static void showNameDialog(String name, String nameLabel, Callback callback) {
-		showNameAndDescriptionDialog(name, null, true, false, nameLabel, null, callback);
-	}
-	
-	public static void showTextAreaDialog(String descLabel, Callback callback) {
-		showNameAndDescriptionDialog(null, null, false, true, null, descLabel, callback);
 	}
 	
 	public static void showTextAreaDialog(String value, String descLabel, Callback callback) {

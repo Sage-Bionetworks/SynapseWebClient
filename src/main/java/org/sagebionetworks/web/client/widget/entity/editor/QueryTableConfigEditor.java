@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,7 +27,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
 		String uri = tableConfig.getUri();
@@ -38,7 +39,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		view.configure(tableConfig);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}
@@ -51,13 +51,14 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	@Override
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
-		view.checkParams();
-		descriptor.clear();
+		String queryString = view.getQueryString();
+		if (!DisplayUtils.isDefined(queryString)) {
+			throw new IllegalArgumentException("A query is required.");
+		}
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, ClientProperties.QUERY_SERVICE_PREFIX + URL.encodeQueryString(view.getQueryString()));
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
 		List<APITableColumnConfig> configs = view.getConfigs();
 		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, configs);
 	}
@@ -65,16 +66,6 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	private void updateDescriptor(String key, String value) {
 		if (value != null && value.trim().length() > 0)
 			descriptor.put(key, value);
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
-	
-	@Override
-	public int getAdditionalWidth() {
-		return view.getAdditionalWidth();
 	}
 	
 	@Override

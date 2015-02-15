@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -20,40 +16,44 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	public void open(String url);
 	
-	public Widget asWidget(String jiraFlagLink,
-			boolean isAnonymous, 
-			boolean hasAdministrativeAccess,
-			Callback loginCallback, 
-			RESTRICTION_LEVEL restrictionLevel,
-			ClickHandler aboutLinkClickHandler,
-			boolean showFlagLink, 
-			boolean showChangeLink);
-	
-	public void showAccessRequirement(
-			 RESTRICTION_LEVEL restrictionLevel, 
-			 APPROVAL_TYPE approvalType,
-			 boolean isAnonymous,
-			 boolean hasAdministrativeAccess,
-			 boolean hasFulfilledAccessRequirements,
-			 IconsImageBundle iconsImageBundle,
-			 String accessRequirementText,  
-			 Callback imposeRestrictionsCallback, 
-			 Callback touAcceptanceCallback, 
-			 Callback requestACTCallback,
-			 Callback loginCallback,
-			 String jiraFlagLink,
-			 Callback showNextRestrictionCallback);
 	/**
 	 * If user indicates that data is sensitive, then view will invoke callback to lockdown the current entity 
 	 * @param imposeRestrictionsCallback
 	 */
-	public void showVerifyDataSensitiveDialog(Callback imposeRestrictionsCallback);
+	public void showVerifyDataSensitiveDialog();
+	
+	void showControlledUseUI();
+	void showUnmetRequirementsIcon();
+	void showMetRequirementsIcon();
+	
+	void showNoRestrictionsUI();
+	void showFlagUI();
+	void showAnonymousFlagUI();
+	void showChangeLink(ClickHandler changeLinkClickHandler);
+	void showShowLink(ClickHandler showLinkClickHandler);
+	
+	void showFlagModal();
+	void showAnonymousFlagModal();
+	void setAccessRequirementDialog(Widget dialog);
+	
+	void setImposeRestrictionOkButtonEnabled(boolean enable);
+	void setNotSensitiveHumanDataMessageVisible(boolean visible);
+	Boolean isYesHumanDataRadioSelected();
+	Boolean isNoHumanDataRadioSelected();
+	
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
+		void flagData();
+		void anonymousFlagModalOkClicked();
+		void reportIssueClicked();
+		void anonymousReportIssueClicked();
+		void imposeRestrictionClicked();
+		
+		void yesHumanDataClicked();
+		void notHumanDataClicked();
 	}
 
 }

@@ -9,12 +9,9 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,7 +23,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer implements SharingAndDataUseConditionWidgetView {
+public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implements SharingAndDataUseConditionWidgetView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
@@ -107,17 +104,13 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		container.add(sharingDescriptionContainer);
 		
 		container.add(new InlineHTML("<br><h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE +"</h5>"));
-		restrictionWidget.configure(bundle, showChangeLink, true, false, new com.google.gwt.core.client.Callback<Void, Throwable>() {
+		restrictionWidget.configure(bundle, showChangeLink, true, false, new Callback() {
 			@Override
-			public void onSuccess(Void result) {
+			public void invoke() {
 				presenter.entityUpdated();
 			}
-			
-			@Override
-			public void onFailure(Throwable reason) {
-				showErrorMessage(reason.getMessage());
-			}
 		});
+		
 		Widget widget = restrictionWidget.asWidget();
 		if (widget != null) {
 			widget.addStyleName("margin-top-left-10");
@@ -144,10 +137,6 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void clear() {
 	}
 
 	@Override

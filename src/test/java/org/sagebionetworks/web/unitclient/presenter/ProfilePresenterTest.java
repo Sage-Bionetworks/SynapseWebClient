@@ -1,8 +1,18 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,9 +25,20 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -28,10 +49,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -42,16 +61,15 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
+import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
-import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -161,6 +179,7 @@ public class ProfilePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(myFavoritesJson).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 		
@@ -268,6 +287,9 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
+		
+		//by default, it should load ALL projects for the current user
+		assertEquals(ProjectFilterEnum.ALL, profilePresenter.getFilterType());
 	}
 	
 	@Test
@@ -302,11 +324,161 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
-	public void testGetMoreOfMyProjects() {
+	public void testGetAllMyProjects() {
 		profilePresenter.setIsOwner(true);
-		//when asking for more projects, it should get MyProjects if I am the owner
-		profilePresenter.getMoreProjects();
+		//when setting the filter to all, it should ask for all of my projects
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setAllProjectsFilterSelected();
+		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(eq(myProjects));
+	}
+	
+	@Test
+	public void testGetProjectsCreatedByMe() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		
+		EntityQueryResults results = new EntityQueryResults();
+		results.setTotalEntityCount(222L);
+		List<EntityQueryResult> resultList = new ArrayList<EntityQueryResult>();
+		results.setEntities(resultList);
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		
+		//when setting the filter to my projects, it should query for projects created by me
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).showProjectFiltersUI();
+		verify(mockView).setMyProjectsFilterSelected();
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockView).addProjects(anyList());
+	}
+	
+
+	@Test
+	public void testGetFavorites() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).showProjectFiltersUI();
+		verify(mockView).setFavoritesFilterSelected();
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(anyList());
+	}
+	
+	@Test
+	public void testGetFavoritesEmpty() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		myFavorites.clear();
+		myFavoritesJson.clear();
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).setFavoritesFilterSelected();
+		verify(mockView).setFavoritesHelpPanelVisible(true);
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView, never()).addProjects(anyList());
+	}
+
+	
+	@Test
+	public void testGetProjectsByTeam() {
+		profilePresenter.setIsOwner(true);
+		Team testTeam = new Team();
+		String teamId = "39448";
+		testTeam.setId(teamId);
+		
+		//when setting the filter to all, it should ask for all of my projects
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, testTeam);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).showProjectFiltersUI();
+		verify(mockView).setTeamsFilterSelected();
+		verify(mockSynapseClient).getProjectsForTeam(eq(teamId), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(eq(myProjects));
+	}
+	
+	@Test
+	public void testGetProjectsByTeamFailure() {
+		profilePresenter.setIsOwner(true);
+		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.TEAM, new Team());
+		verify(mockView).setProjectsError(anyString());
+	}
+	
+	@Test
+	public void testGetProjectCreatedByMeFailure() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("111");
+		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
+		verify(mockView).setProjectsError(anyString());
+	}
+	
+	@Test
+	public void testApplyFilterClickedAll() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
+		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testApplyFilterClickedMine() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("007");
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testApplyFilterClickedFavorites() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("007");
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testCreateProjectQuery(){
+		String creatorId = "5575";
+		Long limit = 5L;
+		Long offset = 22L;
+		EntityQuery query = profilePresenter.createGetProjectsQuery(creatorId, limit, offset);
+		assertNotNull(query);
+		assertNotNull(query.getConditions());
+		assertEquals(1, (query.getConditions().size()));
+		Condition expectedCondition = EntityQueryUtils.buildCondition(EntityFieldName.createdByPrincipalId, Operator.EQUALS, creatorId);
+		assertEquals(expectedCondition, query.getConditions().get(0));
+		assertEquals(EntityType.project, query.getFilterByType());
+		assertEquals(offset, query.getOffset());
+		assertEquals(limit, query.getLimit());
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
+		assertEquals(sort, query.getSort());
+	}
+	
+	@Test
+	public void testGetHeadersFromQueryResults() {
+		EntityQueryResults testResults = new EntityQueryResults();
+		EntityQueryResult result1 = new EntityQueryResult();
+		String id1 = "38383";
+		String name1 = "hello project";
+		result1.setId(id1);
+		result1.setName(name1);
+		List<EntityQueryResult> resultList = new ArrayList<EntityQueryResult>();
+		resultList.add(result1);
+		testResults.setEntities(resultList);
+		List<ProjectHeader> projectHeaders = profilePresenter.getHeadersFromQueryResults(testResults);
+		assertEquals(1, projectHeaders.size());
+		ProjectHeader header1 = projectHeaders.get(0);
+		assertEquals(id1, header1.getId());
+		assertEquals(name1, header1.getName());
 	}
 	
 	@Test
@@ -317,24 +489,18 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
-	@Test
-	public void testGetMyProjects() {
-		profilePresenter.getMyProjects("anyUserId", 1);
-		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects));
-	}
 	
 	@Test
 	public void testGetMyProjectsError() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(anyInt(), anyInt(),  any(AsyncCallback.class));
-		profilePresenter.getMyProjects("anyUserId", 1);
+		profilePresenter.getAllMyProjects(1);
 		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setProjectsError(anyString());
 	}
 	
 	@Test
 	public void testGetUserProjects() {
-		profilePresenter.getUserProjects("anyUserId", 1);
+		profilePresenter.getUserProjects(1);
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
 	}
@@ -342,7 +508,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testGetUserProjectsError() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(),  any(AsyncCallback.class));
-		profilePresenter.getUserProjects("anyUserId", 1);
+		profilePresenter.getUserProjects(1);
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setProjectsError(anyString());
 	}
@@ -548,20 +714,6 @@ public class ProfilePresenterTest {
 		verify(mockView).setTeamsError(errorMessage);
 	}
 	
-	@Test
-	public void testGetFavorites() {
-		profilePresenter.getFavorites();
-		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setFavorites(eq(myFavorites));
-	}
-	
-	@Test
-	public void testGetFavoritesError() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
-		profilePresenter.getFavorites();
-		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setFavoritesError(anyString());
-	}
 	
 	
 	@Test
@@ -599,7 +751,7 @@ public class ProfilePresenterTest {
 		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Profile capturedPlace = captor.getValue();
-		assertNull(capturedPlace.getArea());
+		assertEquals(ProfileArea.PROJECTS, capturedPlace.getArea());
 		assertEquals(testUserId, capturedPlace.getUserId());
 	}
 	@Test
@@ -677,7 +829,8 @@ public class ProfilePresenterTest {
 	@Test
 	public void testTabClickedDefault(){
 		profilePresenter.tabClicked(null);
-		verify(mockView).setTabSelected(eq(ProfileArea.PROJECTS));
+		verify(mockView).showErrorMessage(anyString());
+		verify(mockView, never()).setTabSelected(any(ProfileArea.class));
 	}
 	
 	@Test
@@ -707,4 +860,21 @@ public class ProfilePresenterTest {
 		profilePresenter.certificationBadgeClicked();
 		verify(mockPlaceChanger).goTo(any(Certificate.class));
 	}
+	
+	@Test
+	public void testUpdateArea() {
+		profilePresenter.setPlace(place);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		profilePresenter.updateArea(ProfileArea.CHALLENGES);
+		verify(mockPlaceChanger).goTo(any(Profile.class));
+	}
+
+	@Test
+	public void testUpdateAreaNoChange() {
+		profilePresenter.setPlace(place);
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
+		profilePresenter.updateArea(ProfileArea.PROJECTS);
+		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
+	}
+	
 }
