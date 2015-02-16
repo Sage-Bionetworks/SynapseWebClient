@@ -95,6 +95,9 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/spotlight/Olfaction_Prediction_banner.jpg")
 	ImageResource dreamOP();
 	
+	@Source("images/spotlight/AMP-AD-banner.jpg")
+	ImageResource ampAd();
+	
 	@Source("images/spotlight/Project_datasphere_banner.jpg")
 	ImageResource dreamPDS();
 	
