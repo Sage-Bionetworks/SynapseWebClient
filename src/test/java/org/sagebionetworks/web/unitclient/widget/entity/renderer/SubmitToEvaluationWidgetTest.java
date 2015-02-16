@@ -24,7 +24,9 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -47,13 +49,14 @@ public class SubmitToEvaluationWidgetTest {
 	private static final String EVAL_ID_2 = "2";
 	
 	SubmitToEvaluationWidgetView mockView;
-	SynapseClientAsync mockSynapseClient;
+	ChallengeClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	EvaluationSubmitter mockEvaluationSubmitter;
+	PortalGinInjector mockPortalGinInjector;
 	SubmitToEvaluationWidget widget;
 	Set<String> targetEvaluations;
 	ArrayList<Evaluation> evaluationList;
@@ -63,14 +66,16 @@ public class SubmitToEvaluationWidgetTest {
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		mockView = mock(SubmitToEvaluationWidgetView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockSynapseClient = mock(ChallengeClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
+		mockPortalGinInjector = mock(PortalGinInjector.class);
+		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockEvaluationSubmitter);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		widget = new SubmitToEvaluationWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, mockEvaluationSubmitter);
+		widget = new SubmitToEvaluationWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, mockPortalGinInjector);
 		verify(mockView).setPresenter(widget);
 		targetEvaluations = new HashSet<String>();
 		

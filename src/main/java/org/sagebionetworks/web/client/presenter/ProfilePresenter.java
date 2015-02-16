@@ -612,6 +612,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * Exposed for unit testing purposes only
 	 * @return
 	 */
+	public int getCurrentChallengeOffset() {
+		return currentChallengeOffset;
+	}
+	
+	/**
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
 	public boolean isOwner() {
 		return isOwner;
 	}

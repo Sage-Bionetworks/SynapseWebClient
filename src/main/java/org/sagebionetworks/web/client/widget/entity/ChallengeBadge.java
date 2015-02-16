@@ -40,11 +40,19 @@ public class ChallengeBadge implements ChallengeBadgeView.Presenter, SynapseWidg
 	
 	@Override
 	public void onClick() {
-		globalAppState.getPlaceChanger().goTo(new Synapse(challenge.getChallenge().getProjectId()));
+		if (challenge.getChallenge() != null && challenge.getChallenge().getProjectId() != null)
+			globalAppState.getPlaceChanger().goTo(new Synapse(challenge.getChallenge().getProjectId()));
+		else {
+			view.showErrorMessage("Challenge project is not set.");
+		}
 	}
 	
 	@Override
 	public void onParticipantsClick() {
-		globalAppState.getPlaceChanger().goTo(new Team(challenge.getChallenge().getParticipantTeamId()));
+		if (challenge.getChallenge() != null && challenge.getChallenge().getParticipantTeamId() != null)
+			globalAppState.getPlaceChanger().goTo(new Team(challenge.getChallenge().getParticipantTeamId()));
+		else {
+			view.showErrorMessage("Challenge participant team is not set.");
+		}
 	}
 }

@@ -55,6 +55,8 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.BatchResults;
+import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -72,6 +74,7 @@ import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -131,10 +134,13 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.ChallengeTeamBundle;
+import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -179,6 +185,11 @@ public class ChallengeClientImplTest {
 	MembershipInvtnSubmission testInvitation;
 	MessageToUser sentMessage;
 	
+	private static final String testChallengeId = "1";
+	private static final String testTeam1 = "3322410";
+	private static final String testTeam2 = "3319267";
+	private static final String testChallengeProject = "syn2290704";
+
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
@@ -320,16 +331,16 @@ public class ChallengeClientImplTest {
 		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
 		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 	}
-	
-	@Test
-	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		Submission inputSubmission = new Submission();
-		inputSubmission.setId("my submission id");
-		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
-		Submission returnSubmission = synapseClient.createSubmission(inputSubmission, "fakeEtag");
-		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
-		assertEquals(inputSubmission, returnSubmission);
-	}
+//	
+//	@Test
+//	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+//		Submission inputSubmission = new Submission();
+//		inputSubmission.setId("my submission id");
+//		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
+//		Submission returnSubmission = synapseClient.createSubmission(inputSubmission, "fakeEtag");
+//		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
+//		assertEquals(inputSubmission, returnSubmission);
+//	}
 	
 	private void setupTestSubmitterAliases() throws SynapseException{
 		//set up 2 available evaluations
@@ -436,4 +447,87 @@ public class ChallengeClientImplTest {
 		testValue--;
 		SynapseClientImpl.safeLongToInt(testValue);
 	}
+	
+	
+	/************************************
+	 * Helper test methods for object creation
+	 */
+
+	public static Challenge getTestChallenge() {
+		Challenge c = new Challenge();
+		c.setId(testChallengeId);
+		c.setParticipantTeamId(testTeam1);
+		c.setProjectId(testChallengeProject);
+		return c;
+	}
+	public static ChallengeTeam getTestChallengeTeam(String message, String teamId) {
+		ChallengeTeam ct = new ChallengeTeam();
+		ct.setChallengeId(testChallengeId);
+		ct.setMessage(message);
+		ct.setTeamId(teamId);
+		return ct;
+	}
+	public static ChallengeTeamPagedResults getTestChallengeTeamPagedResults(){
+		ChallengeTeamPagedResults results = new ChallengeTeamPagedResults();
+		ChallengeTeamBundle bundle1 = new ChallengeTeamBundle(getTestChallengeTeam("join the first team", testTeam1), true);
+		ChallengeTeamBundle bundle2 = new ChallengeTeamBundle(getTestChallengeTeam("join the second team", testTeam2), false);
+		List<ChallengeTeamBundle> resultList = new ArrayList<ChallengeTeamBundle>();
+		resultList.add(bundle1);
+		resultList.add(bundle2);
+		results.setResults(resultList);
+		results.setTotalNumberOfResults(4L);
+		return results;
+	}
+	
+	public static ChallengeTeamPagedResults getTestChallengeTeamPagedEmptyResults(){
+		ChallengeTeamPagedResults results = new ChallengeTeamPagedResults();
+		List<ChallengeTeamBundle> resultList = new ArrayList<ChallengeTeamBundle>();
+		results.setResults(resultList);
+		results.setTotalNumberOfResults(0L);
+		return results;
+	}
+
+	
+	public static UserProfilePagedResults getTestUserProfilePagedResults(org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException{
+		UserProfilePagedResults results = new UserProfilePagedResults();
+		UserProfile profile1 = synapseClient.getUserProfile("1418535");
+		UserProfile profile2 = synapseClient.getUserProfile("1118328");
+		List<UserProfile> resultList = new ArrayList<UserProfile>();
+		resultList.add(profile1);
+		resultList.add(profile2);
+		results.setResults(resultList);
+		results.setTotalNumberOfResults(4L);
+		return results;
+	}
+	
+	public static UserProfilePagedResults getTestUserProfilePagedEmptyResults(org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException{
+		UserProfilePagedResults results = new UserProfilePagedResults();
+		List<UserProfile> resultList = new ArrayList<UserProfile>();
+		results.setResults(resultList);
+		results.setTotalNumberOfResults(0L);
+		return results;
+	}
+
+	
+	public static org.sagebionetworks.repo.model.ChallengePagedResults getTestChallengePagedResults() {
+		org.sagebionetworks.repo.model.ChallengePagedResults results = new org.sagebionetworks.repo.model.ChallengePagedResults();
+		List<Challenge> challangeList = new ArrayList<Challenge>();
+		challangeList.add(getTestChallenge());
+		results.setResults(challangeList);
+		results.setTotalNumberOfResults(1L);
+		return results;
+	}
+	
+	public static PaginatedIds getTestRegisteredTeams(){
+		PaginatedIds ids = new PaginatedIds();
+		List<String> idlist = new ArrayList<String>();
+		idlist.add(testTeam1);
+		idlist.add(testTeam2);
+		ids.setResults(idlist);
+		ids.setTotalNumberOfResults(2L);
+		return ids;
+	}
+	/************
+	 * 	
+	 */
 }

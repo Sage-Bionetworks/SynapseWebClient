@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,5 +53,9 @@ public class ChallengeBadgeViewImpl implements ChallengeBadgeView {
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }
