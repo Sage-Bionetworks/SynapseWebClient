@@ -252,31 +252,32 @@ public class EvaluationSubmitter implements Presenter {
 			//TODO: get contributor list for this team
 //			challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
 //				@Override
-//				public void onSuccess(TeamSubmissionEligibility teamState) {
+//				public void onSuccess(TeamSubmissionEligibility teamEligibility) {
 //					//is the team eligible???
-//					if (!teamState.isEligible()) {
+//					if (!teamEligibility.isEligible()) {
 //						//show the error
 //						String reason = ""; //unknown reason
-//						if (!teamState.isRegistered()) {
+//						if (!teamEligibility.isRegistered()) {
 //							reason = selectedTeam.getName() + " is not registered for this challenge. Please register this team, or select a different team.";
-//						} else if (teamState.isQuotaFilled) {
+//						} else if (teamEligibility.isQuotaFilled()) {
 //							reason = selectedTeam.getName() + " has exceeded the submission quota.";
 //						}
-//						view.setTeamInEligibleErrorVisible(true, reason);
 //					} else {
-//						selectedTeamMemberStateHash = teamState.getMemberStateHash();
-//						for (MemberSubmissionEligibility memberState : teamState.getTeamMemberEligibilityList()) {
-//							if (memberState.isEligible()) {
-//								selectedTeamEligibleMembers.add(memberState.getPrincipalId());
-//								view.addEligibleContributor(memberState.getPrincipalId());
+//						selectedTeamMemberStateHash = teamEligibility.getMemberStateHash();
+//						for (MemberSubmissionEligibility memberEligibility : teamEligibility.getTeamMemberEligibilityList()) {
+//							if (memberEligibility.isEligible()) {
+//								selectedTeamEligibleMembers.add(memberEligibility.getPrincipalId());
+//								view.addEligibleContributor(memberEligibility.getPrincipalId());
 //							} else {
 //								String reason = ""; //unknown reason
-//								if (!memberState.isRegistered()) {
+//								if (!memberEligibility.isRegistered()) {
 //									reason = "Not registered for the challenge.";
-//								} else if (memberState.isQuotaFilled) {
+//								} else if (memberEligibility.isQuotaFilled()) {
 //									reason = "Exceeded the submission quota.";
+//								} else if (memberEligibility.hasConflictingSubmission()) {
+//									reason = "Has a conflicting submission.";
 //								}
-//								view.addInEligibleContributor(memberState.getPrincipalId(), reason);
+//								view.addInEligibleContributor(memberEligibility.getPrincipalId(), reason);
 //							}
 //						}
 //						view.setContributorsListVisible(true);
