@@ -79,7 +79,9 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 							DisplayUtils.replaceWithEmptyStringIfNull(challenge.getChallengeTeam().getMessage()), 
 							challenge.isAdmin());
 					}
-				} 
+				} else {
+					view.showNoTeams();
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {

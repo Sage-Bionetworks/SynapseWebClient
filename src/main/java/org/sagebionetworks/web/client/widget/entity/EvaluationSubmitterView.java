@@ -22,18 +22,20 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void addInEligibleContributor(String principalId, String reason);
 	void setTeamInEligibleErrorVisible(boolean isVisible, String error);
 	void clearContributors();
-	void setTeams(List<Team> registeredTeams);
 	void showRegisterTeamDialog(String challengeId);
 	void setTeamComboBoxEnabled(boolean isEnabled);
+	void showEmptyTeams();
+	void clearTeams();
+	void showTeams(List<Team> registeredTeams);
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation
-		void nextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
-		void doneClicked();
-		void teamSelected(String teamName);
+		void onNextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
+		void onDoneClicked();
+		void onTeamSelected(String teamName);
 		void teamAdded();
-		void registerMyTeamLinkClicked();
-		void createNewTeamClicked();
-		void individualSubmissionOptionClicked();
-		void teamSubmissionOptionClicked();
+		void onRegisterTeamClicked();
+		void onNewTeamClicked();
+		void onIndividualSubmissionOptionClicked();
+		void onTeamSubmissionOptionClicked();
 	}
 }

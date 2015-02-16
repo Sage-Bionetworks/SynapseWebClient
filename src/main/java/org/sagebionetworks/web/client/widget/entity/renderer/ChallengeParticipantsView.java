@@ -17,6 +17,7 @@ public interface ChallengeParticipantsView extends IsWidget, SynapseView {
 	void setPaginationWidget(Widget paginationWidget);
 	void clearParticipants();
 	void addParticipant(UserProfile profile);
+	void showNoParticipants();
 	void hideErrors();
 	void hideLoading();
 	

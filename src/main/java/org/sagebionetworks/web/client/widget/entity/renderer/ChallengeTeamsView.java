@@ -21,6 +21,7 @@ public interface ChallengeTeamsView extends IsWidget, SynapseView {
 	void setEditRegisteredTeamDialog(Widget dialogWidget);
 	void clearTeams();
 	void addChallengeTeam(String teamId, String message, boolean showEditButton);
+	void showNoTeams();
 	void hideErrors();
 	void hideLoading();
 	

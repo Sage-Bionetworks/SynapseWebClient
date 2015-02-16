@@ -80,6 +80,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Anchor createNewTeamLink;
 	@UiField
 	Paragraph teamIneligibleHtml;
+	@UiField
+	Paragraph noTeamsFoundUI;
 	
 	private PortalGinInjector ginInjector;
 	private RegisterTeamDialog registerTeamDialog;
@@ -116,7 +118,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 							return;
 						}
 					}
-					presenter.nextClicked(selectedReference, submissionNameField.getValue(), evaluation);
+					presenter.onNextClicked(selectedReference, submissionNameField.getValue(), evaluation);
 				} else {
 					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
 				}
@@ -126,7 +128,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.doneClicked();
+				presenter.onDoneClicked();
 			}
 		});
 		
@@ -153,26 +155,26 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		registerMyTeamLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.registerMyTeamLinkClicked();
+				presenter.onRegisterTeamClicked();
 			}
 		});
 		
 		createNewTeamLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.createNewTeamClicked();
+				presenter.onNewTeamClicked();
 			}
 		});
 		isIndividualRadioButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.individualSubmissionOptionClicked();
+				presenter.onIndividualSubmissionOptionClicked();
 			}
 		});
 		isTeamRadioButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.teamSubmissionOptionClicked();
+				presenter.onTeamSubmissionOptionClicked();
 			}
 		});
 	}
@@ -230,28 +232,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void hideModal1() {
 		modal1.hide();	
-	}
-	
-	@Override
-	public void setTeams(List<Team> registeredTeams) {
-		teamComboBoxContainer.clear();
-		
-		teamComboBox = new Select();
-		teamComboBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.teamSelected(teamComboBox.getValue());
-			}
-		});
-		
-		isIndividualRadioButton.setActive(true);
-		
-		for (Team teamHeader : registeredTeams) {
-			Option teamOption = new Option();
-			teamOption.setText(teamHeader.getName());
-			teamComboBox.add(teamOption);
-		}
-		teamComboBoxContainer.add(teamComboBox);
 	}
 	
 	@Override
@@ -318,5 +298,36 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void setTeamComboBoxEnabled(boolean isEnabled) {
 		teamComboBox.setEnabled(isEnabled);
+	}
+	
+	@Override
+	public void clearTeams() {
+		teamComboBoxContainer.clear();
+		teamComboBox = new Select();
+	}
+	
+	@Override
+	public void showEmptyTeams() {
+		noTeamsFoundUI.setVisible(true);
+	}
+	
+	@Override
+	public void showTeams(List<Team> registeredTeams) {
+		noTeamsFoundUI.setVisible(false);
+		teamComboBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.onTeamSelected(teamComboBox.getValue());
+			}
+		});
+		
+		isIndividualRadioButton.setActive(true);
+		
+		for (Team teamHeader : registeredTeams) {
+			Option teamOption = new Option();
+			teamOption.setText(teamHeader.getName());
+			teamComboBox.add(teamOption);
+		}
+		teamComboBoxContainer.add(teamComboBox);
 	}
 }

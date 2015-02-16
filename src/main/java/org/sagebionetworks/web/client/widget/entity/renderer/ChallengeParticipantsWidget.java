@@ -74,7 +74,9 @@ public class ChallengeParticipantsWidget implements ChallengeParticipantsView.Pr
 					for (UserProfile userProfile : results.getResults()) {
 						view.addParticipant(userProfile);
 					}
-				} 
+				} else {
+					view.showNoParticipants();
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -21,14 +21,11 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.IdList;
-import org.sagebionetworks.repo.model.ListWrapper;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -145,11 +142,6 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	/*
 	 * ChallengeClient Service Methods
 	 */
-	
-	private org.sagebionetworks.client.SynapseClient createAnonymousSynapseClient() {
-		return createSynapseClient(null);
-	}
-	
 	private org.sagebionetworks.client.SynapseClient createSynapseClient() {
 		return createSynapseClient(tokenProvider.getSessionToken());
 	}
@@ -399,9 +391,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	public List<Team> getSubmissionTeams(String userId, String challengeId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//TODO: use new listSubmissionTeams
-			PaginatedIds results = getTestRegisteredTeams();
-//			PaginatedIds results = synapseClient.listSubmissionTeams(challengeId, userId, GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET);
+			PaginatedIds results = synapseClient.listSubmissionTeams(challengeId, userId, GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET);
 			return getTeams(results.getResults(), synapseClient);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -448,6 +438,15 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		return results;
 	}
 	
+	private static ChallengeTeamPagedResults getTestChallengeTeamPagedEmptyResults(){
+		ChallengeTeamPagedResults results = new ChallengeTeamPagedResults();
+		List<ChallengeTeamBundle> resultList = new ArrayList<ChallengeTeamBundle>();
+		results.setResults(resultList);
+		results.setTotalNumberOfResults(0L);
+		return results;
+	}
+
+	
 	private static UserProfilePagedResults getTestUserProfilePagedResults(org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException{
 		UserProfilePagedResults results = new UserProfilePagedResults();
 		UserProfile profile1 = synapseClient.getUserProfile("1418535");
@@ -459,6 +458,15 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		results.setTotalNumberOfResults(4L);
 		return results;
 	}
+	
+	private static UserProfilePagedResults getTestUserProfilePagedEmptyResults(org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException{
+		UserProfilePagedResults results = new UserProfilePagedResults();
+		List<UserProfile> resultList = new ArrayList<UserProfile>();
+		results.setResults(resultList);
+		results.setTotalNumberOfResults(0L);
+		return results;
+	}
+
 	
 	private static org.sagebionetworks.repo.model.ChallengePagedResults getTestChallengePagedResults() {
 		org.sagebionetworks.repo.model.ChallengePagedResults results = new org.sagebionetworks.repo.model.ChallengePagedResults();
@@ -493,7 +501,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	public void unregisterChallengeTeam(String challengeId, String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.deleteChallengeTeam(Long.parseLong(challengeId), Long.parseLong(teamId));
+			synapseClient.deleteChallengeTeam(challengeId, teamId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -512,7 +520,9 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	@Override
 	public ChallengeTeamPagedResults getChallengeTeams(String currentUserId, String challengeId, Integer limit, Integer offset)
 			throws RestServiceException {
+//		return getTestChallengeTeamPagedEmptyResults();
 		return getTestChallengeTeamPagedResults();
+		
 		//TODO: use service
 //		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 //		try {
@@ -543,6 +553,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//			return getTestUserProfilePagedEmptyResults(synapseClient);
 			return getTestUserProfilePagedResults(synapseClient);
 			//TODO: use service
 //			PaginatedIds paginatedIds = synapseClient.listChallengeParticipants(Long.parseLong(challengeId), affiliated, limit.longValue(), offset.longValue());

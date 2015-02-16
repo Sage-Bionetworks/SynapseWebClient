@@ -7,6 +7,8 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -20,19 +22,19 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	private String selectedTeamId;
 	private List<Team> teams;
 	private ChallengeClientAsync challengeClient;
-	private GlobalApplicationState globalAppState;
-	private AuthenticationController authController;
+	private GlobalApplicationState globalApplicationState;
+	private AuthenticationController authenticationController;
 	private Callback callback;
 	
 	@Inject
 	public RegisterTeamDialog(RegisterTeamDialogView view, 
 			ChallengeClientAsync challengeClient,
-			GlobalApplicationState globalAppState,
-			AuthenticationController authController) {
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		this.view = view;
 		this.challengeClient = challengeClient;
-		this.globalAppState = globalAppState;
-		this.authController = authController;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
 		
 		view.setRecruitmentMessage("");
 		view.setPresenter(this);
@@ -62,11 +64,18 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 			@Override
 			public void onSuccess(List<Team> result) {
 				teams = result;
-				view.setTeams(teams);
+				//if there is a team, then select the first team by default.  otherwise, show no teams visible ui
+				if (teams.isEmpty()) {
+					view.setNoTeamsFoundVisible(true);
+				} else {
+					view.setNoTeamsFoundVisible(false);
+					view.setTeams(teams);	
+					selectedTeamId = teams.get(0).getId();
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});
@@ -97,10 +106,20 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(caught.getMessage());
 				}
 			});
+		}
+	}
+	
+	@Override
+	public void onNewTeamClicked() {
+		//go to user profile page, team tab
+		if (authenticationController.isLoggedIn())
+			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.TEAMS_DELIMITER));
+		else {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
 	

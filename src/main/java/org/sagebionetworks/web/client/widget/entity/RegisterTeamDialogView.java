@@ -18,12 +18,13 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	void setTeams(List<Team> teams);
 	void showModal();
 	void hideModal();
-	
+	void setNoTeamsFoundVisible(boolean isVisible);
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void teamSelected(String teamName);
 		void onOk();
+		void onNewTeamClicked();
 	}
 }

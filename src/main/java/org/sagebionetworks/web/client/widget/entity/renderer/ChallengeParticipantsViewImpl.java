@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -70,6 +72,10 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 		participantsContainer.add(userBadgeContainer);
 	}
 
+	@Override
+	public void showNoParticipants() {
+		participantsContainer.add(new Paragraph(DisplayConstants.EMPTY));
+	}
 	@Override
 	public void setPaginationWidget(Widget paginationWidget) {
 		paginationWidgetContainer.clear();

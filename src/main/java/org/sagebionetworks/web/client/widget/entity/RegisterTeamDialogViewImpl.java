@@ -2,11 +2,13 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
@@ -36,6 +38,10 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	Button cancelButton;
 	@UiField
 	Div teamComboBoxContainer;
+	@UiField
+	Anchor createNewTeamLink;
+	@UiField
+	Paragraph noTeamsFoundUI;
 	
 	Modal modal;
 	Select teamComboBox;
@@ -54,6 +60,12 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
+			}
+		});
+		createNewTeamLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onNewTeamClicked();
 			}
 		});
 	}
@@ -108,6 +120,11 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	@Override
+	public void setNoTeamsFoundVisible(boolean isVisible) {
+		noTeamsFoundUI.setVisible(isVisible);
 	}
 	
 	/*

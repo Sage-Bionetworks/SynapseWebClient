@@ -50,6 +50,7 @@
 					<bh:Div ui:field="teamComboBoxContainer" />
 					<bh:Div addStyleNames="highlight-box" ui:field="contributorsPanel" visible="false"/>
 					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
+					<bh:Paragraph emphasis="WARNING" ui:field="noTeamsFoundUI" visible="false">No registered teams found</bh:Paragraph>
 				</b:FieldSet>
 				<bh:Div>
 					<b:Anchor ui:field="createNewTeamLink" text="Create a new team"/>
@@ -57,12 +58,12 @@
 				<bh:Div>
 					<b:Anchor ui:field="registerMyTeamLink" text="Register my team for this challenge"/>
 				</bh:Div>
-				<g:SimplePanel ui:field="registerTeamDialogContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="okButton" type="PRIMARY">Submit</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
+		<g:SimplePanel ui:field="registerTeamDialogContainer" />
 	</g:FlowPanel>
 </ui:UiBinder>

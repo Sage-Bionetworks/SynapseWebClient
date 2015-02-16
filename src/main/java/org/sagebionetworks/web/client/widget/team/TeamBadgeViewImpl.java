@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
@@ -95,7 +96,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		clear();
 		notificationsPanel.clear();
 		
-		Label nameLabel = new Label(name);
+		InlineLabel nameLabel = new InlineLabel(name);
 		nameLabel.addStyleName("font-size-13 boldText");
 		
 		HTML profilePicture;
@@ -106,7 +107,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		} else {
 			profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before margin-right-5"));
 		}
-		profilePicture.addStyleName("displayInline");
+		profilePicture.addStyleName("displayInline margin-right-5");
 		add(profilePicture);
 			
 		add(nameLabel);

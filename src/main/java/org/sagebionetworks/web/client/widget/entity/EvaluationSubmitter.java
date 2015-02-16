@@ -93,13 +93,13 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	@Override
-	public void individualSubmissionOptionClicked() {
+	public void onIndividualSubmissionOptionClicked() {
 		isIndividualSubmission = true;
 		view.setTeamComboBoxEnabled(false);
 	}
 	
 	@Override
-	public void teamSubmissionOptionClicked() {
+	public void onTeamSubmissionOptionClicked() {
 		isIndividualSubmission = false;
 		view.setTeamComboBoxEnabled(true);
 	}
@@ -133,7 +133,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 		
 	@Override
-	public void nextClicked(Reference selectedReference, String submissionName, Evaluation evaluation) {
+	public void onNextClicked(Reference selectedReference, String submissionName, Evaluation evaluation) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
 		submissionEntityVersion = null;
 		if (submissionEntity != null) {
@@ -152,7 +152,7 @@ public class EvaluationSubmitter implements Presenter {
 		view.hideModal1();
 		if (evaluation.getContentSource() == null) {
 			//no need to show second page, this is a submission to a non-challenge eval queue.
-			doneClicked();
+			onDoneClicked();
 		} else {
 			queryForChallenge();
 		}
@@ -183,7 +183,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	@Override
-	public void createNewTeamClicked() {
+	public void onNewTeamClicked() {
 		if (authenticationController.isLoggedIn())
 			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.TEAMS_DELIMITER));
 		else {
@@ -192,7 +192,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	@Override
-	public void registerMyTeamLinkClicked() {
+	public void onRegisterTeamClicked() {
 		view.showRegisterTeamDialog(challenge.getId());
 	}
 	
@@ -200,13 +200,17 @@ public class EvaluationSubmitter implements Presenter {
 		return new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> results) {
+				view.clearTeams();
 				teams = results;
-				view.setTeams(teams);
-				individualSubmissionOptionClicked();
-				if (!teams.isEmpty()) {
+				if (teams.isEmpty()) {
+					view.showEmptyTeams();
+				} else {
+					view.showTeams(teams);
 					//select the first
-					teamSelected(teams.get(0).getName());
+					onTeamSelected(teams.get(0).getName());
 				}
+				onIndividualSubmissionOptionClicked();
+				
 				view.showModal2();
 			}
 			
@@ -219,7 +223,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	@Override
-	public void doneClicked() {
+	public void onDoneClicked() {
 		if (!isIndividualSubmission) {
 			//team submission
 			if (selectedTeam == null) {
@@ -230,7 +234,7 @@ public class EvaluationSubmitter implements Presenter {
 		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion);
 	}
 	@Override
-	public void teamSelected(String selectedTeamName) {
+	public void onTeamSelected(String selectedTeamName) {
 		selectedTeam = null;
 		selectedTeamMemberStateHash = null;
 		selectedTeamEligibleMembers.clear();

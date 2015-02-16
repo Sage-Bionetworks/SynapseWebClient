@@ -5,8 +5,10 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -94,6 +96,11 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 			div.add(editButton);
 		}
 		challengeTeamsContainer.add(div);
+	}
+	
+	@Override
+	public void showNoTeams() {
+		challengeTeamsContainer.add(new Paragraph(DisplayConstants.EMPTY));
 	}
 	
 	@Override
