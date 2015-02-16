@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -18,16 +20,21 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 	private SingleButtonView view;
 	private Map<String,String> descriptor;
 	private PortalGinInjector ginInjector;
-	private AuthenticationController authController;
+	private AuthenticationController authenticationController;
+	private GlobalApplicationState globalApplicationState;
 	public static final String DEFAULT_BUTTON_TEXT = "Register a Team";
 	String challengeId;
 	Callback widgetRefreshRequired;
 	
 	@Inject
-	public RegisterChallengeTeamWidget(SingleButtonView view, PortalGinInjector ginInjector, AuthenticationController authController) {
+	public RegisterChallengeTeamWidget(SingleButtonView view, 
+			PortalGinInjector ginInjector, 
+			AuthenticationController authenticationController, 
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.ginInjector = ginInjector;
-		this.authController = authController;
+		this.authenticationController = authenticationController;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}
 	
@@ -42,13 +49,18 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		
 		view.setButtonText(buttonText);
 		descriptor = widgetDescriptor;
-		view.setButtonVisible(authController.isLoggedIn());
+		view.setButtonVisible(authenticationController.isLoggedIn());
 	}
 	
 	@Override
 	public void onClick() {
-		RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
-		dialog.configure(challengeId, widgetRefreshRequired);
+		//if logged in, then show register team dialog
+		if (authenticationController.isLoggedIn()) {
+			RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
+			dialog.configure(challengeId, widgetRefreshRequired);
+		} else {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		}
 	}
 	
 	@Override
