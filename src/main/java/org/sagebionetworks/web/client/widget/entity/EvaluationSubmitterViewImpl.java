@@ -84,24 +84,21 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Paragraph noTeamsFoundUI;
 	
 	private PortalGinInjector ginInjector;
-	private RegisterTeamDialog registerTeamDialog;
 	private Select teamComboBox;
 	@Inject
 	public EvaluationSubmitterViewImpl(
 			Binder binder, 
 			EntityFinder entityFinder, 
 			EvaluationList evaluationList, 
-			PortalGinInjector ginInjector,
-			RegisterTeamDialog registerTeamDialog) {
+			PortalGinInjector ginInjector
+			) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
-		this.registerTeamDialog = registerTeamDialog;
 		
 		contributorsPanel.getElement().setAttribute("highlight-box-title", "Contributors");
 		evaluationListContainer.setWidget(evaluationList.asWidget());
-		registerTeamDialogContainer.setWidget(registerTeamDialog.asWidget());
 		initClickHandlers();
 	}
 	
@@ -181,7 +178,11 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	@Override
 	public void showRegisterTeamDialog(String challengeId) {
-		registerTeamDialog.configure(challengeId, new Callback() {
+		registerTeamDialogContainer.clear();
+		RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
+		registerTeamDialogContainer.add(dialog.asWidget());
+		
+		dialog.configure(challengeId, new Callback() {
 			@Override
 			public void invoke() {
 				presenter.teamAdded();
