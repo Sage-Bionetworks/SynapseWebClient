@@ -75,6 +75,8 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -92,6 +94,7 @@ import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
@@ -384,9 +387,9 @@ public class SynapseClientImplTest {
 		List<ProjectHeader> projectHeaders = new ArrayList();
 		projectHeaders.add(new ProjectHeader());
 		headers.setResults(projectHeaders);
-		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsForTeam(anyLong(), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getMyProjects(any(ProjectListType.class), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsFromUser(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsForTeam(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1618,8 +1621,8 @@ public class SynapseClientImplTest {
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
-		synapseClient.getMyProjects(limit, offset);
-		verify(mockSynapse).getMyProjects(eq(limit), eq(offset));
+		synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset);
+		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
 	@Test
@@ -1629,7 +1632,7 @@ public class SynapseClientImplTest {
 		Long userId = 133l;
 		String userIdString = userId.toString();
 		synapseClient.getUserProjects(userIdString, limit, offset);
-		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
+		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
 	@Test
@@ -1639,7 +1642,7 @@ public class SynapseClientImplTest {
 		Long teamId = 144l;
 		String teamIdString = teamId.toString();
 		synapseClient.getProjectsForTeam(teamIdString, limit, offset);
-		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(limit), eq(offset));
+		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 
 	
