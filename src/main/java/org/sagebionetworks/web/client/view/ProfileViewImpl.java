@@ -366,9 +366,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		if (isOwner) {
 			//also create a link for each team in the project filters
-//			addMyParticipatedProjectsFilter();
-//			addMyTeamProjectsFilter();
-//			teamFiltersDropDownMenu.add(new SeparatorMenuItem());
+			addMyParticipatedProjectsFilter();
+			addMyTeamProjectsFilter();
+			teamFiltersDropDownMenu.add(new SeparatorMenuItem());
 			for (final Team team : teams) {
 				AnchorListItem teamFilter = new AnchorListItem(team.getName());
 				teamFilter.addClickHandler(new ClickHandler() {
