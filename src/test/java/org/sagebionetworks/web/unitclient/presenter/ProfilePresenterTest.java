@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -177,7 +178,7 @@ public class ProfilePresenterTest {
 		projects.setResults(myProjects);
 		projects.setTotalNumberOfResults(2);
 		
-		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		
@@ -332,7 +333,7 @@ public class ProfilePresenterTest {
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).setAllProjectsFilterSelected();
 		verify(mockView).showProjectFiltersUI();
-		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
 	}
 	
@@ -340,20 +341,13 @@ public class ProfilePresenterTest {
 	public void testGetProjectsCreatedByMe() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
-		
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(222L);
-		List<EntityQueryResult> resultList = new ArrayList<EntityQueryResult>();
-		results.setEntities(resultList);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		
 		//when setting the filter to my projects, it should query for projects created by me
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
 		verify(mockView).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setMyProjectsFilterSelected();
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(anyList());
 	}
 	
@@ -415,7 +409,7 @@ public class ProfilePresenterTest {
 	public void testGetProjectCreatedByMeFailure() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("111");
-		AsyncMockStubber.callFailureWith(new Exception("failed")).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(),  any(AsyncCallback.class));
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MINE, null);
 		verify(mockView).setProjectsError(anyString());
 	}
@@ -424,7 +418,7 @@ public class ProfilePresenterTest {
 	public void testApplyFilterClickedAll() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.ALL, null);
-		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -432,8 +426,25 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
+	
+	@Test
+	public void testApplyFilterClickedMyParticipatedProjects() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("007");
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testApplyFilterClickedMyTeamProjects() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("007");
+		profilePresenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_TEAM_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
+	}
+
 	
 	@Test
 	public void testApplyFilterClickedFavorites() {
@@ -443,43 +454,6 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
-	@Test
-	public void testCreateProjectQuery(){
-		String creatorId = "5575";
-		Long limit = 5L;
-		Long offset = 22L;
-		EntityQuery query = profilePresenter.createGetProjectsQuery(creatorId, limit, offset);
-		assertNotNull(query);
-		assertNotNull(query.getConditions());
-		assertEquals(1, (query.getConditions().size()));
-		Condition expectedCondition = EntityQueryUtils.buildCondition(EntityFieldName.createdByPrincipalId, Operator.EQUALS, creatorId);
-		assertEquals(expectedCondition, query.getConditions().get(0));
-		assertEquals(EntityType.project, query.getFilterByType());
-		assertEquals(offset, query.getOffset());
-		assertEquals(limit, query.getLimit());
-		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.name.name());
-		sort.setDirection(SortDirection.ASC);
-		assertEquals(sort, query.getSort());
-	}
-	
-	@Test
-	public void testGetHeadersFromQueryResults() {
-		EntityQueryResults testResults = new EntityQueryResults();
-		EntityQueryResult result1 = new EntityQueryResult();
-		String id1 = "38383";
-		String name1 = "hello project";
-		result1.setId(id1);
-		result1.setName(name1);
-		List<EntityQueryResult> resultList = new ArrayList<EntityQueryResult>();
-		resultList.add(result1);
-		testResults.setEntities(resultList);
-		List<ProjectHeader> projectHeaders = profilePresenter.getHeadersFromQueryResults(testResults);
-		assertEquals(1, projectHeaders.size());
-		ProjectHeader header1 = projectHeaders.get(0);
-		assertEquals(id1, header1.getId());
-		assertEquals(name1, header1.getName());
-	}
 	
 	@Test
 	public void testGetMoreOfTheirProjects() {
@@ -492,9 +466,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetMyProjectsError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(anyInt(), anyInt(),  any(AsyncCallback.class));
-		profilePresenter.getAllMyProjects(1);
-		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(),  any(AsyncCallback.class));
+		profilePresenter.getMyProjects(ProjectListType.MY_PROJECTS, ProjectFilterEnum.ALL, 0);
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setProjectsError(anyString());
 	}
 	
