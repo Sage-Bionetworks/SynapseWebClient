@@ -66,6 +66,8 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -88,6 +90,7 @@ import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
@@ -2967,7 +2970,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createSubmission(submission, etag);
+			return synapseClient.createIndividualSubmission(submission, etag);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -3556,10 +3559,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ProjectPagedResults getMyProjects(int limit, int offset) throws RestServiceException {
+	public ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(limit, offset);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(projectListType, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC, limit, offset);
 			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -3571,7 +3574,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long teamIdLong = Long.parseLong(teamId);
-			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, limit, offset);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC, limit, offset);
 			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -3584,7 +3587,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long userIdLong = Long.parseLong(userId);
-			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, limit, offset);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC, limit, offset);
 			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -405,7 +406,7 @@ public interface SynapseClientAsync {
 	 * @param offset
 	 * @param projectHeaders
 	 */
-	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	void getMyProjects(ProjectListType projectListType, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 	/**
 	 * Return projects that the current user can access due to being on a particular team. 
 	 * @param teamId
