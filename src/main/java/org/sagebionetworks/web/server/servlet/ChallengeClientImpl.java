@@ -541,6 +541,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	public List<Team> getRegistratableTeams(String challengeId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			//TODO: check to see if current user is registered for the challenge.  if not, send back error.
 			PaginatedIds results = synapseClient.listRegistratableTeams(challengeId, GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET);
 			return getTeams(results.getResults(), synapseClient);
 		} catch (SynapseException e) {
