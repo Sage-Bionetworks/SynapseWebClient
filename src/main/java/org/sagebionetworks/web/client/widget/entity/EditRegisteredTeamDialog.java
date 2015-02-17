@@ -13,13 +13,11 @@ import com.google.inject.Inject;
 
 public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Presenter {
 	private EditRegisteredTeamDialogView view;
-	private String challengeId;
-	private String selectedTeamId;
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private Callback callback;
-	
+	private ChallengeTeam challengeTeam;
 	@Inject
 	public EditRegisteredTeamDialog(EditRegisteredTeamDialogView view, 
 			ChallengeClientAsync challengeClient,
@@ -39,24 +37,19 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 	}
 	
 	private void clearState() {
-		selectedTeamId = null;
-		challengeId = null;
+		challengeTeam = null;
 	}
 	
-	public void showChallengeTeamEditor(String challengeId, String recruitmentMessage, String selectedTeamId, Callback callback) {
+	public void showChallengeTeamEditor(ChallengeTeam challengeTeam, Callback callback) {
 		clearState();
-		this.challengeId = challengeId;
-		this.selectedTeamId = selectedTeamId;
+		this.challengeTeam = challengeTeam;
 		this.callback = callback;
-		view.setRecruitmentMessage(recruitmentMessage);
+		view.setRecruitmentMessage(challengeTeam.getMessage());
 		view.showModal();
 	}
 	
 	@Override
 	public void onOk() {
-		ChallengeTeam challengeTeam = new ChallengeTeam();
-		challengeTeam.setTeamId(selectedTeamId);
-		challengeTeam.setChallengeId(challengeId);
 		challengeTeam.setMessage(view.getRecruitmentMessage());
 		challengeClient.updateRegisteredChallengeTeam(challengeTeam, new AsyncCallback<ChallengeTeam>() {
 			@Override
@@ -76,7 +69,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 	
 	@Override
 	public void onUnregister() {
-		challengeClient.unregisterChallengeTeam(challengeId, selectedTeamId, new AsyncCallback<Void>() {
+		challengeClient.unregisterChallengeTeam(challengeTeam.getChallengeId(), challengeTeam.getTeamId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				if (callback != null) {

@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -59,10 +61,19 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 			RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();
 			dialog.configure(challengeId, widgetRefreshRequired);
 		} else {
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			view.showConfirmDialog(DisplayConstants.ANONYMOUS_JOIN, getConfirmCallback());
 		}
 	}
 	
+	public ConfirmCallback getConfirmCallback() {
+		return new ConfirmCallback() {
+			@Override
+			public void callback(boolean confirmed) {
+				if (confirmed)
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			}
+		};
+	}
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

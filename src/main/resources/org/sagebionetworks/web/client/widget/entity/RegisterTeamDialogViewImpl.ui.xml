@@ -9,6 +9,7 @@
 			<b:FormGroup ui:field="teamSelectionUI">
 				<b:FormLabel addStyleNames="margin-right-10">Select Team</b:FormLabel>
 				<bh:Div ui:field="teamComboBoxContainer"></bh:Div>
+				<b:Anchor ui:field="createNewTeamLink">Create a new team</b:Anchor>
 				<bh:Paragraph emphasis="WARNING" ui:field="noTeamsFoundUI" visible="false">No teams found</bh:Paragraph>	
 			</b:FormGroup>
 			<b:FormGroup>
@@ -16,7 +17,6 @@
 				<b:TextBox ui:field="recruitmentMessageField" name="recruitment"
 					b:id="recruitment" />
 			</b:FormGroup>
-			<b:Anchor ui:field="createNewTeamLink">Create a new team</b:Anchor>
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="cancelButton" type="DEFAULT" >Cancel</b:Button>

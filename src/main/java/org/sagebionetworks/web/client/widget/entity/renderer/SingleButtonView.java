@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.Callback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+
 import com.google.gwt.user.client.ui.IsWidget;
 public interface SingleButtonView extends IsWidget {
 	
@@ -39,5 +42,6 @@ public interface SingleButtonView extends IsWidget {
 	 * @param b
 	 */
 	void setLoading(boolean loading);
-
+	
+	void showConfirmDialog(String message, ConfirmCallback okCallback);
 }

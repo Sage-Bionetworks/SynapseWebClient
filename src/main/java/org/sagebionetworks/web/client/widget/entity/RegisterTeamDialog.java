@@ -75,8 +75,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}

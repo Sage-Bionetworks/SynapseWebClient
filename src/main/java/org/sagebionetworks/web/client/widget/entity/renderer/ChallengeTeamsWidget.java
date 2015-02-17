@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -32,6 +33,8 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	public static final Long DEFAULT_TEAM_LIMIT = 50L;
 	public static final Long DEFAULT_OFFSET = 0L;
 	private AuthenticationController authController;
+	Map<String, ChallengeTeam> teamId2ChallengeTeam;
+	
 	@Inject
 	public ChallengeTeamsWidget(ChallengeTeamsView view, 
 			EditRegisteredTeamDialog dialog, 
@@ -52,6 +55,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
 		this.widgetRefreshRequired = widgetRefreshRequired;
+		teamId2ChallengeTeam = new HashMap<String, ChallengeTeam>();
 		challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
 		descriptor = widgetDescriptor;
 		if (challengeId == null) {
@@ -75,6 +79,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 					//configure the pager, and the challenge list
 					paginationWidget.configure(DEFAULT_TEAM_LIMIT, newOffset, results.getTotalNumberOfResults(), ChallengeTeamsWidget.this);
 					for (ChallengeTeamBundle challenge : results.getResults()) {
+						teamId2ChallengeTeam.put(challenge.getChallengeTeam().getTeamId(), challenge.getChallengeTeam());
 						view.addChallengeTeam(challenge.getChallengeTeam().getTeamId(), 
 							DisplayUtils.replaceWithEmptyStringIfNull(challenge.getChallengeTeam().getMessage()), 
 							challenge.isAdmin());
@@ -92,8 +97,8 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	}
 	
 	@Override
-	public void onEdit(String teamId, String message) {
-		dialog.showChallengeTeamEditor(challengeId, message, teamId, widgetRefreshRequired);
+	public void onEdit(String teamId) {
+		dialog.showChallengeTeamEditor(teamId2ChallengeTeam.get(teamId), widgetRefreshRequired);
 	}
 	
 	@Override

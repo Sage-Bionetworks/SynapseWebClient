@@ -150,7 +150,9 @@ public class EvaluationSubmitter implements Presenter {
 		//The standard is to attach access requirements to the associated team, and show them when joining the team.
 		//So access requirements are not checked again here.
 		view.hideModal1();
-		if (evaluation.getContentSource() == null) {
+		//TODO: content source must be filled in
+		//ask for /entity/{projectId}/challenge
+		if (evaluation.getContentSource() == null) { //
 			//no need to show second page, this is a submission to a non-challenge eval queue.
 			onDoneClicked();
 		} else {

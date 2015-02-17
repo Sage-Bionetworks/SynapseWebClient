@@ -34,8 +34,6 @@ public interface ChallengeClient extends RemoteService {
 	public String getEvaluationAcl(String evalId) throws RestServiceException;
 	public AccessControlList updateEvaluationAcl(AccessControlList acl) throws RestServiceException;
 	
-	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
-
 	public Boolean hasSubmitted()	throws RestServiceException;
 	
 	List<Team> getSubmissionTeams(String userId, String challengeId) throws RestServiceException;
@@ -47,4 +45,6 @@ public interface ChallengeClient extends RemoteService {
 	Challenge getChallenge(String projectId) throws RestServiceException;
 	ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset) throws RestServiceException;
 	List<Team> getRegistratableTeams(String challengeId) throws RestServiceException;
+
+	Set<String> getChallengeEvaluationIds(String challengeProjectId) throws RestServiceException;
 }

@@ -10,7 +10,7 @@ public interface ChallengeTeamsView extends IsWidget, SynapseView {
 		/**
 		 * edit button clicked on row
 		 */
-		void onEdit(String teamId, String message);
+		void onEdit(String teamId);
 	}
 
 	/**

@@ -151,6 +151,7 @@ public class WidgetConstants {
 	public static final String CHALLENGE_TEAMS_CONTENT_TYPE = "challengeTeams";
 	public static final String CHALLENGE_PARTICIPANTS_CONTENT_TYPE = "challengeParticipants";
 	public static final String CHALLENGE_ID_KEY = "challengeId";
+	public static final String CHALLENGE_PROJECT_ID_KEY = "challengeProjectId";
 	public static final String IS_IN_CHALLENGE_TEAM_KEY = "isInTeam";
 	
 	public static final String BOOKMARK_KEY = "bookmarkID";

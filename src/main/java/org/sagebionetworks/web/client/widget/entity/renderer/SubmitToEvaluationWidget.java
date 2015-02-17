@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -36,7 +37,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
-	private String[] evaluationIds;
+	private Set<String> evaluationIds;
 	PortalGinInjector ginInjector;
 	
 	@Inject
@@ -61,46 +62,76 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 		
 		String evaluationId = descriptor.get(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
 		if (evaluationId != null) {
-			evaluationIds = new String[1];
-			evaluationIds[0] = evaluationId;
+			evaluationIds = new HashSet<String>();
+			evaluationIds.add(evaluationId);
 		}
+		getEvaluationIds(new CallbackP<Set<String>>() {
+			@Override
+			public void invoke(Set<String> evalIds) {
+				evaluationIds = evalIds;
+				final String evaluationUnavailableMessage = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
+				final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
+				
+				//figure out if we should show anything
+				try {
+					challengeClient.getAvailableEvaluations(evaluationIds, new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String jsonString) {
+							try {
+								PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
+								view.configure(wikiKey, results.getTotalNumberOfResults() > 0, evaluationUnavailableMessage, buttonText);	
+							} catch (JSONObjectAdapterException e) {
+								onFailure(e);
+							}
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
+							if (!(caught instanceof ForbiddenException)) {
+								view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+							}
+						}
+					});
+				} catch (RestServiceException e) {
+					view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Get the evaluation queue ids
+	 * @param callback
+	 */
+	public void getEvaluationIds(final CallbackP<Set<String>> callback) {
 		String subchallengeIdList = null;
 		if(descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY)) subchallengeIdList = descriptor.get(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
 		if(subchallengeIdList != null) {
-			evaluationIds = subchallengeIdList.split(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER);
-		}
-		final String evaluationUnavailableMessage = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
-		final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
-		
-		//figure out if we should show anything
-		try {
-			final Set<String> targetEvaluations = new HashSet<String>();
-			for (int i = 0; i < evaluationIds.length; i++) {
-				targetEvaluations.add(evaluationIds[i]);
+			String[] evaluationIdsArray = subchallengeIdList.split(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER);
+			Set<String> evaluationIds = new HashSet<String>();
+			for (String evaluationId : evaluationIdsArray) {
+				evaluationIds.add(evaluationId);
 			}
-			challengeClient.getAvailableEvaluations(targetEvaluations, new AsyncCallback<String>() {
+			if (!evaluationIds.isEmpty())
+				callback.invoke(evaluationIds);
+			return;
+		} 
+		//else, look for the challenge id
+		if (descriptor.containsKey(WidgetConstants.CHALLENGE_PROJECT_ID_KEY)) {
+			String projectId = descriptor.get(WidgetConstants.CHALLENGE_PROJECT_ID_KEY);
+			challengeClient.getChallengeEvaluationIds(projectId, new AsyncCallback<Set<String>>() {
 				@Override
-				public void onSuccess(String jsonString) {
-					try {
-						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-						view.configure(wikiKey, results.getTotalNumberOfResults() > 0, evaluationUnavailableMessage, buttonText);	
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
-				}
+				public void onSuccess(Set<String> evaluationIds) {
+					//if no evaluations are accessible, do not continue (show nothing)
+					if (!evaluationIds.isEmpty())
+						callback.invoke(evaluationIds);
+				};
 				@Override
 				public void onFailure(Throwable caught) {
-					//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
-					if (!(caught instanceof ForbiddenException)) {
-						view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
-					}
+					view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
 				}
 			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
 		}
-		//set up view based on descriptor parameters
-		descriptor = widgetDescriptor;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -134,11 +165,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	public void showSubmissionDialog() {
 		EvaluationSubmitter submitter = ginInjector.getEvaluationSubmitter();
 		view.setEvaluationSubmitterWidget(submitter.asWidget());
-		Set<String> evaluationIdsList = new HashSet<String>();
-		for (int i = 0; i < evaluationIds.length; i++) {
-			evaluationIdsList.add(evaluationIds[i]);
-		}
-		submitter.configure(null, evaluationIdsList);
+		submitter.configure(null, evaluationIds);
 	}
 	
 }

@@ -16,7 +16,7 @@
 			<bh:Strong text="Markdown Widget Warning: "/>
 			<bh:Text ui:field="errorText" text=""/>
 		</b:Alert>
-		<b:Panel addStyleNames="margin-bottom-0-imp">
+		<b:Panel ui:field="participantsUI" addStyleNames="margin-bottom-0-imp">
 			<b:PanelBody>
 				<bh:Div ui:field="participantsContainer" />
 			</b:PanelBody>

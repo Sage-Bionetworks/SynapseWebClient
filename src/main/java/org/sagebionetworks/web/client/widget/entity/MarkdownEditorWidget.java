@@ -250,7 +250,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			insertNewWidget(WidgetConstants.REFERENCE_CONTENT_TYPE);
 			break;
 		case INSERT_SUBMIT_TO_EVALUATION:
-			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2&" +WidgetConstants.UNAVAILABLE_MESSAGE + "=Join the team to submit to the evaluation" + WidgetConstants.WIDGET_END_MARKDOWN);
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_PROJECT_ID_KEY+"=syn12345&" +WidgetConstants.UNAVAILABLE_MESSAGE + "=Join the team to submit to the evaluation" + WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
 		case INSERT_TABLE:
 			insertNewWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE);

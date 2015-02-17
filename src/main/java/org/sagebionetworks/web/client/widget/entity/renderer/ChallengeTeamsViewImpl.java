@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -46,6 +47,8 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 	Alert errorUI;
 	@UiField
 	Text errorText;
+	@UiField
+	Panel challengeTeamsUI;
 	
 	Widget widget;
 	
@@ -70,7 +73,7 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 	}
 	
 	@Override
-	public void addChallengeTeam(final String teamId, final String message, boolean showEditButton) {
+	public void addChallengeTeam(final String teamId, String message, boolean showEditButton) {
 		Div div = new Div();
 		div.addStyleName("margin-bottom-5");
 		TeamBadge newTeamBadge = ginInjector.getTeamBadgeWidget();
@@ -86,11 +89,11 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 		if (showEditButton) {
 			Anchor editButton = new Anchor();
 			editButton.setIcon(IconType.EDIT);
-			editButton.addStyleName("margin-left-5");
+			editButton.addStyleName("margin-left-10");
 			editButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					presenter.onEdit(teamId, message);
+					presenter.onEdit(teamId);
 				}
 			});
 			div.add(editButton);
@@ -122,12 +125,14 @@ public class ChallengeTeamsViewImpl implements ChallengeTeamsView {
 	
 	@Override
 	public void showErrorMessage(String message) {
-		errorUI.setText(message);
+		errorText.setText(message);
 		errorUI.setVisible(true);
+		challengeTeamsUI.setVisible(false);
 	}
 	@Override
 	public void hideErrors() {
 		errorUI.setVisible(false);
+		challengeTeamsUI.setVisible(true);
 	}
 	
 	@Override

@@ -547,5 +547,26 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public Set<String> getChallengeEvaluationIds(String challengeProjectId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			//get the challenge, to resolve the project id
+			PaginatedResults<Evaluation> allEvaluations = synapseClient
+					.getEvaluationByContentSource(challengeProjectId,
+							EVALUATION_PAGINATION_OFFSET,
+							EVALUATION_PAGINATION_LIMIT);
+			
+			Set<String> evaluationIds = new HashSet<String>();
+			for (Evaluation evaluation : allEvaluations.getResults()) {
+				evaluationIds.add(evaluation.getId());
+			}
+			return evaluationIds;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+
+	}
 
 }

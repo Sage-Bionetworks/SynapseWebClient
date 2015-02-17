@@ -45,15 +45,6 @@ public interface ChallengeClientAsync {
 	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
 	void updateEvaluationAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
 	
-	
-	/**
-	 * Get all unique submission user aliases associated to the available evaluations (OPEN evaluations that the current user has joined).
-	 * The return list is sorted by Submission created date.
-	 * @param callback
-	 * @throws RestServiceException
-	 */
-	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
-
 	/**
 	 * Return true if the current user has created at least one submission in the given evaluations
 	 * @param evaluationIds
@@ -61,4 +52,6 @@ public interface ChallengeClientAsync {
 	 * @throws RestServiceException
 	 */
 	void hasSubmitted(AsyncCallback<Boolean> callback)	throws RestServiceException;
+	
+	void getChallengeEvaluationIds(String challengeProjectId, AsyncCallback<Set<String>> callback);
 }

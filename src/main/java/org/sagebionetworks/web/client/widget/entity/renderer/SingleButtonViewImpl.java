@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.Callback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -67,5 +70,11 @@ public class SingleButtonViewImpl implements SingleButtonView {
 		}else{
 			this.button.state().reset();
 		}
+	}
+	
+	@Override
+	public void showConfirmDialog(String message, ConfirmCallback callback) {
+		Bootbox.confirm(message, callback);
+
 	}
 }

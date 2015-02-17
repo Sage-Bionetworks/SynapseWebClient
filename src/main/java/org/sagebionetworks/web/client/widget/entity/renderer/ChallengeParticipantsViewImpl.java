@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -40,6 +41,8 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 	Alert errorUI;
 	@UiField
 	Text errorText;
+	@UiField
+	Panel participantsUI;
 	
 	Widget widget;
 	
@@ -90,12 +93,14 @@ public class ChallengeParticipantsViewImpl implements ChallengeParticipantsView 
 	
 	@Override
 	public void showErrorMessage(String message) {
-		errorUI.setText(message);
+		errorText.setText(message);
 		errorUI.setVisible(true);
+		participantsUI.setVisible(false);
 	}
 	@Override
 	public void hideErrors() {
 		errorUI.setVisible(false);
+		participantsUI.setVisible(true);
 	}
 	
 	@Override
