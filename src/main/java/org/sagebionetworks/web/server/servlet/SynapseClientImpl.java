@@ -2204,6 +2204,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			PaginatedResults<Team> teams = synapseClient.getTeamsForUser(
 					userId, MAX_LIMIT, ZERO_OFFSET);
 			List<Team> teamList = teams.getResults();
+			Collections.sort(teamList, new Comparator<Team>() {
+		        @Override
+		        public int compare(Team o1, Team o2) {
+		        	return o1.getName().compareToIgnoreCase(o2.getName());
+		        }
+			});
 			ArrayList<String> teamListStrings = new ArrayList<String>();
 			for (Team t : teamList) {
 				teamListStrings.add(EntityFactory.createJSONStringForEntity(t));
