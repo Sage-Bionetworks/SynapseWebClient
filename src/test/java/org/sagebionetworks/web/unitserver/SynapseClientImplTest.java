@@ -175,6 +175,8 @@ public class SynapseClientImplTest {
 	EntityPath path;
 	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
+	org.sagebionetworks.repo.model.PaginatedResults<Team> pguts;
+	Team teamA, teamZ;
 	AccessControlList acl;
 	WikiPage page;
 	V2WikiPage v2Page;
@@ -267,6 +269,19 @@ public class SynapseClientImplTest {
 		ups.add(new UserProfile());
 		pgups.setResults(ups);
 		when(mockSynapse.getUsers(anyInt(), anyInt())).thenReturn(pgups);
+		
+		pguts = new org.sagebionetworks.repo.model.PaginatedResults<Team>();
+		List<Team> uts = new ArrayList<Team>();
+		teamZ = new Team();
+		teamZ.setId("1");
+		teamZ.setName("zygote");
+		uts.add(teamZ);
+		teamA = new Team();
+		teamA.setId("2");
+		teamA.setName("Amplitude");
+		uts.add(teamA);
+		pguts.setResults(uts);
+		when(mockSynapse.getTeamsForUser(anyString(), anyInt(), anyInt())).thenReturn(pguts);
 		
 		acl  = new AccessControlList();
 		acl.setId("sys999");
@@ -1737,5 +1752,17 @@ public class SynapseClientImplTest {
 		assertEquals(favA, actualList.get(0));
 		assertEquals(favQ, actualList.get(1));
 		assertEquals(favZ, actualList.get(2));
+	}
+	
+	@Test
+	public void testGetTeamsForUser() throws RestServiceException, JSONObjectAdapterException, SynapseException {
+		//the paginated results were set up to return {teamZ, teamA}, but servlet side we sort by name.
+		ArrayList<String> results = synapseClient.getTeamsForUser("abba");
+		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
+		assertEquals(2, results.size());
+		String teamAJson = EntityFactory.createJSONStringForEntity(teamA);
+		String teamZJson = EntityFactory.createJSONStringForEntity(teamZ);
+		assertEquals(teamAJson, results.get(0));
+		assertEquals(teamZJson, results.get(1));
 	}
 }
