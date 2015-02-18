@@ -346,34 +346,38 @@ public class EvaluationSubmitter implements Presenter {
 		try {
 			String teamId = null;
 			String memberStateHash = null;
-			if (!isIndividualSubmission) {
-				//team is selected
+			if (isIndividualSubmission) {
+				challengeClient.createIndividualSubmission(newSubmission, etag, getSubmissionCallback());
+			} else {
+				//team submission
 				teamId = selectedTeam.getId();
 				memberStateHash = selectedTeamMemberStateHash;
+				challengeClient.createTeamSubmission(newSubmission, etag, teamId, memberStateHash, getSubmissionCallback());
 			}
-			
-			challengeClient.createSubmission(newSubmission, etag, teamId, memberStateHash, new AsyncCallback<Submission>() {			
-				@Override
-				public void onSuccess(Submission result) {
-					//result is the updated submission
-					String message = evaluation.getSubmissionReceiptMessage();
-					if (message == null || message.length()==0)
-						message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
-					view.hideModal2();
-					view.showSubmissionAcceptedDialogs(message);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
-				}
-			});
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
 	}
 	
+	public AsyncCallback<Submission> getSubmissionCallback() {
+		return new AsyncCallback<Submission>() {			
+			@Override
+			public void onSuccess(Submission result) {
+				//result is the updated submission
+				String message = evaluation.getSubmissionReceiptMessage();
+				if (message == null || message.length()==0)
+					message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
+				view.hideModal2();
+				view.showSubmissionAcceptedDialogs(message);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		};
+	}
 	
 	public Widget asWidget() {
 		return view.asWidget();

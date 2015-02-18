@@ -62,11 +62,10 @@ public class EvaluationSubmitterTest {
 	EvaluationSubmitter mockEvaluationSubmitter;
 	FileEntity entity;
 	EntityBundle bundle;
-	List<Evaluation> evaluationList;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
 	AccessRequirementsTransport art;
 	Submission returnSubmission;
-	
+	Evaluation e1;
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
 		mockView = mock(EvaluationSubmitterView.class);
@@ -86,13 +85,13 @@ public class EvaluationSubmitterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		returnSubmission = new Submission();
 		returnSubmission.setId("363636");
-		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(2);
-		evaluationList = new ArrayList<Evaluation>();
-		Evaluation e1 = new Evaluation();
+		ArrayList<Evaluation> evaluationList = new ArrayList<Evaluation>();
+		e1 = new Evaluation();
 		e1.setId("1");
 		e1.setName("Test Evaluation 1");
 		e1.setSubmissionReceiptMessage(EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE);
@@ -122,35 +121,32 @@ public class EvaluationSubmitterTest {
 	}
 	
 	@Test
-	public void testSubmitToEvaluations() throws RestServiceException, JSONObjectAdapterException{
+	public void testSubmitToEvaluation() throws RestServiceException, JSONObjectAdapterException{
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
-		//should invoke submission twice (once per evaluation), directly without terms of use
-		verify(mockChallengeClient, times(2)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		submitter.onNextClicked(null, null, e1);
+		//should invoke submission directly without terms of use
+		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 
-		ArgumentCaptor<HashSet> captor = ArgumentCaptor.forClass(HashSet.class);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		//submitted status shown
 		verify(mockView).showSubmissionAcceptedDialogs(captor.capture());
-		//verify both evaluation receipt messages are in the map to display
-		HashSet receiptMessage = captor.getValue();
+		//verify evaluation receipt message is returned
+		String receiptMessage = captor.getValue();
 		assertTrue(receiptMessage.contains(EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE));
-		assertTrue(receiptMessage.contains(EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE));
 	}
 	
 	@Test
-	public void testSubmitToEvaluationsWithSubmissionNameAndTeamName() throws RestServiceException, JSONObjectAdapterException{
+	public void testSubmitToEvaluationsWithSubmissionName() throws RestServiceException, JSONObjectAdapterException{
 		String submissionName = "my custom submission name";
-		String teamName = "my custom team name";
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(null, submissionName, teamName, evaluationList);
-		//should invoke submission twice (once per evaluation), directly without terms of use
+		submitter.onNextClicked(null,  submissionName,  e1);
+		//should invoke submission directly without terms of use
 		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
-		verify(mockSynapseClient, times(2)).createSubmission(captor.capture(), anyString(), any(AsyncCallback.class));
+		verify(mockChallengeClient).createIndividualSubmission(captor.capture(), anyString(), any(AsyncCallback.class));
 		Submission submission = captor.getValue();
 		assertEquals(submissionName, submission.getName());
-		assertEquals(teamName, submission.getSubmitterAlias());
 	}
 	
 	@Test
@@ -159,34 +155,15 @@ public class EvaluationSubmitterTest {
 		reset(mockView);
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
 		
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(ACCESS_TYPE.class), any(AsyncCallback.class));
 
-		List<Evaluation> evals = new ArrayList<Evaluation>();
-		evals.add(new Evaluation());
-		submitter.submitToEvaluations((Reference)null, null, null, evals);
+		submitter.onNextClicked(null, null, e1);
 		//Should invoke once directly without terms of use
-		verify(mockSynapseClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 		
 		//submitted status shown
 		verify(mockView).showErrorMessage(anyString());
-	}
-
-	@Test
-	public void testSubmitToEvaluationsWithTermsOfUse() throws RestServiceException, JSONObjectAdapterException{	
-		requirements.setTotalNumberOfResults(1);
-		TermsOfUseAccessRequirement requirement = new TermsOfUseAccessRequirement();
-		requirement.setId(2l);
-		requirement.setTermsOfUse("My test ToU");
-		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
-		ars.add(requirement);
-		requirements.setResults(ars);
-		
-		submitter.configure(entity, null);
-		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
-		
-		//should show terms of use for the requirement, view does not call back so submission should not be created
-		verify(mockSynapseClient, times(0)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -199,8 +176,8 @@ public class EvaluationSubmitterTest {
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
 		
 		submitter.configure(entity, null);
-		verify(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).popupSelector(anyBoolean(), any(List.class));
+		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockView).showModal1(anyBoolean(), any(List.class));
 	}
 	
 	@Test
@@ -212,16 +189,16 @@ public class EvaluationSubmitterTest {
 		availableEvaluations.setResults(evaluationList);
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
 		submitter.configure(entity, null);
-		verify(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testShowAvailableEvaluationsFailure1() throws RestServiceException, JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null);
-		verify(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
+		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message
 		verify(mockView).showErrorMessage(anyString());
 	}

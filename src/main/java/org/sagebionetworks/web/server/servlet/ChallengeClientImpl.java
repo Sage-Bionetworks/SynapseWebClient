@@ -270,11 +270,19 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public Submission createSubmission(Submission submission, String etag, String teamId, String memberStateHash)
+	public Submission createTeamSubmission(Submission submission, String etag, String teamId, String memberStateHash)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//TODO: use new submission method that uses team id and member state hash
+			return synapseClient.createTeamSubmission(submission, etag, memberStateHash);
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	public Submission createIndividualSubmission(Submission submission, String etag)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
 			return synapseClient.createIndividualSubmission(submission, etag);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
