@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.Callback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -27,6 +28,8 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	@UiField
 	Button button;
 	Widget widget;
+	@UiField
+	Div extraWidgetsContainer;
 	
 	@Inject
 	public SingleButtonViewImpl(Binder binder) {
@@ -75,6 +78,15 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	@Override
 	public void showConfirmDialog(String message, ConfirmCallback callback) {
 		Bootbox.confirm(message, callback);
-
+	}
+	
+	@Override
+	public void addWidget(Widget widget) {
+		extraWidgetsContainer.add(widget);
+	}
+	
+	@Override
+	public void clearWidgets() {
+		extraWidgetsContainer.clear();
 	}
 }

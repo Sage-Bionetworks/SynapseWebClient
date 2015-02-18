@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ShowsErrors;
 
@@ -19,6 +20,8 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	void showModal();
 	void hideModal();
 	void setNoTeamsFoundVisible(boolean isVisible);
+	void showConfirmDialog(String message, ConfirmCallback okCallback);
+	
 	/**
 	 * Presenter interface
 	 */

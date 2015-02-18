@@ -9,7 +9,8 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.Team;
@@ -125,6 +126,11 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	@Override
 	public void setNoTeamsFoundVisible(boolean isVisible) {
 		noTeamsFoundUI.setVisible(isVisible);
+	}
+	
+	@Override
+	public void showConfirmDialog(String message, ConfirmCallback callback) {
+		Bootbox.confirm(message, callback);
 	}
 	
 	/*

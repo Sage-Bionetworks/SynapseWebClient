@@ -117,9 +117,9 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 			return;
 		} 
 		//else, look for the challenge id
-		if (descriptor.containsKey(WidgetConstants.CHALLENGE_PROJECT_ID_KEY)) {
-			String projectId = descriptor.get(WidgetConstants.CHALLENGE_PROJECT_ID_KEY);
-			challengeClient.getChallengeEvaluationIds(projectId, new AsyncCallback<Set<String>>() {
+		if (descriptor.containsKey(WidgetConstants.CHALLENGE_ID_KEY)) {
+			String challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
+			challengeClient.getChallengeEvaluationIds(challengeId, new AsyncCallback<Set<String>>() {
 				@Override
 				public void onSuccess(Set<String> evaluationIds) {
 					//if no evaluations are accessible, do not continue (show nothing)

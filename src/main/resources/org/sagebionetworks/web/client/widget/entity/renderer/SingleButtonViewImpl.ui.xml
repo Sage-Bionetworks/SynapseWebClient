@@ -4,5 +4,6 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 	    <b:Button ui:field="button" />
+	    <bh:Div ui:field="extraWidgetsContainer"/>
 	</bh:Div>
 </ui:UiBinder>

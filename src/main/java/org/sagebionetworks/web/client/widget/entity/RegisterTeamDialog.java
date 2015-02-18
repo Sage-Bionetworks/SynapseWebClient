@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -51,16 +53,29 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	}
 	
 	public void configure(String challengeId, Callback callback) {
+		if (!authenticationController.isLoggedIn()) {
+			view.showConfirmDialog(DisplayConstants.ANONYMOUS_JOIN_EVALUATION, getConfirmCallback());
+			return;
+		}
 		clearState();
 		this.callback = callback;
 		this.challengeId = challengeId;
 		view.setRecruitmentMessage("");
-		view.showModal();
 		getRegistratableTeams();
 	}
 	
+	public ConfirmCallback getConfirmCallback() {
+		return new ConfirmCallback() {
+			@Override
+			public void callback(boolean confirmed) {
+				if (confirmed)
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			}
+		};
+	}
+
 	public void getRegistratableTeams() {
-		challengeClient.getRegistratableTeams(challengeId, new AsyncCallback<List<Team>>() {
+		challengeClient.getRegistratableTeams(authenticationController.getCurrentUserPrincipalId(), challengeId, new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> result) {
 				teams = result;
@@ -72,9 +87,11 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 					view.setTeams(teams);	
 					selectedTeamId = teams.get(0).getId();
 				}
+				view.showModal();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				//note: call will result in a NotFoundException if the current user is not registered for the challenge
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
@@ -115,11 +132,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	@Override
 	public void onNewTeamClicked() {
 		//go to user profile page, team tab
-		if (authenticationController.isLoggedIn())
-			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.TEAMS_DELIMITER));
-		else {
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		}
+		globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.TEAMS_DELIMITER));
 	}
 	
 	@Override

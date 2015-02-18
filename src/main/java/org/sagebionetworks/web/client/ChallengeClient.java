@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
@@ -45,7 +46,9 @@ public interface ChallengeClient extends RemoteService {
 	UserProfilePagedResults getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) throws RestServiceException;
 	Challenge getChallenge(String projectId) throws RestServiceException;
 	ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset) throws RestServiceException;
-	List<Team> getRegistratableTeams(String challengeId) throws RestServiceException;
+	List<Team> getRegistratableTeams(String userId, String challengeId) throws RestServiceException;
 
-	Set<String> getChallengeEvaluationIds(String challengeProjectId) throws RestServiceException;
+	Set<String> getChallengeEvaluationIds(String challengeId) throws RestServiceException;
+
+	TeamSubmissionEligibility getTeamSubmissionEligibility(String evaluationId, String teamId) throws RestServiceException;
 }

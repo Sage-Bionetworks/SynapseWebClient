@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
@@ -40,7 +41,7 @@ public interface ChallengeClientAsync {
 	void getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset, AsyncCallback<UserProfilePagedResults> callback);
 	void getChallenge(String projectId, AsyncCallback<Challenge> callback);
 	void getChallenges(String userId, Integer limit, Integer offset, AsyncCallback<ChallengePagedResults> callback);
-	void getRegistratableTeams(String challengeId, AsyncCallback<List<Team>> callback);
+	void getRegistratableTeams(String userId, String challengeId, AsyncCallback<List<Team>> callback);
 	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
 	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
@@ -54,5 +55,6 @@ public interface ChallengeClientAsync {
 	 */
 	void hasSubmitted(AsyncCallback<Boolean> callback)	throws RestServiceException;
 	
-	void getChallengeEvaluationIds(String challengeProjectId, AsyncCallback<Set<String>> callback);
+	void getChallengeEvaluationIds(String challengeId, AsyncCallback<Set<String>> callback);
+	void getTeamSubmissionEligibility(String evaluationId, String teamId, AsyncCallback<TeamSubmissionEligibility> callback);
 }

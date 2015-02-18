@@ -16,6 +16,7 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AutoGenFactory;
@@ -29,7 +30,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
-import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -410,12 +412,22 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	
 	public List<Team> getTeams(List<String> teamIds, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		//TODO: use a service to get teams in bulk
-		List<Team> teamList = new ArrayList<Team>(teamIds.size());
+		//get teams in bulk
+		Set<Long> teamLongIds = new HashSet<Long>();
 		for (String teamId : teamIds) {
-			teamList.add(synapseClient.getTeam(teamId));
+			teamLongIds.add(Long.parseLong(teamId));
 		}
-		return teamList;
+		List<Team> teams = synapseClient.listTeams(teamLongIds);
+
+		//sort by name
+		Collections.sort(teams, new Comparator<Team>() {
+	        @Override
+	        public int compare(Team o1, Team o2) {
+	        	return o1.getName().compareToIgnoreCase(o2.getName());
+	        }
+		});
+
+		return teams;
 	}
 	
 	@Override
@@ -482,14 +494,14 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			PaginatedIds paginatedIds = synapseClient.listChallengeParticipants(challengeId, affiliated, limit.longValue(), offset.longValue());
-			//TODO: get all user profiles in a single batch call when that service is available
+			//get all user profiles in a single batch
 			UserProfilePagedResults userProfiles = new UserProfilePagedResults();
-			List<UserProfile> userProfileResults = new ArrayList<UserProfile>();
+			Set<Long> userIds = new HashSet<Long>();
 			for (String userId : paginatedIds.getResults()) {
-				userProfileResults.add(synapseClient.getUserProfile(userId));
+				userIds.add(Long.parseLong(userId));
 			}
 			userProfiles.setTotalNumberOfResults(paginatedIds.getTotalNumberOfResults());
-			userProfiles.setResults(userProfileResults);
+			userProfiles.setResults(synapseClient.listUserProfiles(userIds));
 			return userProfiles;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -541,10 +553,15 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public List<Team> getRegistratableTeams(String challengeId) throws RestServiceException {
+	public List<Team> getRegistratableTeams(String userId, String challengeId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//TODO: check to see if current user is registered for the challenge.  if not, send back error.
+			//check to see if current user is registered for the challenge.  if not, send back error.
+			Challenge challenge = synapseClient.getChallenge(challengeId);
+			TeamMembershipStatus status = synapseClient.getTeamMembershipStatus(challenge.getParticipantTeamId(), userId);
+			if (!status.getIsMember()) {
+				throw new NotFoundException("User is not registered for the Challenge.");
+			}
 			PaginatedIds results = synapseClient.listRegistratableTeams(challengeId, GROUPS_PAGINATION_LIMIT, GROUPS_PAGINATION_OFFSET);
 			return getTeams(results.getResults(), synapseClient);
 		} catch (SynapseException e) {
@@ -553,12 +570,13 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public Set<String> getChallengeEvaluationIds(String challengeProjectId) throws RestServiceException {
+	public Set<String> getChallengeEvaluationIds(String challengeId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			Challenge challenge = synapseClient.getChallenge(challengeId);
 			//get the challenge, to resolve the project id
 			PaginatedResults<Evaluation> allEvaluations = synapseClient
-					.getEvaluationByContentSource(challengeProjectId,
+					.getEvaluationByContentSource(challenge.getProjectId(),
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);
 			
@@ -573,4 +591,14 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 
 	}
 
+	@Override
+	public TeamSubmissionEligibility getTeamSubmissionEligibility(String evaluationId, String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getTeamSubmissionEligibility(evaluationId, teamId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+
+	}
 }
