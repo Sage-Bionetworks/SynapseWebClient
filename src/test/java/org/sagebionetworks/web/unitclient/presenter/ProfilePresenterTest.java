@@ -109,7 +109,6 @@ public class ProfilePresenterTest {
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
 	String password = "password";
-	List<String> myFavoritesJson;
 	List<EntityHeader> myFavorites;
 	List<Team> myTeams;
 	ProjectPagedResults projects;
@@ -159,9 +158,6 @@ public class ProfilePresenterTest {
 		EntityHeader project2 = new EntityHeader();
 		project2.setId("syn2");
 		
-		myFavoritesJson = new ArrayList<String>();
-		myFavoritesJson.add(project1.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-		myFavoritesJson.add(project2.writeToJSONObject(adapterFactory.createNew()).toJSONString());
 		myFavorites = new ArrayList<EntityHeader>();
 		myFavorites.add(project1);
 		myFavorites.add(project2);
@@ -182,7 +178,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		
-		AsyncMockStubber.callSuccessWith(myFavoritesJson).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(myFavorites).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		
 		//set up create project test
 		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
@@ -361,7 +357,7 @@ public class ProfilePresenterTest {
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
-		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addProjects(anyList());
 	}
 	
@@ -370,12 +366,11 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		myFavorites.clear();
-		myFavoritesJson.clear();
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockView).setFavoritesHelpPanelVisible(true);
-		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockView, never()).addProjects(anyList());
 	}
 
@@ -451,7 +446,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
-		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 	}
 	
 	
