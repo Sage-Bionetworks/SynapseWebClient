@@ -33,7 +33,7 @@ public interface ChallengeClientAsync {
 	void getSubmissionTeams(String userId, String challengeId, AsyncCallback<List<Team>> submissionTeams);
 	
 	void registerChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);
-	void unregisterChallengeTeam(String challengeId, String teamId, AsyncCallback<Void> callback);
+	void unregisterChallengeTeam(String challengeTeamId, AsyncCallback<Void> callback);
 	void updateRegisteredChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);
 	void getChallengeTeams(String userId, String challengeId, Integer limit, Integer offset, AsyncCallback<ChallengeTeamPagedResults> callback);
 	void getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset, AsyncCallback<UserProfilePagedResults> callback);

@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -486,7 +487,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	ProjectPagedResults getMyProjects(int limit, int offset) throws RestServiceException;
+	ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset) throws RestServiceException;
 	ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset) throws RestServiceException;
 	ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
 	

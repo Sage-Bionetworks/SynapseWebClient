@@ -69,7 +69,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 	
 	@Override
 	public void onUnregister() {
-		challengeClient.unregisterChallengeTeam(challengeTeam.getChallengeId(), challengeTeam.getTeamId(), new AsyncCallback<Void>() {
+		challengeClient.unregisterChallengeTeam(challengeTeam.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				if (callback != null) {

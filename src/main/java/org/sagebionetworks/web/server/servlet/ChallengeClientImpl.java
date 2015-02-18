@@ -23,7 +23,6 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.IdSet;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
@@ -276,7 +275,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//TODO: use new submission method that uses team id and member state hash
-			return synapseClient.createSubmission(submission, etag);
+			return synapseClient.createIndividualSubmission(submission, etag);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -422,10 +421,10 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public void unregisterChallengeTeam(String challengeId, String teamId) throws RestServiceException {
+	public void unregisterChallengeTeam(String challengeTeamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.deleteChallengeTeam(challengeId, teamId);
+			synapseClient.deleteChallengeTeam(challengeTeamId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -450,21 +449,17 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			Long totalCount = pagedResults.getTotalNumberOfResults();
 			List<ChallengeTeamBundle> challengeTeamList = new ArrayList<ChallengeTeamBundle>();
 			
-			/***************************************
-			 * TODO: use a new service to answer the question "Is this user an admin on this set of teams?"
-			 ***************************************/
-			IdSet currentUserIdSet = new IdSet();
-			Set<Long> currentUserIdWrapper = new HashSet<Long>();
-			currentUserIdWrapper.add(Long.parseLong(currentUserId));
-			currentUserIdSet.setSet(currentUserIdWrapper);
+			 //Is this user an admin on this set of teams?
+			Map<Long, ChallengeTeam> teamId2ChallengeTeam = new HashMap<Long, ChallengeTeam>();
 			for (ChallengeTeam challengeTeam : pagedResults.getResults()) {
-				List<TeamMember> teamMemberList = synapseClient.listTeamMembers(challengeTeam.getTeamId(), currentUserIdSet);
-				if (teamMemberList != null && teamMemberList.size() > 0) {
-					ChallengeTeamBundle teamBundle = new ChallengeTeamBundle(challengeTeam, teamMemberList.get(0).getIsAdmin());
-					challengeTeamList.add(teamBundle);
-				}
+				teamId2ChallengeTeam.put(Long.parseLong(challengeTeam.getTeamId()), challengeTeam);
 			}
-			/*********************************************/
+			List<TeamMember> teamMemberList = synapseClient.listTeamMembers(teamId2ChallengeTeam.keySet(), currentUserId);
+			for (TeamMember teamMember : teamMemberList) {
+				ChallengeTeam challengeTeam = teamId2ChallengeTeam.get(Long.parseLong(teamMember.getTeamId()));
+				ChallengeTeamBundle teamBundle = new ChallengeTeamBundle(challengeTeam, teamMember.getIsAdmin());
+				challengeTeamList.add(teamBundle);				
+			}
 			
 			ChallengeTeamPagedResults returnResults = new ChallengeTeamPagedResults(challengeTeamList, totalCount);
 			return returnResults;

@@ -1,1 +1,1 @@
-package org.sagebionetworks.web.client.presenter;/** * The filter type that is applied to the project list * @author jayhodgson * */public enum ProjectFilterEnum {	ALL, 	MINE,	FAVORITES,	TEAM;}
+package org.sagebionetworks.web.client.presenter;/** * The filter type that is applied to the project list * @author jayhodgson * */public enum ProjectFilterEnum {	ALL, 	MINE,	FAVORITES,	MY_PARTICIPATED_PROJECTS,	MY_TEAM_PROJECTS,	TEAM;}

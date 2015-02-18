@@ -73,6 +73,8 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -89,6 +91,7 @@ import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
@@ -169,6 +172,8 @@ public class SynapseClientImplTest {
 	EntityPath path;
 	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
+	org.sagebionetworks.repo.model.PaginatedResults<Team> pguts;
+	Team teamA, teamZ;
 	AccessControlList acl;
 	WikiPage page;
 	V2WikiPage v2Page;
@@ -261,6 +266,19 @@ public class SynapseClientImplTest {
 		ups.add(new UserProfile());
 		pgups.setResults(ups);
 		when(mockSynapse.getUsers(anyInt(), anyInt())).thenReturn(pgups);
+		
+		pguts = new org.sagebionetworks.repo.model.PaginatedResults<Team>();
+		List<Team> uts = new ArrayList<Team>();
+		teamZ = new Team();
+		teamZ.setId("1");
+		teamZ.setName("zygote");
+		uts.add(teamZ);
+		teamA = new Team();
+		teamA.setId("2");
+		teamA.setName("Amplitude");
+		uts.add(teamA);
+		pguts.setResults(uts);
+		when(mockSynapse.getTeamsForUser(anyString(), anyInt(), anyInt())).thenReturn(pguts);
 		
 		acl  = new AccessControlList();
 		acl.setId("sys999");
@@ -381,9 +399,9 @@ public class SynapseClientImplTest {
 		List<ProjectHeader> projectHeaders = new ArrayList();
 		projectHeaders.add(new ProjectHeader());
 		headers.setResults(projectHeaders);
-		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsForTeam(anyLong(), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getMyProjects(any(ProjectListType.class), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsFromUser(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsForTeam(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1434,8 +1452,8 @@ public class SynapseClientImplTest {
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
-		synapseClient.getMyProjects(limit, offset);
-		verify(mockSynapse).getMyProjects(eq(limit), eq(offset));
+		synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset);
+		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
 	@Test
@@ -1445,7 +1463,7 @@ public class SynapseClientImplTest {
 		Long userId = 133l;
 		String userIdString = userId.toString();
 		synapseClient.getUserProjects(userIdString, limit, offset);
-		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
+		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
 	@Test
@@ -1455,7 +1473,7 @@ public class SynapseClientImplTest {
 		Long teamId = 144l;
 		String teamIdString = teamId.toString();
 		synapseClient.getProjectsForTeam(teamIdString, limit, offset);
-		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(limit), eq(offset));
+		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 
 	
@@ -1550,5 +1568,17 @@ public class SynapseClientImplTest {
 		assertEquals(favA, actualList.get(0));
 		assertEquals(favQ, actualList.get(1));
 		assertEquals(favZ, actualList.get(2));
+	}
+	
+	@Test
+	public void testGetTeamsForUser() throws RestServiceException, JSONObjectAdapterException, SynapseException {
+		//the paginated results were set up to return {teamZ, teamA}, but servlet side we sort by name.
+		ArrayList<String> results = synapseClient.getTeamsForUser("abba");
+		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
+		assertEquals(2, results.size());
+		String teamAJson = EntityFactory.createJSONStringForEntity(teamA);
+		String teamZJson = EntityFactory.createJSONStringForEntity(teamZ);
+		assertEquals(teamAJson, results.get(0));
+		assertEquals(teamZJson, results.get(1));
 	}
 }

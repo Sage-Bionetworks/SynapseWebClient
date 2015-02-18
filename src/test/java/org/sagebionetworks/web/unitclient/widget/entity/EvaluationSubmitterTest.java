@@ -127,7 +127,7 @@ public class EvaluationSubmitterTest {
 		submitter.configure(entity, null);
 		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
-		verify(mockSynapseClient, times(2)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		verify(mockChallengeClient, times(2)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 
 		ArgumentCaptor<HashSet> captor = ArgumentCaptor.forClass(HashSet.class);
 		//submitted status shown
