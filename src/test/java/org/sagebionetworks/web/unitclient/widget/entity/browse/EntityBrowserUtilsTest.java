@@ -39,15 +39,15 @@ public class EntityBrowserUtilsTest {
 	@Test
 	public void testLoadFavorites() throws Exception {
 		int total = 2;
-		ArrayList<String> results = new ArrayList<String>();
+		ArrayList<EntityHeader> results = new ArrayList<EntityHeader>();
 		EntityHeader h1 = new EntityHeader();
 		h1.setId("1");
 		EntityHeader h2 = new EntityHeader();
 		h2.setId("2");
-		results.add(h1.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-		results.add(h2.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		results.add(h1);
+		results.add(h2);
 		
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		AsyncCallback<List<EntityHeader>> callback = mock(AsyncCallback.class);
 		EntityBrowserUtils.loadFavorites(mockSynapseClient, adapterFactory, mockGlobalApplicationState, callback);
 		ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);

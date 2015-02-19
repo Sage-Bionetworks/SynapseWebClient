@@ -250,8 +250,6 @@ public interface SynapseClientAsync {
 	void getCertificationQuiz(AsyncCallback<String> callback);
 	void submitCertificationQuizResponse(String quizResponseJson, AsyncCallback<String> callback);
 	
-	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
-
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, AsyncCallback<ChunkedFileToken> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(ChunkRequest request, AsyncCallback<String> callback) throws RestServiceException;

@@ -2607,26 +2607,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ArrayList<String> getFavoritesList(Integer limit, Integer offset)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			PaginatedResults<EntityHeader> favorites = synapseClient
-					.getFavorites(limit, offset);
-			ArrayList<String> results = new ArrayList<String>();
-			for (EntityHeader eh : favorites.getResults()) {
-				results.add(eh.writeToJSONObject(adapterFactory.createNew())
-						.toJSONString());
-			}
-			return results;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	@Override
 	public String getDescendants(String nodeId, int pageSize,
 			String lastDescIdExcl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

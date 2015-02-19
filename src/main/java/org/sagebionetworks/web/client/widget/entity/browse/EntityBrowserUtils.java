@@ -63,23 +63,14 @@ public class EntityBrowserUtils {
 			});
 		}
 	}
-
 	
 	public static void loadFavorites(SynapseClientAsync synapseClient,
 			final AdapterFactory adapterFactory,
 			final GlobalApplicationState globalApplicationState,
 			final AsyncCallback<List<EntityHeader>> callback) {
-		synapseClient.getFavoritesList(Integer.MAX_VALUE, 0, new AsyncCallback<ArrayList<String>>() {
+		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
-			public void onSuccess(ArrayList<String> results) {
-				List<EntityHeader> favorites = new ArrayList<EntityHeader>();
-				for(String entityHeaderJson : results) {
-					try {
-						favorites.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				} 
+			public void onSuccess(List<EntityHeader> favorites) {
 				//show whatever projects that we found (maybe zero)
 				globalApplicationState.setFavorites(favorites);
 				callback.onSuccess(favorites);
