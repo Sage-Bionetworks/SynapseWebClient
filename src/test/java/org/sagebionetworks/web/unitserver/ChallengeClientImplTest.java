@@ -247,67 +247,6 @@ public class ChallengeClientImplTest {
 		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
 		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 	}
-//	
-//	@Test
-//	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-//		Submission inputSubmission = new Submission();
-//		inputSubmission.setId("my submission id");
-//		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
-//		Submission returnSubmission = synapseClient.createSubmission(inputSubmission, "fakeEtag");
-//		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
-//		assertEquals(inputSubmission, returnSubmission);
-//	}
-	
-	private void setupTestSubmitterAliases() throws SynapseException{
-		//set up 2 available evaluations
-		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
-		List<Evaluation> evalResults = new ArrayList<Evaluation>();
-		Evaluation e = new Evaluation();
-		String eval1Id ="evaluation1"; 
-		e.setId(eval1Id);
-		evalResults.add(e);
-		e = new Evaluation();
-		String eval2Id = "evaluation2";
-		e.setId(eval2Id);
-		evalResults.add(e);
-		availableEvaluations.setResults(evalResults);
-		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(availableEvaluations);
-		
-		//test sorting, uniqueness, and empty/null values
-		Submission[] submissions = new Submission[6];
-		Date date = new Date();
-		for (int i = 0; i < submissions.length; i++) {
-			submissions[i] = new Submission();
-			//submission 0 is the most recently used (largest date time), and submission 6 is the oldest
-			submissions[i].setCreatedOn(new Date(date.getTime() - i));	 
-			submissions[i].setSubmitterAlias("Alias " + i);
-		}
-		//set a duplicate
-		submissions[3].setSubmitterAlias("Alias 0");
-		//and add a null and empty string submitter alias, to verify that these are removed
-		submissions[4].setSubmitterAlias(null);
-		submissions[5].setSubmitterAlias("");
-		
-		//assign 2 submissions to evaluation1, and the other 4 submissions to evaluation2
-		//mix them up to test sort
-		PaginatedResults<Submission> submissionSet1 = new PaginatedResults<Submission>();
-		List<Submission> submissionList = new ArrayList<Submission>();
-		submissionList.add(submissions[0]);
-		submissionList.add(submissions[2]);
-		submissionSet1.setTotalNumberOfResults(2);
-		submissionSet1.setResults(submissionList);
-		
-		PaginatedResults<Submission> submissionSet2 = new PaginatedResults<Submission>();
-		submissionList = new ArrayList<Submission>();
-		submissionList.add(submissions[1]);
-		submissionList.add(submissions[3]);
-		submissionList.add(submissions[4]);
-		submissionList.add(submissions[5]);
-		submissionSet2.setTotalNumberOfResults(4);
-		submissionSet2.setResults(submissionList);
-		when(mockSynapse.getMySubmissions(eq(eval1Id), anyLong(), anyLong())).thenReturn(submissionSet1);
-		when(mockSynapse.getMySubmissions(eq(eval2Id), anyLong(), anyLong())).thenReturn(submissionSet2);
-	}
 	
 	@Test
 	public void testGetSharableEvaluations() throws SynapseException, RestServiceException, JSONObjectAdapterException {

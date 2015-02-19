@@ -28,6 +28,37 @@ public class ChallengeTeamBundle implements IsSerializable{
 	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
-	
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((challengeTeam == null) ? 0 : challengeTeam.hashCode());
+		result = prime * result + (isAdmin ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ChallengeTeamBundle other = (ChallengeTeamBundle) obj;
+		if (challengeTeam == null) {
+			if (other.challengeTeam != null)
+				return false;
+		} else if (!challengeTeam.equals(other.challengeTeam))
+			return false;
+		if (isAdmin != other.isAdmin)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ChallengeTeamBundle [challengeTeam=" + challengeTeam + ", isAdmin=" + isAdmin + "]";
+	}
 }

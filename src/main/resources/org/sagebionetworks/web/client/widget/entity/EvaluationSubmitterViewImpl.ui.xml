@@ -9,7 +9,7 @@
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:FlowPanel>
 	  	<b:Modal title="Submit to Challenge"
-				fade="true" dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
+				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
 			<b:ModalBody>
 				<b:Form>
 					<b:FieldSet>
@@ -41,7 +41,7 @@
 			</b:ModalFooter>
 		</b:Modal>
 		<b:Modal title="Submit to Challenge"
-				fade="true" dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
+				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
 			<b:ModalBody>
 				<b:FieldSet>
 					<b:ButtonGroup>

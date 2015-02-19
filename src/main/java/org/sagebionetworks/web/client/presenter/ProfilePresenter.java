@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -287,7 +283,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(ChallengePagedResults challengeResults) {
 				addChallengeResults(challengeResults.getResults());
 				challengePageAdded(challengeResults.getTotalNumberOfResults());
-						}
+			}
 	            @Override
 			public void onFailure(Throwable caught) {
 				view.showChallengesLoading(false);
