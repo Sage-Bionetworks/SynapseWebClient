@@ -509,7 +509,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public Challenge getChallenge(String projectId) throws RestServiceException {
+	public Challenge getChallengeForProject(String projectId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getChallengeForProject(projectId);

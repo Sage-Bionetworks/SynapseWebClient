@@ -161,7 +161,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void queryForChallenge() {
-		challengeClient.getChallenge(evaluation.getContentSource(), new AsyncCallback<Challenge>() {
+		challengeClient.getChallengeForProject(evaluation.getContentSource(), new AsyncCallback<Challenge>() {
 			@Override
 			public void onSuccess(Challenge result) {
 				challenge = result;

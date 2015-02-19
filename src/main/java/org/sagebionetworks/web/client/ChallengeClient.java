@@ -44,7 +44,7 @@ public interface ChallengeClient extends RemoteService {
 	ChallengeTeam updateRegisteredChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException;
 	ChallengeTeamPagedResults getChallengeTeams(String userId, String challengeId, Integer limit, Integer offset) throws RestServiceException;
 	UserProfilePagedResults getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) throws RestServiceException;
-	Challenge getChallenge(String projectId) throws RestServiceException;
+	Challenge getChallengeForProject(String projectId) throws RestServiceException;
 	ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset) throws RestServiceException;
 	List<Team> getRegistratableTeams(String userId, String challengeId) throws RestServiceException;
 

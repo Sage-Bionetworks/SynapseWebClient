@@ -39,7 +39,7 @@ public interface ChallengeClientAsync {
 	void updateRegisteredChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);
 	void getChallengeTeams(String userId, String challengeId, Integer limit, Integer offset, AsyncCallback<ChallengeTeamPagedResults> callback);
 	void getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset, AsyncCallback<UserProfilePagedResults> callback);
-	void getChallenge(String projectId, AsyncCallback<Challenge> callback);
+	void getChallengeForProject(String projectId, AsyncCallback<Challenge> callback);
 	void getChallenges(String userId, Integer limit, Integer offset, AsyncCallback<ChallengePagedResults> callback);
 	void getRegistratableTeams(String userId, String challengeId, AsyncCallback<List<Team>> callback);
 	
