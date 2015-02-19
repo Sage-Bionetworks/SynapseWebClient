@@ -31,7 +31,7 @@ public interface ChallengeClientAsync {
 	 * @param callback
 	 */
 	void createIndividualSubmission(Submission submission, String etag, AsyncCallback<Submission> callback) throws RestServiceException;
-	void createTeamSubmission(Submission submission, String etag, String teamId, String memberStateHash, AsyncCallback<Submission> callback) throws RestServiceException;
+	void createTeamSubmission(Submission submission, String etag, String memberStateHash, AsyncCallback<Submission> callback) throws RestServiceException;
 	void getSubmissionTeams(String userId, String challengeId, AsyncCallback<List<Team>> submissionTeams);
 	
 	void registerChallengeTeam(ChallengeTeam challengeTeam, AsyncCallback<ChallengeTeam> callback);

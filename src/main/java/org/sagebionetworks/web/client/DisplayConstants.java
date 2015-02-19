@@ -622,6 +622,7 @@ public class DisplayConstants {
 	public static final String EVALUATION_JOIN_TEAM_ERROR = "Unable to join team associated with the evaluation: ";
 	public static final String JOIN_TEAM_ERROR = "Unable to request membership to the team: ";
 	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
+	public static final String CHALLENGE_EVALUATIONS_ERROR = "Unable to find the evaluation queues associated with the challenge: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 	public static final String THANK_YOU_FOR_SUBMISSION = "Thank you for your submission!";

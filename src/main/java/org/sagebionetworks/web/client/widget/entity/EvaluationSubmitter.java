@@ -185,8 +185,9 @@ public class EvaluationSubmitter implements Presenter {
 	
 	@Override
 	public void teamAdded() {
-		//when a team is added, we need to refresh the teams list
-		getAvailableTeams();
+		//when a team is added, ideally we would just refresh the teams list.  
+		//But the bootstrap Select adds additional components to the DOM that it does not clean up, so hide the second page for now (user will retry and see newly registered team).
+		view.hideModal2();
 	}
 	
 	@Override
@@ -367,9 +368,9 @@ public class EvaluationSubmitter implements Presenter {
 				challengeClient.createIndividualSubmission(newSubmission, etag, getSubmissionCallback());
 			} else {
 				//team submission
-				teamId = selectedTeam.getId();
+				newSubmission.setTeamId(selectedTeam.getId());
 				memberStateHash = selectedTeamMemberStateHash;
-				challengeClient.createTeamSubmission(newSubmission, etag, teamId, memberStateHash, getSubmissionCallback());
+				challengeClient.createTeamSubmission(newSubmission, etag, memberStateHash, getSubmissionCallback());
 			}
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());

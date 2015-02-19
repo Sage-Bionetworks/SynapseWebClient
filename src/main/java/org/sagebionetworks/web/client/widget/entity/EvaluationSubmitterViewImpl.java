@@ -168,6 +168,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				presenter.onIndividualSubmissionOptionClicked();
 			}
 		});
+		
 		isTeamRadioButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -269,7 +270,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		Div row = getContributorRow(principalId, false);
 		//also add the reason
 		Span span = new Span();
-		span.addStyleName("greyText-imp");
+		span.addStyleName("greyText-imp margin-left-5 moveup-4");
 		span.setText(reason);
 		row.add(span);
 		
@@ -285,6 +286,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {
 		Div row = new Div();
 		InlineCheckBox cb = new InlineCheckBox();
+		cb.addStyleName("moveup-8");
 		cb.setValue(selectCheckbox);
 		cb.setEnabled(false);
 		row.add(cb);
@@ -305,6 +307,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	public void clearTeams() {
 		teamComboBoxContainer.clear();
 		teamComboBox = new Select();
+		teamComboBox.setWidth("100%");
 	}
 	
 	@Override

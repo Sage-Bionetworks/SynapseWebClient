@@ -30,7 +30,7 @@ public interface ChallengeClient extends RemoteService {
 	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
 	
 	public Submission createIndividualSubmission(Submission submission, String etag) throws RestServiceException;
-	public Submission createTeamSubmission(Submission submission, String etag, String teamId, String memberStateHash) throws RestServiceException;
+	public Submission createTeamSubmission(Submission submission, String etag, String memberStateHash) throws RestServiceException;
 	
 	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
 	public String getEvaluationAcl(String evalId) throws RestServiceException;

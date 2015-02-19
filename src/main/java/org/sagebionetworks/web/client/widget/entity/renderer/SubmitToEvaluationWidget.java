@@ -128,7 +128,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				};
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+					view.showErrorMessage(DisplayConstants.CHALLENGE_EVALUATIONS_ERROR + caught.getMessage());
 				}
 			});
 		}
