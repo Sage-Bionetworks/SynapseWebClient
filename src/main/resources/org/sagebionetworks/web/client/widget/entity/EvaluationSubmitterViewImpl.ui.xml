@@ -6,6 +6,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:be="urn:import:org.gwtbootstrap3.extras.select.client.ui"
   >
+  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:FlowPanel>
 	  	<b:Modal title="Submit to Challenge"
 				fade="true" dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
@@ -48,7 +49,14 @@
 						<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
 					</b:ButtonGroup>
 					<bh:Div ui:field="teamComboBoxContainer" />
-					<bh:Div addStyleNames="highlight-box" ui:field="contributorsPanel" visible="false"/>
+					<bh:Div addStyleNames="highlight-box" ui:field="contributorsHighlightPanel">
+						<bh:Div ui:field="contributorsLoadingUI">
+							<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
+					        <bh:Text>&nbsp; Loading...</bh:Text>
+						</bh:Div>
+						<bh:Div ui:field="contributorsPanel"/>
+					</bh:Div>
+					
 					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
 					<bh:Paragraph emphasis="WARNING" ui:field="noTeamsFoundUI" visible="false">No registered teams found</bh:Paragraph>
 				</b:FieldSet>

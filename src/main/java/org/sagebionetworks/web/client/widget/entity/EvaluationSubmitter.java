@@ -86,7 +86,7 @@ public class EvaluationSubmitter implements Presenter {
 		teams = new ArrayList<Team>();
 		selectedTeamEligibleMembers = new ArrayList<Long>();
 		view.showLoading();
-		view.setContributorsListVisible(false);
+		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
 		try {
 			if (evaluationIds == null)
@@ -255,7 +255,6 @@ public class EvaluationSubmitter implements Presenter {
 				break;
 			}
 		}
-		view.setContributorsListVisible(false);
 		if (selectedTeam != null) {
 			getContributorList();
 		}
@@ -263,9 +262,11 @@ public class EvaluationSubmitter implements Presenter {
 	
 	public void getContributorList() {
 		//get contributor list for this team
+		view.setContributorsLoading(true);
 		challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
 			@Override
 			public void onSuccess(TeamSubmissionEligibility teamEligibility) {
+				view.setContributorsLoading(false);
 				//is the team eligible???
 				SubmissionEligibility teamSubmissionEligibility = teamEligibility.getTeamEligibility();
 				if (!teamSubmissionEligibility.getIsEligible()) {
@@ -296,11 +297,11 @@ public class EvaluationSubmitter implements Presenter {
 							view.addInEligibleContributor(memberEligibility.getPrincipalId().toString(), reason);
 						}
 					}
-					view.setContributorsListVisible(true);
 				}
 			};
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setContributorsLoading(false);
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}

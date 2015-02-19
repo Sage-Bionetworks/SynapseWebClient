@@ -27,24 +27,26 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage, String buttonText) {
+	public void configure(WikiPageKey wikiKey, String buttonText) {
 		this.clear();
 		//include the evaluation submitter widget on the page
 		add(evaluationSubmitterContainer);
 		
-		if (isAvailableEvaluation) {
-			String primaryButtonText = buttonText == null ? "Submit To Challenge" : buttonText;
-			Button button = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
-			button.addClickHandler(new ClickHandler() {			
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.submitToChallengeClicked();
-				}
-			});				
-			add(button);
-		} else if (unavailableMessage != null && unavailableMessage.trim().length() > 0){
-			add(new HTML(DisplayUtils.getAlertHtmlSpan(SafeHtmlUtils.htmlEscape(unavailableMessage), "", BootstrapAlertType.INFO)));
-		}
+		String primaryButtonText = buttonText == null ? "Submit To Challenge" : buttonText;
+		Button button = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
+		button.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.submitToChallengeClicked();
+			}
+		});				
+		add(button);
+	}
+	
+	@Override
+	public void showUnavailable(String message) {
+		if (message != null && message.trim().length() > 0)
+			add(new HTML(DisplayUtils.getAlertHtmlSpan(SafeHtmlUtils.htmlEscape(message), "", BootstrapAlertType.INFO)));
 	}
 	
 	@Override

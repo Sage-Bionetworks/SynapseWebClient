@@ -419,16 +419,19 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			Long totalCount = pagedResults.getTotalNumberOfResults();
 			List<ChallengeTeamBundle> challengeTeamList = new ArrayList<ChallengeTeamBundle>();
 			
-			 //Is this user an admin on this set of teams?
-			Map<Long, ChallengeTeam> teamId2ChallengeTeam = new HashMap<Long, ChallengeTeam>();
+			Map<Long, ChallengeTeamBundle> teamId2ChallengeTeam = new HashMap<Long, ChallengeTeamBundle>();
+			//initialize to all isAdmin to false
 			for (ChallengeTeam challengeTeam : pagedResults.getResults()) {
-				teamId2ChallengeTeam.put(Long.parseLong(challengeTeam.getTeamId()), challengeTeam);
+				ChallengeTeamBundle teamBundle = new ChallengeTeamBundle(challengeTeam, false);
+				teamId2ChallengeTeam.put(Long.parseLong(challengeTeam.getTeamId()), teamBundle);
+				challengeTeamList.add(teamBundle);
 			}
-			List<TeamMember> teamMemberList = synapseClient.listTeamMembers(teamId2ChallengeTeam.keySet(), currentUserId);
-			for (TeamMember teamMember : teamMemberList) {
-				ChallengeTeam challengeTeam = teamId2ChallengeTeam.get(Long.parseLong(teamMember.getTeamId()));
-				ChallengeTeamBundle teamBundle = new ChallengeTeamBundle(challengeTeam, teamMember.getIsAdmin());
-				challengeTeamList.add(teamBundle);				
+			if (currentUserId != null) {
+				List<TeamMember> teamMemberList = synapseClient.listTeamMembers(teamId2ChallengeTeam.keySet(), currentUserId);
+				for (TeamMember teamMember : teamMemberList) {
+					ChallengeTeamBundle teamBundle = teamId2ChallengeTeam.get(Long.parseLong(teamMember.getTeamId()));
+					teamBundle.setIsAdmin(teamMember.getIsAdmin());
+				}
 			}
 			
 			ChallengeTeamPagedResults returnResults = new ChallengeTeamPagedResults(challengeTeamList, totalCount);

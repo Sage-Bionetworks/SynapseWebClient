@@ -82,6 +82,10 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Paragraph teamIneligibleHtml;
 	@UiField
 	Paragraph noTeamsFoundUI;
+	@UiField
+	Div contributorsLoadingUI;
+	@UiField
+	Div contributorsHighlightPanel;
 	
 	private PortalGinInjector ginInjector;
 	private Select teamComboBox;
@@ -97,7 +101,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
 		
-		contributorsPanel.getElement().setAttribute("highlight-box-title", "Contributors");
+		contributorsHighlightPanel.getElement().setAttribute("highlight-box-title", "Contributors");
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
 	}
@@ -251,11 +255,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void setContributorsListVisible(boolean isVisible) {
-		contributorsPanel.setVisible(isVisible);
-	}
-
-	@Override
 	public void clearContributors() {
 		contributorsPanel.clear();
 	}
@@ -333,5 +332,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			teamComboBox.add(teamOption);
 		}
 		teamComboBoxContainer.add(teamComboBox);
+	}
+	@Override
+	public void setContributorsLoading(boolean isVisible) {
+		contributorsLoadingUI.setVisible(isVisible);
 	}
 }

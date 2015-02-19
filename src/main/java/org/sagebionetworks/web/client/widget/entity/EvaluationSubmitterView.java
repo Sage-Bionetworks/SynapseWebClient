@@ -17,7 +17,6 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void showModal2();
 	void hideModal2();
 	void showSubmissionAcceptedDialogs(String receiptMessage);
-	void setContributorsListVisible(boolean isVisible);
 	void addEligibleContributor(String principalId);
 	void addInEligibleContributor(String principalId, String reason);
 	void setTeamInEligibleErrorVisible(boolean isVisible, String error);
@@ -27,6 +26,7 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void showEmptyTeams();
 	void clearTeams();
 	void showTeams(List<Team> registeredTeams);
+	void setContributorsLoading(boolean isVisible);
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation
 		void onNextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);

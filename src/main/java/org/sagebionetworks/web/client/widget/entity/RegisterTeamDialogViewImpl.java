@@ -93,6 +93,7 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	@Override
 	public void setTeams(List<Team> teams) {
 		teamComboBox = new Select();
+		teamComboBox.setWidth("100%");
 		teamComboBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {

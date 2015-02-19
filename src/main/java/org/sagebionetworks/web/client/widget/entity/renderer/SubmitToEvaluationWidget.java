@@ -39,7 +39,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private NodeModelCreator nodeModelCreator;
 	private Set<String> evaluationIds;
 	PortalGinInjector ginInjector;
-	
+	private String evaluationUnavailableMessage;
 	@Inject
 	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, ChallengeClientAsync challengeClient,
 			AuthenticationController authenticationController,
@@ -60,6 +60,8 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 		this.wikiKey = wikiKey;
 		this.descriptor = widgetDescriptor;
 		
+		evaluationUnavailableMessage  = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
+		
 		String evaluationId = descriptor.get(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
 		if (evaluationId != null) {
 			evaluationIds = new HashSet<String>();
@@ -69,9 +71,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 			@Override
 			public void invoke(Set<String> evalIds) {
 				evaluationIds = evalIds;
-				final String evaluationUnavailableMessage = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
 				final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
-				
 				//figure out if we should show anything
 				try {
 					challengeClient.getAvailableEvaluations(evaluationIds, new AsyncCallback<String>() {
@@ -79,7 +79,11 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 						public void onSuccess(String jsonString) {
 							try {
 								PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-								view.configure(wikiKey, results.getTotalNumberOfResults() > 0, evaluationUnavailableMessage, buttonText);	
+								if (results.getTotalNumberOfResults() == 0) {
+									view.showUnavailable(evaluationUnavailableMessage);
+								} else {
+									view.configure(wikiKey, buttonText);	
+								}
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}
@@ -88,7 +92,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 						public void onFailure(Throwable caught) {
 							//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
 							if (!(caught instanceof ForbiddenException)) {
-								view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+								view.showUnavailable(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
 							}
 						}
 					});
@@ -114,6 +118,9 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 			}
 			if (!evaluationIds.isEmpty())
 				callback.invoke(evaluationIds);
+			else {
+				view.showUnavailable(evaluationUnavailableMessage);
+			}
 			return;
 		} 
 		//else, look for the challenge id
@@ -125,6 +132,8 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 					//if no evaluations are accessible, do not continue (show nothing)
 					if (!evaluationIds.isEmpty())
 						callback.invoke(evaluationIds);
+					else
+						view.showUnavailable(evaluationUnavailableMessage);
 				};
 				@Override
 				public void onFailure(Throwable caught) {
