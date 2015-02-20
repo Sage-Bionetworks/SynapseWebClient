@@ -67,7 +67,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 			evaluationIds = new HashSet<String>();
 			evaluationIds.add(evaluationId);
 		}
-		getEvaluationIds(new CallbackP<Set<String>>() {
+		getEvaluationIds(descriptor, new CallbackP<Set<String>>() {
 			@Override
 			public void invoke(Set<String> evalIds) {
 				evaluationIds = evalIds;
@@ -107,7 +107,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	 * Get the evaluation queue ids
 	 * @param callback
 	 */
-	public void getEvaluationIds(final CallbackP<Set<String>> callback) {
+	public void getEvaluationIds(Map<String,String> descriptor, final CallbackP<Set<String>> callback) {
 		String subchallengeIdList = null;
 		if(descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY)) subchallengeIdList = descriptor.get(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
 		if(subchallengeIdList != null) {
