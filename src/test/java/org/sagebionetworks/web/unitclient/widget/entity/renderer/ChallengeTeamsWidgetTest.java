@@ -123,7 +123,7 @@ public class ChallengeTeamsWidgetTest {
 		
 		//now edit test team
 		widget.onEdit(TEST_TEAM_ID);
-		verify(mockEditRegisterTeamDialog).showChallengeTeamEditor(eq(testChallengeTeam), any(Callback.class));
+		verify(mockEditRegisterTeamDialog).configure(eq(testChallengeTeam), any(Callback.class));
 	}
 	
 

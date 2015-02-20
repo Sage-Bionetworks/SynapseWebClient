@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -172,7 +173,8 @@ public class EvaluationSubmitter implements Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.resetNextButton();
-				if (caught instanceof NotFoundException) {
+				//if challenge is not found, or if user has access to the evaluation queue but not the project (messy setup)
+				if (caught instanceof NotFoundException || caught instanceof ForbiddenException) {
 					//no need to show second page, this is a submission to a non-challenge eval queue.
 					onDoneClicked();
 				} else {

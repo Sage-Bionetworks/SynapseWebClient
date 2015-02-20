@@ -98,7 +98,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	
 	@Override
 	public void onEdit(String teamId) {
-		dialog.showChallengeTeamEditor(teamId2ChallengeTeam.get(teamId), widgetRefreshRequired);
+		dialog.configure(teamId2ChallengeTeam.get(teamId), widgetRefreshRequired);
 	}
 	
 	@Override

@@ -22,6 +22,12 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("challenge")	
 public interface ChallengeClient extends RemoteService {
 
+	/**
+	 * Get evaluations given a list of ids.
+	 * @param evaluationIds
+	 * @return
+	 * @throws RestServiceException
+	 */
 	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
 	
 	public String getAvailableEvaluations() throws RestServiceException;

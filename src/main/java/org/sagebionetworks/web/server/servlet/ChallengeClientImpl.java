@@ -180,6 +180,10 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	// before we hit this limit we will use another mechanism to find groups
 	private static final Long GROUPS_PAGINATION_LIMIT = 1000L;
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.sagebionetworks.web.client.ChallengeClient#getEvaluations(java.util.List)
+	 */
 	@Override
 	public String getEvaluations(List<String> evaluationIds)
 			throws RestServiceException {

@@ -27,8 +27,6 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 		this.challengeClient = challengeClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
-		
-		view.setRecruitmentMessage("");
 		view.setPresenter(this);
 	}		
 	
@@ -37,14 +35,16 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 	}
 	
 	private void clearState() {
+		view.setRecruitmentMessage("");
 		challengeTeam = null;
 	}
 	
-	public void showChallengeTeamEditor(ChallengeTeam challengeTeam, Callback callback) {
+	public void configure(ChallengeTeam challengeTeam, Callback callback) {
 		clearState();
 		this.challengeTeam = challengeTeam;
 		this.callback = callback;
-		view.setRecruitmentMessage(challengeTeam.getMessage());
+		if (challengeTeam.getMessage() != null)
+			view.setRecruitmentMessage(challengeTeam.getMessage());
 		view.showModal();
 	}
 	
@@ -61,8 +61,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
@@ -79,8 +78,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
