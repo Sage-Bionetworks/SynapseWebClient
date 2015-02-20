@@ -14,19 +14,14 @@ import com.google.inject.Inject;
 public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Presenter {
 	private EditRegisteredTeamDialogView view;
 	private ChallengeClientAsync challengeClient;
-	private GlobalApplicationState globalAppState;
-	private AuthenticationController authController;
 	private Callback callback;
 	private ChallengeTeam challengeTeam;
 	@Inject
 	public EditRegisteredTeamDialog(EditRegisteredTeamDialogView view, 
-			ChallengeClientAsync challengeClient,
-			GlobalApplicationState globalAppState,
-			AuthenticationController authController) {
+			ChallengeClientAsync challengeClient
+			) {
 		this.view = view;
 		this.challengeClient = challengeClient;
-		this.globalAppState = globalAppState;
-		this.authController = authController;
 		view.setPresenter(this);
 	}		
 	

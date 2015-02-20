@@ -36,8 +36,6 @@ public class EditRegisterTeamDialogTest {
 	EditRegisteredTeamDialog widget;
 	EditRegisteredTeamDialogView mockView;
 	ChallengeClientAsync mockChallengeClient;
-	GlobalApplicationState mockGlobalApplicationState;
-	AuthenticationController mockAuthenticationController;
 	PlaceChanger mockPlaceChanger;
 	Callback mockCallback;
 	
@@ -46,16 +44,9 @@ public class EditRegisterTeamDialogTest {
 	@Before
 	public void before() {
 		mockChallengeClient = mock(ChallengeClientAsync.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockView = mock(EditRegisteredTeamDialogView.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
 		mockCallback = mock(Callback.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EditRegisteredTeamDialog(mockView, mockChallengeClient, mockGlobalApplicationState, mockAuthenticationController);
-		
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(LOGGED_IN_USER_ID);
+		widget = new EditRegisteredTeamDialog(mockView, mockChallengeClient);
 		challengeTeam = new ChallengeTeam();
 		challengeTeam.setChallengeId(CHALLENGE_ID);
 		challengeTeam.setTeamId("9");
@@ -80,7 +71,22 @@ public class EditRegisterTeamDialogTest {
 		verify(mockCallback).invoke();
 		verify(mockView).hideModal();
 	}
+
 	
+	@Test
+	public void testConfigureUnregister() {
+		widget.configure(challengeTeam, mockCallback);
+		verify(mockView).setRecruitmentMessage("");
+		verify(mockView).showModal();
+		
+		//click Unregister
+		widget.onUnregister();
+		verify(mockChallengeClient).unregisterChallengeTeam(anyString(), any(AsyncCallback.class));
+		
+		verify(mockCallback).invoke();
+		verify(mockView).hideModal();
+	}
+
 	
 	@Test
 	public void testConfigureWithChallengeMessage() {
