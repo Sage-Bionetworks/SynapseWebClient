@@ -38,7 +38,6 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		
-		view.setRecruitmentMessage("");
 		view.setPresenter(this);
 	}		
 	
@@ -80,10 +79,8 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 			public void onSuccess(List<Team> result) {
 				teams = result;
 				//if there is a team, then select the first team by default.  otherwise, show no teams visible ui
-				if (teams.isEmpty()) {
-					view.setNoTeamsFoundVisible(true);
-				} else {
-					view.setNoTeamsFoundVisible(false);
+				view.setNoTeamsFoundVisible(teams.isEmpty());
+				if (!teams.isEmpty()) {
 					view.setTeams(teams);	
 					selectedTeamId = teams.get(0).getId();
 				}
@@ -122,8 +119,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
+					view.showErrorMessage(caught.getMessage());
 				}
 			});
 		}
@@ -137,11 +133,20 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	
 	@Override
 	public void teamSelected(String teamName) {
-		for (Team team : teams) {
-			if (teamName.equals(team.getName())) {
-				selectedTeamId = team.getId();
-				break;
+		if (teams != null) {
+			for (Team team : teams) {
+				if (teamName.equals(team.getName())) {
+					selectedTeamId = team.getId();
+					break;
+				}
 			}
 		}
+	}
+	
+	/*********
+	 * Exposed for testing purposes
+	 */
+	public String getSelectedTeamId() {
+		return selectedTeamId;
 	}
 }
