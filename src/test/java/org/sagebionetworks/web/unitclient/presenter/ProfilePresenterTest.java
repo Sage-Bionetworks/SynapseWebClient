@@ -116,6 +116,7 @@ public class ProfilePresenterTest {
 	ProjectPagedResults projects;
 	List<ProjectHeader> myProjects;
 	ChallengePagedResults testChallengePagedResults;
+	List<ChallengeBundle> testChallenges;
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		mockView = mock(ProfileView.class);
@@ -197,22 +198,21 @@ public class ProfilePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isEditing()).thenReturn(false);
-		
-		AsyncMockStubber.callSuccessWith(getTestChallengePagedResults()).when(mockChallengeClient).getChallenges(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		setupTestChallengePagedResults();
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
 		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 	
-	public static ChallengePagedResults getTestChallengePagedResults() {
-		ChallengePagedResults results = new ChallengePagedResults();
-		List<ChallengeBundle> challangeList = new ArrayList<ChallengeBundle>();
+	public void setupTestChallengePagedResults() {
+		testChallengePagedResults = new ChallengePagedResults();
+		testChallenges = new ArrayList<ChallengeBundle>();
 		ChallengeBundle bundle = new ChallengeBundle(ChallengeClientImplTest.getTestChallenge(), "my challenge project");
-		challangeList.add(bundle);
-		results.setResults(challangeList);
-		results.setTotalNumberOfResults(1L);
-		return results;
+		testChallenges.add(bundle);
+		testChallengePagedResults.setResults(testChallenges);
+		testChallengePagedResults.setTotalNumberOfResults(1L);
+		AsyncMockStubber.callSuccessWith(testChallengePagedResults).when(mockChallengeClient).getChallenges(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -599,10 +599,10 @@ public class ProfilePresenterTest {
 		profilePresenter.refreshChallenges();
 		verify(mockView).clearChallenges();
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
+		
+		verify(mockView, times(2)).showChallengesLoading(anyBoolean());
+		verify(mockView).addChallenges(testChallenges);
 	}
-	
-	//TODO: add more challenge tests!
-	
 	
 	@Test
 	public void testGetTeams() {
