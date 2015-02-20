@@ -85,7 +85,7 @@ public class EvaluationSubmitter implements Presenter {
 		isIndividualSubmission = true;
 		teams = new ArrayList<Team>();
 		selectedTeamEligibleMembers = new ArrayList<Long>();
-		view.showLoading();
+		view.resetNextButton();
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
 		try {
@@ -155,12 +155,14 @@ public class EvaluationSubmitter implements Presenter {
 		this.evaluation = evaluation;
 		//The standard is to attach access requirements to the associated team, and show them when joining the team.
 		//So access requirements are not checked again here.
-		view.hideModal1();
-		//look for an associated challenge
 		queryForChallenge();
 	}
-	
+
+	/**
+	 * Look for a challenge associated with the selected evaluation
+	 */
 	public void queryForChallenge() {
+		view.setNextButtonLoading();
 		challengeClient.getChallengeForProject(evaluation.getContentSource(), new AsyncCallback<Challenge>() {
 			@Override
 			public void onSuccess(Challenge result) {
@@ -169,6 +171,7 @@ public class EvaluationSubmitter implements Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.resetNextButton();
 				if (caught instanceof NotFoundException) {
 					//no need to show second page, this is a submission to a non-challenge eval queue.
 					onDoneClicked();
@@ -232,10 +235,14 @@ public class EvaluationSubmitter implements Presenter {
 	
 	@Override
 	public void onDoneClicked() {
+		view.hideModal1();
 		if (!isIndividualSubmission) {
 			//team submission
 			if (selectedTeam == null) {
-				view.showErrorMessage("Please select a team");
+				view.showErrorMessage("Please select a team.");
+				return;
+			} else if (selectedTeamEligibleMembers.isEmpty()) {
+				view.showErrorMessage("No eligible contributors on the selected team.");
 				return;
 			}
 		}
@@ -256,11 +263,11 @@ public class EvaluationSubmitter implements Presenter {
 			}
 		}
 		if (selectedTeam != null) {
-			getContributorList();
+			getContributorList(evaluation, selectedTeam);
 		}
 	}
 	
-	public void getContributorList() {
+	public void getContributorList(final Evaluation evaluation, final Team selectedTeam) {
 		//get contributor list for this team
 		view.setContributorsLoading(true);
 		challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
@@ -392,13 +399,33 @@ public class EvaluationSubmitter implements Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(caught.getMessage());
 			}
 		};
 	}
 	
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	/***************************
+	 * Exposed for unit tests
+	 * @return
+	 ****************************/
+	
+	public Challenge getChallenge() {
+		return challenge;
+	}
+	
+	public Team getSelectedTeam() {
+		return selectedTeam;
+	}
+	
+	public String getSelectedTeamMemberStateHash() {
+		return selectedTeamMemberStateHash;
+	}
+	
+	public List<Long> getSelectedTeamEligibleMembers() {
+		return selectedTeamEligibleMembers;
 	}
 }

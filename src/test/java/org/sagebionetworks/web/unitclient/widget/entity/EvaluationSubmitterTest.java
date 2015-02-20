@@ -1,33 +1,31 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.MemberSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.Submission;
+import org.sagebionetworks.evaluation.model.SubmissionEligibility;
+import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -35,13 +33,13 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -66,6 +64,12 @@ public class EvaluationSubmitterTest {
 	AccessRequirementsTransport art;
 	Submission returnSubmission;
 	Evaluation e1;
+	TeamSubmissionEligibility testTeamSubmissionEligibility;
+	SubmissionEligibility teamEligibility;
+	List<MemberSubmissionEligibility> memberEligibilityList;
+	
+	public static final Long ELIGIBILITY_STATE_HASH = 314159269L;
+	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
 		mockView = mock(EvaluationSubmitterView.class);
@@ -118,6 +122,22 @@ public class EvaluationSubmitterTest {
 		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
 		requirements.setResults(ars);
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
+		
+		//by default, this is a standard evaluation (no challenge)
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		
+		setupTeamSubmissionEligibility();
+	}
+	
+	public void setupTeamSubmissionEligibility() {
+		testTeamSubmissionEligibility =  new TeamSubmissionEligibility();
+		testTeamSubmissionEligibility.setEligibilityStateHash(ELIGIBILITY_STATE_HASH);
+		teamEligibility = new SubmissionEligibility();
+		teamEligibility.setIsEligible(true);
+		testTeamSubmissionEligibility.setTeamEligibility(teamEligibility);
+		memberEligibilityList = new ArrayList<MemberSubmissionEligibility>();
+		testTeamSubmissionEligibility.setMembersEligibility(memberEligibilityList);
+		AsyncMockStubber.callSuccessWith(testTeamSubmissionEligibility).when(mockChallengeClient).getTeamSubmissionEligibility(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -201,5 +221,119 @@ public class EvaluationSubmitterTest {
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message
 		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	/****
+	 * Now test challenge based submissions
+	 */
+	
+	private Challenge getTestChallenge() {
+		Challenge testChallenge = new Challenge();
+		testChallenge.setId("4");
+		testChallenge.setProjectId("syn9999");
+		testChallenge.setParticipantTeamId("78");
+		return testChallenge;
+	}
+	
+	@Test
+	public void testQueryForChallengeAndTeams() throws RestServiceException{
+		submitter.configure(entity, null);
+		reset(mockView);
+		
+		Challenge testChallenge = getTestChallenge();
+		AsyncMockStubber.callSuccessWith(testChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		Team testTeam = new Team();
+		testTeam.setId("80");
+		testTeam.setName("test team");
+		List<Team> submissionTeams = Collections.singletonList(testTeam);
+		AsyncMockStubber.callSuccessWith(submissionTeams).when(mockChallengeClient).getSubmissionTeams(anyString(), anyString(), any(AsyncCallback.class));
+		
+		Evaluation testEvaluation = new Evaluation();
+		testEvaluation.setContentSource("syn9999");
+		submitter.onNextClicked(new Reference(), "named submission", testEvaluation);
+		assertEquals(testChallenge, submitter.getChallenge());
+		verify(mockView).showTeams(eq(submissionTeams));
+		//and this first team should be selected by default
+		assertEquals(testTeam, submitter.getSelectedTeam());
+		
+		verify(mockView).showModal2();
+	}
+	
+
+	private void configureSubmitter() {
+		submitter.configure(entity, null);
+		reset(mockView);
+	}
+	
+	@Test
+	public void testQueryForChallengeAndEmptyTeams() throws RestServiceException{
+		configureSubmitter();
+		
+		Challenge testChallenge = getTestChallenge();
+		AsyncMockStubber.callSuccessWith(testChallenge).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		List<Team> submissionTeams = Collections.emptyList();
+		AsyncMockStubber.callSuccessWith(submissionTeams).when(mockChallengeClient).getSubmissionTeams(anyString(), anyString(), any(AsyncCallback.class));
+		
+		Evaluation testEvaluation = new Evaluation();
+		testEvaluation.setContentSource("syn9999");
+		submitter.onNextClicked(new Reference(), "named submission", testEvaluation);
+		assertEquals(testChallenge, submitter.getChallenge());
+		verify(mockView).showEmptyTeams();
+		verify(mockView).showModal2();
+	}
+	
+	@Test
+	public void testContributorsListMemberEligibility() throws RestServiceException{
+		configureSubmitter(); 
+		
+		//add eligible member
+		Long eligibleMemberId = 60L;
+		MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+		memberEligibility.setPrincipalId(eligibleMemberId);
+		memberEligibility.setIsEligible(true);
+		memberEligibilityList.add(memberEligibility);
+		
+		Long inEligibleMemberId = 70L;
+		memberEligibility = new MemberSubmissionEligibility();
+		memberEligibility.setPrincipalId(inEligibleMemberId);
+		memberEligibility.setIsEligible(false);
+		memberEligibility.setIsRegistered(true);
+		memberEligibility.setIsQuotaFilled(false);
+		memberEligibility.setHasConflictingSubmission(true);
+		memberEligibilityList.add(memberEligibility);
+		
+		submitter.getContributorList(new Evaluation(), new Team());
+		
+		//show loading, true then false
+		verify(mockView, times(2)).setContributorsLoading(anyBoolean());
+		
+		//by default, team is eligible.  In this test, one member is eligible, and one is not
+		verify(mockView).addEligibleContributor(eq(eligibleMemberId.toString()));
+		verify(mockView).addInEligibleContributor(eq(inEligibleMemberId.toString()), anyString());
+		assertEquals(ELIGIBILITY_STATE_HASH.toString(), submitter.getSelectedTeamMemberStateHash());
+	}
+	
+
+	@Test
+	public void testContributorsListInEligibleTeam() throws RestServiceException{
+		configureSubmitter(); 
+		teamEligibility.setIsEligible(false);
+		teamEligibility.setIsQuotaFilled(true);
+		teamEligibility.setIsRegistered(true);
+		submitter.getContributorList(new Evaluation(), new Team());
+		
+		//show loading, true then false
+		verify(mockView, times(2)).setContributorsLoading(anyBoolean());
+		
+		//by default, team is eligible.  In this test, one member is eligible, and one is not
+		verify(mockView).setTeamInEligibleErrorVisible(eq(true), anyString());
+	}
+	
+	@Test
+	public void testOnTeamSelected() {
+		configureSubmitter();
+		submitter.onTeamSelected("selected team name");
+		verify(mockView).clearContributors();
+		verify(mockView).setTeamInEligibleErrorVisible(eq(false), anyString());
 	}
 }

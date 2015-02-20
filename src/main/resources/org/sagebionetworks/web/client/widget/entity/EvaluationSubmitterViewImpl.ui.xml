@@ -37,7 +37,7 @@
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-				<b:Button ui:field="nextButton" type="PRIMARY">Next</b:Button>
+				<b:Button ui:field="nextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		<b:Modal title="Submit to Challenge"

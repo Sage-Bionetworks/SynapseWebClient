@@ -182,6 +182,16 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
+	public void setNextButtonLoading() {
+		nextButton.state().loading();
+	}
+
+	@Override
+	public void resetNextButton() {
+		nextButton.state().reset();
+	}
+
+	@Override
 	public void showRegisterTeamDialog(String challengeId) {
 		registerTeamDialogContainer.clear();
 		RegisterTeamDialog dialog = ginInjector.getRegisterTeamDialog();

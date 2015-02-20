@@ -27,6 +27,9 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void clearTeams();
 	void showTeams(List<Team> registeredTeams);
 	void setContributorsLoading(boolean isVisible);
+	void setNextButtonLoading();
+	void resetNextButton();
+
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation
 		void onNextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
