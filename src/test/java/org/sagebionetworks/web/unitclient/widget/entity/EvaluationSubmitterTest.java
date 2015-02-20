@@ -330,6 +330,16 @@ public class EvaluationSubmitterTest {
 	}
 	
 	@Test
+	public void testQueryForChallengeForbidden() throws RestServiceException{
+		configureSubmitter();
+		
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		submitter.onNextClicked(new Reference(), "named submission", new Evaluation());
+		verify(mockView).hideModal1();
+		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testOnTeamSelected() {
 		configureSubmitter();
 		submitter.onTeamSelected("selected team name");
