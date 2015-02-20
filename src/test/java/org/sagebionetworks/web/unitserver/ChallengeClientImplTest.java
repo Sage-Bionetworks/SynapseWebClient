@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,14 +58,18 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.shared.ChallengeBundle;
+import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 public class ChallengeClientImplTest {
 	
 	
+	public static final String TEST_CHALLENGE_PROJECT_NAME = "test challenge project name";
 	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
@@ -108,6 +113,7 @@ public class ChallengeClientImplTest {
 	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
 	private static NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(jsonEntityFactory, jsonObjectAdapter);
 	ChallengeTeam testChallengeTeam1, testChallengeTeam2;
+	Challenge testChallenge;
 	
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException{
@@ -158,8 +164,9 @@ public class ChallengeClientImplTest {
 		
 		testChallengeTeam1 = getTestChallengeTeam("join the first team", testTeam1);
 		testChallengeTeam2 = getTestChallengeTeam("join the second team", testTeam2);
+		testChallenge = getTestChallenge();
 		setupChallengeteamPagedResults();
-		setupChallengeParticipants();
+		when(mockSynapse.getChallenge(anyString())).thenReturn(testChallenge);
 	}
 	
 	@Test
@@ -269,6 +276,7 @@ public class ChallengeClientImplTest {
 	
 	@Test
 	public void testGetChallengeParticipants() throws RestServiceException, SynapseException {
+		setupChallengeParticipants();
 		UserProfilePagedResults results = synapseClient.getChallengeParticipants(false, "12", 10, 0);
 		verify(mockSynapse).listChallengeParticipants(anyString(), anyBoolean(), anyLong(), anyLong());
 		verify(mockSynapse).listUserProfiles(anySet());
@@ -289,8 +297,62 @@ public class ChallengeClientImplTest {
 	}
 	
 	@Test
-	public void testGetChallenges() {
+	public void testGetChallenges() throws SynapseException, RestServiceException {
+		setupListChallengesForParticipant();
+		ChallengePagedResults results = synapseClient.getChallenges("userid", 10, 0);
+		verify(mockSynapse).listChallengesForParticipant(anyString(), anyLong(), anyLong());
+		verify(mockSynapse).getEntityHeaderBatch(anyList());
 		
+		assertTrue(results.getTotalNumberOfResults() == 1);
+		assertEquals(TEST_CHALLENGE_PROJECT_NAME, results.getResults().get(0).getProjectName());
+		assertEquals(testChallenge, results.getResults().get(0).getChallenge());
+	}
+	
+	@Test (expected=NotFoundException.class)
+	public void testGetRegistratableTeamsNotMember() throws SynapseException, RestServiceException {
+		//asks for team membership status.  if not member, returns notfoundexception
+		TeamMembershipStatus status =  new TeamMembershipStatus();
+		status.setIsMember(false);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(status);
+		synapseClient.getRegistratableTeams("userid", "challengeId");
+	}
+	
+	@Test
+	public void testGetRegistratableTeamsIsMember() throws SynapseException, RestServiceException {
+		//asks for team membership status.  if not member, returns notfoundexception
+		TeamMembershipStatus status =  new TeamMembershipStatus();
+		status.setIsMember(true);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(status);
+		
+		Team team = new Team();
+		team.setId("22");
+		team.setName("another team");
+		List<Team> teams = new ArrayList<Team>();
+		teams.add(team);
+		when(mockSynapse.listTeams(anySet())).thenReturn(teams);
+		
+		PaginatedIds teamIds = new PaginatedIds();
+		teamIds.setResults(Collections.singletonList("22"));
+		when(mockSynapse.listRegistratableTeams(anyString(), anyLong(), anyLong())).thenReturn(teamIds);
+		List<Team> results = synapseClient.getRegistratableTeams("userid", "challengeId");
+		
+		verify(mockSynapse).getChallenge(anyString());
+		verify(mockSynapse).getTeamMembershipStatus(anyString(), anyString());
+		verify(mockSynapse).listRegistratableTeams(anyString(), anyLong(), anyLong());
+		verify(mockSynapse).listTeams(anySet());
+		assertTrue(results.size() == 1);
+		assertEquals(team, results.get(0));
+	}
+	
+	@Test
+	public void testGetChallengeEvaluationIds() throws SynapseException, RestServiceException {
+		setupGetEvaluationsForEntity(testChallengeProject);
+		
+		Set<String> results = synapseClient.getChallengeEvaluationIds(testChallengeId);
+		assertTrue(results.contains(EVAL_ID_1));
+		assertTrue(results.contains(EVAL_ID_2));
+		verify(mockSynapse).getEvaluationByContentSource(eq(testChallengeProject),anyInt(),anyInt());
+		verify(mockSynapse).getChallenge(anyString());
 	}
 	
 	@Test
@@ -381,6 +443,14 @@ public class ChallengeClientImplTest {
 		assertEquals(0, sharableEvaluations.size());
 	}
 	
+	@Test
+	public void testGetTeamSubmissionEligibility() throws SynapseException, RestServiceException {
+		//pass through
+		String evaluationId = "4444";
+		String teamId = "22";
+		synapseClient.getTeamSubmissionEligibility(evaluationId, teamId);
+		verify(mockSynapse).getTeamSubmissionEligibility(evaluationId, teamId);
+	}
 	
 	@Test
 	public void testSafeLongToInt() {
@@ -439,6 +509,24 @@ public class ChallengeClientImplTest {
 		participantIds.setTotalNumberOfResults(1L);
 		when(mockSynapse.listChallengeParticipants(anyString(), anyBoolean(), anyLong(), anyLong())).thenReturn(participantIds);
 		when(mockSynapse.listUserProfiles(anySet())).thenReturn(Collections.singletonList(mockUserProfile));
+	}
+	
+	public org.sagebionetworks.repo.model.ChallengePagedResults getTestChallengePagedResults() {
+		org.sagebionetworks.repo.model.ChallengePagedResults results = new org.sagebionetworks.repo.model.ChallengePagedResults();
+		results.setResults(Collections.singletonList(testChallenge));
+		results.setTotalNumberOfResults(1L);
+		return results;
+	}
+	
+	public void setupListChallengesForParticipant() throws SynapseException {
+		when(mockSynapse.listChallengesForParticipant(anyString(), anyLong(), anyLong())).thenReturn(getTestChallengePagedResults());
+		BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>();
+		EntityHeader header = new EntityHeader();
+		header.setId(testChallengeProject);
+		header.setName(TEST_CHALLENGE_PROJECT_NAME);
+		headers.setResults(Collections.singletonList(header));
+		headers.setTotalNumberOfResults(1L);
+		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(headers);
 	}
 	
 	public static PaginatedIds getTestRegisteredTeams(){
