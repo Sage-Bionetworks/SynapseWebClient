@@ -333,7 +333,7 @@ public class EvaluationSubmitterTest {
 	public void testQueryForChallengeForbidden() throws RestServiceException{
 		configureSubmitter();
 		
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		submitter.onNextClicked(new Reference(), "named submission", new Evaluation());
 		verify(mockView).hideModal1();
 		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
