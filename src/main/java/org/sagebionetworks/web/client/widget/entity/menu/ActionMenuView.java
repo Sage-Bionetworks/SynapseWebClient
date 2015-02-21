@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface ActionMenuView extends IsWidget, SynapseView, UploadView {
 
@@ -36,7 +37,7 @@ public interface ActionMenuView extends IsWidget, SynapseView, UploadView {
 	
 	void showAddDescriptionCommand(Callback onClick);
 	void hideAddDescriptionCommand();
-	
+	void setEvaluationSubmitterWidget(Widget widget);
 	/**
 	 * Presenter interface
 	 */

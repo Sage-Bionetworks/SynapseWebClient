@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
@@ -22,7 +23,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.DropdownButton;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
-import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
@@ -63,13 +63,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private Callback addDescriptionCallback;
 	private EntityBundle entityBundle;
 	private AccessControlListModalWidget accessControlListModalWidget;
-	
+	private Div evaluationSubmitterContainer;
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
 			UploadDialogWidget locationableUploader, 
 			EntityTypeProvider typeProvider,
 			EntityFinder entityFinder,
-			EvaluationList evaluationList,
 			PublicPrivateBadge publicPrivateBadge,
 			QuizInfoDialog quizInfoDialog,
 			EntityAccessRequirementsWidget accessRequirementsWidget,
@@ -91,7 +90,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		this.accessControlListModalWidget = accessControlListModalWidget;
 		add(uploader.asWidget()); //add uploader dialog to page
 	}
-
 	@Override
 	public void createMenu(
 			EntityBundle entityBundle, 
@@ -101,6 +99,9 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			boolean isInTestMode) {
 		if(toolsButton != null) this.remove(toolsButton);
 		if(shareButton != null) this.remove(shareButton);
+		if (evaluationSubmitterContainer != null) this.remove(evaluationSubmitterContainer);
+		evaluationSubmitterContainer = new Div();
+		
 		Entity entity = entityBundle.getEntity();
 		typeDisplay = typeProvider.getEntityDispalyName(entityType);
 				
@@ -117,7 +118,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 		this.add(toolsButton);	
 		this.add(shareButton);
-		
+		this.add(evaluationSubmitterContainer);
 		//add quiz info dialog to the DOM
 		toolsButton.add(quizInfoDialog.asWidget());
 	}
@@ -446,6 +447,16 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		});
 		menuBtn.addMenuItem(addDescriptionCommand);
 	}
+
+	/**
+	 * Add the evaluation submitter widget to the page
+	 */
+	@Override
+	public void setEvaluationSubmitterWidget(Widget widget) {
+		evaluationSubmitterContainer.clear();
+		evaluationSubmitterContainer.add(widget);
+	}
+
 }
 
 

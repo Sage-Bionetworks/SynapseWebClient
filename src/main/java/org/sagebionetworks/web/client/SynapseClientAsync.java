@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -153,13 +152,6 @@ public interface SynapseClientAsync {
 	
 	public void getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType, AsyncCallback<AccessRequirementsTransport> callback);
 	
-	/**
-	 * 
-	 * @param evalId the evaluation identifier
-	 * @param callback returns VariableContentPaginatedResults<AccessRequirement> json
-	 */
-	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
-	
 	public void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
 	public void getAllEntityUploadAccessRequirements(String entityId, AsyncCallback<String> callback);
 	
@@ -269,42 +261,8 @@ public interface SynapseClientAsync {
 	
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
-
+	
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
-	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<String> callback) throws RestServiceException;
-	void getSharableEvaluations(String entityId, AsyncCallback<ArrayList<String>> callback);
-	
-	/**
-	 * Create a new Submission object.  Callback returning the updated version of the Submission object
-	 * @param submissionJson
-	 * @param etag
-	 * @param callback
-	 */
-	void createSubmission(Submission submission, String etag, AsyncCallback<Submission> callback) throws RestServiceException;
-	
-	
-	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
-	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
-	void updateEvaluationAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
-	
-	
-	/**
-	 * Get all unique submission user aliases associated to the available evaluations (OPEN evaluations that the current user has joined).
-	 * The return list is sorted by Submission created date.
-	 * @param callback
-	 * @throws RestServiceException
-	 */
-	void getAvailableEvaluationsSubmitterAliases(AsyncCallback<String> callback) throws RestServiceException;
-
-	/**
-	 * Return true if the current user has created at least one submission in the given evaluations
-	 * @param evaluationIds
-	 * @param callback
-	 * @throws RestServiceException
-	 */
-	void hasSubmitted(AsyncCallback<Boolean> callback)	throws RestServiceException;
 	
 	void getSynapseVersions(AsyncCallback<String> callback);
 

@@ -151,7 +151,14 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getVideoWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableQueryResultWikiWidget();
-		} //TODO: add other widget descriptors to this mapping as they become available
+		} else if (contentTypeKey.equals(WidgetConstants.REGISTER_CHALLENGE_TEAM_CONTENT_TYPE)) {
+			presenter = ginInjector.getRegisterChallengeTeamWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_TEAMS_CONTENT_TYPE)) {
+			presenter = ginInjector.getChallengeTeamsWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
+			presenter = ginInjector.getChallengeParticipantsWidget();
+		}	 
+		//TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
 			presenter.configure(wikiKey, model, widgetRefreshRequired, wikiVersionInView);

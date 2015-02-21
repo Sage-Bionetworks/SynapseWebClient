@@ -20,9 +20,9 @@ public interface EvaluationListView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		void configure(List<Evaluation> list);
-		List<Evaluation> getSelectedEvaluations();
+		Evaluation getSelectedEvaluation();
 	}
 
 	void configure(List<Evaluation> evaluationList);
-	List<Integer> getSelectedEvaluationIndexes();
+	Integer getSelectedEvaluationIndex();
 }

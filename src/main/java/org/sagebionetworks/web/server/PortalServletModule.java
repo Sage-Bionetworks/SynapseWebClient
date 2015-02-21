@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ChallengeClient;
+import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
@@ -84,9 +86,13 @@ public class PortalServletModule extends ServletModule {
 		bind(CRCSCFilter.class).in(Singleton.class);
 		filter("/crcsc").through(CRCSCFilter.class);
 
-		// Setup the Search service
+		// Setup the Synapse service
 		bind(SynapseClientImpl.class).in(Singleton.class);
 		serve("/Portal/synapse").with(SynapseClientImpl.class);
+		
+		// Setup the Challenge service
+		bind(ChallengeClientImpl.class).in(Singleton.class);
+		serve("/Portal/challenge").with(ChallengeClientImpl.class);
 		
 		// Setup the Search service
 		bind(SearchServiceImpl.class).in(Singleton.class);

@@ -15,14 +15,14 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
-public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView {
+public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
@@ -76,15 +76,14 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
 				profilePicture.setWidth("16px");
 				profilePicture.setHeight("16px");
-				profilePicture.addStyleName("imageButton userProfileImage displayInline");
+				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-5");
 				profilePicture.addClickHandler(clickHandler);
 				add(profilePicture);
-				setCellWidth(profilePicture, "20px");
 			} else {
-				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before margin-right-5"));
+				profilePicture.addStyleName("displayInline");
 				profilePicture.addClickHandler(clickHandler);
 				add(profilePicture);
-				setCellWidth(profilePicture, "20px");
 			}
 			add(anchor);
 			add(notificationsPanel);
@@ -97,7 +96,7 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		clear();
 		notificationsPanel.clear();
 		
-		Label nameLabel = new Label(name);
+		InlineLabel nameLabel = new InlineLabel(name);
 		nameLabel.addStyleName("font-size-13 boldText");
 		
 		HTML profilePicture;
@@ -106,11 +105,10 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 			String html = AbstractImagePrototype.create(iconsImageBundle.globe16()).getHTML();
 			profilePicture = new HTML(html);
 		} else {
-			profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+			profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before margin-right-5"));
 		}
-		
+		profilePicture.addStyleName("displayInline margin-right-5");
 		add(profilePicture);
-		setCellWidth(profilePicture, "20px");
 			
 		add(nameLabel);
 		add(notificationsPanel);

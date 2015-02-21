@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -258,9 +257,6 @@ public interface SynapseClient extends RemoteService {
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType)
 			throws RestServiceException;
 	
-	String getUnmetEvaluationAccessRequirements(String evalId)
-			throws RestServiceException;
-
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
 	String getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
 	
@@ -366,23 +362,6 @@ public interface SynapseClient extends RemoteService {
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
-	
-	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
-	
-	public String getAvailableEvaluations() throws RestServiceException;
-	public String getAvailableEvaluations(Set<String> targetEvaluationIds) throws RestServiceException;
-	
-	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
-	
-	public Submission createSubmission(Submission submission, String etag) throws RestServiceException;
-	
-	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
-	public String getEvaluationAcl(String evalId) throws RestServiceException;
-	public AccessControlList updateEvaluationAcl(AccessControlList acl) throws RestServiceException;
-	
-	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
-
-	public Boolean hasSubmitted()	throws RestServiceException;
 		
 	public String getSynapseVersions() throws RestServiceException;
 	

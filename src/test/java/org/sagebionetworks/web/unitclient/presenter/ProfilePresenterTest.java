@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -46,6 +47,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -70,12 +72,15 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.shared.ChallengeBundle;
+import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
+import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.Header;
@@ -94,15 +99,12 @@ public class ProfilePresenterTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserService;
 	SynapseClientAsync mockSynapseClient;
+	ChallengeClientAsync mockChallengeClient;
+	
 	GlobalApplicationState mockGlobalApplicationState;
 	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	GWTWrapper mockGWTWrapper;
-	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-	RequestBuilderWrapper mockRequestBuilder;
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	CookieProvider mockCookies;
 	Profile place = Mockito.mock(Profile.class);
 	
 	UserSessionData testUser = new UserSessionData();
@@ -113,7 +115,8 @@ public class ProfilePresenterTest {
 	List<Team> myTeams;
 	ProjectPagedResults projects;
 	List<ProjectHeader> myProjects;
-	
+	ChallengePagedResults testChallengePagedResults;
+	List<ChallengeBundle> testChallenges;
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		mockView = mock(ProfileView.class);
@@ -122,14 +125,10 @@ public class ProfilePresenterTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockGWTWrapper = mock(GWTWrapper.class);
+		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockProfileForm = mock(ProfileFormWidget.class);
-		mockRequestBuilder = mock(RequestBuilderWrapper.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockCookies = mock(CookieProvider.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockCookies, mockGWTWrapper, adapter, mockProfileForm, adapterFactory, 
-				mockSynapseJSNIUtils, mockRequestBuilder);	
+				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
@@ -186,8 +185,6 @@ public class ProfilePresenterTest {
 		//set up create team test
 		AsyncMockStubber.callSuccessWith("new team id").when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		
 		BatchResults<EntityHeader> testBatchResults = new BatchResults<EntityHeader>();
 		List<EntityHeader> testEvaluationResults = new ArrayList<EntityHeader>();
 		EntityHeader testEvaluation = new EntityHeader();
@@ -201,10 +198,21 @@ public class ProfilePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isEditing()).thenReturn(false);
+		setupTestChallengePagedResults();
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
 		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
+	
+	public void setupTestChallengePagedResults() {
+		testChallengePagedResults = new ChallengePagedResults();
+		testChallenges = new ArrayList<ChallengeBundle>();
+		ChallengeBundle bundle = new ChallengeBundle(ChallengeClientImplTest.getTestChallenge(), "my challenge project");
+		testChallenges.add(bundle);
+		testChallengePagedResults.setResults(testChallenges);
+		testChallengePagedResults.setTotalNumberOfResults(1L);
+		AsyncMockStubber.callSuccessWith(testChallengePagedResults).when(mockChallengeClient).getChallenges(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -220,7 +228,6 @@ public class ProfilePresenterTest {
 	@Test
 	public void testUpdateProfileWithLinkedIn() {
 		profilePresenter.setPlace(place);
-		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn("secret");
 		String requestToken = "token";
 		String verifier = "12345";
 		profilePresenter.updateProfileWithLinkedIn(requestToken, verifier);
@@ -588,88 +595,18 @@ public class ProfilePresenterTest {
 	
 	//Challenge tests
 	@Test
-	public void testGetChallengeProjectHeaders() {
-		profilePresenter.getChallengeProjectHeaders(new HashSet<String>());
-		verify(mockView).setChallenges(anyList());
-	}
-	
-	@Test
-	public void testGetChallengeProjectHeadersFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
-		profilePresenter.getChallengeProjectHeaders(new HashSet<String>());
-		verify(mockView).setChallengesError(anyString());
-	}
-	
-	@Test
-	public void testTeam2ChallengeEndToEnd() throws RequestException {
-		Team t1 = new Team();
-		t1.setId("2");
-		List<Team> myTeams = new ArrayList<Team>();
-		myTeams.add(t1);
-		profilePresenter.getChallengeProjectIds(myTeams);
-		//grab the request callback and invoke
-		ArgumentCaptor<RequestCallback> arg = ArgumentCaptor.forClass(RequestCallback.class);
-		verify(mockRequestBuilder).sendRequest(anyString(), arg.capture());
-		RequestCallback callback = arg.getValue();
-		Response testResponse = new Response() {
-			@Override
-			public String getText() {
-				return "{\"1\":\"syn1\", \"2\" : \"syn2\"}";
-			}
-			
-			@Override
-			public String getStatusText() {
-				return null;
-			}
-			
-			@Override
-			public int getStatusCode() {
-				return 0;
-			}
-			
-			@Override
-			public String getHeadersAsString() {
-				return null;
-			}
-			
-			@Override
-			public Header[] getHeaders() {
-				return null;
-			}
-			
-			@Override
-			public String getHeader(String header) {
-				return null;
-			}
-		};
-		callback.onResponseReceived(null, testResponse);
-		ArgumentCaptor<List> entityList = ArgumentCaptor.forClass(List.class);
-		verify(mockRequestBuilder).sendRequest(anyString(), arg.capture());
-		verify(mockView).setChallenges(entityList.capture());
-		List<EntityHeader> capturedEntityList = entityList.getValue();
-		assertEquals(1, capturedEntityList.size());
-	}
-	
-	@Test
-	public void testTeam2ChallengeProjectFileCache() {
-		CallbackP callback = new CallbackP() {
-			@Override
-			public void invoke(Object param) {
-			}
-		};
-		when(mockCookies.getCookie(eq(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn("{\"1\":\"syn1\", \"2\" : \"syn2\"}");
-		profilePresenter.getTeamId2ChallengeIdWhitelist(callback);
-		verify(mockRequestBuilder, times(0)).configure(any(RequestBuilder.Method.class), anyString());
+	public void testRefreshChallenges() {
+		profilePresenter.refreshChallenges();
+		verify(mockView).clearChallenges();
+		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
 		
-		//but without the cookie, it should be called
-		when(mockCookies.getCookie(eq(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn(null);
-		profilePresenter.getTeamId2ChallengeIdWhitelist(callback);
-		verify(mockRequestBuilder, times(1)).configure(any(RequestBuilder.Method.class), anyString());
+		verify(mockView, times(2)).showChallengesLoading(anyBoolean());
+		verify(mockView).addChallenges(testChallenges);
 	}
 	
 	@Test
 	public void testGetTeams() {
-		profilePresenter.getTeamsAndChallenges("anyUserId");
+		profilePresenter.getTeams("anyUserId");
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeams(eq(myTeams), anyBoolean());
 	}
@@ -678,7 +615,7 @@ public class ProfilePresenterTest {
 	public void testGetTeamsError() {
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
-		profilePresenter.getTeamsAndChallenges("anyUserId");
+		profilePresenter.getTeams("anyUserId");
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeamsError(errorMessage);
 	}
