@@ -117,6 +117,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button myProjectsFilter;
 	@UiField
+	Button sharedDirectlyWithMeFilter;
+	@UiField
+	Button sharedByTeamFilter;
+	
+	@UiField
 	Button favoritesFilter;
 	@UiField
 	Button teamFilters;
@@ -278,6 +283,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
 			}
 		});
+		sharedDirectlyWithMeFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+			}
+		});
+		sharedByTeamFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
+			}
+		});
 	}
 	
 	private void initCertificationBadge() {
@@ -379,9 +396,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		if (isOwner) {
 			//also create a link for each team in the project filters
-			addMyParticipatedProjectsFilter();
-			addMyTeamProjectsFilter();
-			teamFiltersDropDownMenu.add(new SeparatorMenuItem());
 			for (final Team team : teams) {
 				AnchorListItem teamFilter = new AnchorListItem(team.getName());
 				teamFilter.addClickHandler(new ClickHandler() {
@@ -394,28 +408,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		}
 	}
-	
-	private void addMyParticipatedProjectsFilter() {
-		AnchorListItem teamFilter = new AnchorListItem("Shared directly with me");
-		teamFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
-			}
-		});
-		teamFiltersDropDownMenu.add(teamFilter);
-	}
-	private void addMyTeamProjectsFilter() {
-		AnchorListItem teamFilter = new AnchorListItem("Shared via any team");
-		teamFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
-			}
-		});
-		teamFiltersDropDownMenu.add(teamFilter);
-	}
-
 	
 	@Override
 	public void setTeamsFilterVisible(boolean isVisible) {
