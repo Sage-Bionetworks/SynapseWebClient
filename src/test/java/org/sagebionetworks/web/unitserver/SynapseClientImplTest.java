@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -1522,10 +1523,12 @@ public class SynapseClientImplTest {
 	}
 	@Test
 	public void testGetRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		WikiPage testPage = new WikiPage();
+		V2WikiHeader testPage = new V2WikiHeader();
 		String expectedId = "88837";
 		testPage.setId(expectedId);
-		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
+		PaginatedResults<V2WikiHeader> results = new PaginatedResults<V2WikiHeader>();
+		results.setResults(Collections.singletonList(testPage));
+		when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(results);
 		
 		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
 		assertEquals(expectedId, actualId);
@@ -1533,12 +1536,8 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetNullRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		WikiPage testPage = null;
-		String expectedId = null;
-		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
-		
 		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
-		assertEquals(expectedId, actualId);
+		assertNull(actualId);
 	}
 	
 	@Test
