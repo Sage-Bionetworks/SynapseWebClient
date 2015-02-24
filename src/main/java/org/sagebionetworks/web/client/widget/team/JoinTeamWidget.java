@@ -288,19 +288,20 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			//include other information from the profile
 			UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
 			return url + "?" + 
-					getEncodedParamValueIfDefined(WebConstants.FIRST_NAME_PARAM, profile.getFirstName(), "&") + 
-					getEncodedParamValueIfDefined(WebConstants.LAST_NAME_PARAM, profile.getLastName(), "&") + 
-					getEncodedParamValueIfDefined(WebConstants.EMAIL_PARAM, profile.getEmails().get(0), "&") + 
-					getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, profile.getOwnerId(), ""); 
+					getEncodedParamValue(WebConstants.FIRST_NAME_PARAM, profile.getFirstName(), "&") + 
+					getEncodedParamValue(WebConstants.LAST_NAME_PARAM, profile.getLastName(), "&") + 
+					getEncodedParamValue(WebConstants.EMAIL_PARAM, profile.getEmails().get(0), "&") + 
+					getEncodedParamValue(WebConstants.USER_ID_PARAM, profile.getOwnerId(), ""); 
 		} else
 			return url;
 	}
 	
-	public String getEncodedParamValueIfDefined(String paramKey, String value, String suffix) {
-		String param = "";
+	public String getEncodedParamValue(String paramKey, String value, String suffix) {
+		String param = paramKey+"=";
 		if (DisplayUtils.isDefined(value)) {
-			param = paramKey+"="+gwt.encodeQueryString(value) + suffix;
+			param += gwt.encodeQueryString(value);
 		}
+		param += suffix;
 		return param;
 	}
 	

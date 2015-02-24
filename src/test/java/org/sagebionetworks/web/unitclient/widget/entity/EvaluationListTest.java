@@ -7,7 +7,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +44,8 @@ public class EvaluationListTest {
 		evaluations.add(new Evaluation());
 		evaluations.add(new Evaluation());
 		widget.configure(evaluations);
-		when(mockView.getSelectedEvaluationIndexes()).thenReturn(new ArrayList<Integer>());
-		
-		assertTrue(widget.getSelectedEvaluations().isEmpty());
+		when(mockView.getSelectedEvaluationIndex()).thenReturn(null);
+		assertNull(widget.getSelectedEvaluation());
 	}
 	
 	@Test
@@ -58,12 +57,9 @@ public class EvaluationListTest {
 		eval2.setId("2");
 		evaluations.add(eval2);
 		widget.configure(evaluations);
-		ArrayList<Integer> selectedIndexes = new ArrayList<Integer>();
-		selectedIndexes.add(1);
-		when(mockView.getSelectedEvaluationIndexes()).thenReturn(selectedIndexes);
+		when(mockView.getSelectedEvaluationIndex()).thenReturn(1);
 		
-		assertEquals(1, widget.getSelectedEvaluations().size());
-		assertEquals(eval2, widget.getSelectedEvaluations().get(0));
+		assertEquals(eval2, widget.getSelectedEvaluation());
 	}
 	
 	

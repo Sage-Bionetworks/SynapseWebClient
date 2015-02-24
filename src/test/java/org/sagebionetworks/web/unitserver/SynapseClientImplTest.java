@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitserver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +48,6 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
-import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -75,8 +74,9 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.ResourceAccess;
-import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
@@ -92,6 +92,7 @@ import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
@@ -172,6 +173,8 @@ public class SynapseClientImplTest {
 	EntityPath path;
 	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
+	org.sagebionetworks.repo.model.PaginatedResults<Team> pguts;
+	Team teamA, teamZ;
 	AccessControlList acl;
 	WikiPage page;
 	V2WikiPage v2Page;
@@ -264,6 +267,19 @@ public class SynapseClientImplTest {
 		ups.add(new UserProfile());
 		pgups.setResults(ups);
 		when(mockSynapse.getUsers(anyInt(), anyInt())).thenReturn(pgups);
+		
+		pguts = new org.sagebionetworks.repo.model.PaginatedResults<Team>();
+		List<Team> uts = new ArrayList<Team>();
+		teamZ = new Team();
+		teamZ.setId("1");
+		teamZ.setName("zygote");
+		uts.add(teamZ);
+		teamA = new Team();
+		teamA.setId("2");
+		teamA.setName("Amplitude");
+		uts.add(teamA);
+		pguts.setResults(uts);
+		when(mockSynapse.getTeamsForUser(anyString(), anyInt(), anyInt())).thenReturn(pguts);
 		
 		acl  = new AccessControlList();
 		acl.setId("sys999");
@@ -384,9 +400,9 @@ public class SynapseClientImplTest {
 		List<ProjectHeader> projectHeaders = new ArrayList();
 		projectHeaders.add(new ProjectHeader());
 		headers.setResults(projectHeaders);
-		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
-		when(mockSynapse.getProjectsForTeam(anyLong(), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getMyProjects(any(ProjectListType.class), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsFromUser(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsForTeam(anyLong(), any(ProjectListSortColumn.class), any(SortDirection.class), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1114,187 +1130,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetAvailableEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
-		Evaluation e = new Evaluation();
-		e.setId("A test ID");
-		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
-		String evaluationsJson = synapseClient.getAvailableEvaluations();
-		verify(mockSynapse).getAvailableEvaluationsPaginated(anyInt(),anyInt());
-		String expectedJson = EntityFactory.createJSONStringForEntity(testResults);
-		assertEquals(expectedJson, evaluationsJson);
-	}
-	
-	@Test
-	public void testGetEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		when(mockSynapse.getEvaluation(anyString())).thenReturn(new Evaluation());
-		List<String> evaluationIds = new ArrayList<String>();
-		evaluationIds.add("1");
-		evaluationIds.add("2");
-		String evaluationsJson = synapseClient.getEvaluations(evaluationIds);
-		
-		verify(mockSynapse, Mockito.times(2)).getEvaluation(anyString());
-		
-		org.sagebionetworks.web.shared.PaginatedResults<Evaluation> evaluationObjectList = 
-				nodeModelCreator.createPaginatedResults(evaluationsJson, Evaluation.class);
-		assertEquals(2, evaluationObjectList.getTotalNumberOfResults());
-		assertEquals(2, evaluationObjectList.getResults().size());
-	}
-
-	
-	@Test
-	public void testHasSubmitted() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		String sharedEntityId = "syn123455";
-		setupGetAvailableEvaluations(sharedEntityId);
-		
-		PaginatedResults<Submission> submissions = new PaginatedResults<Submission>();
-		//verify when all empty, hasSubmitted returns false
-		when(mockSynapse.getMySubmissions(anyString(), anyLong(), anyLong())).thenReturn(submissions);
-		assertFalse(synapseClient.hasSubmitted());
-		
-		//verify when there is a submission, it returns true
-		submissions.setTotalNumberOfResults(1);
-		List<Submission> submissionList = new ArrayList<Submission>();
-		submissionList.add(new Submission());
-		submissions.setResults(submissionList);
-		assertTrue(synapseClient.hasSubmitted());
-	}
-	
-	public void setupGetAllEvaluations(String sharedEntityId) throws SynapseException {
-		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
-		when(mockSynapse.getEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
-	}
-	
-	public void setupGetEvaluationsForEntity(String sharedEntityId) throws SynapseException {
-		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
-		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(getEmptyPaginatedResults());
-		when(mockSynapse.getEvaluationByContentSource(eq(sharedEntityId),anyInt(),anyInt())).thenReturn(testResults);
-	}
-	
-	private PaginatedResults<Evaluation> getEmptyPaginatedResults() {
-		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
-		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
-		testResults.setTotalNumberOfResults(0);
-		testResults.setResults(evaluationList);
-		return testResults;
-	}
-	
-	private PaginatedResults<Evaluation> getTestEvaluations(String sharedEntityId) {
-		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
-		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
-		Evaluation e = new Evaluation();
-		e.setId(EVAL_ID_1);
-		e.setContentSource(sharedEntityId);
-		evaluationList.add(e);
-		e = new Evaluation();
-		e.setId(EVAL_ID_2);
-		e.setContentSource(sharedEntityId);
-		evaluationList.add(e);
-		testResults.setTotalNumberOfResults(2);
-		testResults.setResults(evaluationList);
-		return testResults;
-	}
-	
-	public void setupGetAvailableEvaluations(String sharedEntityId) throws SynapseException {
-		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
-		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
-	}
-	
-	@Test
-	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		Submission inputSubmission = new Submission();
-		inputSubmission.setId("my submission id");
-		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
-		Submission returnSubmission = synapseClient.createSubmission(inputSubmission, "fakeEtag");
-		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
-		assertEquals(inputSubmission, returnSubmission);
-	}
-	
-	private void setupTestSubmitterAliases() throws SynapseException{
-		//set up 2 available evaluations
-		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
-		List<Evaluation> evalResults = new ArrayList<Evaluation>();
-		Evaluation e = new Evaluation();
-		String eval1Id ="evaluation1"; 
-		e.setId(eval1Id);
-		evalResults.add(e);
-		e = new Evaluation();
-		String eval2Id = "evaluation2";
-		e.setId(eval2Id);
-		evalResults.add(e);
-		availableEvaluations.setResults(evalResults);
-		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(availableEvaluations);
-		
-		//test sorting, uniqueness, and empty/null values
-		Submission[] submissions = new Submission[6];
-		Date date = new Date();
-		for (int i = 0; i < submissions.length; i++) {
-			submissions[i] = new Submission();
-			//submission 0 is the most recently used (largest date time), and submission 6 is the oldest
-			submissions[i].setCreatedOn(new Date(date.getTime() - i));	 
-			submissions[i].setSubmitterAlias("Alias " + i);
-		}
-		//set a duplicate
-		submissions[3].setSubmitterAlias("Alias 0");
-		//and add a null and empty string submitter alias, to verify that these are removed
-		submissions[4].setSubmitterAlias(null);
-		submissions[5].setSubmitterAlias("");
-		
-		//assign 2 submissions to evaluation1, and the other 4 submissions to evaluation2
-		//mix them up to test sort
-		PaginatedResults<Submission> submissionSet1 = new PaginatedResults<Submission>();
-		List<Submission> submissionList = new ArrayList<Submission>();
-		submissionList.add(submissions[0]);
-		submissionList.add(submissions[2]);
-		submissionSet1.setTotalNumberOfResults(2);
-		submissionSet1.setResults(submissionList);
-		
-		PaginatedResults<Submission> submissionSet2 = new PaginatedResults<Submission>();
-		submissionList = new ArrayList<Submission>();
-		submissionList.add(submissions[1]);
-		submissionList.add(submissions[3]);
-		submissionList.add(submissions[4]);
-		submissionList.add(submissions[5]);
-		submissionSet2.setTotalNumberOfResults(4);
-		submissionSet2.setResults(submissionList);
-		when(mockSynapse.getMySubmissions(eq(eval1Id), anyLong(), anyLong())).thenReturn(submissionSet1);
-		when(mockSynapse.getMySubmissions(eq(eval2Id), anyLong(), anyLong())).thenReturn(submissionSet2);
-	}
-	
-	@Test
-	public void testGetAvailableEvaluationSubmitterAliases() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		setupTestSubmitterAliases();
-		String resourceListJson = synapseClient.getAvailableEvaluationsSubmitterAliases();
-		RestResourceList resourceList = EntityFactory.createEntityFromJSONString(resourceListJson, RestResourceList.class);
-		List<String> submitterAliasList = resourceList.getList();
-		//3 unique submitter aliases across the evaluations
-		assertEquals(3, submitterAliasList.size());
-		
-		//order should be Alias 0, Alias 1, Alias 2
-		for (int i = 0; i < submitterAliasList.size(); i++) {
-			assertEquals("Alias " + i, submitterAliasList.get(i));
-		}
-	}
-	
-	@Test
-	public void testGetSharableEvaluations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		String myEntityId = "syn123";
-		//set up 2 available evaluations associated to this entity id
-		setupGetEvaluationsForEntity(myEntityId);
-		
-		//"Before" junit test setup configured so this user to have the ability to change permissions on eval 2, but not on eval 1
-		ArrayList<String> sharableEvaluations = synapseClient.getSharableEvaluations(myEntityId);
-		//verify this is eval 2
-		assertEquals(1, sharableEvaluations.size());
-		Evaluation e2 = nodeModelCreator.createJSONEntity(sharableEvaluations.get(0), Evaluation.class);
-		assertEquals(EVAL_ID_2, e2.getId());
-		
-		//and verify that no evaluations are returned for a different entity id
-		sharableEvaluations = synapseClient.getSharableEvaluations("syn456");
-		assertEquals(0, sharableEvaluations.size());
-	}
-	
-	@Test
 	public void testInviteMemberOpenInvitations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenInvitation(true);
 		//verify it does not create a new invitation since one is already open
@@ -1618,8 +1453,8 @@ public class SynapseClientImplTest {
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
-		synapseClient.getMyProjects(limit, offset);
-		verify(mockSynapse).getMyProjects(eq(limit), eq(offset));
+		synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset);
+		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
 	@Test
@@ -1629,7 +1464,7 @@ public class SynapseClientImplTest {
 		Long userId = 133l;
 		String userIdString = userId.toString();
 		synapseClient.getUserProjects(userIdString, limit, offset);
-		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
+		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
 	@Test
@@ -1639,7 +1474,7 @@ public class SynapseClientImplTest {
 		Long teamId = 144l;
 		String teamIdString = teamId.toString();
 		synapseClient.getProjectsForTeam(teamIdString, limit, offset);
-		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(limit), eq(offset));
+		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 
 	
@@ -1688,10 +1523,12 @@ public class SynapseClientImplTest {
 	}
 	@Test
 	public void testGetRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		WikiPage testPage = new WikiPage();
+		V2WikiHeader testPage = new V2WikiHeader();
 		String expectedId = "88837";
 		testPage.setId(expectedId);
-		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
+		PaginatedResults<V2WikiHeader> results = new PaginatedResults<V2WikiHeader>();
+		results.setResults(Collections.singletonList(testPage));
+		when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(results);
 		
 		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
 		assertEquals(expectedId, actualId);
@@ -1699,11 +1536,48 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetNullRootWikiId() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		WikiPage testPage = null;
-		String expectedId = null;
-		when(mockSynapse.getRootWikiPage(anyString(), any(ObjectType.class))).thenReturn(testPage);
-		
 		String actualId = synapseClient.getRootWikiId("1", ObjectType.ENTITY.toString());
-		assertEquals(expectedId, actualId);
+		assertNull(actualId);
+	}
+	
+	@Test
+	public void testGetFavorites() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		PaginatedResults<EntityHeader> pagedResults = new PaginatedResults<EntityHeader>();
+		List<EntityHeader> unsortedResults = new ArrayList<EntityHeader>();
+		pagedResults.setResults(unsortedResults);
+		when(mockSynapse.getFavorites(anyInt(), anyInt())).thenReturn(pagedResults);
+		
+		//test empty favorites
+		List<EntityHeader> actualList = synapseClient.getFavorites();
+		assertTrue(actualList.isEmpty());
+		
+		//test a few unsorted favorites
+		EntityHeader favZ = new EntityHeader();
+		favZ.setName("Z");
+		unsortedResults.add(favZ);
+		EntityHeader favA = new EntityHeader();
+		favA.setName("A");
+		unsortedResults.add(favA);
+		EntityHeader favQ = new EntityHeader();
+		favQ.setName("q");
+		unsortedResults.add(favQ);
+		
+		actualList = synapseClient.getFavorites();
+		assertEquals(3, actualList.size());
+		assertEquals(favA, actualList.get(0));
+		assertEquals(favQ, actualList.get(1));
+		assertEquals(favZ, actualList.get(2));
+	}
+	
+	@Test
+	public void testGetTeamsForUser() throws RestServiceException, JSONObjectAdapterException, SynapseException {
+		//the paginated results were set up to return {teamZ, teamA}, but servlet side we sort by name.
+		ArrayList<String> results = synapseClient.getTeamsForUser("abba");
+		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
+		assertEquals(2, results.size());
+		String teamAJson = EntityFactory.createJSONStringForEntity(teamA);
+		String teamZJson = EntityFactory.createJSONStringForEntity(teamZ);
+		assertEquals(teamAJson, results.get(0));
+		assertEquals(teamZJson, results.get(1));
 	}
 }

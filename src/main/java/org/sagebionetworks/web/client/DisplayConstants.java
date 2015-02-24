@@ -281,7 +281,6 @@ public class DisplayConstants {
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
 	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
-	public static final String FAVORITES_REMINDER_TOOLTIP_MESSAGE = "Click the star to add this to your favorites!";
 	public static final String SUBMITTED_TITLE = "Submitted";
 	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
 	
@@ -415,7 +414,6 @@ public class DisplayConstants {
 	public static final String URL_LABEL = "URL:";
 	public static final String EQUATION_LABEL = "TeX:";
 	public static final String LINK_TEXT_LABEL = "Link Text:";
-	public static final String TABLE_LABEL = "Tab Delimitted Table Contents:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
 	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
@@ -598,7 +596,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String EXTERNAL_URL = "External URL";
 	public static final String ADD_ENTITY = "Add Entity";
-	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please " + ClientProperties.HELP_EMAIL_ADDRESS_LINK + " if you would like your Server added to our white list.";
+	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please contact us at " + ClientProperties.HELP_EMAIL_ADDRESS + " if you would like your Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
@@ -624,6 +622,7 @@ public class DisplayConstants {
 	public static final String EVALUATION_JOIN_TEAM_ERROR = "Unable to join team associated with the evaluation: ";
 	public static final String JOIN_TEAM_ERROR = "Unable to request membership to the team: ";
 	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
+	public static final String CHALLENGE_EVALUATIONS_ERROR = "Unable to find the evaluation queues associated with the challenge: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 	public static final String THANK_YOU_FOR_SUBMISSION = "Thank you for your submission!";

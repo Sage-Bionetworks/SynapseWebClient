@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -12,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -33,8 +33,11 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void refreshHeader();
 	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
-	void setChallenges(List<EntityHeader> headers);
+	void addChallenges(List<ChallengeBundle> challenges);
 	void setChallengesError(String error);
+	void clearChallenges();
+	void showChallengesLoading(boolean isVisible);
+	void setIsMoreChallengesVisible(boolean isVisible);
 	void setTeams(List<Team> teams, boolean isOwner);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
@@ -52,7 +55,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setMyProjectsFilterSelected();
 	void setAllProjectsFilterSelected();
 	void setFavoritesFilterSelected();
-	
+	void setFavoritesHelpPanelVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
 		void createProject(String name);
@@ -65,6 +68,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();
 		void getMoreProjects();
+		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 	}
 }

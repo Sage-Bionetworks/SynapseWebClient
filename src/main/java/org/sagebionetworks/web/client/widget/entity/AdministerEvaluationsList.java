@@ -6,8 +6,8 @@ import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -18,13 +18,13 @@ import com.google.inject.Inject;
 
 public class AdministerEvaluationsList implements SynapseWidgetPresenter, AdministerEvaluationsListView.Presenter {
 	
-	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private AdapterFactory adapterFactory;
 	private AdministerEvaluationsListView view;
 	
 	@Inject
-	public AdministerEvaluationsList(AdministerEvaluationsListView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
-		this.synapseClient = synapseClient;
+	public AdministerEvaluationsList(AdministerEvaluationsListView view, ChallengeClientAsync challengeClient, AdapterFactory adapterFactory) {
+		this.challengeClient = challengeClient;
 		this.adapterFactory = adapterFactory;
 		this.view = view;
 	}
@@ -35,7 +35,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	 * @param evaluationCallback call back with the evaluation if it is selected
 	 */
 	public void configure(String entityId, final CallbackP<Boolean> isChallengeCallback) {
-		synapseClient.getSharableEvaluations(entityId, new AsyncCallback<ArrayList<String>>() {
+		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<ArrayList<String>>() {
 			
 			@Override
 			public void onSuccess(ArrayList<String> results) {					

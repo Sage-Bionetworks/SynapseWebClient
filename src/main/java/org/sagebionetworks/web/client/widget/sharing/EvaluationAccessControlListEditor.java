@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -48,6 +49,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	// Editor components
 	private AccessControlListEditorView view;
 	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private JSONObjectAdapter jsonObjectAdapter;
 	
@@ -68,10 +70,12 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			SynapseClientAsync synapseClientAsync,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			JSONObjectAdapter jsonObjectAdapter
+			JSONObjectAdapter jsonObjectAdapter,
+			ChallengeClientAsync challengeClient
 			) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
+		this.challengeClient = challengeClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jsonObjectAdapter = jsonObjectAdapter;
@@ -148,7 +152,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		view.showLoading();
 		hasChangesHandler.hasChanges(false);
 		
-		synapseClient.getEvaluationAcl(evaluation.getId(), new AsyncCallback<String>() {
+		challengeClient.getEvaluationAcl(evaluation.getId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				//set the evaluation acl
@@ -176,7 +180,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		});
 	}
 	public void getUserPermissions(final AsyncCallback<Void> callback) {
-		synapseClient.getUserEvaluationPermissions(evaluation.getId(), new AsyncCallback<String>() {
+		challengeClient.getUserEvaluationPermissions(evaluation.getId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				//set the user permissions object
@@ -402,7 +406,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	
 	protected void applyChanges(AsyncCallback<AccessControlList> callback) {
 		// Apply changes
-		synapseClient.updateEvaluationAcl(acl, callback);
+		challengeClient.updateEvaluationAcl(acl, callback);
 	}
 	
 	public String getDisplayName(String principalId) {

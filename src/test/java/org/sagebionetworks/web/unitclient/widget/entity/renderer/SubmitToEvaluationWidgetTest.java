@@ -1,15 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,10 +19,12 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
@@ -47,13 +44,14 @@ public class SubmitToEvaluationWidgetTest {
 	private static final String EVAL_ID_2 = "2";
 	
 	SubmitToEvaluationWidgetView mockView;
-	SynapseClientAsync mockSynapseClient;
+	ChallengeClientAsync mockChallengeClient;
 	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	EvaluationSubmitter mockEvaluationSubmitter;
+	PortalGinInjector mockPortalGinInjector;
 	SubmitToEvaluationWidget widget;
 	Set<String> targetEvaluations;
 	ArrayList<Evaluation> evaluationList;
@@ -63,14 +61,16 @@ public class SubmitToEvaluationWidgetTest {
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		mockView = mock(SubmitToEvaluationWidgetView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
+		mockPortalGinInjector = mock(PortalGinInjector.class);
+		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockEvaluationSubmitter);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		widget = new SubmitToEvaluationWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, mockEvaluationSubmitter);
+		widget = new SubmitToEvaluationWidget(mockView, mockChallengeClient, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, mockPortalGinInjector);
 		verify(mockView).setPresenter(widget);
 		targetEvaluations = new HashSet<String>();
 		
@@ -83,7 +83,7 @@ public class SubmitToEvaluationWidgetTest {
 		targetEvaluations.add(EVAL_ID_1);
 		targetEvaluations.add(EVAL_ID_2);
 		
-		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockSynapseClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockChallengeClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(2);
 		evaluationList = new ArrayList<Evaluation>();
@@ -105,16 +105,55 @@ public class SubmitToEvaluationWidgetTest {
 	@Test
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockSynapseClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
-		verify(mockView).configure(any(WikiPageKey.class), eq(true), eq(TEST_UNAVAILABLE_MESSAGE), anyString());
+		verify(mockChallengeClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
+		verify(mockView).configure(any(WikiPageKey.class), anyString());
+	}
+	
+	@Test
+	public void testGetEvaluationIds() throws Exception {
+		//test resolving evaluation ids from challenge id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.CHALLENGE_ID_KEY, "1");
+		Set<String> evaluationIds = Collections.singleton("5");
+		AsyncMockStubber.callSuccessWith(evaluationIds).when(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockCallback).invoke(evaluationIds);
+	}
+	
+	@Test
+	public void testGetEvaluationIdsEmpty() throws Exception {
+		//test resolving evaluation ids from challenge id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.CHALLENGE_ID_KEY, "1");
+		Set<String> evaluationIds = Collections.emptySet();
+		AsyncMockStubber.callSuccessWith(evaluationIds).when(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockCallback, never()).invoke(anySet());
+		verify(mockView).showUnavailable(anyString());
+	}
+	
+	@Test
+	public void testGetEvaluationIdsError() throws Exception {
+		//test resolving evaluation ids from challenge id
+		CallbackP<Set<String>> mockCallback = mock(CallbackP.class);
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
+		descriptor.put(WidgetConstants.CHALLENGE_ID_KEY, "1");
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
+		widget.getEvaluationIds(descriptor, mockCallback);
+		verify(mockChallengeClient).getChallengeEvaluationIds(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
 	}
 
 	@Test
 	public void testConfigureServiceFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockChallengeClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		verify(mockSynapseClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockChallengeClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
+		verify(mockView).showUnavailable(anyString());
 	}
 	
 	

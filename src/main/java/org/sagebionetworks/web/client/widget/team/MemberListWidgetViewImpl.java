@@ -35,7 +35,7 @@ import com.google.inject.Inject;
 
 public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWidgetView {
 	public static final String MEMBER_ACCESS = "Member";
-	public static final String ADMIN_ACCESS = "Captain";
+	public static final String ADMIN_ACCESS = "Team Manager";
 	
 	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	private Presenter presenter;
@@ -204,7 +204,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		Option adminOption = new Option();
 		adminOption.setText(ADMIN_ACCESS);
 		accessCombo.add(adminOption);
-		accessCombo.setWidth("100px");
+		accessCombo.setWidth("140px");
 		accessCombo.addChangeHandler(new ChangeHandler() {
 			boolean initializing = true;
 			@Override

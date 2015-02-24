@@ -5,16 +5,12 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<b:Form type="HORIZONTAL">
-			<b:FieldSet>
-				<b:FormGroup>
-					<b:FormLabel for="url" addStyleNames="col-xs-2">Video URL</b:FormLabel>
-					<g:FlowPanel addStyleNames="col-xs-10">
-						<b:TextBox ui:field="urlField" name="url" b:id="url" />
-					</g:FlowPanel>
-				</b:FormGroup>
-			</b:FieldSet>
-		</b:Form>
+		<b:FieldSet>
+			<b:FormGroup>
+				<b:FormLabel for="url">Video URL</b:FormLabel>
+				<b:TextBox ui:field="urlField" name="url" b:id="url" />
+			</b:FormGroup>
+		</b:FieldSet>
 	</bh:Div>
 	
 </ui:UiBinder>

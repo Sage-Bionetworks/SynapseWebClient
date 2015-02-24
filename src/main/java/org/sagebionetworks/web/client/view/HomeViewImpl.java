@@ -41,7 +41,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
-
+	public static final String FAVORITE_STAR_HTML = "<span style=\"font-size:19px;color:#f0ad4e\" class=\"fa fa-star\"></span>";
+	
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
 	
 	@UiField
@@ -168,19 +169,20 @@ public class HomeViewImpl extends Composite implements HomeView {
 		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
 	}
-
+		
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button
 	 */
 	public void addUserPicturePanel() {
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-            @Override
+			@Override
             public void execute() {
             	dashboardBtn.add(userPicturePanel);
-            }
-        });
+			}
+		});
 	}
+
 	
 	@Override
 	public void showLoggedInUI(UserSessionData userData) {
@@ -249,7 +251,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-	}
+		}
 	
 	@Override
 	public void showErrorMessage(String message) {
@@ -269,8 +271,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void clear() {
 	}
-	
-	
+
+
 	private void fillProgrammaticClientInstallCode() {
 		configureNewWindowLink(rAPILink, ClientProperties.CLIENT_R_API_URL, DisplayConstants.API_DOCUMENTATION);
 		configureNewWindowLink(rExampleCodeLink, ClientProperties.CLIENT_R_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);

@@ -48,11 +48,6 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 		userId2html = new HashMap<String, String>();
 		//get unique user ids, then ask for the user group headers
 		inputUserIds = APITableWidget.getColumnValues(inputColumnName, columnData);
-		if (inputUserIds == null) {
-			//user defined an input column that doesn't exist in the service output
-			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + inputColumnName));
-			return;
-		}
 		
 		for (String userId : inputUserIds) {
 			if (userId != null)

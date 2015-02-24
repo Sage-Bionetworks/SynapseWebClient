@@ -68,7 +68,7 @@ public class APITableWidgetTest {
 	WikiPageKey testWikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String col1Name ="column 1";
 	String col2Name ="column 2";
-	
+	public static final int COLUMN_ROW_COUNT = 10;
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(APITableWidgetView.class);
@@ -266,7 +266,7 @@ public class APITableWidgetTest {
 	}
 	private List<String> getTestColumnValues(String columnName) {
 		List<String> testColumnValues = new ArrayList<String>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < COLUMN_ROW_COUNT; i++) {
 			testColumnValues.add(columnName + " data item " + i);
 		}
 		return testColumnValues;
@@ -495,6 +495,10 @@ public class APITableWidgetTest {
 		assertNotNull(APITableWidget.getColumnValues(column1, columnData));
 		//previous table column definitions will be looking for the type. This should also work
 		assertNotNull(APITableWidget.getColumnValues("project."+column1, columnData));
-		assertNull(APITableWidget.getColumnValues("absent", columnData));
+		//absent column should not be null, and should have the item count 
+		List<String> absentColumn = APITableWidget.getColumnValues("absent", columnData);
+		assertNotNull(absentColumn);
+		assertEquals(COLUMN_ROW_COUNT, absentColumn.size());
+		assertNull(absentColumn.get(0));
 	}
 }
