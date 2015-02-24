@@ -408,14 +408,14 @@ public class JoinTeamWidgetTest {
 
 	@Test
 	public void testGetEncodedParamValueIfDefined() {
-		//return empty string if null value
-		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, null, "&"));
+		//return the param key if null value
+		assertEquals(WebConstants.USER_ID_PARAM+"=&", joinWidget.getEncodedParamValue(WebConstants.USER_ID_PARAM, null, "&"));
 		//or empty string value
-		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "", "&"));
+		assertEquals(WebConstants.USER_ID_PARAM+"=&", joinWidget.getEncodedParamValue(WebConstants.USER_ID_PARAM, "", "&"));
 		
 		//if defined, return <paramkey>=<url-encoded-value><suffix>
 		when(mockGwt.encodeQueryString("bar")).thenReturn("encodedbar");
-		assertEquals(WebConstants.USER_ID_PARAM+"=encodedbar&", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "bar", "&"));
+		assertEquals(WebConstants.USER_ID_PARAM+"=encodedbar&", joinWidget.getEncodedParamValue(WebConstants.USER_ID_PARAM, "bar", "&"));
 	}
 	
 }
