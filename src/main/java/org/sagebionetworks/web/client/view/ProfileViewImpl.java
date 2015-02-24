@@ -118,8 +118,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button myProjectsFilter;
 	@UiField
 	Button sharedDirectlyWithMeFilter;
-	@UiField
-	Button sharedByTeamFilter;
 	
 	@UiField
 	Button favoritesFilter;
@@ -289,12 +287,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
 			}
 		});
-		sharedByTeamFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
-			}
-		});
 	}
 	
 	private void initCertificationBadge() {
@@ -396,6 +388,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		if (isOwner) {
 			//also create a link for each team in the project filters
+			addMyTeamProjectsFilter();
+			teamFiltersDropDownMenu.add(new SeparatorMenuItem());
 			for (final Team team : teams) {
 				AnchorListItem teamFilter = new AnchorListItem(team.getName());
 				teamFilter.addClickHandler(new ClickHandler() {
@@ -407,6 +401,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				teamFiltersDropDownMenu.add(teamFilter);
 			}
 		}
+	}
+	
+	private void addMyTeamProjectsFilter() {
+		AnchorListItem teamFilter = new AnchorListItem("All of my teams");
+		teamFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
+			}
+		});
+		teamFiltersDropDownMenu.add(teamFilter);
 	}
 	
 	@Override
