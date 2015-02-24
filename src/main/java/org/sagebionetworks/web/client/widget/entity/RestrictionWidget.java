@@ -106,10 +106,15 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	
 	public AccessRequirement selectNextAccessRequirement() {
 		AccessRequirement nextAR = null;
-		if (unmetArsIterator.hasNext())
-			nextAR = unmetArsIterator.next();
-		else if (allArsIterator.hasNext())
-			nextAR = allArsIterator.next();
+		if (hasUnmetDownloadAccessRequirements()) {
+			if (unmetArsIterator.hasNext())
+				nextAR = unmetArsIterator.next();
+		} else {
+			if (allArsIterator.hasNext()) {
+				nextAR = allArsIterator.next();
+			}
+		}
+			
 		return nextAR;
 	}
 	
@@ -117,7 +122,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		shownAccessRequirements.clear();
 		allArsIterator = bundle.getAccessRequirements().iterator();
 		unmetArsIterator = bundle.getUnmetDownloadAccessRequirements().iterator();
-		currentAR = selectNextAccessRequirement();
 	}
 	
 	public boolean hasUnmetDownloadAccessRequirements() {
@@ -209,9 +213,14 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				public void onClick(ClickEvent event) {
 					//will run through all access requirements, unmet first (see selectNextAccessRequirement)
 					resetAccessRequirementCount();
+					setCurrentAccessRequirement(selectNextAccessRequirement());
 					showNextAccessRequirement(hasAdministrativeAccess);
 				}
 		};
+	}
+	
+	public void setCurrentAccessRequirement(AccessRequirement currentAR) {
+		this.currentAR = currentAR;
 	}
 	
 	public void showNextAccessRequirement(

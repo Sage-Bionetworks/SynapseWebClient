@@ -1551,10 +1551,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			org.sagebionetworks.client.SynapseClient synapseClient,
 			String ownerId, ObjectType ownerType) throws RestServiceException {
 		try {
-			WikiPage rootPage = synapseClient.getRootWikiPage(ownerId,
-					ownerType);
-			if (rootPage != null)
-				return rootPage.getId();
+			PaginatedResults<V2WikiHeader> headerTree = synapseClient.getV2WikiHeaderTree(ownerId, ownerType);
+			if (headerTree != null && headerTree.getResults() != null && !headerTree.getResults().isEmpty())
+				return headerTree.getResults().get(0).getId();
 			else
 				return null;
 		} catch (SynapseException e) {
