@@ -106,12 +106,13 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	
 	public AccessRequirement selectNextAccessRequirement() {
 		AccessRequirement nextAR = null;
-		if (unmetArsIterator.hasNext())
-			nextAR = unmetArsIterator.next();
-		else if (allArsIterator.hasNext()) {
-			//show all ARs if no unmet (if there are any unmet access requirements, then only show unmet).
-			if (bundle.getUnmetDownloadAccessRequirements().isEmpty())
+		if (hasUnmetDownloadAccessRequirements()) {
+			if (unmetArsIterator.hasNext())
+				nextAR = unmetArsIterator.next();
+		} else {
+			if (allArsIterator.hasNext()) {
 				nextAR = allArsIterator.next();
+			}
 		}
 			
 		return nextAR;
