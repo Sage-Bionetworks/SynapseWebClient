@@ -26,7 +26,7 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void teamSelected(String teamName);
+		void teamSelected(int selectedIndex);
 		void onOk();
 		void onNewTeamClicked();
 	}

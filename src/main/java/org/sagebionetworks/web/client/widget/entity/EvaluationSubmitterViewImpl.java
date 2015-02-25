@@ -179,6 +179,13 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 				presenter.onTeamSubmissionOptionClicked();
 			}
 		});
+
+		teamComboBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.onTeamSelected(teamComboBox.getSelectedIndex());
+			}
+		});
 	}
 	
 	@Override
@@ -327,15 +334,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	public void showTeams(List<Team> registeredTeams) {
 		submissionTypeSelectUI.setVisible(true);
 		noTeamsFoundUI.setVisible(false);
-		teamComboBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.onTeamSelected(teamComboBox.getSelectedIndex());
-			}
-		});
 		
 		isIndividualRadioButton.setActive(true);
-		
+		teamComboBox.clear();
 		for (Team teamHeader : registeredTeams) {
 			teamComboBox.addItem(teamHeader.getName());
 		}
