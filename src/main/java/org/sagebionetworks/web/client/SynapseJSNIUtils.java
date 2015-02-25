@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
@@ -49,7 +48,7 @@ public interface SynapseJSNIUtils {
 	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback);
 	
 	public String getContentType(String fileFieldId, int index);
-	
+	public boolean isFileAPISupported();
 	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(String fileFieldId, int index, MD5Callback callback);
 	public double getFileSize(String fileFieldId, int index);

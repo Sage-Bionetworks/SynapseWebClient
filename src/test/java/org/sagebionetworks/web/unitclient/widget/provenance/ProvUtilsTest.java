@@ -423,6 +423,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
+			
+			@Override
+			public boolean isFileAPISupported() {
+				return true;
+			}
 		};
 	}
 

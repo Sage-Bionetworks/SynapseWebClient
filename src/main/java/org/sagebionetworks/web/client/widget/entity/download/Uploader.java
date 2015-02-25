@@ -303,29 +303,40 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	public boolean checkFileAPISupported() {
+		boolean isFileAPISupported = synapseJsniUtils.isFileAPISupported();
+		if (!isFileAPISupported) {
+			String message = "Multipart upload is not supported on this browser.";
+			uploadError(message, new UnsupportedOperationException(message));
+		}
+		return isFileAPISupported;
+	}
+	
 	public void uploadToS3() {
-		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
-		if (isFileEntity) {
-			//use case B from above
-			Callback callback = new Callback() {
-				@Override
-				public void invoke() {
-					directUploadStep2(fileNames[currIndex]);
-				}
-			};
-			checkForExistingFileName(fileNames[currIndex], callback);
-		} else {
-			//use case A from above
-			//uses the default action url
-			//if using this method, block if file size is > MAX_SIZE
-			try {
-				checkFileSize();
-			} catch (Exception e) {
-				view.showErrorMessage(e.getMessage());
-				fireCancelEvent();
-				return;
-			}				
-			view.submitForm(getOldUploadUrl());
+		if (checkFileAPISupported()) {
+			boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
+			if (isFileEntity) {
+				//use case B from above
+				Callback callback = new Callback() {
+					@Override
+					public void invoke() {
+						directUploadStep2(fileNames[currIndex]);
+					}
+				};
+				checkForExistingFileName(fileNames[currIndex], callback);
+			} else {
+				//use case A from above
+				//uses the default action url
+				//if using this method, block if file size is > MAX_SIZE
+				try {
+					checkFileSize();
+				} catch (Exception e) {
+					view.showErrorMessage(e.getMessage());
+					fireCancelEvent();
+					return;
+				}				
+				view.submitForm(getOldUploadUrl());
+			}
 		}
 	}
 	
