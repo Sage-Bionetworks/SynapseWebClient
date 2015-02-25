@@ -342,7 +342,7 @@ public class EvaluationSubmitterTest {
 	@Test
 	public void testOnTeamSelected() {
 		configureSubmitter();
-		submitter.onTeamSelected("selected team name");
+		submitter.onTeamSelected(0);
 		verify(mockView).clearContributors();
 		verify(mockView).setTeamInEligibleErrorVisible(eq(false), anyString());
 	}

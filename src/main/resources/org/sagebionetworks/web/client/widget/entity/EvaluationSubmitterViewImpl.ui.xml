@@ -44,17 +44,19 @@
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
 			<b:ModalBody>
 				<b:FieldSet>
-					<b:ButtonGroup>
-						<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
-						<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
-					</b:ButtonGroup>
-					<bh:Div ui:field="teamComboBoxContainer" />
-					<bh:Div addStyleNames="highlight-box" ui:field="contributorsHighlightPanel">
-						<bh:Div ui:field="contributorsLoadingUI">
-							<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
-					        <bh:Text>&nbsp; Loading...</bh:Text>
+					<bh:Div ui:field="submissionTypeSelectUI">
+						<b:ButtonGroup>
+							<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
+							<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
+						</b:ButtonGroup>
+						<g:ListBox ui:field="teamComboBox" styleName="form-control" />
+						<bh:Div addStyleNames="highlight-box" ui:field="contributorsHighlightPanel">
+							<bh:Div ui:field="contributorsLoadingUI">
+								<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
+						        <bh:Text>&nbsp; Loading...</bh:Text>
+							</bh:Div>
+							<bh:Div ui:field="contributorsPanel"/>
 						</bh:Div>
-						<bh:Div ui:field="contributorsPanel"/>
 					</bh:Div>
 					
 					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
