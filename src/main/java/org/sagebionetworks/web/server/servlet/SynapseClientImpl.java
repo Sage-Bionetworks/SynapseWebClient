@@ -1626,23 +1626,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-//	private String getV2RootWikiId(
-//			org.sagebionetworks.client.SynapseClient synapseClient,
-//			String ownerId, ObjectType ownerType) throws RestServiceException {
-//		try {
-//			V2WikiPage rootPage = synapseClient.getV2RootWikiPage(ownerId,
-//					ownerType);
-//			if (rootPage != null)
-//				return rootPage.getId();
-//			else
-//				return null;
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		} catch (JSONObjectAdapterException e) {
-//			throw new UnknownErrorException(e.getMessage());
-//		}
-//	}
-
 	@Override
 	public String getV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
 			throws RestServiceException {
