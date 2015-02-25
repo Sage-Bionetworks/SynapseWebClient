@@ -34,7 +34,7 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 		//view sends back the selected entity, selected evaluation
 		void onNextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
 		void onDoneClicked();
-		void onTeamSelected(String teamName);
+		void onTeamSelected(int index);
 		void teamAdded();
 		void onRegisterTeamClicked();
 		void onNewTeamClicked();

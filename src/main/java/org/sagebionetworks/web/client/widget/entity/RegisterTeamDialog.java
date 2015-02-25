@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -132,14 +131,10 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	}
 	
 	@Override
-	public void teamSelected(String teamName) {
-		if (teams != null) {
-			for (Team team : teams) {
-				if (teamName.equals(team.getName())) {
-					selectedTeamId = team.getId();
-					break;
-				}
-			}
+	public void teamSelected(int selectedIndex) {
+		selectedTeamId = null;
+		if (teams != null && selectedIndex >= 0 && selectedIndex<teams.size()) {
+			selectedTeamId = teams.get(selectedIndex).getId();
 		}
 	}
 	
