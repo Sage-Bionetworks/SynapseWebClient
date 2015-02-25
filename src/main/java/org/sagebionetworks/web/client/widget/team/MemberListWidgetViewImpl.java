@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.extras.select.client.ui.Option;
-import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -28,6 +26,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -140,7 +139,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			left.add(userBadgeView);
 			if (isAdmin) {
 				//add simple combo
-				Select combo = getAccessCombo(member.getOwnerId(), teamMember.getIsAdmin());
+				ListBox combo = getAccessCombo(member.getOwnerId(), teamMember.getIsAdmin());
 				SimplePanel wrap = new SimplePanel();
 				wrap.addStyleName("margin-top-5");
 				wrap.add(combo);
@@ -195,29 +194,20 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			mainContainer.add(lc);
 	}
 	
-	private Select getAccessCombo(final String ownerId, boolean isAdmin) {
-		final Select accessCombo = new Select();
-		Option memberOption = new Option();
-		memberOption.setText(MEMBER_ACCESS);
-		accessCombo.add(memberOption);
-		
-		Option adminOption = new Option();
-		adminOption.setText(ADMIN_ACCESS);
-		accessCombo.add(adminOption);
+	private ListBox getAccessCombo(final String ownerId, boolean isAdmin) {
+		final ListBox accessCombo = new ListBox();
+		accessCombo.setStyleName("form-control");
+		accessCombo.addItem(MEMBER_ACCESS);
+		accessCombo.addItem(ADMIN_ACCESS);
 		accessCombo.setWidth("140px");
 		accessCombo.addChangeHandler(new ChangeHandler() {
-			boolean initializing = true;
 			@Override
 			public void onChange(ChangeEvent event) {
-				if (initializing) {
-					initializing = false;
-					return;
-				}
-				boolean isAdmin = ADMIN_ACCESS.equals(accessCombo.getValue());
+				boolean isAdmin = accessCombo.getSelectedIndex() == 1;
 				presenter.setIsAdmin(ownerId, isAdmin);
 			}
 		});
-		accessCombo.setValue(isAdmin ? adminOption : memberOption);
+		accessCombo.setSelectedIndex(isAdmin ? 1 : 0);
 		
 		return accessCombo;
 	}

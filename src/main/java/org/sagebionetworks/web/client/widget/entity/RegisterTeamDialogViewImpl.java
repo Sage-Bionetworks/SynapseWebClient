@@ -11,8 +11,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
-import org.gwtbootstrap3.extras.select.client.ui.Option;
-import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -22,6 +20,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -38,15 +37,15 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	@UiField
 	Button cancelButton;
 	@UiField
-	Div teamComboBoxContainer;
+	ListBox teamComboBox;
 	@UiField
 	Anchor createNewTeamLink;
 	@UiField
 	Paragraph noTeamsFoundUI;
+	@UiField
+	Div teamSelectComboUI;
 	
 	Modal modal;
-	Select teamComboBox;
-	
 	@Inject
 	public RegisterTeamDialogViewImpl(RegisterTeamDialogViewImplUiBinder binder) {
 		modal = (Modal)binder.createAndBindUi(this);
@@ -67,6 +66,12 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onNewTeamClicked();
+			}
+		});
+		teamComboBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.teamSelected(teamComboBox.getSelectedIndex());
 			}
 		});
 	}
@@ -92,21 +97,10 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	
 	@Override
 	public void setTeams(List<Team> teams) {
-		teamComboBox = new Select();
-		teamComboBox.setWidth("100%");
-		teamComboBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.teamSelected(teamComboBox.getValue());
-			}
-		});
-		
+		teamComboBox.clear();
 		for (Team team : teams) {
-			Option teamOption = new Option();
-			teamOption.setText(team.getName());
-			teamComboBox.add(teamOption);
+			teamComboBox.addItem(team.getName());
 		}
-		teamComboBoxContainer.add(teamComboBox);
 	}
 	
 	@Override
@@ -127,6 +121,7 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	@Override
 	public void setNoTeamsFoundVisible(boolean isVisible) {
 		noTeamsFoundUI.setVisible(isVisible);
+		teamSelectComboUI.setVisible(!isVisible);
 	}
 	
 	@Override
