@@ -132,6 +132,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 	
 	@Override
 	public void teamSelected(int selectedIndex) {
+		selectedTeamId = null;
 		if (teams != null && selectedIndex >= 0 && selectedIndex<teams.size()) {
 			selectedTeamId = teams.get(selectedIndex).getId();
 		}
