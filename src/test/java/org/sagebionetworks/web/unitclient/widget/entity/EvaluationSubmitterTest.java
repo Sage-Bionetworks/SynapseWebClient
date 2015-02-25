@@ -255,8 +255,18 @@ public class EvaluationSubmitterTest {
 		verify(mockView).showTeams(eq(submissionTeams));
 		//and this first team should be selected by default
 		assertEquals(testTeam, submitter.getSelectedTeam());
-		
+		verify(mockView).hideModal1();
 		verify(mockView).showModal2();
+		
+		//try selecting invalid indexes
+		submitter.onTeamSelected(-1);
+		assertNull(submitter.getSelectedTeam());
+		
+		submitter.onTeamSelected(0);
+		assertEquals(testTeam, submitter.getSelectedTeam());
+		
+		submitter.onTeamSelected(1);
+		assertNull(submitter.getSelectedTeam());
 	}
 	
 
@@ -342,7 +352,7 @@ public class EvaluationSubmitterTest {
 	@Test
 	public void testOnTeamSelected() {
 		configureSubmitter();
-		submitter.onTeamSelected("selected team name");
+		submitter.onTeamSelected(0);
 		verify(mockView).clearContributors();
 		verify(mockView).setTeamInEligibleErrorVisible(eq(false), anyString());
 	}
