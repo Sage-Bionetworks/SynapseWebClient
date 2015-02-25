@@ -61,7 +61,7 @@ public class FileHandleServletTest {
 		WikiPage testPage = new WikiPage();
 		testPage.setAttachmentFileHandleIds(new ArrayList<String>());
 		when(mockSynapse.createFileHandles(any(List.class))).thenReturn(testResults);
-		when(mockSynapse.getV2WikiPageAsV1(any(WikiPageKey.class))).thenReturn(testPage);
+		when(mockSynapse.getWikiPage(any(WikiPageKey.class))).thenReturn(testPage);
 		URL resolvedUrl = new URL("http://localhost/file.png");
 		when(mockSynapse.getV2WikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
 		when(mockSynapse.getV2WikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
