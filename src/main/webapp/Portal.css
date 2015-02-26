@@ -388,7 +388,7 @@
 	font-size: 1.2em;
 }
 
-i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover {
+i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
 	color:#f0ad4e;
 }
 
