@@ -6,10 +6,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   >
 	<bh:Div>
-		<b:Anchor ui:field="link" addStyleNames="displayInline"></b:Anchor>
-		<b:Tooltip title="Participants">
-			<b:Anchor ui:field="participantsLink" icon="GROUP" addStyleNames="displayInline margin-left-5"/>
-		</b:Tooltip>
-		
+		<b:Icon type="TROPHY" addStyleNames="lightGreyText"/>
+		<b:Anchor ui:field="link" addStyleNames="displayInline margin-left-5"></b:Anchor>
 	</bh:Div>
 </ui:UiBinder>
