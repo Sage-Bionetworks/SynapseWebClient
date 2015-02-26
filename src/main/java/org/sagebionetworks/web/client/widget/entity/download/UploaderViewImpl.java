@@ -318,10 +318,12 @@ public class UploaderViewImpl extends FlowPanel implements
 		if(externalUsername != null) {
 			externalUsername.clear();
 			externalUsername.setVisible(false);
+			externalUsername.setPlaceholder("Username");
 		}
 		if(externalPassword != null) {
 			externalPassword.setValue("");
 			externalPassword.setVisible(false);
+			externalPassword.getElement().setAttribute("placeholder", "Password");
 		}
 	}
 	
@@ -522,11 +524,9 @@ public class UploaderViewImpl extends FlowPanel implements
 		externalUsername = new TextBox();
 		externalUsername.addStyleName("margin-bottom-5");
 		externalUsername.setName("username");
-		externalUsername.setPlaceholder("Username");
 		externalPassword = new PasswordTextBox();
 		externalPassword.setName("password");
 		externalPassword.setStyleName("form-control margin-bottom-5");
-		externalPassword.getElement().setAttribute("placeholder", "Password");
 		externalUsername.setVisible(false);
 		externalPassword.setVisible(false);
 		
@@ -551,9 +551,14 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void showUploadingToExternalStorage(String host, String banner) {
 		uploadDestinationContainer.clear();
-		uploadDestinationContainer.add(new HTML(DisplayConstants.UPLOAD_DESTINATION + "<strong>" + SafeHtmlUtils.htmlEscape(host) + "</strong>"));
+		String escapedHost = SafeHtmlUtils.htmlEscape(host);
+		uploadDestinationContainer.add(new HTML(DisplayConstants.UPLOAD_DESTINATION + "<strong>" + escapedHost + "</strong>"));
 		if (banner != null)
 			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+		//add the host to the field names too
+		externalUsername.setPlaceholder(escapedHost + " username");
+		externalPassword.getElement().setAttribute("placeholder", escapedHost + " password");
+
 		externalUsername.setVisible(true);
 		externalPassword.setVisible(true);
 	}
