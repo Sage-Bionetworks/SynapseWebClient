@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 
@@ -17,9 +19,6 @@ public class ChallengeBadgeViewImpl implements ChallengeBadgeView {
 	
 	@UiField
 	Anchor link;
-	@UiField
-	Anchor participantsLink;
-	
 	Widget widget;
 	
 	@Inject
@@ -33,17 +32,11 @@ public class ChallengeBadgeViewImpl implements ChallengeBadgeView {
 				presenter.onClick();
 			}
 		});
-		participantsLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onParticipantsClick();
-			}
-		});
 	}
 
 	@Override
 	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
+		this.presenter = presenter;
 	}
 	
 	public void setChallenge(ChallengeBundle challenge) {
