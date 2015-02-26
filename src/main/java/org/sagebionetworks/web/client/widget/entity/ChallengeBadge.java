@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 
@@ -29,7 +28,6 @@ public class ChallengeBadge implements ChallengeBadgeView.Presenter, SynapseWidg
 		view.setChallenge(challenge);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 	}
 
@@ -44,15 +42,6 @@ public class ChallengeBadge implements ChallengeBadgeView.Presenter, SynapseWidg
 			globalAppState.getPlaceChanger().goTo(new Synapse(challenge.getChallenge().getProjectId()));
 		else {
 			view.showErrorMessage("Challenge project is not set.");
-		}
-	}
-	
-	@Override
-	public void onParticipantsClick() {
-		if (challenge.getChallenge() != null && challenge.getChallenge().getParticipantTeamId() != null)
-			globalAppState.getPlaceChanger().goTo(new Team(challenge.getChallenge().getParticipantTeamId()));
-		else {
-			view.showErrorMessage("Challenge participant team is not set.");
 		}
 	}
 }
