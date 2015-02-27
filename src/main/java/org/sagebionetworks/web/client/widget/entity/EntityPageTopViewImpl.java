@@ -517,14 +517,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		InlineHTML inlineHtml = new InlineHTML(DisplayConstants.CREATED_BY);
 		attributionPanel.add(inlineHtml);
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
-		createdByBadgeWidget.addStyleName("movedown-4");
+		createdByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(createdByBadgeWidget);
 		
 		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDataToPrettyString(entity.getCreatedOn()) + "<br>" + DisplayConstants.MODIFIED_BY);
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
-		modifiedByBadgeWidget.addStyleName("movedown-4");
+		modifiedByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(modifiedByBadgeWidget);
 		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
 		

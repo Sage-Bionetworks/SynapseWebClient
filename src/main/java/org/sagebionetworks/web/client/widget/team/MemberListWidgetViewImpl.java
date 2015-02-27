@@ -3,9 +3,7 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.constants.IconSize;
-import org.sagebionetworks.repo.model.TeamMember;
-import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
@@ -16,6 +14,7 @@ import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -114,7 +113,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	
 	
 	@Override
-	public void configure(List<TeamMember> members, String searchTerm, boolean isAdmin) {
+	public void configure(List<TeamMemberBundle> members, String searchTerm, boolean isAdmin) {
 		clear();
 		mainContainer.clear();
 		if (searchTerm == null)
@@ -123,7 +122,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
 		add(memberSearchContainer);
 		
-		for (TeamMember teamMember : members) {
+		for (TeamMemberBundle teamMember : members) {
 			FlowPanel mediaContainer = new FlowPanel();
 			mediaContainer.addStyleName("col-xs-12 col-md-6");
 			mediaContainer.setHeight("120px");
@@ -133,16 +132,15 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			right.addStyleName("col-xs-3 col-sm-2 col-md-1");
 			mediaContainer.add(left);
 			mediaContainer.add(right);
-			final UserGroupHeader member = teamMember.getMember();
-			String rowPrincipalId = member.getOwnerId();
+			final UserProfile member = teamMember.getUserProfile();
 			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-			userBadge.configure(rowPrincipalId, true);
+			userBadge.configure(member);
 			userBadge.setSize(BadgeSize.LARGE);
 			Widget userBadgeView = userBadge.asWidget();
 			left.add(userBadgeView);
 			if (isAdmin) {
 				//add simple combo
-				ListBox combo = getAccessCombo(member.getOwnerId(), teamMember.getIsAdmin());
+				ListBox combo = getAccessCombo(member.getOwnerId(), teamMember.isAdmin());
 				SimplePanel wrap = new SimplePanel();
 				wrap.addStyleName("margin-top-5");
 				wrap.add(combo);
@@ -163,7 +161,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 					}
 				});
 				right.add(leaveButton);
-			} else if (teamMember.getIsAdmin()) {
+			} else if (teamMember.isAdmin()) {
 				//otherwise, indicate that this row user is an admin (via label)
 				left.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
 			}

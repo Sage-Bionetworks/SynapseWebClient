@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 
 import com.google.gwt.place.shared.Place;
@@ -31,7 +32,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private PaginatedResults<TeamMember> memberList;
+	private TeamMemberPagedResults memberList;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
 	
@@ -66,15 +67,11 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		this.searchTerm = searchTerm;
 		this.offset = offset;
 		
-		synapseClient.getTeamMembers(teamId, searchTerm, MEMBER_LIMIT, offset, new AsyncCallback<String>() {
+		synapseClient.getTeamMembers(teamId, searchTerm, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					memberList = nodeModelCreator.createPaginatedResults(result, TeamMember.class);
-					view.configure(memberList.getResults(), searchTerm, isAdmin);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void onSuccess(TeamMemberPagedResults results) {
+				memberList = results;
+				view.configure(memberList.getResults(), searchTerm, isAdmin);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

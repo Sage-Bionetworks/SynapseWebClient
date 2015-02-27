@@ -45,6 +45,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -233,7 +234,7 @@ public interface SynapseClientAsync {
 	void updateTeam(String teamJson, AsyncCallback<String> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
-	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<String> callback);	
+	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
 //	void getTeamMembershipState(String currentUserId, String teamId, AsyncCallback<String> callback);
 	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
 	

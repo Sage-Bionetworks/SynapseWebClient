@@ -1496,7 +1496,10 @@ ol.lowerroman {
 	position: relative;
 	top: 6px;
 }
-
+.movedown-7 {
+	position: relative;
+	top: 7px;
+}
 .moveright-5 {
 	position: relative;
 	left: 5px;
