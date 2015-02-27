@@ -127,8 +127,16 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPage(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		verify(mockView).showNoWikiAvailableUI(false);
+		verify(mockView).showCreateWiki(false);
 	}
+	
+	@Test
+	public void testConfigureNoWikiPageCannotEditIsEmbedded(){
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
+		verify(mockView).showWarningMessageInPage(anyString());
+	}
+
 	
 	@Test
 	public void testConfigureNoWikiPageNotEmbedded(){
@@ -165,7 +173,7 @@ public class WikiPageWidgetTest {
 	public void testConfigureOtherErrorGettingWikiPage(){
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockView).showWarningMessageInPage(anyString());
 	}
 	
 	@Test

@@ -321,6 +321,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_MARKDOWN_FAILED = "Failed to load the markdown: ";
 	public static final String ERROR_SAVING_WIKI = "Could not save your changes.\nIt is recommended that you copy your version of the wiki text so that it is not lost.\n";
 	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
+	public static final String NO_WIKI_FOUND = "A Wiki has not been created.";
 	public static final String ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED = "Failed to load the history of the wiki page.";
 	public static final String ERROR_WIKI_MODIFIED = "Sorry, another process has made changes to this wiki while you were editing.  Please reload the page, merge in your changes, and try saving again.";
 	public static final String ERROR_WIKI_SAVE_MARKDOWN = "Failed to properly save markdown: ";
