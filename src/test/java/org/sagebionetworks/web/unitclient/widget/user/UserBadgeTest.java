@@ -12,13 +12,17 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -31,6 +35,7 @@ public class UserBadgeTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
+	PlaceChanger mockPlaceChanger;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	UserBadgeView mockView;
 	UserBadge userBadge;
@@ -50,9 +55,11 @@ public class UserBadgeTest {
 		displayName = DisplayUtils.getDisplayName(profile);
 		profile.setOwnerId(principalId);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		mockPlaceChanger = mock(PlaceChanger.class);
 		mockView = mock(UserBadgeView.class);
 		mockCache = mock(ClientCache.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils);
 	}
@@ -89,5 +96,21 @@ public class UserBadgeTest {
 	public void testConfigureEmptyPrincipalId() throws Exception {
 		userBadge.configure("");
 		verify(mockView).showLoadError(anyString());
+	}
+	
+	@Test
+	public void testBadgeClicked() {
+		userBadge.configure(profile);
+		userBadge.badgeClicked(null);
+		verify(mockPlaceChanger).goTo(any(Profile.class));
+	}
+	
+	@Test
+	public void testBadgeClickedCustomClickHandler() {
+		userBadge.configure(profile);
+		ClickHandler mockClickHandler = mock(ClickHandler.class);
+		userBadge.setCustomClickHandler(mockClickHandler);
+		userBadge.badgeClicked(null);
+		verify(mockClickHandler).onClick(any(ClickEvent.class));
 	}
 }
