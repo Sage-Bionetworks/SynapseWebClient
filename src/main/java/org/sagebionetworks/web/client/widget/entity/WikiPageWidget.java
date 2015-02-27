@@ -139,9 +139,13 @@ SynapseWidgetPresenter {
 						//if it is because of a missing root (and we have edit permission), then the pages browser should have a Create Wiki button
 						if (caught instanceof NotFoundException) {
 							//show insert wiki button if user can edit and it's embedded in another entity page
-							if (canEdit && isEmbeddedInOwnerPage)
-								view.showNoWikiAvailableUI(isDescription);
-							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
+							if (isEmbeddedInOwnerPage) {
+								if (canEdit) {
+									view.showCreateWiki(isDescription);	
+								} else {
+									view.showWarningMessageInPage("A Wiki has not been created.");
+								}
+							} else //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
 							
 							if (callback != null)
@@ -153,7 +157,7 @@ SynapseWidgetPresenter {
 						}
 						else {
 							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+								view.showWarningMessageInPage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
 				});				
