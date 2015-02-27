@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -13,7 +14,8 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
-import org.sagebionetworks.web.client.widget.user.BigUserBadge;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -133,8 +135,9 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			mediaContainer.add(right);
 			final UserGroupHeader member = teamMember.getMember();
 			String rowPrincipalId = member.getOwnerId();
-			BigUserBadge userBadge = portalGinInjector.getBigUserBadgeWidget();
-			userBadge.configure(rowPrincipalId);
+			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
+			userBadge.configure(rowPrincipalId, true);
+			userBadge.setSize(BadgeSize.LARGE);
 			Widget userBadgeView = userBadge.asWidget();
 			left.add(userBadgeView);
 			if (isAdmin) {
@@ -162,7 +165,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				right.add(leaveButton);
 			} else if (teamMember.getIsAdmin()) {
 				//otherwise, indicate that this row user is an admin (via label)
-				left.add(new HTML("<span class=\"margin-left-15\">"+ADMIN_ACCESS+"</span>"));
+				left.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
 			}
 			
 			singleRow.add(mediaContainer);

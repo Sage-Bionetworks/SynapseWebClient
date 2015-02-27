@@ -509,6 +509,14 @@ a.shortBtn {
 .user-profile-change-photo {
 }
 	
+.margin-right-2 {
+	margin-right: 2px;
+}
+
+.margin-right-4 {
+	margin-right: 4px;
+}
+
 .margin-right-5 {
 	margin-right: 5px;
 }
@@ -923,7 +931,9 @@ a.shortBtn {
 .font-size-22 {
 	font-size: 22px;
 }
-
+.font-size-20 {
+	font-size: 20px;
+}
 .font-size-18 {
 	font-size: 18px;
 }
@@ -1481,6 +1491,10 @@ ol.lowerroman {
 .movedown-4 {
 	position: relative;
 	top: 4px;
+}
+.movedown-6 {
+	position: relative;
+	top: 6px;
 }
 
 .moveright-5 {

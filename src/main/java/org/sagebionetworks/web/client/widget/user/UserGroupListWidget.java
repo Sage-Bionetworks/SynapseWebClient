@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -89,8 +90,9 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 	public Widget getBadgeWidget(String ownerId, boolean isIndividual, String userName) {
 		if (isBig) {
 			if (isIndividual) {
-				BigUserBadge userBadge = portalGinInjector.getBigUserBadgeWidget();
-				userBadge.configure(ownerId);
+				UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
+				userBadge.configure(ownerId, true);
+				userBadge.setSize(BadgeSize.LARGE);
 				return userBadge.asWidget();
 			} else {
 				BigTeamBadge teamBadge = portalGinInjector.getBigTeamBadgeWidget();

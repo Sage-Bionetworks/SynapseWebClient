@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +16,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
-import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
-
-import com.google.gwt.user.client.ui.Widget;
 
 
 public class UserGroupListWidgetTest {
@@ -54,14 +53,13 @@ public class UserGroupListWidgetTest {
 	
 	@Test
 	public void testBadgeWidgetIndividualBig() {
-		BigUserBadge mockBadge = mock(BigUserBadge.class);
-		when(mockPortalGinInjector.getBigUserBadgeWidget()).thenReturn(mockBadge);
-		when(mockBadge.asWidget()).thenReturn(null);
+		UserBadge mockBadge = mock(UserBadge.class);
+		when(mockPortalGinInjector.getUserBadgeWidget()).thenReturn(mockBadge);
 		
 		List<UserGroupHeader> testUsers = getIndividualTestUsers();
 		widget.configure(testUsers);
 		widget.getBadgeWidget(testUsers.get(0).getOwnerId(), testUsers.get(0).getIsIndividual(), testUsers.get(0).getUserName());
-		verify(mockPortalGinInjector).getBigUserBadgeWidget();
+		verify(mockPortalGinInjector).getUserBadgeWidget();
 	}
 	
 	@Test
