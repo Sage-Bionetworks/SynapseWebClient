@@ -1,19 +1,8 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
@@ -84,6 +73,7 @@ import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -135,6 +125,8 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -1257,6 +1249,57 @@ public class SynapseClientImplTest {
 		assertEquals(membershipStatusJson, bundle.getTeamMembershipStatusJson());
 		assertEquals(isAdmin, bundle.isUserAdmin());
 		assertEquals(testMemberCount, bundle.getTotalMemberCount());
+	}
+	
+
+	@Test
+	public void testGetTeamMembers() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//set team member count
+		Long testMemberCount = 111L;
+		PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
+		allMembers.setTotalNumberOfResults(testMemberCount);
+		List<TeamMember> members = new ArrayList<TeamMember>();
+		
+		TeamMember member1 = new TeamMember();
+		member1.setIsAdmin(true);
+		UserGroupHeader header1 = new UserGroupHeader();
+		Long member1Id = 123L;
+		header1.setOwnerId(member1Id + "");
+		member1.setMember(header1);
+		members.add(member1);
+		
+		TeamMember member2 = new TeamMember();
+		member2.setIsAdmin(false);
+		UserGroupHeader header2 = new UserGroupHeader();
+		Long member2Id = 456L;
+		header2.setOwnerId(member2Id + "");
+		member2.setMember(header2);
+		members.add(member2);
+		
+		allMembers.setResults(members);
+		when(mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(), anyLong())).thenReturn(allMembers);
+		
+		List<UserProfile> profiles = new ArrayList<UserProfile>();
+		UserProfile profile1= new UserProfile();
+		profile1.setOwnerId(member1Id + "");
+		UserProfile profile2= new UserProfile();
+		profile2.setOwnerId(member2Id + "");
+		profiles.add(profile1);
+		profiles.add(profile2);
+		when(mockSynapse.listUserProfiles(anyList())).thenReturn(profiles);
+		
+		//make the call
+		TeamMemberPagedResults results = synapseClient.getTeamMembers("myTeamId", "search term", 100, 0);
+		
+		//verify it results in the two team member bundles that we expect
+		List<TeamMemberBundle> memberBundles = results.getResults();
+		assertEquals(2, memberBundles.size());
+		TeamMemberBundle bundle1 = memberBundles.get(0);
+		assertTrue(bundle1.getIsTeamAdmin());
+		assertEquals(profile1, bundle1.getUserProfile());
+		TeamMemberBundle bundle2 = memberBundles.get(1);
+		assertFalse(bundle2.getIsTeamAdmin());
+		assertEquals(profile2, bundle2.getUserProfile());
 	}
 	
 	@Test

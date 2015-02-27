@@ -150,6 +150,8 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -2130,17 +2132,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getTeamMembers(String teamId, String fragment, Integer limit,
+	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			PaginatedResults<TeamMember> members = synapseClient
 					.getTeamMembers(teamId, fragment, limit, offset);
-			return EntityFactory.createJSONStringForEntity(members);
+			List<TeamMember> teamMembers = members.getResults();
+			
+			//gather user ids to ask for all user profiles in bulk
+			List<Long> userIds = new ArrayList<Long>();
+			for (TeamMember member : members.getResults()) {
+				userIds.add(Long.parseLong(member.getMember().getOwnerId()));
+			}
+			List<UserProfile> profiles = synapseClient.listUserProfiles(userIds);
+			List<TeamMemberBundle> teamMemberBundles = new ArrayList<TeamMemberBundle>();
+			for (int i = 0; i < userIds.size(); i++) {
+				teamMemberBundles.add(new TeamMemberBundle(profiles.get(i), teamMembers.get(i).getIsAdmin(), teamMembers.get(i).getTeamId()));
+			}
+			TeamMemberPagedResults results = new TeamMemberPagedResults();
+			results.setResults(teamMemberBundles);
+			results.setTotalNumberOfResults(members.getTotalNumberOfResults());
+			return results;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 

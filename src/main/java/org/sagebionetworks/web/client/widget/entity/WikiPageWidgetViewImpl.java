@@ -222,12 +222,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		
 		modifiedPanel.clear();
 		modifiedPanel.add(modifiedText);
-		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
+		modifiedPanel.add(modifiedBy.asWidget());
 		modifiedPanel.add(modifiedOnText);
 		
 		createdPanel.clear();
 		createdPanel.add(createdText);
-		createdPanel.add(wrapWidget(createdBy.asWidget(), "padding-left-5"));
+		createdPanel.add(createdBy.asWidget());
 		createdPanel.add(createdOnText);
 		
 		FlowPanel modifiedAndCreatedSection = new FlowPanel();

@@ -47,6 +47,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -340,7 +341,7 @@ public interface SynapseClient extends RemoteService {
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	public String updateTeam(String teamJson) throws RestServiceException;
-	public String getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
+	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
 	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;

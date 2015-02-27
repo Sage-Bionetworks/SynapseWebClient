@@ -8,7 +8,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.user.BigUserBadge;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -63,8 +64,9 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 		for (int i = 0; i < profiles.size(); i++) {
 			FlowPanel lc = new FlowPanel();
 			final UserProfile profile = profiles.get(i);
-			BigUserBadge renderer = ginInjector.getBigUserBadgeWidget();
+			UserBadge renderer = ginInjector.getUserBadgeWidget();
 			renderer.configure(profile, requestMessages.get(i));
+			renderer.setSize(BadgeSize.LARGE);
 			Widget rendererWidget = renderer.asWidget();
 			rendererWidget.addStyleName("margin-top-15 col-xs-8 col-sm-9 col-md-10");
 			
