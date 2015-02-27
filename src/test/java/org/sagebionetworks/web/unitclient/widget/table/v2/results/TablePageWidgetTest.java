@@ -39,11 +39,14 @@ import org.sagebionetworks.web.client.widget.table.v2.results.PagingAndSortingLi
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
+import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
+
+import com.google.gwt.thirdparty.javascript.rhino.jstype.StaticSourceFile;
 
 /**
  * Business logic unit tests for the TablePageWidget.
@@ -64,6 +67,7 @@ public class TablePageWidgetTest {
 	List<ColumnModel> schema;
 	SelectColumn derivedColumn;
 	List<SortableTableHeader> sortHeaders;
+	List<StaticTableHeader> staticHeader;
 	List<SelectColumn> headers;
 	QueryResultBundle bundle;
 	List<Row> rows;
@@ -106,6 +110,16 @@ public class TablePageWidgetTest {
 					throws Throwable {
 				SortableTableHeader header = Mockito.mock(SortableTableHeader.class);
 				sortHeaders.add(header);
+				return header;
+			}
+		});
+		staticHeader = new LinkedList<StaticTableHeader>();
+		when(mockGinInjector.createStaticTableHeader()).thenAnswer(new Answer<StaticTableHeader>() {
+			@Override
+			public StaticTableHeader answer(InvocationOnMock invocation)
+					throws Throwable {
+				StaticTableHeader header = Mockito.mock(StaticTableHeader.class);
+				staticHeader.add(header);
 				return header;
 			}
 		});
@@ -175,17 +189,23 @@ public class TablePageWidgetTest {
 	@Test
 	public void testConfigureEditable(){
 		boolean isEditable = true;
+		// Static headers should be used for edits
+		assertTrue(staticHeader.isEmpty());
 		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(true);
+		assertEquals(bundle.getColumnModels().size()+1, staticHeader.size());
 	}
 	
 	@Test
 	public void testConfigureNotEditable(){
 		boolean isEditable = false;
+		// Sortable headers should be used for views.
+		assertTrue(sortHeaders.isEmpty());
 		widget.configure(bundle, query, null, isEditable, null, mockPageChangeListner);
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
+		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
 	}
 	
 	@Test
