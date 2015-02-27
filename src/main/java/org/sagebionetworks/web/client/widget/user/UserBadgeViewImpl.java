@@ -71,31 +71,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void setSize(BadgeSize size) {
-		String sizeInPx = "";
-		switch (size) {
-			case LARGE:
-				anonymousUserLink.setIconSize(IconSize.TIMES5);
-				usernameLink.setStyleName("font-size-20");
-				sizeInPx="64px";
-				break;
-			case SMALL:
-				anonymousUserLink.setIconSize(IconSize.LARGE);
-				usernameLink.setStyleName("font-size-15");
-				sizeInPx="24px";
-				break;
-			case EXTRA_SMALL:
-				anonymousUserLink.setIconSize(IconSize.NONE);
-				usernameLink.setVisible(false);
-				sizeInPx="16px";
-				break;
-			case DEFAULT:
-			default:
-				anonymousUserLink.setIconSize(IconSize.TIMES2);
-				usernameLink.setStyleName("font-size-17");
-				sizeInPx="32px";
-				break;
-		}
-		userPicture.setHeight(sizeInPx);
+		anonymousUserLink.setIconSize(size.iconSize());
+		usernameLink.setStyleName(size.textStyle());
+		userPicture.setHeight(size.pictureHeight());
+		usernameLink.setVisible(size.isTextVisible());
 	}
 
 	@Override
@@ -104,8 +83,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		usernameLink.setText(shortDisplayName);
 		usernameTooltip.setText(displayName);
 	}
-
-	
 	
 	@Override
 	public void showLoadError(String error) {
