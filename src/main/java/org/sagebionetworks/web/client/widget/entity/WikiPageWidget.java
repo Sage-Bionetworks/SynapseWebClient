@@ -143,7 +143,7 @@ SynapseWidgetPresenter {
 								if (canEdit) {
 									view.showCreateWiki(isDescription);	
 								} else {
-									view.showWarningMessageInPage("A Wiki has not been created.");
+									view.showWarningMessageInPage(DisplayConstants.NO_WIKI_FOUND);
 								}
 							} else //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
