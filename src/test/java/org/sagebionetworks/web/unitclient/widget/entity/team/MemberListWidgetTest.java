@@ -8,29 +8,25 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.TeamMember;
-import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -43,7 +39,6 @@ public class MemberListWidgetTest {
 	String teamId = "123";
 	MemberListWidget widget;
 	AuthenticationController mockAuthenticationController;
-	NodeModelCreator mockNodeModelCreator;
 	Callback mockTeamUpdatedCallback;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	boolean isAdmin;
@@ -54,36 +49,33 @@ public class MemberListWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(MemberListWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new MemberListWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, adapter);
+		widget = new MemberListWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, adapter);
 		isAdmin = true;
 		
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(getTestTeamMembers());
 	}
 	
-	private PaginatedResults<TeamMember> getTestTeamMembers() {
-		PaginatedResults<TeamMember> teamMembers = new PaginatedResults<TeamMember>();
+	private TeamMemberPagedResults getTestTeamMembers() {
+		TeamMemberPagedResults teamMembers = new TeamMemberPagedResults();
 		
-		List<TeamMember> teamMemberList = new ArrayList<TeamMember>();
-		TeamMember team = new TeamMember();
+		List<TeamMemberBundle> teamMemberList = new ArrayList<TeamMemberBundle>();
+		TeamMemberBundle team = new TeamMemberBundle();
 		team.setIsAdmin(true);
-		team.setMember(new UserGroupHeader());
+		team.setUserProfile(new UserProfile());
 		team.setTeamId(teamId);
 		teamMemberList.add(team);
 		
-		team = new TeamMember();
+		team = new TeamMemberBundle();
 		team.setIsAdmin(false);
-		team.setMember(new UserGroupHeader());
+		team.setUserProfile(new UserProfile());
 		team.setTeamId(teamId);
 		teamMemberList.add(team);
 		
 		teamMembers.setResults(teamMemberList);
-		teamMembers.setTotalNumberOfResults(teamMemberList.size());
+		teamMembers.setTotalNumberOfResults((long)teamMemberList.size());
 		return teamMembers;
 	}
 	

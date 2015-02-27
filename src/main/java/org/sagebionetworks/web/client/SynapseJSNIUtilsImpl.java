@@ -303,6 +303,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
        $wnd.loadNext();
 	}-*/;
 
+	@Override
+	public boolean isFileAPISupported() {
+		return _isFileAPISupported();
+	}
+	
+	private final static native boolean _isFileAPISupported() /*-{
+		return ($wnd.File && $wnd.FileReader && $wnd.FileList && $wnd.Blob);
+	}-*/;
+
 	/**
 	 * Get the url to a local file blob.
 	 */

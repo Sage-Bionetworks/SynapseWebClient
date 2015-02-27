@@ -437,7 +437,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		inlineHtml.addStyleName("hitattribution");
 		attributionPanel.add(inlineHtml);
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
-		createdByBadgeWidget.addStyleName("inline-block margin-left-5 movedown-4");
+		createdByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(createdByBadgeWidget);
 		
 		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
@@ -445,7 +445,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
-		modifiedByBadgeWidget.addStyleName("inline-block margin-left-5 movedown-4");
+		modifiedByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(modifiedByBadgeWidget);
 		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
 		inlineHtml.addStyleName("hitattribution");
@@ -661,7 +661,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 					badge.configure(getSearchUserId(constraint.getValue()));
 					badge.setCustomClickHandler(clickHandler);
 					Widget widget = badge.asWidget();
-					widget.addStyleName("inline-block margin-right-5 movedown-4");
+					widget.addStyleName("movedown-7");
 					valueContainer.add(widget);
 				}
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");

@@ -20,7 +20,6 @@ public interface ChallengeBadgeView extends IsWidget, ShowsErrors {
 	 */
 	public interface Presenter {
 		void onClick();
-		void onParticipantsClick();
 	}
 
 	

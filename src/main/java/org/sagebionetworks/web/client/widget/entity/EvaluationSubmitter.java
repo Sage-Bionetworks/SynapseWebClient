@@ -220,10 +220,10 @@ public class EvaluationSubmitter implements Presenter {
 				} else {
 					view.showTeams(teams);
 					//select the first
-					onTeamSelected(teams.get(0).getName());
+					onTeamSelected(0);
 				}
 				onIndividualSubmissionOptionClicked();
-				
+				view.hideModal1();
 				view.showModal2();
 			}
 			
@@ -251,20 +251,15 @@ public class EvaluationSubmitter implements Presenter {
 		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion);
 	}
 	@Override
-	public void onTeamSelected(String selectedTeamName) {
+	public void onTeamSelected(int selectedIndex) {
 		selectedTeam = null;
 		selectedTeamMemberStateHash = null;
 		selectedTeamEligibleMembers.clear();
 		view.clearContributors();
 		view.setTeamInEligibleErrorVisible(false, "");
 		//resolve team from team name
-		for (Team team : teams) {
-			if(selectedTeamName.equals(team.getName())) {
-				selectedTeam = team;
-				break;
-			}
-		}
-		if (selectedTeam != null) {
+		if (selectedIndex >= 0 && selectedIndex<teams.size()) {
+			selectedTeam = teams.get(selectedIndex);
 			getContributorList(evaluation, selectedTeam);
 		}
 	}
@@ -372,7 +367,6 @@ public class EvaluationSubmitter implements Presenter {
 		//and create a new submission for each evaluation
 		newSubmission.setEvaluationId(evaluation.getId());
 		try {
-			String teamId = null;
 			String memberStateHash = null;
 			if (isIndividualSubmission) {
 				challengeClient.createIndividualSubmission(newSubmission, etag, getSubmissionCallback());

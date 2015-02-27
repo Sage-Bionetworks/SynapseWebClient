@@ -186,24 +186,36 @@ public class ChallengeClientImplTest {
 		synapseClient.createTeamSubmission(mockSubmission, etag, memberStateHash);
 		verify(mockSynapse).createTeamSubmission(mockSubmission, etag, memberStateHash);
 	}
+	private void setupTeams(String... teamNames) throws SynapseException{
+		List<Team> teams = new ArrayList<Team>();
+		for (String teamName : teamNames) {
+			Team t1 = new Team();
+			t1.setName(teamName);
+			teams.add(t1);
+		}
+		when(mockSynapse.listTeams(anyList())).thenReturn(teams);
+	}
 	
 	@Test
-	public void testGetTeams() throws SynapseException {
-		List<Team> teams = new ArrayList<Team>();
-		Team t1 = new Team();
-		t1.setName("z team");
-		teams.add(t1);
-		Team t2 = new Team();
-		t2.setName("A team");
-		teams.add(t2);
-		when(mockSynapse.listTeams(anySet())).thenReturn(teams);
-		String teamId = "1234";
-		List<Team> returnedTeams = synapseClient.getTeams(Collections.singletonList(teamId), mockSynapse);
+	public void testGetTeamsSorted() throws SynapseException {
+		setupTeams("z team", "A team");
+		List<Team> returnedTeams = synapseClient.getTeams(Collections.singletonList("1234"), true, mockSynapse);
 		
 		assertEquals(2, returnedTeams.size());
-		assertEquals(t2, returnedTeams.get(0));
-		assertEquals(t1, returnedTeams.get(1));
+		assertEquals("A team", returnedTeams.get(0).getName());
+		assertEquals("z team", returnedTeams.get(1).getName());
 	}
+	
+	@Test
+	public void testGetTeamsUnSorted() throws SynapseException {
+		setupTeams("z team", "A team");
+		List<Team> returnedTeams = synapseClient.getTeams(Collections.singletonList("1234"), false, mockSynapse);
+		
+		assertEquals(2, returnedTeams.size());
+		assertEquals("z team", returnedTeams.get(0).getName());
+		assertEquals("A team", returnedTeams.get(1).getName());
+	}
+
 	
 	@Test
 	public void testRegisterChallengeTeam() throws SynapseException, RestServiceException {
@@ -242,7 +254,7 @@ public class ChallengeClientImplTest {
 		ChallengeTeamPagedResults results = synapseClient.getChallengeTeams(null, "2", 10, 0);
 		//before we set up challenge results
 		//we should not ask the synapse client for team members in this case (only for isAdmin)
-		verify(mockSynapse, never()).listTeamMembers(anySet(), anyString());
+		verify(mockSynapse, never()).listTeamMembers(anyList(), anyString());
 		verify(mockSynapse).listChallengeTeams(anyString(), anyLong(), anyLong());
 		assertTrue(results.getTotalNumberOfResults() == 2);
 		assertEquals(testChallengeTeam1, results.getResults().get(0).getChallengeTeam());
@@ -263,9 +275,9 @@ public class ChallengeClientImplTest {
 		member2.setIsAdmin(false);
 		testTeamMembers.add(member2);
 		
-		when(mockSynapse.listTeamMembers(anySet(), anyString())).thenReturn(testTeamMembers);
+		when(mockSynapse.listTeamMembers(anyList(), anyString())).thenReturn(testTeamMembers);
 		ChallengeTeamPagedResults results = synapseClient.getChallengeTeams("1234", "2", 10, 0);
-		verify(mockSynapse).listTeamMembers(anySet(), anyString());
+		verify(mockSynapse).listTeamMembers(anyList(), anyString());
 		verify(mockSynapse).listChallengeTeams(anyString(), anyLong(), anyLong());
 		assertTrue(results.getTotalNumberOfResults() == 2);
 		assertEquals(testChallengeTeam1, results.getResults().get(0).getChallengeTeam());
@@ -279,7 +291,7 @@ public class ChallengeClientImplTest {
 		setupChallengeParticipants();
 		UserProfilePagedResults results = synapseClient.getChallengeParticipants(false, "12", 10, 0);
 		verify(mockSynapse).listChallengeParticipants(anyString(), anyBoolean(), anyLong(), anyLong());
-		verify(mockSynapse).listUserProfiles(anySet());
+		verify(mockSynapse).listUserProfiles(anyList());
 		assertTrue(results.getTotalNumberOfResults() == 1);
 		assertEquals(mockUserProfile,results.getResults().get(0));
 	}
@@ -329,7 +341,7 @@ public class ChallengeClientImplTest {
 		team.setName("another team");
 		List<Team> teams = new ArrayList<Team>();
 		teams.add(team);
-		when(mockSynapse.listTeams(anySet())).thenReturn(teams);
+		when(mockSynapse.listTeams(anyList())).thenReturn(teams);
 		
 		PaginatedIds teamIds = new PaginatedIds();
 		teamIds.setResults(Collections.singletonList("22"));
@@ -339,7 +351,7 @@ public class ChallengeClientImplTest {
 		verify(mockSynapse).getChallenge(anyString());
 		verify(mockSynapse).getTeamMembershipStatus(anyString(), anyString());
 		verify(mockSynapse).listRegistratableTeams(anyString(), anyLong(), anyLong());
-		verify(mockSynapse).listTeams(anySet());
+		verify(mockSynapse).listTeams(anyList());
 		assertTrue(results.size() == 1);
 		assertEquals(team, results.get(0));
 	}
@@ -508,7 +520,7 @@ public class ChallengeClientImplTest {
 		participantIds.setResults(Collections.singletonList("777"));
 		participantIds.setTotalNumberOfResults(1L);
 		when(mockSynapse.listChallengeParticipants(anyString(), anyBoolean(), anyLong(), anyLong())).thenReturn(participantIds);
-		when(mockSynapse.listUserProfiles(anySet())).thenReturn(Collections.singletonList(mockUserProfile));
+		when(mockSynapse.listUserProfiles(anyList())).thenReturn(Collections.singletonList(mockUserProfile));
 	}
 	
 	public org.sagebionetworks.repo.model.ChallengePagedResults getTestChallengePagedResults() {

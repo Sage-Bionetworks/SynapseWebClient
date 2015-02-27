@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -18,7 +18,7 @@ public interface MemberListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void configure(List<TeamMember> members, String searchTerm, boolean isAdmin);
+	public void configure(List<TeamMemberBundle> members, String searchTerm, boolean isAdmin);
 	
 	public interface Presenter extends SynapsePresenter {
 		//used for the user profile links

@@ -164,6 +164,7 @@ public class UploaderTest {
 		multipartUploader.setFileHandle("99999");
 		
 		when(synapseJsniUtils.getFileSize(anyString(), anyInt())).thenReturn(1.0);
+		when(synapseJsniUtils.isFileAPISupported()).thenReturn(true);
 	}
 	
 	@Test
@@ -527,6 +528,19 @@ public class UploaderTest {
 		verify(synapseJsniUtils).getFileSize(anyString(), anyInt());
 		//and submit the form
 		verify(view).submitForm(anyString());
+	}
+	
+	@Test
+	public void testFileSupported() {
+		when(synapseJsniUtils.isFileAPISupported()).thenReturn(true);
+		assertTrue(uploader.checkFileAPISupported());
+	}
+	
+	@Test
+	public void testFileNotSupported() {
+		when(synapseJsniUtils.isFileAPISupported()).thenReturn(false);
+		assertFalse(uploader.checkFileAPISupported());
+		verifyUploadError();
 	}
 	
 	@Test

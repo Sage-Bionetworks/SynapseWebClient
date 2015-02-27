@@ -77,6 +77,16 @@ public class RegisterTeamDialogTest {
 		verify(mockView).setTeams(registratableTeams);
 		assertEquals(firstTeam.getId(), widget.getSelectedTeamId());
 		verify(mockView).showModal();
+		
+		//now try selecting invalid and valid indices
+		widget.teamSelected(-1);
+		assertNull(widget.getSelectedTeamId());
+		
+		widget.teamSelected(0);
+		assertEquals(firstTeam.getId(), widget.getSelectedTeamId());
+		
+		widget.teamSelected(10);
+		assertNull(widget.getSelectedTeamId());
 	}
 	
 	@Test

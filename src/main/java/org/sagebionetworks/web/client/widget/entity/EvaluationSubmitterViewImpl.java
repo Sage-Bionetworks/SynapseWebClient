@@ -13,8 +13,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.extras.select.client.ui.Option;
-import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
@@ -33,6 +31,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -65,7 +64,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	FormGroup entityFinderUI;
 	@UiField
-	Div teamComboBoxContainer;
+	ListBox teamComboBox;
 	@UiField
 	Radio isIndividualRadioButton;
 	@UiField
@@ -86,9 +85,10 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Div contributorsLoadingUI;
 	@UiField
 	Div contributorsHighlightPanel;
+	@UiField
+	Div submissionTypeSelectUI;
 	
 	private PortalGinInjector ginInjector;
-	private Select teamComboBox;
 	@Inject
 	public EvaluationSubmitterViewImpl(
 			Binder binder, 
@@ -177,6 +177,13 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onTeamSubmissionOptionClicked();
+			}
+		});
+
+		teamComboBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				presenter.onTeamSelected(teamComboBox.getSelectedIndex());
 			}
 		});
 	}
@@ -314,34 +321,25 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	@Override
 	public void clearTeams() {
-		teamComboBoxContainer.clear();
-		teamComboBox = new Select();
-		teamComboBox.setWidth("100%");
+		teamComboBox.clear();
 	}
 	
 	@Override
 	public void showEmptyTeams() {
+		submissionTypeSelectUI.setVisible(false);
 		noTeamsFoundUI.setVisible(true);
 	}
 	
 	@Override
 	public void showTeams(List<Team> registeredTeams) {
+		submissionTypeSelectUI.setVisible(true);
 		noTeamsFoundUI.setVisible(false);
-		teamComboBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.onTeamSelected(teamComboBox.getValue());
-			}
-		});
 		
 		isIndividualRadioButton.setActive(true);
-		
+		teamComboBox.clear();
 		for (Team teamHeader : registeredTeams) {
-			Option teamOption = new Option();
-			teamOption.setText(teamHeader.getName());
-			teamComboBox.add(teamOption);
+			teamComboBox.addItem(teamHeader.getName());
 		}
-		teamComboBoxContainer.add(teamComboBox);
 	}
 	@Override
 	public void setContributorsLoading(boolean isVisible) {

@@ -85,25 +85,4 @@ public class ChallengeBadgeTest {
 		widget.onClick();
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
-	
-	@Test
-	public void testOnParticipantsClick() {
-		widget.onParticipantsClick();
-		verify(mockPlaceChanger).goTo(any(Team.class));
-	}
-	
-	@Test
-	public void testOnParticipantsClickNullChallenge() {
-		testChallengeBundle.setChallenge(null);
-		widget.onParticipantsClick();
-		verify(mockView).showErrorMessage(anyString());
-	}
-	
-	@Test
-	public void testOnParticipantsClickNullParticipantTeamId() {
-		testChallenge.setParticipantTeamId(null);
-		widget.onParticipantsClick();
-		verify(mockView).showErrorMessage(anyString());
-	}
 }

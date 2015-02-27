@@ -148,10 +148,10 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
-import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
+import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
@@ -474,8 +474,6 @@ import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
-import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
-import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
@@ -920,7 +918,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
-		bind(BigUserBadgeView.class).to(BigUserBadgeViewImpl.class);
 		
 		bind(EntityIconsCache.class).in(Singleton.class);
 		

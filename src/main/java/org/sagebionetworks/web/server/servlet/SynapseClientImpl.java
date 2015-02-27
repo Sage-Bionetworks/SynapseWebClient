@@ -139,7 +139,7 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
-import org.sagebionetworks.web.server.table.TableSqlProcessor;
+import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -150,6 +150,8 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -192,11 +194,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 						WikiPage returnPage = null;
 						if (key.getVersion() == null)
-							returnPage = synapseClient.getV2WikiPageAsV1(key
+							returnPage = synapseClient.getWikiPage(key
 									.getWikiPageKey());
 						else
 							returnPage = synapseClient
-									.getVersionOfV2WikiPageAsV1(
+									.getWikiPageForVersion(
 											key.getWikiPageKey(),
 											key.getVersion());
 
@@ -1551,11 +1553,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			org.sagebionetworks.client.SynapseClient synapseClient,
 			String ownerId, ObjectType ownerType) throws RestServiceException {
 		try {
-			PaginatedResults<V2WikiHeader> headerTree = synapseClient.getV2WikiHeaderTree(ownerId, ownerType);
-			if (headerTree != null && headerTree.getResults() != null && !headerTree.getResults().isEmpty())
-				return headerTree.getResults().get(0).getId();
-			else
-				return null;
+			WikiPageKey key= synapseClient.getRootWikiPageKey(ownerId, ownerType);
+			return key.getWikiPageId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -1629,23 +1628,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	private String getV2RootWikiId(
-			org.sagebionetworks.client.SynapseClient synapseClient,
-			String ownerId, ObjectType ownerType) throws RestServiceException {
-		try {
-			V2WikiPage rootPage = synapseClient.getV2RootWikiPage(ownerId,
-					ownerType);
-			if (rootPage != null)
-				return rootPage.getId();
-			else
-				return null;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
 	@Override
 	public String getV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
 			throws RestServiceException {
@@ -1653,7 +1635,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				// asking for the root. find the root id first
-				String rootWikiPage = getV2RootWikiId(synapseClient,
+				String rootWikiPage = getRootWikiId(synapseClient,
 						key.getOwnerObjectId(),
 						ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
@@ -1679,7 +1661,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				// asking for the root. find the root id first
-				String rootWikiPage = getV2RootWikiId(synapseClient,
+				String rootWikiPage = getRootWikiId(synapseClient,
 						key.getOwnerObjectId(),
 						ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
@@ -1814,7 +1796,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				// asking for the root. find the root id first
-				String rootWikiPage = getV2RootWikiId(synapseClient,
+				String rootWikiPage = getRootWikiId(synapseClient,
 						key.getOwnerObjectId(),
 						ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
@@ -1841,7 +1823,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			if (key.getWikiPageId() == null) {
 				// asking for the root. find the root id first
-				String rootWikiPage = getV2RootWikiId(synapseClient,
+				String rootWikiPage = getRootWikiId(synapseClient,
 						key.getOwnerObjectId(),
 						ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
@@ -1975,7 +1957,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			@SuppressWarnings("unchecked")
 			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
 					WikiPage.class);
-			WikiPage returnPage = synapseClient.createV2WikiPageWithV1(ownerId,
+			WikiPage returnPage = synapseClient.createWikiPage(ownerId,
 					ObjectType.valueOf(ownerType), page);
 			return EntityFactory.createJSONStringForEntity(returnPage);
 		} catch (SynapseException e) {
@@ -1995,7 +1977,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			@SuppressWarnings("unchecked")
 			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
 					WikiPage.class);
-			WikiPage returnPage = synapseClient.updateV2WikiPageWithV1(ownerId,
+			WikiPage returnPage = synapseClient.updateWikiPage(ownerId,
 					ObjectType.valueOf(ownerType), page);
 			return EntityFactory.createJSONStringForEntity(returnPage);
 		} catch (SynapseException e) {
@@ -2012,7 +1994,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		String wikiPageId = key.getWikiPageId();
 		if (wikiPageId == null) {
 			// asking for the root. find the root id first
-			wikiPageId = getV2RootWikiId(synapseClient, key.getOwnerObjectId(),
+			wikiPageId = getRootWikiId(synapseClient, key.getOwnerObjectId(),
 					ObjectType.valueOf(key.getOwnerObjectType()));
 		}
 		return wikiPageId;
@@ -2150,17 +2132,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getTeamMembers(String teamId, String fragment, Integer limit,
+	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			PaginatedResults<TeamMember> members = synapseClient
 					.getTeamMembers(teamId, fragment, limit, offset);
-			return EntityFactory.createJSONStringForEntity(members);
+			List<TeamMember> teamMembers = members.getResults();
+			
+			//gather user ids to ask for all user profiles in bulk
+			List<Long> userIds = new ArrayList<Long>();
+			for (TeamMember member : members.getResults()) {
+				userIds.add(Long.parseLong(member.getMember().getOwnerId()));
+			}
+			List<UserProfile> profiles = synapseClient.listUserProfiles(userIds);
+			List<TeamMemberBundle> teamMemberBundles = new ArrayList<TeamMemberBundle>();
+			for (int i = 0; i < userIds.size(); i++) {
+				teamMemberBundles.add(new TeamMemberBundle(profiles.get(i), teamMembers.get(i).getIsAdmin(), teamMembers.get(i).getTeamId()));
+			}
+			TeamMemberPagedResults results = new TeamMemberPagedResults();
+			results.setResults(teamMemberBundles);
+			results.setTotalNumberOfResults(members.getTotalNumberOfResults());
+			return results;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
