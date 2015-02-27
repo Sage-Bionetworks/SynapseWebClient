@@ -140,7 +140,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			left.add(userBadgeView);
 			if (isAdmin) {
 				//add simple combo
-				ListBox combo = getAccessCombo(member.getOwnerId(), teamMember.isAdmin());
+				ListBox combo = getAccessCombo(member.getOwnerId(), teamMember.getIsTeamAdmin());
 				SimplePanel wrap = new SimplePanel();
 				wrap.addStyleName("margin-top-5");
 				wrap.add(combo);
@@ -161,7 +161,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 					}
 				});
 				right.add(leaveButton);
-			} else if (teamMember.isAdmin()) {
+			} else if (teamMember.getIsTeamAdmin()) {
 				//otherwise, indicate that this row user is an admin (via label)
 				left.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
 			}

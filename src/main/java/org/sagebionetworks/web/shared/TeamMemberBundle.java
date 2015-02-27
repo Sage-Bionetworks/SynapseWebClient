@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.UserProfile;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -21,7 +20,7 @@ public class TeamMemberBundle implements IsSerializable{
 		this.teamId = teamId;
 	}
 
-	public Boolean isAdmin() {
+	public Boolean getIsTeamAdmin() {
 		return isAdmin;
 	}
 	public void setIsAdmin(Boolean isAdmin) {

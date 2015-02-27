@@ -3,20 +3,15 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,7 +26,6 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private MemberListWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private TeamMemberPagedResults memberList;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
@@ -42,14 +36,12 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			SynapseClientAsync synapseClient, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
-			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		view.setPresenter(this);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 	}
 
 	public void configure(String teamId, String initialSearchTerm, int initialOffset, boolean isAdmin, Callback teamUpdatedCallback) {

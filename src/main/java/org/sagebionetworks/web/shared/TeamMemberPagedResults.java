@@ -3,8 +3,6 @@ package org.sagebionetworks.web.shared;
 import java.io.Serializable;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.UserProfile;
-
 public class TeamMemberPagedResults implements Serializable {
 	private Long totalNumberOfResults;
 	private List<TeamMemberBundle> results;
