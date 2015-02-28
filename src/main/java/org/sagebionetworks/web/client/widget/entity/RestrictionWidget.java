@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,6 +11,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -123,8 +125,15 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		shownAccessRequirements.clear();
 		allArsIterator = bundle.getAccessRequirements().iterator();
 		if (hasUnmetDownloadAccessRequirements()) {
-			//stop after the first one
-			unmetArsIterator = Collections.singletonList(bundle.getUnmetDownloadAccessRequirements().get(0)).iterator();
+			List<AccessRequirement> unmetRequirements = new ArrayList<AccessRequirement>();
+			for (AccessRequirement unmetRequirement : bundle.getUnmetDownloadAccessRequirements()) {
+				unmetRequirements.add(unmetRequirement);
+				if (!(unmetRequirement instanceof SelfSignAccessRequirement)) {
+					break;
+				}
+			}
+			//show self sign access requirements, but block when we get to ACT
+			unmetArsIterator = unmetRequirements.iterator();
 		}
 	}
 	

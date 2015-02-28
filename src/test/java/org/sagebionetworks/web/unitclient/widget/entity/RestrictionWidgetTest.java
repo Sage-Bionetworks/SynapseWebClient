@@ -2,11 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +10,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -365,11 +362,16 @@ public class RestrictionWidgetTest {
 		
 		List<AccessRequirement> list = new ArrayList<AccessRequirement>();
 		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(list);
+		ACTAccessRequirement actAccessRequirement = new ACTAccessRequirement();
+		actAccessRequirement.setId(9883L);
 		list.add(accessRequirement1);
+		list.add(actAccessRequirement);
 		list.add(accessRequirement2);
 		widget.resetAccessRequirementCount();
 		assertEquals(accessRequirement1, widget.selectNextAccessRequirement());
-		//does not show second unmet AR
+		//continues past the first, because it was SelfSign
+		assertEquals(actAccessRequirement, widget.selectNextAccessRequirement());
+		//ends after the second, because it was an ACT AR (cannot accept)
 		assertNull(widget.selectNextAccessRequirement());
 	}
 	
