@@ -358,4 +358,19 @@ public class RestrictionWidgetTest {
 		assertNull(widget.selectNextAccessRequirement());
 	}
 	
+	@Test
+	public void testSelectNextAccessRequirementMultipleUnmet() {
+		//in this case, more than one requirement is unmet.
+		//verify that only the first unmet requirement is selected
+		
+		List<AccessRequirement> list = new ArrayList<AccessRequirement>();
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(list);
+		list.add(accessRequirement1);
+		list.add(accessRequirement2);
+		widget.resetAccessRequirementCount();
+		assertEquals(accessRequirement1, widget.selectNextAccessRequirement());
+		//does not show second unmet AR
+		assertNull(widget.selectNextAccessRequirement());
+	}
+	
 }

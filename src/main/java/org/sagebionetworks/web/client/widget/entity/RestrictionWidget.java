@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -121,7 +122,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public void resetAccessRequirementCount() {
 		shownAccessRequirements.clear();
 		allArsIterator = bundle.getAccessRequirements().iterator();
-		unmetArsIterator = bundle.getUnmetDownloadAccessRequirements().iterator();
+		if (hasUnmetDownloadAccessRequirements()) {
+			//stop after the first one
+			unmetArsIterator = Collections.singletonList(bundle.getUnmetDownloadAccessRequirements().get(0)).iterator();
+		}
 	}
 	
 	public boolean hasUnmetDownloadAccessRequirements() {
