@@ -347,7 +347,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
-			
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
@@ -363,10 +362,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void resetHighlightBoxes() {
-		setHighlightBoxUser(null);
+		projectsHighlightBox.removeClassName("highlight-box");
+		challengesHighlightBox.removeClassName("highlight-box");
+		teamsHighlightBox.removeClassName("highlight-box");
 	}
 	
 	private void setHighlightBoxUser(String displayName) {
+		projectsHighlightBox.addClassName("highlight-box");
+		challengesHighlightBox.addClassName("highlight-box");
+		teamsHighlightBox.addClassName("highlight-box");
+
 		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
 		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
 		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
