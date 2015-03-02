@@ -281,7 +281,7 @@ public class EvaluationSubmitter implements Presenter {
 					if (!teamSubmissionEligibility.getIsRegistered()) {
 						reason = selectedTeam.getName() + " is not registered for this challenge. Please register this team, or select a different team.";
 					} else if (teamSubmissionEligibility.getIsQuotaFilled()) {
-						reason = selectedTeam.getName() + " has exceeded the submission quota.";
+						reason = selectedTeam.getName() + " has reached the submission quota.";
 					}
 					view.setTeamInEligibleError(reason);
 				} else {
@@ -296,7 +296,7 @@ public class EvaluationSubmitter implements Presenter {
 							if (!memberEligibility.getIsRegistered()) {
 								reason = "Not registered for the challenge.";
 							} else if (memberEligibility.getIsQuotaFilled()) {
-								reason = "Exceeded the submission quota.";
+								reason = "Reached the submission quota.";
 							} else if (memberEligibility.getHasConflictingSubmission()) {
 								reason = "Has a conflicting submission.";
 							}

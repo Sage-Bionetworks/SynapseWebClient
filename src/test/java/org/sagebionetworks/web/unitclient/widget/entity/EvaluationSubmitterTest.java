@@ -347,7 +347,9 @@ public class EvaluationSubmitterTest {
 		verify(mockView, times(2)).setContributorsLoading(anyBoolean());
 		
 		//by default, team is eligible.  In this test, one member is eligible, and one is not
-		verify(mockView).setTeamInEligibleError(anyString());
+		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).setTeamInEligibleError(stringCaptor.capture());
+		assertFalse(stringCaptor.getValue().isEmpty());
 	}
 	
 	@Test
