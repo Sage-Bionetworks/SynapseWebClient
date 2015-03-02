@@ -161,11 +161,22 @@ public class EvaluationSubmitterTest {
 		String submissionName = "my custom submission name";
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
+		
+		//also set contributors, and verify on individual submission that this is not set in the submission
+		//add eligible member
+		Long eligibleMemberId = 60L;
+		MemberSubmissionEligibility memberEligibility = new MemberSubmissionEligibility();
+		memberEligibility.setPrincipalId(eligibleMemberId);
+		memberEligibility.setIsEligible(true);
+		memberEligibilityList.add(memberEligibility);
+		submitter.getContributorList(new Evaluation(), new Team());
+		
 		submitter.onNextClicked(null,  submissionName,  e1);
 		//should invoke submission directly without terms of use
 		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
 		verify(mockChallengeClient).createIndividualSubmission(captor.capture(), anyString(), any(AsyncCallback.class));
 		Submission submission = captor.getValue();
+		assertNull(submission.getContributors());
 		assertEquals(submissionName, submission.getName());
 	}
 	
@@ -336,7 +347,7 @@ public class EvaluationSubmitterTest {
 		verify(mockView, times(2)).setContributorsLoading(anyBoolean());
 		
 		//by default, team is eligible.  In this test, one member is eligible, and one is not
-		verify(mockView).setTeamInEligibleErrorVisible(eq(true), anyString());
+		verify(mockView).setTeamInEligibleError(anyString());
 	}
 	
 	@Test
@@ -354,6 +365,7 @@ public class EvaluationSubmitterTest {
 		configureSubmitter();
 		submitter.onTeamSelected(0);
 		verify(mockView).clearContributors();
-		verify(mockView).setTeamInEligibleErrorVisible(eq(false), anyString());
+		verify(mockView).setTeamInEligibleError("");
 	}
+	//TODO: add tests for onindividual and onteam
 }

@@ -294,9 +294,13 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void setTeamInEligibleErrorVisible(boolean isVisible, String error) {
-		teamIneligibleHtml.setVisible(isVisible);
+	public void setTeamInEligibleError(String error) {
 		teamIneligibleHtml.setText(error);
+	}
+	
+	@Override
+	public void setTeamInEligibleErrorVisible(boolean isVisible) {
+		teamIneligibleHtml.setVisible(isVisible);
 	}
 	
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {

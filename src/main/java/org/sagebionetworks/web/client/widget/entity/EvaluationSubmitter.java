@@ -102,12 +102,14 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void onIndividualSubmissionOptionClicked() {
 		isIndividualSubmission = true;
+		view.setTeamInEligibleErrorVisible(false);
 		view.setTeamComboBoxEnabled(false);
 	}
 	
 	@Override
 	public void onTeamSubmissionOptionClicked() {
 		isIndividualSubmission = false;
+		view.setTeamInEligibleErrorVisible(true);
 		view.setTeamComboBoxEnabled(true);
 	}
 	
@@ -256,7 +258,7 @@ public class EvaluationSubmitter implements Presenter {
 		selectedTeamMemberStateHash = null;
 		selectedTeamEligibleMembers.clear();
 		view.clearContributors();
-		view.setTeamInEligibleErrorVisible(false, "");
+		view.setTeamInEligibleError("");
 		//resolve team from team name
 		if (selectedIndex >= 0 && selectedIndex<teams.size()) {
 			selectedTeam = teams.get(selectedIndex);
@@ -281,7 +283,7 @@ public class EvaluationSubmitter implements Presenter {
 					} else if (teamSubmissionEligibility.getIsQuotaFilled()) {
 						reason = selectedTeam.getName() + " has exceeded the submission quota.";
 					}
-					view.setTeamInEligibleErrorVisible(true, reason);
+					view.setTeamInEligibleError(reason);
 				} else {
 					selectedTeamMemberStateHash = teamEligibility.getEligibilityStateHash().toString();
 					
@@ -343,7 +345,13 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void submitToEvaluation(final String entityId, final Long versionNumber, final String etag) {
+	public void submitToEvaluation(String entityId, Long versionNumber, final String etag) {
+		//set up shared values across all submissions
+		Submission newSubmission = getNewSubmission(entityId, versionNumber);
+		submitToEvaluation(newSubmission, etag);
+	}
+	
+	public Submission getNewSubmission(String entityId, Long versionNumber) {
 		//set up shared values across all submissions
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entityId);
@@ -351,7 +359,7 @@ public class EvaluationSubmitter implements Presenter {
 		newSubmission.setVersionNumber(versionNumber);
 		if (submissionName != null && submissionName.trim().length() > 0)
 			newSubmission.setName(submissionName);
-		if (!selectedTeamEligibleMembers.isEmpty()) {
+		if (!isIndividualSubmission && !selectedTeamEligibleMembers.isEmpty()) {
 			Set<SubmissionContributor> contributors = new HashSet<SubmissionContributor>();
 			for (Long memberId : selectedTeamEligibleMembers) {
 				SubmissionContributor contributor = new SubmissionContributor();
@@ -360,7 +368,7 @@ public class EvaluationSubmitter implements Presenter {
 			}
 			newSubmission.setContributors(contributors);
 		}
-		submitToEvaluation(newSubmission, etag);
+		return newSubmission;
 	}
 	
 	public void submitToEvaluation(final Submission newSubmission, final String etag) {
