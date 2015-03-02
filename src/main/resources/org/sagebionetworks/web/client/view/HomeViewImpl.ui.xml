@@ -74,7 +74,7 @@
 					<div class="col-md-4 ">
 						<h3>Get Started</h3>
 						Synapse is free to use as a service.
-						<b:Button ui:field="dashboardBtn" size="LARGE" visible="false" text="My Dashboard" block="true" marginTop="20" />
+						<b:Button ui:field="dashboardBtn" size="LARGE" visible="false" block="true" marginTop="20" />
 						<b:Button ui:field="loginBtn" size="LARGE" text="Log in" block="true" marginTop="20" />
 						<b:Button ui:field="registerBtn" size="LARGE" text="Register for a Synapse Account" marginTop="20" block="true" />
 						<b:Button ui:field="dreamBtn" size="LARGE" text="DREAM Challenges" block="true" marginTop="20" /> 

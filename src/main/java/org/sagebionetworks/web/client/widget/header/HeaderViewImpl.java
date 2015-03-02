@@ -3,17 +3,16 @@ package org.sagebionetworks.web.client.widget.header;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.constants.IconSize;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.UserProfile;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.DivElement;
@@ -24,6 +23,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment.VerticalAlignmentConstant;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -82,31 +84,33 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Anchor goToStandardSite;
 	@UiField
 	SimplePanel searchBoxContainer;
-	SimplePanel userPicturePanel;
-	
 	private Presenter presenter;
 	private SearchBox searchBox;	
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
 	SageImageBundle sageImageBundle;
 	boolean showLargeLogo;
+	UserBadge userBadge;
+	HorizontalPanel myDashboardButtonContents;
 	
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
 			SearchBox searchBox,
-			SynapseJSNIUtils synapseJSNIUtils, 
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			UserBadge userBadge) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.searchBox = searchBox;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
+		this.userBadge = userBadge;
+		userBadge.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.setWidget(searchBox.asWidget());
-		userPicturePanel = new SimplePanel();
-		userPicturePanel.addStyleName("displayInline margin-right-5");
+		myDashboardButtonContents = new HorizontalPanel();
+		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		myDashboardButtonContents.add(userBadge.asWidget());
+		myDashboardButtonContents.add(new Span("My Dashboard"));
 		addUserPicturePanel();
 		showLargeLogo = false; // default
 		initClickHandlers();
@@ -121,7 +125,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
             @Override
             public void execute() {
-            	dashboardButton.add(userPicturePanel);
+            	dashboardButton.add(myDashboardButtonContents);
             }
         });
 	}
@@ -242,7 +246,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		searchBox.setVisible(searchVisible);
 	}
 	
-	
 	/*
 	 * Private Methods
 	 */
@@ -250,25 +253,15 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private void setUser(UserSessionData userData) {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
-	 	userPicturePanel.clear();
-	 	dashboardButton.setIcon(IconType.USER);
-		dashboardButton.setIconSize(IconSize.LARGE);
+	 	userBadge.clearState();
 	 	if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
-			UserProfile profile = userData.getProfile();
-			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-				dashboardButton.setIcon(null);
-				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-				profilePicture.setWidth("18px");
-				profilePicture.setHeight("18px");
-				profilePicture.addStyleName("userProfileImage moveup-2");
-				userPicturePanel.setWidget(profilePicture);
-			}
+	 		userBadge.configure(userData.getProfile());
 			loginLinkUI.setVisible(false);
 			registerLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 		} else {
+			userBadge.configurePicture();
 			loginLinkUI.setVisible(true);
 			registerLinkUI.setVisible(true);
 			logoutLink.setVisible(false);

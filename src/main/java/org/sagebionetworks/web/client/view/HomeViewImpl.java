@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.constants.IconSize;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -23,6 +22,8 @@ import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,7 +36,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -61,7 +63,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	org.gwtbootstrap3.client.ui.Button dreamBtn;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
-	
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
@@ -103,9 +104,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private GlobalApplicationState globalApplicationState;
 	private HomeSearchBox homeSearchBox;	
 	IconsImageBundle iconsImageBundle;
-	SimplePanel userPicturePanel;
 	private CookieProvider cookies;
 	SynapseJSNIUtils synapseJSNIUtils;
+	UserBadge userBadge;
+	HorizontalPanel myDashboardButtonContents;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -117,7 +119,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 			HomeSearchBox homeSearchBox, 
 			CookieProvider cookies,
 			final AuthenticationController authController,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			UserBadge userBadge) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -126,8 +129,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.iconsImageBundle = icons;
 		this.cookies = cookies;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		userPicturePanel = new SimplePanel();
-		userPicturePanel.addStyleName("displayInline margin-right-5");
+		this.userBadge = userBadge;
+		userBadge.setSize(BadgeSize.DEFAULT_PICTURE_ONLY);
+		myDashboardButtonContents = new HorizontalPanel();
+		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		myDashboardButtonContents.add(userBadge.asWidget());
+		myDashboardButtonContents.add(new Span("My Dashboard"));
+		myDashboardButtonContents.addStyleName("margin-left-100");
+		
 		addUserPicturePanel();
 		
 		headerWidget.configure(true);
@@ -179,7 +188,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			@Override
             public void execute() {
-            	dashboardBtn.add(userPicturePanel);
+				dashboardBtn.add(myDashboardButtonContents);
 			}
 		});
 	}
@@ -203,23 +212,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 	
 	private void clearUserProfilePicture() {
-		userPicturePanel.clear();
-		dashboardBtn.setIcon(IconType.USER);
-		dashboardBtn.setIconSize(IconSize.LARGE);
+		userBadge.clearState();
+		userBadge.configurePicture();
 	}
 	
 	private void setUserProfilePicture(UserSessionData userData) {
 		if (userData != null && userData.getProfile() != null) {
 			UserProfile profile = userData.getProfile();
-			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-				dashboardBtn.setIcon(null);
-				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-				profilePicture.setWidth("25px");
-				profilePicture.setHeight("25px");
-				profilePicture.addStyleName("userProfileImage moveup-2");
-				userPicturePanel.setWidget(profilePicture);
-			}
+			userBadge.configure(profile);
 		}
 	}
 
