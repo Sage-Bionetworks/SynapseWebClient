@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
-import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -77,17 +76,25 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		for (ColumnModel type: types) {
 			// Create each header
 			String headerName = type.getName();
-			SortableTableHeader sth = ginInjector.createSortableTableHeader();
-			sth.configure(type.getName(), pageChangeListener);
-			headers.add(sth);
-			if(sort != null){
-				if(headerName.equals(sort.getColumn())){
-					if(SortDirection.ASC.equals(sort.getDirection())){
-						sth.setIcon(IconType.SORT_ASC);
-					}else{
-						sth.setIcon(IconType.SORT_DESC);
+			if(!isEditable){
+				// For sorting we need click handler and to set sort direction when needed.
+				SortableTableHeader sth = ginInjector.createSortableTableHeader();
+				sth.configure(type.getName(), pageChangeListener);
+				headers.add(sth);
+				if(sort != null){
+					if(headerName.equals(sort.getColumn())){
+						if(SortDirection.ASC.equals(sort.getDirection())){
+							sth.setIcon(IconType.SORT_ASC);
+						}else{
+							sth.setIcon(IconType.SORT_DESC);
+						}
 					}
 				}
+			}else{
+				// For the static case we just set the header name.
+				StaticTableHeader sth = ginInjector.createStaticTableHeader();
+				sth.setHeader(headerName);
+				headers.add(sth);
 			}
 		}
 		

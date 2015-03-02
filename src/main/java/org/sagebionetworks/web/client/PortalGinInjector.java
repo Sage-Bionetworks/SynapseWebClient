@@ -95,6 +95,7 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
+import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
@@ -309,6 +310,7 @@ public interface PortalGinInjector extends Ginjector {
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 
 	public SortableTableHeader createSortableTableHeader();
+	public StaticTableHeader createStaticTableHeader();
 	public EvaluationSubmitter getEvaluationSubmitter();
 	public RegisterTeamDialog getRegisterTeamDialog();
 }

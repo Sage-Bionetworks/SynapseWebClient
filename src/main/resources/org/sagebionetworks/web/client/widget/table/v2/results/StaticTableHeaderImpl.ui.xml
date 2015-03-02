@@ -5,8 +5,8 @@
 	xmlns:bt="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	
-	<bt:TableHeader>
-		<b:Button ui:field="button" iconPosition="RIGHT" type="LINK"/>
+
+	<bt:TableHeader minimumWidth="225px">
+		<bh:Strong ui:field="header"></bh:Strong>
 	</bt:TableHeader>
 </ui:UiBinder>
