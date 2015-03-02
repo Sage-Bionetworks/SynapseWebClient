@@ -74,13 +74,28 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public Place getLastPlace() {
-		return getLastPlace(AppActivityMapper.getDefaultPlace());
+		return getLastPlace(null);
 	}
 	
 	@Override
 	public Place getLastPlace(Place defaultPlace) {
 		String historyValue = cookieProvider.getCookie(CookieKeys.LAST_PLACE);
-		return getPlaceFromHistoryValue(historyValue, defaultPlace);
+		return getPlaceFromHistoryValue(historyValue, fixIfNull(defaultPlace));
+	}
+	
+	@Override
+	public void gotoLastPlace() {
+		gotoLastPlace(null);
+	}
+
+	@Override
+	public void gotoLastPlace(Place defaultPlace) {
+		getPlaceChanger().goTo(getLastPlace(defaultPlace));
+	}
+	
+	private Place fixIfNull(Place defaultPlace) {
+		if (defaultPlace == null) return AppActivityMapper.getDefaultPlace();
+		else return defaultPlace;
 	}
 
 	@Override

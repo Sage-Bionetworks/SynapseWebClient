@@ -2138,10 +2138,6 @@ public class DisplayUtils {
 		return str;
 	}
 	
-	public static void goToLastPlace(GlobalApplicationState globalApplicationState) {
-		globalApplicationState.getPlaceChanger().goTo(globalApplicationState.getLastPlace());
-	}
-	
 	public static String getStackTrace(Throwable t) {
 		StringBuilder stackTrace = new StringBuilder();
 		if (t != null) {

@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -144,5 +145,14 @@ public class GlobalApplicationStateImplTest {
 		Place mockDefaultPlace = mock(Place.class);
 		Place returnedPlace = globalApplicationState.getLastPlace(mockDefaultPlace);
 		assertEquals(mockDefaultPlace, returnedPlace);
+	}
+	
+	@Test
+	public void testGetLastPlaceNullDefault() {
+		//next line is not really necessary, but to make this explicit
+		when(mockCookieProvider.getCookie(CookieKeys.LAST_PLACE)).thenReturn(null);
+		//and the history value resolves to a place
+		Place returnedPlace = globalApplicationState.getLastPlace(null);
+		assertEquals(AppActivityMapper.getDefaultPlace(), returnedPlace);
 	}
 }

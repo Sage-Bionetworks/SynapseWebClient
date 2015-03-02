@@ -150,7 +150,7 @@ public class LoginPresenterTest {
 
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
-		verify(mockPlaceChanger).goTo(any(Place.class));
+		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 	
 	@Test 
@@ -165,16 +165,13 @@ public class LoginPresenterTest {
 	
 	@Test 
 	public void testCheckTempUsernameNotTemp() throws JSONObjectAdapterException {
-		Place mockLastPlace = Mockito.mock(Place.class);
-		when(mockGlobalApplicationState.getLastPlace(any(Place.class))).thenReturn(mockLastPlace);
-		
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
 		profile.setUserName("not-temp");
 		usd.setProfile(profile);
 		loginPresenter.checkForTempUsername();
 		//should go to the last place, since this is not a temporary username
-		verify(mockPlaceChanger).goTo(eq(mockLastPlace));
+		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 	
 	
@@ -284,13 +281,9 @@ public class LoginPresenterTest {
 	@Test
 	public void testLastPlaceAfterLogin() {
 		//this should send to this user's profile (dashboard) by default
-		Place mockPlace = mock(Place.class);
-		when(mockGlobalApplicationState.getLastPlace(any(Place.class))).thenReturn(mockPlace);
 		loginPresenter.goToLastPlace();
-		
-		verify(mockPlaceChanger).goTo(eq(mockPlace));
 		ArgumentCaptor<Place> defaultPlaceCaptor = ArgumentCaptor.forClass(Place.class);
-		verify(mockGlobalApplicationState).getLastPlace(defaultPlaceCaptor.capture());
+		verify(mockGlobalApplicationState).gotoLastPlace(defaultPlaceCaptor.capture());
 		Place defaultPlace = defaultPlaceCaptor.getValue();
 		assertTrue(defaultPlace instanceof Profile);
 		assertEquals(userId, ((Profile)defaultPlace).getUserId());

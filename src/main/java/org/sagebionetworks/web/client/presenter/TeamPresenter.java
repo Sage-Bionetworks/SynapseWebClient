@@ -117,7 +117,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			public void onSuccess(Void result) {
 				//go home
 				view.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS, "");
-				DisplayUtils.goToLastPlace(globalApplicationState);
+				globalApplicationState.gotoLastPlace();
 			}
 			@Override
 			public void onFailure(Throwable caught) {

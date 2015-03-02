@@ -39,6 +39,17 @@ public interface GlobalApplicationState {
 	 */
 	public Place getLastPlace();
 	
+	
+	/**
+	 * Go to the last visited place. 
+	 */
+	public void gotoLastPlace();
+	/**
+	 * Go to the last visited place.  Return to the given default place if no last place is available. 
+	 * @param defaultPlace
+	 */
+	public void gotoLastPlace(Place defaultPlace);
+	
 	/**
 	 * Holds the last visited place.  Return the given default place if no last place is available.
 	 * @return

@@ -64,7 +64,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 					@Override
 					public void onSuccess(Void result) {
 						view.showInfo("Successfully updated your username", "");
-						DisplayUtils.goToLastPlace(globalAppState);
+						globalAppState.gotoLastPlace();
 					}
 					
 					@Override

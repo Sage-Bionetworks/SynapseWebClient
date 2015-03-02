@@ -173,8 +173,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void goToLastPlace() {
 		view.hideLoggingInLoader();
 		Place defaultPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
-		Place lastPlace = globalApplicationState.getLastPlace(defaultPlace);
-		globalApplicationState.getPlaceChanger().goTo(lastPlace);
+		globalApplicationState.gotoLastPlace(defaultPlace);
 	}
 	
 	/*
