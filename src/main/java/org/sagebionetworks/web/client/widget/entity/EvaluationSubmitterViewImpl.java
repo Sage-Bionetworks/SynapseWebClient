@@ -85,8 +85,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Div contributorsLoadingUI;
 	@UiField
 	Div contributorsHighlightPanel;
-	@UiField
-	Div submissionTypeSelectUI;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -330,13 +328,19 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
 	@Override
 	public void showEmptyTeams() {
-		submissionTypeSelectUI.setVisible(false);
+		teamComboBox.setVisible(false);
 		noTeamsFoundUI.setVisible(true);
+		isIndividualRadioButton.setEnabled(false);
+		isTeamRadioButton.setEnabled(false);
+		contributorsHighlightPanel.setVisible(false);
 	}
 	
 	@Override
 	public void showTeams(List<Team> registeredTeams) {
-		submissionTypeSelectUI.setVisible(true);
+		isIndividualRadioButton.setEnabled(true);
+		isTeamRadioButton.setEnabled(true);
+		contributorsHighlightPanel.setVisible(true);
+		teamComboBox.setVisible(true);
 		noTeamsFoundUI.setVisible(false);
 		
 		isIndividualRadioButton.setActive(true);

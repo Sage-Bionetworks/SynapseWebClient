@@ -44,7 +44,7 @@
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
 			<b:ModalBody>
 				<b:FieldSet>
-					<bh:Div ui:field="submissionTypeSelectUI">
+					<bh:Div>
 						<b:ButtonGroup>
 							<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
 							<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
