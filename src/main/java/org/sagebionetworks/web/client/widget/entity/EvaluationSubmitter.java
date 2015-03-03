@@ -102,16 +102,12 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void onIndividualSubmissionOptionClicked() {
 		isIndividualSubmission = true;
-		view.setTeamInEligibleErrorVisible(false);
-		view.setTeamComboBoxEnabled(false);
 		view.hideTeamsUI();
 	}
 	
 	@Override
 	public void onTeamSubmissionOptionClicked() {
 		isIndividualSubmission = false;
-		view.setTeamInEligibleErrorVisible(true);
-		view.setTeamComboBoxEnabled(true);
 		
 		if (teams.isEmpty()) {
 			view.showEmptyTeams();
@@ -435,5 +431,8 @@ public class EvaluationSubmitter implements Presenter {
 	
 	public List<Long> getSelectedTeamEligibleMembers() {
 		return selectedTeamEligibleMembers;
+	}
+	public boolean getIsIndividualSubmission() {
+		return isIndividualSubmission;
 	}
 }

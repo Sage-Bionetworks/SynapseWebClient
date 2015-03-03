@@ -299,11 +299,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		teamIneligibleHtml.setText(error);
 	}
 	
-	@Override
-	public void setTeamInEligibleErrorVisible(boolean isVisible) {
-		teamIneligibleHtml.setVisible(isVisible);
-	}
-	
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {
 		Div row = new Div();
 		InlineCheckBox cb = new InlineCheckBox();
@@ -317,11 +312,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		row.add(badge.asWidget());
 		
 		return row;
-	}
-	
-	@Override
-	public void setTeamComboBoxEnabled(boolean isEnabled) {
-		teamComboBox.setEnabled(isEnabled);
 	}
 	
 	@Override
