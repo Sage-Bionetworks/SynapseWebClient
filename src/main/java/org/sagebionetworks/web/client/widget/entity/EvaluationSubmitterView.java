@@ -26,7 +26,9 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void setTeamComboBoxEnabled(boolean isEnabled);
 	void showEmptyTeams();
 	void clearTeams();
-	void showTeams(List<Team> registeredTeams);
+	void showTeamsUI(List<Team> registeredTeams);
+	void hideTeamsUI();
+	void setIsIndividualSubmissionActive(boolean isActive);
 	void setContributorsLoading(boolean isVisible);
 	void setNextButtonLoading();
 	void resetNextButton();
