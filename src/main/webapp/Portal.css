@@ -1827,6 +1827,12 @@ a.projectTitle:hover {
 	opacity: 1 !important;
 }
 
+/* Attribute wildcard selector. 
+Looks for any child element under .modal-fullscreen that has a class that contains modal-dialog.*/
+.modal-fullscreen [class*="modal-dialog"] {
+	width: 95%;
+}
+
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */
 iframe[seamless] {
     background-color: transparent;
