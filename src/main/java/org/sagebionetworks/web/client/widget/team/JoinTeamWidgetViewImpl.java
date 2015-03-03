@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
@@ -55,7 +54,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.wikiPage = wikiPage;
 		this.progressWidget = progressWidget;
 		this.joinWizard = joinWizard;
-		joinWizard.setSize(ModalSize.LARGE);
+		joinWizard.addStyleName("modal-fullscreen");
 	}
 	
 	@Override
