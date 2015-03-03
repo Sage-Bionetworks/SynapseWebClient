@@ -14,7 +14,7 @@
 		</bh:Span>
 		<g:HorizontalPanel addStyleNames="displayInlineBlock">
 			<bh:Div addStyleNames="moveup-1">
-				<b:Anchor ui:field="defaultUserPicture" icon="USER" addStyleNames="lightGreyText margin-right-2" />
+				<b:Icon ui:field="defaultUserPicture" type="USER" addStyleNames="lightGreyText margin-right-2" />
 				<g:Image ui:field="userPicture" addStyleNames="userProfileImage imageButton margin-right-2" />
 			</bh:Div>
 			<bh:Div>
