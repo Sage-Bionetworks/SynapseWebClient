@@ -65,7 +65,9 @@ public class AppActivityMapperTest {
 		when(mockInjector.getHomePresenter()).thenReturn(mockAll);
 		// Global App State
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
-		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);		
+		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		
+		when(mockInjector.getAuthenticationController()).thenReturn(mockAuthenticationController);
 		
 		appActivityMapper = new AppActivityMapper(mockInjector, mockSynapseJSNIUtils, null);
 	}
@@ -94,7 +96,6 @@ public class AppActivityMapperTest {
 	 * Part 1: Then go to the login page and verify that the entity place is stored.
 	 * Part 2: Then go back to the login page (SSO simulation) and assure that last place is still the entity place and not the first login page visit
 	 */
-	@SuppressWarnings("unchecked")
 	@Test 
 	public void testSetLastPlace() {
 		// Part 1
@@ -117,5 +118,4 @@ public class AppActivityMapperTest {
 		verify(mockGlobalApplicationState, times(0)).setLastPlace(any(Place.class));
 		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace2);
 	}
-
 }

@@ -71,7 +71,7 @@ public class AppActivityMapper implements ActivityMapper {
 		this.loading = loading;
 		
 		openAccessPlaces = new ArrayList<Class>();
-		openAccessPlaces.add(Home.class);		
+		openAccessPlaces.add(Home.class);
 		openAccessPlaces.add(LoginPlace.class);
 		openAccessPlaces.add(PasswordReset.class);
 		openAccessPlaces.add(RegisterAccount.class);
@@ -93,6 +93,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Certificate.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
+		excludeFromLastPlace.add(Home.class);
 		excludeFromLastPlace.add(LoginPlace.class);
 		excludeFromLastPlace.add(PasswordReset.class);
 		excludeFromLastPlace.add(RegisterAccount.class);
@@ -116,13 +117,14 @@ public class AppActivityMapper implements ActivityMapper {
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
 		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is  
 		if(storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
-			if (!(isFirstTime && storedCurrentPlace.getClass().equals(AppActivityMapper.getDefaultPlace().getClass())))  //if first load, then do not set the last place (if it's the default place) 
+			if (!(isFirstTime && storedCurrentPlace.getClass().equals(Profile.class)))  //if first load, then do not set the last place (if it's a default place) 
 				globalApplicationState.setLastPlace(storedCurrentPlace);			
 		}
 		
 		isFirstTime = false;
+		
 		globalApplicationState.setCurrentPlace(place);
-				
+		
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {
@@ -130,8 +132,6 @@ public class AppActivityMapper implements ActivityMapper {
 				// Redirect them to the login screen
 				LoginPlace loginPlace = new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN);
 				return getActivity(loginPlace);
-			} else {
-				
 			}
 		}
 		

@@ -113,7 +113,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			public void onSuccess(Boolean isAvailable) {
 				if (!isAvailable) {
 					view.showErrorMessage(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
-					DisplayUtils.goToLastPlace(globalAppState);
+					globalAppState.gotoLastPlace();
 				}
 			}
 			

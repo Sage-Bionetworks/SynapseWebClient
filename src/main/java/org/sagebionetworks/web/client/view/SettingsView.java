@@ -18,7 +18,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	public void render(boolean standAlonePlace);
+	public void render();
 
 	/**
 	 * Shows the user that their password change succeeded
@@ -33,8 +33,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	public void updateStorageUsage(Long grandTotal);
 
 	public void clearStorageUsageUI();
-	
-	public void refreshHeader();
 	
 	public void updateNotificationCheckbox(UserProfile profile);
 	

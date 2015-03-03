@@ -147,7 +147,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
         authenticationController.loginUser(username, newPassword, new AsyncCallback<UserSessionData>() {
                 @Override
                 public void onSuccess(UserSessionData result) {
-                	DisplayUtils.goToLastPlace(globalApplicationState);// redirect to last place
+                	globalApplicationState.gotoLastPlace();
                 }
                 @Override
                 public void onFailure(Throwable caught) {

@@ -73,7 +73,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 				// detect prefetch
 				if (panel == null && eventBus == null) return;
 				if (loading != null) loading.hide();
-
 				if (place instanceof Synapse) {
 					EntityPresenter presenter = ginjector.getEntityPresenter();
 					presenter.setPlace((Synapse) place);

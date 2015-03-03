@@ -34,16 +34,27 @@ public interface GlobalApplicationState {
 	public JiraURLHelper getJiraURLHelper();
 	
 	/**
-	 * Set the activity mapper.
-	 * @param mapper
-	 */
-	public void setActivityMapper(ActivityMapper mapper);
-
-	/**
 	 * Holds the last visited place
 	 * @return
 	 */
 	public Place getLastPlace();
+	
+	
+	/**
+	 * Go to the last visited place. 
+	 */
+	public void gotoLastPlace();
+	/**
+	 * Go to the last visited place.  Return to the given default place if no last place is available. 
+	 * @param defaultPlace
+	 */
+	public void gotoLastPlace(Place defaultPlace);
+	
+	/**
+	 * Holds the last visited place.  Return the given default place if no last place is available.
+	 * @return
+	 */
+	public Place getLastPlace(Place defaultPlace);
 	
 	/**
 	 * Sets the last visited place (should only used in the AppActivityMapper) 

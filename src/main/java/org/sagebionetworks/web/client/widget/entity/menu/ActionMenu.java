@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -30,7 +29,7 @@ import org.sagebionetworks.web.client.events.EntityDeletedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -226,7 +225,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 					else gotoPlace = new Synapse(parentId);
 				} else {
-					gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+					gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
 				}
 					
 				globalApplicationState.getPlaceChanger().goTo(gotoPlace);

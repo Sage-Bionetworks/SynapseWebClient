@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -22,7 +23,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -38,12 +39,10 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
@@ -64,6 +63,7 @@ public class LoginPresenterTest {
 	AcceptsOneWidget mockPanel;
 	EventBus mockEventBus;
 	UserSessionData usd;
+	String userId = "007";
 	
 	@Before
 	public void setup(){
@@ -90,6 +90,7 @@ public class LoginPresenterTest {
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 	}	
 	
@@ -149,7 +150,7 @@ public class LoginPresenterTest {
 
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
-		verify(mockPlaceChanger).goTo(any(Place.class));
+		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 	
 	@Test 
@@ -164,16 +165,13 @@ public class LoginPresenterTest {
 	
 	@Test 
 	public void testCheckTempUsernameNotTemp() throws JSONObjectAdapterException {
-		Place mockLastPlace = Mockito.mock(Place.class);
-		when(mockGlobalApplicationState.getLastPlace()).thenReturn(mockLastPlace);
-		
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
 		profile.setUserName("not-temp");
 		usd.setProfile(profile);
 		loginPresenter.checkForTempUsername();
 		//should go to the last place, since this is not a temporary username
-		verify(mockPlaceChanger).goTo(eq(mockLastPlace));
+		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 	
 	
@@ -279,4 +277,17 @@ public class LoginPresenterTest {
 		assertTrue(LoginPresenter.isValidUrl(null, true));
 		assertFalse(LoginPresenter.isValidUrl(null, false));
 	}
+	
+	@Test
+	public void testLastPlaceAfterLogin() {
+		//this should send to this user's profile (dashboard) by default
+		loginPresenter.goToLastPlace();
+		ArgumentCaptor<Place> defaultPlaceCaptor = ArgumentCaptor.forClass(Place.class);
+		verify(mockGlobalApplicationState).gotoLastPlace(defaultPlaceCaptor.capture());
+		Place defaultPlace = defaultPlaceCaptor.getValue();
+		assertTrue(defaultPlace instanceof Profile);
+		assertEquals(userId, ((Profile)defaultPlace).getUserId());
+	}
+	
+	
 }

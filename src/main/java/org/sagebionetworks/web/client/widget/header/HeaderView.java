@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.header;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface HeaderView extends IsWidget {
@@ -33,6 +31,13 @@ public interface HeaderView extends IsWidget {
 	public interface Presenter {
 		
 		UserSessionData getUser();
+		void onGettingStartedClick();
+		void onTrashClick();
+		void onLogoutClick();
+		void onDashboardClick();
+		void onLoginClick();
+		void onRegisterClick();
+		
 	}
 
 	public void setLargeLogo(boolean isHome);

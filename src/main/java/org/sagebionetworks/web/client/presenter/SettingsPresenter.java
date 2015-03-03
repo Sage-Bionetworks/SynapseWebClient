@@ -5,8 +5,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,7 +12,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -33,9 +30,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private AuthenticationController authenticationController;
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
-	private CookieProvider cookieProvider;
 	private NodeModelCreator nodeModelCreator;
-	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
 	private GWTWrapper gwt;
 	private String apiKey = null;
@@ -45,19 +40,15 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			AuthenticationController authenticationController,
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
-			CookieProvider cookieProvider,
 			NodeModelCreator nodeModelCreator,
 			SynapseClientAsync synapseClient,
-			AdapterFactory adapterFactory,
 			GWTWrapper gwt) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
-		this.cookieProvider = cookieProvider;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
-		this.adapterFactory = adapterFactory;
 		this.gwt = gwt;
 		view.setPresenter(this);
 	}
@@ -283,7 +274,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 	
 	public Widget asWidget() {
-		this.view.render(false);
+		this.view.render();
 		updateView();
 		return view.asWidget();
 	}

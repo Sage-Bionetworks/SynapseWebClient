@@ -70,7 +70,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	@Override
 	public void goToLastPlace() {
 		view.hideLoading();
-		DisplayUtils.goToLastPlace(globalApplicationState);
+		globalApplicationState.gotoLastPlace();
 	}
 	
 	@Override

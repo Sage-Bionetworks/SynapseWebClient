@@ -6,18 +6,15 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.place.shared.Place;
@@ -32,20 +29,17 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private NodeModelCreator nodeModelCreator;
 	private IconsImageBundle iconsImageBundle;
 
 	@Inject
 	public Breadcrumb(BreadcrumbView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			NodeModelCreator nodeModelCreator,
 			IconsImageBundle iconsImageBundle) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeModelCreator = nodeModelCreator;
 		this.iconsImageBundle = iconsImageBundle;
 		view.setPresenter(this);
 	}
@@ -56,11 +50,9 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	 * @param entity
 	 * @return
 	 */
-	public Widget asWidget(EntityPath entityPath, EntityArea optionalArea, boolean showHome) {
+	public Widget asWidget(EntityPath entityPath, EntityArea optionalArea) {
 		view.setPresenter(this);
-		// exchange root for home
 		List<LinkData> links = new ArrayList<LinkData>();
-		if(showHome) links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
 		if (entityPath != null) {
 			List<EntityHeader> path = entityPath.getPath();
 			if (path != null) {
@@ -86,17 +78,6 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 		}
 		view.setLinksList(links);
 		return view.asWidget();
-	}
-	/**
-	 * Use when the only page link is back to the Home page 
-	 * @param currentPageName
-	 * @return
-	 */
-	public Widget asWidget(String currentPageName){
-		List<LinkData> links = new ArrayList<LinkData>();
-		links.add(new LinkData("Home", new Home(
-				ClientProperties.DEFAULT_PLACE_TOKEN)));
-		return asWidget(links, currentPageName);
 	}
 	
 	/**

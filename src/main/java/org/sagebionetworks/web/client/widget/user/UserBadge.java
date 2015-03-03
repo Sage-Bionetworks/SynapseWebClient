@@ -48,7 +48,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);
 		view.setSize(BadgeSize.SMALL);
-		isShowCompany = false;
+		clearState();
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {
@@ -193,8 +193,13 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
+		profile = null;
+		description = null;
+		customClickHandler = null;
+		isShowCompany = false;
+		maxNameLength = null;
+		view.clear();
 	}
 
 	@Override

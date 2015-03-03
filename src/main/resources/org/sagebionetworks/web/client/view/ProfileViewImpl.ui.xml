@@ -42,7 +42,7 @@
 					</div>
 					<div class="row">
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
-							<div class="highlight-box" ui:field="projectsHighlightBox" highlight-box-title="Projects">
+							<div class="highlight-box panel panel-default padding-5" ui:field="projectsHighlightBox" highlight-box-title="Projects">
 								<b:Row>
 									<b:Column size="XS_12">
 										<b:ButtonGroup ui:field="projectFiltersUI">
@@ -90,7 +90,7 @@
 							</div>
 						</div>
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer">
-					    	<div class="highlight-box" ui:field="challengesHighlightBox" highlight-box-title="Challenges">
+					    	<div class="highlight-box panel panel-default padding-5" ui:field="challengesHighlightBox" highlight-box-title="Challenges">
 					    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
 					    	</div>
 					    	<div ui:field="challengesLoadingUI" >
@@ -103,7 +103,7 @@
 					    </div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="teamsTabContainer">
 							<g:FlowPanel ui:field="openInvitesContainer" />
-							<div class="highlight-box" ui:field="teamsHighlightBox" highlight-box-title="Teams">
+							<div class="highlight-box panel panel-default padding-5" ui:field="teamsHighlightBox" highlight-box-title="Teams">
 								<g:FlowPanel ui:field="teamsTabContent" styleName="margin-10" />
 							</div>
 							<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
