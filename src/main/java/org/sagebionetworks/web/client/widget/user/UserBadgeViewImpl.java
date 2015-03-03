@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.user;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -19,7 +20,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@UiField
 	Span loadingUI;
 	@UiField
-	Anchor defaultUserPicture;
+	Icon defaultUserPicture;
 	@UiField
 	Image userPicture;
 	@UiField
@@ -43,7 +44,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.badgeClicked(event);
 			}
 		};
-		defaultUserPicture.addClickHandler(badgeClicked);
 		userPicture.addClickHandler(badgeClicked);
 		usernameLink.addClickHandler(badgeClicked);
 	}
@@ -71,7 +71,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void setSize(BadgeSize size) {
-		defaultUserPicture.setIconSize(size.iconSize());
+		defaultUserPicture.addStyleName(size.getDefaultPictureStyle());
 		usernameLink.setStyleName(size.textStyle());
 		userPicture.setHeight(size.pictureHeight());
 		usernameLink.setVisible(size.isTextVisible());
