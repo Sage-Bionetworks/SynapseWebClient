@@ -956,6 +956,23 @@ a.shortBtn {
 	font-size: 12px;
 }
 
+.font-size-1x {
+	font-size:1em;
+}
+.font-size-lg {
+	font-size:1.33em;
+}
+.font-size-2x {
+	font-size:2em;
+}
+.font-size-5x {
+	font-size:5em;
+}
+.font-size-12x {
+	font-size:12em;
+}
+
+
 .vertical-align-bottom {
 	vertical-align: bottom;
 }
