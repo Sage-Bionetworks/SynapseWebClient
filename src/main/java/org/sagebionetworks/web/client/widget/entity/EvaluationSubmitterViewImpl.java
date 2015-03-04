@@ -71,23 +71,23 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	Radio isTeamRadioButton;
 	@UiField
-	Div contributorsPanel;
+	Panel contributorsPanel;
 	@UiField
 	SimplePanel registerTeamDialogContainer;
 	@UiField
 	Anchor registerMyTeamLink;
 	@UiField
-	Anchor createNewTeamLink;
+	Anchor registerMyTeamLink2;
 	@UiField
 	Paragraph teamIneligibleHtml;
 	@UiField
-	Paragraph noTeamsFoundUI;
-	@UiField
 	Div contributorsLoadingUI;
 	@UiField
-	Div contributorsHighlightPanel;
+	Div teamsUI;
 	@UiField
-	Panel teamsUI;
+	Div availableTeamsUI;
+	@UiField
+	Div emptyTeamsUI;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -101,8 +101,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
-		
-		contributorsHighlightPanel.getElement().setAttribute("highlight-box-title", "Contributors");
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
 	}
@@ -154,19 +152,15 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			}
 		});
 		
-		registerMyTeamLink.addClickHandler(new ClickHandler() {
+		ClickHandler registerTeamLink = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onRegisterTeamClicked();
 			}
-		});
+		};
+		registerMyTeamLink.addClickHandler(registerTeamLink);
+		registerMyTeamLink2.addClickHandler(registerTeamLink);
 		
-		createNewTeamLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onNewTeamClicked();
-			}
-		});
 		isIndividualRadioButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -322,18 +316,17 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void showEmptyTeams() {
 		teamsUI.setVisible(true);
-		teamComboBox.setVisible(false);
-		noTeamsFoundUI.setVisible(true);
-		contributorsHighlightPanel.setVisible(false);
+		emptyTeamsUI.setVisible(true);
+		availableTeamsUI.setVisible(false);
+		registerMyTeamLink2.setVisible(true);
 	}
 	
 	@Override
 	public void showTeamsUI(List<Team> registeredTeams) {
 		teamsUI.setVisible(true);
-		contributorsHighlightPanel.setVisible(true);
-		teamComboBox.setVisible(true);
-		noTeamsFoundUI.setVisible(false);
-		
+		emptyTeamsUI.setVisible(false);
+		availableTeamsUI.setVisible(true);
+		registerMyTeamLink2.setVisible(false);
 		teamComboBox.clear();
 		for (Team teamHeader : registeredTeams) {
 			teamComboBox.addItem(teamHeader.getName());

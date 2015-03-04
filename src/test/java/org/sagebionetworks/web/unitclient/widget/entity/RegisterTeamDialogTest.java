@@ -128,6 +128,7 @@ public class RegisterTeamDialogTest {
 		assertEquals(firstTeam.getId(), capturedTeam.getTeamId());
 		
 		verify(mockCallback).invoke();
+		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockView).hideModal();
 	}
 
