@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -86,7 +87,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	Div contributorsHighlightPanel;
 	@UiField
-	Div submissionTypeSelectUI;
+	Panel teamsUI;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -298,11 +299,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		teamIneligibleHtml.setText(error);
 	}
 	
-	@Override
-	public void setTeamInEligibleErrorVisible(boolean isVisible) {
-		teamIneligibleHtml.setVisible(isVisible);
-	}
-	
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {
 		Div row = new Div();
 		InlineCheckBox cb = new InlineCheckBox();
@@ -319,32 +315,39 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void setTeamComboBoxEnabled(boolean isEnabled) {
-		teamComboBox.setEnabled(isEnabled);
-	}
-	
-	@Override
 	public void clearTeams() {
 		teamComboBox.clear();
 	}
 	
 	@Override
 	public void showEmptyTeams() {
-		submissionTypeSelectUI.setVisible(false);
+		teamsUI.setVisible(true);
+		teamComboBox.setVisible(false);
 		noTeamsFoundUI.setVisible(true);
+		contributorsHighlightPanel.setVisible(false);
 	}
 	
 	@Override
-	public void showTeams(List<Team> registeredTeams) {
-		submissionTypeSelectUI.setVisible(true);
+	public void showTeamsUI(List<Team> registeredTeams) {
+		teamsUI.setVisible(true);
+		contributorsHighlightPanel.setVisible(true);
+		teamComboBox.setVisible(true);
 		noTeamsFoundUI.setVisible(false);
 		
-		isIndividualRadioButton.setActive(true);
 		teamComboBox.clear();
 		for (Team teamHeader : registeredTeams) {
 			teamComboBox.addItem(teamHeader.getName());
 		}
 	}
+	@Override
+	public void setIsIndividualSubmissionActive(boolean isActive) {
+		isIndividualRadioButton.setActive(isActive);	
+	}
+	@Override
+	public void hideTeamsUI() {
+		teamsUI.setVisible(false);
+	}
+	
 	@Override
 	public void setContributorsLoading(boolean isVisible) {
 		contributorsLoadingUI.setVisible(isVisible);
