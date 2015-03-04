@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.user;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -20,7 +21,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@UiField
 	Span loadingUI;
 	@UiField
-	Anchor anonymousUserLink;
+	Icon defaultUserPicture;
 	@UiField
 	Image userPicture;
 	@UiField
@@ -44,14 +45,13 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.badgeClicked(event);
 			}
 		};
-		anonymousUserLink.addClickHandler(badgeClicked);
 		userPicture.addClickHandler(badgeClicked);
 		usernameLink.addClickHandler(badgeClicked);
 	}
 	
 	public void clear() {
 		loadingUI.setVisible(false);
-		anonymousUserLink.setVisible(false);
+		defaultUserPicture.setVisible(false);
 		userPicture.setVisible(false);
 		description.setVisible(false);
 		errorLoadingUI.setVisible(false);
@@ -60,18 +60,19 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void showAnonymousUserPicture() {
 		userPicture.setVisible(false);
-		anonymousUserLink.setVisible(true);
+		defaultUserPicture.setVisible(true);
 	}
 	
 	@Override
 	public void showCustomUserPicture(String url) {
+		defaultUserPicture.setVisible(false);
 		userPicture.setVisible(true);
 		userPicture.setUrl(url);
 	}
 	
 	@Override
 	public void setSize(BadgeSize size) {
-		anonymousUserLink.setIconSize(size.iconSize());
+		defaultUserPicture.setSize(size.iconSize());
 		usernameLink.setStyleName(size.textStyle());
 		userPicture.setHeight(size.pictureHeight());
 		usernameLink.setVisible(size.isTextVisible());
