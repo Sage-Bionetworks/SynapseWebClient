@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class ProfilePresenterTest {
 	PlaceChanger mockPlaceChanger;	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	Profile place = Mockito.mock(Profile.class);
-	
+	CookieProvider mockCookies;
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
@@ -126,8 +127,9 @@ public class ProfilePresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockProfileForm = mock(ProfileFormWidget.class);
+		mockCookies = mock(CookieProvider.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient);	
+				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient, mockCookies);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
@@ -252,6 +254,7 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
 		
 		assertEquals(targetUserId, captor.getValue());
+		verifyProfileShown();
 	}
 
 	@Test
@@ -782,4 +785,54 @@ public class ProfilePresenterTest {
 		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
 	}
 	
+	private void verifyProfileHidden() {
+		verify(mockView).hideProfile();
+		verify(mockView).setShowProfileButtonVisible(true);
+		verify(mockView).setHideProfileButtonVisible(false);
+		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(false)), any(Date.class));
+	}
+	private void verifyProfileShown() {
+		verify(mockView).showProfile();
+		verify(mockView).setShowProfileButtonVisible(false);
+		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(true);
+		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(true)), any(Date.class));
+	}
+	
+	@Test
+	public void testInitShowHideProfileNotOwner() {
+		profilePresenter.initializeShowHideProfile(false);
+		verifyProfileShown();
+		//and verify that hide profile button was hidden
+		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(false);
+	}
+	
+	@Test
+	public void testInitShowHideProfileNullCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn(null);
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileShown();
+	}
+	
+	@Test
+	public void testInitShowHideProfileEmptyCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("");
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileShown();
+	}
+	@Test
+	public void testInitShowHideProfileTrueCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("true");
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileShown();
+	}
+	@Test
+	public void testInitShowHideProfileFalseCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("false");
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileHidden();
+	}
 }

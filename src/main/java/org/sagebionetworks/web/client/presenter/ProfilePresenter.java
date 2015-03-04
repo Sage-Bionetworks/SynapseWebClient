@@ -47,6 +47,7 @@ import com.google.inject.Inject;
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
+	
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
@@ -200,18 +201,23 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void initializeShowHideProfile(boolean isOwner) {
-		boolean isProfileVisible = true;
-		try {
-			if (isOwner) {
+		if (isOwner) {
+			boolean isProfileVisible = true;
+			try {
 				String cookieValue = cookies.getCookie(USER_PROFILE_VISIBLE_STATE_KEY);
 				if (cookieValue != null && !cookieValue.isEmpty()) {
 					isProfileVisible = Boolean.valueOf(cookieValue);	
 				}
+			} catch (Exception e) {
+				//if there are any problems getting the profile visibility state, ignore and use default (show)
 			}
-		} catch (Exception e) {
-			//if there are any problems getting the profile visibility state, ignore and use default (show)
+			setIsProfileVisible(isProfileVisible);
+		} else {
+			//not the owner
+			//show the profile, and hide the profile button
+			setIsProfileVisible(true);
+			view.setHideProfileButtonVisible(false);
 		}
-		setIsProfileVisible(isProfileVisible);
 	}
 	
 	@Override
