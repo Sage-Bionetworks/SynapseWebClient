@@ -77,6 +77,10 @@ public class EditRegisteredTeamDialogViewImpl implements EditRegisteredTeamDialo
 		DisplayUtils.showErrorMessage(message);
 	}
 	
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
 	/*
 	 * Private Methods
 	 */

@@ -111,6 +111,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 			challengeClient.registerChallengeTeam(challengeTeam, new AsyncCallback<ChallengeTeam>() {
 				@Override
 				public void onSuccess(ChallengeTeam result) {
+					view.showInfo("Team Registration", "Successfully registered your team for the challenge.");
 					if (callback != null) {
 						callback.invoke();
 					}
