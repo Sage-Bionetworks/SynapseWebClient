@@ -27,6 +27,7 @@
 			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
 			    </div>
 			    <div ui:field="dashboardUI" class="col-md-9 col-xs-12">
+			    	<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false"/>
 			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
 			        	<b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
 							<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
@@ -134,7 +135,6 @@
 					        </div>
 					    </div>
 					</div>
-					<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" pull="LEFT" icon="CHEVRON_RIGHT" text="Show Profile" addStyleNames="margin-top-5" visible="false"/>
 				</div>
 			</div>
 			<p>&nbsp;</p>
