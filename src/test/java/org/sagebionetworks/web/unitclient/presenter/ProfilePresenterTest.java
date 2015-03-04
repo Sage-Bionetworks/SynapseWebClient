@@ -254,7 +254,7 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
 		
 		assertEquals(targetUserId, captor.getValue());
-		verifyProfileShown();
+		verifyProfileShown(false);
 	}
 
 	@Test
@@ -785,23 +785,29 @@ public class ProfilePresenterTest {
 		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
 	}
 	
-	private void verifyProfileHidden() {
+	private void verifyProfileHidden(boolean isCookieExpected) {
 		verify(mockView).hideProfile();
 		verify(mockView).setShowProfileButtonVisible(true);
 		verify(mockView).setHideProfileButtonVisible(false);
-		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(false)), any(Date.class));
+		if (isCookieExpected)
+			verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(false)), any(Date.class));
+		else
+			verify(mockCookies, never()).setCookie(anyString(), anyString(), any(Date.class));
 	}
-	private void verifyProfileShown() {
+	private void verifyProfileShown(boolean isCookieExpected) {
 		verify(mockView).showProfile();
 		verify(mockView).setShowProfileButtonVisible(false);
 		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(true);
-		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(true)), any(Date.class));
+		if (isCookieExpected)
+			verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(true)), any(Date.class));
+		else
+			verify(mockCookies, never()).setCookie(anyString(), anyString(), any(Date.class));
 	}
 	
 	@Test
 	public void testInitShowHideProfileNotOwner() {
 		profilePresenter.initializeShowHideProfile(false);
-		verifyProfileShown();
+		verifyProfileShown(false);
 		//and verify that hide profile button was hidden
 		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(false);
 	}
@@ -811,7 +817,7 @@ public class ProfilePresenterTest {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn(null);
 		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileShown();
+		verifyProfileShown(false);
 	}
 	
 	@Test
@@ -819,20 +825,35 @@ public class ProfilePresenterTest {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("");
 		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileShown();
+		verifyProfileShown(false);
 	}
 	@Test
 	public void testInitShowHideProfileTrueCookieValue() {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("true");
 		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileShown();
+		verifyProfileShown(false);
 	}
 	@Test
 	public void testInitShowHideProfileFalseCookieValue() {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("false");
 		profilePresenter.initializeShowHideProfile(true);
-		verifyProfileHidden();
+		verifyProfileHidden(false);
+	}
+	
+	@Test
+	public void testHideProfileButtonClicked() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("true");
+		profilePresenter.hideProfileButtonClicked();
+		verifyProfileHidden(true);
+	}
+	@Test
+	public void testShowProfileButtonClicked() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("false");
+		profilePresenter.showProfileButtonClicked();
+		verifyProfileShown(true);
 	}
 }

@@ -24,7 +24,7 @@
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
 			        	<g:FlowPanel ui:field="viewProfilePanel" />
 			        </div>
-			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" />
+			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
 			    </div>
 			    <div ui:field="dashboardUI" class="col-md-9 col-xs-12">
 			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
@@ -134,7 +134,7 @@
 					        </div>
 					    </div>
 					</div>
-					<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" pull="LEFT" icon="CHEVRON_RIGHT" text="Show Profile" addStyleNames="margin-top-5"/>
+					<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" pull="LEFT" icon="CHEVRON_RIGHT" text="Show Profile" addStyleNames="margin-top-5" visible="false"/>
 				</div>
 			</div>
 			<p>&nbsp;</p>
