@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -16,6 +17,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -39,16 +41,19 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
+	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
 	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
+	private CookieProvider cookies;
 	
 	private ProfileFormWidget profileForm;
 	private AdapterFactory adapterFactory;
@@ -69,7 +74,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			SynapseClientAsync synapseClient,
 			ProfileFormWidget profileForm,
 			AdapterFactory adapterFactory,
-			ChallengeClientAsync challengeClient
+			ChallengeClientAsync challengeClient,
+			CookieProvider cookies
 			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -78,6 +84,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
 		this.challengeClient = challengeClient;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	}
 
@@ -146,7 +153,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							//only configure the profile form (editor) if owner of this profile
 							profileForm.configure(profile, profileUpdatedCallback);
 						}
-						
+						initializeShowHideProfile(isOwner);
 						getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 					}
 				@Override
@@ -190,6 +197,45 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				refreshChallenges();
 			}
 		});
+	}
+	
+	public void initializeShowHideProfile(boolean isOwner) {
+		boolean isProfileVisible = true;
+		try {
+			if (isOwner) {
+				String cookieValue = cookies.getCookie(USER_PROFILE_VISIBLE_STATE_KEY);
+				if (cookieValue != null && !cookieValue.isEmpty()) {
+					isProfileVisible = Boolean.valueOf(cookieValue);	
+				}
+			}
+		} catch (Exception e) {
+			//if there are any problems getting the profile visibility state, ignore and use default (show)
+		}
+		setIsProfileVisible(isProfileVisible);
+	}
+	
+	@Override
+	public void hideProfileButtonClicked() {
+		setIsProfileVisible(false);
+	}
+	
+	@Override
+	public void showProfileButtonClicked() {
+		setIsProfileVisible(true);
+	}
+	
+	private void setIsProfileVisible(boolean isVisible) {
+		if (isVisible){
+			view.showProfile();
+		} else {
+			view.hideProfile();
+		}
+		view.setShowProfileButtonVisible(!isVisible);
+		view.setHideProfileButtonVisible(isVisible);
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_VISIBLE_STATE_KEY, Boolean.toString(isVisible), yearFromNow);
+
 	}
 	
 	public void refreshProjects() {
