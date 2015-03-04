@@ -211,26 +211,28 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			} catch (Exception e) {
 				//if there are any problems getting the profile visibility state, ignore and use default (show)
 			}
-			setIsProfileVisible(isProfileVisible, false);
+			setIsProfileVisible(isProfileVisible);
 		} else {
 			//not the owner
 			//show the profile, and hide the profile button
-			setIsProfileVisible(true, false);
+			setIsProfileVisible(true);
 			view.setHideProfileButtonVisible(false);
 		}
 	}
 	
 	@Override
 	public void hideProfileButtonClicked() {
-		setIsProfileVisible(false, true);
+		setIsProfileVisible(false);
+		setIsProfileVisibleCookie(false);
 	}
 	
 	@Override
 	public void showProfileButtonClicked() {
-		setIsProfileVisible(true, true);
+		setIsProfileVisible(true);
+		setIsProfileVisibleCookie(true);
 	}
 	
-	private void setIsProfileVisible(boolean isVisible, boolean isSetCookie) {
+	private void setIsProfileVisible(boolean isVisible) {
 		if (isVisible){
 			view.showProfile();
 		} else {
@@ -238,11 +240,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		view.setShowProfileButtonVisible(!isVisible);
 		view.setHideProfileButtonVisible(isVisible);
-		if (isSetCookie) {
-			Date yearFromNow = new Date();
-			CalendarUtil.addMonthsToDate(yearFromNow, 12);
-			cookies.setCookie(USER_PROFILE_VISIBLE_STATE_KEY, Boolean.toString(isVisible), yearFromNow);
-		}
+	}
+	
+	public void setIsProfileVisibleCookie(boolean isVisible) {
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_VISIBLE_STATE_KEY, Boolean.toString(isVisible), yearFromNow);
 	}
 	
 	public void refreshProjects() {
