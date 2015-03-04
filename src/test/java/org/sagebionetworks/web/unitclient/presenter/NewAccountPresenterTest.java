@@ -122,8 +122,7 @@ public class NewAccountPresenterTest {
 		newAccountPresenter.checkEmailAvailable("abcd@efg.com");
 		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
 		//attempts to go to the last place
-		verify(mockGlobalApplicationState).getLastPlace();
-		verify(mockPlaceChanger).goTo(any(Place.class));
+		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
 
 	@Test

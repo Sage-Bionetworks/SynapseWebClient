@@ -321,6 +321,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_MARKDOWN_FAILED = "Failed to load the markdown: ";
 	public static final String ERROR_SAVING_WIKI = "Could not save your changes.\nIt is recommended that you copy your version of the wiki text so that it is not lost.\n";
 	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
+	public static final String NO_WIKI_FOUND = "A Wiki has not been created.";
 	public static final String ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED = "Failed to load the history of the wiki page.";
 	public static final String ERROR_WIKI_MODIFIED = "Sorry, another process has made changes to this wiki while you were editing.  Please reload the page, merge in your changes, and try saving again.";
 	public static final String ERROR_WIKI_SAVE_MARKDOWN = "Failed to properly save markdown: ";
@@ -622,6 +623,7 @@ public class DisplayConstants {
 	public static final String EVALUATION_JOIN_TEAM_ERROR = "Unable to join team associated with the evaluation: ";
 	public static final String JOIN_TEAM_ERROR = "Unable to request membership to the team: ";
 	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
+	public static final String CHALLENGE_EVALUATIONS_ERROR = "Unable to find the evaluation queues associated with the challenge: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
 	public static final String THANK_YOU_FOR_SUBMISSION = "Thank you for your submission!";
@@ -631,7 +633,7 @@ public class DisplayConstants {
 	public static final String PROPERTY_ERROR = "Unable to query for property: ";
 	public static final String READ_ONLY_MODE = "Read Only Mode";
 	public static final String SYNAPSE_IN_READ_ONLY_MODE = "Synapse is in READ_ONLY mode for maintenance. You can continue to browse, but can not modify during this period.";
-	public static final String VIEW_EDIT_PROFILE = "View / Edit Profile";
+	public static final String VIEW_DASHBOARD = "View my dashboard";
 	public static final String SHOW = "Show";
 	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Send Password Change Request";
 	public static final String EMAIL_ADDRESS = "Username or Email Address";

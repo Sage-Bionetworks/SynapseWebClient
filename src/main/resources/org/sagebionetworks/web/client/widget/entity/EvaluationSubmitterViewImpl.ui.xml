@@ -3,41 +3,77 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:be="urn:import:org.gwtbootstrap3.extras.select.client.ui"
   >
-  	<b:Modal title="Submit to Challenge"
-			fade="true" dataBackdrop="STATIC" dataKeyboard="false">
-		<b:ModalBody>
-			<b:Form>
+  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+  	<g:FlowPanel>
+	  	<b:Modal title="Submit to Challenge"
+				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
+			<b:ModalBody>
+				<b:Form>
+					<b:FieldSet>
+						<b:FormGroup ui:field="entityFinderUI">
+							<b:FormGroup>
+								<b:FormLabel for="finderButton">Select the Entity that you would like to submit:</b:FormLabel>
+								<g:FlowPanel>
+									<b:Button ui:field="entityFinderButton" icon="SEARCH" size="SMALL" b:id="finderButton">Find Entity</b:Button>
+									<b:Heading ui:field="selectedText" size="H6" addStyleNames="displayInline margin-left-10" />
+								</g:FlowPanel>
+							</b:FormGroup>
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormGroup>
+								<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
+								<g:SimplePanel ui:field="evaluationListContainer" />
+							</b:FormGroup>
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel for="submissionName">Submission name (optional)</b:FormLabel>
+							<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
+						</b:FormGroup>
+					</b:FieldSet>
+				</b:Form>
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="nextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+		<b:Modal title="Submit to Challenge"
+				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
+			<b:ModalBody>
 				<b:FieldSet>
-					<b:FormGroup ui:field="entityFinderUI">
-						<b:FormGroup>
-							<b:FormLabel for="finderButton">Select the Entity that you would like to submit:</b:FormLabel>
-							<g:FlowPanel>
-								<b:Button ui:field="entityFinderButton" icon="SEARCH" size="SMALL" b:id="finderButton">Find Entity</b:Button>
-								<b:Heading ui:field="selectedText" size="H6" addStyleNames="displayInline margin-left-10" />
-							</g:FlowPanel>
-						</b:FormGroup>
-					</b:FormGroup>
-					<b:FormGroup>
-						<b:FormGroup>
-							<b:FormLabel>Select the challenge(s) below that you would like to submit to</b:FormLabel>
-							<g:SimplePanel ui:field="evaluationListContainer" />
-						</b:FormGroup>
-					</b:FormGroup>
-					<b:FormGroup>
-						<b:FormLabel for="submissionName">Submission name (optional)</b:FormLabel>
-						<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
-					</b:FormGroup>
-					<b:FormGroup>
-						<b:FormLabel for="teamName">Team name (optional)</b:FormLabel>
-						<b:TextBox ui:field="teamNameField" b:id="teamName" />
-					</b:FormGroup>
+					<bh:Div ui:field="submissionTypeSelectUI">
+						<b:ButtonGroup>
+							<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
+							<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
+						</b:ButtonGroup>
+						<g:ListBox ui:field="teamComboBox" styleName="form-control" />
+						<bh:Div addStyleNames="highlight-box" ui:field="contributorsHighlightPanel">
+							<bh:Div ui:field="contributorsLoadingUI">
+								<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
+						        <bh:Text>&nbsp; Loading...</bh:Text>
+							</bh:Div>
+							<bh:Div ui:field="contributorsPanel"/>
+						</bh:Div>
+					</bh:Div>
+					
+					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
+					<bh:Paragraph emphasis="WARNING" ui:field="noTeamsFoundUI" visible="false">No registered teams found</bh:Paragraph>
 				</b:FieldSet>
-			</b:Form>
-		</b:ModalBody>
-		<b:ModalFooter>
-			<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-			<b:Button ui:field="okButton" type="PRIMARY">OK</b:Button>
-		</b:ModalFooter>
-	</b:Modal>
+				<bh:Div>
+					<b:Anchor ui:field="createNewTeamLink" text="Create a new team"/>
+				</bh:Div>
+				<bh:Div>
+					<b:Anchor ui:field="registerMyTeamLink" text="Register my team for this challenge"/>
+				</bh:Div>
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="okButton" type="PRIMARY">Submit</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+		<g:SimplePanel ui:field="registerTeamDialogContainer" />
+	</g:FlowPanel>
 </ui:UiBinder>

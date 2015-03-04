@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -10,7 +11,8 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
-import org.sagebionetworks.web.client.widget.user.BigUserBadge;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -76,11 +78,12 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 			rowPanel.add(right);
 			
 			final UserProfile profile = profiles.get(i);
-			BigUserBadge renderer = ginInjector.getBigUserBadgeWidget();
+			UserBadge renderer = ginInjector.getUserBadgeWidget();
 			MembershipInvtnSubmission invite = invitations.get(i);
 			final String inviteId = invite.getId();
 			String inviteMessage = invite.getMessage() != null ? invite.getMessage() : "";
 			renderer.configure(profile, inviteMessage);
+			renderer.setSize(BadgeSize.LARGE);
 			Widget rendererWidget = renderer.asWidget();
 			rendererWidget.addStyleName("margin-top-15");
 			left.add(rendererWidget);

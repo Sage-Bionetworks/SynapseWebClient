@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -16,6 +15,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -47,6 +47,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -257,9 +258,6 @@ public interface SynapseClient extends RemoteService {
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType)
 			throws RestServiceException;
 	
-	String getUnmetEvaluationAccessRequirements(String evalId)
-			throws RestServiceException;
-
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
 	String getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
 	
@@ -343,7 +341,7 @@ public interface SynapseClient extends RemoteService {
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	public String updateTeam(String teamJson) throws RestServiceException;
-	public String getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
+	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
 	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
@@ -351,8 +349,6 @@ public interface SynapseClient extends RemoteService {
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
 	public String getCertificationQuiz() throws RestServiceException;
 	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException; 
-	
-	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
@@ -367,23 +363,6 @@ public interface SynapseClient extends RemoteService {
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
-	
-	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
-	
-	public String getAvailableEvaluations() throws RestServiceException;
-	public String getAvailableEvaluations(Set<String> targetEvaluationIds) throws RestServiceException;
-	
-	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
-	
-	public Submission createSubmission(Submission submission, String etag) throws RestServiceException;
-	
-	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
-	public String getEvaluationAcl(String evalId) throws RestServiceException;
-	public AccessControlList updateEvaluationAcl(AccessControlList acl) throws RestServiceException;
-	
-	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException;
-
-	public Boolean hasSubmitted()	throws RestServiceException;
 		
 	public String getSynapseVersions() throws RestServiceException;
 	
@@ -507,7 +486,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	ProjectPagedResults getMyProjects(int limit, int offset) throws RestServiceException;
+	ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset) throws RestServiceException;
 	ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset) throws RestServiceException;
 	ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
 	

@@ -6,17 +6,18 @@ import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -33,25 +34,25 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private Map<String,String> descriptor;
 	private WikiPageKey wikiKey;
 	private AuthenticationController authenticationController;
-	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
-	private EvaluationSubmitter evaluationSubmitter;
-	private String[] evaluationIds;
-	
+	private Set<String> evaluationIds;
+	PortalGinInjector ginInjector;
+	private String evaluationUnavailableMessage;
 	@Inject
-	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, SynapseClientAsync synapseClient,
+	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, ChallengeClientAsync challengeClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			NodeModelCreator nodeModelCreator,
-			EvaluationSubmitter evaluationSubmitter) {
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
-		this.synapseClient = synapseClient;
+		this.challengeClient = challengeClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
-		this.evaluationSubmitter = evaluationSubmitter;
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
@@ -59,48 +60,87 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 		this.wikiKey = wikiKey;
 		this.descriptor = widgetDescriptor;
 		
+		evaluationUnavailableMessage  = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
+		
 		String evaluationId = descriptor.get(WidgetConstants.JOIN_WIDGET_EVALUATION_ID_KEY);
 		if (evaluationId != null) {
-			evaluationIds = new String[1];
-			evaluationIds[0] = evaluationId;
+			evaluationIds = new HashSet<String>();
+			evaluationIds.add(evaluationId);
 		}
+		getEvaluationIds(descriptor, new CallbackP<Set<String>>() {
+			@Override
+			public void invoke(Set<String> evalIds) {
+				evaluationIds = evalIds;
+				final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
+				//figure out if we should show anything
+				try {
+					challengeClient.getAvailableEvaluations(evaluationIds, new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String jsonString) {
+							try {
+								PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
+								if (results.getTotalNumberOfResults() == 0) {
+									view.showUnavailable(evaluationUnavailableMessage);
+								} else {
+									view.configure(wikiKey, buttonText);	
+								}
+							} catch (JSONObjectAdapterException e) {
+								onFailure(e);
+							}
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
+							if (!(caught instanceof ForbiddenException)) {
+								view.showUnavailable(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+							}
+						}
+					});
+				} catch (RestServiceException e) {
+					view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Get the evaluation queue ids
+	 * @param callback
+	 */
+	public void getEvaluationIds(Map<String,String> descriptor, final CallbackP<Set<String>> callback) {
 		String subchallengeIdList = null;
 		if(descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY)) subchallengeIdList = descriptor.get(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY);
 		if(subchallengeIdList != null) {
-			evaluationIds = subchallengeIdList.split(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER);
-		}
-		final String evaluationUnavailableMessage = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
-		final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
-		
-		//figure out if we should show anything
-		try {
-			final Set<String> targetEvaluations = new HashSet<String>();
-			for (int i = 0; i < evaluationIds.length; i++) {
-				targetEvaluations.add(evaluationIds[i]);
+			String[] evaluationIdsArray = subchallengeIdList.split(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER);
+			Set<String> evaluationIds = new HashSet<String>();
+			for (String evaluationId : evaluationIdsArray) {
+				evaluationIds.add(evaluationId);
 			}
-			synapseClient.getAvailableEvaluations(targetEvaluations, new AsyncCallback<String>() {
+			if (!evaluationIds.isEmpty())
+				callback.invoke(evaluationIds);
+			else {
+				view.showUnavailable(evaluationUnavailableMessage);
+			}
+			return;
+		} 
+		//else, look for the challenge id
+		if (descriptor.containsKey(WidgetConstants.CHALLENGE_ID_KEY)) {
+			String challengeId = descriptor.get(WidgetConstants.CHALLENGE_ID_KEY);
+			challengeClient.getChallengeEvaluationIds(challengeId, new AsyncCallback<Set<String>>() {
 				@Override
-				public void onSuccess(String jsonString) {
-					try {
-						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-						view.configure(wikiKey, results.getTotalNumberOfResults() > 0, evaluationUnavailableMessage, buttonText);	
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
-				}
+				public void onSuccess(Set<String> evaluationIds) {
+					//if no evaluations are accessible, do not continue (show nothing)
+					if (!evaluationIds.isEmpty())
+						callback.invoke(evaluationIds);
+					else
+						view.showUnavailable(evaluationUnavailableMessage);
+				};
 				@Override
 				public void onFailure(Throwable caught) {
-					//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
-					if (!(caught instanceof ForbiddenException)) {
-						view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
-					}
+					view.showErrorMessage(DisplayConstants.CHALLENGE_EVALUATIONS_ERROR + caught.getMessage());
 				}
 			});
-		} catch (RestServiceException e) {
-			view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
 		}
-		//set up view based on descriptor parameters
-		descriptor = widgetDescriptor;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -132,11 +172,9 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	}
 	
 	public void showSubmissionDialog() {
-		Set<String> evaluationIdsList = new HashSet<String>();
-		for (int i = 0; i < evaluationIds.length; i++) {
-			evaluationIdsList.add(evaluationIds[i]);
-		}
-		evaluationSubmitter.configure(null, evaluationIdsList);
+		EvaluationSubmitter submitter = ginInjector.getEvaluationSubmitter();
+		view.setEvaluationSubmitterWidget(submitter.asWidget());
+		submitter.configure(null, evaluationIds);
 	}
 	
 }

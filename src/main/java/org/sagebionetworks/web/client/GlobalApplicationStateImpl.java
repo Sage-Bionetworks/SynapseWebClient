@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
-import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
@@ -27,7 +26,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private SynapseClientAsync synapseClient;
-	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
 	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
@@ -44,7 +42,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.synapseClient = synapseClient;
 		isEditing = false;
 	}
-
+	
 	@Override
 	public PlaceChanger getPlaceChanger() {
 		if(placeChanger == null) {
@@ -75,9 +73,29 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Override
-	public Place getLastPlace() {		
+	public Place getLastPlace() {
+		return getLastPlace(null);
+	}
+	
+	@Override
+	public Place getLastPlace(Place defaultPlace) {
 		String historyValue = cookieProvider.getCookie(CookieKeys.LAST_PLACE);
-		return getPlaceFromHistoryValue(historyValue);		
+		return getPlaceFromHistoryValue(historyValue, fixIfNull(defaultPlace));
+	}
+	
+	@Override
+	public void gotoLastPlace() {
+		gotoLastPlace(null);
+	}
+
+	@Override
+	public void gotoLastPlace(Place defaultPlace) {
+		getPlaceChanger().goTo(getLastPlace(defaultPlace));
+	}
+	
+	private Place fixIfNull(Place defaultPlace) {
+		if (defaultPlace == null) return AppActivityMapper.getDefaultPlace();
+		else return defaultPlace;
 	}
 
 	@Override
@@ -89,7 +107,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public Place getCurrentPlace() {
 		String historyValue = cookieProvider.getCookie(CookieKeys.CURRENT_PLACE);
-		return getPlaceFromHistoryValue(historyValue);		
+		return getPlaceFromHistoryValue(historyValue, AppActivityMapper.getDefaultPlace());		
 	}
 
 	@Override
@@ -111,16 +129,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	/*
 	 * Private Methods
 	 */
-	private Place getPlaceFromHistoryValue(String historyValue) {
+	private Place getPlaceFromHistoryValue(String historyValue, Place defaultPlace) {
 		if(historyValue != null) {
 			Place place = appPlaceHistoryMapper.getPlace(historyValue);
 			return place;
-		} else return AppActivityMapper.getDefaultPlace();
-	}
-
-	@Override
-	public void setActivityMapper(ActivityMapper mapper) {
-		this.directMapper = mapper;
+		} else return defaultPlace;
 	}
 
 	@Override

@@ -124,8 +124,7 @@ public class ChangeUsernamePresenterTest {
 		presenter.setUsername("newname");
 		verify(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		//go to the last place
-		verify(mockPlaceChanger).goTo(any(Place.class));
-	}
+		verify(mockGlobalApplicationState).gotoLastPlace();	}
 
 	
 	@Test 

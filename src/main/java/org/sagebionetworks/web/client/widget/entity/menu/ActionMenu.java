@@ -16,11 +16,11 @@ import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -29,7 +29,7 @@ import org.sagebionetworks.web.client.events.EntityDeletedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -62,7 +62,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private EntityDeletedHandler entityDeletedHandler;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
-	private EvaluationSubmitter evaluationSubmitter;
+	private PortalGinInjector ginInjector;
 	private Long versionNumber;
 	
 	public interface EvaluationsCallback {
@@ -88,7 +88,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor,
 			AutoGenFactory entityFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
-			CookieProvider cookieProvider, EvaluationSubmitter evaluationSubmitter
+			CookieProvider cookieProvider, PortalGinInjector ginInjector
 			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -100,7 +100,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.entityFactory = entityFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookieProvider = cookieProvider;
-		this.evaluationSubmitter = evaluationSubmitter;
+		this.ginInjector = ginInjector;
 		view.setPresenter(this);
 	}	
 	
@@ -225,7 +225,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 					if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 					else gotoPlace = new Synapse(parentId);
 				} else {
-					gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+					gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
 				}
 					
 				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
@@ -355,7 +355,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	
 	@Override
 	public void showAvailableEvaluations() {
-		evaluationSubmitter.configure(entityBundle.getEntity(), null);
+		EvaluationSubmitter submitter = ginInjector.getEvaluationSubmitter();
+		view.setEvaluationSubmitterWidget(submitter.asWidget());
+		submitter.configure(entityBundle.getEntity(), null);
 	}
 	
 }

@@ -18,6 +18,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -45,6 +46,7 @@ public class ActionMenuTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	CookieProvider mockCookieProvider;
 	EvaluationSubmitter mockEvaluationSubmitter;
+	PortalGinInjector mockPortalGinInjector;
 	FileEntity entity;
 	EntityBundle bundle;
 	String submitterAlias = "MyAlias";
@@ -62,7 +64,9 @@ public class ActionMenuTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockEntityEditor = mock(EntityEditor.class);
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		actionMenu = new ActionMenu(mockView, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockSynapseClient, jSONObjectAdapter, mockEntityEditor, mockAutoGenFactory, mockSynapseJSNIUtils, mockCookieProvider, mockEvaluationSubmitter);
+		mockPortalGinInjector = mock(PortalGinInjector.class);
+		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockEvaluationSubmitter);
+		actionMenu = new ActionMenu(mockView, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockSynapseClient, jSONObjectAdapter, mockEntityEditor, mockAutoGenFactory, mockSynapseJSNIUtils, mockCookieProvider, mockPortalGinInjector);
 		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");

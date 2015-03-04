@@ -1,18 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -65,6 +63,9 @@ public class RestrictionWidgetTest {
 	UserEntityPermissions mockPermissions;
 	PlaceChanger mockPlaceChanger;
 	
+	AccessRequirement accessRequirement1;
+	AccessRequirement accessRequirement2;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
@@ -102,13 +103,16 @@ public class RestrictionWidgetTest {
 		when(bundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPermissions.getCanChangePermissions()).thenReturn(true);
 		
-		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
-		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setId(testAccessRequirementId);
-		accessRequirement.setTermsOfUse("terms of use");
-		accessRequirements.add(accessRequirement);
-		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(accessRequirements);
+		List<AccessRequirement> allAccessRequirements = new ArrayList<AccessRequirement>();
+		accessRequirement1 = new TermsOfUseAccessRequirement();
+		accessRequirement1.setId(testAccessRequirementId);
+		((TermsOfUseAccessRequirement)accessRequirement1).setTermsOfUse("terms of use");
+		accessRequirement2 = new TermsOfUseAccessRequirement();
+		accessRequirement2.setId(5555L);
+		allAccessRequirements.add(accessRequirement1);
+		allAccessRequirements.add(accessRequirement2);
+		when(bundle.getAccessRequirements()).thenReturn(allAccessRequirements);
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(Collections.singletonList(accessRequirement1));
 				
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
@@ -247,6 +251,7 @@ public class RestrictionWidgetTest {
 	
 	@Test
 	public void testEntityUpdatedCallback() {
+		widget.setCurrentAccessRequirement(widget.selectNextAccessRequirement());
 		Callback mockEntityUpdatedCallback = mock(Callback.class);
 		widget.setEntityUpdated(mockEntityUpdatedCallback);
 		//show nothing if empty and no admin privs (should not get into this state)
@@ -330,4 +335,44 @@ public class RestrictionWidgetTest {
 		verify(mockView).setImposeRestrictionOkButtonEnabled(true);
 		verify(mockView).setNotSensitiveHumanDataMessageVisible(false);
 	}
+	
+	@Test
+	public void testSelectNextAccessRequirement() {
+		widget.resetAccessRequirementCount();
+		//given the configuration, it should show the unmet AR, but not the met AR
+		assertEquals(accessRequirement1, widget.selectNextAccessRequirement());
+		assertNull(widget.selectNextAccessRequirement());
+	}
+	
+	@Test
+	public void testSelectNextAccessRequirementAllMet() {
+		//in this case, all access requirements have been met. verify all are shown.
+		List<AccessRequirement> emptyList = Collections.emptyList();
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(emptyList);
+		widget.resetAccessRequirementCount();
+		assertEquals(accessRequirement1, widget.selectNextAccessRequirement());
+		assertEquals(accessRequirement2, widget.selectNextAccessRequirement());
+		assertNull(widget.selectNextAccessRequirement());
+	}
+	
+	@Test
+	public void testSelectNextAccessRequirementMultipleUnmet() {
+		//in this case, more than one requirement is unmet.
+		//verify that only the first unmet requirement is selected
+		
+		List<AccessRequirement> list = new ArrayList<AccessRequirement>();
+		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(list);
+		ACTAccessRequirement actAccessRequirement = new ACTAccessRequirement();
+		actAccessRequirement.setId(9883L);
+		list.add(accessRequirement1);
+		list.add(actAccessRequirement);
+		list.add(accessRequirement2);
+		widget.resetAccessRequirementCount();
+		assertEquals(accessRequirement1, widget.selectNextAccessRequirement());
+		//continues past the first, because it was SelfSign
+		assertEquals(actAccessRequirement, widget.selectNextAccessRequirement());
+		//ends after the second, because it was an ACT AR (cannot accept)
+		assertNull(widget.selectNextAccessRequirement());
+	}
+	
 }

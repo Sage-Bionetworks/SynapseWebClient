@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -32,12 +31,11 @@ public class EvaluationList implements EvaluationListView.Presenter,
 	}
 	
 	@Override
-	public List<Evaluation> getSelectedEvaluations() {
-		List<Integer> selectedEvaluationIndexes= view.getSelectedEvaluationIndexes();
-		List<Evaluation> selectedEvaluations = new ArrayList<Evaluation>();
-		for (Integer index : selectedEvaluationIndexes) {
-			selectedEvaluations.add(evaluationList.get(index));
-		}
-		return selectedEvaluations;
+	public Evaluation getSelectedEvaluation() {
+		Integer selectedEvaluationIndex= view.getSelectedEvaluationIndex();
+		if (selectedEvaluationIndex == null)
+			return null;
+
+		return evaluationList.get(selectedEvaluationIndex);
 	}
 }

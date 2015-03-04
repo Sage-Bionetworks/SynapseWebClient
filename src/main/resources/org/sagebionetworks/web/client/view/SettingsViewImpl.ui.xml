@@ -6,16 +6,8 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
-		<div ui:field="colorLine" class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
 		<div class="margin-top-10-imp"></div>
-		<div ui:field="separator" class="separator"></div>
 		<div class="">
-			<div style="white-space: normal;">
-				<g:SimplePanel ui:field="breadcrumbsPanel" />
-			</div>
-			<h2 ui:field="settingsHeading">Settings</h2>
-
 			<div class="well">
 				<h4>
 					<span class="glyphicon glyphicon-info-sign" style="position: relative; top: 4px;"></span>

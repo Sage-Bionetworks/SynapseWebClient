@@ -30,11 +30,14 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
+import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
+import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -43,11 +46,11 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor;
@@ -69,11 +72,14 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.RegisterChallengeTeamWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
@@ -89,6 +95,7 @@ import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
+import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.BooleanCellEditor;
@@ -112,7 +119,6 @@ import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
-import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 
@@ -134,7 +140,7 @@ public interface PortalGinInjector extends Ginjector {
 	public GlobalApplicationState getGlobalApplicationState();
 	
 	public PresenterProxy<HomePresenter, Home> getHomePresenter();
-
+	
 	public EntityPresenter getEntityPresenter();
 	
 	public ProjectsHomePresenter getProjectsHomePresenter();
@@ -236,6 +242,9 @@ public interface PortalGinInjector extends Ginjector {
 	public ButtonLinkWidget getButtonLinkWidget();
 	public VideoWidget getVideoWidget();
 	public TableQueryResultWikiWidget getSynapseTableQueryResultWikiWidget();
+	public RegisterChallengeTeamWidget getRegisterChallengeTeamWidget();
+	public ChallengeTeamsWidget getChallengeTeamsWidget();
+	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -247,7 +256,6 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// Other widgets
 	public UserBadge getUserBadgeWidget();
-	public BigUserBadge getBigUserBadgeWidget();
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	
@@ -284,6 +292,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
 	
+	public ChallengeBadge getChallengeBadgeWidget();
+	
 	public EntityBadge getEntityBadgeWidget();
 	public ProjectBadge getProjectBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
@@ -300,4 +310,7 @@ public interface PortalGinInjector extends Ginjector {
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 
 	public SortableTableHeader createSortableTableHeader();
+	public StaticTableHeader createStaticTableHeader();
+	public EvaluationSubmitter getEvaluationSubmitter();
+	public RegisterTeamDialog getRegisterTeamDialog();
 }

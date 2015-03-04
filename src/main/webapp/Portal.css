@@ -388,7 +388,7 @@
 	font-size: 1.2em;
 }
 
-i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover {
+button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
 	color:#f0ad4e;
 }
 
@@ -509,6 +509,14 @@ a.shortBtn {
 .user-profile-change-photo {
 }
 	
+.margin-right-2 {
+	margin-right: 2px;
+}
+
+.margin-right-4 {
+	margin-right: 4px;
+}
+
 .margin-right-5 {
 	margin-right: 5px;
 }
@@ -650,6 +658,9 @@ a.shortBtn {
 	margin-left: 35px;
 }
 
+.margin-left-100 {
+	margin-left: 100px;
+}
 
 .margin-bottom-60 {
 	margin-bottom: 60px;
@@ -923,7 +934,9 @@ a.shortBtn {
 .font-size-22 {
 	font-size: 22px;
 }
-
+.font-size-20 {
+	font-size: 20px;
+}
 .font-size-18 {
 	font-size: 18px;
 }
@@ -945,6 +958,23 @@ a.shortBtn {
 .font-size-12 {
 	font-size: 12px;
 }
+
+.font-size-1x {
+	font-size:1em;
+}
+.font-size-lg {
+	font-size:1.33em;
+}
+.font-size-2x {
+	font-size:2em;
+}
+.font-size-5x {
+	font-size:5em;
+}
+.font-size-12x {
+	font-size:12em;
+}
+
 
 .vertical-align-bottom {
 	vertical-align: bottom;
@@ -1482,7 +1512,14 @@ ol.lowerroman {
 	position: relative;
 	top: 4px;
 }
-
+.movedown-6 {
+	position: relative;
+	top: 6px;
+}
+.movedown-7 {
+	position: relative;
+	top: 7px;
+}
 .moveright-5 {
 	position: relative;
 	left: 5px;
@@ -1808,6 +1845,12 @@ a.projectTitle:hover {
 
 .fullOpacityImp {
 	opacity: 1 !important;
+}
+
+/* Attribute wildcard selector. 
+Looks for any child element under .modal-fullscreen that has a class that contains modal-dialog.*/
+.modal-fullscreen [class*="modal-dialog"] {
+	width: 95%;
 }
 
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */

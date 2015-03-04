@@ -129,7 +129,6 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -2137,14 +2136,6 @@ public class DisplayUtils {
 		if (version != null)
 			str += "/rowversion/" + version;
 		return str;
-	}
-	
-	public static void goToLastPlace(GlobalApplicationState globalApplicationState) {
-		Place forwardPlace = globalApplicationState.getLastPlace();
-		if(forwardPlace == null) {
-			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-		}
-		globalApplicationState.getPlaceChanger().goTo(forwardPlace);
 	}
 	
 	public static String getStackTrace(Throwable t) {

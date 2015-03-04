@@ -60,7 +60,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 	@Override
 	public void goToLastPlace() {
 		view.hideLoading();
-		DisplayUtils.goToLastPlace(globalApplicationState);
+		globalApplicationState.gotoLastPlace();
 	}
 	
 	@Override

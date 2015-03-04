@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
-
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -10,7 +8,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TeamView;
@@ -120,7 +117,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			public void onSuccess(Void result) {
 				//go home
 				view.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS, "");
-				goTo(new Home(DEFAULT_PLACE_TOKEN));
+				globalApplicationState.gotoLastPlace();
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -9,7 +9,6 @@ import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -28,7 +27,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -36,8 +35,10 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
+import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -116,6 +117,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button myProjectsFilter;
 	@UiField
+	Button sharedDirectlyWithMeFilter;
+	
+	@UiField
 	Button favoritesFilter;
 	@UiField
 	Button teamFilters;
@@ -150,7 +154,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//Challenges
 	@UiField
 	FlowPanel challengesTabContent;
-	
+	@UiField
+	Button moreChallengesButton;
+
 	//Settings
 	@UiField
 	FlowPanel settingsTabContent;
@@ -166,6 +172,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 	@UiField 
 	DivElement projectsLoadingUI;
+	@UiField 
+	DivElement challengesLoadingUI;
 	@UiField 
 	Row profilePictureLoadingUI;
 	@UiField 
@@ -193,7 +201,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			Header headerWidget, 
 			Footer footerWidget, 
 			SageImageBundle sageImageBundle,
-			Breadcrumb breadcrumb, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
@@ -246,6 +253,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		showProjectsLoading(false);
+		
+		moreChallengesButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getMoreChallenges();
+			}
+		});
+		showChallengesLoading(false);
+		
 		favoritesFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -262,6 +278,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.MINE, null);
+			}
+		});
+		sharedDirectlyWithMeFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
 			}
 		});
 	}
@@ -325,7 +347,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
-			
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
@@ -341,10 +362,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void resetHighlightBoxes() {
-		setHighlightBoxUser(null);
+		projectsHighlightBox.removeClassName("highlight-box");
+		challengesHighlightBox.removeClassName("highlight-box");
+		teamsHighlightBox.removeClassName("highlight-box");
 	}
 	
 	private void setHighlightBoxUser(String displayName) {
+		projectsHighlightBox.addClassName("highlight-box");
+		challengesHighlightBox.addClassName("highlight-box");
+		teamsHighlightBox.addClassName("highlight-box");
+
 		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
 		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
 		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
@@ -365,6 +392,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		if (isOwner) {
 			//also create a link for each team in the project filters
+			addMyTeamProjectsFilter();
+			teamFiltersDropDownMenu.add(new SeparatorMenuItem());
 			for (final Team team : teams) {
 				AnchorListItem teamFilter = new AnchorListItem(team.getName());
 				teamFilter.addClickHandler(new ClickHandler() {
@@ -376,6 +405,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				teamFiltersDropDownMenu.add(teamFilter);
 			}
 		}
+	}
+	
+	private void addMyTeamProjectsFilter() {
+		AnchorListItem teamFilter = new AnchorListItem("All of my teams");
+		teamFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.MY_TEAM_PROJECTS, null);
+			}
+		});
+		teamFiltersDropDownMenu.add(teamFilter);
 	}
 	
 	@Override
@@ -421,6 +461,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		setIsMoreProjectsVisible(false);
 		favoritesHelpPanel.setVisible(false);
 	}
+	@Override
+	public void clearChallenges() {
+		challengesTabContent.clear();
+		setIsMoreChallengesVisible(false);
+	}
 	
 	@Override
 	public void setIsMoreProjectsVisible(boolean isVisible) {
@@ -440,27 +485,35 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
-	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
+	private void addChallengeBadges(List<ChallengeBundle> challenges, FlowPanel targetPanel) {
 		targetPanel.clear();
-		for (EntityHeader entityHeader : projectHeaders) {
-			EntityBadge badge = ginInjector.getEntityBadgeWidget();
-			badge.configure(entityHeader);
+		for (ChallengeBundle challenge : challenges) {
+			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
+			badge.configure(challenge);
 			Widget widget = badge.asWidget();
 			widget.addStyleName("margin-top-5");
 			targetPanel.add(widget);
 		}
-		if (projectHeaders.isEmpty())
+		if (challenges.isEmpty())
 			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
 	}
 	
 	@Override
-	public void setChallenges(List<EntityHeader> projectHeaders) {
-		if (projectHeaders.size() > 0) {
+	public void addChallenges(List<ChallengeBundle> challenges) {
+		if (challenges.size() > 0) {
 			DisplayUtils.show(challengesListItem);
-			addEntityBadges(projectHeaders, challengesTabContent);
+			addChallengeBadges(challenges, challengesTabContent);
 		}
 	}
+	@Override
+	public void showChallengesLoading(boolean isVisible) {
+		UIObject.setVisible(challengesLoadingUI, isVisible);
+	}
 	
+	@Override
+	public void setIsMoreChallengesVisible(boolean isVisible) {
+		moreChallengesButton.setVisible(isVisible);
+	}
 	@Override
 	public void setChallengesError(String error) {
 		DisplayUtils.showErrorMessage(error);

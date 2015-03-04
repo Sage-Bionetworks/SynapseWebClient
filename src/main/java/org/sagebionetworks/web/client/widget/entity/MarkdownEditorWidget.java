@@ -250,7 +250,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			insertNewWidget(WidgetConstants.REFERENCE_CONTENT_TYPE);
 			break;
 		case INSERT_SUBMIT_TO_EVALUATION:
-			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2&" +WidgetConstants.UNAVAILABLE_MESSAGE + "=Join the team to submit to the evaluation" + WidgetConstants.WIDGET_END_MARKDOWN);
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_ID_KEY+"=123&" +WidgetConstants.UNAVAILABLE_MESSAGE + "=Join the team to submit to the evaluation" + WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
 		case INSERT_TABLE:
 			insertNewWidget(WidgetConstants.TABBED_TABLE_CONTENT_TYPE);
@@ -285,6 +285,16 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_TUTORIAL_WIZARD:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=syn123&" +WidgetConstants.TEXT_KEY + "=Tutorial"+ WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
+		case INSERT_REGISTER_CHALLENGE_TEAM:
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.REGISTER_CHALLENGE_TEAM_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_ID_KEY + "=123&" +WidgetConstants.BUTTON_TEXT_KEY + "=Register team" + WidgetConstants.WIDGET_END_MARKDOWN);
+			break;
+		case INSERT_CHALLENGE_TEAMS:
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.CHALLENGE_TEAMS_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_ID_KEY + "=123"+ WidgetConstants.WIDGET_END_MARKDOWN);
+			break;
+		case INSERT_CHALLENGE_PARTICIPANTS:
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_ID_KEY + "=123&"+ WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY +"=false" + WidgetConstants.WIDGET_END_MARKDOWN);
+			break;
+			
 		case BOLD:
 			surroundWithTag("**");
 			break;

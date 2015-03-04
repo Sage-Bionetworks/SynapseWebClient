@@ -1,7 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
  	
  	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
@@ -72,17 +73,13 @@
 				<g:HTMLPanel ui:field="getStartedContainer">
 					<div class="col-md-4 ">
 						<h3>Get Started</h3>
-						Synapse is free to use as a service.<br/><br/> 
-						<g:SimplePanel ui:field="loginBtnPanel"/>
-						<br/>
-						<g:SimplePanel ui:field="registerBtnPanel"/>
-						<br/>
-						<g:SimplePanel ui:field="dreamBtnPanel"/>
+						Synapse is free to use as a service.
+						<b:Button ui:field="dashboardBtn" size="LARGE" visible="false" block="true" marginTop="20" />
+						<b:Button ui:field="loginBtn" size="LARGE" text="Log in" block="true" marginTop="20" />
+						<b:Button ui:field="registerBtn" size="LARGE" text="Register for a Synapse Account" marginTop="20" block="true" />
+						<b:Button ui:field="dreamBtn" size="LARGE" text="DREAM Challenges" block="true" marginTop="20" /> 
 					</div>
 				</g:HTMLPanel>
-	
-				<!-- START PROJECT & MY PROJECTS -->
-				<g:SimplePanel ui:field="projectPanel" />
 			</div> <!-- end row -->				
 			
 			<!-- SEARCH BOX -->
@@ -105,7 +102,7 @@
 			        <li data-target="#myCarousel" data-slide-to="2"></li>
 			        <li data-target="#myCarousel" data-slide-to="3"></li>
    			        <li data-target="#myCarousel" data-slide-to="4"></li>
-   			        <li data-target="#myCarousel" data-slide-to="5"></li>
+					<li data-target="#myCarousel" data-slide-to="5"></li>
 				  </ol>
 			      <div class="carousel-inner">
 			        <div class="item active">
@@ -119,7 +116,7 @@
 			        <div class="item">
 			          <a href="#!Synapse:syn2580853"><g:Image resource='{sageImageBundle.ampAd}' /></a>
 			        </div>
-			        <div class="item">
+					<div class="item">
 			          <a href="#!Synapse:syn2813589"><g:Image resource='{sageImageBundle.dreamSMCRNA}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">			              

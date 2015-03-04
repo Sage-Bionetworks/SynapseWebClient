@@ -1,129 +1,104 @@
 package org.sagebionetworks.web.client.widget.user;
 
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Profile;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserBadgeViewImpl extends FlowPanel implements UserBadgeView {
+public class UserBadgeViewImpl implements UserBadgeView {
+	public interface Binder extends UiBinder<Widget, UserBadgeViewImpl> {	}
+	
+	@UiField
+	Span loadingUI;
+	@UiField
+	Icon defaultUserPicture;
+	@UiField
+	Image userPicture;
+	@UiField
+	Tooltip usernameTooltip;
+	@UiField
+	Anchor usernameLink;
+	@UiField
+	Paragraph description;
+	@UiField
+	Paragraph errorLoadingUI;
 	
 	private Presenter presenter;
-	SynapseJSNIUtils synapseJSNIUtils;
-	GlobalApplicationState globalApplicationState;
-	SageImageBundle sageImageBundle;
-	IconsImageBundle iconsImageBundle;
-	HorizontalPanel container;
-	ClickHandler customClickHandler;
+	Widget widget;
 	
 	@Inject
-	public UserBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
-			GlobalApplicationState globalApplicationState,
-			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.globalApplicationState = globalApplicationState;
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
-		
-		customClickHandler = null;
-		container = new HorizontalPanel();
-		container.addStyleName("nobordertable-imp displayInline");
-		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
-		this.add(container);
-		addStyleName("inline-block");
+	public UserBadgeViewImpl(Binder uiBinder) {
+		widget = uiBinder.createAndBindUi(this);
+		ClickHandler badgeClicked = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.badgeClicked(event);
+			}
+		};
+		userPicture.addClickHandler(badgeClicked);
+		usernameLink.addClickHandler(badgeClicked);
+	}
+	
+	public void clear() {
+		loadingUI.setVisible(false);
+		defaultUserPicture.setVisible(false);
+		userPicture.setVisible(false);
+		description.setVisible(false);
+		errorLoadingUI.setVisible(false);
 	}
 	
 	@Override
-	public void setProfile(final UserProfile profile, Integer maxNameLength) {
-		container.clear();
-		
-		if(profile == null)  throw new IllegalArgumentException("Profile is required");
-		
-		if(profile != null) {
-			String displayName = DisplayUtils.getDisplayName(profile);
-			String name = maxNameLength == null ? displayName : DisplayUtils.stubStrPartialWord(displayName, maxNameLength); 
-			
-			Widget nameWidget;
-			final Anchor userAnchor = new Anchor();
-			if(profile.getOwnerId() != null) {				
-				userAnchor.setText(name);
-				userAnchor.addStyleName("usernameLink margin-left-5");
-				userAnchor.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						if (customClickHandler == null) 
-							globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));
-						else
-							customClickHandler.onClick(event);
-					}
-				});
-				nameWidget = userAnchor;
-			} else {
-				HTML html = new HTML(name);
-				html.addStyleName("usernamelink margin-left-5");
-				nameWidget = html;
-			}
-			//also add the username in a popup (in the case when the name shown does not show the entire display name)
-			if (displayName.length() != name.length())
-				DisplayUtils.addTooltip(nameWidget, displayName);
-			ClickHandler clickHandler = new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					userAnchor.fireEvent(event);
-				}
-			};
-			
-			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-				profilePicture.setWidth("16px");
-				profilePicture.setHeight("16px");
-				profilePicture.addStyleName("imageButton userProfileImage");
-				profilePicture.addClickHandler(clickHandler);
-				container.add(profilePicture);	
-			} else {
-				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before"));
-				profilePicture.addClickHandler(clickHandler);
-				container.add(profilePicture);
-			}
-			
-			container.add(nameWidget);				 
-		} 		
-		
+	public void showAnonymousUserPicture() {
+		userPicture.setVisible(false);
+		defaultUserPicture.setVisible(true);
+	}
+	
+	@Override
+	public void showCustomUserPicture(String url) {
+		defaultUserPicture.setVisible(false);
+		userPicture.setVisible(true);
+		userPicture.setUrl(url);
+	}
+	
+	@Override
+	public void setSize(BadgeSize size) {
+		defaultUserPicture.addStyleName(size.getDefaultPictureStyle());
+		usernameLink.setStyleName(size.textStyle());
+		userPicture.setHeight(size.pictureHeight());
+		usernameLink.setVisible(size.isTextVisible());
 	}
 
-	
+	@Override
+	public void setDisplayName(String displayName, String shortDisplayName) {
+		loadingUI.setVisible(false);
+		usernameLink.setText(shortDisplayName);
+		usernameTooltip.setText(displayName);
+	}
 	
 	@Override
-	public void showLoadError(String principalId) {
-		container.clear();
-		container.add(new HTML(DisplayConstants.ERROR_LOADING));		
+	public void showLoadError(String error) {
+		loadingUI.setVisible(false);
+		errorLoadingUI.setText("Error loading profile: " + error);
+		errorLoadingUI.setVisible(true);	
 	}
 	
 	@Override
 	public void showLoading() {
-		container.clear();
-		container.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		loadingUI.setVisible(true);
 	}
 
 	@Override
 	public void showInfo(String title, String message) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -138,10 +113,15 @@ public class UserBadgeViewImpl extends FlowPanel implements UserBadgeView {
 	}
 
 	@Override
-	public void setCustomClickHandler(ClickHandler clickHandler) {
-		customClickHandler = clickHandler;
+	public void showDescription(String descriptionText) {
+		description.setText(descriptionText);
+		description.setVisible(true);
 	}
 
+	@Override
+	public Widget asWidget() {
+		return widget;
+	}
 
 	/*
 	 * Private Methods

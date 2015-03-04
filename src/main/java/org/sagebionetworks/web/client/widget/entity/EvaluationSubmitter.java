@@ -1,62 +1,76 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.MemberSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.Submission;
-import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.evaluation.model.SubmissionContributor;
+import org.sagebionetworks.evaluation.model.SubmissionEligibility;
+import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationSubmitter implements Presenter {
 
 	private EvaluationSubmitterView view;
 	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
 	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private Entity submissionEntity;
-	private String submissionEntityId, submissionName, teamName;
+	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
+	List<Team> teams;
+	private Evaluation evaluation;
+	private Challenge challenge;
+	private Team selectedTeam;
+	private String selectedTeamMemberStateHash;
+	private List<Long> selectedTeamEligibleMembers;
+	boolean isIndividualSubmission;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			ChallengeClientAsync challengeClient) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.challengeClient = challengeClient;
 	}
 	
 	/**
@@ -65,16 +79,38 @@ public class EvaluationSubmitter implements Presenter {
 	 * @param evaluationIds set to null if we should query for all available evaluations
 	 */
 	public void configure(Entity submissionEntity, Set<String> evaluationIds) {
-		view.showLoading();
+		challenge = null;
+		evaluation = null;
+		selectedTeam = null;
+		//initialize as an individual submission
+		isIndividualSubmission = true;
+		teams = new ArrayList<Team>();
+		selectedTeamEligibleMembers = new ArrayList<Long>();
+		view.resetNextButton();
+		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
 		try {
 			if (evaluationIds == null)
-				synapseClient.getAvailableEvaluations(getEvalCallback());
+				challengeClient.getAvailableEvaluations(getEvalCallback());
 			else
-				synapseClient.getAvailableEvaluations(evaluationIds, getEvalCallback());
+				challengeClient.getAvailableEvaluations(evaluationIds, getEvalCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
+	}
+	
+	@Override
+	public void onIndividualSubmissionOptionClicked() {
+		isIndividualSubmission = true;
+		view.setTeamInEligibleErrorVisible(false);
+		view.setTeamComboBoxEnabled(false);
+	}
+	
+	@Override
+	public void onTeamSubmissionOptionClicked() {
+		isIndividualSubmission = false;
+		view.setTeamInEligibleErrorVisible(true);
+		view.setTeamComboBoxEnabled(true);
 	}
 	
 	private AsyncCallback<String> getEvalCallback() {
@@ -89,7 +125,7 @@ public class EvaluationSubmitter implements Presenter {
 						view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 					} 
 					else {
-						view.popupSelector(submissionEntity == null, evaluations);
+						view.showModal1(submissionEntity == null, evaluations);
 					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -106,7 +142,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 		
 	@Override
-	public void submitToEvaluations(Reference selectedReference, String submissionName, String teamName, List<Evaluation> evaluations) {
+	public void onNextClicked(Reference selectedReference, String submissionName, Evaluation evaluation) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
 		submissionEntityVersion = null;
 		if (submissionEntity != null) {
@@ -119,90 +155,166 @@ public class EvaluationSubmitter implements Presenter {
 			submissionEntityVersion = selectedReference.getTargetVersionNumber();
 		}
 		this.submissionName = submissionName;
-		this.teamName = teamName;
-		
-		 //Check access requirements for evaluations before moving on with submission
-		 try {
-			 checkForUnmetRequirements(0, evaluations);
-		 } catch(RestServiceException e) {
-			 view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
-		 }
+		this.evaluation = evaluation;
+		//The standard is to attach access requirements to the associated team, and show them when joining the team.
+		//So access requirements are not checked again here.
+		queryForChallenge();
 	}
-	
-	/**
-	* Check for unmet access restrictions. As long as more exist, it will not move onto submissions.
-	* @throws RestServiceException
-	*/
-	public void checkForUnmetRequirements(final int evalIndex, final List<Evaluation> evaluations) throws RestServiceException {
-		synapseClient.getUnmetEvaluationAccessRequirements(evaluations.get(evalIndex).getId(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				try {
-					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
-					if (ar.getTotalNumberOfResults() > 0) {
-						//there are unmet access requirements.  user must accept all
-						List<TermsOfUseAccessRequirement> unmetRequirements = ar.getResults();
-						final AccessRequirement firstUnmetAccessRequirement = unmetRequirements.get(0);
-						String text = GovernanceServiceHelper.getAccessRequirementText(firstUnmetAccessRequirement);
-						Callback termsOfUseCallback = new Callback() {
-							@Override
-							public void invoke() {
-								//agreed to terms of use.
-								setLicenseAccepted(firstUnmetAccessRequirement, evalIndex, evaluations);
-							}
-						};
-						//pop up the requirement
-						view.showAccessRequirement(text, termsOfUseCallback);
-					} else {
-						if (evalIndex != evaluations.size() - 1) {
-							checkForUnmetRequirements(evalIndex+1, evaluations);
-						} else {
-							//we have gone through all unmet access requirements for all evaluations.
-							lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations);
-						}
-					}
-				} catch(Throwable e) {
-					onFailure(e);
-				}
-			}
 
+	/**
+	 * Look for a challenge associated with the selected evaluation
+	 */
+	public void queryForChallenge() {
+		view.setNextButtonLoading();
+		challengeClient.getChallengeForProject(evaluation.getContentSource(), new AsyncCallback<Challenge>() {
+			@Override
+			public void onSuccess(Challenge result) {
+				challenge = result;
+				getAvailableTeams();
+			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR+ caught.getMessage());
+				view.resetNextButton();
+				//if challenge is not found, or if user has access to the evaluation queue but not the project (messy setup)
+				if (caught instanceof NotFoundException || caught instanceof ForbiddenException) {
+					//no need to show second page, this is a submission to a non-challenge eval queue.
+					onDoneClicked();
+				} else {
+					view.showErrorMessage("Error querying for associated challenge: " + caught.getMessage());	
+				}
 			}
 		});
 	}
 	
-	public void setLicenseAccepted(AccessRequirement ar, final int evalIndex, final List<Evaluation> evaluations) {	
-		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
-			@Override
-			public void invoke(Throwable t) {
-				view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + t.getMessage());
-			}
-		};
-		
-		Callback onSuccess = new Callback() {
-			@Override
-			public void invoke() {
-				//ToU signed, now try to submit evaluations (checks for other unmet access restrictions before submission)
-				try {
-					checkForUnmetRequirements(evalIndex, evaluations);
-				} catch (RestServiceException e) {
-					onFailure.invoke(e);
-				}
-			}
-		};
-		
-		GovernanceServiceHelper.signTermsOfUse(
-				authenticationController.getCurrentUserPrincipalId(), 
-				ar, 
-				onSuccess, 
-				onFailure, 
-				synapseClient, 
-				jsonObjectAdapter);
+	public void getAvailableTeams() {
+		challengeClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
 	}
 	
-	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations) {
+	@Override
+	public void teamAdded() {
+		//when a team is added, ideally we would just refresh the teams list.  
+		//But the bootstrap Select adds additional components to the DOM that it does not clean up, so hide the second page for now (user will retry and see newly registered team).
+		view.hideModal2();
+	}
+	
+	@Override
+	public void onNewTeamClicked() {
+		if (authenticationController.isLoggedIn())
+			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()+Profile.TEAMS_DELIMITER));
+		else {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		}
+	}
+	
+	@Override
+	public void onRegisterTeamClicked() {
+		view.showRegisterTeamDialog(challenge.getId());
+	}
+	
+	private AsyncCallback<List<Team>> getTeamsCallback() {
+		return new AsyncCallback<List<Team>>() {
+			@Override
+			public void onSuccess(List<Team> results) {
+				view.clearTeams();
+				teams = results;
+				if (teams.isEmpty()) {
+					view.showEmptyTeams();
+				} else {
+					view.showTeams(teams);
+					//select the first
+					onTeamSelected(0);
+				}
+				onIndividualSubmissionOptionClicked();
+				view.hideModal1();
+				view.showModal2();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		};
+	}
+	
+	@Override
+	public void onDoneClicked() {
+		view.hideModal1();
+		if (!isIndividualSubmission) {
+			//team submission
+			if (selectedTeam == null) {
+				view.showErrorMessage("Please select a team.");
+				return;
+			} else if (selectedTeamEligibleMembers.isEmpty()) {
+				view.showErrorMessage("No eligible contributors on the selected team.");
+				return;
+			}
+		}
+		lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion);
+	}
+	@Override
+	public void onTeamSelected(int selectedIndex) {
+		selectedTeam = null;
+		selectedTeamMemberStateHash = null;
+		selectedTeamEligibleMembers.clear();
+		view.clearContributors();
+		view.setTeamInEligibleError("");
+		//resolve team from team name
+		if (selectedIndex >= 0 && selectedIndex<teams.size()) {
+			selectedTeam = teams.get(selectedIndex);
+			getContributorList(evaluation, selectedTeam);
+		}
+	}
+	
+	public void getContributorList(final Evaluation evaluation, final Team selectedTeam) {
+		//get contributor list for this team
+		view.setContributorsLoading(true);
+		challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
+			@Override
+			public void onSuccess(TeamSubmissionEligibility teamEligibility) {
+				view.setContributorsLoading(false);
+				//is the team eligible???
+				SubmissionEligibility teamSubmissionEligibility = teamEligibility.getTeamEligibility();
+				if (!teamSubmissionEligibility.getIsEligible()) {
+					//show the error
+					String reason = ""; //unknown reason
+					if (!teamSubmissionEligibility.getIsRegistered()) {
+						reason = selectedTeam.getName() + " is not registered for this challenge. Please register this team, or select a different team.";
+					} else if (teamSubmissionEligibility.getIsQuotaFilled()) {
+						reason = selectedTeam.getName() + " has reached the submission quota.";
+					}
+					view.setTeamInEligibleError(reason);
+				} else {
+					selectedTeamMemberStateHash = teamEligibility.getEligibilityStateHash().toString();
+					
+					for (MemberSubmissionEligibility memberEligibility : teamEligibility.getMembersEligibility()) {
+						if (memberEligibility.getIsEligible()) {
+							selectedTeamEligibleMembers.add(memberEligibility.getPrincipalId());
+							view.addEligibleContributor(memberEligibility.getPrincipalId().toString());
+						} else {
+							String reason = ""; //unknown reason
+							if (!memberEligibility.getIsRegistered()) {
+								reason = "Not registered for the challenge.";
+							} else if (memberEligibility.getIsQuotaFilled()) {
+								reason = "Reached the submission quota.";
+							} else if (memberEligibility.getHasConflictingSubmission()) {
+								reason = "Has a conflicting submission.";
+							}
+							view.addInEligibleContributor(memberEligibility.getPrincipalId().toString(), reason);
+						}
+					}
+				}
+			};
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setContributorsLoading(false);
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+	
+	public void lookupEtagAndCreateSubmission(final String id, final Long ver) {
 		//look up entity for the current etag
 		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
@@ -219,9 +331,7 @@ public class EvaluationSubmitter implements Presenter {
 						v = 1L;
 					 }
 						 
-					
-					view.hideWindow();
-					submitToEvaluations(id, v, entity.getEtag(), evaluations);
+					submitToEvaluation(id, v, entity.getEtag());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -235,7 +345,13 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void submitToEvaluations(String entityId, Long versionNumber, String etag, List<Evaluation> evaluations) {
+	public void submitToEvaluation(String entityId, Long versionNumber, final String etag) {
+		//set up shared values across all submissions
+		Submission newSubmission = getNewSubmission(entityId, versionNumber);
+		submitToEvaluation(newSubmission, etag);
+	}
+	
+	public Submission getNewSubmission(String entityId, Long versionNumber) {
 		//set up shared values across all submissions
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entityId);
@@ -243,46 +359,77 @@ public class EvaluationSubmitter implements Presenter {
 		newSubmission.setVersionNumber(versionNumber);
 		if (submissionName != null && submissionName.trim().length() > 0)
 			newSubmission.setName(submissionName);
-		if (teamName != null && teamName.trim().length() > 0)
-			newSubmission.setSubmitterAlias(teamName);
-
-		if (evaluations.size() > 0)
-			submitToEvaluations(newSubmission, etag, evaluations, 0);
+		if (!isIndividualSubmission && !selectedTeamEligibleMembers.isEmpty()) {
+			Set<SubmissionContributor> contributors = new HashSet<SubmissionContributor>();
+			for (Long memberId : selectedTeamEligibleMembers) {
+				SubmissionContributor contributor = new SubmissionContributor();
+				contributor.setPrincipalId(memberId.toString());
+				contributors.add(contributor);
+			}
+			newSubmission.setContributors(contributors);
+		}
+		return newSubmission;
 	}
 	
-	public void submitToEvaluations(final Submission newSubmission, final String etag, final List<Evaluation> evaluations, final int index) {
+	public void submitToEvaluation(final Submission newSubmission, final String etag) {
 		//and create a new submission for each evaluation
-		Evaluation evaluation = evaluations.get(index);
 		newSubmission.setEvaluationId(evaluation.getId());
 		try {
-			synapseClient.createSubmission(newSubmission, etag, new AsyncCallback<Submission>() {			
-				@Override
-				public void onSuccess(Submission result) {
-					//result is the updated submission
-					if (index == evaluations.size()-1) {
-						HashSet<String> replyMessages = new HashSet<String>();
-						for (Evaluation eval : evaluations) {
-							String message = eval.getSubmissionReceiptMessage();
-							if (message == null || message.length()==0)
-								message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
-							replyMessages.add(message);
-						}
-						
-						view.showSubmissionAcceptedDialogs(replyMessages);
-					} else {
-						submitToEvaluations(newSubmission, etag, evaluations, index+1);
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
-				}
-			});
+			String memberStateHash = null;
+			if (isIndividualSubmission) {
+				challengeClient.createIndividualSubmission(newSubmission, etag, getSubmissionCallback());
+			} else {
+				//team submission
+				newSubmission.setTeamId(selectedTeam.getId());
+				memberStateHash = selectedTeamMemberStateHash;
+				challengeClient.createTeamSubmission(newSubmission, etag, memberStateHash, getSubmissionCallback());
+			}
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
 	}
 	
+	public AsyncCallback<Submission> getSubmissionCallback() {
+		return new AsyncCallback<Submission>() {			
+			@Override
+			public void onSuccess(Submission result) {
+				//result is the updated submission
+				String message = evaluation.getSubmissionReceiptMessage();
+				if (message == null || message.length()==0)
+					message = DisplayConstants.SUBMISSION_RECEIVED_TEXT;
+				view.hideModal2();
+				view.showSubmissionAcceptedDialogs(message);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		};
+	}
+	
+	public Widget asWidget() {
+		return view.asWidget();
+	}
+	
+	/***************************
+	 * Exposed for unit tests
+	 * @return
+	 ****************************/
+	
+	public Challenge getChallenge() {
+		return challenge;
+	}
+	
+	public Team getSelectedTeam() {
+		return selectedTeam;
+	}
+	
+	public String getSelectedTeamMemberStateHash() {
+		return selectedTeamMemberStateHash;
+	}
+	
+	public List<Long> getSelectedTeamEligibleMembers() {
+		return selectedTeamEligibleMembers;
+	}
 }

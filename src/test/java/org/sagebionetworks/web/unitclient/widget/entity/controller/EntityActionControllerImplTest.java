@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -68,6 +69,7 @@ public class EntityActionControllerImplTest {
 	String parentId;
 	String entityId;
 	String entityDispalyType;
+	String currentUserId = "12344321";
 
 	@Before
 	public void before() {
@@ -87,6 +89,7 @@ public class EntityActionControllerImplTest {
 		mockEntityUpdatedHandler = Mockito.mock(EntityUpdatedHandler.class);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		entityDispalyType = "Sometype";
 		when(mockEntityTypeProvider.getEntityDispalyName(any(Entity.class))).thenReturn(entityDispalyType);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -211,7 +214,7 @@ public class EntityActionControllerImplTest {
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + entityDispalyType + WAS_SUCCESSFULLY_DELETED);
-		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null) );
+		verify(mockGlobalApplicationState).gotoLastPlace(new Synapse(parentId, null, EntityArea.TABLES, null) );
 	}
 	
 	@Test
@@ -220,8 +223,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// call under test
 		Place result =controller.createDeletePlace();
-		Place expected =  new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-		assertEquals(expected, result);
+		assertTrue(result instanceof Profile);
+		assertEquals(currentUserId, ((Profile)result).getUserId());
 	}
 	
 	@Test
@@ -234,8 +237,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();
-		Place expected = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-		assertEquals(expected, result);
+		assertTrue(result instanceof Profile);
+		assertEquals(currentUserId, ((Profile)result).getUserId());
 	}
 	
 	@Test

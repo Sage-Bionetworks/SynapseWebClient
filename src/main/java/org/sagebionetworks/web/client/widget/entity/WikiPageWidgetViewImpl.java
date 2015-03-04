@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -128,7 +130,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	
 	@Override
-	public void showNoWikiAvailableUI(boolean isDescription) {
+	public void showCreateWiki(boolean isDescription) {
 		clear();
 		this.isDescription = isDescription;
 		if (!isDescription) {
@@ -137,6 +139,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			createWikiButtonWrapper.add(insertBtn);
 			add(createWikiButtonWrapper);
 		}
+	}
+	
+	@Override
+	public void showWarningMessageInPage(String message) {
+		clear();
+		add(new Alert(message, AlertType.WARNING));
 	}
 	
 	@Override
@@ -222,12 +230,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		
 		modifiedPanel.clear();
 		modifiedPanel.add(modifiedText);
-		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
+		modifiedPanel.add(modifiedBy.asWidget());
 		modifiedPanel.add(modifiedOnText);
 		
 		createdPanel.clear();
 		createdPanel.add(createdText);
-		createdPanel.add(wrapWidget(createdBy.asWidget(), "padding-left-5"));
+		createdPanel.add(createdBy.asWidget());
 		createdPanel.add(createdOnText);
 		
 		FlowPanel modifiedAndCreatedSection = new FlowPanel();

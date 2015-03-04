@@ -108,8 +108,12 @@ import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView;
+import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
@@ -146,6 +150,8 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
+import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
@@ -248,6 +254,10 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsView;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
+import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
@@ -260,6 +270,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
+import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
@@ -380,6 +392,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeader;
 import org.sagebionetworks.web.client.widget.table.v2.results.SortableTableHeaderImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeader;
+import org.sagebionetworks.web.client.widget.table.v2.results.StaticTableHeaderImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
@@ -462,8 +476,6 @@ import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
-import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
-import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
@@ -908,7 +920,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
-		bind(BigUserBadgeView.class).to(BigUserBadgeViewImpl.class);
 		
 		bind(EntityIconsCache.class).in(Singleton.class);
 		
@@ -957,6 +968,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UploadCSVAppendPage.class).to(UploadCSVAppendPageImpl.class);
 		bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
 		bind(SortableTableHeader.class).to(SortableTableHeaderImpl.class);
+		bind(StaticTableHeader.class).to(StaticTableHeaderImpl.class);
 		
 		bind(CreateDownloadPage.class).to(CreateDownloadPageImpl.class);
 		bind(CreateDownloadPageView.class).to(CreateDownloadPageViewImpl.class);
@@ -1055,7 +1067,14 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AccessRequirementDialogView.class).to(AccessRequirementDialogViewImpl.class);
 		
 		bind(ImageParamsPanelView.class).to(ImageParamsPanelViewImpl.class);
+		bind(RegisterTeamDialogView.class).to(RegisterTeamDialogViewImpl.class);
+		bind(EditRegisteredTeamDialogView.class).to(EditRegisteredTeamDialogViewImpl.class);
+		bind(ChallengeTeamsView.class).to(ChallengeTeamsViewImpl.class);
+		bind(ChallengeBadgeView.class).to(ChallengeBadgeViewImpl.class);
 		bind(ProjectBadgeView.class).to(ProjectBadgeViewImpl.class);
 		bind(TableQueryResultWikiWidgetView.class).to(TableQueryResultWikiWidgetViewImpl.class);
+		
+		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
+		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
 	}
 }
