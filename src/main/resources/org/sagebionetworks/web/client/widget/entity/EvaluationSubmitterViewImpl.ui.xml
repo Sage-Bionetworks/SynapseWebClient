@@ -44,30 +44,35 @@
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal2">
 			<b:ModalBody>
 				<b:FieldSet>
-					<bh:Div ui:field="submissionTypeSelectUI">
+					<bh:Div>
 						<b:ButtonGroup>
 							<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
-							<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team:"/>
+							<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team"/>
 						</b:ButtonGroup>
-						<g:ListBox ui:field="teamComboBox" styleName="form-control" />
-						<bh:Div addStyleNames="highlight-box" ui:field="contributorsHighlightPanel">
-							<bh:Div ui:field="contributorsLoadingUI">
-								<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
-						        <bh:Text>&nbsp; Loading...</bh:Text>
+						<bh:Div ui:field="teamsUI">
+							<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" />
+							<bh:Div ui:field="availableTeamsUI">
+								<b:FormGroup>
+									<b:FormLabel>Select Team</b:FormLabel> 
+									<g:ListBox ui:field="teamComboBox" styleName="form-control" />
+									<b:Anchor ui:field="registerMyTeamLink" text="Register a different team" />
+								</b:FormGroup>
+								<b:FormGroup>
+									<bh:Div ui:field="contributorsLoadingUI">
+										<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
+								        <bh:Text>&nbsp; Loading...</bh:Text>
+									</bh:Div>
+									<b:FormLabel>Contributors</b:FormLabel>
+									<b:Panel ui:field="contributorsPanel"  addStyleNames="padding-5" />
+								</b:FormGroup> 
 							</bh:Div>
-							<bh:Div ui:field="contributorsPanel"/>
+							<bh:Div ui:field="emptyTeamsUI">
+								<bh:Paragraph emphasis="WARNING">No registered teams were found</bh:Paragraph>
+								<b:Anchor ui:field="registerMyTeamLink2" text="Register a team" />
+							</bh:Div>
 						</bh:Div>
 					</bh:Div>
-					
-					<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" visible="false"/>
-					<bh:Paragraph emphasis="WARNING" ui:field="noTeamsFoundUI" visible="false">No registered teams found</bh:Paragraph>
 				</b:FieldSet>
-				<bh:Div>
-					<b:Anchor ui:field="createNewTeamLink" text="Create a new team"/>
-				</bh:Div>
-				<bh:Div>
-					<b:Anchor ui:field="registerMyTeamLink" text="Register my team for this challenge"/>
-				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
