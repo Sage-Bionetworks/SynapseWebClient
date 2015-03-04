@@ -2,9 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -66,6 +63,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 		challengeClient.unregisterChallengeTeam(challengeTeam.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
+				view.showInfo("Team Registration", "Successfully unregistered your team");
 				if (callback != null) {
 					callback.invoke();
 				}

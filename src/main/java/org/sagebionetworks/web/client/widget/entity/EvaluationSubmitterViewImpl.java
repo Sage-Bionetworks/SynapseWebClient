@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -70,23 +71,23 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	Radio isTeamRadioButton;
 	@UiField
-	Div contributorsPanel;
+	Panel contributorsPanel;
 	@UiField
 	SimplePanel registerTeamDialogContainer;
 	@UiField
 	Anchor registerMyTeamLink;
 	@UiField
-	Anchor createNewTeamLink;
+	Anchor registerMyTeamLink2;
 	@UiField
 	Paragraph teamIneligibleHtml;
 	@UiField
-	Paragraph noTeamsFoundUI;
-	@UiField
 	Div contributorsLoadingUI;
 	@UiField
-	Div contributorsHighlightPanel;
+	Div teamsUI;
 	@UiField
-	Div submissionTypeSelectUI;
+	Div availableTeamsUI;
+	@UiField
+	Div emptyTeamsUI;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -100,8 +101,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		this.entityFinder = entityFinder;
 		this.evaluationList = evaluationList;
 		this.ginInjector = ginInjector;
-		
-		contributorsHighlightPanel.getElement().setAttribute("highlight-box-title", "Contributors");
 		evaluationListContainer.setWidget(evaluationList.asWidget());
 		initClickHandlers();
 	}
@@ -153,19 +152,15 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			}
 		});
 		
-		registerMyTeamLink.addClickHandler(new ClickHandler() {
+		ClickHandler registerTeamLink = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onRegisterTeamClicked();
 			}
-		});
+		};
+		registerMyTeamLink.addClickHandler(registerTeamLink);
+		registerMyTeamLink2.addClickHandler(registerTeamLink);
 		
-		createNewTeamLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onNewTeamClicked();
-			}
-		});
 		isIndividualRadioButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -298,11 +293,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		teamIneligibleHtml.setText(error);
 	}
 	
-	@Override
-	public void setTeamInEligibleErrorVisible(boolean isVisible) {
-		teamIneligibleHtml.setVisible(isVisible);
-	}
-	
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {
 		Div row = new Div();
 		InlineCheckBox cb = new InlineCheckBox();
@@ -319,32 +309,38 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void setTeamComboBoxEnabled(boolean isEnabled) {
-		teamComboBox.setEnabled(isEnabled);
-	}
-	
-	@Override
 	public void clearTeams() {
 		teamComboBox.clear();
 	}
 	
 	@Override
 	public void showEmptyTeams() {
-		submissionTypeSelectUI.setVisible(false);
-		noTeamsFoundUI.setVisible(true);
+		teamsUI.setVisible(true);
+		emptyTeamsUI.setVisible(true);
+		availableTeamsUI.setVisible(false);
+		registerMyTeamLink2.setVisible(true);
 	}
 	
 	@Override
-	public void showTeams(List<Team> registeredTeams) {
-		submissionTypeSelectUI.setVisible(true);
-		noTeamsFoundUI.setVisible(false);
-		
-		isIndividualRadioButton.setActive(true);
+	public void showTeamsUI(List<Team> registeredTeams) {
+		teamsUI.setVisible(true);
+		emptyTeamsUI.setVisible(false);
+		availableTeamsUI.setVisible(true);
+		registerMyTeamLink2.setVisible(false);
 		teamComboBox.clear();
 		for (Team teamHeader : registeredTeams) {
 			teamComboBox.addItem(teamHeader.getName());
 		}
 	}
+	@Override
+	public void setIsIndividualSubmissionActive(boolean isActive) {
+		isIndividualRadioButton.setActive(isActive);	
+	}
+	@Override
+	public void hideTeamsUI() {
+		teamsUI.setVisible(false);
+	}
+	
 	@Override
 	public void setContributorsLoading(boolean isVisible) {
 		contributorsLoadingUI.setVisible(isVisible);

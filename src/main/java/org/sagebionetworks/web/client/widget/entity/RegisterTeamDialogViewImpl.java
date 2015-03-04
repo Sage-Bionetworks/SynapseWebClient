@@ -129,6 +129,10 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 		Bootbox.confirm(message, callback);
 	}
 	
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
 	/*
 	 * Private Methods
 	 */
