@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
@@ -95,6 +94,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	LIElement challengesListItem;
 	
+	@UiField
+	DivElement profileUI;
+	@UiField
+	DivElement dashboardUI;
 
 	@UiField
 	DivElement navtabContainer;
@@ -181,6 +184,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
+	@UiField
+	Button showProfileButton;
+	@UiField
+	Button hideProfileButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -221,7 +228,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
 		initTabs();
-		
 		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
 		createProjectButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -284,6 +290,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+			}
+		});
+		showProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showProfileButtonClicked();
+			}
+		});
+		hideProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.hideProfileButtonClicked();
 			}
 		});
 	}
@@ -772,5 +790,27 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		favoritesFilter.setActive(false);
 		myProjectsFilter.setActive(false);
 		teamFilters.setActive(false);
+	}
+	
+	@Override
+	public void setHideProfileButtonVisible(boolean isVisible) {
+		hideProfileButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setShowProfileButtonVisible(boolean isVisible) {
+		showProfileButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void showProfile() {
+		UIObject.setVisible(profileUI, true);
+		dashboardUI.addClassName("col-md-9");
+	}
+	
+	@Override
+	public void hideProfile() {
+		UIObject.setVisible(profileUI, false);
+		dashboardUI.removeClassName("col-md-9");
 	}
 }

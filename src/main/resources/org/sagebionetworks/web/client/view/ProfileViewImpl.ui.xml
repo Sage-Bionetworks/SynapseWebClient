@@ -13,9 +13,9 @@
 		<div class="separator margin-top-10-imp"></div>
 		<div class="margin-10">
 			<div class="row margin-top-5">
-			    <div class="col-md-3 col-xs-12">
+			    <div ui:field="profileUI" class="col-md-3 col-xs-12">
 			        <div class="padding-15 light-border">
-			            <b:Row ui:field="profilePictureLoadingUI" visible="false">
+		        	    <b:Row ui:field="profilePictureLoadingUI" visible="false">
 				            <b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
 				            	<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
 				            	<bh:Text>&nbsp; Loading...</bh:Text>
@@ -24,8 +24,10 @@
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
 			        	<g:FlowPanel ui:field="viewProfilePanel" />
 			        </div>
+			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
 			    </div>
-			    <div class="col-md-9 col-xs-12">
+			    <div ui:field="dashboardUI" class="col-md-9 col-xs-12">
+			    	<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false"/>
 			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
 			        	<b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
 							<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
