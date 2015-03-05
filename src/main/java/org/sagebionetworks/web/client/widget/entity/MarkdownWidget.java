@@ -54,7 +54,6 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	private ResourceLoader resourceLoader;
 	private String md;
 	private WikiPageKey wikiKey;
-	private boolean isWiki;
 	private boolean isPreview;
 	private Long wikiVersionInView;
 	
@@ -89,7 +88,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 			@Override
 			public void onSuccess(WikiPage page) {
 				wikiKey.setWikiPageId(page.getId());
-				setMarkdown(page.getMarkdown(), wikiKey, true, isPreview, null);
+				setMarkdown(page.getMarkdown(), wikiKey, isPreview, null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -100,7 +99,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	}
 
 	public void refresh() {
-		setMarkdown(md, wikiKey, isWiki, isPreview, null);
+		setMarkdown(md, wikiKey, isPreview, null);
 	}
 	
 	/**
@@ -108,11 +107,10 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	 * @param wikiVersionInView TODO
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
-	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview, final Long wikiVersionInView) {
+	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
 		final SynapseView view = this;
 		this.md = md;
 		this.wikiKey = wikiKey;
-		this.isWiki = isWiki;
 		this.isPreview= isPreview;
 		this.wikiVersionInView = wikiVersionInView;
 		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
@@ -145,7 +143,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 						}
 					};
 					//asynchronously load the widgets
-					Set<String> contentTypes = loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview, widgetRefreshRequired, wikiVersionInView);
+					Set<String> contentTypes = loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, isPreview, widgetRefreshRequired, wikiVersionInView);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -171,7 +169,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	 * @param view
 	 * @throws JSONObjectAdapterException 
 	 */
-	public static Set<String> loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, 
+	public static Set<String> loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, 
 			final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, 
 			IconsImageBundle iconsImageBundle, Boolean isPreview, Callback widgetRefreshRequired, 
 			Long wikiVersionInView) throws JSONObjectAdapterException {
@@ -189,7 +187,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 						innerText = innerText.trim();
 						String contentType = widgetRegistrar.getWidgetContentType(innerText);
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki, widgetRefreshRequired, wikiVersionInView);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, widgetRefreshRequired, wikiVersionInView);
 						if (presenter == null)
 							throw new IllegalArgumentException("Unable to render widget from the specified markdown.");
 						panel.add(presenter.asWidget(), currentWidgetDiv);

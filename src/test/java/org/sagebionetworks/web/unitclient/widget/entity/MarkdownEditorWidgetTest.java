@@ -57,7 +57,6 @@ public class MarkdownEditorWidgetTest {
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
 	WidgetDescriptorUpdatedHandler mockDescriptorUpdatedHandler;
-	boolean isWikiEditor;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -76,7 +75,6 @@ public class MarkdownEditorWidgetTest {
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(WidgetDescriptorUpdatedHandler.class);
 		initialMarkdown = "Hello Markdown";
-		isWikiEditor = true;
 		presenter.configure(wikiPageKey, initialMarkdown, isWikiEditor, mockDescriptorUpdatedHandler);
 	}
 	
@@ -295,7 +293,7 @@ public class MarkdownEditorWidgetTest {
 	public void testInsertNewWidget() {
 		String contentType = WidgetConstants.VIDEO_CONTENT_TYPE;
 		presenter.insertNewWidget(contentType);
-		verify(mockEditDescriptor).editNew(wikiPageKey, contentType, isWikiEditor);
+		verify(mockEditDescriptor).editNew(wikiPageKey, contentType);
 		
 		//verify that a widget descriptor update handler is added, and when fired it sends back to our handler that we passed as input to the configure.
 		ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor = ArgumentCaptor.forClass(WidgetDescriptorUpdatedHandler.class);
@@ -309,7 +307,7 @@ public class MarkdownEditorWidgetTest {
 	public void testEditWidgetNoneSelected() {
 		presenter.getWidgetSelectionState().setWidgetSelected(false);
 		presenter.editExistingWidget();
-		verify(mockEditDescriptor, Mockito.never()).editExisting(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean());
+		verify(mockEditDescriptor, Mockito.never()).editExisting(any(WikiPageKey.class), anyString(), any(Map.class));
 	}
 	@Test
 	public void testEditWidget() {
@@ -338,7 +336,7 @@ public class MarkdownEditorWidgetTest {
 		//it should have selected the existing widget definition
 		verify(mockView).setSelectionRange(startWidgetIndex, widgetDefinition.length());
 		
-		verify(mockEditDescriptor).editExisting(wikiPageKey, contentType, mockWidgetDescriptor, isWikiEditor);
+		verify(mockEditDescriptor).editExisting(wikiPageKey, contentType, mockWidgetDescriptor);
 		
 		//verify that a widget descriptor update handler is added, and when fired it removes the old widget markdown (to replace it with the updated value)
 		ArgumentCaptor<WidgetDescriptorUpdatedHandler> captor = ArgumentCaptor.forClass(WidgetDescriptorUpdatedHandler.class);
@@ -355,103 +353,103 @@ public class MarkdownEditorWidgetTest {
 	public void testHandleCommandInsertAttachment(){
 		String contentType = WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_ATTACHMENT);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	@Test
 	public void testHandleCommandInsertButtonLink(){
 		String contentType = WidgetConstants.BUTTON_LINK_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_BUTTON_LINK);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	@Test
 	public void testHandleCommandInsertEntityList(){
 		String contentType = WidgetConstants.ENTITYLIST_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_ENTITY_LIST);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	@Test
 	public void testHandleCommandInsertImage(){
 		String contentType = WidgetConstants.IMAGE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_IMAGE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	@Test
 	public void testHandleCommandInsertLink(){
 		String contentType = WidgetConstants.LINK_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_LINK);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertProvGraph(){
 		String contentType = WidgetConstants.PROVENANCE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_PROV_GRAPH);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertQueryTable(){
 		String contentType = WidgetConstants.QUERY_TABLE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_QUERY_TABLE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertSynapseTable(){
 		String contentType = WidgetConstants.SYNAPSE_TABLE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_SYNAPSE_TABLE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	@Test
 	public void testHandleCommandInsertReference(){
 		String contentType = WidgetConstants.REFERENCE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_REFERENCE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertTable(){
 		String contentType = WidgetConstants.TABBED_TABLE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_TABLE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertUserTeam(){
 		String contentType = WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_USER_TEAM_BADGE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertVideo(){
 		String contentType = WidgetConstants.VIDEO_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_VIDEO);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	@Test
 	public void testHandleCommandInsertYouTube(){
 		String contentType = WidgetConstants.YOUTUBE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_YOU_TUBE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertBookmark(){
 		String contentType = WidgetConstants.BOOKMARK_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_BOOKMARK);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertExternalWebsite(){
 		String contentType = WidgetConstants.SHINYSITE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	@Test
 	public void testHandleCommandInsertAPISuperTable(){
 		String contentType = WidgetConstants.API_TABLE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_API_SUPERTABLE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
 	private String surroundTextMarkdown = "this";

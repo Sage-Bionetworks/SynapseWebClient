@@ -42,7 +42,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WikiPageKey wikiKey;
 	private WidgetSelectionState widgetSelectionState;
 	WidgetDescriptorUpdatedHandler widgetDescriptorUpdatedHandler;
-	private boolean isWikiEditor;
 	private Callback attachmentsHandler, saveHandler, cancelHandler, deleteHandler; 
 	
 	@Inject
@@ -100,10 +99,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	 * @param closeHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
 	public void configure(final WikiPageKey wikiKey,
-			final String markdown, 
-			final boolean isWikiEditor,
+			final String markdown,
 			final WidgetDescriptorUpdatedHandler callback) {
-		this.isWikiEditor = isWikiEditor;
 		this.wikiKey = wikiKey;
 		this.widgetDescriptorUpdatedHandler = callback;
 		attachmentsHandler = null;
@@ -390,7 +387,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			}
 		};
 		widgetDescriptorEditor.addWidgetDescriptorUpdatedHandler(handler);
-		widgetDescriptorEditor.editNew(wikiKey, contentTypeKey, isWikiEditor);
+		widgetDescriptorEditor.editNew(wikiKey, contentTypeKey);
 	}
 	
 	/**
@@ -426,7 +423,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			};
 			
 			widgetDescriptorEditor.addWidgetDescriptorUpdatedHandler(handler);
-			widgetDescriptorEditor.editExisting(wikiKey, contentTypeKey, widgetDescriptor, isWikiEditor);
+			widgetDescriptorEditor.editExisting(wikiKey, contentTypeKey, widgetDescriptor);
 		}
 	}
 

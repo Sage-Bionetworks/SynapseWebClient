@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.entity.Attachments;
 
 /**
  * The abstraction of an entity dialog.
@@ -34,7 +33,7 @@ public interface EntityEditorDialog {
 	 * @param filter
 	 * @param callback
 	 */
-	public void showEditEntityDialog(String windowTitle, EntityBundle bundle, Attachments attachmentsWidget, JSONObjectAdapter newAdapter,	ObjectSchema schema, Annotations newAnnos, Set<String> filter,
+	public void showEditEntityDialog(String windowTitle, EntityBundle bundle, JSONObjectAdapter newAdapter,	ObjectSchema schema, Annotations newAnnos, Set<String> filter,
 			Callback callback);
 	
 	/**

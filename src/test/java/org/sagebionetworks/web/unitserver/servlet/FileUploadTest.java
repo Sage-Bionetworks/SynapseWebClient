@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
-import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;

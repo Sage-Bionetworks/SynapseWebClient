@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -36,7 +35,7 @@ public interface ProfileFormView extends IsWidget, SynapseView {
 	
 	public interface Presenter extends SynapsePresenter {
 
-		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, String email, AttachmentData pic, String teamName, String url, String userName);
+		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, String email, String imageFileHandleId, String teamName, String url, String userName);
 		void redirectToLinkedIn();
 		void rollback();
 		void startEditing();

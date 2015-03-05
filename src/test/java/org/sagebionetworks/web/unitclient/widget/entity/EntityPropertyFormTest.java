@@ -18,7 +18,6 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -54,7 +53,6 @@ public class EntityPropertyFormTest {
 	EntityPropertyForm presenter;
 	ExampleEntity entity;
 	EntityBundle entityBundle;
-	AttachmentData attachment1;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 
@@ -77,15 +75,7 @@ public class EntityPropertyFormTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setName("Test Entity");
-		entity.setEntityType(ExampleEntity.class.getName());
-		List<AttachmentData> entityAttachments = new ArrayList<AttachmentData>();
-		String attachment1Name = "attachment1";
-		attachment1 = new AttachmentData();
-		attachment1.setName(attachment1Name);
-		attachment1.setTokenId("token1");
-		attachment1.setContentType(WidgetConstants.YOUTUBE_CONTENT_TYPE);
-		entityAttachments.add(attachment1);
-		entity.setAttachments(entityAttachments);
+		entity.setEntityType(ExampleEntity.class.getName());;
 		EntityBundleTransport ebt = new EntityBundleTransport();
 		ebt.setEntityJson(EntityFactory.createJSONStringForEntity(entity));
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));

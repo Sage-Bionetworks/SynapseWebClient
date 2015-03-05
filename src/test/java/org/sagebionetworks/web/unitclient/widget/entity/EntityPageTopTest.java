@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
@@ -13,9 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -24,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -54,7 +50,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.shared.EventBus;
@@ -76,7 +71,6 @@ public class EntityPageTopTest {
 	EntityPageTop pageTop;
 	ExampleEntity entity;
 	TableEntity tableEntity;
-	AttachmentData attachment1;
 	WidgetRendererPresenter testWidgetRenderer;
 	String entityId = "syn123";
 	Long entityVersion = 1L;
@@ -121,16 +115,8 @@ public class EntityPageTopTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
-		List<AttachmentData> entityAttachments = new ArrayList<AttachmentData>();
-		String attachment1Name = "attachment1";
-		attachment1 = new AttachmentData();
-		attachment1.setName(attachment1Name);
-		attachment1.setTokenId("token1");
-		attachment1.setContentType(WidgetConstants.YOUTUBE_CONTENT_TYPE);
-		entityAttachments.add(attachment1);
-		entity.setAttachments(entityAttachments);
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean(), any(Callback.class), any(Long.class))).thenReturn(testWidgetRenderer);
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), any(Callback.class), any(Long.class))).thenReturn(testWidgetRenderer);
 
 		
 		// setup table entity

@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -83,7 +82,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	@Override
-	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url, final String userName) {				
+	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final String imageFileHandleId, final String teamName, final String url, final String userName) {				
 		final UserSessionData currentUser = authenticationController.getCurrentUserSessionData();			
 		if(currentUser != null) {
 				//check for valid url
@@ -121,8 +120,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 							ownerProfile.setEmail(email);
 						}
 							
-						if (pic != null)
-							ownerProfile.setPic(pic);
+						ownerProfile.setProfilePicureFileHandleId(imageFileHandleId);
 						
 						synapseClient.updateUserProfile(ownerProfile, new AsyncCallback<Void>() {
 							@Override
@@ -238,7 +236,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 						updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
 						    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
 						    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
-						    		linkedInProfile.getCompany(), null, linkedInProfile.getPic(), null, null, null);
+						    		linkedInProfile.getCompany(), null, linkedInProfile.getProfilePicureFileHandleId(), null, null, null);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}

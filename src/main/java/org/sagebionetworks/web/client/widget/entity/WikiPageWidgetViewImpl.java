@@ -163,9 +163,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		isAttachmentsWidgetConfigured = false;
 		if(!isCurrentVersion) {
-			markdownWidget.setMarkdown(markdown, wikiKey, true, false, versionInView);
+			markdownWidget.setMarkdown(markdown, wikiKey, false, versionInView);
 		} else {
-			markdownWidget.setMarkdown(markdown, wikiKey, true, false, null);
+			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
 		}
 		showDefaultViewWithWiki();
 	}

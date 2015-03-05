@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.entity.Attachments;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 
@@ -46,7 +45,6 @@ public class EntityEditorTest {
 	ClientLogger mockLogger;
 	GlobalApplicationState mockGlobal;
 	PlaceChanger mockPlaceChanger;
-	Attachments mockAttachmentsWidget;
 	SynapseClientAsync mockSynapseClient;
 	AutoGenFactory autoGenFactory;
 	ObjectSchema versionableSchema;
@@ -65,7 +63,6 @@ public class EntityEditorTest {
 		mockLogger = Mockito.mock(ClientLogger.class);
 		mockGlobal = Mockito.mock(GlobalApplicationState.class);
 		when(mockGlobal.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		mockAttachmentsWidget= Mockito.mock(Attachments.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		// setup the entity editor with 
 		editor = new EntityEditor(schemaCache, factory, autoGenFactory, mockDialog, mockLogger, mockGlobal, mockSynapseClient);

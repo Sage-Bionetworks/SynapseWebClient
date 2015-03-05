@@ -106,8 +106,6 @@ import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListVie
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
-import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -214,8 +212,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
@@ -808,9 +804,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// MyEntitiesBrowser
 		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
 
-		// Attachments		
-		bind(AttachmentsView.class).to(AttachmentsViewImpl.class);
-
 		// Wiki Attachments		
 		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
 
@@ -869,7 +862,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
 		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
-		bind(OldImageConfigView.class).to(OldImageConfigViewImpl.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
 		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
