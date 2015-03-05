@@ -25,7 +25,7 @@
 					<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="26px">Register</b:Button>
 				</g:SimplePanel>
 				<g:SimplePanel addStyleNames="right margin-5">
-					<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="26px" />
+					<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="26px" addStyleNames="my-dashboard-header-button" />
 				</g:SimplePanel>
 				<b:ButtonGroup addStyleNames="right margin-5">
 					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px">Help</b:Button>
