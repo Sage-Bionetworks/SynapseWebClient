@@ -38,8 +38,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ChallengeBadgeTest {
 
-	GlobalApplicationState mockGlobalApplicationState;
-	PlaceChanger mockPlaceChanger;
 	ChallengeBadgeView mockView;
 	ChallengeBadge widget;
 	ChallengeBundle testChallengeBundle;
@@ -47,22 +45,19 @@ public class ChallengeBadgeTest {
 	String testProjectName= "my test challenge project";
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockView = mock(ChallengeBadgeView.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new ChallengeBadge(mockView, mockGlobalApplicationState);
+		widget = new ChallengeBadge(mockView);
 		testChallengeBundle = new ChallengeBundle();
 		testChallenge = new Challenge();
 		testChallenge.setProjectId("syn123");
 		testChallenge.setParticipantTeamId("12345");
 		testChallengeBundle.setChallenge(testChallenge);
 		testChallengeBundle.setProjectName(testProjectName);
-		widget.configure(testChallengeBundle);
 	}
 	
 	@Test
 	public void testSetPresenter() {
+		widget.configure(testChallengeBundle);
 		verify(mockView).setPresenter(widget);
 	}
 	

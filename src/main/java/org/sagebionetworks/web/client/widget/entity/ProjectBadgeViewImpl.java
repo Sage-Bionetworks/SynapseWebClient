@@ -72,22 +72,16 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 				tooltip.hide();
 			}
 		});
-		
-		anchor.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.entityClicked();
-			}
-		});
 	}
 	
 	@Override
-	public void setProject(String projectName, String projectId) {
+	public void setProject(String projectName, String href) {
 		isPopoverInitialized = false;
 		tooltip.setIsHtml(true);
 		tooltip.setTitle(projectName);
 		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 		anchor.setText(projectName);
+		anchor.setHref(href);
 	}
 	
 	@Override
