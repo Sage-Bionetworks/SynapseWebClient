@@ -509,7 +509,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-top-5");
+			widget.addStyleName("margin-top-10");
 			targetPanel.add(widget);
 		}
 		if (challenges.isEmpty())
