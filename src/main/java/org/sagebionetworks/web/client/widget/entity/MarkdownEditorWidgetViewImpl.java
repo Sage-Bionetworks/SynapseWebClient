@@ -341,7 +341,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	public void initFormattingGuide(WikiPageKey formattingGuideWikiPageKey) {
-		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false);
+		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
 		formattingGuideContainer.clear();
 		formattingGuideContainer.add(markdownWidget);
 	}

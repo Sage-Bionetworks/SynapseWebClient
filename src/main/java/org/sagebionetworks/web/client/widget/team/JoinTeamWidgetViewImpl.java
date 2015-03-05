@@ -225,7 +225,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		Widget wikiPageWidget = wikiPage.asWidget();
         currentWizardContent.clear();
         currentWizardContent.add(wikiPageWidget);
-		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true);
+		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true, false);
 	}
 	
 	@Override
