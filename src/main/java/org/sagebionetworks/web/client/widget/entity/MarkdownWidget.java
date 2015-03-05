@@ -83,7 +83,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 		this.ginInjector = ginInjector;
 	}
 	
-	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview) {
+	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview, final boolean isIgnoreLoadingFailure) {
 		//get the wiki page
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
@@ -93,7 +93,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), MarkdownWidget.this))
+				if (!isIgnoreLoadingFailure)
 					MarkdownWidget.this.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 			}
 		});				
