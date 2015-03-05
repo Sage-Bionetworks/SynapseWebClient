@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -58,7 +57,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 				} catch(Exception e) {};
 			}
 			favoritesWidget.configure(header.getId());
-			view.setProject(header.getName(), header.getId());
+			view.setProject(header.getName(), DisplayUtils.getSynapseHistoryToken(header.getId()));
 		}
 	}
 	
@@ -91,11 +90,6 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 					callback.onFailure(caught);
 			}
 		});
-	}
-	
-	@Override
-	public void entityClicked() {
-		globalAppState.getPlaceChanger().goTo(new Synapse(header.getId()));
 	}
 	
 	public ProjectHeader getHeader() {

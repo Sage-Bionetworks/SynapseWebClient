@@ -3,15 +3,15 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Date;
 
+import static junit.framework.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -89,7 +89,7 @@ public class ProjectBadgeTest {
 		header.setLastActivity(lastActivity);
 		
 		widget.configure(header);
-		verify(mockView).setProject(name, id);
+		verify(mockView).setProject(eq(name), anyString());
 		verify(mockView).setLastActivityVisible(true);
 		verify(mockView).setLastActivityText(anyString());
 		verify(mockView).setFavoritesWidget(any(Widget.class));
@@ -104,7 +104,7 @@ public class ProjectBadgeTest {
 		header.setId(id);
 		header.setName(name);
 		widget.configure(header);
-		verify(mockView).setProject(name, id);
+		verify(mockView).setProject(eq(name), anyString());
 		verify(mockView).setLastActivityVisible(false);
 		verify(mockView, never()).setLastActivityText(anyString());
 	}
@@ -166,8 +166,13 @@ public class ProjectBadgeTest {
 		Project testProject = new Project();
 		testProject.setModifiedBy("4444");
 		testProject.setId(entityId);
+		String projectName = "rosebud";
+		testProject.setName(projectName);
 		setupEntity(testProject, null);
-		widget.entityClicked();
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
+		ArgumentCaptor<String> hrefCaptor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).setProject(eq(projectName), hrefCaptor.capture());
+		String href = hrefCaptor.getValue();
+		assertTrue(href.contains("#!Synapse:"));
+		assertTrue(href.contains(entityId));
 	}
 }
