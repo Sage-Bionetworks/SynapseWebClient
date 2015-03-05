@@ -83,7 +83,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 				teamRenderer.configure(team);
 				team2Badge.put(team.getId(), teamRenderer);
 				Widget teamRendererWidget = teamRenderer.asWidget();
-				teamRendererWidget.addStyleName("margin-top-5");
+				teamRendererWidget.addStyleName("margin-top-10");
 				add(teamRendererWidget);
 			}
 		}

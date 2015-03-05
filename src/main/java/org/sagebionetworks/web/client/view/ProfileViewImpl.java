@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
@@ -153,6 +154,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	FlowPanel teamsTabContent;
 	@UiField
 	Button teamSearchButton;
+	@UiField
+	Button projectSearchButton;
 	
 	//Challenges
 	@UiField
@@ -250,6 +253,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new TeamSearch(""));
 			}
 		});
+		
+		projectSearchButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new Search(""));
+			}
+		});
+
 		initCertificationBadge();
 
 		moreProjectsButton.addClickHandler(new ClickHandler() {
@@ -401,7 +412,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeams(List<Team> teams, boolean isOwner) {
-		myTeamsWidget.configure(teams, true, isOwner, new TeamListWidget.RequestCountCallback() {
+		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
 			@Override
 			public void invoke(String teamId, Long requestCount) {
 				presenter.addMembershipRequests(requestCount.intValue());
