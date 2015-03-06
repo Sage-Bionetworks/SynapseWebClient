@@ -824,4 +824,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		UIObject.setVisible(profileUI, false);
 		dashboardUI.removeClassName("col-md-9");
 	}
+	
+	@Override
+	public void showTeamsLoading() {
+		myTeamsWidget.showLoading();
+	}
 }

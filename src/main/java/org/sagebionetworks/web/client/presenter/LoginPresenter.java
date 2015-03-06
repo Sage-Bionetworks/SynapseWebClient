@@ -79,6 +79,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		String token = place.toToken();
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
 			authenticationController.logoutUser();
+			globalApplicationState.clearLastPlace();
 			view.showLogout();
 		} else if (WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN.equals(token)) {
 			// User does not exist, redirect to Registration page
