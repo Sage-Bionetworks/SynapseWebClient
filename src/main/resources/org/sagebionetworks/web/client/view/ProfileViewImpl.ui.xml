@@ -13,9 +13,9 @@
 		<div class="separator margin-top-10-imp"></div>
 		<div class="margin-10">
 			<div class="row margin-top-5">
-			    <div class="col-md-3 col-xs-12">
+			    <div ui:field="profileUI" class="col-md-3 col-xs-12">
 			        <div class="padding-15 light-border">
-			            <b:Row ui:field="profilePictureLoadingUI" visible="false">
+		        	    <b:Row ui:field="profilePictureLoadingUI" visible="false">
 				            <b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
 				            	<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
 				            	<bh:Text>&nbsp; Loading...</bh:Text>
@@ -24,8 +24,10 @@
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
 			        	<g:FlowPanel ui:field="viewProfilePanel" />
 			        </div>
+			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
 			    </div>
-			    <div class="col-md-9 col-xs-12">
+			    <div ui:field="dashboardUI" class="col-md-9 col-xs-12">
+			    	<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false"/>
 			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
 			        	<b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
 							<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
@@ -42,7 +44,20 @@
 					</div>
 					<div class="row">
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
-							<div class="highlight-box panel panel-default padding-5" ui:field="projectsHighlightBox" highlight-box-title="Projects">
+							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
+							    <div class="col-xs-8 col-sm-6">
+									<div class="input-group">
+										<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
+										<span class="input-group-btn">
+											<b:Button ui:field="createProjectButton" type="DEFAULT">Create Project</b:Button>
+										</span>
+									</div>
+								</div>
+								<div class="col-xs-4 col-sm-6">
+								    <b:Button ui:field="projectSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Project Search" />
+								</div>
+							</div>
+							<div class="highlight-box panel panel-default padding-5 min-height-200" ui:field="projectsHighlightBox" highlight-box-title="Projects">
 								<b:Row>
 									<b:Column size="XS_12">
 										<b:ButtonGroup ui:field="projectFiltersUI">
@@ -74,23 +89,12 @@
 									</b:BlockQuote>
 								</g:FlowPanel>
 							</div>
-							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
-							    <div class="col-xs-12 col-sm-6">
-									<div class="input-group">
-										<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
-										<span class="input-group-btn">
-											<b:Button ui:field="createProjectButton" type="DEFAULT">Create Project</b:Button>
-										</span>
-									</div>
-								</div>
-								<div class="col-xs-12 col-sm-6" />
-								<div class="col-xs-12 left">
-								    <a href="#!ProjectsHome:0">What's a Project?</a>
-								</div>
-							</div>
+							<b:Row>
+								<b:Column size="XS_12"><b:Anchor href="#!ProjectsHome:0">What's a Project?</b:Anchor></b:Column>
+							</b:Row>
 						</div>
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer">
-					    	<div class="highlight-box panel panel-default padding-5" ui:field="challengesHighlightBox" highlight-box-title="Challenges">
+					    	<div class="highlight-box panel panel-default padding-5 min-height-200" ui:field="challengesHighlightBox" highlight-box-title="Challenges">
 					    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
 					    	</div>
 					    	<div ui:field="challengesLoadingUI" >
@@ -102,11 +106,7 @@
 							</div>
 					    </div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="teamsTabContainer">
-							<g:FlowPanel ui:field="openInvitesContainer" />
-							<div class="highlight-box panel panel-default padding-5" ui:field="teamsHighlightBox" highlight-box-title="Teams">
-								<g:FlowPanel ui:field="teamsTabContent" styleName="margin-10" />
-							</div>
-							<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
+					    	<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-8 col-sm-6">
 									<div class="input-group">
 										<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
@@ -118,6 +118,10 @@
 								 <div class="col-xs-4 col-sm-6">
 								    <b:Button ui:field="teamSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Team Search" />
 								</div>
+							</div>
+							<g:FlowPanel ui:field="openInvitesContainer" />
+							<div class="highlight-box panel panel-default padding-5 min-height-200" ui:field="teamsHighlightBox" highlight-box-title="Teams">
+								<g:FlowPanel ui:field="teamsTabContent" styleName="margin-10" />
 							</div>
 						</div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer">

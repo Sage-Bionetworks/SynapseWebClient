@@ -56,7 +56,14 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setAllProjectsFilterSelected();
 	void setFavoritesFilterSelected();
 	void setFavoritesHelpPanelVisible(boolean isVisible);
+	void showProfile();
+	void hideProfile();
+	void setShowProfileButtonVisible(boolean isVisible);
+	void setHideProfileButtonVisible(boolean isVisible);
+	
 	public interface Presenter extends SynapsePresenter {
+		void showProfileButtonClicked();
+		void hideProfileButtonClicked();
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
 		void createProject(String name);
 		void createTeam(final String teamName);

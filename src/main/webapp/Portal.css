@@ -558,6 +558,9 @@ a.shortBtn {
 .min-height-400 {
 	min-height: 400px;
 }
+.min-height-200 {
+	min-height: 200px;
+}
 
 .profile-image-40px {
 	width: 40px;	
@@ -658,8 +661,8 @@ a.shortBtn {
 	margin-left: 35px;
 }
 
-.margin-left-100 {
-	margin-left: 100px;
+.margin-auto {
+	margin: auto;
 }
 
 .margin-bottom-60 {
@@ -1851,6 +1854,11 @@ a.projectTitle:hover {
 Looks for any child element under .modal-fullscreen that has a class that contains modal-dialog.*/
 .modal-fullscreen [class*="modal-dialog"] {
 	width: 95%;
+}
+
+.my-dashboard-header-button [class*="user-badge"] {
+	margin-left: 0px;
+	margin-right: 0px;
 }
 
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */

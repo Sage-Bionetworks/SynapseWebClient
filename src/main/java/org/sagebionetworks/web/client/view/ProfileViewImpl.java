@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
@@ -93,6 +94,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	LIElement challengesListItem;
 	
+	@UiField
+	DivElement profileUI;
+	@UiField
+	DivElement dashboardUI;
 
 	@UiField
 	DivElement navtabContainer;
@@ -148,6 +153,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	FlowPanel teamsTabContent;
 	@UiField
 	Button teamSearchButton;
+	@UiField
+	Button projectSearchButton;
 	
 	//Challenges
 	@UiField
@@ -179,6 +186,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
+	@UiField
+	Button showProfileButton;
+	@UiField
+	Button hideProfileButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -219,7 +230,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
 		initTabs();
-		
 		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
 		createProjectButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -242,6 +252,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new TeamSearch(""));
 			}
 		});
+		
+		projectSearchButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new Search(""));
+			}
+		});
+
 		initCertificationBadge();
 
 		moreProjectsButton.addClickHandler(new ClickHandler() {
@@ -282,6 +300,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+			}
+		});
+		showProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showProfileButtonClicked();
+			}
+		});
+		hideProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.hideProfileButtonClicked();
 			}
 		});
 	}
@@ -381,7 +411,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeams(List<Team> teams, boolean isOwner) {
-		myTeamsWidget.configure(teams, true, isOwner, new TeamListWidget.RequestCountCallback() {
+		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
 			@Override
 			public void invoke(String teamId, Long requestCount) {
 				presenter.addMembershipRequests(requestCount.intValue());
@@ -489,7 +519,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-top-5");
+			widget.addStyleName("margin-top-10");
 			targetPanel.add(widget);
 		}
 		if (challenges.isEmpty())
@@ -766,5 +796,27 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		favoritesFilter.setActive(false);
 		myProjectsFilter.setActive(false);
 		teamFilters.setActive(false);
+	}
+	
+	@Override
+	public void setHideProfileButtonVisible(boolean isVisible) {
+		hideProfileButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setShowProfileButtonVisible(boolean isVisible) {
+		showProfileButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void showProfile() {
+		UIObject.setVisible(profileUI, true);
+		dashboardUI.addClassName("col-md-9");
+	}
+	
+	@Override
+	public void hideProfile() {
+		UIObject.setVisible(profileUI, false);
+		dashboardUI.removeClassName("col-md-9");
 	}
 }

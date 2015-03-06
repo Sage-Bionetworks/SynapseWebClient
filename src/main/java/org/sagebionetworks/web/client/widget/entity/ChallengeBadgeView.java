@@ -12,16 +12,12 @@ public interface ChallengeBadgeView extends IsWidget, ShowsErrors {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-	
 	void setChallenge(ChallengeBundle header);
+	void setHref(String href);
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void onClick();
 	}
-
-	
-
 }
