@@ -128,12 +128,7 @@
 		    <b:Button ui:field="previewDialogOkButton" type="PRIMARY">OK</b:Button>
 		  </b:ModalFooter>
 		</b:Modal>
-		
-		<b:Modal ui:field="uploadPictureDialog" title="Upload Picture" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
-		  <b:ModalBody>
-		  	<g:SimplePanel ui:field="uploadPicturePanel"/>
-		  </b:ModalBody>
-		</b:Modal>
+		<g:SimplePanel ui:field="fileUploadModalPanel"/>
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

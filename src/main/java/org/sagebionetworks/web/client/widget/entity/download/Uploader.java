@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -27,6 +29,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -43,9 +46,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * This Uploader class supports 3 use cases:
- * A. Legacy data types (like the Data Entity): Uploads to the FileUpload servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileUpload
+ * This Uploader class supports 2 use cases:
  * B. File Entity, newer client browser: Direct multipart upload to S3, using a PUT to presigned URLs.
+ * C. Upload to the NCI proxy.
  * 
  * Case B will be the most common case.
  */
@@ -311,29 +314,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void uploadToS3() {
 		if (checkFileAPISupported()) {
-			boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
-			if (isFileEntity) {
-				//use case B from above
-				Callback callback = new Callback() {
-					@Override
-					public void invoke() {
-						directUploadStep2(fileNames[currIndex]);
-					}
-				};
-				checkForExistingFileName(fileNames[currIndex], callback);
-			} else {
-				//use case A from above
-				//uses the default action url
-				//if using this method, block if file size is > MAX_SIZE
-				try {
-					checkFileSize();
-				} catch (Exception e) {
-					view.showErrorMessage(e.getMessage());
-					fireCancelEvent();
-					return;
-				}				
-				view.submitForm(getOldUploadUrl());
-			}
+			//use case B from above
+			Callback callback = new Callback() {
+				@Override
+				public void invoke() {
+					directUploadStep2(fileNames[currIndex]);
+				}
+			};
+			checkForExistingFileName(fileNames[currIndex], callback);
 		}
 	}
 	
@@ -486,19 +474,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		boolean isUpdating = entityId != null || entity != null;
 		if (isUpdating) {
 			//existing entity
-			if (entity==null || entity instanceof FileEntity) {
-				updateExternalFileEntity(entityId, path, name);
-			} else {
-				synapseClient.updateExternalLocationable(entityId, path, name, new AsyncCallback<EntityWrapper>() {
-					public void onSuccess(EntityWrapper result) {
-						externalLinkUpdated(result, entity.getClass());
-					};
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
-					}
-				} );
-			}
+			updateExternalFileEntity(entityId, path, name);
 		} else {
 			//new data, use the appropriate synapse call
 			createNewExternalFileEntity(path, name);
@@ -684,11 +660,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.resetToInitialState();
 		resetUploadProgress();
 		handlerManager.fireEvent(new EntityUpdatedEvent());
-	}
-
-	public String getOldUploadUrl() {
-		 String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() : "";
-		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
 	}
 	
 	private void resetUploadProgress() {

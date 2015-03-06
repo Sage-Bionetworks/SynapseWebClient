@@ -1,8 +1,20 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
@@ -17,7 +29,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -153,7 +164,6 @@ public class SynapseClientImplTest {
 	String inviteeUserId = "900";
 	UserProfile inviteeUserProfile;
 	ExampleEntity entity;
-	AttachmentData attachment1, attachment2;
 	Annotations annos;
 	UserEntityPermissions eup;
 	UserEvaluationPermissions userEvaluationPermissions;
@@ -203,14 +213,6 @@ public class SynapseClientImplTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
-		List<AttachmentData> attachments = new ArrayList<AttachmentData>();
-		attachment1 = new AttachmentData();
-		attachment1.setName("attachment1");
-		attachment2 = new AttachmentData();
-		attachment2.setName("attachment2");
-		attachments.add(attachment1);
-		attachments.add(attachment2);
-		entity.setAttachments(attachments);
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityById(entityId)).thenReturn(entity);
 		// Setup the annotations
@@ -605,77 +607,6 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(testUserProfile);
 		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
 		assertEquals(userProfile, testUserProfile);
-	}
-	
-	@Test
-	public void testCreateUserProfileAttachment() throws Exception {
-		//verify call is directly calling the synapse client provider
-		PresignedUrl testPresignedUrl = new PresignedUrl();
-		testPresignedUrl.setPresignedUrl("http://mytestpresignedurl");
-		String testId = "myTestId";
-		String testToken = "myTestToken";
-		when(mockSynapse.createUserProfileAttachmentPresignedUrl(testId, testToken)).thenReturn(testPresignedUrl);
-		String presignedUrl = synapseClient.createUserProfileAttachmentPresignedUrl(testId, testToken);
-		assertEquals(presignedUrl, EntityFactory.createJSONStringForEntity(testPresignedUrl));
-	}
-	
-	private void resetUpdateLocationableMock(Data layer, String testUrl, String testId) throws SynapseException {
-		reset(mockSynapse);
-		when(mockSynapse.updateExternalLocationableToSynapse(layer, testUrl)).thenReturn(layer);
-		when(mockSynapse.getEntityById(testId)).thenReturn(layer);
-	}
-	
-	@Test
-	public void testUpdateLocationable() throws Exception {
-		//verify call is directly calling the synapse client provider
-		String testUrl = "http://mytesturl/something.jpg";
-		List<LocationData> locations = new ArrayList<LocationData>();
-		LocationData externalLocation = new LocationData();
-		externalLocation.setPath(testUrl);
-		externalLocation.setType(LocationTypeNames.external);
-		locations.add(externalLocation);
-
-		Data layer = new Data();
-		layer.setType(LayerTypeNames.M);
-		layer.setLocations(locations);
-
-		String testId = "myTestId";
-		resetUpdateLocationableMock(layer, testUrl, testId);
-		EntityWrapper returnedLayer = synapseClient.updateExternalLocationable(testId, testUrl, null);
-		//should have called with the layer
-		verify(mockSynapse).updateExternalLocationableToSynapse(eq(layer), eq(testUrl));
-		assertEquals(returnedLayer.getEntityJson(), EntityFactory.createJSONStringForEntity(layer));
-		
-		//test with empty string new name
-		resetUpdateLocationableMock(layer, testUrl, testId);
-		synapseClient.updateExternalLocationable(testId, testUrl, "");
-		verify(mockSynapse).updateExternalLocationableToSynapse(eq(layer), eq(testUrl));
-		
-		//and test with a rename
-		resetUpdateLocationableMock(layer, testUrl, testId);
-		String newName = "a new name";
-		synapseClient.updateExternalLocationable(testId, testUrl, newName);
-		layer.setName(newName);
-		verify(mockSynapse).updateExternalLocationableToSynapse(eq(layer), eq(testUrl));
-	}
-	
-	@Test
-	public void testRemoveAttachmentFromEntity() throws Exception {
-
-		Mockito.when(mockSynapse.putEntity(any(ExampleEntity.class))).thenReturn(entity);
-		
-		ArgumentCaptor<ExampleEntity> arg = ArgumentCaptor.forClass(ExampleEntity.class);
-		
-		synapseClient.removeAttachmentFromEntity(entityId, attachment2.getName());
-	    
-		//test to see if attachment has been removed
-		verify(mockSynapse).getEntityById(entityId);
-		verify(mockSynapse).putEntity(arg.capture());
-		
-		 //verify that attachment2 has been removed
-		ExampleEntity updatedEntity = arg.getValue();
-		List<AttachmentData> attachments = updatedEntity.getAttachments();
-		assertTrue(attachments.size() == 1 && attachments.get(0).equals(attachment1));
 	}
 	
 	@Test

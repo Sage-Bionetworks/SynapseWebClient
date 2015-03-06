@@ -1,17 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -27,6 +22,8 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
@@ -146,7 +143,6 @@ public class UploaderTest {
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		//by default, there is no name conflict
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
@@ -163,31 +159,6 @@ public class UploaderTest {
 		
 		when(synapseJsniUtils.getFileSize(anyString(), anyInt())).thenReturn(1.0);
 		when(synapseJsniUtils.isFileAPISupported()).thenReturn(true);
-	}
-	
-	@Test
-	public void testGetUploadActionUrlWithNull() {
-		uploader.getOldUploadUrl();
-		verify(gwt).getModuleBaseURL();
-		
-		//also check view reset
-		verify(view).resetToInitialState();
-	}
-	
-	@Test
-	public void testGetUploadActionUrlWithFileEntity() {
-		FileEntity fileEntity = new FileEntity();
-		uploader.asWidget(fileEntity);
-		uploader.getOldUploadUrl();
-		verify(gwt).getModuleBaseURL();
-	}
-	
-	@Test
-	public void testGetUploadActionUrlWithData() {
-		Data data = new Data();
-		uploader.asWidget(data);
-		uploader.getOldUploadUrl();
-		verify(gwt).getModuleBaseURL();
 	}
 	
 	@Test
@@ -213,16 +184,6 @@ public class UploaderTest {
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		
 		verify(view).showErrorMessage(anyString());
-	}
-
-	@Test
-	public void testSetExternalFilePathNotAFileEntity() {
-		//success setting external file path with a Locationable
-		Data data = new Data();
-		uploader.asWidget(data);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
-		verify(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(view).showInfo(anyString(), anyString());
 	}
 	
 	@Test
@@ -516,16 +477,6 @@ public class UploaderTest {
 	public void testUploadFiles() {
 		uploader.uploadFiles();
 		verify(view).triggerUpload();
-	}
-	
-	@Test
-	public void testServletS3Upload() {
-		uploader.asWidget(new Data());
-		uploader.uploadToS3();
-		//going to check file size
-		verify(synapseJsniUtils).getFileSize(anyString(), anyInt());
-		//and submit the form
-		verify(view).submitForm(anyString());
 	}
 	
 	@Test

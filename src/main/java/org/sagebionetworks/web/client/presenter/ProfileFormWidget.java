@@ -18,6 +18,8 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProfileFormView;
+import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -33,8 +35,8 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	private AuthenticationController authenticationController;
 	private UserProfile ownerProfile;
 	private ProfileUpdatedCallback profileUpdatedCallback;
-	private AdapterFactory adapterFactory;
 	private GlobalApplicationState globalApplicationState;
+	private FileInputWidget fileInputWidget;
 	
 	private LinkedInServiceAsync linkedInService;
 	private CookieProvider cookieProvider;
@@ -45,18 +47,19 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			AdapterFactory adapterFactory,
 			CookieProvider cookieProvider,
 			LinkedInServiceAsync linkedInService,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			FileInputWidget fileInputWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
 		this.linkedInService = linkedInService;
 		this.gwt = gwt;
+		this.fileInputWidget = fileInputWidget;
+		view.addFileInputWidget(fileInputWidget);
 		view.setPresenter(this);
 	}
 	
@@ -97,7 +100,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 				}
 				
 				//get the owner profile (may or may not be currently set
-				ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
+				getMyProfile(new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
 						ownerProfile = profile;
@@ -119,9 +122,10 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 						if (isUpdatingEmail) {
 							ownerProfile.setEmail(email);
 						}
-							
-						ownerProfile.setProfilePicureFileHandleId(imageFileHandleId);
-						
+						if(imageFileHandleId != null){
+							ownerProfile.setProfilePicureFileHandleId(imageFileHandleId);
+						}
+
 						synapseClient.updateUserProfile(ownerProfile, new AsyncCallback<Void>() {
 							@Override
 							public void onSuccess(Void result) {
@@ -157,7 +161,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		view.setIsDataModified(false);
 	}
 	
-	public static void getMyProfile(SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<UserProfile> callback){
+	public void getMyProfile(final AsyncCallback<UserProfile> callback){
 		synapseClient.getUserProfile(null, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile userProfile) {
@@ -226,20 +230,14 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		if(secret == null || secret.equals("")) {
 			view.showErrorMessage("You request has timed out. Please reload the page and try again.");
 		} else {
-			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
+			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
 				@Override
-				public void onSuccess(String result) {
+				public void onSuccess(UserProfile linkedInProfile) {
 					//parse the LinkedIn UserProfile json
-					UserProfile linkedInProfile;
-					try {
-						linkedInProfile = new UserProfile(adapterFactory.createNew(result));
-						updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
-						    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
-						    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
-						    		linkedInProfile.getCompany(), null, linkedInProfile.getProfilePicureFileHandleId(), null, null, null);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
+					updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
+				    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
+				    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
+				    		linkedInProfile.getCompany(), null, linkedInProfile.getProfilePicureFileHandleId(), null, null, null);
 				}
 				
 				@Override
@@ -249,6 +247,51 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 				}
 			});
 		}
+	}
+
+	@Override
+	public void onUploadImage() {
+		final UserSessionData currentUser = authenticationController.getCurrentUserSessionData();			
+		if(currentUser != null) {
+			fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
+				
+				@Override
+				public void uploadSuccess(final String fileHandleId) {
+					// get the profile and update
+					getMyProfile(new AsyncCallback<UserProfile>(){
+
+						@Override
+						public void onFailure(Throwable caught) {
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+								view.showErrorMessage("An error occurred. Please try reloading the page.");		
+						}
+
+						@Override
+						public void onSuccess(final UserProfile profile) {
+							profile.setProfilePicureFileHandleId(fileHandleId);
+							synapseClient.updateUserProfile(ownerProfile, new AsyncCallback<Void>() {
+								@Override
+								public void onSuccess(Void result) {
+									view.showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
+									view.updateProfilePicture(profile);
+								}
+								
+								@Override
+								public void onFailure(Throwable caught) {
+									view.userUpdateFailed();
+									profileUpdatedCallback.onFailure(caught);
+								}
+							});
+							
+						}});
+				}
+				
+				@Override
+				public void uploadFailed(String error) {
+					view.showErrorMessage(error);
+				}
+			});
+		}		
 	}
 	
 }

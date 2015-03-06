@@ -424,7 +424,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 					add(titleField);
 				}
 				//also add commands at the bottom
-				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), true, new WidgetDescriptorUpdatedHandler() {
+				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.addFileHandles(event.getNewFileHandleIds());

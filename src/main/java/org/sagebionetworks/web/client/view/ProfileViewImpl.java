@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
@@ -338,7 +337,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				}
 			
 		fillInProfileView(profile, viewProfilePanel);
-		picturePanel.add(getProfilePicture(profile, profile.getPic(), synapseJSNIUtils));
+		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
 		
 		if (isOwner) {
 			resetHighlightBoxes();
@@ -518,15 +517,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
-	public static Widget getProfilePicture(UserProfile profile, AttachmentData pic, SynapseJSNIUtils synapseJSNIUtils) {
+	public static Widget getProfilePicture(UserProfile profile, SynapseJSNIUtils synapseJSNIUtils) {
 		 Widget profilePicture; 
-		 if (pic != null && pic.getPreviewId() != null && pic.getPreviewId().length() > 0) {
+		 if (profile.getProfilePicureFileHandleId() != null) {
 			 //use preview
-			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
-			 profilePicture = new FitImage(url, 150, 150);
-		 } else if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
-			 //use token
-			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), pic.getTokenId(), null);
+			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), false);
 			 profilePicture = new FitImage(url, 150, 150);
 		 } else {
 			 //use default picture

@@ -191,6 +191,14 @@ public interface SynapseClient extends RemoteService {
 	public UserProfile getUserProfile(String userId) throws RestServiceException;
 	
 	/**
+	 * List UserProfiels by ID.
+	 * @param userIds
+	 * @return
+	 * @throws RestServiceException 
+	 */
+	public List<UserProfile> listUserProfiles(List<String> userIds) throws RestServiceException;
+	
+	/**
 	 * Return the specified team object in json string
 	 * @param teamId
 	 * @return
@@ -246,9 +254,6 @@ public interface SynapseClient extends RemoteService {
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
 	public EntityWrapper getAllUsers() throws RestServiceException;
-	
-	public String createUserProfileAttachmentPresignedUrl(String id,
-			String tokenOrPreviewId) throws RestServiceException;
 
 	AccessRequirement createAccessRequirement(AccessRequirement arEW)
 			throws RestServiceException;
@@ -263,8 +268,7 @@ public interface SynapseClient extends RemoteService {
 	
 	EntityWrapper createAccessApproval(EntityWrapper aaEW)
 			throws RestServiceException;
-	
-	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl, String name) throws RestServiceException;
+
 	
 	public EntityWrapper updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
 	
@@ -285,7 +289,6 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
 
-	public EntityWrapper removeAttachmentFromEntity(String entityId, String attachmentName) throws RestServiceException;
 	public String getJSONEntity(String repoUri) throws RestServiceException;
 	
 	public String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;

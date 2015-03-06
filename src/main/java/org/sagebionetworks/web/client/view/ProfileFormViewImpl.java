@@ -8,10 +8,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HeadingElement;
@@ -25,6 +22,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,12 +33,9 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	@UiField
-	Modal uploadPictureDialog;
-	@UiField
-	SimplePanel uploadPicturePanel;
+	SimplePanel fileUploadModalPanel;
 	
 	@UiField
 	org.gwtbootstrap3.client.ui.Button okButton;
@@ -105,10 +100,8 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	
 	@Inject
 	public ProfileFormViewImpl(ProfileFormImplUiBinder binder, 
-			SageImageBundle sageImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {
 		initWidget(binder.createAndBindUi(this));
-		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		linkedInButtonEditProfile = createLinkedInButton();
 		init();
@@ -123,7 +116,7 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	public void updateView(UserProfile profile) {
 		clear();
 		updateUserForm(profile);
-		updateProfilePicture(profile, profile.getPic());
+		updateProfilePicture(profile);
 		editPictureButtonPanel.add(getEditPictureButton(profile));
 		updateWithLinkedInPanel.add(linkedInButtonEditProfile);
 	}
@@ -287,45 +280,26 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	}
 	
 	private Button getEditPictureButton(final UserProfile profile) {
-		 String userId = profile.getOwnerId();
-		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + WebConstants.USER_PROFILE_PARAM_KEY + "=" + userId;
 		 Button editPictureButton = DisplayUtils.createButton("Upload new picture");
 		 editPictureButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
-				uploadPicturePanel.setWidget(
-					AddAttachmentHelper.getUploadFormPanel(actionUrl, 
-							DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT, 
-							new AddAttachmentHelper.Callback() {
-								@Override
-								public void onSaveAttachment(UploadResult result) {
-									if(result != null){
-										if(UploadStatus.SUCCESS == result.getUploadStatus()){
-											showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
-											updateProfilePicture(profile, result.getAttachmentData());
-											uploadPictureDialog.hide();
-										}else{
-											showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
-										}
-									}
-								}
-							}));
-				uploadPictureDialog.show();
+				presenter.onUploadImage();
 			}
 		});
 		return editPictureButton;
 	 }
 	
-	private void updateProfilePicture(UserProfile profile, AttachmentData pic) {
+	@Override
+	public void updateProfilePicture(UserProfile profile) {
 		//update main edit picture panel
 		editPicturePanel.clear();
-		Widget profilePicture = ProfileViewImpl.getProfilePicture(profile, pic, synapseJSNIUtils);
+		Widget profilePicture = ProfileViewImpl.getProfilePicture(profile, synapseJSNIUtils);
 		profilePicture.addStyleName("left");
 		editPicturePanel.add(profilePicture);
 		//and preview
 		picturePanel.clear();
-		profilePicture = ProfileViewImpl.getProfilePicture(profile, pic, synapseJSNIUtils);
+		profilePicture = ProfileViewImpl.getProfilePicture(profile, synapseJSNIUtils);
 		profilePicture.addStyleName("left");
 		picturePanel.add(profilePicture);
 	}
@@ -360,5 +334,10 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	public void setIsDataModified(boolean isModified) {
 		cancelButton.setEnabled(isModified);
 		okButton.setEnabled(isModified);
+	}
+
+	@Override
+	public void addFileInputWidget(IsWidget widget) {
+		fileUploadModalPanel.add(widget);
 	}
 }

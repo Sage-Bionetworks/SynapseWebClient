@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProfileFormView;
+import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,6 +42,7 @@ public class ProfileFormPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
 	GWTWrapper mockGWTWrapper;
+	FileInputWidget mockFileInputWidget;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	ProfileUpdatedCallback mockProfileUpdatedCallback;
 	LinkedInServiceAsync mockLinkedInService;
@@ -62,7 +64,8 @@ public class ProfileFormPresenterTest {
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockLinkedInService = mock(LinkedInServiceAsync.class);
 		mockCookies = mock(CookieProvider.class);
-		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, mockGlobalApplicationState, adapterFactory, mockCookies, mockLinkedInService, mockGWTWrapper);
+		mockFileInputWidget = Mockito.mock(FileInputWidget.class);
+		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, mockGlobalApplicationState, mockCookies, mockLinkedInService, mockGWTWrapper,mockFileInputWidget);
 		profileForm.configure(userProfile, mockProfileUpdatedCallback);
 		verify(mockView).setPresenter(profileForm);
 		userProfile.writeToJSONObject(adapter.createNew());
@@ -94,7 +97,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
 				userProfile.getEmail(), 
-				userProfile.getPic(), 
+				userProfile.getProfilePicureFileHandleId(), 
 				userProfile.getTeamName(), 
 				userProfile.getUrl(),
 				userProfile.getUserName());
@@ -117,7 +120,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getLocation(), 
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic(), null, null, userProfile.getUserName());
+				userProfile.getEmail(), userProfile.getProfilePicureFileHandleId(), null, null, userProfile.getUserName());
 		
 		verify(mockProfileUpdatedCallback).onFailure(eq(myException));//exception is thrown back
 	}
@@ -133,7 +136,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getLocation(), 
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic(), null, null, userProfile.getUserName());
+				userProfile.getEmail(), userProfile.getProfilePicureFileHandleId(), null, null, userProfile.getUserName());
 		
 		verify(mockProfileUpdatedCallback).onFailure(eq(myException));//exception is thrown back
 	}

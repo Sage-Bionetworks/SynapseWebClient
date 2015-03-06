@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -15,14 +12,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.http.client.ClientProtocolException;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.repo.model.ServiceConstants.AttachmentType;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
@@ -33,11 +26,11 @@ import com.google.inject.Inject;
  */
 public class UserProfileAttachmentServlet extends HttpServlet {
 
-	public static final int MAX_TIME_OUT = 10 * 1000;
-	public static final long BYTES_PER_MEGABYTE = 1048576;
-	public static final long MAX_ATTACHMENT_MEGABYTES = 4;
-	public static final long MAX_ATTACHMENT_SIZE_IN_BYTES = MAX_ATTACHMENT_MEGABYTES*BYTES_PER_MEGABYTE; // 4 MB
-	private static Logger logger = Logger.getLogger(FileUpload.class.getName());
+	/**
+	 * 10 seconds divided by 3.
+	 */
+	private static final int WAIT_FOR_PRVIEW_MS = 3333;
+
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
@@ -48,12 +41,6 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	@SuppressWarnings("unused")
 	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-	private TokenProvider tokenProvider = new TokenProvider() {
-		@Override
-		public String getSessionToken() {
-			return UserDataProvider.getThreadLocalUserToken(FileAttachmentServlet.perThreadRequest.get());
-		}
-	};
 
 	/**
 	 * Unit test can override this.
@@ -74,135 +61,86 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 		this.urlProvider = provider;
 	}
 
-	/**
-	 * Unit test uses this to provide a mock token provider
-	 *
-	 * @param tokenProvider
-	 */
-	public void setTokenProvider(TokenProvider tokenProvider) {
-		this.tokenProvider = tokenProvider;
-	}
-
 	@Override
 	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
 			throws ServletException, IOException {
-		FileAttachmentServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String token = getSessionToken(request);
-
 		// Now get the signed url
-		SynapseClient client = createNewClient(token);
+		SynapseClient client = createNewClient();
 		String userId = request.getParameter(WebConstants.USER_PROFILE_PARAM_KEY);
-		String tokenId = request.getParameter(WebConstants.TOKEN_ID_PARAM_KEY);
+		/*
+		 * We do not need the file ID but adding it to the URL ensures the browser
+		 * will fetch a new image if the user's profile picture changes.
+		 */
+		String fileId = request.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID);
+		String previewString = request.getParameter(WebConstants.USER_PROFILE_PREVIEW);
 		try {
-			if (tokenId == null || tokenId.trim().length() == 0) {
-				//if token is null, assume we want the user profile picture
-				UserProfile profile = client.getUserProfile(userId);
-				if (profile.getPic() != null)
-					tokenId = profile.getPic().getTokenId();
+			boolean preview = true;
+			if(previewString != null){
+				preview = Boolean.parseBoolean(previewString);
 			}
-			PresignedUrl url = null;
-			url = client.waitForPreviewToBeCreated(userId, AttachmentType.USER_PROFILE, tokenId, MAX_TIME_OUT);
+			URL url = getUrlWithWait(client, userId, preview);
 			// Redirect the user to the url
-			response.sendRedirect(url.getPresignedUrl());
+			response.sendRedirect(url.toString());
 		} catch (Exception e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getOutputStream().write(("Failed to get the pre-signed url"+e.getMessage()).getBytes("UTF-8"));
 			response.getOutputStream().flush();
 			return;
 		}
-
 	}
 
+	private URL getUrlWithWait(SynapseClient client, String userId, boolean preview) throws ClientProtocolException, MalformedURLException, IOException, SynapseException, InterruptedException{
+		if(preview){
+			return waitForPreview(client, userId);
+		}else{
+			return client.getUserProfilePictureUrl(userId);
+		}
+	}
+	
+	/**
+	 * Try three times to get the preview image.
+	 * @param client
+	 * @param userId
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws SynapseException
+	 * @throws InterruptedException
+	 */
+	private URL waitForPreview(SynapseClient client, String userId) throws ClientProtocolException, MalformedURLException, IOException, SynapseException, InterruptedException{
+		try{
+			return client.getUserProfilePicturePreviewUrl(userId);
+		}catch (SynapseNotFoundException e){
+			// wait an try again
+			Thread.sleep(WAIT_FOR_PRVIEW_MS);
+			try{
+				return client.getUserProfilePicturePreviewUrl(userId);
+			}catch (SynapseNotFoundException e2){
+				// wait again
+				Thread.sleep(WAIT_FOR_PRVIEW_MS);
+				try{
+					return client.getUserProfilePicturePreviewUrl(userId);
+				}catch (SynapseNotFoundException e3){
+					// this is our last chance
+					Thread.sleep(WAIT_FOR_PRVIEW_MS);
+					// If it fails again, there is no preview.
+					return client.getUserProfilePicturePreviewUrl(userId);
+				}
+			}
+		}
+	}
+	
 	@Override
 	public void service(ServletRequest arg0, ServletResponse arg1)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		super.service(arg0, arg1);
-	}
-
-	@Override
-	public void doPost(final HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		ServletFileUpload upload = new ServletFileUpload();
-
-		// Before we do anything make sure we can get the users token
-		String token = getSessionToken(request);
-		if (token == null) {
-			setForbiddenMessage(response);
-			return;
-		}
-
-		try {
-			List<AttachmentData> list = new ArrayList<AttachmentData>();
-			// Connect to synapse
-			SynapseClient client = createNewClient(token);
-			// get user and store file in location
-			String userId = request.getParameter(WebConstants.USER_PROFILE_PARAM_KEY);
-			FileItemIterator iter = upload.getItemIterator(request);
-			while (iter.hasNext()) {
-				FileItemStream item = iter.next();
-
-				String name = item.getFieldName();
-				InputStream stream = item.openStream();
-				String fileName = item.getName();
-				File temp = ServiceUtils.writeToTempFile(stream, MAX_ATTACHMENT_SIZE_IN_BYTES);
-				try{
-					// Now upload the file
-					AttachmentData data = client.uploadUserProfileAttachmentToSynapse(userId, temp, fileName);
-					// If this had a preview then wait for it
-					list.add(data);
-				}finally{
-					// Unconditionally delete the tmp file
-					temp.delete();
-				}
-			}
-			// Now add all of the attachments to the entity.
-			UserProfile userProfile = client.getUserProfile(userId);
-			UploadResult result = new UploadResult();
-			//set the profile picture
-			if (!list.isEmpty()) {
-				userProfile.setPic(list.get(0));
-				result.setAttachmentData(list.get(0));
-			}
-				
-			// Save the changes.
-			client.updateMyProfile(userProfile);
-			result.setMessage("File upload successfully");
-			result.setUploadStatus(UploadStatus.SUCCESS);
-			String out = EntityFactory.createJSONStringForEntity(result);
-			response.setStatus(HttpServletResponse.SC_CREATED);
-			response.getOutputStream().write(out.getBytes("UTF-8"));
-			response.getOutputStream().flush();
-		} catch (Exception e) {
-			UploadResult result = new UploadResult();
-			result.setMessage(e.getMessage());
-			result.setUploadStatus(UploadStatus.FAILED);
-			String out;
-			try {
-				out = EntityFactory.createJSONStringForEntity(result);
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				response.getOutputStream().write(out.getBytes("UTF-8"));
-				response.getOutputStream().flush();
-			} catch (JSONObjectAdapterException e1) {
-				throw new RuntimeException(e1);
-			}
-			return;
-		}
-	}
-
-	/**
-	 * Get the session token
-	 * @param request
-	 * @return
-	 */
-	public String getSessionToken(final HttpServletRequest request){
-		return tokenProvider.getSessionToken();
 	}
 
 	/**
@@ -225,11 +163,10 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private SynapseClient createNewClient(String sessionToken) {
+	private SynapseClient createNewClient() {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setSessionToken(sessionToken);
 		return client;
 	}
 

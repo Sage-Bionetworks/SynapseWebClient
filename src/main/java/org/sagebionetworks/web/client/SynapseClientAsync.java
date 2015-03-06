@@ -113,6 +113,9 @@ public interface SynapseClientAsync {
 	
 	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
 	
+	void listUserProfiles(List<String> userIds,
+			AsyncCallback<List<UserProfile>> callback);
+	
 	void getTeam(String teamId, AsyncCallback<Team> callback);
 	
 	void getUserGroupHeadersById(ArrayList<String> ids, AsyncCallback<UserGroupHeaderResponsePage> headers);
@@ -120,8 +123,6 @@ public interface SynapseClientAsync {
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
 	
 	void getUserGroupHeadersByPrefix(String prefix, long limit, long offset, AsyncCallback<UserGroupHeaderResponsePage> callback);
-	
-	void createUserProfileAttachmentPresignedUrl(String id, String tokenOrPreviewId, AsyncCallback<String> callback);
 	
 	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> callback);
 	
@@ -157,8 +158,6 @@ public interface SynapseClientAsync {
 	public void getAllEntityUploadAccessRequirements(String entityId, AsyncCallback<String> callback);
 	
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
-
-	public void updateExternalLocationable(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback);
 	
 	public void updateExternalFile(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 	
@@ -171,9 +170,7 @@ public interface SynapseClientAsync {
 	void getActivityForEntity(String entityId, AsyncCallback<Activity> callback);
 
 	void getActivity(String activityId, AsyncCallback<Activity> callback);
-	
-	void removeAttachmentFromEntity(String entityId, String attachmentName, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
-	
+		
 	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
 	
 	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);

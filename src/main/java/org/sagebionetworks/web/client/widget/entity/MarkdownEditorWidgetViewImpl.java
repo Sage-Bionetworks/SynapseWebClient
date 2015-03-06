@@ -372,7 +372,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		}
 		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
-		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, null, null);
+		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, true, null, null);
 		
 		previewHtmlContainer.clear();
 		previewHtmlContainer.add(panel);

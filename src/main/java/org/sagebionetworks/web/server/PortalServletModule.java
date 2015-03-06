@@ -18,9 +18,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClient;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
-import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
-import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
@@ -124,18 +122,10 @@ public class PortalServletModule extends ServletModule {
 		// setup the Simple Search servlet
 		bind(SimpleSearchService.class).in(Singleton.class);
 		serve("/Portal/simplesearch").with(SimpleSearchService.class);
-				
-		// setup GWTupload
-		bind(FileUpload.class).in(Singleton.class);
-		serve("/Portal/" + WebConstants.LEGACY_DATA_UPLOAD_SERVLET).with(FileUpload.class);
 
 		// Setup the File Uploader JNLP mapping
 		bind(FileUploaderJnlp.class).in(Singleton.class);
 		serve("/Portal/fileUploaderJnlp").with(FileUploaderJnlp.class);
-		
-		// Attachments
-		bind(FileAttachmentServlet.class).in(Singleton.class);
-		serve("/Portal/attachment").with(FileAttachmentServlet.class);
 		
 		// FileHandle upload
 		bind(FileHandleServlet.class).in(Singleton.class);

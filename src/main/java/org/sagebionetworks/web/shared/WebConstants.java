@@ -117,10 +117,10 @@ public class WebConstants {
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
-
-	public static final String TOKEN_ID_PARAM_KEY = "tokenId";
-
-	public static final String WAIT_FOR_URL = "waitForUrl";
+	
+	public static final String USER_PROFILE_IMIAGE_ID = "imageId";
+	
+	public static final String USER_PROFILE_PREVIEW = "preview";
 
 	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
 
@@ -168,8 +168,6 @@ public class WebConstants {
 	
 	
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
-	
-	public static final String LEGACY_DATA_UPLOAD_SERVLET = "upload";
 
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";

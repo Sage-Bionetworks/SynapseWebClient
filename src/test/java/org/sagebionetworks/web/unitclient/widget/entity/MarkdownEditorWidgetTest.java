@@ -75,7 +75,7 @@ public class MarkdownEditorWidgetTest {
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(WidgetDescriptorUpdatedHandler.class);
 		initialMarkdown = "Hello Markdown";
-		presenter.configure(wikiPageKey, initialMarkdown, isWikiEditor, mockDescriptorUpdatedHandler);
+		presenter.configure(wikiPageKey, initialMarkdown, mockDescriptorUpdatedHandler);
 	}
 	
 	
@@ -87,7 +87,7 @@ public class MarkdownEditorWidgetTest {
 		verify(mockView).setAttachmentsButtonVisible(false);
 		verify(mockView).clear();
 		verify(mockView).setCancelVisible(false);
-		verify(mockView).setAttachmentCommandsVisible(isWikiEditor);
+		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
 	}
 	
@@ -143,7 +143,7 @@ public class MarkdownEditorWidgetTest {
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
 		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showPreviewHTML(htmlReturned, wikiPageKey, isWikiEditor, mockWidgetRegistrar);
+		verify(mockView).showPreviewHTML(htmlReturned, wikiPageKey, mockWidgetRegistrar);
 	}
 	
 	@Test

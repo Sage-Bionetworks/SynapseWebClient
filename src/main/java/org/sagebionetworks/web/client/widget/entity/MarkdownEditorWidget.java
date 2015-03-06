@@ -114,7 +114,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		
 		//clear view state
 		view.clear();
-		view.setAttachmentCommandsVisible(isWikiEditor);
+		view.setAttachmentCommandsVisible(true);
 		view.setAlphaCommandsVisible(DisplayUtils.isInTestWebsite(cookies));
 	
 		if (formattingGuideWikiPageKey == null) {
@@ -152,7 +152,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {
-					view.showPreviewHTML(result, wikiKey, isWikiEditor, widgetRegistrar);
+					view.showPreviewHTML(result, wikiKey, widgetRegistrar);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
