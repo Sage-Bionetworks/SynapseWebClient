@@ -411,6 +411,24 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setTeamsFilterTeams(List<Team> teams) {
+		teamFiltersDropDownMenu.clear();
+		//also create a link for each team in the project filters
+		addMyTeamProjectsFilter();
+		teamFiltersDropDownMenu.add(new SeparatorMenuItem());
+		for (final Team team : teams) {
+			AnchorListItem teamFilter = new AnchorListItem(team.getName());
+			teamFilter.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.applyFilterClicked(ProjectFilterEnum.TEAM, team);
+				}
+			});
+			teamFiltersDropDownMenu.add(teamFilter);
+		}
+	}
+	
+	@Override
 	public void setTeams(List<Team> teams, boolean isOwner) {
 		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
 			@Override
@@ -418,22 +436,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.addMembershipRequests(requestCount.intValue());
 			}
 		});
-		
-		if (isOwner) {
-			//also create a link for each team in the project filters
-			addMyTeamProjectsFilter();
-			teamFiltersDropDownMenu.add(new SeparatorMenuItem());
-			for (final Team team : teams) {
-				AnchorListItem teamFilter = new AnchorListItem(team.getName());
-				teamFilter.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						presenter.applyFilterClicked(ProjectFilterEnum.TEAM, team);
-					}
-				});
-				teamFiltersDropDownMenu.add(teamFilter);
-			}
-		}
 	}
 	
 	private void addMyTeamProjectsFilter() {
@@ -823,5 +825,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void hideProfile() {
 		UIObject.setVisible(profileUI, false);
 		dashboardUI.removeClassName("col-md-9");
+	}
+	
+	@Override
+	public void showTeamsLoading() {
+		myTeamsWidget.showLoading();
 	}
 }

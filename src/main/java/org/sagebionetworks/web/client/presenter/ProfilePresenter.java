@@ -147,22 +147,37 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.showLoading();
 		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
-		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+		
+		if (isOwner) {
+			//make sure we have the user favorites before continuing
+			initUserFavorites(new Callback() {
 				@Override
-				public void onSuccess(UserProfile profile) {
-						if (isOwner) {
-							//only configure the profile form (editor) if owner of this profile
-							profileForm.configure(profile, profileUpdatedCallback);
-						}
-						initializeShowHideProfile(isOwner);
-						getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
-					}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.hideLoading();
-					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
+				public void invoke() {
+					getUserProfile(initialTab);		
 				}
 			});
+		} else {
+			getUserProfile(initialTab);
+		}
+	}
+	
+	private void getUserProfile(final ProfileArea initialTab) {
+		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+			@Override
+			public void onSuccess(UserProfile profile) {
+					if (isOwner) {
+						//only configure the profile form (editor) if owner of this profile
+						profileForm.configure(profile, profileUpdatedCallback);
+					}
+					initializeShowHideProfile(isOwner);
+					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
+				}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.hideLoading();
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
+			}
+		});
 	}
 	
 	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner, final ProfileArea area) {
@@ -174,7 +189,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget());
 					tabClicked(area);
-					proceed();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -188,14 +202,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 				else
 					view.showErrorMessage(caught.getMessage());
-				
-				proceed();
-			}
-			
-			private void proceed() {
-				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
-				refreshTeams();
-				refreshChallenges();
 			}
 		});
 	}
@@ -252,6 +258,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentProjectOffset = 0;
 		view.clearProjects();
 		getMoreProjects();
+		
+		//initialize team filters
+		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				//could not load teams for team filters
+				view.setTeamsFilterVisible(false);
+			}
+			@Override
+			public void onSuccess(List<Team> teams) {
+				view.setTeamsFilterVisible(!teams.isEmpty());
+				view.setTeamsFilterTeams(teams);
+			}
+		};
+		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
 	}
 	
 	public void refreshChallenges() {
@@ -309,14 +330,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
+		view.showTeamsLoading();
 		teamNotificationCount = 0;
 		view.clearTeamNotificationCount();
 		if (isOwner)
 			view.refreshTeamInvites();
-		getTeams(currentUserId);
-	}
-	
-	public void getTeams(String userId) {
 		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -325,12 +343,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(List<Team> teams) {
 				view.setTeams(teams,isOwner);
-				view.setTeamsFilterVisible(!teams.isEmpty());
 			}
 		};
-		TeamListWidget.getTeams(userId, synapseClient, adapterFactory, teamCallback);
+		
+		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
 	}
-	
 	
 	public void getMoreChallenges() {
 		view.showChallengesLoading(true);
@@ -662,18 +679,39 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			view.showErrorMessage("The selected tab is undefined.");
 			return;
 		}
+		
 		//if we are editing, then pop up a confirm
 		if (globalApplicationState.isEditing()) {
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
 					profileForm.rollback();
+					refreshData(tab);
 					view.setTabSelected(tab);
 				}
 			};
 			view.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
-		} else
+		} else {
+			refreshData(tab);
 			view.setTabSelected(tab);
+		}
+	}
+	
+	private void refreshData(ProfileArea tab) {
+		switch (tab) {
+			case PROJECTS:
+				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+				break;
+			case TEAMS:
+				refreshTeams();
+				break;
+			case CHALLENGES:
+			case SETTINGS:
+			default:
+				break;
+		}
+		//always refreshes challenges to determine if tab should be shown
+		refreshChallenges();
 	}
 	
 	/**
@@ -687,6 +725,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void certificationBadgeClicked() {
 		goTo(new Certificate(currentUserId));
+	}
+	
+	public void initUserFavorites(final Callback callback) {
+		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onSuccess(List<EntityHeader> favorites) {
+				globalApplicationState.setFavorites(favorites);
+				callback.invoke();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.invoke();
+			}
+		});
 	}
 	
 	@Override
