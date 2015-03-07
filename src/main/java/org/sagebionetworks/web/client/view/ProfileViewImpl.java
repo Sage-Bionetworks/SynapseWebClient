@@ -412,6 +412,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeams(List<Team> teams, boolean isOwner) {
+		teamFiltersDropDownMenu.clear();
 		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
 			@Override
 			public void invoke(String teamId, Long requestCount) {
