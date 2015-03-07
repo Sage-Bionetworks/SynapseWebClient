@@ -592,7 +592,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeams() {
-		profilePresenter.getTeams("anyUserId");
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockView).showTeamsLoading();
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeams(eq(myTeams), anyBoolean());
@@ -602,11 +602,34 @@ public class ProfilePresenterTest {
 	public void testGetTeamsError() {
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
-		profilePresenter.getTeams("anyUserId");
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeamsError(errorMessage);
 	}
 	
+	@Test
+	public void testGetTeamFilters() {
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(true);
+		verify(mockView).setTeamsFilterTeams(myTeams);
+	}
+	
+	@Test
+	public void testGetTeamFiltersEmpty() {
+		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(false);
+	}
+	@Test
+	public void testGetTeamFiltersError() {
+		String errorMessage = "error loading teams";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(false);
+	}
 	
 	
 	@Test

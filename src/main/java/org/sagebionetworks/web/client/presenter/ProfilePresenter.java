@@ -258,6 +258,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentProjectOffset = 0;
 		view.clearProjects();
 		getMoreProjects();
+		
+		//initialize team filters
+		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				//could not load teams for team filters
+				view.setTeamsFilterVisible(false);
+			}
+			@Override
+			public void onSuccess(List<Team> teams) {
+				view.setTeamsFilterVisible(!teams.isEmpty());
+				view.setTeamsFilterTeams(teams);
+			}
+		};
+		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
 	}
 	
 	public void refreshChallenges() {
@@ -315,15 +330,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
+		view.showTeamsLoading();
 		teamNotificationCount = 0;
 		view.clearTeamNotificationCount();
 		if (isOwner)
 			view.refreshTeamInvites();
-		getTeams(currentUserId);
-	}
-	
-	public void getTeams(String userId) {
-		view.showTeamsLoading();
 		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -332,12 +343,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(List<Team> teams) {
 				view.setTeams(teams,isOwner);
-				view.setTeamsFilterVisible(!teams.isEmpty());
 			}
 		};
-		TeamListWidget.getTeams(userId, synapseClient, adapterFactory, teamCallback);
+		
+		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
 	}
-	
 	
 	public void getMoreChallenges() {
 		view.showChallengesLoading(true);
@@ -692,16 +702,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			case PROJECTS:
 				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
 				break;
-			case CHALLENGES:
-				refreshChallenges();
-				break;
 			case TEAMS:
 				refreshTeams();
 				break;
+			case CHALLENGES:
 			case SETTINGS:
 			default:
 				break;
 		}
+		//always refreshes challenges to determine if tab should be shown
+		refreshChallenges();
 	}
 	
 	/**

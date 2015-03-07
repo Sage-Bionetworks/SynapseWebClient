@@ -51,6 +51,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showProjectsLoading(boolean isLoading);
 	void showProjectFiltersUI();
 	void hideLoading();
+	void setTeamsFilterTeams(List<Team> teams);
 	void setTeamsFilterVisible(boolean isVisible);
 	void setTeamsFilterSelected();
 	void setMyProjectsFilterSelected();
