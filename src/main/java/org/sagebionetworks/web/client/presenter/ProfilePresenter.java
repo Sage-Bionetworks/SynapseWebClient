@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
@@ -55,6 +56,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookies;
+	private UserProfileModalWidget userProfileModalWidget;
 	
 	private ProfileFormWidget profileForm;
 	private AdapterFactory adapterFactory;
@@ -76,8 +78,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			ProfileFormWidget profileForm,
 			AdapterFactory adapterFactory,
 			ChallengeClientAsync challengeClient,
-			CookieProvider cookies
-			) {
+			CookieProvider cookies,
+			UserProfileModalWidget userProfileModalWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -86,7 +88,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.profileForm = profileForm;
 		this.challengeClient = challengeClient;
 		this.cookies = cookies;
+		this.userProfileModalWidget = userProfileModalWidget;
 		view.setPresenter(this);
+		view.addUserProfileModalWidget(userProfileModalWidget);
 	}
 
 	@Override
@@ -146,6 +150,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clear();
 		view.showLoading();
 		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
+		view.setProfileEditButtonVisible(isOwner);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
 				@Override
@@ -600,10 +605,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateTeamInvites(List<MembershipInvitationBundle> invites) {
 		if (invites != null && invites.size() > 0) {
 			teamNotificationCount += invites.size();
-			//update team notification count
+			// update team notification count
 			if (teamNotificationCount > 0)
-				view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
-}
+				view.setTeamNotificationCount(Integer
+						.toString(teamNotificationCount));
+		}
 	}
 
 	@Override
@@ -707,6 +713,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 */
 	public ProjectFilterEnum getFilterType() {
 		return filterType;
+	}
+
+	@Override
+	public void onEditProfile() {
+		this.userProfileModalWidget.showEditProfile(this.currentUserId, new Callback() {
+			
+			@Override
+			public void invoke() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 	}
 }
 

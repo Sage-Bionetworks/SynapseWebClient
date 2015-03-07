@@ -52,6 +52,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
@@ -70,6 +71,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel updateUserInfoPanel;
 	@UiField
 	FlowPanel viewProfilePanel;
+	@UiField
+	Button editProfileButton;
+	@UiField
+	SimplePanel editUserProfilePanel;
 	
 	SimplePanel certifiedUserBadgePanel;
 	
@@ -312,6 +317,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.hideProfileButtonClicked();
+			}
+		});
+		editProfileButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onEditProfile();
 			}
 		});
 	}
@@ -818,5 +830,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void hideProfile() {
 		UIObject.setVisible(profileUI, false);
 		dashboardUI.removeClassName("col-md-9");
+	}
+
+	@Override
+	public void setProfileEditButtonVisible(boolean isVisible) {
+		this.editProfileButton.setVisible(isVisible);
+	}
+
+	@Override
+	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
+		this.editUserProfilePanel.add(userProfileModalWidget);
 	}
 }

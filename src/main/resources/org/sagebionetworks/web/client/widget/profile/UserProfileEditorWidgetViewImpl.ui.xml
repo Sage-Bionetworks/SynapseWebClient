@@ -1,0 +1,56 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+	<g:HTMLPanel>
+		<div class="row">
+			<div class="col-sm-12">
+				<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+			</div>
+			<div class="margin-bottom-10 col-sm-12">
+				<g:SimplePanel ui:field="editPicturePanel" />
+			</div>
+			<div class="margin-bottom-20 col-sm-12">
+				<g:SimplePanel ui:field="editPictureButtonPanel" />
+			</div>
+		</div>
+
+		<b:Row>
+			<b:Column size="SM_6">
+				<b:FormGroup ui:field="userNameFormGroup">
+					<b:FormLabel for="username">Username</b:FormLabel>
+					<b:TextBox name="username" ui:field="username" />
+					<b:HelpBlock ui:field="userNameHelpBlock" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+
+		<b:Row>
+			<b:Column size="SM_6">
+				<b:FormGroup>
+					<b:FormLabel for="firstName">First Name</b:FormLabel>
+					<b:TextBox name="firstName" ui:field="firstName"
+						placeholder="Enter first name" />
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="SM_6">
+				<b:FormGroup>
+					<b:FormLabel for="lastName">Last Name</b:FormLabel>
+					<b:TextBox name="lastName" ui:field="lastName"
+						placeholder="Enter last name" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+
+		<b:Row>
+			<b:Column size="SM_12">
+				<b:FormGroup>
+					<b:FormLabel for="bio">Bio</b:FormLabel>
+					<b:TextArea name="bio" ui:field="bio" placeholder="Enter bio"
+						height="150px" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+
+	</g:HTMLPanel>
+
+</ui:UiBinder> 

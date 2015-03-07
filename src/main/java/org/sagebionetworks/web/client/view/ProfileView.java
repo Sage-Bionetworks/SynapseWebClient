@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
@@ -60,6 +61,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void hideProfile();
 	void setShowProfileButtonVisible(boolean isVisible);
 	void setHideProfileButtonVisible(boolean isVisible);
+	void setProfileEditButtonVisible(boolean isVisible);
+	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
@@ -77,5 +80,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void getMoreProjects();
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
+		void onEditProfile();
 	}
 }

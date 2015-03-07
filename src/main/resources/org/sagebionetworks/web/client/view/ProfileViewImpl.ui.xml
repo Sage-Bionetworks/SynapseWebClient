@@ -23,6 +23,8 @@
 						</b:Row>
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
 			        	<g:FlowPanel ui:field="viewProfilePanel" />
+			        	<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO">Edit Profile</b:Button>
+			        	<g:SimplePanel ui:field="editUserProfilePanel"/>
 			        </div>
 			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
 			    </div>

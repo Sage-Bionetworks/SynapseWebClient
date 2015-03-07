@@ -310,6 +310,14 @@ import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalView;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalViewImpl;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
@@ -832,6 +840,11 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ProfileFormView
 		bind(ProfileFormView.class).to(ProfileFormViewImpl.class);		
+		
+		bind(UserProfileEditorWidget.class).to(UserProfileEditorWidgetImpl.class);
+		bind(UserProfileEditorWidgetView.class).to(UserProfileEditorWidgetViewImpl.class);
+		bind(UserProfileModalWidget.class).to(UserProfileModalWidgetImpl.class);
+		bind(UserProfileModalView.class).to(UserProfileModalViewImpl.class);
 
 		// API Table Column manager	
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);

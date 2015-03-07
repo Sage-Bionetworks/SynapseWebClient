@@ -72,6 +72,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -107,6 +109,7 @@ public class ProfilePresenterTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	Profile place = Mockito.mock(Profile.class);
 	CookieProvider mockCookies;
+	UserProfileModalWidget mockUserProfileModalWidget;
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
@@ -128,8 +131,9 @@ public class ProfilePresenterTest {
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockProfileForm = mock(ProfileFormWidget.class);
 		mockCookies = mock(CookieProvider.class);
+		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient, mockCookies);	
+				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
