@@ -65,11 +65,9 @@
 											<b:Button ui:field="myProjectsFilter">Created by me</b:Button>
 											<b:Button ui:field="favoritesFilter" icon="STAR" addStyleNames="favoriteIcon">Favorites</b:Button>
 											<b:Button ui:field="sharedDirectlyWithMeFilter">Shared directly with me</b:Button>
-											<b:ButtonGroup>
-												<b:Button ui:field="teamFilters" dataToggle="DROPDOWN">By Team</b:Button>
-												<b:DropDownMenu ui:field="teamFiltersDropDownMenu">
-												</b:DropDownMenu>
-											</b:ButtonGroup>
+											<b:Button ui:field="teamFilters" dataToggle="DROPDOWN">By Team</b:Button>
+											<b:DropDownMenu ui:field="teamFiltersDropDownMenu">
+											</b:DropDownMenu>
 										</b:ButtonGroup>
 									</b:Column>
 								</b:Row>

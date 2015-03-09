@@ -355,6 +355,19 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testGetSharedDirectlyWithMeProjects() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).showProjectFiltersUI();
+		verify(mockView).setSharedDirectlyWithMeFilterSelected();
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(anyList());
+	}
+	
+	@Test
 	public void testGetFavoritesEmpty() {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");

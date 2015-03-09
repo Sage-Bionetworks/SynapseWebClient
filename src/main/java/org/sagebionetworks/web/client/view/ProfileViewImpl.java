@@ -797,12 +797,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		clearFiltersSelected();
 		teamFilters.setActive(true);
 	}
-	
+	@Override
+	public void setSharedDirectlyWithMeFilterSelected() {
+		clearFiltersSelected();
+		sharedDirectlyWithMeFilter.setActive(true);
+	}
 	private void clearFiltersSelected() {
 		allProjectsFilter.setActive(false);
 		favoritesFilter.setActive(false);
 		myProjectsFilter.setActive(false);
 		teamFilters.setActive(false);
+		sharedDirectlyWithMeFilter.setActive(false);
 	}
 	
 	@Override
