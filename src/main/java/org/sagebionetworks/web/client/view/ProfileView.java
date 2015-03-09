@@ -57,6 +57,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setMyProjectsFilterSelected();
 	void setAllProjectsFilterSelected();
 	void setFavoritesFilterSelected();
+	void setSharedDirectlyWithMeFilterSelected();
 	void setFavoritesHelpPanelVisible(boolean isVisible);
 	void showProfile();
 	void hideProfile();
