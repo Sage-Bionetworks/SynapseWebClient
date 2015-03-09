@@ -306,7 +306,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					getMyProjects(ProjectListType.MY_CREATED_PROJECTS, ProjectFilterEnum.MINE, currentProjectOffset);
 					break;
 				case MY_PARTICIPATED_PROJECTS:
-					view.setTeamsFilterSelected();
+					view.setSharedDirectlyWithMeFilterSelected();
 					getMyProjects(ProjectListType.MY_PARTICIPATED_PROJECTS, ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, currentProjectOffset);
 					break;
 				case MY_TEAM_PROJECTS:
