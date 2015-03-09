@@ -3,26 +3,29 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalBody;
+import org.gwtbootstrap3.client.ui.ModalFooter;
+import org.gwtbootstrap3.client.ui.ModalSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TutorialWizardViewImpl  implements TutorialWizardView {
+public class TutorialWizardViewImpl implements TutorialWizardView {
 	
 	public static final String SKIP_TUTORIAL = "Skip Tutorial";
-	public static final String BACK_TEXT = "< Back";
-	public static final String NEXT_TEXT = "Next >";
+	public static final String BACK_TEXT = "Back";
+	public static final String NEXT_TEXT = "Next";
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 	private List<MarkdownWidget> pageContents;
@@ -41,75 +44,82 @@ public class TutorialWizardViewImpl  implements TutorialWizardView {
 	@Override
 	public void showWizard(String ownerObjectId, List<WikiHeader> headers) {
 		this.wikiHeaders = headers;
-		final Dialog dialog = new Dialog();
-       	dialog.setMaximizable(false);
-        dialog.setPlain(true); 
-        dialog.setModal(true);
-        dialog.setWidth(900);
-        //dialog.setAutoWidth(true);
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
-        dialog.noText = NEXT_TEXT;
-        dialog.yesText = BACK_TEXT;
-        dialog.cancelText = SKIP_TUTORIAL;
-        dialog.setButtons(Dialog.YESNOCANCEL);
-        pageContents = new ArrayList<MarkdownWidget>();
+		final Modal dialog = new Modal();
+		dialog.setSize(ModalSize.LARGE);
+		final ModalBody body = new ModalBody();
+		dialog.add(body);
+		ModalFooter footer = new ModalFooter();
+		final Button nextButton = new Button(NEXT_TEXT);
+		nextButton.setIcon(IconType.CHEVRON_RIGHT);
+		final Button prevButton = new Button(BACK_TEXT);
+		prevButton.setIcon(IconType.CHEVRON_LEFT);
+		final Button cancelButton = new Button(SKIP_TUTORIAL);
+		final Button okButton = new Button("OK");
+		footer.add(prevButton);
+		footer.add(nextButton);
+		footer.add(okButton);
+		footer.add(cancelButton);
+		dialog.add(footer);
+		okButton.setVisible(false);
+		pageContents = new ArrayList<MarkdownWidget>();
         loadAllPageContents(ownerObjectId, headers);
         currentPageIndex = 0;
-        dialog.add(wrap(pageContents.get(currentPageIndex)));
- 		dialog.setHeading(wikiHeaders.get(currentPageIndex).getTitle());
+        body.add(wrap(pageContents.get(currentPageIndex)));
+        
+        dialog.setTitle(wikiHeaders.get(currentPageIndex).getTitle());
+ 		prevButton.setEnabled(false);
  		
-        final com.extjs.gxt.ui.client.widget.button.Button nextButton = dialog.getButtonById(Dialog.NO);
-        final com.extjs.gxt.ui.client.widget.button.Button prevButton = dialog.getButtonById(Dialog.YES);
-        prevButton.setEnabled(false);
-        final com.extjs.gxt.ui.client.widget.button.Button cancelButton = dialog.getButtonById(Dialog.CANCEL);
-        cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+ 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				//if the user cancels, then go straight to the submit entity dialog
 				dialog.hide();
 				presenter.userSkippedTutorial();
 			}
-        });
-        nextButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+		});
+
+ 		okButton.addClickHandler(new ClickHandler() {
+			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-				//hide if we're on the last page
-				if (currentPageIndex == pageContents.size()-1) {
-					dialog.hide();
-					presenter.userFinishedTutorial();
-				} else {
-					//else go to the next page
-					currentPageIndex++;
-					updatePageContents(dialog, currentPageIndex);
-					prevButton.setEnabled(true);
-			 		if (currentPageIndex == pageContents.size()-1) {
-			 			nextButton.setText("OK");
-			 		}
-				}
+			public void onClick(ClickEvent event) {
+				dialog.hide();
+				presenter.userFinishedTutorial();
 			}
-        });
-        prevButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+		});
+ 		
+ 		nextButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-					//go to the prev page
+			public void onClick(ClickEvent event) {
+				//else go to the next page
+				currentPageIndex++;
+				updatePageContents(dialog, body, currentPageIndex);
+				prevButton.setEnabled(true);
+				boolean isLastPage = currentPageIndex == pageContents.size()-1; 
+		 		nextButton.setVisible(!isLastPage);
+		 		okButton.setVisible(isLastPage);
+			}
+		});
+        prevButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to the prev page
 				currentPageIndex--;
-				nextButton.setText(NEXT_TEXT);
-				updatePageContents(dialog, currentPageIndex);
+				nextButton.setVisible(true);
+				okButton.setVisible(false);
+				updatePageContents(dialog, body, currentPageIndex);
 				if (currentPageIndex == 0) {
 		 			prevButton.setEnabled(false);
 		 		}
 			}
-        });
+		});
 
 		dialog.show();	
 	}
 	
-	private void updatePageContents(Dialog dialog, int currentPageIndex) {
-		dialog.removeAll();
-		dialog.add(wrap(pageContents.get(currentPageIndex)));
- 		dialog.setHeading(wikiHeaders.get(currentPageIndex).getTitle());
- 		dialog.layout(true);
+	private void updatePageContents(Modal dialog, ModalBody body, int currentPageIndex) {
+		body.clear();
+		body.add(wrap(pageContents.get(currentPageIndex)));
+ 		dialog.setTitle(wikiHeaders.get(currentPageIndex).getTitle());
 	}
 	
 	public void loadAllPageContents(String ownerObjectId, List<WikiHeader> headers){
