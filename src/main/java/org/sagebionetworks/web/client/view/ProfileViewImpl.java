@@ -5,6 +5,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -38,7 +39,6 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
-import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -415,7 +415,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamFiltersDropDownMenu.clear();
 		//also create a link for each team in the project filters
 		addMyTeamProjectsFilter();
-		teamFiltersDropDownMenu.add(new SeparatorMenuItem());
+		teamFiltersDropDownMenu.add(new Divider());
 		for (final Team team : teams) {
 			AnchorListItem teamFilter = new AnchorListItem(team.getName());
 			teamFilter.addClickHandler(new ClickHandler() {
