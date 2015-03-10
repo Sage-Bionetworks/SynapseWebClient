@@ -74,6 +74,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button editProfileButton;
 	@UiField
+	Button importLinkedIn;
+	@UiField
 	SimplePanel editUserProfilePanel;
 	
 	SimplePanel certifiedUserBadgePanel;
@@ -324,6 +326,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onEditProfile();
+			}
+		});
+		importLinkedIn.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onImportLinkedIn();
 			}
 		});
 	}

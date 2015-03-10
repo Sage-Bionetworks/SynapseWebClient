@@ -727,5 +727,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 		
 	}
+
+	@Override
+	public void onImportLinkedIn() {
+		
+		
+	}
 }
 

@@ -310,6 +310,10 @@ import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.profile.ProfileImageView;
+import org.sagebionetworks.web.client.widget.profile.ProfileImageViewImpl;
+import org.sagebionetworks.web.client.widget.profile.ProfileImageWidget;
+import org.sagebionetworks.web.client.widget.profile.ProfileImageWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
@@ -845,6 +849,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UserProfileEditorWidgetView.class).to(UserProfileEditorWidgetViewImpl.class);
 		bind(UserProfileModalWidget.class).to(UserProfileModalWidgetImpl.class);
 		bind(UserProfileModalView.class).to(UserProfileModalViewImpl.class);
+		bind(ProfileImageView.class).to(ProfileImageViewImpl.class);
+		bind(ProfileImageWidget.class).to(ProfileImageWidgetImpl.class);
 
 		// API Table Column manager	
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);

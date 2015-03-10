@@ -81,5 +81,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
+		void onImportLinkedIn();
 	}
 }

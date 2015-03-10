@@ -12,34 +12,34 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 	
 	private static final String SEE_ERRORS_ABOVE = "See errors above.";
 	UserProfile originalProfile;
-	UserProfileModalView view;
+	UserProfileModalView modalView;
 	UserProfileEditorWidget editorWidget;
 	SynapseClientAsync synapse;
 	Callback callback;
 	
 	@Inject
 	public UserProfileModalWidgetImpl(UserProfileModalView view, UserProfileEditorWidget editorWidget, SynapseClientAsync synapse){
-		this.view = view;
+		this.modalView = view;
 		this.editorWidget = editorWidget;
 		this.synapse = synapse;
-		this.view.setPreseneter(this);
-		this.view.addEditorWidget(editorWidget);
+		this.modalView.setPreseneter(this);
+		this.modalView.addEditorWidget(editorWidget);
 	}
 
 	@Override
 	public Widget asWidget() {
-		return view.asWidget();
+		return modalView.asWidget();
 	}
 
 	@Override
 	public void onSave() {
 		// First validate the view
 		if(!editorWidget.isValid()){
-			view.showError(SEE_ERRORS_ABOVE);
+			modalView.showError(SEE_ERRORS_ABOVE);
 			return;
 		}
-		view.hideError();
-		view.setProcessing(true);
+		modalView.hideError();
+		modalView.setProcessing(true);
 		// Update the profile from the editor
 		originalProfile.setProfilePicureFileHandleId(editorWidget.getImageId());
 		originalProfile.setUserName(editorWidget.getUsername());
@@ -57,14 +57,14 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 			
 			@Override
 			public void onSuccess(Void result) {
-				view.hideModal();
+				modalView.hideModal();
 				callback.invoke();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError(caught.getMessage());
-				view.setProcessing(false);
+				modalView.showError(caught.getMessage());
+				modalView.setProcessing(false);
 			}
 		});
 	}
@@ -72,22 +72,23 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 	@Override
 	public void showEditProfile(String userId, Callback callback) {
 		this.callback = callback;
-		view.showModal();
-		view.setLoading(true);
-		view.hideError();
+		modalView.showModal();
+		modalView.setLoading(true);
+		modalView.setProcessing(false);
+		modalView.hideError();
 		synapse.getUserProfile(userId, new AsyncCallback<UserProfile>() {
 			
 			@Override
 			public void onSuccess(UserProfile profile) {
 				originalProfile = profile;
 				editorWidget.configure(profile);
-				view.setLoading(false);
+				modalView.setLoading(false);
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoading(false);
-				view.showError(caught.getMessage());
+				modalView.setLoading(false);
+				modalView.showError(caught.getMessage());
 			}
 		});
 	}

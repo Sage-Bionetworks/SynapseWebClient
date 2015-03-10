@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.ClientProtocolException;
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -71,7 +72,8 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Now get the signed url
-		SynapseClient client = createNewClient();
+		String sessionToken = UserDataProvider.getThreadLocalUserToken(request);
+		SynapseClient client = createNewClient(sessionToken);
 		String userId = request.getParameter(WebConstants.USER_PROFILE_PARAM_KEY);
 		/*
 		 * We do not need the file ID but adding it to the URL ensures the browser
@@ -84,7 +86,13 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 			if(previewString != null){
 				preview = Boolean.parseBoolean(previewString);
 			}
-			URL url = getUrlWithWait(client, userId, preview);
+			URL url = null;
+			if(userId == null){
+				// Only the creator of the file handle can call this.
+				url = client.getFileHandleTemporaryUrl(fileId);
+			}else{
+				url = getUrlWithWait(client, userId, preview);
+			}
 			// Redirect the user to the url
 			response.sendRedirect(url.toString());
 		} catch (Exception e) {
@@ -163,12 +171,13 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private SynapseClient createNewClient() {
+	private SynapseClient createNewClient(String sessionToken) {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
+		client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		client.setSessionToken(sessionToken);
 		return client;
 	}
-
-
+	
 }

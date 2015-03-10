@@ -166,7 +166,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	 * @param wikiVersionInView TODO
 	 * @param bundle
 	 * @param nodeModelCreator
-	 * @param view
+	 * @param modalView
 	 * @throws JSONObjectAdapterException 
 	 */
 	public static Set<String> loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, 
