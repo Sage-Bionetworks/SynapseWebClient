@@ -144,8 +144,6 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView;
-import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -314,8 +312,6 @@ import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationViewIm
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidgetImpl;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
-import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
-import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
@@ -822,9 +818,6 @@ public class PortalGinModule extends AbstractGinModule {
 		//Single Evaluation link selection
 		bind(EvaluationLinksListView.class).to(EvaluationLinksListViewImpl.class);
 		
-		//My Evaluations
-		bind(MyEvaluationEntitiesListView.class).to(MyEvaluationEntitiesListViewImpl.class);
-		
 		//Administer Evaluations list 
 		bind(AdministerEvaluationsListView.class).to(AdministerEvaluationsListViewImpl.class);
 		
@@ -926,8 +919,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityBadgeView.class).to(EntityBadgeViewImpl.class);
 		
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);
-		
-		bind(CytoscapeWidgetView.class).to(CytoscapeWidgetViewImpl.class);
 		
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
 		
