@@ -324,7 +324,29 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
+		
+		//should have refreshed teams too, since this is the owner
+		verify(mockView).clearTeamNotificationCount();
+		verify(mockView).refreshTeamInvites();
+		verify(mockView).setTeams(anyList(), eq(true));
 	}
+	
+	@Test
+	public void testGetAllTheirProjects() {
+		profilePresenter.setIsOwner(false);
+		//when setting the filter to all, it should ask for all of their projects
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(eq(myProjects));
+		
+		//should have refreshed teams too, since this is the owner
+		verify(mockView, never()).clearTeamNotificationCount();
+		verify(mockView, never()).refreshTeamInvites();
+		verify(mockView, never()).setTeams(anyList(), eq(true));
+	}
+
 	
 	@Test
 	public void testGetProjectsCreatedByMe() {

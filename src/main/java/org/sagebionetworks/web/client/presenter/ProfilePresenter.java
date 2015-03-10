@@ -273,6 +273,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 		};
 		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
+		
+		//also refresh the teams tab if you are the owner (to show notifications)
+		if (isOwner)
+			refreshTeams();
 	}
 	
 	public void refreshChallenges() {
