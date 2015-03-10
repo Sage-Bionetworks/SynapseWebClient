@@ -66,6 +66,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	SimplePanel registerLinkUI;
 	@UiField
+	SimplePanel dashboardButtonUI;
+	@UiField
 	Button registerLink;
 	@UiField
 	SimplePanel loginLinkUI;
@@ -89,6 +91,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SageImageBundle sageImageBundle;
 	boolean showLargeLogo;
 	UserBadge userBadge;
+	Span userBadgeText;
 	HorizontalPanel myDashboardButtonContents;
 	
 	@Inject
@@ -109,7 +112,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		myDashboardButtonContents = new HorizontalPanel();
 		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		myDashboardButtonContents.add(userBadge.asWidget());
-		myDashboardButtonContents.add(new Span("My Dashboard"));
+		userBadgeText = new Span();
+		myDashboardButtonContents.add(userBadgeText);
+		
 		addUserPicturePanel();
 		showLargeLogo = false; // default
 		initClickHandlers();
@@ -256,14 +261,16 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 	if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 	 		userBadge.configure(userData.getProfile());
+	 		userBadgeText.setText(DisplayUtils.getDisplayName(userData.getProfile()));
 			loginLinkUI.setVisible(false);
 			registerLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
+			dashboardButtonUI.setVisible(true);
 		} else {
-			userBadge.configurePicture();
 			loginLinkUI.setVisible(true);
 			registerLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
+			dashboardButtonUI.setVisible(false);
 		}
 	}
 	
