@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -16,7 +15,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
@@ -24,7 +22,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
-import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -32,16 +29,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
-import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -50,13 +37,11 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -65,14 +50,11 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
@@ -85,14 +67,8 @@ import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Header;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePresenterTest {
 	
@@ -102,9 +78,10 @@ public class ProfilePresenterTest {
 	UserAccountServiceAsync mockUserService;
 	SynapseClientAsync mockSynapseClient;
 	ChallengeClientAsync mockChallengeClient;
+	LinkedInServiceAsync mockLinkedInServic;
+	GWTWrapper mockGwt;
 	
 	GlobalApplicationState mockGlobalApplicationState;
-	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	Profile place = Mockito.mock(Profile.class);
@@ -129,11 +106,12 @@ public class ProfilePresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
-		mockProfileForm = mock(ProfileFormWidget.class);
 		mockCookies = mock(CookieProvider.class);
+		mockLinkedInServic = mock(LinkedInServiceAsync.class);
+		mockGwt = mock(GWTWrapper.class);
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget);	
+				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic,mockGwt);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
@@ -231,13 +209,19 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testRedirectToLinkedIn() {
+		profilePresenter.redirectToLinkedIn();
+		verify(mockLinkedInServic).returnAuthUrl(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testUpdateProfileWithLinkedIn() {
-		profilePresenter.setPlace(place);
+		String secret = "secret";
+		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn(secret);
 		String requestToken = "token";
 		String verifier = "12345";
 		profilePresenter.updateProfileWithLinkedIn(requestToken, verifier);
-		//pass-through
-		verify(mockProfileForm).updateProfileWithLinkedIn(eq(requestToken), eq(verifier));
+		verify(mockLinkedInServic).getCurrentUserInfo(eq(requestToken), eq(secret), eq(verifier), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -295,7 +279,6 @@ public class ProfilePresenterTest {
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
 		
 		//by default, it should load ALL projects for the current user
@@ -309,8 +292,6 @@ public class ProfilePresenterTest {
 
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.TEAMS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.TEAMS));
 	}
 	
@@ -762,7 +743,6 @@ public class ProfilePresenterTest {
 		
 		//click yes
 		yesCallback.getValue().invoke();
-		verify(mockProfileForm).rollback();
 		verify(mockView).setTabSelected(any(ProfileArea.class));
 	}
 	

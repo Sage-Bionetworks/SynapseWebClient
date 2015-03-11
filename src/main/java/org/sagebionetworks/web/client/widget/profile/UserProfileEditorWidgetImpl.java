@@ -11,9 +11,12 @@ import com.google.inject.Inject;
 
 public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
 	
-	private static final String PLEASE_SELECT_A_FILE = "Please select a file";
-	private static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
-	private static final String MUST_BE_AT_LEAST_3_CHARACTERS = "Must be at least 3 characters";
+	public static final String PLEASE_ENTER_A_VALID_URL = "Please enter a valid URL";
+	public static final String FILE_WAS_SELECTED_BUT_NOT_UPLOADED = "File was selected but not uploaded.";
+	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
+	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
+	public static final String MUST_BE_AT_LEAST_3_CHARACTERS = "Must be at least 3 characters";
+	
 	UserProfileEditorWidgetView view;
 	ProfileImageWidget imageWidget;
 	FileInputWidget fileInputWidget;
@@ -38,10 +41,17 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	@Override
 	public void configure(UserProfile profile) {
 		view.hideUsernameError();
+		view.hideLinkError();
+		view.hideUploadError();
 		view.setUsername(profile.getUserName());
 		view.setFirstName(profile.getFirstName());
 		view.setLastName(profile.getLastName());
+		view.setCurrentPosition(profile.getPosition());
+		view.setCurrentAffiliation(profile.getCompany());
 		view.setBio(profile.getSummary());
+		view.setIndustry(profile.getIndustry());
+		view.setLocation(profile.getLocation());
+		view.setLink(profile.getUrl());
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
 		imageWidget.configure(this.fileHandleId);
 	}
@@ -50,7 +60,9 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	public boolean isValid() {
 		view.hideUploadError();
 		view.hideUsernameError();
+		view.hideLinkError();
 		boolean valid = true;
+		// username
 		String username = view.getUsername();
 		if (username != null && !LoginPresenter.isValidUsername(username)) {
 			valid = false;
@@ -58,6 +70,19 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 				view.showUsernameError(MUST_BE_AT_LEAST_3_CHARACTERS);
 			}else{
 				view.showUsernameError(CAN_ONLY_INCLUDE);
+			}
+		}
+		// file
+		if(isFileSelected()){
+			valid = false;
+			view.showUploadError(FILE_WAS_SELECTED_BUT_NOT_UPLOADED);
+		}
+		// link
+		String link = view.getLink();
+		if(link != null && !"".equals(link.trim())){
+			if(!LoginPresenter.isValidUrl(link, true)){
+				valid = false;
+				view.showLinkError(PLEASE_ENTER_A_VALID_URL);
 			}
 		}
 		return valid;
@@ -85,32 +110,27 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 
 	@Override
 	public String getPosition() {
-		// TODO Auto-generated method stub
-		return null;
+		return view.getCurrentPosition();
 	}
 
 	@Override
 	public String getCompany() {
-		// TODO Auto-generated method stub
-		return null;
+		return view.getCurrentAffiliation();
 	}
 
 	@Override
 	public String getIndustry() {
-		// TODO Auto-generated method stub
-		return null;
+		return view.getIndustry();
 	}
 
 	@Override
 	public String getLocation() {
-		// TODO Auto-generated method stub
-		return null;
+		return view.getLocation();
 	}
 
 	@Override
 	public String getUrl() {
-		// TODO Auto-generated method stub
-		return null;
+		return view.getLink();
 	}
 
 	@Override
@@ -121,8 +141,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	@Override
 	public void onUploadFile() {
 		view.hideUploadError();
-		FileMetadata[] selectedFiles = this.fileInputWidget.getSelectedFileMetadata();
-		if(selectedFiles == null || selectedFiles.length < 1){
+		if(!isFileSelected()){
 			view.showUploadError(PLEASE_SELECT_A_FILE);
 			return;
 		}
@@ -148,6 +167,11 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	private void setNewFileHandle(String fileHandleId) {
 		this.fileHandleId = fileHandleId;
 		this.imageWidget.configure(this.fileHandleId);
+	}
+	
+	private boolean isFileSelected(){
+		FileMetadata[] selectedFiles = this.fileInputWidget.getSelectedFileMetadata();
+		return !(selectedFiles == null || selectedFiles.length < 1);
 	}
 
 }

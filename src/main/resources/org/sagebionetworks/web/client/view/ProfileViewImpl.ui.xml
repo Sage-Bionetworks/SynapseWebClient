@@ -135,15 +135,6 @@
 						</div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer">
 					        <g:FlowPanel ui:field="settingsTabContent" />
-					        <div class="">
-						        <div class="highlight-box margin-top-0" highlight-box-title="Profile">
-						            <div class="row">
-										<div class="margin-bottom-20 col-sm-12">
-											<g:SimplePanel ui:field="updateUserInfoPanel" />
-										</div>
-									</div>    
-						        </div>    
-					        </div>
 					    </div>
 					</div>
 				</div>

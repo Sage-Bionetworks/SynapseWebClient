@@ -57,8 +57,6 @@ import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
 import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
-import org.sagebionetworks.web.client.view.ProfileFormView;
-import org.sagebionetworks.web.client.view.ProfileFormViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
@@ -841,10 +839,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntityMetadata
 		bind(EntityMetadataViewImpl.class).in(Singleton.class);
 		bind(EntityMetadataView.class).to(EntityMetadataViewImpl.class);
-		
-		// ProfileFormView
-		bind(ProfileFormView.class).to(ProfileFormViewImpl.class);		
-		
+				
 		bind(UserProfileEditorWidget.class).to(UserProfileEditorWidgetImpl.class);
 		bind(UserProfileEditorWidgetView.class).to(UserProfileEditorWidgetViewImpl.class);
 		bind(UserProfileModalWidget.class).to(UserProfileModalWidgetImpl.class);

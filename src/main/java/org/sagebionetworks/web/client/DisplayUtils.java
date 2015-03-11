@@ -1267,7 +1267,7 @@ public class DisplayUtils {
 	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String fileHandleId, boolean preview){
 		StringBuilder builder = new StringBuilder();
 		builder.append(baseURl);
-		builder.append("?"+WebConstants.USER_PROFILE_PARAM_KEY+"=");
+		builder.append("?"+WebConstants.USER_PROFILE_USER_ID+"=");
 		builder.append(userId);
 		builder.append("&"+WebConstants.USER_PROFILE_IMIAGE_ID+"=");
 		builder.append(fileHandleId);

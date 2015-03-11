@@ -68,8 +68,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel updateUserInfoPanel;
-	@UiField
 	FlowPanel viewProfilePanel;
 	@UiField
 	Button editProfileButton;
@@ -380,7 +378,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord) {
 		clear();
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
@@ -399,8 +397,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
-			
-			initEditProfileUI(profile, profileFormWidget);
 		} else {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}
@@ -424,10 +420,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
 		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
 		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
-	}
-	
-	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
-		updateUserInfoPanel.add(profileFormWidget);
 	}
 	
 	@Override
@@ -675,7 +667,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void clear() {
-		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
@@ -844,10 +835,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setProfileEditButtonVisible(boolean isVisible) {
 		this.editProfileButton.setVisible(isVisible);
+		this.importLinkedIn.setVisible(isVisible);
 	}
 
 	@Override
 	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
+		this.editUserProfilePanel.clear();
 		this.editUserProfilePanel.add(userProfileModalWidget);
 	}
 }

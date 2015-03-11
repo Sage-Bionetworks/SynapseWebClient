@@ -43,4 +43,28 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 
 	void setUploading(boolean uplaoding);
 
+	String getLink();
+
+	void showLinkError(String string);
+
+	void hideLinkError();
+
+	String getCurrentPosition();
+
+	void setCurrentPosition(String position);
+
+	void setCurrentAffiliation(String company);
+
+	String getCurrentAffiliation();
+
+	void setIndustry(String industry);
+
+	String getIndustry();
+
+	void setLocation(String location);
+
+	String getLocation();
+
+	void setLink(String url);
+
 }

@@ -25,7 +25,7 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	@Override
 	public void configure(String userId, String fileHandleId) {
 		if(fileHandleId != null){
-			String url = buildUrl(userId, fileHandleId, false);
+			String url = buildUrl(userId, fileHandleId, true, true);
 			view.setImageUrl(url);
 		}else{
 			view.showDefault();
@@ -35,24 +35,24 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	@Override
 	public void configure(String fileHandleId) {
 		if(fileHandleId != null){
-			String url = buildUrl(null, fileHandleId, false);
+			String url = buildUrl(null, fileHandleId, false, false);
 			view.setImageUrl(url);
 		}else{
 			view.showDefault();
 		}
 	}
 	
-	private String buildUrl(String userId, String fileHandleId, boolean preview){
+	private String buildUrl(String userId, String fileHandleId, boolean preview, boolean applied){
 		StringBuilder builder = new StringBuilder();
 		builder.append(baseUrl);
 		builder.append("?"+WebConstants.USER_PROFILE_IMIAGE_ID+"=");
 		builder.append(fileHandleId);
-		if(userId != null){
-			builder.append("&"+WebConstants.USER_PROFILE_PARAM_KEY+"=");
-			builder.append(userId);
-		}
+		builder.append("&"+WebConstants.USER_PROFILE_USER_ID+"=");
+		builder.append(userId);
 		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
 		builder.append(preview);
+		builder.append("&"+WebConstants.USER_PROFILE_APPLIED+"=");
+		builder.append(applied);
 		return builder.toString();
 	}
 

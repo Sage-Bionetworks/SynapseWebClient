@@ -116,11 +116,13 @@ public class WebConstants {
 
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 
-	public static final String USER_PROFILE_PARAM_KEY = "userId";
+	public static final String USER_PROFILE_USER_ID = "userId";
 	
 	public static final String USER_PROFILE_IMIAGE_ID = "imageId";
 	
 	public static final String USER_PROFILE_PREVIEW = "preview";
+	
+	public static final String USER_PROFILE_APPLIED = "applied";
 
 	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
 

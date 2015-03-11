@@ -30,7 +30,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
+	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord);
 	void refreshHeader();
 	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);

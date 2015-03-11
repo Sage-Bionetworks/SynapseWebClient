@@ -59,6 +59,49 @@
 		</b:Row>
 
 		<b:Row>
+			<b:Column size="SM_6">
+				<b:FormGroup>
+					<b:FormLabel for="currentPosition">Current position</b:FormLabel>
+					<b:TextBox name="currentPosition" ui:field="currentPosition"
+						placeholder="Enter current position" />
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="SM_6">
+				<b:FormGroup>
+					<b:FormLabel for="currentAffiliation">Current affiliation</b:FormLabel>
+					<b:TextBox name="currentAffiliation" ui:field="currentAffiliation"
+						placeholder="Enter current affiliation" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+		<b:Row>
+			<b:Column size="SM_6">
+				<b:FormGroup>
+					<b:FormLabel for="industry">Industry/Discipline</b:FormLabel>
+					<b:TextBox name="industry" ui:field="industry"
+						placeholder="Enter industry/discipline" />
+				</b:FormGroup>
+			</b:Column>
+			<b:Column size="SM_6">
+				<b:FormGroup>
+					<b:FormLabel for="location">City, Country</b:FormLabel>
+					<b:TextBox name="location" ui:field="location"
+						placeholder="Enter City, Country" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+
+		<b:Row>
+			<b:Column size="SM_6">
+				<b:FormGroup ui:field="linkFormGroup">
+					<b:FormLabel for="link">Link to more info</b:FormLabel>
+					<b:TextBox name="link" ui:field="link" placeholder="Enter link to more info" />
+					<b:HelpBlock ui:field="linkHelpBlock" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+
+		<b:Row>
 			<b:Column size="SM_12">
 				<b:FormGroup>
 					<b:FormLabel for="bio">Bio</b:FormLabel>

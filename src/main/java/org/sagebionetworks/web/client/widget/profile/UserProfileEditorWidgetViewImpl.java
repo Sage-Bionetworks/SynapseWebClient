@@ -33,14 +33,27 @@ public class UserProfileEditorWidgetViewImpl implements
 	@UiField
 	FormGroup usernameFormGroup;
 	@UiField
-	HelpBlock usernameHelpBlock;
-	
+	HelpBlock usernameHelpBlock;	
 	@UiField
 	TextBox username;
 	@UiField
 	TextBox firstName;
 	@UiField
 	TextBox lastName;
+	@UiField
+	TextBox currentPosition;
+	@UiField
+	TextBox currentAffiliation;
+	@UiField
+	TextBox industry;
+	@UiField
+	TextBox location;
+	@UiField
+	FormGroup linkFormGroup;
+	@UiField
+	TextBox link;
+	@UiField
+	HelpBlock linkHelpBlock;
 	@UiField
 	TextArea bio;
 	
@@ -146,6 +159,68 @@ public class UserProfileEditorWidgetViewImpl implements
 		}else{
 			uploadFileButton.state().reset(); 
 		}
+	}
+
+	@Override
+	public String getLink() {
+		return link.getText();
+	}
+
+	@Override
+	public void showLinkError(String string) {
+		linkFormGroup.setValidationState(ValidationState.ERROR);
+		linkHelpBlock.setText(string);
+	}
+
+	@Override
+	public void hideLinkError() {
+		linkFormGroup.setValidationState(ValidationState.NONE);
+		linkHelpBlock.setText("");
+	}
+
+	@Override
+	public String getCurrentPosition() {
+		return currentPosition.getText();
+	}
+
+	@Override
+	public void setCurrentPosition(String position) {
+		currentPosition.setText(position);
+	}
+
+	@Override
+	public void setCurrentAffiliation(String company) {
+		currentAffiliation.setText(company);
+	}
+
+	@Override
+	public String getCurrentAffiliation() {
+		return currentAffiliation.getText();
+	}
+
+	@Override
+	public void setIndustry(String industry) {
+		this.industry.setText(industry);
+	}
+
+	@Override
+	public String getIndustry() {
+		return this.industry.getText();
+	}
+
+	@Override
+	public void setLocation(String location) {
+		this.location.setText(location);
+	}
+
+	@Override
+	public String getLocation() {
+		return this.location.getText();
+	}
+
+	@Override
+	public void setLink(String url) {
+		this.link.setText(url);
 	}
 
 }
