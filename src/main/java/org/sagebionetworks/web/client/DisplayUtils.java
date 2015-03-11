@@ -25,10 +25,19 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalBody;
+import org.gwtbootstrap3.client.ui.ModalFooter;
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -99,21 +108,13 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
@@ -440,14 +441,6 @@ public class DisplayUtils {
 	/*
 	 * Button Saving 
 	 */
-	public static void changeButtonToSaving(Button button, SageImageBundle sageImageBundle) {
-		button.setText(DisplayConstants.BUTTON_SAVING);
-		button.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
-	}
-	
-	/*
-	 * Button Saving 
-	 */
 	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button) {
 		button.addStyleName("disabled");
 		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
@@ -456,7 +449,7 @@ public class DisplayUtils {
 	/*
 	 * Button Saving 
 	 */
-	public static void changeButtonToSaving(org.gwtbootstrap3.client.ui.Button button) {
+	public static void changeButtonToSaving(Button button) {
 		button.setEnabled(false);
 		button.setText(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "...").asString());
 	}
@@ -505,15 +498,12 @@ public class DisplayUtils {
 	}	
 		
 	/**
-	 * Returns a ContentPanel used to show a component is loading in the view
+	 * Returns a panel used to show a component is loading in the view
 	 * @param sageImageBundle
 	 * @return
 	 */
-	public static ContentPanel getLoadingWidget(SageImageBundle sageImageBundle) {
-		ContentPanel cp = new ContentPanel();
-		cp.setHeaderVisible(false);
-		cp.setCollapsible(true);
-		cp.setLayout(new CenterLayout());								
+	public static Div getLoadingWidget(SageImageBundle sageImageBundle) {
+		Div cp = new Div();
 		cp.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()))));		
 		return cp;
 	}
@@ -581,20 +571,23 @@ public class DisplayUtils {
 			showErrorMessage(t.getMessage());
 			return;
 		}
-		final Dialog d = new Dialog();
+		final Modal d = new Modal();
 		d.addStyleName("padding-5");
 
 		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
-		HTML errorContent = new HTML(
-				getIcon("glyphicon-exclamation-sign margin-right-10 font-size-22 alert-danger")
-				+ errorMessage);
-		FlowPanel dialogContent = new FlowPanel();
+		Icon errorIcon = new Icon(IconType.EXCLAMATION_CIRCLE);
+		errorIcon.setSize(org.gwtbootstrap3.client.ui.constants.IconSize.TIMES3);
+		errorIcon.setPull(Pull.LEFT);
+		errorIcon.addStyleName("margin-right-10");
+		HTML errorContent = new HTML(errorMessage);
+		ModalBody dialogContent = new ModalBody();
 		dialogContent.addStyleName("margin-10");
+		dialogContent.add(errorIcon);
 		dialogContent.add(errorContent);
 
 		// create text area for steps
 		FlowPanel formGroup = new FlowPanel();
-		formGroup.addStyleName("form-group margin-top-10");
+		formGroup.addStyleName("form-group margin-top-30");
 		formGroup.add(new HTML("<label>Describe the problem (optional)</label>"));
 		final TextArea textArea = new TextArea();
 		textArea.addStyleName("form-control");
@@ -602,30 +595,18 @@ public class DisplayUtils {
 		textArea.getElement().setAttribute("rows", "4");
 		formGroup.add(textArea);
 		dialogContent.add(formGroup);
-
 		d.add(dialogContent);
-
-		d.setAutoHeight(true);
-		d.setHideOnButtonClick(true);
-		d.setWidth(400);
-		d.setPlain(true);
-		d.setModal(true);
-		d.setLayout(new FitLayout());
-		d.setButtonAlign(HorizontalAlignment.RIGHT);
-		d.setHeading("Synapse Error");
-		d.yesText = DisplayConstants.SEND_BUG_REPORT;
-		d.noText = DisplayConstants.DO_NOT_SEND_BUG_REPORT;
-		d.setButtons(Dialog.YESNO);
-		com.extjs.gxt.ui.client.widget.button.Button yesButton = d.getButtonById(Dialog.YES);
-		yesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		d.setSize(ModalSize.LARGE);
+		d.setTitle("Synapse Error");
+		Button sendBugButton = new Button(DisplayConstants.SEND_BUG_REPORT, new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				jiraHelper.createIssueOnBackend(textArea.getValue(), t,
 						errorMessage, new AsyncCallback<Void>() {
 							@Override
 							public void onSuccess(Void result) {
+								d.hide();
 								showInfo("Report sent", "Thank you!");
-
 							}
 
 							@Override
@@ -638,6 +619,18 @@ public class DisplayUtils {
 						});
 			}
 		});
+		sendBugButton.setType(org.gwtbootstrap3.client.ui.constants.ButtonType.PRIMARY);
+		Button doNotSendBugButton = new Button(DisplayConstants.DO_NOT_SEND_BUG_REPORT, new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				d.hide();
+			}
+		});
+		ModalFooter footer = new ModalFooter();
+		footer.add(doNotSendBugButton);
+		footer.add(sendBugButton);
+		d.add(footer);;
 		d.show();
 	}
 	
