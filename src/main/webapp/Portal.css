@@ -598,6 +598,9 @@ a.shortBtn {
 	margin-top: 10px;
 	margin-left: 10px;
 }
+.margin-left-1 {
+	margin-left: 1px;
+}
 .margin-left-9 {
 	margin-left: 9px;
 }
@@ -614,9 +617,17 @@ a.shortBtn {
 .margin-left-2 {
 	margin-left: 2px;
 }
+.margin-left-3 {
+	margin-left: 3px;
+}
+
 .margin-left-5 {
 	margin-left: 5px;
 }
+.margin-top-3 {
+	margin-top: 3px;
+}
+
 .margin-top-5 {
 	margin-top: 5px !important;
 }
@@ -628,7 +639,9 @@ a.shortBtn {
 .margin-top-0, .margin-top-0-radio input[type=radio], .margin-top-0-checkbox input[type=checkbox] {
 	margin-top: 0px !important;
 }
-
+.margin-top-1 {
+	margin-top: 1px;
+}
 .margin-top-10 {
 	margin-top: 10px;
 }
@@ -689,6 +702,9 @@ a.shortBtn {
 
 .margin-bottom-4 {
 	margin-bottom: 4px;
+}
+.margin-bottom-1 {
+	margin-bottom: 1px;
 }
 
 .margin-bottom-15 {
@@ -1793,6 +1809,10 @@ a.projectTitle:hover {
 .updateTeamIconLink {
 	padding: 0px 0px 10px 0px;
 	font-size: 12px;
+}
+
+.position-relative {
+	position: relative;
 }
 
 .dropText-10 {
