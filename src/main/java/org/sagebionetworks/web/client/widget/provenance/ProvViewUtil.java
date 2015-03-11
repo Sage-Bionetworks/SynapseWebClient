@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.IconSize;
@@ -18,11 +21,7 @@ import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
-import com.extjs.gxt.ui.client.Style.AnchorPosition;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.LayoutData;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
@@ -31,6 +30,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -49,24 +49,23 @@ public class ProvViewUtil {
 	private static final int MAX_TOOL_TIP_VALUE_CHAR = 300;	 	
 	private static final int MAX_ACT_CODE_NAME_CHAR = 30;
 	private static final int MAX_DISPLAY_NAME_CHAR = 13;
-	private static MarginData ACT_MARGIN_USER = new MarginData(0, 0, 1, 10);
-	private static MarginData ACT_MARGIN_TIME = new MarginData(0, 0, 3, 10);
-	private static final MarginData ACT_MARGIN_NAME = new MarginData(5, 4, 8, 10);
-		
+	private static String ACT_MARGIN_USER = "margin-bottom-1 margin-left-10";
+	private static String ACT_MARGIN_TIME = "margin-bottom-3 margin-left-10";
+	private static final String ACT_MARGIN_NAME = "margin-top-5 margin-right-4 margin-bottom-10 margin-left-10";
+	
 	public static ProvNodeContainer createActivityContainer(ActivityGraphNode node, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		ProvNodeContainer container = new ProvNodeContainer();
-		container.setAutoHeight(true);
-		container.setAutoWidth(true);
-		container.setId(node.getId());
-		container.setStyleName(PROV_ACTIVITY_NODE_STYLE);
-		LayoutContainer label = new LayoutContainer();
-		label.setStyleName(PROV_ACTIVITY_LABEL_STYLE);
+		container.getElement().setId(node.getId());
+		container.addStyleName(PROV_ACTIVITY_NODE_STYLE);
+		FlowPanel label = new FlowPanel();
+		label.addStyleName(PROV_ACTIVITY_LABEL_STYLE);
 
 		
 		if(node.getType() == ActivityType.UNDEFINED) {		
 			container.addStyleName(PROV_ACTIVITY_UNDEFINED_STYLE);						
 			label.add(new HTML(DisplayConstants.UNDEFINED));
-			container.add(label, ACT_MARGIN_NAME);
+			label.addStyleName(ACT_MARGIN_NAME);
+			container.add(label);
 		} else {
 			// display user profile and name if defined
 			if(node.getActivityName() != null) {				
@@ -78,10 +77,14 @@ public class ProvViewUtil {
 			HTML time = new HTML(DisplayUtils.converDataToPrettyString(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);
 
-			LayoutContainer content = new LayoutContainer();
-			content.add(label, ACT_MARGIN_NAME);
-			content.add(badge.asWidget(), ACT_MARGIN_USER);
-			content.add(time, ACT_MARGIN_TIME);
+			FlowPanel content = new FlowPanel();
+			label.addStyleName(ACT_MARGIN_NAME);
+			content.add(label);
+			Widget userBadgeWidget = badge.asWidget();
+			userBadgeWidget.addStyleName(ACT_MARGIN_USER);
+			content.add(userBadgeWidget);
+			time.addStyleName(ACT_MARGIN_TIME);
+			content.add(time);
 			container.addContent(content);
 		}
 		
@@ -114,10 +117,9 @@ public class ProvViewUtil {
 		});
 		
 		ProvNodeContainer container = new ProvNodeContainer();
-		container.setId(node.getId());
+		container.getElement().setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE + " " + PROV_EXPAND_NODE_STYLE);
 		container.add(link);
-		container.layout();
 		setPosition(node, container);
 		return container;
 	}	
@@ -147,10 +149,9 @@ public class ProvViewUtil {
 		link.setHTML(builder.toSafeHtml());
 
 		ProvNodeContainer container = new ProvNodeContainer();
-		if(node.getId() != null) container.setId(node.getId());
+		if(node.getId() != null) container.getElement().setId(node.getId());
 		container.setStyleName(PROV_ENTTITY_NODE_STYLE);
 		container.addContent(link);
-		container.layout();
 		setPosition(node, container);
 		return container;
 	}
@@ -159,9 +160,9 @@ public class ProvViewUtil {
 	/*
 	 * Private utils
 	 */
-	private static void setPosition(ProvGraphNode node, LayoutContainer container) {
-		container.setStyleAttribute("top", node.getyPos() + "px");
-		container.setStyleAttribute("left", node.getxPos() + "px");
+	private static void setPosition(ProvGraphNode node, FlowPanel container) {
+		container.getElement().getStyle().setTop(node.getyPos(), Unit.PX);
+		container.getElement().getStyle().setLeft(node.getxPos(), Unit.PX);
 	}
 	
 	private static ProvNodeContainer createEntityContainer(String id, String entityId, String name, String versionLabel, Long versionNumber, String entityType, IconsImageBundle iconsImageBundle) {
@@ -203,10 +204,9 @@ public class ProvViewUtil {
 		link.setHTML(builder.toSafeHtml());
 
 		ProvNodeContainer node = new ProvNodeContainer();
-		if(id != null) node.setId(id);
+		if(id != null) node.getElement().setId(id);
 		node.setStyleName(PROV_ENTTITY_NODE_STYLE);
 		node.addContent(link);
-		node.layout();
 		return node;
 	}
 
@@ -226,30 +226,23 @@ public class ProvViewUtil {
 					.appendHtmlConstant("<br/>");
 				}
 			}
-		}		
+		}
 		return sb.toSafeHtml();
 	}
 
-	public static ToolTipConfig createTooltipConfig(String title, String text) {
-		ToolTipConfig config = new ToolTipConfig();
-	    config.setTitle(title);
-	    config.setText(text);
-	    config.setMouseOffset(new int[] {0,0});
-	    config.setAnchor(AnchorPosition.RIGHT.toString());	   
-	    config.setShowDelay(200);
-	    config.setDismissDelay(10000);	    
-		return config;
-	}
-
-	public static ToolTipConfig createMessageConfig(String title, String text) {
-		ToolTipConfig config = new ToolTipConfig();
-	    config.setTitle(title);
-	    config.setText(text);
-	    config.setAnchor(AnchorPosition.BOTTOM.toString());	    	    
-	    config.setDismissDelay(0);
-	    config.setShowDelay(200);
-	    config.setCloseable(true);
-		return config;
+	/**
+	 * Create a closable popover
+	 * @param title
+	 * @param text
+	 * @param widget
+	 */
+	public static void createMessageConfig(String title, String text, Widget widget) {
+		Tooltip tip = new Tooltip(widget);
+		tip.setIsHtml(true);
+		tip.setTitle(title);
+		tip.setText(text);
+		tip.setPlacement(Placement.BOTTOM);
+		tip.setShowDelayMs(200);
 	}
 
 }
