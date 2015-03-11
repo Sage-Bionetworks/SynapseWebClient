@@ -5,10 +5,10 @@
 	<g:HTMLPanel>
 
 		<b:Row>
-			<b:Column size="XS_4" offset="XS_1">
+			<b:Column size="XS_3" offset="XS_1">
 				<g:SimplePanel ui:field="imagePanel" />
 			</b:Column>
-			<b:Column size="XS_7">
+			<b:Column size="XS_8">
 				<b:Row>
 					<b:Column size="XS_8">
 						<bh:Strong>Profile Image</bh:Strong>

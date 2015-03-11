@@ -22,9 +22,9 @@ import com.google.inject.Inject;
 public class UserProfileAttachmentServlet extends HttpServlet {
 
 	/**
-	 * 10 seconds divided by 3.
+	 * 10 seconds.
 	 */
-	private static final int WAIT_FOR_PRVIEW_MS = 3333;
+	private static final int WAIT_FOR_PRVIEW_MS = 10000;
 
 	private static final long serialVersionUID = 1L;
 

@@ -28,7 +28,7 @@
 			        			<b:Button ui:field="importLinkedIn" icon="LINKEDIN_SQUARE">Import from LinkedIn</b:Button>
 			        		</b:Column>
 			        		<b:Column size="XS_6">
-			        			<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO">Edit Profile</b:Button>
+			        			<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO" pull="RIGHT" >Edit Profile</b:Button>
 			        		</b:Column>
 			        	</b:Row>
 			        	<g:SimplePanel ui:field="editUserProfilePanel"/>

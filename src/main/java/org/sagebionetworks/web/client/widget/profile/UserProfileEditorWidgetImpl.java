@@ -64,7 +64,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		boolean valid = true;
 		// username
 		String username = view.getUsername();
-		if (username != null && !LoginPresenter.isValidUsername(username)) {
+		if (!LoginPresenter.isValidUsername(username)) {
 			valid = false;
 			if(username.length() < 3){
 				view.showUsernameError(MUST_BE_AT_LEAST_3_CHARACTERS);
