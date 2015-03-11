@@ -1255,18 +1255,6 @@ public class DisplayUtils {
 		return string;
 	}
 	
-	/**
-	 * Create the url to an attachment image.
-	 * @param baseURl
-	 * @param entityId
-	 * @param tokenId
-	 * @param fileName
-	 * @return
-	 */
-	public static String createAttachmentUrl(String baseURl, String entityId, String tokenId, String fileName){
-		return createAttachmentUrl(baseURl, entityId, tokenId, fileName, WebConstants.ENTITY_PARAM_KEY);
-	}
-	
 
 	/**
 	 * Create the url to a profile attachment image.
@@ -1276,30 +1264,15 @@ public class DisplayUtils {
 	 * @param fileName
 	 * @return
 	 */
-	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
-		return createAttachmentUrl(baseURl, userId, tokenId, fileName, WebConstants.USER_PROFILE_PARAM_KEY);
-	}
-
-	public static String createUserProfilePicUrl(String baseURl, String userId){
-		return createAttachmentUrl(baseURl, userId, "", null, WebConstants.USER_PROFILE_PARAM_KEY);
-	}
-
-	/**
-	 * Create the url to an attachment image.
-	 * @param baseURl
-	 * @param id
-	 * @param tokenId
-	 * @param fileName
-	 * @return
-	 */
-	public static String createAttachmentUrl(String baseURl, String id, String tokenId, String fileName, String paramKey){
+	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String fileHandleId, boolean preview){
 		StringBuilder builder = new StringBuilder();
 		builder.append(baseURl);
-		builder.append("?"+paramKey+"=");
-		builder.append(id);
-		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
-		builder.append(tokenId);
-		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
+		builder.append("?"+WebConstants.USER_PROFILE_USER_ID+"=");
+		builder.append(userId);
+		builder.append("&"+WebConstants.USER_PROFILE_IMIAGE_ID+"=");
+		builder.append(fileHandleId);
+		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
+		builder.append(preview);
 		return builder.toString();
 	}
 	

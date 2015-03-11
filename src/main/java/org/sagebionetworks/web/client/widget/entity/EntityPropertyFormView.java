@@ -13,7 +13,6 @@ public interface EntityPropertyFormView extends SynapseView, IsWidget {
 	public void hideLoading();
 	public void showEditEntityDialog(final String windowTitle);
 	public boolean isComponentVisible();
-	public String getMarkdownDescription();
 	
 	/**
 	 * Presenter interface

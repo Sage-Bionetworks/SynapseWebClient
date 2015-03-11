@@ -47,7 +47,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, DialogCallback dialogCallback) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -59,10 +59,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			if (isWiki)
-				presenter = ginInjector.getImageConfigEditor();
-			else
-				presenter = ginInjector.getOldImageConfigEditor();
+			presenter = ginInjector.getImageConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.TABBED_TABLE_CONTENT_TYPE)) {
@@ -105,7 +102,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, Callback widgetRefreshRequired, Long wikiVersionInView) { 
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -117,10 +114,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
-			if (isWiki)
-				presenter = ginInjector.getImageRenderer();
-			else
-				presenter = ginInjector.getOldImageRenderer();
+			presenter = ginInjector.getImageRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.API_TABLE_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.QUERY_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseAPICallRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.TOC_CONTENT_TYPE)) {

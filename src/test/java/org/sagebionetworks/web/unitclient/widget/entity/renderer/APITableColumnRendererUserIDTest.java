@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static junit.framework.Assert.*;
-
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
@@ -15,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -30,7 +30,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class APITableColumnRendererUserIDTest {
 		
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockJsniUtils;
 	APITableColumnRendererUserId renderer;
 	Map<String, List<String>> columnData;
@@ -44,21 +43,18 @@ public class APITableColumnRendererUserIDTest {
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockJsniUtils = mock(SynapseJSNIUtils.class);
 		
-		UserGroupHeaderResponsePage responsePage = new UserGroupHeaderResponsePage();
-		List<UserGroupHeader> userGroupHeaders = new ArrayList<UserGroupHeader>();
-		UserGroupHeader ugh = new UserGroupHeader();
-		ugh.setOwnerId(inputValue);
-		ugh.setFirstName(firstName);
-		ugh.setLastName(lastName);
-		userGroupHeaders.add(ugh);
-		responsePage.setChildren(userGroupHeaders);
+		List<UserProfile> listProfiles = new ArrayList<UserProfile>();
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId(inputValue);
+		profile.setFirstName(firstName);
+		profile.setLastName(lastName);
+		listProfiles.add(profile);
 		
-		AsyncMockStubber.callSuccessWith(responsePage).when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(listProfiles).when(mockSynapseClient).listUserProfiles(any(ArrayList.class), any(AsyncCallback.class));
 		
-		renderer = new APITableColumnRendererUserId(mockSynapseClient, mockNodeModelCreator, mockJsniUtils);
+		renderer = new APITableColumnRendererUserId(mockSynapseClient, mockJsniUtils);
 		columnData = new HashMap<String, List<String>>();
 		config = new APITableColumnConfig();
 		HashSet<String> inputColumnNames = new HashSet<String>();
@@ -102,7 +98,7 @@ public class APITableColumnRendererUserIDTest {
 	@Test
 	public void testGetUserGroupHeadersFailure() {
 		Exception thrownException = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(thrownException).when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(thrownException).when(mockSynapseClient).listUserProfiles(any(ArrayList.class), any(AsyncCallback.class));
 		renderer.init(columnData, config, mockCallback);
 		verify(mockCallback).onFailure(eq(thrownException));
 	}

@@ -21,7 +21,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 */
 	public void hide();
 	
-	public void setWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> widgetDescriptor, boolean isWiki);
+	public void setWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> widgetDescriptor);
 
 	/**
 	 * Call to tell the widget descriptor view to update the widgetDescriptor based on user input (called on save) 
@@ -43,8 +43,8 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 		 * @param entityId
 		 * @param widgetType
 		 */
-		public void editNew(WikiPageKey wikiKey, String widgetType, boolean isWiki);
-		public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor, boolean isWiki);
+		public void editNew(WikiPageKey wikiKey, String widgetType);
+		public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor);
 		/**
 		 * 
 		 * @param handler

@@ -23,6 +23,15 @@
 						</b:Row>
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
 			        	<g:FlowPanel ui:field="viewProfilePanel" />
+			        	<b:Row>
+			        		<b:Column size="XS_6">
+			        			<b:Button ui:field="importLinkedIn" icon="LINKEDIN_SQUARE">Import from LinkedIn</b:Button>
+			        		</b:Column>
+			        		<b:Column size="XS_6">
+			        			<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO" pull="RIGHT" >Edit Profile</b:Button>
+			        		</b:Column>
+			        	</b:Row>
+			        	<g:SimplePanel ui:field="editUserProfilePanel"/>
 			        </div>
 			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
 			    </div>
@@ -126,15 +135,6 @@
 						</div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer">
 					        <g:FlowPanel ui:field="settingsTabContent" />
-					        <div class="">
-						        <div class="highlight-box margin-top-0" highlight-box-title="Profile">
-						            <div class="row">
-										<div class="margin-bottom-20 col-sm-12">
-											<g:SimplePanel ui:field="updateUserInfoPanel" />
-										</div>
-									</div>    
-						        </div>    
-					        </div>
 					    </div>
 					</div>
 				</div>

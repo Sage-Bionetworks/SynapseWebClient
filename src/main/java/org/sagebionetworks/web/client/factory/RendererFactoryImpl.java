@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
@@ -31,8 +30,6 @@ public class RendererFactoryImpl implements RendererFactory {
 	@Inject
 	private Provider<ProvenanceWidget> provenanceWidgetProvider;
 	@Inject
-	private Provider<OldImageWidget> oldImageWidgetProvider;
-	@Inject
 	private Provider<ImageWidget> imageWidgetProvider;
 	@Inject
 	private Provider<AttachmentPreviewWidget> attachmentPreviewWidgetProvider;
@@ -57,11 +54,6 @@ public class RendererFactoryImpl implements RendererFactory {
 	@Override
 	public ProvenanceWidget getProvenanceRenderer() {
 		return provenanceWidgetProvider.get();
-	}
-
-	@Override
-	public OldImageWidget getOldImageRenderer() {
-		return oldImageWidgetProvider.get();
 	}
 
 	@Override

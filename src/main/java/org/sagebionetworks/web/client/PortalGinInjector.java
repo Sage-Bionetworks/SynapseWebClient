@@ -49,7 +49,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
@@ -77,7 +76,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidge
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.RegisterChallengeTeamWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
@@ -204,7 +202,6 @@ public interface PortalGinInjector extends Ginjector {
 	public ReferenceConfigEditor getReferenceConfigEditor();
 	public YouTubeConfigEditor getYouTubeConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
-	public OldImageConfigEditor getOldImageConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
 	public AttachmentConfigEditor getAttachmentConfigEditor();
 	public LinkConfigEditor getLinkConfigEditor();
@@ -227,7 +224,6 @@ public interface PortalGinInjector extends Ginjector {
 	public TutorialWizard getTutorialWidgetRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
 	public AdministerEvaluationsList getAdministerEvaluationsList();
-	public OldImageWidget getOldImageRenderer();
 	public ImageWidget getImageRenderer();
 	public AttachmentPreviewWidget getAttachmentPreviewRenderer();
 	public APITableWidget getSynapseAPICallRenderer();

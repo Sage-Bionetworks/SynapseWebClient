@@ -13,7 +13,6 @@ import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -53,6 +52,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
@@ -68,9 +68,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel updateUserInfoPanel;
-	@UiField
 	FlowPanel viewProfilePanel;
+	@UiField
+	Button editProfileButton;
+	@UiField
+	Button importLinkedIn;
+	@UiField
+	SimplePanel editUserProfilePanel;
 	
 	SimplePanel certifiedUserBadgePanel;
 	
@@ -315,6 +319,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.hideProfileButtonClicked();
 			}
 		});
+		editProfileButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onEditProfile();
+			}
+		});
+		importLinkedIn.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onImportLinkedIn();
+			}
+		});
 	}
 	
 	private void initCertificationBadge() {
@@ -360,7 +378,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord) {
 		clear();
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
@@ -368,7 +386,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				}
 			
 		fillInProfileView(profile, viewProfilePanel);
-		picturePanel.add(getProfilePicture(profile, profile.getPic(), synapseJSNIUtils));
+		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
 		
 		if (isOwner) {
 			resetHighlightBoxes();
@@ -379,8 +397,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
-			
-			initEditProfileUI(profile, profileFormWidget);
 		} else {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}
@@ -404,10 +420,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
 		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
 		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
-	}
-	
-	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
-		updateUserInfoPanel.add(profileFormWidget);
 	}
 	
 	@Override
@@ -550,15 +562,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
-	public static Widget getProfilePicture(UserProfile profile, AttachmentData pic, SynapseJSNIUtils synapseJSNIUtils) {
+	public static Widget getProfilePicture(UserProfile profile, SynapseJSNIUtils synapseJSNIUtils) {
 		 Widget profilePicture; 
-		 if (pic != null && pic.getPreviewId() != null && pic.getPreviewId().length() > 0) {
+		 if (profile.getProfilePicureFileHandleId() != null) {
 			 //use preview
-			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
-			 profilePicture = new FitImage(url, 150, 150);
-		 } else if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
-			 //use token
-			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), pic.getTokenId(), null);
+			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), false);
 			 profilePicture = new FitImage(url, 150, 150);
 		 } else {
 			 //use default picture
@@ -661,7 +669,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void clear() {
-		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
@@ -830,6 +837,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void hideProfile() {
 		UIObject.setVisible(profileUI, false);
 		dashboardUI.removeClassName("col-md-9");
+	}
+
+	@Override
+	public void setProfileEditButtonVisible(boolean isVisible) {
+		this.editProfileButton.setVisible(isVisible);
+		this.importLinkedIn.setVisible(isVisible);
+	}
+
+	@Override
+	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
+		this.editUserProfilePanel.clear();
+		this.editUserProfilePanel.add(userProfileModalWidget);
 	}
 	
 	@Override

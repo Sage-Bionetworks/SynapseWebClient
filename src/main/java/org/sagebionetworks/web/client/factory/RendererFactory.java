@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
@@ -25,7 +24,6 @@ public interface RendererFactory {
 	public YouTubeWidget getYouTubeRenderer();
 	public TutorialWizard getTutorialWidgetRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
-	public OldImageWidget getOldImageRenderer();
 	public ImageWidget getImageRenderer();
 	public AttachmentPreviewWidget getAttachmentPreviewRenderer();
 	public APITableWidget getSynapseAPICallRenderer();

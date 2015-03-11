@@ -38,22 +38,25 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -67,7 +70,6 @@ import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePresenterTest {
 	
@@ -77,13 +79,15 @@ public class ProfilePresenterTest {
 	UserAccountServiceAsync mockUserService;
 	SynapseClientAsync mockSynapseClient;
 	ChallengeClientAsync mockChallengeClient;
+	LinkedInServiceAsync mockLinkedInServic;
+	GWTWrapper mockGwt;
 	
 	GlobalApplicationState mockGlobalApplicationState;
-	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	Profile place = Mockito.mock(Profile.class);
 	CookieProvider mockCookies;
+	UserProfileModalWidget mockUserProfileModalWidget;
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
@@ -103,10 +107,12 @@ public class ProfilePresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
-		mockProfileForm = mock(ProfileFormWidget.class);
 		mockCookies = mock(CookieProvider.class);
+		mockLinkedInServic = mock(LinkedInServiceAsync.class);
+		mockGwt = mock(GWTWrapper.class);
+		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient, mockCookies);	
+				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic,mockGwt);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
@@ -204,13 +210,19 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testRedirectToLinkedIn() {
+		profilePresenter.redirectToLinkedIn();
+		verify(mockLinkedInServic).returnAuthUrl(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testUpdateProfileWithLinkedIn() {
-		profilePresenter.setPlace(place);
+		String secret = "secret";
+		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn(secret);
 		String requestToken = "token";
 		String verifier = "12345";
 		profilePresenter.updateProfileWithLinkedIn(requestToken, verifier);
-		//pass-through
-		verify(mockProfileForm).updateProfileWithLinkedIn(eq(requestToken), eq(verifier));
+		verify(mockLinkedInServic).getCurrentUserInfo(eq(requestToken), eq(secret), eq(verifier), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -275,7 +287,6 @@ public class ProfilePresenterTest {
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
 		
 		//by default, it should not load ALL projects for the current user if going straight to settings
@@ -289,8 +300,6 @@ public class ProfilePresenterTest {
 
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.TEAMS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.TEAMS));
 	}
 	
@@ -801,7 +810,6 @@ public class ProfilePresenterTest {
 		
 		//click yes
 		yesCallback.getValue().invoke();
-		verify(mockProfileForm).rollback();
 		verify(mockView).setTabSelected(any(ProfileArea.class));
 	}
 	

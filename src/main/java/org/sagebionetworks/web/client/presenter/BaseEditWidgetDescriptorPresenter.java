@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
@@ -85,12 +84,12 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	}
 	
 	@Override
-	public void editNew(WikiPageKey wikiKey, String contentTypeKey, boolean isWiki) {
-		editExisting(wikiKey, contentTypeKey, new HashMap<String, String>(), isWiki);
+	public void editNew(WikiPageKey wikiKey, String contentTypeKey) {
+		editExisting(wikiKey, contentTypeKey, new HashMap<String, String>());
 	}
 	
 	@Override
-	public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor, boolean isWiki) {
+	public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor) {
 		if(wikiKey == null) throw new IllegalArgumentException("wiki key cannot be null");
 		if(wikiKey.getOwnerObjectId() == null) throw new IllegalArgumentException("ownerObjectId cannot be null");
 		if(wikiKey.getOwnerObjectType() == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
@@ -100,7 +99,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
 		widgetDescriptor = descriptor;
-		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki);
+		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor);
 		view.show();
 	}
 	
