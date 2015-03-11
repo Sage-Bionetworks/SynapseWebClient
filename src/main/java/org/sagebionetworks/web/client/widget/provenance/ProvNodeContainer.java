@@ -32,15 +32,13 @@ public class ProvNodeContainer extends FlowPanel {
 			content.add(widget);
 		}
 		tip = new Tooltip(content);
-		tip.setTrigger(Trigger.MANUAL);
+		tip.setIsAnimated(false);
 		tip.setIsHtml(true);
 		tip.setPlacement(Placement.BOTTOM);
+		tip.setTrigger(Trigger.HOVER);
+		
 		this.add(tip);
 		setupMessage();
-	}
-	
-	public FlowPanel getContent() {
-		return content;
 	}
 	
 	public void showMessage(String display, String detailedMessage) {

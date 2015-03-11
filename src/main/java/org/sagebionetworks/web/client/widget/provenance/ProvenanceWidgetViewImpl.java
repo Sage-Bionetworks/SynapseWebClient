@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.shared.event.HideEvent;
+import org.gwtbootstrap3.client.shared.event.HideHandler;
+import org.gwtbootstrap3.client.shared.event.ShowEvent;
+import org.gwtbootstrap3.client.shared.event.ShowHandler;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
@@ -28,8 +32,13 @@ import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -187,25 +196,52 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	}
 
 	private void addToolTipToContainer(final ProvGraphNode node, final ProvNodeContainer nodeContainer, final String title) {					
-		//create a tooltip for the node
-		// retrieve info
-		presenter.getInfo(node.getId(), new AsyncCallback<KeyValueDisplay<String>>() {						
+		nodeContainer.getTip().setText(DisplayUtils.getLoadingHtml(sageImageBundle));
+		nodeContainer.getTip().addShowHandler(new ShowHandler() {
 			@Override
-			public void onSuccess(KeyValueDisplay<String> result) {
-				String popoverHtml = ProvViewUtil.createEntityPopoverHtml(result).asString();
-				if (!DisplayUtils.isDefined(popoverHtml))
-					popoverHtml = DisplayConstants.DETAILS_UNAVAILABLE;
-				renderPopover(popoverHtml);
+			public void onShow(ShowEvent showEvent) {
+				node.setShowingTooltip(true);
+				//load the tooltip contents only once
+				if(filledPopoverIds.containsKey(node.getId())) {
+					return;
+				}  
+				// retrieve info
+				presenter.getInfo(node.getId(), new AsyncCallback<KeyValueDisplay<String>>() {						
+					@Override
+					public void onSuccess(KeyValueDisplay<String> result) {
+						String popoverHtml = ProvViewUtil.createEntityPopoverHtml(result).asString();
+						if (!DisplayUtils.isDefined(popoverHtml))
+							popoverHtml = DisplayConstants.DETAILS_UNAVAILABLE;
+						renderPopover(popoverHtml);
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
+					}
+					
+					private void renderPopover(final String rendered) {
+						filledPopoverIds.put(container.getElement().getId(), rendered);
+						Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+							 @Override
+							public void execute() {
+								boolean isShowingTooltip = node.isShowingTooltip();
+								nodeContainer.getTip().setText(rendered);
+								nodeContainer.getTip().reconfigure();
+								if (isShowingTooltip)
+									nodeContainer.getTip().show();
+							}
+						 });
+					}
+				});
 			}
+		});
+		
+		nodeContainer.getTip().addHideHandler(new HideHandler() {
 			
 			@Override
-			public void onFailure(Throwable caught) {
-				renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
-			}
-			
-			private void renderPopover(final String rendered) {
-				nodeContainer.getTip().setTrigger(Trigger.HOVER);
-				nodeContainer.getTip().setText(rendered);
+			public void onHide(HideEvent hideEvent) {
+				node.setShowingTooltip(false);
 			}
 		});
 	}
