@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EvaluationLinksListViewImpl extends LayoutContainer implements EvaluationLinksListView {
+public class EvaluationLinksListViewImpl extends FlowPanel implements EvaluationLinksListView {
 
 	private Presenter presenter;
 	private IconsImageBundle imageBundle;
@@ -66,7 +66,6 @@ public class EvaluationLinksListViewImpl extends LayoutContainer implements Eval
 			
 			add(border);
 		}
-		layout(true);
 	}
 	
 	public ClickHandler getEvaluationClickHandler(final Evaluation eval) {
@@ -91,11 +90,6 @@ public class EvaluationLinksListViewImpl extends LayoutContainer implements Eval
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
-	}
-	
-	@Override
-	public void clear() {
-		this.removeAll();
 	}
 	
 	@Override

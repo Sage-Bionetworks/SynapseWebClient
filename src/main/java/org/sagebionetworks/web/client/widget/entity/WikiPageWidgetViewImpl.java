@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -501,15 +502,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	public void deleteClicked() {
 		//delete wiki
-		DisplayUtils.showConfirmDialog(
-				DisplayConstants.LABEL_DELETE + " Page",
-				DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?",
-				new org.sagebionetworks.web.client.utils.Callback() {
-					@Override
-					public void invoke() {
-						presenter.deleteButtonClicked();
-					}
-				});
+		Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
+			@Override
+			public void callback(boolean isConfirmed) {
+				if (isConfirmed)
+					presenter.deleteButtonClicked();
+			}
+		});
 	}
 	
 	public void attachmentsClicked() {

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -237,12 +238,17 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
 		
 		assertEquals(targetUserId, captor.getValue());
 		verifyProfileShown(false);
+		
+		//not logged in, should not ask for this user favs
+		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
 	}
 
 	@Test
@@ -259,6 +265,8 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
 		//also verify that it is asking for the correct teams
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
@@ -281,8 +289,8 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
 		
-		//by default, it should load ALL projects for the current user
-		assertEquals(ProjectFilterEnum.ALL, profilePresenter.getFilterType());
+		//by default, it should not load ALL projects for the current user if going straight to settings
+		assertNull(profilePresenter.getFilterType());
 	}
 	
 	@Test
@@ -325,7 +333,29 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
+		
+		//should have refreshed teams too, since this is the owner
+		verify(mockView).clearTeamNotificationCount();
+		verify(mockView).refreshTeamInvites();
+		verify(mockView).setTeams(anyList(), eq(true));
 	}
+	
+	@Test
+	public void testGetAllTheirProjects() {
+		profilePresenter.setIsOwner(false);
+		//when setting the filter to all, it should ask for all of their projects
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(eq(myProjects));
+		
+		//should have refreshed teams too, since this is the owner
+		verify(mockView, never()).clearTeamNotificationCount();
+		verify(mockView, never()).refreshTeamInvites();
+		verify(mockView, never()).setTeams(anyList(), eq(true));
+	}
+
 	
 	@Test
 	public void testGetProjectsCreatedByMe() {
@@ -352,6 +382,19 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockView).addProjects(anyList());
+	}
+	
+	@Test
+	public void testGetSharedDirectlyWithMeProjects() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).showProjectFiltersUI();
+		verify(mockView).setSharedDirectlyWithMeFilterSelected();
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(anyList());
 	}
 	
@@ -583,7 +626,7 @@ public class ProfilePresenterTest {
 	//Challenge tests
 	@Test
 	public void testRefreshChallenges() {
-		profilePresenter.refreshChallenges();
+		profilePresenter.tabClicked(ProfileArea.CHALLENGES);
 		verify(mockView).clearChallenges();
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
 		
@@ -593,7 +636,8 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeams() {
-		profilePresenter.getTeams("anyUserId");
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
+		verify(mockView).showTeamsLoading();
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeams(eq(myTeams), anyBoolean());
 	}
@@ -602,11 +646,34 @@ public class ProfilePresenterTest {
 	public void testGetTeamsError() {
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
-		profilePresenter.getTeams("anyUserId");
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeamsError(errorMessage);
 	}
 	
+	@Test
+	public void testGetTeamFilters() {
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(true);
+		verify(mockView).setTeamsFilterTeams(myTeams);
+	}
+	
+	@Test
+	public void testGetTeamFiltersEmpty() {
+		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(false);
+	}
+	@Test
+	public void testGetTeamFiltersError() {
+		String errorMessage = "error loading teams";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(false);
+	}
 	
 	
 	@Test
@@ -840,4 +907,26 @@ public class ProfilePresenterTest {
 		profilePresenter.showProfileButtonClicked();
 		verifyProfileShown(true);
 	}
+	
+	@Test
+	public void testInitUserFavorites() {
+		List<EntityHeader> favorites = new ArrayList<EntityHeader>();
+		AsyncMockStubber.callSuccessWith(favorites).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		
+		Callback mockCallback = mock(Callback.class);
+		profilePresenter.initUserFavorites(mockCallback);
+		verify(mockGlobalApplicationState).setFavorites(favorites);
+		verify(mockCallback).invoke();
+	}
+	
+	@Test
+	public void testInitUserFavoritesFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		
+		Callback mockCallback = mock(Callback.class);
+		profilePresenter.initUserFavorites(mockCallback);
+		verify(mockGlobalApplicationState, never()).setFavorites(anyList());
+		verify(mockCallback).invoke();
+	}
+
 }

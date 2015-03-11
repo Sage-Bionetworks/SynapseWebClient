@@ -8,7 +8,7 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator separator-header-page"></div>
 
-		<div class="container margin-top-15">
+		<div class="margin-top-15 margin-left-35 margin-right-40">
 			<div class="row">
 				<div class="col-md-9 col-md-push-3">
 					<div class="row">

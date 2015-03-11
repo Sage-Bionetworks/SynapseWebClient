@@ -114,5 +114,8 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		view.clear();
 	}
 	
+	public void showLoading() {
+		view.showLoading();
+	}
 
 }

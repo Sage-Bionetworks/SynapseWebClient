@@ -39,6 +39,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
+	void showTeamsLoading();
 	void setTeams(List<Team> teams, boolean isOwner);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
@@ -51,11 +52,13 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showProjectsLoading(boolean isLoading);
 	void showProjectFiltersUI();
 	void hideLoading();
+	void setTeamsFilterTeams(List<Team> teams);
 	void setTeamsFilterVisible(boolean isVisible);
 	void setTeamsFilterSelected();
 	void setMyProjectsFilterSelected();
 	void setAllProjectsFilterSelected();
 	void setFavoritesFilterSelected();
+	void setSharedDirectlyWithMeFilterSelected();
 	void setFavoritesHelpPanelVisible(boolean isVisible);
 	void showProfile();
 	void hideProfile();
