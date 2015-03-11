@@ -84,6 +84,7 @@ public class UserProfileEditorWidgetImplTest {
 	public void testIsValid(){
 		widget.configure(profile);
 		reset(mockView);
+		when(mockView.getUsername()).thenReturn("valid");
 		assertTrue(widget.isValid());
 		verify(mockView).hideLinkError();
 		verify(mockView).hideUploadError();
@@ -118,6 +119,7 @@ public class UserProfileEditorWidgetImplTest {
 	public void testIsValidFileSelected(){
 		widget.configure(profile);
 		reset(mockView);
+		when(mockView.getUsername()).thenReturn("valid");
 		// select a file
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("foo.bar", "text/plain")});
 		assertFalse(widget.isValid());
