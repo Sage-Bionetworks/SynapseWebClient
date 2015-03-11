@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -13,7 +15,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements OpenTeamInvitationsWidgetView {
@@ -63,8 +64,9 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 			final Team team = teams.get(i);
 			BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 			teamRenderer.configure(team, inviteMessages.get(i));
-			Widget teamRendererWidget = teamRenderer.asWidget();
-			teamRendererWidget.addStyleName("margin-top-15 col-xs-8 col-sm-9 col-md-10");
+			Column teamBadgeColumn = new Column(ColumnSize.XS_8, ColumnSize.SM_9, ColumnSize.MD_10);
+			teamBadgeColumn.addStyleName("margin-top-15");
+			teamBadgeColumn.add(teamRenderer.asWidget());
 			Button joinButton = DisplayUtils.createButton(DisplayConstants.JOIN, ButtonType.PRIMARY);
 			joinButton.addStyleName("right margin-top-15 margin-right-15 btn-lg");
 			joinButton.addClickHandler(new ClickHandler() {
@@ -73,10 +75,9 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 					presenter.joinTeam(team.getId());
 				}
 			});
-			FlowPanel buttonContainer = new FlowPanel();
-			buttonContainer.addStyleName("col-xs-4 col-sm-3 col-md-2");
+			Column buttonContainer = new Column(ColumnSize.XS_4, ColumnSize.SM_3, ColumnSize.MD_2);
 			buttonContainer.add(joinButton);
-			lc.add(teamRendererWidget);
+			lc.add(teamBadgeColumn);
 			lc.add(buttonContainer);
 			singleRow.add(lc);
 		}
