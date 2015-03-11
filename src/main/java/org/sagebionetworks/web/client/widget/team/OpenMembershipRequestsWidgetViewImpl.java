@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -15,7 +17,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
@@ -64,11 +65,12 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 		for (int i = 0; i < profiles.size(); i++) {
 			FlowPanel lc = new FlowPanel();
 			final UserProfile profile = profiles.get(i);
+			Column userBadgeColumn = new Column(ColumnSize.XS_8, ColumnSize.SM_9, ColumnSize.MD_10);
+			userBadgeColumn.addStyleName("margin-top-15");
 			UserBadge renderer = ginInjector.getUserBadgeWidget();
 			renderer.configure(profile, requestMessages.get(i));
 			renderer.setSize(BadgeSize.LARGE);
-			Widget rendererWidget = renderer.asWidget();
-			rendererWidget.addStyleName("margin-top-15 col-xs-8 col-sm-9 col-md-10");
+			userBadgeColumn.add(renderer.asWidget());
 			
 			Button joinButton = DisplayUtils.createButton(DisplayConstants.ACCEPT, ButtonType.PRIMARY);
 			joinButton.addStyleName("right margin-top-15 margin-right-15 btn-lg");
@@ -78,10 +80,9 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 					presenter.acceptRequest(profile.getOwnerId());
 				}
 			});
-			FlowPanel buttonContainer = new FlowPanel();
-			buttonContainer.addStyleName("col-xs-4 col-sm-3 col-md-2");
+			Column buttonContainer = new Column(ColumnSize.XS_4, ColumnSize.SM_3, ColumnSize.MD_2);
 			buttonContainer.add(joinButton);
-			lc.add(rendererWidget);
+			lc.add(userBadgeColumn);
 			lc.add(buttonContainer);
 			
 			singleRow.add(lc);
