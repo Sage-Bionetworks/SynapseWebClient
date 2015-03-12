@@ -30,10 +30,10 @@
 				        <div ui:field="scoreContainer" style="display:none" class="margin-bottom-40 margin-right-10 margin-left-10  markdown"></div>
 				        <g:Button ui:field="tutorialButton1" styleName="btn btn-default right margin-right-10" text="Open the Tutorial"/>
 					    <div ui:field="quizHeader" class="margin-bottom-40 margin-right-10 margin-left-10  markdown"></div>
-					    <form>
+					    <div role="form">
 						    <g:FlowPanel ui:field="testContainer">
 						    </g:FlowPanel>
-		   				</form>
+		   				</div>
 					</div>
 					<div class="col-sm-offset-1 col-sm-10">
 					    <g:Button ui:field="submitButton" styleName="btn btn-primary btn-lg margin-top-10 margin-bottom-40 right" text="Submit"/>
