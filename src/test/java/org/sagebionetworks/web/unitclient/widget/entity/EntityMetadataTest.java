@@ -1,13 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
@@ -20,7 +21,7 @@ public class EntityMetadataTest {
 	AuthenticationController mockAuthenticationController;
 
 	@Before
-	public void before() throws JSONObjectAdapterException {
+	public void before() {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockView = mock(EntityMetadataView.class);
 		widget = new EntityMetadata(mockView, mockAuthenticationController);
