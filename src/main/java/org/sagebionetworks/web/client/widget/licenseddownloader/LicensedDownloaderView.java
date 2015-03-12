@@ -20,8 +20,6 @@ public interface LicensedDownloaderView extends SynapseView {
 		
 		public boolean isDownloadAllowed();
 
-		void clearHandlers();
-
-		void addEntityUpdatedHandler(EntityUpdatedHandler handler);
+		void setEntityUpdatedHandler(EntityUpdatedHandler handler);
 	}
 }

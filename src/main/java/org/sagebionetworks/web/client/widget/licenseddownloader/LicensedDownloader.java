@@ -41,7 +41,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 	private AccessRequirement accessRequirementToDisplay;
 	private String entityId;
 	private APPROVAL_TYPE approvalType;
-	private HandlerManager handlerManager;
+	private EntityUpdatedHandler handler;
 	
 	private boolean isDirectDownloadSupported;
 	private AuthenticationController authenticationController;
@@ -63,26 +63,17 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 		this.gwt = gwt;
 		this.accessRequirementDialog = accessRequirementDialog;
 		view.setPresenter(this);		
-		clearHandlers();
 	}
 
 	// this method could be public but it's only used privately (when a ToU agreement
 	// is created) so for now it's private
 	private void fireEntityUpdatedEvent() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		handler.onPersistSuccess(new EntityUpdatedEvent());
 	}
 	
-	/*
-	 * Public methods
-	 */
 	@Override
-	public void clearHandlers() {
-		handlerManager = new HandlerManager(this);
-	}
-
-	@Override
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {		
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		this.handler = handler;
 	}
 
 	/**
@@ -159,7 +150,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 					entityId, 
 					false, /*hasAdministrativeAccess*/
 					false, /*accessApproved*/
-					null,
+					finishedCallback, /*entity updated callback*/
 					finishedCallback /*on hide dialog callback*/);
 			accessRequirementDialog.show();
 		} else {

@@ -165,11 +165,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		}
 		
 		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
-		licensedDownloader.clearHandlers();
-		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
+		licensedDownloader.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
+				presenter.fireEntityUpdatedEvent(event);
 			}
 		});
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
