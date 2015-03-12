@@ -70,9 +70,9 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	}
     
 	@Override
-	public void fireEntityUpdatedEvent() {
+	public void fireEntityUpdatedEvent(EntityUpdatedEvent event) {
 		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
+			entityUpdatedHandler.onPersistSuccess(event);
 	}
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {

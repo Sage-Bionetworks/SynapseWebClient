@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -39,7 +40,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 
-		void fireEntityUpdatedEvent();
+		void fireEntityUpdatedEvent(EntityUpdatedEvent event);
 		
 		boolean isUserLoggedIn();
 		
