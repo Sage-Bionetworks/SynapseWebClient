@@ -228,8 +228,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarView;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -774,9 +772,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(EntityNameModalView.class).to(EntityNameModalViewImpl.class);
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
-		// FileBox
-		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
-		bind(LocationableTitleBarView.class).to(LocationableTitleBarViewImpl.class);
 		
 		// FileBox
 		bind(FileTitleBarViewImpl.class).in(Singleton.class);

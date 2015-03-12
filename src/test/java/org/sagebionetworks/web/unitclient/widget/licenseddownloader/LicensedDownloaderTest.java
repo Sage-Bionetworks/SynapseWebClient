@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -12,25 +12,23 @@ import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -45,8 +43,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.JiraGovernanceConstants;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -74,7 +70,7 @@ public class LicensedDownloaderTest {
 
 	JSONObjectAdapter jsonObjectAdapterProvider;
 	EntityTypeProvider entityTypeProvider;
-	Locationable entity;
+	FileEntity entity;
 	EntityBundle entityBundle;
 	Entity parentEntity;
 	List<LocationData> locations;	
@@ -105,9 +101,6 @@ public class LicensedDownloaderTest {
 		// create entity type provider
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 
-		AdapterFactory adapterFactory = new AdapterFactoryImpl();
-		JSONEntityFactory factory = new JSONEntityFactoryImpl(adapterFactory);
-		
 		JiraGovernanceConstants gc = mock(JiraGovernanceConstants.class);
 		JiraClientAsync mockJiraClient = mock(JiraClientAsync.class);
 		GWTWrapper mockGWTWrapper = mock(GWTWrapper.class);
@@ -127,17 +120,16 @@ public class LicensedDownloaderTest {
 		parentEntity.setUri("blahblah/Study/StudyId");
 
 		// Entity
-		String md5sum = "4759818803f93967eb250f784cf8576d";
-		String contentType = "application/jpg";		
-		entity = new Data();
-		entity.setUri("blahblah/layer/layerId");
-		entity.setId("layerId");
-		entity.setName("layer");
+		entity = new FileEntity();
+		entity.setDataFileHandleId("123");
+		entity.setId("444");
+		entity.setName("file entity");
 		entity.setParentId(parentEntity.getId());
-		entity.setMd5(md5sum);
-		entity.setContentType(contentType);
 		
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		FileHandle mockFileHandle = mock(FileHandle.class);
+		when(mockFileHandle.getId()).thenReturn("123");
+		
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, Collections.singletonList(mockFileHandle), null);
 		
 		// path for entity
 		entityPath = new EntityPath();
@@ -159,52 +151,10 @@ public class LicensedDownloaderTest {
 		path.add(entityHeader);
 		entityPath.setPath(path);
 		
-		// create a DownloadLocation model for this test
-		LocationData downloadLocation = new LocationData();				
-		downloadLocation.setPath("path");
-		locations = new ArrayList<LocationData>();
-		locations.add(downloadLocation);
 
-		StudyEntityWrapper = new EntityWrapper("StudyEntityWrapper", Study.class.getName());
-		layerEntityWrapper = new EntityWrapper("layerEntityWrapper", Data.class.getName());
 		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
 		
-		when(mockView.getDirectDownloadURL()).thenReturn("http://synapse.sagebase.org/file.png");
-		
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn(baseFileHandleUrl);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testLoadDownloadLocations() throws RestServiceException {
-				
-		// null model
-		resetMocks();
-		licensedDownloader.loadDownloadUrl(null);
-		
-		// Null locations
-		resetMocks();			
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		((Locationable)entity).setLocations(null);		
-		licensedDownloader.loadDownloadUrl(entityBundle);
-		verify(mockView).showDownloadsLoading();
-		verify(mockView).setNoDownloads();	
-
-		// Not Logged in Test: Download
-		resetMocks();
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false); 
-		entity.setLocations(locations);
-		licensedDownloader.loadDownloadUrl(entityBundle);
-		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setNeedToLogIn();
-
-		// Success Test: Download
-		resetMocks();			
-		entity.setLocations(locations);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		licensedDownloader.loadDownloadUrl(entityBundle);
-		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocations(locations, entity.getMd5());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -221,16 +171,14 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		entityBundle.setFileHandles(null);		
 		licensedDownloader.loadDownloadUrl(entityBundle);
-		verify(mockView).showDownloadsLoading();
-		verify(mockView).setNoDownloads();	
-
+		assertNull(licensedDownloader.getLoadedDirectDownloadURL());
+		
 		// Not Logged in Test: Download
 		resetMocks();
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		licensedDownloader.loadDownloadUrl(entityBundle);
-		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setNeedToLogIn();
-
+		assertNull(licensedDownloader.getLoadedDirectDownloadURL());
+		
 		// Success Test: Download
 		resetMocks();			
 		String fileHandleId = "22";
@@ -244,8 +192,7 @@ public class LicensedDownloaderTest {
 		entityBundle.setFileHandles(fileHandles);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
-		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(eq(fileHandle.getContentMd5()), anyString());
+		assertNotNull(licensedDownloader.getLoadedDirectDownloadURL());
 		
 		// Success Test: External file
 		resetMocks();			
@@ -261,16 +208,7 @@ public class LicensedDownloaderTest {
 		entityBundle.setFileHandles(fileHandles);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
-		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(null, externalFileHandle.getExternalURL());
-	}
-	
-
-	@Test
-	public void testAsWidget(){
-		// make sure this version of asWidget can not be used		
-		Widget widget = licensedDownloader.asWidget();
-		assertNull(widget);		
+		assertNotNull(licensedDownloader.getLoadedDirectDownloadURL());
 	}
 	
 	@Test
@@ -278,6 +216,7 @@ public class LicensedDownloaderTest {
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		licensedDownloader.setLicenseAgreement(accessRequirements, accessRequirements);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		licensedDownloader.loadDownloadUrl(entityBundle);
 		//direct download available if there are no access requirements
 		assertTrue(licensedDownloader.getDirectDownloadURL()!=null);
 	}

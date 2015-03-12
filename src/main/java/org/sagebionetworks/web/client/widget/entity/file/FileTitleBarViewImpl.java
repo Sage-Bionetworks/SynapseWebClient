@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.ImageAnchor;
-import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -30,7 +29,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -60,18 +58,9 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Anchor directDownloadLink;
 	@UiField
-	ImageAnchor directDownloadImage;
-	
-	@UiField
 	Anchor authorizedDirectDownloadLink;
 	@UiField
-	Image authorizedDirectDownloadImage;
-	
-	
-	@UiField
 	SimplePanel md5LinkContainer;
-	@UiField
-	SimplePanel downloadButtonContainer;
 	@UiField
 	Image entityIcon;
 	@UiField
@@ -91,34 +80,30 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
 			MyEntitiesBrowser myEntitiesBrowser, 
-			LicensedDownloader licensedDownloader, 
+			LicensedDownloader licensedDownloaderHandler, 
 			EntityTypeProvider typeProvider,
 			FavoriteWidget favoriteWidget,
 			GlobalApplicationState globalAppState,
 			Md5Link md5Link,
 			LoginModalWidget loginRequiredModalWidget) {
 		this.iconsImageBundle = iconsImageBundle;
-		this.licensedDownloader = licensedDownloader;
+		this.licensedDownloader = licensedDownloaderHandler;
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
 		this.globalAppState = globalAppState;
 		this.loginModalWidget = loginRequiredModalWidget;
 		initWidget(uiBinder.createAndBindUi(this));
-		downloadButtonContainer.addStyleName("inline-block margin-left-5");
 		md5LinkContainer.addStyleName("inline-block margin-left-5");
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 		loginRequiredModalWidget.setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
-		final Widget downloadButton = licensedDownloader.asWidget();
-		DisplayUtils.addTooltip(downloadButton, DisplayConstants.BUTTON_DOWNLOAD, Placement.BOTTOM);
-		downloadButtonContainer.add(downloadButton);
 		licensedDownloadLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				//if there is an href, ignore it
 				event.preventDefault();
-				downloadButton.fireEvent(event);
+				licensedDownloader.onDownloadButtonClicked();
 			}
 		});
 		
@@ -128,17 +113,13 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				loginModalWidget.showModal();
 			}
 		};
-		authorizedDirectDownloadImage.addClickHandler(authorizedDirectDownloadClickHandler);
 		authorizedDirectDownloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
 	}
 	
 	private void hideAll() {
 		licensedDownloadLink.setVisible(false);
-		downloadButtonContainer.setVisible(false);
 		directDownloadLink.setVisible(false);
-		directDownloadImage.setVisible(false);
 		authorizedDirectDownloadLink.setVisible(false);
-		authorizedDirectDownloadImage.setVisible(false);
 	}
 	
 	@Override
@@ -197,23 +178,19 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 			if (directDownloadUrl.startsWith(sftpProxy)) {
 				authorizedDirectDownloadLink.setVisible(true);
-				authorizedDirectDownloadImage.setVisible(true);
 				authorizedDirectDownloadLink.setText(entity.getName());
 				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
 				presenter.queryForSftpLoginInstructions(url);
 			} else {
 				directDownloadLink.setVisible(true);
-				directDownloadImage.setVisible(true);
 				directDownloadLink.setHref(directDownloadUrl);
-				directDownloadImage.setHref(directDownloadUrl);
 				directDownloadLink.setText(entity.getName());
 			}
 		}
 		else {
 			licensedDownloadLink.setText(entity.getName());
 			licensedDownloadLink.setVisible(true);
-			downloadButtonContainer.setVisible(true);
 		}
 	}
 	@Override

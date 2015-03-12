@@ -26,8 +26,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
-import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.events.EntityDeletedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -41,7 +39,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
@@ -53,7 +50,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -113,7 +109,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SageImageBundle sageImageBundle;
 	
 	private ActionMenu actionMenu;
-	private LocationableTitleBar locationableTitleBar;
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
 	
@@ -211,7 +206,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle,
 			ActionMenu actionMenu,
-			LocationableTitleBar locationableTitleBar,
 			FileTitleBar fileTitleBar,
 			Breadcrumb breadcrumb,
 			SnapshotWidget snapshotWidget,
@@ -234,7 +228,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.evaluationList = evaluationList;
-		this.locationableTitleBar = locationableTitleBar;
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.folderFilesBrowser = folderFilesBrowser;
@@ -250,7 +243,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileHistoryContainer.add(fileHistoryWidget.asWidget());
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileSnapshotsContainer.add(snapshotWidget.asWidget());
-		locationableTitlebarContainer.add(locationableTitleBar.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
 
@@ -407,7 +399,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		};
 		actionMenu.setEntityUpdatedHandler(handler);
-		locationableTitleBar.setEntityUpdatedHandler(handler);
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		EntityUpdatedHandler fileBrowserUpdateHandler = new EntityUpdatedHandler() {
 			@Override
@@ -446,7 +437,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void clear() {
 		actionMenu.clearState();
-		locationableTitleBar.clearState();
 		fileTitleBar.clearState();
 	}
 
@@ -464,10 +454,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if (bundle.getEntity() instanceof FileEntity) {
 			fileTitleBar.configure(bundle);
 			fileTitlebarContainer.setVisible(true);
-		} else {
-			locationableTitleBar.configure(bundle);
-			locationableTitlebarContainer.setVisible(true);
-		}		
+		} 	
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());

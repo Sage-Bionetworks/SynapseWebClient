@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -10,7 +8,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,13 +40,7 @@ public class EntityMetadata implements Presenter {
 			showDetailedMetadata = ((FileEntity)bundle.getEntity()).getDataFileHandleId() != null;
 			showEntityName = !showDetailedMetadata;
 		}
-		else {
-			//TODO: delete this after migration to FileHandle system.  This corresponds to the old logic
-			boolean isLocationable = bundle.getEntity() instanceof Locationable;
-			boolean isStudy = bundle.getEntity() instanceof Study; //if study, always show metadata and entity name
-			showDetailedMetadata = !isLocationable || isStudy || LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
-			showEntityName = !isLocationable || isStudy || !LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, !isAnonymous());
-		}
+		
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 		view.setEntityNameVisible(showEntityName);
 	}
