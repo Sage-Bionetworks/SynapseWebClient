@@ -76,7 +76,6 @@
 					</b:Column>
 					<b:Column size="XS_12">
 						<g:SimplePanel ui:field="tableListWidgetContainer"/>
-						<g:SimplePanel ui:field="tableActionControllerContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
 						<g:FlowPanel addStyleNames="help-panel">

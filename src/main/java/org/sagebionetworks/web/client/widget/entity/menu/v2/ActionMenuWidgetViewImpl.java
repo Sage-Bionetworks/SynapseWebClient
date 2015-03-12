@@ -5,9 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 /**
@@ -18,19 +21,24 @@ import com.google.inject.Inject;
  */
 public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	
-	public interface Binder extends UiBinder<ButtonToolBar, ActionMenuWidgetViewImpl> {}
+	public interface Binder extends UiBinder<Widget, ActionMenuWidgetViewImpl> {}
 
+	@UiField
 	ButtonToolBar buttonToolBar;
+	@UiField
+	Div controllerContainer;
+	
+	Widget widget;
 
 	
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
-		buttonToolBar = binder.createAndBindUi(this);
+		widget = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return buttonToolBar;
+		return widget;
 	}
 
 	@Override
@@ -58,6 +66,11 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void addControllerWidget(IsWidget controllerWidget) {
+		controllerContainer.add(controllerWidget);
 	}
 
 }

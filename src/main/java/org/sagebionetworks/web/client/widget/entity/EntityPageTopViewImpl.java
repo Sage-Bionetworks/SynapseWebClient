@@ -26,20 +26,16 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityDeletedEvent;
-import org.sagebionetworks.web.client.events.EntityDeletedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
@@ -108,7 +104,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	
-	private ActionMenu actionMenu;
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
 	
@@ -121,7 +116,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel projectDescriptionContainer;
 	@UiField
 	SimplePanel projectActionMenuContainer;
-
 	
 	@UiField
 	Row wikiTabContainer;
@@ -175,8 +169,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel tableActionMenuContainer;
 	@UiField
-	SimplePanel tableActionControllerContainer;
-	@UiField
 	SimplePanel tableWidgetContainer;
 	@UiField
 	SimplePanel tableModifiedAndCreatedContainer;
@@ -205,7 +197,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle,
-			ActionMenu actionMenu,
 			FileTitleBar fileTitleBar,
 			Breadcrumb breadcrumb,
 			SnapshotWidget snapshotWidget,
@@ -222,7 +213,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PreviewWidget previewWidget, CookieProvider cookies,
 			GlobalApplicationState globalApplicationState) {
 		this.sageImageBundle = sageImageBundle;
-		this.actionMenu = actionMenu;
 		this.breadcrumb = breadcrumb;
 		this.snapshotWidget = snapshotWidget;
 		this.entityMetadata = entityMetadata;
@@ -372,7 +362,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableBreadcrumbContainer.clear();
 		tableMetadataContainer.clear();
 		tableActionMenuContainer.clear();
-		tableActionControllerContainer.clear();
 		tableWidgetContainer.clear();
 		tableModifiedAndCreatedContainer.clear();
 		tableListWidgetContainer.setVisible(false);
@@ -398,7 +387,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		actionMenu.setEntityUpdatedHandler(handler);
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		EntityUpdatedHandler fileBrowserUpdateHandler = new EntityUpdatedHandler() {
 			@Override
@@ -413,12 +401,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		folderFilesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		entityMetadata.setEntityUpdatedHandler(handler);
 		fileHistoryWidget.setEntityUpdatedHandler(handler);
-		actionMenu.setEntityDeletedHandler(new EntityDeletedHandler() {			
-			@Override
-			public void onDeleteSuccess(EntityDeletedEvent event) {
-				presenter.entityDeleted(event);
-			}
-		});
 	}
 
 	@Override
@@ -436,7 +418,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void clear() {
-		actionMenu.clearState();
 		fileTitleBar.clearState();
 	}
 
@@ -459,7 +440,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
-		fileActionMenuContainer.add(actionMenu.asWidget(bundle, versionNumber));
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		fileActionMenuContainer.add(actionMenu.asWidget());
 				
 		// File History
 		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
@@ -530,7 +512,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
 		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES));
 		// ActionMenu
-		fileActionMenuContainer.add(actionMenu.asWidget(bundle, versionNumber));
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		fileActionMenuContainer.add(actionMenu.asWidget());
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
@@ -557,8 +540,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
 		projectMetadataContainer.add(entityMetadata.asWidget());
 		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
+	
 		// ActionMenu
-		projectActionMenuContainer.add(actionMenu.asWidget(bundle, versionNumber));
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		projectActionMenuContainer.add(actionMenu.asWidget());
 
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiPageContainer, bundle, wikiPageId, area);
@@ -654,20 +639,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					} else {
 						// hide description area, and add description command in the Tools menu
 						wrapper.setVisible(false);
-						actionMenu.showAddDescriptionCommand(new Callback() {
-							@Override
-							public void invoke() {
-								wikiPageWidget.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME, new Callback() {
-									@Override
-									public void invoke() {
-										//if successful, then show the wiki page and remove the special command from the action menu
-										wrapper.setVisible(true);
-										actionMenu.hideAddDescriptionCommand();
-									}
-								});
-								
-							}
-						});
 					}
 				}
 			}, true);
@@ -709,18 +680,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		tableMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
-		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
 		tableActionMenuContainer.add(actionMenu.asWidget());
-				
-		// Action controller
-		EntityActionController controller = ginInjector.createEntityActionController();
-		tableActionControllerContainer.add(controller.asWidget());
-		controller.configure(actionMenu, bundle, new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
 
 		// Table
 		QueryChangeHandler qch = new QueryChangeHandler() {			
@@ -804,6 +765,26 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    }
 	    
    		return lc;
+	}
+	
+	/**
+	 * Create a new action menu for an entity.
+	 * @param bundle
+	 * @return
+	 */
+	public ActionMenuWidget createEntityActionMenu(EntityBundle bundle){
+		// Create a menu
+		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		// Create a controller.
+		EntityActionController controller = ginInjector.createEntityActionController();
+		actionMenu.addControllerWidget(controller.asWidget());
+		controller.configure(actionMenu, bundle, new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
+		return actionMenu;
 	}
 	
 }
