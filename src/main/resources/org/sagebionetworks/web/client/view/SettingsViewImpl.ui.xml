@@ -39,7 +39,7 @@
 				<div class="col-md-6">
 					<div ui:field="changeSynapsePasswordUI">
 					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-20" >
-					        <form class="form-horizontal" role="form">
+					        <div class="form-horizontal">
 					   			  <div ui:field="currentPassword" class="form-group row">
 								    <label class="col-sm-3 control-label">Current password</label>
 								    <div class="col-sm-8">
@@ -67,7 +67,7 @@
 									      <g:FlowPanel ui:field="forgotPasswordContainer"/>
 									  </div>
 								 </div>
-							</form>
+							</div>
 						</div>
 					</div>
 				</div>
