@@ -47,6 +47,7 @@ import com.google.inject.Inject;
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
+	public static final String USER_PROFILE_WELCOME_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.welcome.message.visible.state";
 	
 	private Profile place;
 	private ProfileView view;
@@ -170,6 +171,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						profileForm.configure(profile, profileUpdatedCallback);
 					}
 					initializeShowHideProfile(isOwner);
+					initializeShowHideWelcome(isOwner);
 					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 				}
 			@Override
@@ -223,6 +225,25 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			//show the profile, and hide the profile button
 			setIsProfileVisible(true);
 			view.setHideProfileButtonVisible(false);
+		}
+	}
+	
+	public void initializeShowHideWelcome(boolean isOwner) {
+		if (isOwner) {
+			boolean isWelcomeMessageVisible = true;
+			try {
+				String cookieValue = cookies.getCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY);
+				if (cookieValue != null && !cookieValue.isEmpty()) {
+					isWelcomeMessageVisible = Boolean.valueOf(cookieValue);	
+				}
+			} catch (Exception e) {
+				//if there are any problems getting the welcome message visibility state, ignore and use default (show)
+			}
+			view.setWelcomeToDashboardVisible(isWelcomeMessageVisible);
+		} else {
+			//not the owner
+			//hide welcome message
+			view.setWelcomeToDashboardVisible(false);
 		}
 	}
 	
@@ -748,6 +769,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void applyFilterClicked(ProjectFilterEnum filterType, Team team) {
 		setProjectFilterAndRefresh(filterType, team);
+	}
+	
+	@Override
+	public void welcomeToDashboardDismissed() {
+		//set welcome message visible=false for a year
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
 	}
 	
 	/**

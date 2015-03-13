@@ -2,6 +2,9 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.shared.event.AlertClosedEvent;
+import org.gwtbootstrap3.client.shared.event.AlertClosedHandler;
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
@@ -191,6 +194,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button showProfileButton;
 	@UiField
 	Button hideProfileButton;
+	@UiField
+	Alert welcomeToDashboardAlert;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -313,6 +318,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.hideProfileButtonClicked();
+			}
+		});
+		welcomeToDashboardAlert.addClosedHandler(new AlertClosedHandler() {
+			@Override
+			public void onClosed(AlertClosedEvent evt) {
+				presenter.welcomeToDashboardDismissed();
 			}
 		});
 	}
@@ -835,5 +846,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showTeamsLoading() {
 		myTeamsWidget.showLoading();
+	}
+	
+	@Override
+	public void setWelcomeToDashboardVisible(boolean isVisible) {
+		welcomeToDashboardAlert.setVisible(isVisible);	
 	}
 }

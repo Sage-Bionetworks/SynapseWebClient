@@ -63,7 +63,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void hideProfile();
 	void setShowProfileButtonVisible(boolean isVisible);
 	void setHideProfileButtonVisible(boolean isVisible);
-	
+	void setWelcomeToDashboardVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
@@ -80,5 +80,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void getMoreProjects();
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
+		void welcomeToDashboardDismissed();
 	}
 }
