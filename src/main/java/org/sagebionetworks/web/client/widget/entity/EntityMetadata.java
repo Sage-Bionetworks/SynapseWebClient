@@ -33,12 +33,10 @@ public class EntityMetadata implements Presenter {
 
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		view.setEntityBundle(bundle, bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber != null);
-		boolean showDetailedMetadata = false;
-		boolean showEntityName = false;
+		boolean showDetailedMetadata = true;
+		boolean showEntityName = true;
 		if (bundle.getEntity() instanceof FileEntity) {
-			//it has data if there is a file handle associated with it
-			showDetailedMetadata = ((FileEntity)bundle.getEntity()).getDataFileHandleId() != null;
-			showEntityName = !showDetailedMetadata;
+			showEntityName = false;
 		}
 		
 		view.setDetailedMetadataVisible(showDetailedMetadata);

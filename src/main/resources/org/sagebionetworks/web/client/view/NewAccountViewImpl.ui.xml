@@ -13,7 +13,7 @@
 			        <h2 class="margin-bottom-40">Register with Synapse</h2>
 			        <div class="margin-bottom-40" ui:field="contentHtml" />
 				    <div ui:field="registrationForm">
-				        <form class="form-horizontal" role="form">
+				        <div class="form-horizontal">
 							  <div ui:field="email" class="form-group row">
 							    <label class="col-sm-3 control-label">Email</label>
 							    <div class="col-sm-9">
@@ -55,7 +55,7 @@
 							      <div ui:field="password2Error" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
-						</form>
+						</div>
 					</div>
 				</div>
 			</div>

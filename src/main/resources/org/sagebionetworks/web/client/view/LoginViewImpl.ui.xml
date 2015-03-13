@@ -39,7 +39,7 @@
 					<!-- termsOfUseView -->
 					<div class="row">
 						<div ui:field="termsOfServiceHighlightBox" class="highlight-box col-sm-offset-1 col-sm-10">
-								<form>
+								<div>
 								    <h5>I commit myself to:</h5>
 									<div class="checkbox margin-top-15 margin-bottom-20-imp">
 					   					<g:CheckBox ui:field="actEthicallyCb" text="Act ethically and responsibly."/>
@@ -59,7 +59,7 @@
 					   				<div class="checkbox margin-bottom-20-imp">
 					   					<g:CheckBox ui:field="lawsCb" text="Abide by all applicable laws and regulations as laid out in the complete ethical and legal documents governing Synapse."/>
 					   				</div>
-				   				</form>
+				   				</div>
 						</div>
 					</div>
 					<div class="row margin-bottom-40">
