@@ -25,4 +25,10 @@ public interface ActionMenuWidgetView extends IsWidget {
 	 * @param controllerWidget
 	 */
 	void addControllerWidget(IsWidget controllerWidget);
+
+	/**
+	 * Show/hide the basic divider.
+	 * @param visible
+	 */
+	void setBasicDividerVisible(boolean visible);
 }

@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -38,7 +39,6 @@ import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -60,9 +60,9 @@ public interface SynapseClientAsync {
 	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<EntityWrapper> callback);
 	
-	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundleTransport> callback);
+	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundle> callback);
 	
-	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundleTransport> callback);
+	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
 
 	void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<String> callback);
 

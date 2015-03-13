@@ -1,7 +1,8 @@
-package org.sagebionetworks.web.client.model;
+package org.sagebionetworks.web.shared;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
@@ -10,6 +11,8 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.TableBundle;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
  * A bundle of various parts of an entity.  This allows the client to get all the required parts in 
  * a minimum number of RPC calls.
@@ -17,17 +20,23 @@ import org.sagebionetworks.repo.model.table.TableBundle;
  * @author John
  *
  */
-public class EntityBundle {
+public class EntityBundle implements IsSerializable {
 	
 	private Entity entity;
 	private Annotations annotations;
 	private UserEntityPermissions permissions;
 	private EntityPath path;
+	private AccessControlList acl;
 	private List<AccessRequirement> accessRequirements;
 	private List<AccessRequirement> unmetDownloadAccessRequirements;
 	private Boolean hasChildren;
 	private List<FileHandle> fileHandles;
 	private TableBundle tableBundle;
+	private String rootWikiId;
+	private boolean isWikiBasedEntity;
+	
+	public EntityBundle(){
+	}
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
@@ -104,6 +113,36 @@ public class EntityBundle {
 	public void setTableBundle(TableBundle tableBundle) {
 		this.tableBundle = tableBundle;
 	}
+	
+	public String getRootWikiId() {
+		return rootWikiId;
+	}
+	public void setRootWikiId(String rootWikiId) {
+		this.rootWikiId = rootWikiId;
+	}
+	public Boolean getIsWikiBasedEntity() {
+		return isWikiBasedEntity;
+	}
+	public void setIsWikiBasedEntity(Boolean isWikiBasedEntity) {
+		this.isWikiBasedEntity = isWikiBasedEntity;
+	}
+	
+	public AccessControlList getAcl() {
+		return acl;
+	}
+
+	public void setAcl(AccessControlList acl) {
+		this.acl = acl;
+	}
+
+	public void setHasChildren(Boolean hasChildren) {
+		this.hasChildren = hasChildren;
+	}
+
+	public void setWikiBasedEntity(boolean isWikiBasedEntity) {
+		this.isWikiBasedEntity = isWikiBasedEntity;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -122,6 +161,10 @@ public class EntityBundle {
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
 		result = prime * result
 				+ ((permissions == null) ? 0 : permissions.hashCode());
+		result = prime * result
+				+ ((rootWikiId == null) ? 0 : rootWikiId.hashCode());
+		result = prime * result
+				+ ((tableBundle == null) ? 0 : tableBundle.hashCode());
 		result = prime
 				* result
 				+ ((unmetDownloadAccessRequirements == null) ? 0
@@ -172,6 +215,16 @@ public class EntityBundle {
 				return false;
 		} else if (!permissions.equals(other.permissions))
 			return false;
+		if (rootWikiId == null) {
+			if (other.rootWikiId != null)
+				return false;
+		} else if (!rootWikiId.equals(other.rootWikiId))
+			return false;
+		if (tableBundle == null) {
+			if (other.tableBundle != null)
+				return false;
+		} else if (!tableBundle.equals(other.tableBundle))
+			return false;
 		if (unmetDownloadAccessRequirements == null) {
 			if (other.unmetDownloadAccessRequirements != null)
 				return false;
@@ -189,5 +242,4 @@ public class EntityBundle {
 				+ ", hasChildren=" + hasChildren + ", fileHandles=" + fileHandles
 				+ "]";
 	}
-	
 }

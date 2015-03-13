@@ -13,12 +13,12 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.WebConstants;
 

@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -23,6 +22,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;

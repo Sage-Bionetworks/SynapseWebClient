@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Code;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -28,13 +29,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -69,18 +68,19 @@ public class EntityPropertyFormTest {
 				mockNodeModelCreator, mockSynapseClient, mockSynapseJSNIUtils,
 				mockWidgetRegistrar, mockGlobalApplicationState,
 				mockAuthenticationController);
-		EntityBundle bundle = new EntityBundle(new Project(), null, null,null,null, null, null, null);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(new Project());
 		
 		String entityId = "123";
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setName("Test Entity");
 		entity.setEntityType(ExampleEntity.class.getName());;
-		EntityBundleTransport ebt = new EntityBundleTransport();
-		ebt.setEntityJson(EntityFactory.createJSONStringForEntity(entity));
+		EntityBundle ebt = new EntityBundle();
+		ebt.setEntity(entity);
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
-		when(mockNodeModelCreator.createEntityBundle(any(EntityBundleTransport.class))).thenReturn(entityBundle);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(entity);
 		
 		AdapterFactory factory = new AdapterFactoryImpl();
 		JSONObjectAdapter newAdapter = factory.createNew();

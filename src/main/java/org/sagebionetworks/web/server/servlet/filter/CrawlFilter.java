@@ -26,6 +26,7 @@ import org.jsoup.Jsoup;
 import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -150,10 +151,9 @@ public class CrawlFilter implements Filter {
 	
 	private String getEntityHtml(String entityId) throws RestServiceException, JSONObjectAdapterException{
 		int mask = ENTITY | ANNOTATIONS;
-		EntityBundleTransport entityTransport = synapseClient.getEntityBundle(entityId, mask);
-		Entity entity = EntityFactory.createEntityFromJSONString(entityTransport.getEntityJson(), Entity.class);
-		Annotations annotations = EntityFactory.createEntityFromJSONString(entityTransport.getAnnotationsJson(), Annotations.class);
-		
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
+		Entity entity = bundle.getEntity();
+		Annotations annotations = bundle.getAnnotations();
 		String name = escapeHtml(entity.getName());
 		String description = escapeHtml(entity.getDescription());
 		String markdown = null;

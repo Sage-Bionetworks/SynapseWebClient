@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -23,6 +24,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	
 	public interface Binder extends UiBinder<Widget, ActionMenuWidgetViewImpl> {}
 
+	@UiField
+	Divider basicDivider;
 	@UiField
 	ButtonToolBar buttonToolBar;
 	@UiField
@@ -71,6 +74,11 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Override
 	public void addControllerWidget(IsWidget controllerWidget) {
 		controllerContainer.add(controllerWidget);
+	}
+
+	@Override
+	public void setBasicDividerVisible(boolean visible) {
+		this.basicDivider.setVisible(visible);
 	}
 
 }

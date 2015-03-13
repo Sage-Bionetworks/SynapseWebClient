@@ -17,7 +17,7 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -84,78 +84,6 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		BatchResults<T> batchResults = new BatchResults(clazz);
 		batchResults.initializeFromJSONObject(jsonObjectAdapter.createNew(jsonString));
 		return batchResults;
-	}
-
-
-	@Override
-	public EntityBundle createEntityBundle(EntityBundleTransport transport) throws JSONObjectAdapterException {
-		Entity entity = null;
-		Annotations annotations = null;
-		UserEntityPermissions permissions = null;
-		EntityPath path = null;
-		List<AccessRequirement> accessRequirements = null;
-		List<AccessRequirement> unmetDownloadAccessRequirements = null;
-		List<FileHandle> fileHandles = null;
-		TableBundle tableBundle = null;
-		Long version = null;
-		// entity?
-		if(transport.getEntityJson() != null){
-			entity = factory.createEntity(transport.getEntityJson());
-		}
-		// annotations?
-		if(transport.getAnnotationsJson() != null){
-			annotations = factory.initializeEntity(transport.getAnnotationsJson(), new Annotations());
-		}
-		// permissions?
-		if(transport.getPermissions() != null){
-			permissions = transport.getPermissions();
-		}
-		// path?
-		if(transport.getEntityPath() != null){
-			path =  transport.getEntityPath();
-		}
-		// accessRequirements?
-		if(transport.getAccessRequirementsJson() != null){
-			accessRequirements =  new ArrayList<AccessRequirement>();
-			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getAccessRequirementsJson());
-			for (int i=0; i<aa.length(); i++) {
-				JSONObjectAdapter joa = aa.getJSONObject(i);
-				accessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
-			}
-		}			
-		// unmetDownloadAccessRequirements?
-		if(transport.getUnmetDownloadAccessRequirementsJson() != null){
-			unmetDownloadAccessRequirements =  new ArrayList<AccessRequirement>();
-			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getUnmetDownloadAccessRequirementsJson());
-			for (int i=0; i<aa.length(); i++) {
-				JSONObjectAdapter joa = aa.getJSONObject(i);
-				unmetDownloadAccessRequirements.add((AccessRequirement)EntityClassHelper.deserialize(joa));
-			}
-		}
-		// file handles?
-		if(transport.getFileHandlesJson() != null){
-			fileHandles =  new ArrayList<FileHandle>();
-			JSONArrayAdapter aa = jsonObjectAdapter.createNewArray(transport.getFileHandlesJson());
-			for (int i=0; i<aa.length(); i++) {
-				JSONObjectAdapter joa = aa.getJSONObject(i);
-				String concreteClassName = (String)joa.get(FILE_HANDLE_TYPE_FIELD_NAME);
-				fileHandles.add((FileHandle)factory.createEntity(joa.toJSONString(), concreteClassName));
-			}
-		}
-		// Table data
-		if (transport.getTableData() != null) {
-			tableBundle = transport.getTableData();
-		}
-		
-		// put it all together.
-		EntityBundle eb = new EntityBundle(entity, annotations, permissions,
-				path, accessRequirements, unmetDownloadAccessRequirements, fileHandles, tableBundle);
-		// Set the child count when there.
-		if(transport.getHasChildren() != null){
-			eb.setChildCount(transport.getHasChildren());
-		}
-
-		return eb;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -21,11 +22,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -65,13 +64,10 @@ public class EntityListUtil {
 		final Reference ref = record.getEntityReference();
 		if(ref == null) return;
 				
-		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundleTransport result) {
-				EntityBundle bundle = null;
-				try {
-					bundle = nodeModelCreator.createEntityBundle(result);
-					
+			public void onSuccess(EntityBundle bundle) {
+				try {				
 					// Old behavior.
 					handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record,
 							synapseJSNIUtils, bundle.getEntity().getDescription()));

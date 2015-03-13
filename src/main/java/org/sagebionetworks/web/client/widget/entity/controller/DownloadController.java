@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 /**
  * Can the user download from this entity.

@@ -21,13 +21,13 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -61,11 +61,10 @@ public class EntityListConfigEditorTest {
 		syn456 = new Data();
 		syn456.setId("syn456");
 		syn456.setName(syn456.getId());
-		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null, null);
-		EntityBundleTransport transport = new EntityBundleTransport();
-		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntityBundle(transport)).thenReturn(bundle);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(syn456);
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
 
 		// create an entity group record for syn456
 		record456 = new EntityGroupRecord();

@@ -26,9 +26,9 @@ import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.event.shared.EventBus;
 

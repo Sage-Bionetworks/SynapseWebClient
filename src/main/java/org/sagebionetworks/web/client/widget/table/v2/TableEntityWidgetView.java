@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 

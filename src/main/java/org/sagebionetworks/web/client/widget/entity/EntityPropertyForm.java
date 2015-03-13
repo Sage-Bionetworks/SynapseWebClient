@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -16,14 +17,12 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog.Callback;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -114,13 +113,11 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 		// We need to refresh the entity, and update our entity bundle with the most current attachments and etag.
 		view.showLoading();
 		int mask = ENTITY;
-		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundleTransport transport) {
+			public void onSuccess(EntityBundle newBundle) {
 				view.hideLoading();
-				EntityBundle newBundle = null;
 				try {
-					newBundle = nodeModelCreator.createEntityBundle(transport);
 					Entity newEntity = newBundle.getEntity();
 					refreshEntityAttachments(newEntity);
 				} catch (JSONObjectAdapterException e) {

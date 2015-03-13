@@ -22,13 +22,13 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 public class ActionMenuTest {
@@ -78,7 +78,8 @@ public class ActionMenuTest {
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);
 		entity.setId("file entity test id");
-		bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		bundle = new EntityBundle();
+		bundle.setEntity(entity);
 		
 		actionMenu.asWidget(bundle, null);
 	}

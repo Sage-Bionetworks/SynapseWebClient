@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;

@@ -8,9 +8,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
@@ -29,7 +26,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -43,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -111,7 +108,9 @@ public class EntityActionControllerImplTest {
 		permissions.setCanDelete(true);
 		permissions.setCanPublicRead(true);
 		permissions.setCanEdit(true);
-		entityBundle = new EntityBundle(table, null, permissions, null, null, null, null, null);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(table);
+		entityBundle.setPermissions(permissions);
 		
 	}
 
@@ -233,7 +232,9 @@ public class EntityActionControllerImplTest {
 		Entity project = new Project();
 		project.setId(entityId);
 		project.setParentId(parentId);
-		entityBundle = new EntityBundle(project, null, entityBundle.getPermissions(), null, null, null, null, null);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(project);
+		entityBundle.setPermissions(entityBundle.getPermissions());
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();
@@ -247,7 +248,8 @@ public class EntityActionControllerImplTest {
 		Entity file = new FileEntity();
 		file.setId(entityId);
 		file.setParentId(parentId);
-		entityBundle = new EntityBundle(file, null, entityBundle.getPermissions(), null, null, null, null, null);
+		entityBundle.setEntity(file);
+		entityBundle.setPermissions(entityBundle.getPermissions());
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();

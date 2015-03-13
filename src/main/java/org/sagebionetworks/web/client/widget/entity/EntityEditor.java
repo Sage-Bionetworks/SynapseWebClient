@@ -19,11 +19,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.dialog.EntityEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRowFactory;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -229,7 +229,8 @@ public class EntityEditor {
 		Entity entity = (Entity) entityFactory.newInstance(className);
 		entity.setParentId(parentId);
 		entity.setEntityType(className);
-		EntityBundle newBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		EntityBundle newBundle = new EntityBundle();
+		newBundle.setEntity(entity);
 		return newBundle;
 	}
 

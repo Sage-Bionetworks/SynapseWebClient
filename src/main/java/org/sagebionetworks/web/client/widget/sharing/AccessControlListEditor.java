@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -144,10 +144,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		hasChangesHandler.hasChanges(false);
 		
-		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
-		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
+		int partsMask = EntityBundle.ACL | EntityBundle.PERMISSIONS;
+		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundleTransport bundle) {
+			public void onSuccess(EntityBundle bundle) {
 				try {
 					// retrieve ACL and user entity permissions from bundle
 					acl = bundle.getAcl();

@@ -24,7 +24,7 @@
 							Query Results</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DOWNLOAD"
 							action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Query Results</a:ActionMenuItem>
-						<b:Divider />
+						<b:Divider ui:field="basicDivider" visible="false" />
 						<a:ActionMenuItem action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS" action="ADD_WIKI_PAGE">Add Wiki</a:ActionMenuItem>
 						<a:ActionMenuItem action="SUBMIT_TO_CHALLENGE">Submit To Challenge</a:ActionMenuItem>

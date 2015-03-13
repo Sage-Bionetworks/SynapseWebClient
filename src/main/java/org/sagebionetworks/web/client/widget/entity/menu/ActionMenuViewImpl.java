@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.DropdownButton;
@@ -29,6 +28,8 @@ import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.event.dom.client.ClickEvent;

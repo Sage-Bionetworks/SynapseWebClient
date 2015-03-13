@@ -2,8 +2,8 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 

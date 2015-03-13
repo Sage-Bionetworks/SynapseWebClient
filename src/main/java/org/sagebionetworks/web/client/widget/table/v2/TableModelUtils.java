@@ -11,7 +11,7 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 
 import com.google.inject.Inject;
@@ -113,7 +113,10 @@ public class TableModelUtils {
 	public EntityBundle bundleFromTransport(EntityBundleTransport transport) throws JSONObjectAdapterException{
 		TableEntity entity = tableEntityFromJSON(transport.getEntityJson());
 		TableBundle tableBundle = tableBundleFromJSON(transport.getEntityJson());
-		return new EntityBundle(entity, null, null, null, null, null, null, tableBundle);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(entity);
+		bundle.setTableBundle(tableBundle);
+		return bundle;
 	}
 	
 	

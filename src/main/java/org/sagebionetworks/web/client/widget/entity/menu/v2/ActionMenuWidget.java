@@ -71,4 +71,10 @@ public interface ActionMenuWidget extends IsWidget{
 	 * @param controllerWidget
 	 */
 	public void addControllerWidget(IsWidget controllerWidget);
+
+	/**
+	 * Show/hide the divider between basic commands and specific commands.
+	 * @param visible
+	 */
+	public void setBasicDivderVisible(boolean visible);
 }

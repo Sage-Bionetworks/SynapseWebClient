@@ -430,32 +430,32 @@ public class SynapseClientImplTest {
 		// Make sure we can get all parts of the bundel
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN
 		| ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
-		EntityBundleTransport bundle = synapseClient.getEntityBundle(entityId, mask);
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
-		assertNotNull(bundle.getEntityJson());
-		assertNotNull(bundle.getAnnotationsJson());
-		assertNotNull(bundle.getEntityPath());
+		assertNotNull(bundle.getEntity());
+		assertNotNull(bundle.getAnnotations());
+		assertNotNull(bundle.getPath());
 		assertNotNull(bundle.getPermissions());
 		assertNotNull(bundle.getHasChildren());
-		assertNotNull(bundle.getAccessRequirementsJson());
-		assertNotNull(bundle.getUnmetDownloadAccessRequirementsJson());
+		assertNotNull(bundle.getAccessRequirements());
+		assertNotNull(bundle.getUnmetAccessRequirements());
 	}
 	
 	@Test
 	public void testGetEntityBundleNone() throws RestServiceException{
 		// Make sure all are null
 		int mask = 0x0;
-		EntityBundleTransport bundle = synapseClient.getEntityBundle(entityId, mask);
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
-		assertNull(bundle.getEntityJson());
-		assertNull(bundle.getAnnotationsJson());
-		assertNull(bundle.getEntityPath());
+		assertNull(bundle.getEntity());
+		assertNull(bundle.getAnnotations());
+		assertNull(bundle.getPath());
 		assertNull(bundle.getPermissions());
 		assertNull(bundle.getHasChildren());
-		assertNull(bundle.getAccessRequirementsJson());
-		assertNull(bundle.getUnmetDownloadAccessRequirementsJson());
+		assertNull(bundle.getAccessRequirements());
+		assertNull(bundle.getUnmetAccessRequirements());
 	}
 	
 	@Test (expected=IllegalArgumentException.class)

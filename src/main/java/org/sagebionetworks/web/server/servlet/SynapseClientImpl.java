@@ -140,7 +140,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -323,53 +322,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public EntityBundleTransport getEntityBundle(String entityId, int partsMask)
+	public EntityBundle getEntityBundle(String entityId, int partsMask)
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			EntityBundle eb;
-			// TODO:remove the try catch when PLFM-1752 is fixed
-			try {
-				eb = synapseClient.getEntityBundle(entityId, partsMask);
-			} catch (SynapseNotFoundException e) {
-				// if we're trying to get the filehandles, then give another try
-				// without the filehandles
-				if ((EntityBundleTransport.FILE_HANDLES & partsMask) != 0) {
-					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES)
-							& partsMask;
-					eb = synapseClient.getEntityBundle(entityId, newPartsMask);
-				} else
-					throw e;
-			}
-			return convertBundleToTransport(entityId, eb, partsMask);
+			return synapseClient.getEntityBundle(entityId, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	@Override
-	public EntityBundleTransport getEntityBundleForVersion(String entityId,
+	public EntityBundle getEntityBundleForVersion(String entityId,
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			EntityBundle eb;
-			// TODO:remove the try catch when PLFM-1752 is fixed
-			try {
-				eb = synapseClient.getEntityBundle(entityId, versionNumber,
-						partsMask);
-			} catch (SynapseNotFoundException e) {
-				// if we're trying to get the filehandles, then give another try
-				// without the filehandles
-				if ((EntityBundleTransport.FILE_HANDLES & partsMask) != 0) {
-					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES)
-							& partsMask;
-					eb = synapseClient.getEntityBundle(entityId, versionNumber,
-							newPartsMask);
-				} else
-					throw e;
-			}
-
-			return convertBundleToTransport(entityId, eb, partsMask);
+			return synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -430,72 +398,72 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return synapseClient.query(query);
 	}
 
-	// Convert repo-side EntityBundle to serializable EntityBundleTransport
-	private EntityBundleTransport convertBundleToTransport(String entityId,
-			EntityBundle eb, int partsMask) throws RestServiceException {
-		EntityBundleTransport ebt = new EntityBundleTransport();
-		try {
-			if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
-				Entity e = eb.getEntity();
-				ebt.setEntityJson(EntityFactory.createJSONStringForEntity(e));
-			}
-			if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
-				Annotations a = eb.getAnnotations();
-				ebt.setAnnotationsJson(EntityFactory.createJSONStringForEntity(a));
-			}
-			if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
-				UserEntityPermissions uep = eb.getPermissions();
-				ebt.setPermissions(uep);
-			}
-			if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
-				EntityPath path = eb.getPath();
-				ebt.setEntityPath(path);
-			}
-			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
-				List<EntityHeader> rbList = eb.getReferencedBy();
-				PaginatedResults<EntityHeader> rb = new PaginatedResults<EntityHeader>();
-				rb.setResults(rbList);
-				ebt.setEntityReferencedByJson(EntityFactory
-						.createJSONStringForEntity(rb));
-			}
-			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
-				Boolean hasChildren = eb.getHasChildren();
-				ebt.setHashChildren(hasChildren);
-			}
-			if ((EntityBundleTransport.ACL & partsMask) > 0) {
-				AccessControlList acl = eb.getAccessControlList();
-				if (acl == null) {
-					// ACL is inherited; fetch benefactor ACL.
-					try {
-						acl = getAcl(entityId);
-					} catch (SynapseException e) {
-						e.printStackTrace();
-					}
-				}
-				ebt.setAcl(acl);
-			}
-			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
-			}
-			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setUnmetDownloadAccessRequirementsJson(createJSONStringFromArray(eb
-						.getUnmetAccessRequirements()));
-			}
-			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
-				ebt.setFileHandlesJson(createJSONStringFromArray(eb.getFileHandles()));
-			
-			if ((EntityBundleTransport.TABLE_DATA & partsMask) != 0
-					&& eb.getTableBundle() != null) {
-				ebt.setTableData(eb.getTableBundle());
-			}
-			
-			ebt.setIsWikiBasedEntity(getWikiBasedEntities().contains(entityId));
-
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-		return ebt;
-	}
+//	// Convert repo-side EntityBundle to serializable EntityBundleTransport
+//	private org.sagebionetworks.web.shared.EntityBundle convertBundleToTransport(String entityId,
+//			EntityBundle eb, int partsMask) throws RestServiceException {
+//		org.sagebionetworks.web.shared.EntityBundle ebt = new org.sagebionetworks.web.shared.EntityBundle();
+//		try {
+//			if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
+//				Entity e = eb.getEntity();
+//				ebt.setEntity(e);
+//			}
+//			if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
+//				Annotations a = eb.getAnnotations();
+//				ebt.setAnnotations(a);
+//			}
+//			if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
+//				UserEntityPermissions uep = eb.getPermissions();
+//				ebt.setPermissions(uep);
+//			}
+//			if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
+//				EntityPath path = eb.getPath();
+//				ebt.setEntityPath(path);
+//			}
+//			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
+//				List<EntityHeader> rbList = eb.getReferencedBy();
+//				PaginatedResults<EntityHeader> rb = new PaginatedResults<EntityHeader>();
+//				rb.setResults(rbList);
+//				ebt.setEntityReferencedByJson(EntityFactory
+//						.createJSONStringForEntity(rb));
+//			}
+//			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
+//				Boolean hasChildren = eb.getHasChildren();
+//				ebt.setHashChildren(hasChildren);
+//			}
+//			if ((EntityBundleTransport.ACL & partsMask) > 0) {
+//				AccessControlList acl = eb.getAccessControlList();
+//				if (acl == null) {
+//					// ACL is inherited; fetch benefactor ACL.
+//					try {
+//						acl = getAcl(entityId);
+//					} catch (SynapseException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				ebt.setAcl(acl);
+//			}
+//			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
+//				ebt.setAccessRequirements(eb.getAccessRequirements());
+//			}
+//			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
+//				ebt.setUnmetDownloadAccessRequirements(eb
+//						.getUnmetAccessRequirements());
+//			}
+//			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
+//				ebt.setFileHandles(eb.getFileHandles());
+//			
+//			if ((EntityBundleTransport.TABLE_DATA & partsMask) != 0
+//					&& eb.getTableBundle() != null) {
+//				ebt.setTableData(eb.getTableBundle());
+//			}
+//			
+//			ebt.setIsWikiBasedEntity(getWikiBasedEntities().contains(entityId));
+//
+//		} catch (JSONObjectAdapterException e) {
+//			throw new UnknownErrorException(e.getMessage());
+//		}
+//		return ebt;
+//	}
 
 	public static String createJSONStringFromArray(
 			List<? extends JSONEntity> list) throws JSONObjectAdapterException {
@@ -3031,23 +2999,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-	}
-	
-	/**
-	 * Helper to get the entity bundle of a table entity.
-	 * 
-	 * @param synapseClient
-	 * @param tableId
-	 * @return
-	 * @throws SynapseException
-	 * @throws RestServiceException
-	 */
-	private EntityBundleTransport getTableEntityBundle(
-			org.sagebionetworks.client.SynapseClient synapseClient,
-			String tableId) throws SynapseException, RestServiceException {
-		int partsMask = EntityBundle.ENTITY + EntityBundle.TABLE_DATA;
-		EntityBundle bundle = synapseClient.getEntityBundle(tableId, partsMask);
-		return convertBundleToTransport(tableId, bundle, partsMask);
 	}
 	
 	@Override

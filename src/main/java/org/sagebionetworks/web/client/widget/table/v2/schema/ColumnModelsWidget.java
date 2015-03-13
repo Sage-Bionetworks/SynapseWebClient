@@ -11,11 +11,11 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;

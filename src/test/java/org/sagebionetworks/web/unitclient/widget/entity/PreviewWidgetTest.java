@@ -19,9 +19,9 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
 import com.google.gwt.http.client.RequestCallback;
@@ -56,7 +56,9 @@ public class PreviewWidgetTest {
 		mainFileHandle.setId(mainFileId);
 		testFileHandleList.add(mainFileHandle);
 		testEntity.setDataFileHandleId(mainFileId);
-		testBundle = new EntityBundle(testEntity, null,null,null,null,null,testFileHandleList, null);
+		testBundle = new EntityBundle();
+		testBundle.setEntity(testEntity);
+		testBundle.setFileHandles(testFileHandleList);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
