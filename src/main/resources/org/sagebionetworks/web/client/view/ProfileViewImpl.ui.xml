@@ -67,7 +67,7 @@
 									</div>
 								</div>
 								<div class="col-xs-4 col-sm-6">
-								    <b:Button ui:field="projectSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Project Search" />
+								    <b:Button ui:field="projectSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Projects" />
 								</div>
 							</div>
 							<div class="highlight-box panel panel-default padding-5 min-height-200" ui:field="projectsHighlightBox" highlight-box-title="Projects">
@@ -129,7 +129,7 @@
 									</div>
 								</div>
 								 <div class="col-xs-4 col-sm-6">
-								    <b:Button ui:field="teamSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Team Search" />
+								    <b:Button ui:field="teamSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Teams" />
 								</div>
 							</div>
 							<g:FlowPanel ui:field="openInvitesContainer" />
