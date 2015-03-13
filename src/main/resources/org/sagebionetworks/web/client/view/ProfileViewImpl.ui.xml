@@ -11,6 +11,10 @@
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
+		<b:Alert type="INFO" ui:field="welcomeToDashboardAlert" dismissable="true" visible="false">
+			<bh:Strong text="Welcome to the new Synapse User Dashboard - all of your Synapse content in one convenient place!"/>
+			<bh:Paragraph text="Access Projects you have recently worked on, filter by how Projects were shared with you, and track your 'Favorite' Synapse objects."/>
+		</b:Alert>
 		<div class="margin-10">
 			<div class="row margin-top-5">
 			    <div ui:field="profileUI" class="col-md-3 col-xs-12">
