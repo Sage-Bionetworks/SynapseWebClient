@@ -139,7 +139,7 @@ public class EntityPresenterTest {
 	
 	@Test
 	public void testWikiBasedEntity() {
-//		ebt.setIsWikiBasedEntity(true);
+		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
 		entityPresenter.setPlace(place);
@@ -154,7 +154,7 @@ public class EntityPresenterTest {
 	@Test
 	public void testWikiBasedEntityInTestWebsite() {
 		//will show full project page for wiki based entities when in alpha mode
-//		ebt.setIsWikiBasedEntity(true);
+		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);

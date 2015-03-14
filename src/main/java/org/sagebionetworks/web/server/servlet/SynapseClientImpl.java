@@ -1795,18 +1795,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String createV2WikiPageWithV1(String ownerId, String ownerType,
-			String wikiPageJson) throws IOException, RestServiceException {
+	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType,
+			WikiPage page) throws IOException, RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			@SuppressWarnings("unchecked")
-			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
-					WikiPage.class);
-			WikiPage returnPage = synapseClient.createWikiPage(ownerId,
-					ObjectType.valueOf(ownerType), page);
-			return EntityFactory.createJSONStringForEntity(returnPage);
+			return synapseClient.createWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -1815,18 +1808,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String updateV2WikiPageWithV1(String ownerId, String ownerType,
-			String wikiPageJson) throws IOException, RestServiceException {
+	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType,
+			WikiPage page) throws IOException, RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			@SuppressWarnings("unchecked")
-			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
-					WikiPage.class);
-			WikiPage returnPage = synapseClient.updateWikiPage(ownerId,
-					ObjectType.valueOf(ownerType), page);
-			return EntityFactory.createJSONStringForEntity(returnPage);
+			return synapseClient.updateWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

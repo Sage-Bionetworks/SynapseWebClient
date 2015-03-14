@@ -2,9 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -22,7 +25,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
-import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -99,6 +101,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureDeleteAction();
 		configureShareAction();
 		configureRenameAction();
+		configureAddWiki();
+	}
+	
+	private void configureAddWiki(){
+		if(this.entityBundle.getRootWikiId() == null){
+			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
+			actionMenu.setActionText(Action.ADD_WIKI_PAGE, "Add wiki");
+			actionMenu.addActionListener(Action.ADD_WIKI_PAGE, this);
+		}
 	}
 	
 	private void configureRenameAction(){
@@ -137,10 +149,39 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CHANGE_ENTITY_NAME:
 			onRename();
+			break;
+		case ADD_WIKI_PAGE:
+			onAddWiki();
 			break;	
 		default:
 			break;
 		}
+	}
+
+	private void onAddWiki() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckAddWiki();
+			}
+		});
+	}
+	
+	private void postCheckAddWiki(){
+		WikiPage page = new WikiPage();
+		synapseClient.createV2WikiPageWithV1(this.entityBundle.getEntity(). getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(WikiPage result) {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				
+			}});
 	}
 
 	private void onRename() {

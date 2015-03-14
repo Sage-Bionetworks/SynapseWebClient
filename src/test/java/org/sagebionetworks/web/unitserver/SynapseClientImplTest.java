@@ -755,17 +755,15 @@ public class SynapseClientImplTest {
      
  	@Test
  	public void testCreateV2WikiPageWithV1() throws Exception {
- 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.createV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+		synapseClient.createV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), page);
 	    verify(mockSynapse).createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
  	}
  	
  	@Test
  	public void testUpdateV2WikiPageWithV1() throws Exception {
- 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.updateV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+		synapseClient.updateV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), page);
 		verify(mockSynapse).updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
  	}
  	
@@ -874,14 +872,6 @@ public class SynapseClientImplTest {
 		synapseClient.getEntityDoi("test entity id", null);
 	    verify(mockSynapse).getEntityDoi(anyString(), anyLong());
 	}
-
-//	@Test
-//	public void testGetParticipant() throws Exception{
-//		//basic wiring test
-//		//String returnJson = synapseClient.createParticipant("myEvalId");
-//		
-//	}
-
 	
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();

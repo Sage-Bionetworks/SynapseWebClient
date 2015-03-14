@@ -197,8 +197,8 @@ public interface SynapseClientAsync {
 	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
 	public void zipAndUploadFile(String content, String fileName, AsyncCallback<String> callback);
 	
-	public void createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-	public void updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
+	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
 	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
 	

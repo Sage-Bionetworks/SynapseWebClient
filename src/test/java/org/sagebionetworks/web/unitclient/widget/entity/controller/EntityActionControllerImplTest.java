@@ -61,6 +61,7 @@ public class EntityActionControllerImplTest {
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	
 	EntityBundle entityBundle;
+	UserEntityPermissions permissions;
 
 	EntityActionControllerImpl controller;
 	String parentId;
@@ -103,7 +104,7 @@ public class EntityActionControllerImplTest {
 		Entity table = new TableEntity();
 		table.setId(entityId);
 		table.setParentId(parentId);
-		UserEntityPermissions permissions = new UserEntityPermissions();
+		permissions = new UserEntityPermissions();
 		permissions.setCanChangePermissions(true);
 		permissions.setCanDelete(true);
 		permissions.setCanPublicRead(true);
@@ -234,7 +235,7 @@ public class EntityActionControllerImplTest {
 		project.setParentId(parentId);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(project);
-		entityBundle.setPermissions(entityBundle.getPermissions());
+		entityBundle.setPermissions(permissions);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();

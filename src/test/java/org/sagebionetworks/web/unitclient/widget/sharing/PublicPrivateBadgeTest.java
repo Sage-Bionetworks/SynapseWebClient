@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -70,7 +71,7 @@ public class PublicPrivateBadgeTest {
 		testEntity.setId("syn12345");
 		publicPrincipalIds=new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		EntityBundleTransport transport = new EntityBundleTransport();
+		EntityBundle transport = new EntityBundle();
 		transport.setAcl(acl);
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(publicPrincipalIds).when(mockUserService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
