@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,15 +21,12 @@ public class ChallengeBadgeViewImpl implements ChallengeBadgeView {
 	public ChallengeBadgeViewImpl(
 			final Binder uiBinder) {
 		widget = uiBinder.createAndBindUi(this);
-		//init click handler
-		link.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClick();
-			}
-		});
 	}
 
+	@Override
+	public void setHref(String href) {
+		link.setHref(href);
+	}
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;

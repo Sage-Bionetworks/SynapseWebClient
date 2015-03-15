@@ -38,7 +38,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	private JoinTeamWidgetView.Presenter presenter;
 	private FlowPanel requestUIPanel;
-	private Button requestButton, acceptInviteButton, anonymousUserButton;
+	private Button requestButton, acceptInviteButton, anonymousUserButton, simpleRequestButton;
 	private HTML requestedMessage;
 	private TextArea messageArea;
 	private MarkdownWidget wikiPage;
@@ -58,7 +58,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage, String buttonText) {
+	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage, String buttonText, boolean isSimpleRequestButton) {
 		clear();
 		String joinButtonText = buttonText == null ? WidgetConstants.JOIN_TEAM_DEFAULT_BUTTON_TEXT : buttonText;
 		initView(joinButtonText);
@@ -77,10 +77,14 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				// display a message saying "your membership request is pending review by team administration"
 				add(requestedMessage);
 			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
-				// show request UI 
-				add(requestButton);
-				add(requestUIPanel);
-				requestUIPanel.setVisible(false);
+				// show request UI
+				if (isSimpleRequestButton) {
+					add(simpleRequestButton);
+				} else {
+					add(requestButton);
+					add(requestUIPanel);
+					requestUIPanel.setVisible(false);
+				}
 			} else if (teamMembershipStatus.getHasUnmetAccessRequirement()) {
 			    // show Join; clicking shows ToU
 				add(acceptInviteButton);
@@ -131,6 +135,15 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			acceptInviteButton.setType(ButtonType.PRIMARY);
 			acceptInviteButton.setSize(ButtonSize.LARGE);
 			
+			simpleRequestButton = new Button(joinButtonText, new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.sendJoinRequest("", false);
+				}
+			});
+			simpleRequestButton.setType(ButtonType.PRIMARY);
+			simpleRequestButton.setSize(ButtonSize.LARGE);
+			
 			requestedMessage = new HTML(DisplayUtils.getAlertHtmlSpan("Request open.", "Your request to join this team has been sent.", BootstrapAlertType.INFO));
 			requestUIPanel = new FlowPanel();
 			requestUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
@@ -171,6 +184,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		requestButton.setEnabled(enable);
 		anonymousUserButton.setEnabled(enable);
 		acceptInviteButton.setEnabled(enable);
+		simpleRequestButton.setEnabled(enable);
 	}
 	
 	
@@ -225,7 +239,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		Widget wikiPageWidget = wikiPage.asWidget();
         currentWizardContent.clear();
         currentWizardContent.add(wikiPageWidget);
-		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true);
+		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true, false);
 	}
 	
 	@Override

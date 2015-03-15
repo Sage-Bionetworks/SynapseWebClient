@@ -12,7 +12,7 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void configure(WikiPageKey formattingGuideWikiPageKey,
 			String markdown);
 	
-	void showPreviewHTML(String result, WikiPageKey wikiKey, boolean isWiki, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException;
+	void showPreviewHTML(String result, WikiPageKey wikiKey, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException;
 	/**
 	 * Set the presenter.
 	 * @param presenter

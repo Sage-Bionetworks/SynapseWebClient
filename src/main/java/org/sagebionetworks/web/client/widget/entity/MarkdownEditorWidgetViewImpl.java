@@ -341,7 +341,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	public void initFormattingGuide(WikiPageKey formattingGuideWikiPageKey) {
-		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false);
+		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
 		formattingGuideContainer.clear();
 		formattingGuideContainer.add(markdownWidget);
 	}
@@ -362,7 +362,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	@Override
-	public void showPreviewHTML(String result, WikiPageKey wikiKey, boolean isWiki, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
+	public void showPreviewHTML(String result, WikiPageKey wikiKey, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
 		HTMLPanel panel;
 		if(result == null || "".equals(result)) {
 	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>"));
@@ -372,7 +372,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		}
 		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
-		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true, null, null);
+		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, true, null, null);
 		
 		previewHtmlContainer.clear();
 		previewHtmlContainer.add(panel);

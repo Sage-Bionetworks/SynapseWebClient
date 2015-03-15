@@ -102,15 +102,18 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void onIndividualSubmissionOptionClicked() {
 		isIndividualSubmission = true;
-		view.setTeamInEligibleErrorVisible(false);
-		view.setTeamComboBoxEnabled(false);
+		view.hideTeamsUI();
 	}
 	
 	@Override
 	public void onTeamSubmissionOptionClicked() {
 		isIndividualSubmission = false;
-		view.setTeamInEligibleErrorVisible(true);
-		view.setTeamComboBoxEnabled(true);
+		
+		if (teams.isEmpty()) {
+			view.showEmptyTeams();
+		} else {
+			view.showTeamsUI(teams);
+		}
 	}
 	
 	private AsyncCallback<String> getEvalCallback() {
@@ -217,14 +220,11 @@ public class EvaluationSubmitter implements Presenter {
 			public void onSuccess(List<Team> results) {
 				view.clearTeams();
 				teams = results;
-				if (teams.isEmpty()) {
-					view.showEmptyTeams();
-				} else {
-					view.showTeams(teams);
-					//select the first
+				if (!teams.isEmpty()) {
 					onTeamSelected(0);
 				}
 				onIndividualSubmissionOptionClicked();
+				view.setIsIndividualSubmissionActive(true);
 				view.hideModal1();
 				view.showModal2();
 			}
@@ -431,5 +431,8 @@ public class EvaluationSubmitter implements Presenter {
 	
 	public List<Long> getSelectedTeamEligibleMembers() {
 		return selectedTeamEligibleMembers;
+	}
+	public boolean getIsIndividualSubmission() {
+		return isIndividualSubmission;
 	}
 }

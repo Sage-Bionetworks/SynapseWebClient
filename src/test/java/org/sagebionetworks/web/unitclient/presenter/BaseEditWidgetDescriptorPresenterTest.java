@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
@@ -37,7 +36,6 @@ public class BaseEditWidgetDescriptorPresenterTest {
 	WidgetRegistrar mockWidgetRegistrar;
 	ExampleEntity entity;
 	Map<String, String> descriptor1;
-	AttachmentData attachment1, attachment2;
 	WidgetDescriptorUpdatedHandler mockDescriptorUpdatedHandler;
 	ArgumentCaptor<WidgetDescriptorUpdatedEvent> descriptorUpdateEventCaptor;
 	
@@ -54,16 +52,6 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
-		List<AttachmentData> attachments = new ArrayList<AttachmentData>();
-		String attachment1Name = "attachment1";
-		attachment1 = new AttachmentData();
-		attachment1.setName(attachment1Name);
-		attachment1.setContentType(WidgetConstants.YOUTUBE_CONTENT_TYPE);
-		attachment2 = new AttachmentData();
-		attachment2.setName("attachment2");
-		attachments.add(attachment1);
-		attachments.add(attachment2);
-		entity.setAttachments(attachments);
 		
 		descriptor1 = new HashMap<String, String>();
 		descriptor1.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, "myVideoId");
@@ -77,21 +65,21 @@ public class BaseEditWidgetDescriptorPresenterTest {
 	public void testEditNew() {
 		descriptor1.clear();  //should be no arguments passed to the view, since this is editing a new widget
 		
-		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
-		verify(mockView).setWidgetDescriptor(any(WikiPageKey.class), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1), anyBoolean());
+		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), WidgetConstants.YOUTUBE_CONTENT_TYPE);
+		verify(mockView).setWidgetDescriptor(any(WikiPageKey.class), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1));
 		verify(mockView).show();
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions1() {
-		presenter.editNew(null,WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
+		presenter.editNew(null,WidgetConstants.YOUTUBE_CONTENT_TYPE);
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions2() {
-		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), null, true);
+		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), null);
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions3() {
-		presenter.editNew(new WikiPageKey(entity.getId(), null, null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
+		presenter.editNew(new WikiPageKey(entity.getId(), null, null), WidgetConstants.YOUTUBE_CONTENT_TYPE);
 	}
 
 	@Test
@@ -117,7 +105,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		//in this case, the descriptor is telling us that we should simply insert some text into the description, and nothing more (examples are external images, and links)
 		when(mockView.getTextToInsert()).thenReturn(null);
 		//set widget by telling it to edit a new one
-		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
+		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), WidgetConstants.YOUTUBE_CONTENT_TYPE);
 		presenter.apply();
 		//verify it updates the descriptor from the view, and updates the entity attachments
 		verify(mockView).updateDescriptorFromView();

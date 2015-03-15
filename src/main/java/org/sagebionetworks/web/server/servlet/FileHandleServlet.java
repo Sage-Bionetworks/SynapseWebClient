@@ -54,7 +54,7 @@ import com.google.inject.Inject;
  */
 public class FileHandleServlet extends HttpServlet {
 
-	private static Logger logger = Logger.getLogger(FileUpload.class.getName());
+	private static Logger logger = Logger.getLogger(FileHandleServlet.class.getName());
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();

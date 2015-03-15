@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
-import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -31,16 +30,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
-import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -49,13 +38,11 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -64,13 +51,12 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -82,14 +68,8 @@ import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Header;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePresenterTest {
 	
@@ -99,13 +79,15 @@ public class ProfilePresenterTest {
 	UserAccountServiceAsync mockUserService;
 	SynapseClientAsync mockSynapseClient;
 	ChallengeClientAsync mockChallengeClient;
+	LinkedInServiceAsync mockLinkedInServic;
+	GWTWrapper mockGwt;
 	
 	GlobalApplicationState mockGlobalApplicationState;
-	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	Profile place = Mockito.mock(Profile.class);
-	
+	CookieProvider mockCookies;
+	UserProfileModalWidget mockUserProfileModalWidget;
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
@@ -125,9 +107,12 @@ public class ProfilePresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
-		mockProfileForm = mock(ProfileFormWidget.class);
+		mockCookies = mock(CookieProvider.class);
+		mockLinkedInServic = mock(LinkedInServiceAsync.class);
+		mockGwt = mock(GWTWrapper.class);
+		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockProfileForm, adapterFactory, mockChallengeClient);	
+				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic,mockGwt);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
@@ -225,13 +210,19 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testRedirectToLinkedIn() {
+		profilePresenter.redirectToLinkedIn();
+		verify(mockLinkedInServic).returnAuthUrl(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testUpdateProfileWithLinkedIn() {
-		profilePresenter.setPlace(place);
+		String secret = "secret";
+		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn(secret);
 		String requestToken = "token";
 		String verifier = "12345";
 		profilePresenter.updateProfileWithLinkedIn(requestToken, verifier);
-		//pass-through
-		verify(mockProfileForm).updateProfileWithLinkedIn(eq(requestToken), eq(verifier));
+		verify(mockLinkedInServic).getCurrentUserInfo(eq(requestToken), eq(secret), eq(verifier), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -247,11 +238,17 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
 		
 		assertEquals(targetUserId, captor.getValue());
+		verifyProfileShown(false);
+		
+		//not logged in, should not ask for this user favs
+		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
 	}
 
 	@Test
@@ -268,6 +265,8 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
 		//also verify that it is asking for the correct teams
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
@@ -288,11 +287,10 @@ public class ProfilePresenterTest {
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
 		
-		//by default, it should load ALL projects for the current user
-		assertEquals(ProjectFilterEnum.ALL, profilePresenter.getFilterType());
+		//by default, it should not load ALL projects for the current user if going straight to settings
+		assertNull(profilePresenter.getFilterType());
 	}
 	
 	@Test
@@ -302,8 +300,6 @@ public class ProfilePresenterTest {
 
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.TEAMS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.TEAMS));
 	}
 	
@@ -337,7 +333,29 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(eq(myProjects));
+		
+		//should have refreshed teams too, since this is the owner
+		verify(mockView).clearTeamNotificationCount();
+		verify(mockView).refreshTeamInvites();
+		verify(mockView).setTeams(anyList(), eq(true));
 	}
+	
+	@Test
+	public void testGetAllTheirProjects() {
+		profilePresenter.setIsOwner(false);
+		//when setting the filter to all, it should ask for all of their projects
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(eq(myProjects));
+		
+		//should have refreshed teams too, since this is the owner
+		verify(mockView, never()).clearTeamNotificationCount();
+		verify(mockView, never()).refreshTeamInvites();
+		verify(mockView, never()).setTeams(anyList(), eq(true));
+	}
+
 	
 	@Test
 	public void testGetProjectsCreatedByMe() {
@@ -364,6 +382,19 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockView).addProjects(anyList());
+	}
+	
+	@Test
+	public void testGetSharedDirectlyWithMeProjects() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.setCurrentUserId("125");
+		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
+		verify(mockView).clearProjects();
+		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
+		verify(mockView).showProjectFiltersUI();
+		verify(mockView).setSharedDirectlyWithMeFilterSelected();
+		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).addProjects(anyList());
 	}
 	
@@ -595,7 +626,7 @@ public class ProfilePresenterTest {
 	//Challenge tests
 	@Test
 	public void testRefreshChallenges() {
-		profilePresenter.refreshChallenges();
+		profilePresenter.tabClicked(ProfileArea.CHALLENGES);
 		verify(mockView).clearChallenges();
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
 		
@@ -605,7 +636,8 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeams() {
-		profilePresenter.getTeams("anyUserId");
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
+		verify(mockView).showTeamsLoading();
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeams(eq(myTeams), anyBoolean());
 	}
@@ -614,11 +646,34 @@ public class ProfilePresenterTest {
 	public void testGetTeamsError() {
 		String errorMessage = "error loading teams";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
-		profilePresenter.getTeams("anyUserId");
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeamsError(errorMessage);
 	}
 	
+	@Test
+	public void testGetTeamFilters() {
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(true);
+		verify(mockView).setTeamsFilterTeams(myTeams);
+	}
+	
+	@Test
+	public void testGetTeamFiltersEmpty() {
+		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(false);
+	}
+	@Test
+	public void testGetTeamFiltersError() {
+		String errorMessage = "error loading teams";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFilterVisible(false);
+	}
 	
 	
 	@Test
@@ -755,7 +810,6 @@ public class ProfilePresenterTest {
 		
 		//click yes
 		yesCallback.getValue().invoke();
-		verify(mockProfileForm).rollback();
 		verify(mockView).setTabSelected(any(ProfileArea.class));
 	}
 	
@@ -782,4 +836,141 @@ public class ProfilePresenterTest {
 		verify(mockPlaceChanger, never()).goTo(any(Profile.class));
 	}
 	
+	private void verifyProfileHidden(boolean isCookieExpected) {
+		verify(mockView).hideProfile();
+		verify(mockView).setShowProfileButtonVisible(true);
+		verify(mockView).setHideProfileButtonVisible(false);
+		if (isCookieExpected)
+			verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(false)), any(Date.class));
+		else
+			verify(mockCookies, never()).setCookie(anyString(), anyString(), any(Date.class));
+	}
+	private void verifyProfileShown(boolean isCookieExpected) {
+		verify(mockView).showProfile();
+		verify(mockView).setShowProfileButtonVisible(false);
+		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(true);
+		if (isCookieExpected)
+			verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY), eq(Boolean.toString(true)), any(Date.class));
+		else
+			verify(mockCookies, never()).setCookie(anyString(), anyString(), any(Date.class));
+	}
+	
+	@Test
+	public void testInitShowHideProfileNotOwner() {
+		profilePresenter.initializeShowHideProfile(false);
+		verifyProfileShown(false);
+		//and verify that hide profile button was hidden
+		verify(mockView, Mockito.atLeastOnce()).setHideProfileButtonVisible(false);
+	}
+	
+	@Test
+	public void testInitShowHideProfileNullCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn(null);
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileShown(false);
+	}
+	
+	@Test
+	public void testInitShowHideProfileEmptyCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("");
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileShown(false);
+	}
+	@Test
+	public void testInitShowHideProfileTrueCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("true");
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileShown(false);
+	}
+	@Test
+	public void testInitShowHideProfileFalseCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("false");
+		profilePresenter.initializeShowHideProfile(true);
+		verifyProfileHidden(false);
+	}
+	
+	@Test
+	public void testHideProfileButtonClicked() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("true");
+		profilePresenter.hideProfileButtonClicked();
+		verifyProfileHidden(true);
+	}
+	@Test
+	public void testShowProfileButtonClicked() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VISIBLE_STATE_KEY))).thenReturn("false");
+		profilePresenter.showProfileButtonClicked();
+		verifyProfileShown(true);
+	}
+	
+	@Test
+	public void testInitUserFavorites() {
+		List<EntityHeader> favorites = new ArrayList<EntityHeader>();
+		AsyncMockStubber.callSuccessWith(favorites).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		
+		Callback mockCallback = mock(Callback.class);
+		profilePresenter.initUserFavorites(mockCallback);
+		verify(mockGlobalApplicationState).setFavorites(favorites);
+		verify(mockCallback).invoke();
+	}
+	
+	@Test
+	public void testInitUserFavoritesFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		
+		Callback mockCallback = mock(Callback.class);
+		profilePresenter.initUserFavorites(mockCallback);
+		verify(mockGlobalApplicationState, never()).setFavorites(anyList());
+		verify(mockCallback).invoke();
+	}
+	
+	
+	
+	@Test
+	public void testInitShowHideWelcomeNotOwner() {
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn(null);
+		profilePresenter.initializeShowHideWelcome(false);
+		verify(mockView).setWelcomeToDashboardVisible(false);
+	}
+	
+	@Test
+	public void testInitShowHideWelcomeNullCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn(null);
+		profilePresenter.initializeShowHideWelcome(true);
+		verify(mockView).setWelcomeToDashboardVisible(true);
+	}
+	
+	@Test
+	public void testInitShowHideWelcomeEmptyCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn("");
+		profilePresenter.initializeShowHideWelcome(true);
+		verify(mockView).setWelcomeToDashboardVisible(true);
+	}
+	@Test
+	public void testInitShowHideWelcomeTrueCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn("true");
+		profilePresenter.initializeShowHideWelcome(true);
+		verify(mockView).setWelcomeToDashboardVisible(true);
+	}
+	@Test
+	public void testInitShowHideWelcomeFalseCookieValue() {
+		//return null
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn("false");
+		profilePresenter.initializeShowHideWelcome(true);
+		verify(mockView).setWelcomeToDashboardVisible(false);
+	}
+	@Test
+	public void testWelcomeToDashboardDismissed() {
+		profilePresenter.welcomeToDashboardDismissed();
+		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY), eq(Boolean.FALSE.toString()), any(Date.class));
+	}
+
 }

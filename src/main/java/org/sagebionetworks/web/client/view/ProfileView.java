@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
@@ -29,7 +30,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
+	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord);
 	void refreshHeader();
 	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
@@ -38,6 +39,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
+	void showTeamsLoading();
 	void setTeams(List<Team> teams, boolean isOwner);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
@@ -50,13 +52,25 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showProjectsLoading(boolean isLoading);
 	void showProjectFiltersUI();
 	void hideLoading();
+	void setTeamsFilterTeams(List<Team> teams);
 	void setTeamsFilterVisible(boolean isVisible);
 	void setTeamsFilterSelected();
 	void setMyProjectsFilterSelected();
 	void setAllProjectsFilterSelected();
 	void setFavoritesFilterSelected();
+	void setSharedDirectlyWithMeFilterSelected();
 	void setFavoritesHelpPanelVisible(boolean isVisible);
+	void showProfile();
+	void hideProfile();
+	void setShowProfileButtonVisible(boolean isVisible);
+	void setHideProfileButtonVisible(boolean isVisible);
+	void setProfileEditButtonVisible(boolean isVisible);
+	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
+	
+	void setWelcomeToDashboardVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
+		void showProfileButtonClicked();
+		void hideProfileButtonClicked();
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
 		void createProject(String name);
 		void createTeam(final String teamName);
@@ -70,5 +84,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void getMoreProjects();
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
+		void onEditProfile();
+		void onImportLinkedIn();
+		void welcomeToDashboardDismissed();
 	}
 }

@@ -5,8 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.shared.event.HideEvent;
+import org.gwtbootstrap3.client.shared.event.HideHandler;
+import org.gwtbootstrap3.client.shared.event.ShowEvent;
+import org.gwtbootstrap3.client.shared.event.ShowHandler;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalBody;
+import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -26,48 +32,38 @@ import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitData;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.LayoutData;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProvenanceWidgetViewImpl extends LayoutContainer implements ProvenanceWidgetView {
+public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWidgetView {
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private PortalGinInjector ginInjector;
 	private ProvGraph graph;
-	private LayoutContainer debug;
+	private FlowPanel debug;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HashMap<String,String> filledPopoverIds;
 		
 	private int height = WidgetConstants.PROV_WIDGET_HEIGHT_DEFAULT;
-	private static final LayoutData TOP3_LEFT3 = new MarginData(3, 0, 0, 3);
+	private static final String TOP3_LEFT3 = "margin-left-3 margin-top-3";
 	
-	private LayoutContainer container;
-	private LayoutContainer thisLayoutContainer;
+	private FlowPanel container;
+	private FlowPanel thisLayoutContainer;
 	private Anchor fullScreenAnchor;
-	private LayoutContainer prov;
+	private FlowPanel prov;
 	private HTML loadingContainer;
 	private boolean blockCloseFullscreen = false;
 	private boolean inFullScreen = false;
@@ -81,27 +77,17 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
 		
-		container = new LayoutContainer();
+		container = new FlowPanel();
 		this.thisLayoutContainer = this;
-		
+		this.add(container);
 		createFullScreenButton(iconsImageBundle);	
 		loadingContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading provenance"));
 	}
 
 	@Override
-	protected void onRender(Element parent, int index) {
-		// TODO Auto-generated method stub
-		super.onRender(parent, index);
-		this.add(container);
-		createGraph();
-	}
-
-	@Override
 	public void setGraph(ProvGraph graph) {
 		this.graph = graph;
-		if(this.isRendered()) {
-			createGraph();
-		}
+		createGraph();
 	}
 
 	@Override
@@ -121,8 +107,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	@Override
 	public void showLoading() {
-		container.add(loadingContainer, TOP3_LEFT3);
-		container.layout(true);
+		container.add(loadingContainer);
+		container.addStyleName(TOP3_LEFT3);
 	}
 
 	@Override
@@ -132,7 +118,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	@Override
 	public void clear() {
-		container.removeAll();
+		container.clear();
 	}
 	
 
@@ -148,11 +134,11 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		nodeToContainer = new HashMap<String, ProvNodeContainer>();
 		this.filledPopoverIds = new HashMap<String,String>();
 		blockCloseFullscreen = false;
-		prov = new LayoutContainer();
-		prov.setStyleAttribute("position", "relative");		
-		prov.setHeight(height);				
+		prov = new FlowPanel();
+		prov.addStyleName("position-relative margin-5");		
+		prov.setHeight(height+"px");				
 		if(graph != null) {
-			container.removeAll();			
+			container.clear();			
 			if(!inFullScreen) addFullScreenAnchor();			
 			// add nodes to graph
 			Set<ProvGraphNode> nodes = graph.getNodes();
@@ -163,13 +149,12 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			}						
 		}
 		
-		container.add(prov, new MarginData(5));
+		container.add(prov);
 		this.addStyleName("scroll-auto");
 		
-		container.layout(true);
 		if(graph != null) {			
 			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
-			beforeJSPlumbLoad(prov.getId());
+			beforeJSPlumbLoad(prov.getElement().getId());
 			Set<ProvGraphEdge> edges = graph.getEdges();
 			for(ProvGraphEdge edge : edges) {
 				connect(edge.getSink().getId(), edge.getSource().getId());
@@ -210,25 +195,16 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer nodeContainer, final String title) {					
-		final Tooltip tooltip = new Tooltip(nodeContainer);
-		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
-		tooltip.setTrigger(Trigger.MANUAL);
-		tooltip.setPlacement(Placement.BOTTOM);
-		tooltip.setIsHtml(true);
-		
-		nodeContainer.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
+	private void addToolTipToContainer(final ProvGraphNode node, final ProvNodeContainer nodeContainer, final String title) {					
+		nodeContainer.getTip().setText(DisplayUtils.getLoadingHtml(sageImageBundle));
+		nodeContainer.getTip().addShowHandler(new ShowHandler() {
 			@Override
-			public void handleEvent(BaseEvent be) {	
-				if (!node.isShowingTooltip()) {
-					node.setShowingTooltip(true);
-					tooltip.show();
-				}
-				
-				// load the tooltip contents only once
+			public void onShow(ShowEvent showEvent) {
+				node.setShowingTooltip(true);
+				//load the tooltip contents only once
 				if(filledPopoverIds.containsKey(node.getId())) {
 					return;
-				}															
+				}  
 				// retrieve info
 				presenter.getInfo(node.getId(), new AsyncCallback<KeyValueDisplay<String>>() {						
 					@Override
@@ -245,39 +221,38 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					}
 					
 					private void renderPopover(final String rendered) {
-						filledPopoverIds.put(container.getId(), rendered);
+						filledPopoverIds.put(container.getElement().getId(), rendered);
 						Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-							@Override
+							 @Override
 							public void execute() {
-								if (nodeContainer.isAttached()) {
-									tooltip.setText(rendered);
-									tooltip.reconfigure();
-									if (node.isShowingTooltip())
-										tooltip.show();
-								}
+								boolean isShowingTooltip = node.isShowingTooltip();
+								nodeContainer.getTip().setText(rendered);
+								nodeContainer.getTip().reconfigure();
+								if (isShowingTooltip)
+									nodeContainer.getTip().show();
 							}
-						});
+						 });
 					}
 				});
 			}
 		});
 		
-		container.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
+		nodeContainer.getTip().addHideHandler(new HideHandler() {
+			
 			@Override
-			public void handleEvent(BaseEvent be) {
-				tooltip.hide();
+			public void onHide(HideEvent hideEvent) {
 				node.setShowingTooltip(false);
 			}
 		});
 	}
 
-	private void addUndefinedToolTip(LayoutContainer container) {
+	private void addUndefinedToolTip(FlowPanel container) {
 		Anchor a = new Anchor();
 		a.setHref(WebConstants.PROVENANCE_API_URL);
 		a.setText(DisplayConstants.HOW_TO_DEFINE_ACTIVITY);
 		a.setTarget("_blank");		
 		a.setStyleName("link");
-		container.setToolTip(ProvViewUtil.createMessageConfig(DisplayConstants.DEFINE_ACTIVITY, a.toString()));		
+		ProvViewUtil.createMessageConfig(DisplayConstants.DEFINE_ACTIVITY, a.toString(), container);
 	}
 
 	
@@ -349,52 +324,34 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 				// remove graph from on page container
 				thisLayoutContainer.remove(container);
 				container.remove(fullScreenAnchor);
-				thisLayoutContainer.layout(true);
 				
 				// add it to window
 				container.addStyleName("scroll-auto");				
-				final Window window = new Window();
-				// 90% h/w
-				window.setSize(
-						new Double(com.google.gwt.user.client.Window.getClientWidth() * .97).intValue(),
-						new Double(com.google.gwt.user.client.Window.getClientHeight() * .97).intValue()); 
-				window.setPlain(true);
-				window.setModal(true);
-				window.setHeaderVisible(true);
-				window.setHeading(DisplayConstants.PROVENANCE);
-				window.addListener(Events.OnClick, new Listener<BaseEvent>() {
+				final Modal window = new Modal();
+				window.addStyleName("modal-fullscreen");
+				window.setTitle(DisplayConstants.PROVENANCE);
+				final ModalBody body = new ModalBody();
+				body.add(container);
+				prov.setHeight(new Double(com.google.gwt.user.client.Window.getClientHeight() * .97).intValue() + "px");
+				ClickHandler closeHandler = new ClickHandler() {
 					@Override
-					public void handleEvent(BaseEvent be) {
-						if(!blockCloseFullscreen) {
-							window.hide();
-						}
-					}
-				});
-				window.addListener(Events.Hide, new Listener<ComponentEvent>() {
-			        @Override
-			        public void handleEvent(ComponentEvent be) {
-			        	addFullScreenAnchor();
+					public void onClick(ClickEvent event) {
+						addFullScreenAnchor();
 			        	container.removeStyleName("scroll-auto");
+			        	prov.setHeight(height + "px");
+			        	body.remove(container);
 			        	thisLayoutContainer.add(container);
-			        	container.setSize(prov.getWidth(), height); // reset height as window alters it 
-			        	prov.setHeight(height);
-			        	thisLayoutContainer.layout(true);
 			        	inFullScreen = false;
-			        }
-
-			    });
-				window.setLayout(new FitLayout());
-				LayoutContainer white = new LayoutContainer(new FitLayout());
-				white.addStyleName("whiteBackground");
-				white.add(container, new FitData(4));
-				window.add(white);				
-				window.addButton(new Button(DisplayConstants.CLOSE, new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						window.hide();
+			        	window.hide();
 					}
-				}));
-				window.setButtonAlign(HorizontalAlignment.RIGHT);
+				};
+				window.addCloseHandler(closeHandler);
+				window.add(body);
+				ModalFooter footer = new ModalFooter();
+				Button closeButton = new Button(DisplayConstants.CLOSE,closeHandler);
+				footer.add(closeButton);
+				
+				window.add(footer);
 				inFullScreen = true;
 				window.show();
 			}
@@ -402,7 +359,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	}
 		
 	private void addFullScreenAnchor() {
-		container.insert(fullScreenAnchor, 0, new MarginData(1, 0, 0, 1));
+		fullScreenAnchor.addStyleName("margin-top-1 margin-left-1");
+		container.insert(fullScreenAnchor, 0);
 	}
 
 	@Override

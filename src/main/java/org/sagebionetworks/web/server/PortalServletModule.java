@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -16,11 +15,8 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.ChallengeClient;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
-import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
-import org.sagebionetworks.web.server.servlet.FileUpload;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
@@ -45,11 +41,8 @@ import org.sagebionetworks.web.server.servlet.openid.OpenIDServlet;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
@@ -124,18 +117,10 @@ public class PortalServletModule extends ServletModule {
 		// setup the Simple Search servlet
 		bind(SimpleSearchService.class).in(Singleton.class);
 		serve("/Portal/simplesearch").with(SimpleSearchService.class);
-				
-		// setup GWTupload
-		bind(FileUpload.class).in(Singleton.class);
-		serve("/Portal/" + WebConstants.LEGACY_DATA_UPLOAD_SERVLET).with(FileUpload.class);
 
 		// Setup the File Uploader JNLP mapping
 		bind(FileUploaderJnlp.class).in(Singleton.class);
 		serve("/Portal/fileUploaderJnlp").with(FileUploaderJnlp.class);
-		
-		// Attachments
-		bind(FileAttachmentServlet.class).in(Singleton.class);
-		serve("/Portal/attachment").with(FileAttachmentServlet.class);
 		
 		// FileHandle upload
 		bind(FileHandleServlet.class).in(Singleton.class);

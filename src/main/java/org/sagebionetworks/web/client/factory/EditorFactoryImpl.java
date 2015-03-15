@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
@@ -25,8 +24,6 @@ public class EditorFactoryImpl implements EditorFactory {
 	private Provider<YouTubeConfigEditor> youTubeConfigEditorProvider;
 	@Inject
 	private Provider<ProvenanceConfigEditor> provenanceConfigEditorProvider;
-	@Inject
-	private Provider<OldImageConfigEditor> oldImageConfigEditorProvider;
 	@Inject
 	private Provider<ImageConfigEditor> imageConfigEditorProvider;
 	@Inject
@@ -50,11 +47,6 @@ public class EditorFactoryImpl implements EditorFactory {
 	@Override
 	public ProvenanceConfigEditor getProvenanceConfigEditor() {
 		return provenanceConfigEditorProvider.get();
-	}
-
-	@Override
-	public OldImageConfigEditor getOldImageConfigEditor() {
-		return oldImageConfigEditorProvider.get();
 	}
 
 	@Override

@@ -135,7 +135,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		myDashboardButtonContents.add(userBadge.asWidget());
 		myDashboardButtonContents.add(new Span("My Dashboard"));
-		myDashboardButtonContents.addStyleName("margin-left-100");
+		myDashboardButtonContents.addStyleName("margin-auto");
 		
 		addUserPicturePanel();
 		

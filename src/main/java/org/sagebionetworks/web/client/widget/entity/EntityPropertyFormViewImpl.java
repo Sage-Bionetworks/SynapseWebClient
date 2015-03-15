@@ -2,17 +2,13 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.widget.entity.row.EntityFormModel;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -33,7 +29,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.inject.Inject;
 
 public class EntityPropertyFormViewImpl extends FormPanel implements EntityPropertyFormView {
@@ -48,16 +43,14 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 	SageImageBundle sageImageBundle;
 	SynapseJSNIUtils synapseJSNIUtils;
 	Window loading;
-	private MarkdownEditorWidget markdownEditorWidget;
 	public static final int DIALOG_WIDTH = 850;
 	
 	@Inject
-	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils, MarkdownEditorWidget markdownEditorWidget) {
+	public EntityPropertyFormViewImpl(FormFieldFactory formFactory, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,SynapseJSNIUtils synapseJSNIUtils) {
 		this.formFactory = formFactory;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle= sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.markdownEditorWidget= markdownEditorWidget;
 		loading = DisplayUtils.createLoadingWindow(sageImageBundle, "Updating...");
 		this.setHeaderVisible(false);
 	}
@@ -154,20 +147,6 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		// Add both panels back.
 		this.propPanel.add(formPanel);
-		//markdown widget to be removed from entity property form
-		//only reconfigure the md editor if the entity id is set
-		if (!DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
-			if (presenter.getEntity().getId() != null) {
-				String markdown = presenter.getFormModel().getDescription().getValue();
-				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  ObjectType.ENTITY.toString(), null, DisplayUtils.getVersion(presenter.getEntity())), markdown, false, new WidgetDescriptorUpdatedHandler() {
-					@Override
-					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						presenter.refreshEntityAttachments();
-					}
-				});
-				propPanel.add(markdownEditorWidget.asWidget());
-			}
-		}
 		this.layout();
 	}
 	
@@ -226,8 +205,4 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		return form;
 	}
 	
-	@Override
-	public String getMarkdownDescription() {
-		return markdownEditorWidget.getMarkdown();
-	}
 }

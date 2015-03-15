@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -14,21 +15,26 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
+import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -37,22 +43,29 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
+	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
+	public static final String USER_PROFILE_WELCOME_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.welcome.message.visible.state";
+	
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
 	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	
-	private ProfileFormWidget profileForm;
+	private CookieProvider cookies;
+	private UserProfileModalWidget userProfileModalWidget;
+	private LinkedInServiceAsync linkedInService;
+	private GWTWrapper gwt;
+
 	private AdapterFactory adapterFactory;
-	private ProfileUpdatedCallback profileUpdatedCallback;
 	private int teamNotificationCount;
 	private String currentUserId;
 	private boolean isOwner;
@@ -67,18 +80,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			ProfileFormWidget profileForm,
 			AdapterFactory adapterFactory,
-			ChallengeClientAsync challengeClient
-			) {
+			ChallengeClientAsync challengeClient,
+			CookieProvider cookies,
+			UserProfileModalWidget userProfileModalWidget,
+			LinkedInServiceAsync linkedInServic,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
-		this.profileForm = profileForm;
 		this.challengeClient = challengeClient;
+		this.cookies = cookies;
+		this.userProfileModalWidget = userProfileModalWidget;
+		this.linkedInService = linkedInServic;
+		this.gwt = gwt;
 		view.setPresenter(this);
+		view.addUserProfileModalWidget(userProfileModalWidget);
 	}
 
 	@Override
@@ -125,36 +144,41 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			globalApplicationState.getPlaceChanger().goTo(place);
 		}
 	}
-	
-	/**
-	 * This method will update the current user's profile using LinkedIn
-	 */
-	@Override
-	public void updateProfileWithLinkedIn(String requestToken, String verifier) {
-		profileForm.updateProfileWithLinkedIn(requestToken, verifier);
-	}
-	
+
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
 		view.showLoading();
-		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
-		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
-		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+		isOwner = authenticationController.isLoggedIn()
+				&& authenticationController.getCurrentUserPrincipalId().equals(
+						userId);
+		view.setProfileEditButtonVisible(isOwner);	currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
+		if (isOwner) {
+			// make sure we have the user favorites before continuing
+			initUserFavorites(new Callback() {
 				@Override
-				public void onSuccess(UserProfile profile) {
-						if (isOwner) {
-							//only configure the profile form (editor) if owner of this profile
-							profileForm.configure(profile, profileUpdatedCallback);
-						}
-						
-						getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
-					}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.hideLoading();
-					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
+				public void invoke() {
+					getUserProfile(initialTab);
 				}
 			});
+		} else {
+			getUserProfile(initialTab);
+		}
+	}
+	
+	private void getUserProfile(final ProfileArea initialTab) {
+		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+			@Override
+			public void onSuccess(UserProfile profile) {
+					initializeShowHideProfile(isOwner);
+					initializeShowHideWelcome(isOwner);
+					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
+				}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.hideLoading();
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
+			}
+		});
 	}
 	
 	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner, final ProfileArea area) {
@@ -164,9 +188,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				try {
 					view.hideLoading();
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget());
+					view.updateView(profile, isOwner, passingRecord);
 					tabClicked(area);
-					proceed();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -175,27 +198,105 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
 				if (caught instanceof NotFoundException) {
-					view.updateView(profile, isOwner, null, profileForm.asWidget());
+					view.updateView(profile, isOwner, null);
 					tabClicked(area);
 				}
 				else
 					view.showErrorMessage(caught.getMessage());
-				
-				proceed();
-			}
-			
-			private void proceed() {
-				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
-				refreshTeams();
-				refreshChallenges();
 			}
 		});
+	}
+	
+	public void initializeShowHideProfile(boolean isOwner) {
+		if (isOwner) {
+			boolean isProfileVisible = true;
+			try {
+				String cookieValue = cookies.getCookie(USER_PROFILE_VISIBLE_STATE_KEY);
+				if (cookieValue != null && !cookieValue.isEmpty()) {
+					isProfileVisible = Boolean.valueOf(cookieValue);	
+				}
+			} catch (Exception e) {
+				//if there are any problems getting the profile visibility state, ignore and use default (show)
+			}
+			setIsProfileVisible(isProfileVisible);
+		} else {
+			//not the owner
+			//show the profile, and hide the profile button
+			setIsProfileVisible(true);
+			view.setHideProfileButtonVisible(false);
+		}
+	}
+	
+	public void initializeShowHideWelcome(boolean isOwner) {
+		if (isOwner) {
+			boolean isWelcomeMessageVisible = true;
+			try {
+				String cookieValue = cookies.getCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY);
+				if (cookieValue != null && !cookieValue.isEmpty()) {
+					isWelcomeMessageVisible = Boolean.valueOf(cookieValue);	
+				}
+			} catch (Exception e) {
+				//if there are any problems getting the welcome message visibility state, ignore and use default (show)
+			}
+			view.setWelcomeToDashboardVisible(isWelcomeMessageVisible);
+		} else {
+			//not the owner
+			//hide welcome message
+			view.setWelcomeToDashboardVisible(false);
+		}
+	}
+	
+	@Override
+	public void hideProfileButtonClicked() {
+		setIsProfileVisible(false);
+		setIsProfileVisibleCookie(false);
+	}
+	
+	@Override
+	public void showProfileButtonClicked() {
+		setIsProfileVisible(true);
+		setIsProfileVisibleCookie(true);
+	}
+	
+	private void setIsProfileVisible(boolean isVisible) {
+		if (isVisible){
+			view.showProfile();
+		} else {
+			view.hideProfile();
+		}
+		view.setShowProfileButtonVisible(!isVisible);
+		view.setHideProfileButtonVisible(isVisible);
+	}
+	
+	public void setIsProfileVisibleCookie(boolean isVisible) {
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_VISIBLE_STATE_KEY, Boolean.toString(isVisible), yearFromNow);
 	}
 	
 	public void refreshProjects() {
 		currentProjectOffset = 0;
 		view.clearProjects();
 		getMoreProjects();
+		
+		//initialize team filters
+		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				//could not load teams for team filters
+				view.setTeamsFilterVisible(false);
+			}
+			@Override
+			public void onSuccess(List<Team> teams) {
+				view.setTeamsFilterVisible(!teams.isEmpty());
+				view.setTeamsFilterTeams(teams);
+			}
+		};
+		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
+		
+		//also refresh the teams tab if you are the owner (to show notifications)
+		if (isOwner)
+			refreshTeams();
 	}
 	
 	public void refreshChallenges() {
@@ -229,7 +330,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					getMyProjects(ProjectListType.MY_CREATED_PROJECTS, ProjectFilterEnum.MINE, currentProjectOffset);
 					break;
 				case MY_PARTICIPATED_PROJECTS:
-					view.setTeamsFilterSelected();
+					view.setSharedDirectlyWithMeFilterSelected();
 					getMyProjects(ProjectListType.MY_PARTICIPATED_PROJECTS, ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, currentProjectOffset);
 					break;
 				case MY_TEAM_PROJECTS:
@@ -253,14 +354,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
+		view.showTeamsLoading();
 		teamNotificationCount = 0;
 		view.clearTeamNotificationCount();
 		if (isOwner)
 			view.refreshTeamInvites();
-		getTeams(currentUserId);
-	}
-	
-	public void getTeams(String userId) {
 		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -269,12 +367,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(List<Team> teams) {
 				view.setTeams(teams,isOwner);
-				view.setTeamsFilterVisible(!teams.isEmpty());
 			}
 		};
-		TeamListWidget.getTeams(userId, synapseClient, adapterFactory, teamCallback);
+		
+		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
 	}
-	
 	
 	public void getMoreChallenges() {
 		view.showChallengesLoading(true);
@@ -464,27 +561,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return true;
 	}
 	
-	private void setupProfileFormCallback() {
-		profileUpdatedCallback = new ProfileUpdatedCallback() {
-			@Override
-			public void profileUpdateSuccess() {
-				view.showInfo("Success", "Your profile has been updated.");
-				continueToEditProfile();
-			}
-			
-			public void continueToEditProfile() {
-				editMyProfile();
-				view.refreshHeader();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(caught.getMessage());
-				}
-				continueToEditProfile();
-			}
-		};
+	private void profileUpdated() {
+		view.showInfo("Success", "Your profile has been updated.");
+		editMyProfile();
+		view.refreshHeader();
 	}
 	
 	private void loggedInCheck() {
@@ -496,7 +576,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void showView(Profile place) {
 		view.clear();
-		setupProfileFormCallback();
 		String token = place.toToken();
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
@@ -544,10 +623,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateTeamInvites(List<MembershipInvitationBundle> invites) {
 		if (invites != null && invites.size() > 0) {
 			teamNotificationCount += invites.size();
-			//update team notification count
+			// update team notification count
 			if (teamNotificationCount > 0)
-				view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
-}
+				view.setTeamNotificationCount(Integer
+						.toString(teamNotificationCount));
+		}
 	}
 
 	@Override
@@ -606,18 +686,39 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			view.showErrorMessage("The selected tab is undefined.");
 			return;
 		}
-		//if we are editing, then pop up a confirm
+		// if we are editing, then pop up a confirm
 		if (globalApplicationState.isEditing()) {
 			Callback yesCallback = new Callback() {
 				@Override
 				public void invoke() {
-					profileForm.rollback();
+					refreshData(tab);
 					view.setTabSelected(tab);
 				}
 			};
-			view.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
-		} else
+			view.showConfirmDialog("",
+					DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE,
+					yesCallback);
+		} else {
+			refreshData(tab);
 			view.setTabSelected(tab);
+		}
+	}
+	
+	private void refreshData(ProfileArea tab) {
+		switch (tab) {
+			case PROJECTS:
+				setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
+				break;
+			case TEAMS:
+				refreshTeams();
+				break;
+			case CHALLENGES:
+			case SETTINGS:
+			default:
+				break;
+		}
+		//always refreshes challenges to determine if tab should be shown
+		refreshChallenges();
 	}
 	
 	/**
@@ -633,9 +734,31 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		goTo(new Certificate(currentUserId));
 	}
 	
+	public void initUserFavorites(final Callback callback) {
+		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onSuccess(List<EntityHeader> favorites) {
+				globalApplicationState.setFavorites(favorites);
+				callback.invoke();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.invoke();
+			}
+		});
+	}
+	
 	@Override
 	public void applyFilterClicked(ProjectFilterEnum filterType, Team team) {
 		setProjectFilterAndRefresh(filterType, team);
+	}
+	
+	@Override
+	public void welcomeToDashboardDismissed() {
+		//set welcome message visible=false for a year
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
 	}
 	
 	/**
@@ -651,6 +774,72 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 */
 	public ProjectFilterEnum getFilterType() {
 		return filterType;
+	}
+
+	@Override
+	public void onEditProfile() {
+		this.userProfileModalWidget.showEditProfile(this.currentUserId, new Callback() {
+			@Override
+			public void invoke() {
+				profileUpdated();
+			}
+		});
+		
+	}
+
+	@Override
+	public void onImportLinkedIn() {
+		redirectToLinkedIn();
+	}
+	
+	public void redirectToLinkedIn() {
+		linkedInService.returnAuthUrl(gwt.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
+			@Override
+			public void onSuccess(LinkedInInfo result) {
+				// Store the requestToken secret in a cookie, set to expire in five minutes
+				Date date = new Date(System.currentTimeMillis() + 300000);
+				cookies.setCookie(CookieKeys.LINKEDIN, result.getRequestSecret(), date);
+				// Open the LinkedIn authentication window in the same tab
+				Window.open(result.getAuthUrl(), "_self", "");
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage("An error occurred. Please try reloading the page.");					
+			}
+		});
+	}
+	
+	/**
+	 * This method will update the current user's profile using LinkedIn
+	 */
+	public void updateProfileWithLinkedIn(String requestToken, String verifier) {
+		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
+		// If not, grab the user's info for an update.
+		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
+		if(secret == null || secret.equals("")) {
+			view.showErrorMessage("You request has timed out. Please reload the page and try again.");
+		} else {
+			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
+				@Override
+				public void onSuccess(UserProfile linkedInProfile) {
+					// Give the user a chance to edit the profile.
+					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
+
+						@Override
+						public void invoke() {
+							profileUpdated();
+						}});
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+						view.showErrorMessage("An error occurred. Please try reloading the page.");									
+				}
+			});
+		}
 	}
 }
 

@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -125,6 +126,31 @@ public class JoinTeamWidgetTest {
 //		verify(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
 //		verify(mockView).showErrorMessage(anyString());
 //	}
+	
+	
+	@Test
+	public void testSimpleRequestButton() throws Exception {
+		reset(mockView);
+		TeamMembershipStatus status = new TeamMembershipStatus();
+		String isMemberMessage = "already a member";
+		String successMessage = "successfully joined";
+		String buttonText = "join a team";
+		boolean isChallenge = true;
+		joinWidget.configure(teamId, false, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText);
+		verify(mockView).configure(true, false, status, isMemberMessage, buttonText, isChallenge);
+	}
+	
+	@Test
+	public void testNormalRequestButton() throws Exception {
+		reset(mockView);
+		TeamMembershipStatus status = new TeamMembershipStatus();
+		String isMemberMessage = "already a member";
+		String successMessage = "successfully joined";
+		String buttonText = "join a team";
+		boolean isChallenge = false;
+		joinWidget.configure(teamId, false, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText);
+		verify(mockView).configure(true, false, status, isMemberMessage, buttonText, isChallenge);
+	}
 	
 	@Test
 	public void testJoinRequestStep1() throws Exception {

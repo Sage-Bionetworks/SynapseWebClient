@@ -155,4 +155,11 @@ public class GlobalApplicationStateImplTest {
 		Place returnedPlace = globalApplicationState.getLastPlace(null);
 		assertEquals(AppActivityMapper.getDefaultPlace(), returnedPlace);
 	}
+	
+	@Test
+	public void testClearLastPlace() {
+		globalApplicationState.clearLastPlace();
+		verify(mockCookieProvider).removeCookie(CookieKeys.LAST_PLACE);
+	}
+	
 }

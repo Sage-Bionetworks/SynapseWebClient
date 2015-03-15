@@ -263,11 +263,18 @@ public class EvaluationSubmitterTest {
 		testEvaluation.setContentSource("syn9999");
 		submitter.onNextClicked(new Reference(), "named submission", testEvaluation);
 		assertEquals(testChallenge, submitter.getChallenge());
-		verify(mockView).showTeams(eq(submissionTeams));
-		//and this first team should be selected by default
+		//the first team should be selected by default
 		assertEquals(testTeam, submitter.getSelectedTeam());
 		verify(mockView).hideModal1();
 		verify(mockView).showModal2();
+		
+		//individual submission is selected by default
+		assertTrue(submitter.getIsIndividualSubmission());
+		verify(mockView).setIsIndividualSubmissionActive(true);
+		verify(mockView, never()).showTeamsUI(anyList());
+		submitter.onTeamSubmissionOptionClicked();
+		verify(mockView).showTeamsUI(eq(submissionTeams));
+		assertFalse(submitter.getIsIndividualSubmission());
 		
 		//try selecting invalid indexes
 		submitter.onTeamSelected(-1);
@@ -280,7 +287,7 @@ public class EvaluationSubmitterTest {
 		assertNull(submitter.getSelectedTeam());
 	}
 	
-
+	
 	private void configureSubmitter() {
 		submitter.configure(entity, null);
 		reset(mockView);
@@ -299,8 +306,22 @@ public class EvaluationSubmitterTest {
 		testEvaluation.setContentSource("syn9999");
 		submitter.onNextClicked(new Reference(), "named submission", testEvaluation);
 		assertEquals(testChallenge, submitter.getChallenge());
-		verify(mockView).showEmptyTeams();
 		verify(mockView).showModal2();
+		
+		//individual submission is selected by default
+		assertTrue(submitter.getIsIndividualSubmission());
+		verify(mockView, never()).showEmptyTeams();
+		submitter.onTeamSubmissionOptionClicked();
+		verify(mockView).showEmptyTeams();
+		assertFalse(submitter.getIsIndividualSubmission());
+	}
+	
+	@Test
+	public void testOnIndividualSubmissionOptionClicked() {
+		configureSubmitter();
+		
+		submitter.onIndividualSubmissionOptionClicked();
+		verify(mockView).hideTeamsUI();
 	}
 	
 	@Test

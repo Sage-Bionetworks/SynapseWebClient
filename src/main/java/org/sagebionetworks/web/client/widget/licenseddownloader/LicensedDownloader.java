@@ -5,11 +5,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -23,13 +20,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -37,7 +32,7 @@ import com.google.inject.Inject;
  * @author dburdick
  *
  */
-public class LicensedDownloader implements LicensedDownloaderView.Presenter, SynapseWidgetPresenter {
+public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 	
 	private LicensedDownloaderView view;
 	
@@ -46,12 +41,13 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private AccessRequirement accessRequirementToDisplay;
 	private String entityId;
 	private APPROVAL_TYPE approvalType;
-	private HandlerManager handlerManager;
+	private EntityUpdatedHandler handler;
 	
 	private boolean isDirectDownloadSupported;
 	private AuthenticationController authenticationController;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private AccessRequirementDialog accessRequirementDialog;
+	private String directDownloadURL;
 	
 	@Inject
 	public LicensedDownloader(LicensedDownloaderView view,
@@ -67,26 +63,17 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.gwt = gwt;
 		this.accessRequirementDialog = accessRequirementDialog;
 		view.setPresenter(this);		
-		clearHandlers();
 	}
 
 	// this method could be public but it's only used privately (when a ToU agreement
 	// is created) so for now it's private
 	private void fireEntityUpdatedEvent() {
-		handlerManager.fireEvent(new EntityUpdatedEvent());
+		handler.onPersistSuccess(new EntityUpdatedEvent());
 	}
 	
-	/*
-	 * Public methods
-	 */
 	@Override
-	public void clearHandlers() {
-		handlerManager = new HandlerManager(this);
-	}
-
-	@Override
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {		
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		this.handler = handler;
 	}
 
 	/**
@@ -114,60 +101,24 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 */
 	public String getDirectDownloadURL() {
 		if (isDirectDownloadSupported && authenticationController.isLoggedIn())
-			return view.getDirectDownloadURL();
+			return directDownloadURL;
 		else return null; 
 	}
 	
 	/**
-	 * Returns a standard download button.  User must configure this widget
-	 * @param entity
-	 * @param showDownloadLocations
-	 * @return
-	 */
-	public Widget asWidget() {
-		return view.asWidget();
-	}	
-			
-	/**
 	 * Loads the download url 
 	 */
-	public void loadDownloadUrl(final EntityBundle entityBundle) {		
+	public void loadDownloadUrl(final EntityBundle entityBundle) {
+		directDownloadURL = null;
 		if(entityBundle != null && entityBundle.getEntity() != null) {
-			view.showDownloadsLoading();
 			if (entityBundle.getEntity() instanceof FileEntity) {
 				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
 				if (this.authenticationController.isLoggedIn()) {
 					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 					if (fileHandle != null) {
-						String md5 = null;
-						if (fileHandle instanceof S3FileHandleInterface) {
-							md5 = ((S3FileHandleInterface)fileHandle).getContentMd5();
-						}
-						String directDownloadURL = getDirectDownloadURL(fileEntity, fileHandle);
-						this.view.setDownloadLocation(md5, directDownloadURL);
+						directDownloadURL = getDirectDownloadURL(fileEntity, fileHandle);
 					}
-					else {
-						this.view.setNoDownloads();
-					}
-				} else {
-					this.view.setNeedToLogIn();
 				}
-			}
-			//TODO: next block to be deleted
-			else if(entityBundle.getEntity() instanceof Locationable) {
-				Locationable locationable = (Locationable)entityBundle.getEntity();
-				List<LocationData> locations = locationable.getLocations();				
-				if (this.authenticationController.isLoggedIn()) {
-					if(locations != null && locations.size() > 0) {
-						this.view.setDownloadLocations(locations, locationable.getMd5());
-					} else {
-						this.view.setNoDownloads();
-					}
-				} else {
-					this.view.setNeedToLogIn();
-				}
-			} else {
-				view.setNoDownloads();
 			}
 		}
 	}		
@@ -181,7 +132,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		return false;
 	}
 
-	public void showWindow() {
+	public void onDownloadButtonClicked() {
 		if (!isDownloadAllowed()) return;
 		
 		if (approvalType != APPROVAL_TYPE.NONE){
@@ -199,11 +150,11 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 					entityId, 
 					false, /*hasAdministrativeAccess*/
 					false, /*accessApproved*/
-					null,
+					finishedCallback, /*entity updated callback*/
 					finishedCallback /*on hide dialog callback*/);
 			accessRequirementDialog.show();
 		} else {
-			this.view.showWindow();	
+			view.newWindow(directDownloadURL);	
 		}
 	}
 	
@@ -216,10 +167,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			isDirectDownloadSupported = false;
 			approvalType = GovernanceServiceHelper.accessRequirementApprovalType(accessRequirementToDisplay);
 		}
-	}
-	
-	public void showLoading() {
-		this.view.showDownloadsLoading();
 	}
 		
 	public void clear() {
@@ -243,6 +190,14 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 				directDownloadURL = externalUrl;	
 			}
 		}
+		return directDownloadURL;
+	}
+	
+	/**
+	 * For testing purposes only.
+	 * @return
+	 */
+	public String getLoadedDirectDownloadURL() {
 		return directDownloadURL;
 	}
 }

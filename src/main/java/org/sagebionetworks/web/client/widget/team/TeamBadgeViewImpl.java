@@ -18,7 +18,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
@@ -58,12 +57,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			final Anchor anchor = new Anchor();
 			anchor.setText(name);
 			anchor.addStyleName("usernameLink");
-			anchor.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
-				}
-			});
+			anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
 			
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override

@@ -6,7 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.search.Facet;
@@ -18,8 +23,6 @@ import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -30,22 +33,6 @@ import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.core.El;
-import com.extjs.gxt.ui.client.core.XDOM;
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.ComponentPlugin;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.Slider;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -59,15 +46,16 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -111,11 +99,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
 	private TextBox searchField;
 	private Button searchButton;
-	private ContentPanel loadingPanel;
 	private boolean loadShowing;
 	private List<Button> facetButtons;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -124,12 +110,11 @@ public class SearchViewImpl extends Composite implements SearchView {
 	
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
-			Footer footerWidget, IconsImageBundle iconsImageBundle,
+			Footer footerWidget,
 			SageImageBundle sageImageBundle, 
 			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		initWidget(binder.createAndBindUi(this));
 		
-		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -139,9 +124,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		loadShowing = false;
-//		loadingPanel = DisplayUtils.getLoadingWidget(sageImageBundle);
-//		loadingPanel.setSize(700, 100);
-		
 	}
 
 	@Override
@@ -200,7 +182,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	private void createPagination(SearchResults searchResults) {
-		LayoutContainer lc = new LayoutContainer();
+		SimplePanel lc = new SimplePanel();
 		UnorderedListPanel ul = new UnorderedListPanel();
 		ul.setStyleName("pagination pagination-lg");
 				
@@ -223,16 +205,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private String createShownFacets(SearchResults searchResults) {
 		StringBuilder facetNames = new StringBuilder();
-		LayoutContainer currentFacets = new LayoutContainer();
+		FlowPanel currentFacets = new FlowPanel();
 
 		// add size
-		Html totalFound = new Html(searchResults.getFound() + " results found");
-		totalFound.setStyleName("small-italic");
-		totalFound.setStyleAttribute("margin", "6px 0 0 15px");
+		HTML totalFound = new HTML(searchResults.getFound() + " results found");
+		totalFound.setStyleName("small-italic margin-10");
 		currentFacets.add(totalFound);
 
-		currentFacets.setWidth(513);
-		currentFacets.setAutoHeight(true);
+		currentFacets.setWidth("513px");
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
 			// Don't display the !link node_type facet
 			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()))
@@ -240,9 +220,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			
 			// show project facet differently
 			if("project".equals(facet.getValue()) && "node_type".equals(facet.getKey())) {
-				Button btn = DisplayUtils.createIconButton(DisplayConstants.SHOW_ALL_RESULTS, ButtonType.DEFAULT, "glyphicon-search");
-				btn.addStyleName("floatleft");
-				btn.addClickHandler(new ClickHandler() {
+				Button btn = new Button(DisplayConstants.SHOW_ALL_RESULTS, IconType.SEARCH, new ClickHandler() {
 					
 					@Override
 					public void onClick(ClickEvent event) {
@@ -254,7 +232,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 						presenter.removeFacet(facet.getKey(), facet.getValue());						
 					}
 				});
-				currentFacets.insert(btn, 1, new MarginData(6, 5, 0, 0));
+				btn.addStyleName("margin-right-2");
+				btn.setPull(Pull.LEFT);
+				currentFacets.add(btn);
 				facetButtons.add(0, btn);				
 				continue;
 			}
@@ -271,9 +251,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			}
 			facetNames.append(text);
 			facetNames.append(" ");
-			Button btn = DisplayUtils.createIconButton(text, ButtonType.DEFAULT, "glyphicon-remove");
-			btn.addStyleName("floatleft");
-			btn.addClickHandler(new ClickHandler() {				
+			Button btn = new Button(text, IconType.TIMES, new ClickHandler() {				
 				@Override
 				public void onClick(ClickEvent event) {
 					// disable all buttons to allow only one click
@@ -284,10 +262,11 @@ public class SearchViewImpl extends Composite implements SearchView {
 					presenter.removeFacet(facet.getKey(), facet.getValue());						
 				}
 			});
-			currentFacets.add(btn, new MarginData(6, 5, 0, 0));
+			btn.addStyleName("margin-right-2");
+			btn.setPull(Pull.LEFT);
+			currentFacets.add(btn);
 			facetButtons.add(btn);
 		}
-		currentFacets.layout(true);
 		currentFacetsPanel.clear();
 		currentFacetsPanel.add(currentFacets);
 		return facetNames.toString();
@@ -304,9 +283,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 						switch (type) {
 						case LITERAL:
 							widget = createLiteralFacet(facet); 
-							break;
-						case CONTINUOUS:
-							widget = createContinuousFacet(facet); 
 							break;
 						case DATE:
 							widget = createDateFacet(facet); 
@@ -351,9 +327,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	public void showLoading() {
 		resultsPanel.clear();
 		paginationPanel.clear();
-		Html html = new Html();
-		html.setHtml(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " Loading...");
-		resultsPanel.add(html);
+		resultsPanel.add(new HTMLPanel(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " Loading..."));
 		loadShowing = true;
 	}
 
@@ -373,18 +347,17 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private void configureSearchBox() {
 		// setup search box
 		SimplePanel container;
-		LayoutContainer horizontalTable = new LayoutContainer();
-		horizontalTable.addStyleName("row");
+		Row horizontalTable = new Row();
 		
 		// setup serachButton
-		searchButton = DisplayUtils.createIconButton(DisplayConstants.LABEL_SEARCH, ButtonType.DEFAULT, "glyphicon-search");
-		searchButton.addStyleName("btn-lg btn-block");
-		searchButton.addClickHandler(new ClickHandler() {				
+		searchButton = new Button(DisplayConstants.LABEL_SEARCH, IconType.SEARCH, new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
 				presenter.setSearchTerm(searchField.getText());
 			}
 		});
+		searchButton.setSize(ButtonSize.LARGE);
+		searchButton.setBlock(true);
 
 		// setup field
 		searchField = new TextBox();
@@ -501,12 +474,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return pathBuilder.toSafeHtml();
 	}
 
-	private LayoutContainer createDateFacet(final Facet facet) {
+	private FlowPanel createDateFacet(final Facet facet) {
 		if(facet == null) return null;
 		if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
 		
-		LayoutContainer lc = new LayoutContainer();
-		lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
+		FlowPanel lc = new FlowPanel();
+		lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
 		FlexTable table = new FlexTable();
 		
 		// convert to miliseconds
@@ -558,80 +531,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return a;
 	}
 
-	private LayoutContainer createContinuousFacet(final Facet facet) {
-		if(facet == null) return null;
-		if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;
-		
-		LayoutContainer lc = new LayoutContainer();
-		lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
-		final Slider slider = new Slider();
-	    ComponentPlugin plugin = new ComponentPlugin() {  
-	        public void init(Component component) {  
-	          component.addListener(Events.Render, new Listener<ComponentEvent>() {  
-	            public void handleEvent(ComponentEvent be) {  
-	              El elem = be.getComponent().el().findParent(".facetSliderWrapper", 3);  
-	              // should style in external CSS  rather than directly
-	              elem.appendChild(XDOM.create("<div style='color: #615f5f;padding: 1 0 2 0px;'>From " + be.getComponent().getData("text") + "</div>"));	              
-	            }  
-	          });
-	        }  
-	      };  	      
-		
-		slider.setMaxValue(facet.getMax().intValue());
-		slider.setMinValue(facet.getMin().intValue());
-		int increment = 1;
-		long range = facet.getMax() - facet.getMin();
-		if(range >= 10000) {
-			increment = 1000;
-		} else if(range >= 1000) {
-			increment = 100;
-		} else if(range >= 100) {
-			increment = 10;
-		}
-		slider.setIncrement(increment);
-		slider.setMessage("At least {0}");
-		slider.addPlugin(plugin);
-		slider.setData("text", facet.getMin() + " to " + facet.getMax());
 
-		final com.extjs.gxt.ui.client.widget.button.Button apply = new com.extjs.gxt.ui.client.widget.button.Button("Apply Filter");
-		apply.hide();
-		apply.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// TODO : add an addContinuousFacet method to presenter
-				Window.scrollTo(0, 0);
-				presenter.addFacet(facet.getName(), slider.getValue() + "..");
-			}
-		});
-
-		slider.addListener(Events.Change, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				apply.show();
-				apply.setText("Apply: At least " + slider.getValue());				
-			}
-		});
-
-		LayoutContainer lc2 = new LayoutContainer();
-		lc2.setStyleName("facetSliderWrapper");
-		lc2.add(slider);
-		lc2.add(apply);				
-		lc.setId("custom-slider");
-	    lc.add(lc2);  
-	    	    
-	  	     	  
-		return lc;
-	}
-
-	private LayoutContainer createLiteralFacet(final Facet facet) {
-		LayoutContainer lc = null; 
+	private FlowPanel createLiteralFacet(final Facet facet) {
+		FlowPanel lc = null; 
 		if(facet != null && facet.getConstraints() != null && facet.getConstraints().size() > 0) {
-			lc = new LayoutContainer();
-			lc.setWidth(188);
+			lc = new FlowPanel();
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
 			//special case.  if this is the created_by facet, then add a UserBadge
 			boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
-			lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
+			lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
 			FlowPanel flowPanel = new FlowPanel();
 			//FlexTable flexTable = new FlexTable();
 			int i=0;
@@ -692,72 +600,3 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	
 }
-
-
-
-//@SuppressWarnings({ "unchecked", "rawtypes" })
-//private Widget createLiteralFacet(final Facet facet) {	     
-//	ListStore<BaseModelData> store = new ListStore<BaseModelData>();
-//	
-//	for(FacetConstraint constraint : facet.getConstraints()) {
-//		BaseModelData model = new BaseModelData();
-//		String num = " (" + constraint.getCount() + ")";
-//		model.set("name", constraint.getValue() + num);
-//		model.set("shortName", Format.ellipse(constraint.getValue(), FACET_NAME_LENGTH_CHAR) + num);
-//		model.set("facet", facet.getName());
-//		model.set("value", constraint.getValue());		
-//		store.add(model);
-//	}
-//	
-//	final ContentPanel panel = new ContentPanel();
-//	panel.setFrame(false);
-//	panel.setHeaderVisible(false);
-//	panel.setWidth(191);
-//	panel.setHeight(222);
-//	panel.setBodyBorder(false);
-//	panel.setScrollMode(Scroll.AUTO);
-//
-//	final CheckBoxListView<BaseModelData> view = new CheckBoxListView<BaseModelData>() {
-//		@Override
-//		protected BaseModelData prepareData(BaseModelData model) {
-//			// no preparations needed
-//			return model;
-//		}
-//
-//	};
-//
-//	final List<BaseModelData> prevSelected = new ArrayList<BaseModelData>();
-//	view.setStore(store);
-//	view.setDisplayProperty("shortName");
-//	view.addListener(Events.OnClick, new Listener() {
-//		public void handleEvent(BaseEvent be) {
-//			if (((DomEvent) be).getTarget(".x-view-item-checkbox", 2) != null) {
-//				List<BaseModelData> selected = view.getChecked();					
-//				BaseModelData model = selected.get(0);
-//				presenter.addFacet((String)model.get("facet"), (String)model.get("value"));
-//
-////this was cool but wrong					
-////				if(selected.size() > prevSelected.size()) {
-////					// addition
-////					selected.removeAll(prevSelected);
-////					BaseModelData model = selected.get(0);
-////					presenter.addFacet((String)model.get("facet"), (String)model.get("value"));
-////					prevSelected.add(model);
-////				} else {
-////					// subtraction
-////					prevSelected.removeAll(selected);
-////					BaseModelData model = prevSelected.get(0);						
-////					presenter.removeFacet((String)model.get("facet"), (String)model.get("value"));
-////					prevSelected.remove(model);						
-////					prevSelected.addAll(selected);
-////				}					
-//			}
-//		}
-//	});
-//	panel.add(view);
-//	
-//	LayoutContainer lc = new LayoutContainer();
-//	lc.add(new Html("<h6>" + facet.getName() + "</h6><p>"));
-//	lc.add(panel);
-//	return lc;
-//}

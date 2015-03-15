@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -163,9 +164,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		isAttachmentsWidgetConfigured = false;
 		if(!isCurrentVersion) {
-			markdownWidget.setMarkdown(markdown, wikiKey, true, false, versionInView);
+			markdownWidget.setMarkdown(markdown, wikiKey, false, versionInView);
 		} else {
-			markdownWidget.setMarkdown(markdown, wikiKey, true, false, null);
+			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
 		}
 		showDefaultViewWithWiki();
 	}
@@ -424,7 +425,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 					add(titleField);
 				}
 				//also add commands at the bottom
-				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), true, new WidgetDescriptorUpdatedHandler() {
+				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.addFileHandles(event.getNewFileHandleIds());
@@ -501,15 +502,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	public void deleteClicked() {
 		//delete wiki
-		DisplayUtils.showConfirmDialog(
-				DisplayConstants.LABEL_DELETE + " Page",
-				DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?",
-				new org.sagebionetworks.web.client.utils.Callback() {
-					@Override
-					public void invoke() {
-						presenter.deleteButtonClicked();
-					}
-				});
+		Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
+			@Override
+			public void callback(boolean isConfirmed) {
+				if (isConfirmed)
+					presenter.deleteButtonClicked();
+			}
+		});
 	}
 	
 	public void attachmentsClicked() {

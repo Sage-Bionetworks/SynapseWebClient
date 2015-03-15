@@ -5,17 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -24,16 +18,14 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 
 	private SynapseClientAsync synapseClient;
 	private Map<String, String> userId2html;
-	private NodeModelCreator nodeModelCreator;
 	SynapseJSNIUtils jsniUtils;
 	List<String> inputUserIds;
 	String outputColumnName;
 	private Map<String, List<String>> outputColumnData;
 	
 	@Inject
-	public APITableColumnRendererUserId(SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SynapseJSNIUtils jsniUtils) {
+	public APITableColumnRendererUserId(SynapseClientAsync synapseClient, SynapseJSNIUtils jsniUtils) {
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsniUtils = jsniUtils;
 	}
 	
@@ -56,23 +48,23 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 		
 		ArrayList<String> uniqueUserIds = new ArrayList<String>();
 		uniqueUserIds.addAll(userId2html.keySet());
-		synapseClient.getUserGroupHeadersById(uniqueUserIds, new AsyncCallback<UserGroupHeaderResponsePage>() {
+		synapseClient.listUserProfiles(uniqueUserIds, new AsyncCallback<List<UserProfile>>() {
 			@Override
-			public void onSuccess(UserGroupHeaderResponsePage response) {
-				for (UserGroupHeader ugh : response.getChildren()){
+			public void onSuccess(List<UserProfile> response) {
+				for (UserProfile profile : response){
 					StringBuilder html = new StringBuilder();
-					html.append("<a class=\"link\" href=\"#!Profile:"+ugh.getOwnerId()+"\">");
-					if (ugh.getPic() != null && ugh.getPic().getPreviewId() != null && ugh.getPic().getPreviewId().length() > 0) {
+					html.append("<a class=\"link\" href=\"#!Profile:"+profile.getOwnerId()+"\">");
+					if (profile.getProfilePicureFileHandleId() != null) {
 						//also include a little profile pic in the link
 						html.append("<span class=\"iconSpan\"><img src=\"");
-						html.append(DisplayUtils.createUserProfileAttachmentUrl(jsniUtils.getBaseProfileAttachmentUrl(), ugh.getOwnerId(), ugh.getPic().getPreviewId(), null));
+						html.append(DisplayUtils.createUserProfileAttachmentUrl(jsniUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), true));
 						html.append("\" style=\"width: 20px; height: 20px\"></img></span>");
 					}
 					else
 						html.append(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText displayInline"));
 						
-					html.append("&nbsp;"+DisplayUtils.getDisplayName(ugh)+"</a>");
-					userId2html.put(ugh.getOwnerId(), html.toString());
+					html.append("&nbsp;"+DisplayUtils.getDisplayName(profile)+"</a>");
+					userId2html.put(profile.getOwnerId(), html.toString());
 				}
 
 				callback.onSuccess(new APITableInitializedColumnRenderer() {

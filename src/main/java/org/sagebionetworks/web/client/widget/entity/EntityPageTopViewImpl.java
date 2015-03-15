@@ -26,8 +26,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
-import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.events.EntityDeletedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -41,7 +39,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
@@ -53,7 +50,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -113,7 +109,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SageImageBundle sageImageBundle;
 	
 	private ActionMenu actionMenu;
-	private LocationableTitleBar locationableTitleBar;
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
 	
@@ -158,8 +153,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel fileProvenanceContainer;
 	@UiField
-	SimplePanel fileAttachmentsContainer;
-	@UiField
 	SimplePanel fileProgrammaticClientsContainer;
 	@UiField
 	SimplePanel fileModifiedAndCreatedContainer;
@@ -190,7 +183,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel tableListWidgetContainer;
 	
-	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
 	private FileHistoryWidget fileHistoryWidget;
 	private TableListWidget tableListWidget;
@@ -214,10 +206,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle,
 			ActionMenu actionMenu,
-			LocationableTitleBar locationableTitleBar,
 			FileTitleBar fileTitleBar,
 			Breadcrumb breadcrumb,
-			Attachments attachmentsPanel, 
 			SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, 
 			FileHistoryWidget fileHistoryWidget, 
@@ -234,12 +224,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
 		this.breadcrumb = breadcrumb;
-		this.attachmentsPanel = attachmentsPanel;
 		this.snapshotWidget = snapshotWidget;
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.evaluationList = evaluationList;
-		this.locationableTitleBar = locationableTitleBar;
 		this.fileTitleBar = fileTitleBar;
 		this.ginInjector = ginInjector;
 		this.folderFilesBrowser = folderFilesBrowser;
@@ -255,7 +243,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileHistoryContainer.add(fileHistoryWidget.asWidget());
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileSnapshotsContainer.add(snapshotWidget.asWidget());
-		locationableTitlebarContainer.add(locationableTitleBar.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
 
@@ -376,7 +363,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesWikiPageContainer.clear();
 		filePreviewContainer.clear();
 		fileProvenanceContainer.clear();
-		fileAttachmentsContainer.clear();
 		fileProgrammaticClientsContainer.clear();
 		fileModifiedAndCreatedContainer.clear();
 		wikiPageContainer.clear();
@@ -413,7 +399,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		};
 		actionMenu.setEntityUpdatedHandler(handler);
-		locationableTitleBar.setEntityUpdatedHandler(handler);
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		EntityUpdatedHandler fileBrowserUpdateHandler = new EntityUpdatedHandler() {
 			@Override
@@ -452,7 +437,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void clear() {
 		actionMenu.clearState();
-		locationableTitleBar.clearState();
 		fileTitleBar.clearState();
 	}
 
@@ -470,10 +454,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if (bundle.getEntity() instanceof FileEntity) {
 			fileTitleBar.configure(bundle);
 			fileTitlebarContainer.setVisible(true);
-		} else {
-			locationableTitleBar.configure(bundle);
-			locationableTitlebarContainer.setVisible(true);
-		}		
+		} 	
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
@@ -497,9 +478,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) { 
 			// Provenance Widget (for anything other than projects of folders)
 			fileProvenanceContainer.add(createProvenanceWidget(bundle, provFullWidth));
-		}
-		// Attachments
-		fileAttachmentsContainer.add(createAttachmentsWidget(bundle));		
+		}	
 		// Programmatic Clients
 		fileProgrammaticClientsContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
 		// Created By/Modified By
@@ -586,7 +565,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// File Tab: Files, Annotations & old
 		fileBrowserContainer.add(configureFilesBrowser(projectFilesBrowser, bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
-		fileAttachmentsContainer.add(createAttachmentsWidget(bundle)); // Attachments (TODO : this should eventually be removed)
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 
@@ -716,8 +694,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		boolean readOnly = versionNumber != null;
 		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), readOnly);		
 		fileSnapshotsContainer.setVisible(true);		
-		// Attachments
-		fileAttachmentsContainer.add(createAttachmentsWidget(bundle));
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 	}
@@ -821,42 +797,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 		// Add the description body
 	    if(description != null && !("".equals(description))) {
-	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-				lc.add(markdownWidget);
-		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  ObjectType.ENTITY.toString(), null, versionNumber), false, false, null);
-	    	}
-	    	else {
-	    		Label plainDescriptionText = new Label();
-	    		plainDescriptionText.addStyleName("wiki-description");
-	    		plainDescriptionText.setText(description);
-	    		lc.add(plainDescriptionText);
-	    	}
+    		Label plainDescriptionText = new Label();
+    		plainDescriptionText.addStyleName("wiki-description");
+    		plainDescriptionText.setText(description);
+    		lc.add(plainDescriptionText);
 	    }
 	    
    		return lc;
 	}
 	
-	private Widget createAttachmentsWidget(final EntityBundle bundle) {	    
-		SimplePanel lc = new SimplePanel();
-	    lc.getElement().setAttribute("highlight-box-title", DisplayConstants.BUTTON_WIKI_ATTACHMENTS);
-		lc.setStyleName("highlight-box"); 
-        final String baseURl = GWT.getModuleBaseURL()+"attachment";
-
-        // We just create a new one each time.
-        attachmentsPanel.configure(baseURl, bundle.getEntity(), false);
-        if(attachmentsPanel.isEmpty()) 
-        	return new SimplePanel();
-        attachmentsPanel.clearHandlers();
-        attachmentsPanel.addAttachmentSelectedHandler(new AttachmentSelectedHandler() {
-			
-			@Override
-			public void onAttachmentSelected(AttachmentSelectedEvent event) {
-				String url = DisplayUtils.createAttachmentUrl(baseURl, bundle.getEntity().getId(), event.getTokenId(), event.getTokenId());
-				DisplayUtils.newWindow(url, "", "");
-			}
-		});
-        		
-        lc.add(attachmentsPanel.asWidget());
-		return lc;
-	}
 }

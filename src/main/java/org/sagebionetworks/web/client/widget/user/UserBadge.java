@@ -86,8 +86,8 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 
 	public void configurePicture() {
-		if (profile != null && profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-			String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
+		if (profile != null && profile.getProfilePicureFileHandleId() != null) {
+			String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), true);
 			view.showCustomUserPicture(url);
 		} else {
 			view.showAnonymousUserPicture();

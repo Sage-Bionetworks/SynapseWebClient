@@ -12,14 +12,10 @@
 		<g:HTMLPanel ui:field="fileFoundContainer">
 			<h2 style="margin-bottom: 0px;">
 			 	<span class="liftLargeIcon"><g:Image ui:field="entityIcon"/></span>
-			 	<g:Anchor ui:field="directDownloadLink" styleName="downloadLink link displayInline" />
-			 	<b:ImageAnchor ui:field="directDownloadImage" styleName="displayInline imageButton" url='{icons.NavigateDown16.getSafeUri.asString}' />
+			 	<b:Anchor ui:field="directDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT"/>
+			 	<b:Anchor ui:field="authorizedDirectDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT" />
 			 	
-			 	<g:Anchor ui:field="authorizedDirectDownloadLink" styleName="downloadLink link displayInline" />
-			 	<g:Image ui:field="authorizedDirectDownloadImage" styleName="displayInline imageButton" resource='{icons.NavigateDown16}' />
-			 	
-			 	<g:Anchor ui:field="licensedDownloadLink" styleName="downloadLink link"/>
-			 	<g:SimplePanel ui:field="downloadButtonContainer"/>&nbsp;
+			 	<b:Anchor ui:field="licensedDownloadLink" styleName="downloadLink link" icon="DOWNLOAD" iconPosition="RIGHT"/>
 			 	<g:SimplePanel ui:field="favoritePanel"/>
 			</h2>
 			<g:HTMLPanel ui:field="fileNameContainer">

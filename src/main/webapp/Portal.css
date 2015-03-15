@@ -558,6 +558,9 @@ a.shortBtn {
 .min-height-400 {
 	min-height: 400px;
 }
+.min-height-200 {
+	min-height: 200px;
+}
 
 .profile-image-40px {
 	width: 40px;	
@@ -595,6 +598,9 @@ a.shortBtn {
 	margin-top: 10px;
 	margin-left: 10px;
 }
+.margin-left-1 {
+	margin-left: 1px;
+}
 .margin-left-9 {
 	margin-left: 9px;
 }
@@ -611,9 +617,17 @@ a.shortBtn {
 .margin-left-2 {
 	margin-left: 2px;
 }
+.margin-left-3 {
+	margin-left: 3px;
+}
+
 .margin-left-5 {
 	margin-left: 5px;
 }
+.margin-top-3 {
+	margin-top: 3px;
+}
+
 .margin-top-5 {
 	margin-top: 5px !important;
 }
@@ -625,7 +639,9 @@ a.shortBtn {
 .margin-top-0, .margin-top-0-radio input[type=radio], .margin-top-0-checkbox input[type=checkbox] {
 	margin-top: 0px !important;
 }
-
+.margin-top-1 {
+	margin-top: 1px;
+}
 .margin-top-10 {
 	margin-top: 10px;
 }
@@ -658,8 +674,8 @@ a.shortBtn {
 	margin-left: 35px;
 }
 
-.margin-left-100 {
-	margin-left: 100px;
+.margin-auto {
+	margin: auto;
 }
 
 .margin-bottom-60 {
@@ -686,6 +702,9 @@ a.shortBtn {
 
 .margin-bottom-4 {
 	margin-bottom: 4px;
+}
+.margin-bottom-1 {
+	margin-bottom: 1px;
 }
 
 .margin-bottom-15 {
@@ -1792,6 +1811,10 @@ a.projectTitle:hover {
 	font-size: 12px;
 }
 
+.position-relative {
+	position: relative;
+}
+
 .dropText-10 {
 	position: relative;
 	top: 10px;
@@ -1851,6 +1874,11 @@ a.projectTitle:hover {
 Looks for any child element under .modal-fullscreen that has a class that contains modal-dialog.*/
 .modal-fullscreen [class*="modal-dialog"] {
 	width: 95%;
+}
+
+.my-dashboard-header-button [class*="user-badge"] {
+	margin-left: 0px;
+	margin-right: 0px;
 }
 
 /* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */

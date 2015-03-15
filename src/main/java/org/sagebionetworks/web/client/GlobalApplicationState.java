@@ -100,4 +100,6 @@ public interface GlobalApplicationState {
 	void initSynapseProperties(Callback c);
 	
 	String getSynapseProperty(String key);
+	
+	void clearLastPlace();
 }

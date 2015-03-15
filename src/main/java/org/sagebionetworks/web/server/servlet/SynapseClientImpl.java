@@ -78,8 +78,6 @@ import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
@@ -134,12 +132,12 @@ import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
+import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
-import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -178,7 +176,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	// This will be appended to the User-Agent header.
-	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
+	public static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
 			+ PortalVersionHolder.getVersionInfo();
 	static {// kick off initialization (like pattern compilation) by referencing
 			// it
@@ -938,56 +936,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			AttachmentData pic = profile.getPic();
-			if (pic != null && pic.getTokenId() == null && pic.getUrl() != null) {
-				// special case, client provided just enough information to pull
-				// the pic from an external location (so try to store in s3
-				// before updating the profile).
-				log.info("Downloading picture from url: " + pic.getUrl());
-				URL url = new URL(pic.getUrl());
-				pic.setUrl(null);
-				File temp = null;
-				URLConnection conn = null;
-				try {
-					conn = url.openConnection();
-					conn.setDoInput(true);
-					conn.setDoOutput(false);
-					temp = ServiceUtils
-							.writeToTempFile(
-									conn.getInputStream(),
-									UserProfileAttachmentServlet.MAX_ATTACHMENT_SIZE_IN_BYTES);
-					// Now upload the file
-					String contentType = conn.getContentType();
-					String fileName = temp.getName();
-					if (contentType != null
-							&& contentType.equalsIgnoreCase("image/jpeg")
-							&& !fileName.toLowerCase().endsWith(".jpg"))
-						fileName = profile.getOwnerId() + ".jpg";
-					pic = synapseClient.uploadUserProfileAttachmentToSynapse(
-							profile.getOwnerId(), temp, fileName);
-				} catch (Throwable t) {
-					// couldn't pull the picture from the external server. log
-					// and move on with the update
-					t.printStackTrace();
-				} finally {
-					// Unconditionally delete the tmp file and close the input
-					// stream
-					if (temp != null)
-						temp.delete();
-					try {
-						conn.getInputStream().close();
-					} catch (Throwable t) {
-						t.printStackTrace();
-					}
-				}
-				profile.setPic(pic);
-			}
 			synapseClient.updateMyProfile(profile);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (IOException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
+		} 
 	}
 
 	@Override
@@ -1130,22 +1082,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					.writeToJSONObject(adapterFactory.createNew());
 			return new EntityWrapper(upJson.toJSONString(), upJson.getClass()
 					.getName());
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	@Override
-	public String createUserProfileAttachmentPresignedUrl(String id,
-			String tokenOrPreviewId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			PresignedUrl url = synapseClient
-					.createUserProfileAttachmentPresignedUrl(id,
-							tokenOrPreviewId);
-			return EntityFactory.createJSONStringForEntity(url);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -1304,34 +1240,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	@Deprecated
-	public EntityWrapper updateExternalLocationable(String entityId,
-			String externalUrl, String name) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			Entity locationable = synapseClient.getEntityById(entityId);
-			if (!(locationable instanceof Locationable)) {
-				throw new RuntimeException("Upload failed. Entity id: "
-						+ locationable.getId() + " is not Locationable.");
-			}
-			if (isManuallySettingExternalName(name)) {
-				locationable.setName(name);
-			}
-			Locationable result = synapseClient
-					.updateExternalLocationableToSynapse(
-							(Locationable) locationable, externalUrl);
-			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory
-					.createNew());
-			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass()
-					.getName());
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	@Override
 	public EntityWrapper updateExternalFile(String entityId,
 			String externalUrl, String name) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1475,35 +1383,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-	}
-
-	@Override
-	public EntityWrapper removeAttachmentFromEntity(String entityId,
-			String attachmentName) throws RestServiceException {
-		EntityWrapper updatedEntityWrapper = null;
-		try {
-			org.sagebionetworks.client.SynapseClient client = createSynapseClient();
-			Entity e = client.getEntityById(entityId);
-			if (e.getAttachments() != null) {
-				for (AttachmentData data : e.getAttachments()) {
-					if (data.getName().equals(attachmentName)) {
-						e.getAttachments().remove(data);
-						break;
-					}
-				}
-			}
-			// Save the changes.
-			Entity updatedEntity = client.putEntity(e);
-			updatedEntityWrapper = new EntityWrapper(
-					EntityFactory.createJSONStringForEntity(updatedEntity),
-					updatedEntity.getClass().getName());
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-
-		return updatedEntityWrapper;
 	}
 
 	@Override
@@ -2154,6 +2033,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			results.setResults(teamMemberBundles);
 			results.setTotalNumberOfResults(members.getTotalNumberOfResults());
 			return results;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public List<UserProfile> listUserProfiles(List<String> userIds) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			List<Long> userIdsLong = new LinkedList<Long>();
+			for (String idString :userIds) {
+				userIdsLong.add(Long.parseLong(idString));
+			}
+			return synapseClient.listUserProfiles(userIdsLong);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
