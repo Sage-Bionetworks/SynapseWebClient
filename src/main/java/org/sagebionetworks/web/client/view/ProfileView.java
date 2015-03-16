@@ -67,6 +67,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setProfileEditButtonVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
 	
+	void setWelcomeToDashboardVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
@@ -85,5 +86,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
 		void onImportLinkedIn();
+		void welcomeToDashboardDismissed();
 	}
 }
