@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -14,11 +15,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -26,20 +28,19 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -56,6 +57,7 @@ public class EntityActionControllerImplTest {
 	AuthenticationController mockAuthenticationController;
 	AccessControlListModalWidget mockAccessControlListModalWidget;
 	RenameEntityModalWidget mockRenameEntityModalWidget;
+	EntityFinder mockEntityFinder;
 	
 	ActionMenuWidget mockActionMenu;
 	EntityUpdatedHandler mockEntityUpdatedHandler;
@@ -85,6 +87,7 @@ public class EntityActionControllerImplTest {
 		
 		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
 		mockEntityUpdatedHandler = Mockito.mock(EntityUpdatedHandler.class);
+		mockEntityFinder = Mockito.mock(EntityFinder.class);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
@@ -97,7 +100,7 @@ public class EntityActionControllerImplTest {
 				mockPreflightController, mockEntityTypeProvider,
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget);
+				mockRenameEntityModalWidget, mockEntityFinder);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -112,7 +115,6 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
-		
 	}
 
 	@Test
@@ -147,6 +149,24 @@ public class EntityActionControllerImplTest {
 		entityBundle.getPermissions().setCanPublicRead(false);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.LOCK);
+	}
+	
+	@Test
+	public void testConfigureNoWiki(){
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, true);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, true);
+		verify(mockActionMenu).setActionText(Action.ADD_WIKI_PAGE, ADD_WIKI);
+		verify(mockActionMenu).addActionListener(Action.ADD_WIKI_PAGE, controller);
+	}
+	
+	@Test
+	public void testConfigureWiki(){
+		entityBundle.setRootWikiId("7890");
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, false);
 	}
 	
 	@Test
@@ -314,4 +334,39 @@ public class EntityActionControllerImplTest {
 		verify(mockRenameEntityModalWidget, never()).onRename(any(Entity.class), any(Callback.class));
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
+	
+	@Test
+	public void testOnAddWikiNoUpdate(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_PAGE);
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnAddWikiCanUpdate(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_PAGE);
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnAddWikiCanUpdateFailure(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		String error = "some error";
+		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_PAGE);
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		mockView.showErrorMessage(error);
+	}
+	
 }

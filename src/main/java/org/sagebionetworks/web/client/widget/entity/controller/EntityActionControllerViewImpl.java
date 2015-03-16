@@ -35,7 +35,6 @@ public class EntityActionControllerViewImpl implements
 	@Override
 	public void showConfirmDialog(String title, String string, Callback callback) {
 		DisplayUtils.showConfirmDialog(title, string, callback);
-
 	}
 
 	@Override

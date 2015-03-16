@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.apache.http.entity.FileEntity;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -13,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -21,6 +25,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -33,6 +38,10 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
+	public static final String MOVE_PREFIX = "Move ";
+
+	public static final String ADD_WIKI = "Add wiki";
+
 	public static final String THE = "The ";
 
 	public static final String WAS_SUCCESSFULLY_DELETED = " was successfully deleted.";
@@ -55,6 +64,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
 	RenameEntityModalWidget renameEntityModalWidget;
+	EntityFinder entityFinder;
 	
 	EntityBundle entityBundle;
 	Entity entity;
@@ -73,7 +83,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			AccessControlListModalWidget accessControlListModalWidget,
-			RenameEntityModalWidget renameEntityModalWidget) {
+			RenameEntityModalWidget renameEntityModalWidget,
+			EntityFinder entityFinder) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -84,6 +95,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.renameEntityModalWidget = renameEntityModalWidget;
+		this.entityFinder = entityFinder;
 	}
 
 	@Override
@@ -102,14 +114,31 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureShareAction();
 		configureRenameAction();
 		configureAddWiki();
+		configureMove();
 	}
 	
 	private void configureAddWiki(){
 		if(this.entityBundle.getRootWikiId() == null){
 			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
-			actionMenu.setActionText(Action.ADD_WIKI_PAGE, "Add wiki");
+			actionMenu.setActionText(Action.ADD_WIKI_PAGE, ADD_WIKI);
 			actionMenu.addActionListener(Action.ADD_WIKI_PAGE, this);
+		}else{
+			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, false);
+			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, false);
+		}
+	}
+	
+	private void configureMove(){
+		Entity entity = entityBundle.getEntity();
+		if(entity instanceof Folder || entity instanceof FileEntity ){
+			actionMenu.setActionVisible(Action.MOVE_ENTITY, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.MOVE_ENTITY, permissions.getCanEdit());
+			actionMenu.setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+enityTypeDisplay);
+			actionMenu.addActionListener(Action.MOVE_ENTITY, this);
+		}else{
+			actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
+			actionMenu.setActionEnabled(Action.MOVE_ENTITY, false);
 		}
 	}
 	
@@ -152,12 +181,61 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case ADD_WIKI_PAGE:
 			onAddWiki();
-			break;	
+			break;
+		case MOVE_ENTITY:
+			onMove();
+			break;
 		default:
 			break;
 		}
 	}
+	
+	private void onMove() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckMove();
+			}
+		});
+	}
 
+	private void postCheckMove(){
+		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				if(selected.getTargetId() != null) {
+					moveEntity(selected.getTargetId());
+					entityFinder.hide();
+				} else {
+					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		});
+		entityFinder.show();
+	}
+	
+	/**
+	 * Move the entity to the given target.
+	 * @param target
+	 */
+	private void moveEntity(String target){
+		Entity entity = entityBundle.getEntity();
+		entity.setParentId(target);
+		synapseClient.updateEntity(entity, new AsyncCallback<Entity>() {
+			
+			@Override
+			public void onSuccess(Entity result) {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+	
 	private void onAddWiki() {
 		// Validate the user can update this entity.
 		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
