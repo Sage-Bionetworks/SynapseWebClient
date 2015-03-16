@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.apache.http.entity.FileEntity;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
@@ -130,8 +129,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureMove(){
-		Entity entity = entityBundle.getEntity();
-		if(entity instanceof Folder || entity instanceof FileEntity ){
+		if(isMovableType(entityBundle.getEntity()) ){
 			actionMenu.setActionVisible(Action.MOVE_ENTITY, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.MOVE_ENTITY, permissions.getCanEdit());
 			actionMenu.setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+enityTypeDisplay);
@@ -165,6 +163,34 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}else{
 			actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
 		}
+	}
+	
+	/**
+	 * Can an entity of this type be moved?
+	 * @param entity
+	 * @return
+	 */
+	public boolean isMovableType(Entity entity){
+		if(entity instanceof Project){
+			return false;
+		}else if(entity instanceof TableEntity){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Can an entity of this type have a wiki?
+	 * @param entity
+	 * @return
+	 */
+	public boolean isWikiableType(Entity entity){
+		if(entity instanceof TableEntity){
+			return false;
+		}else if(entity instanceof Link){
+			return false;
+		}
+		return true;
 	}
 
 	@Override

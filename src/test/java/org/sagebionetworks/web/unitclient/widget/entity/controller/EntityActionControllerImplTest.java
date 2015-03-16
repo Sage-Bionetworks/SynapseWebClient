@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -8,20 +9,32 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ADD_WIKI;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -70,6 +83,8 @@ public class EntityActionControllerImplTest {
 	String entityId;
 	String entityDispalyType;
 	String currentUserId = "12344321";
+	
+	Reference selected;
 
 	@Before
 	public void before() {
@@ -115,6 +130,19 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
+		
+		selected = new Reference();
+		selected.setTargetId("syn9876");
+		// Setup the mock entity selector to select an entity.
+		Mockito.doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation)
+					throws Throwable {
+				SelectedHandler<Reference> handler = (SelectedHandler<Reference>) invocation.getArguments()[1];
+				handler.onSelected(selected);
+				return null;
+			}
+		}).when(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
 	}
 
 	@Test
@@ -167,6 +195,23 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, false);
+	}
+	
+	@Test
+	public void testConfigureMoveTable(){
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, false);
+		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
+	}
+	
+	@Test
+	public void testConfigureMove(){
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, true);
+		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
+		verify(mockActionMenu).setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+entityDispalyType);
+		verify(mockActionMenu).addActionListener(Action.MOVE_ENTITY, controller);
 	}
 	
 	@Test
@@ -369,4 +414,62 @@ public class EntityActionControllerImplTest {
 		mockView.showErrorMessage(error);
 	}
 	
+	@Test
+	public void testIsMovableType(){
+		assertFalse(controller.isMovableType(new Project()));
+		assertFalse(controller.isMovableType(new TableEntity()));
+		assertTrue(controller.isMovableType(new FileEntity()));
+		assertTrue(controller.isMovableType(new Folder()));
+		assertTrue(controller.isMovableType(new Link()));
+	}
+	
+	@Test
+	public void testIsWikableType(){
+		assertTrue(controller.isWikiableType(new Project()));
+		assertFalse(controller.isWikiableType(new TableEntity()));
+		assertTrue(controller.isWikiableType(new FileEntity()));
+		assertTrue(controller.isWikiableType(new Folder()));
+		assertFalse(controller.isWikiableType(new Link()));
+	}
+	
+	@Test
+	public void testOnMoveNoUpdate(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.MOVE_ENTITY);
+		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder, never()).show();
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnMoveCanUpdateFailed(){
+		String error = "An error";
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.MOVE_ENTITY);
+		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder).show();
+		verify(mockEntityFinder).hide();
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockView).showErrorMessage(error);
+	}
+	
+	@Test
+	public void testOnMoveCanUpdateSuccess(){
+		String error = "An error";
+		AsyncMockStubber.callSuccessWith(new Folder()).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.MOVE_ENTITY);
+		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder).show();
+		verify(mockEntityFinder).hide();
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockView, never()).showErrorMessage(error);
+	}
 }
