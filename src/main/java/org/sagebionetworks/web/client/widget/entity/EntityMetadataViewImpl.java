@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidget;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
@@ -65,14 +66,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField(provided = true)
 	final IconsImageBundle icons;
 
-	AnnotationsWidget annotationsWidget;
+	AnnotationsRendererWidget annotationsWidget;
 	RestrictionWidget restrictionWidget;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			FavoriteWidget favoriteWidget,
 			DoiWidget doiWidget,
-			AnnotationsWidget annotationsWidget,
+			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget
 			) {
 		this.icons = iconsImageBundle;
@@ -134,7 +135,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {
 		// configure widget
-		annotationsWidget.configure(bundle, canEdit);
+		annotationsWidget.configure(bundle.getEntity(), bundle.getAnnotations(), canEdit);
 		// show widget?
 		if(canEdit || !annotationsWidget.isEmpty()) {
 			annotationsPanel.setVisible(true);

@@ -279,7 +279,6 @@ public interface PortalGinInjector extends Ginjector {
 	public LinkCellRenderer createLinkCellRenderer();
 	public FileCellEditor createFileCellEditor();
 	public FileCellRenderer createFileCellRenderer();
-
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();

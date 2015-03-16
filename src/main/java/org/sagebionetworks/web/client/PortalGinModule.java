@@ -282,6 +282,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidgetView;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
@@ -532,6 +534,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationsWidgetViewImpl.class).in(Singleton.class);
 		bind(AnnotationsWidgetView.class).to(AnnotationsWidgetViewImpl.class);
 		
+		bind(AnnotationsRendererWidgetView.class).to(AnnotationsRendererWidgetViewImpl.class);
 		
 		//file history
 		bind(FileHistoryWidget.class).in(Singleton.class);
