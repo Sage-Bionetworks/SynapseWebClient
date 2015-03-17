@@ -13,6 +13,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,9 +25,7 @@ import com.google.inject.Inject;
  */
 public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.Presenter, IsWidget {
 	
-	private AdapterFactory factory;
-	private EntitySchemaCache cache;
-	private List<EntityRow<?>> rows;
+	private Annotations annotations;
 	private AnnotationsRendererWidgetView view;
 	EntityUpdatedHandler entityUpdatedHandler;
 	/**
@@ -36,48 +35,25 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	 * @param propertyView
 	 */
 	@Inject
-	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, AdapterFactory factory, EntitySchemaCache cache) {
+	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView) {
 		super();
-		this.factory = factory;
-		this.cache = cache;
 		this.view = propertyView;
 		this.view.setPresenter(this);
 	}
 	
-	
 	@Override
-	public void configure(Entity entity, Annotations annotations, boolean canEdit) {
-		try {
-			rows = getRows(entity, annotations, factory, cache);
-			view.configure(rows);
-			view.setEditButtonVisible(canEdit);
-		} catch (JSONObjectAdapterException e) {
-			throw new RuntimeException(e);
-		}
+	public void configure(Annotations annotations, boolean canEdit) {
+		this.annotations = annotations;
+		view.configure(getAnnotations(annotations));
+		view.setEditButtonVisible(canEdit);
+	}
+	
+	public static List<Annotation> getAnnotations(Annotations annotations) {
+		annotations.getDoubleAnnotations()
 	}
 	
 	public boolean isEmpty() {
-		return rows.isEmpty();
-	}
-	
-	public static List<EntityRow<?>> getRows(Entity entity, Annotations annotations, AdapterFactory factory, EntitySchemaCache cache) throws JSONObjectAdapterException {
-		JSONObjectAdapter adapter = factory.createNew();
-		entity.writeToJSONObject(adapter);
-		ObjectSchema schema = cache.getSchemaEntity(entity);
-		// Get the list of rows
-		// Filter out all versionable properties
-		ObjectSchema versionableScheam = cache.getEntitySchema(Versionable.EFFECTIVE_SCHEMA, Versionable.class);
-		Set<String> filter = new HashSet<String>();
-		// filter out all properties from versionable
-		filter.addAll(versionableScheam.getProperties().keySet());
-		// Filter all transient properties
-		EntityRowFactory.addTransientToFilter(schema, filter);
-		// Add all objects to the filter
-		EntityRowFactory.addObjectTypeToFilter(schema, filter);
-		List<EntityRow<?>> rows = EntityRowFactory.createEntityRowListForProperties(adapter, schema, filter);
-		// Add the annotations to this list.
-		rows.addAll(EntityRowFactory.createEntityRowListForAnnotations(annotations));
-		return rows;
+		return annotations.keySet().isEmpty();
 	}
 	
 	@Override
