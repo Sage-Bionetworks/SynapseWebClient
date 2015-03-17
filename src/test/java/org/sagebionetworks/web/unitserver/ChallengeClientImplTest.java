@@ -3,13 +3,13 @@ package org.sagebionetworks.web.unitserver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
@@ -281,13 +282,26 @@ public class ChallengeClientImplTest {
 		member2.setIsAdmin(false);
 		testTeamMembers.add(member2);
 		
-		when(mockSynapse.listTeamMembers(anyList(), anyString())).thenReturn(testTeamMembers);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(member1, member2);
 		ChallengeTeamPagedResults results = synapseClient.getChallengeTeams("1234", "2", 10, 0);
-		verify(mockSynapse).listTeamMembers(anyList(), anyString());
+		verify(mockSynapse, times(2)).getTeamMember(anyString(), anyString());
 		verify(mockSynapse).listChallengeTeams(anyString(), anyLong(), anyLong());
 		assertTrue(results.getTotalNumberOfResults() == 2);
 		assertEquals(testChallengeTeam1, results.getResults().get(0).getChallengeTeam());
 		assertTrue(results.getResults().get(0).isAdmin());
+		assertEquals(testChallengeTeam2, results.getResults().get(1).getChallengeTeam());
+		assertFalse(results.getResults().get(1).isAdmin());
+	}
+	
+	@Test
+	public void testGetChallengeTeamsLoggedInNotFound() throws SynapseException, RestServiceException {
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenThrow(new SynapseNotFoundException());
+		ChallengeTeamPagedResults results = synapseClient.getChallengeTeams("1234", "2", 10, 0);
+		verify(mockSynapse, times(2)).getTeamMember(anyString(), anyString());
+		verify(mockSynapse).listChallengeTeams(anyString(), anyLong(), anyLong());
+		assertTrue(results.getTotalNumberOfResults() == 2);
+		assertEquals(testChallengeTeam1, results.getResults().get(0).getChallengeTeam());
+		assertFalse(results.getResults().get(0).isAdmin());
 		assertEquals(testChallengeTeam2, results.getResults().get(1).getChallengeTeam());
 		assertFalse(results.getResults().get(1).isAdmin());
 	}
