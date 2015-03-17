@@ -90,7 +90,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setAnnotationsVisible(boolean visible) {
 		if (visible) {
-			annotationsContainer.setVisible(true);
+			annotationsContent.setVisible(true);
 			annotationsContent.show();
 		} else {
 			annotationsContent.hide();
@@ -142,7 +142,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		// configure widget
 		annotationsWidget.configure(bundle, canEdit);
 		// reset view
-		annotationsContainer.setVisible(false);
+		annotationsContent.setVisible(false);
+		annotationsContent.hide();
 	}
 	
 	private void clearmeta() {

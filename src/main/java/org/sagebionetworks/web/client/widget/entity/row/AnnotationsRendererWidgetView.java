@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.row;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
