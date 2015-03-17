@@ -101,9 +101,6 @@ import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -278,6 +275,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationTransformer;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationTransformerImpl;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidgetView;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
@@ -525,10 +524,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntitySchemaCacheImpl
 		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
 		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
-		
-		bind(AnnotationsWidget.class).in(Singleton.class);
-		bind(AnnotationsWidgetViewImpl.class).in(Singleton.class);
-		bind(AnnotationsWidgetView.class).to(AnnotationsWidgetViewImpl.class);
 		
 		bind(AnnotationsRendererWidgetView.class).to(AnnotationsRendererWidgetViewImpl.class);
 		
@@ -1056,5 +1051,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
 		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
+		
+		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);
 	}
 }

@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -51,25 +52,20 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 		return widget;
 	}
 	
-	/**
-	 * The rows of data to render.
-	 * 
-	 * @param rows
-	 */
-	@Override
-	public void configure(List<EntityRow<?>> rows) {
+
+	public void configure(List<Annotation> annotations) {
 		//now add a row for each annotation
 		tableBody.clear();
-		for (final EntityRow<?> row : rows) {
+		for (final Annotation row : annotations) {
 			TableRow tableRow = new TableRow();
 			
 			TableData labelCell = new TableData();
-			String label = row.getLabel();
+			String label = row.getKey();
 			labelCell.add(new Text(label));
 			tableRow.add(labelCell);
 			
 			TableData valueCell = new TableData();
-			String value = SafeHtmlUtils.htmlEscapeAllowEntities(row.getDislplayValue());
+			String value = SafeHtmlUtils.htmlEscapeAllowEntities(row.getValuesString());
 			valueCell.add(new Text(value));
 			tableRow.add(valueCell);
 			

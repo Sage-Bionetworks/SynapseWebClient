@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.row;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -10,7 +11,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface AnnotationsRendererWidgetView extends IsWidget{
 	
 	public interface Presenter {
-		 void configure(Annotations annotations, boolean canEdit);
+		 void configure(EntityBundle bundle, boolean canEdit);
 		 void onEdit();
 	}
 

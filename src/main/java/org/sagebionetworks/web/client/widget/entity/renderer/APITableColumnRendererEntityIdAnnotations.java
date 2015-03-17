@@ -12,15 +12,12 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
+import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
-import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationTransformer;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -36,22 +33,24 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	SynapseClientAsync synapseClient;
 	NodeModelCreator nodeModelCreator;
 	AsyncCallback<APITableInitializedColumnRenderer> finalCallback;
-	Map<String, List<EntityRow<?>>> value2Annotations;
+	Map<String, List<Annotation>> value2Annotations;
 	Map<String, String> value2Error;
 	List<String> entityIds;
-	List<EntityRow<?>> masterAnnotationList;
+	List<Annotation> masterAnnotationList;
 	AdapterFactory factory;
 	EntitySchemaCache cache;
+	AnnotationTransformer transformer;
 	private List<String> outputColumnNames;
 	private Map<String, List<String>> outputColumnData;
 	private List<String> sourceColumnData;
 	
 	@Inject
-	public APITableColumnRendererEntityIdAnnotations(AdapterFactory factory, EntitySchemaCache cache, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public APITableColumnRendererEntityIdAnnotations(AdapterFactory factory, EntitySchemaCache cache, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AnnotationTransformer transformer) {
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.factory = factory;
 		this.cache = cache;
+		this.transformer = transformer;
 	}
 	
 	@Override
@@ -67,7 +66,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 		uniqueIds.addAll(sourceColumnData);
 		entityIds = new ArrayList<String>();
 		entityIds.addAll(uniqueIds);
-		value2Annotations = new HashMap<String, List<EntityRow<?>>>();
+		value2Annotations = new HashMap<String, List<Annotation>>();
 		value2Error = new HashMap<String, String>();
 		masterAnnotationList = null;
 		finalCallback = callback;
@@ -88,15 +87,11 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				
-				try {
-					List<EntityRow<?>> entityRowList =  AnnotationsWidget.getRows(bundle.getEntity(), bundle.getAnnotations(), factory, cache);
-
-					if (masterAnnotationList == null && entityRowList.size() > 0)
-						masterAnnotationList = entityRowList;
-					value2Annotations.put(columnData.get(currentIndex), entityRowList);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+				List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
+				
+				if (masterAnnotationList == null && annotationList.size() > 0)
+					masterAnnotationList = annotationList;
+				value2Annotations.put(columnData.get(currentIndex), annotationList);
 
 				processNext();
 			}
@@ -135,15 +130,15 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 								outputColumn.add(error);
 							}
 							else {
-								List<EntityRow<?>> row = value2Annotations.get(originalValue);
+								List<Annotation> row = value2Annotations.get(originalValue);
 								//does this row have the same annotation
 								String renderedValue = "";
 								if (row != null) {
-									for (EntityRow<?> entityRow : row) {
-										if (entityRow.getLabel().equals(outputColumnName)) {
+									for (Annotation entityRow : row) {
+										if (entityRow.getKey().equals(outputColumnName)) {
 											//report this display value
-											if (entityRow.getValue() != null)
-												renderedValue = entityRow.getDislplayValue();
+											if (entityRow.getValues() != null)
+												renderedValue = entityRow.getValuesString();
 											break;
 										}
 									}
@@ -162,8 +157,8 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 				if (outputColumnNames == null) {
 					outputColumnNames =  new ArrayList<String>();
 					if (masterAnnotationList != null) {
-						for (EntityRow<?> entityRow : masterAnnotationList) {
-							outputColumnNames.add(entityRow.getLabel());
+						for (Annotation entityRow : masterAnnotationList) {
+							outputColumnNames.add(entityRow.getKey());
 						}
 					}
 				}

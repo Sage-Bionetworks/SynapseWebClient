@@ -135,7 +135,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {
 		// configure widget
-		annotationsWidget.configure(bundle.getEntity(), bundle.getAnnotations(), canEdit);
+		annotationsWidget.configure(bundle, canEdit);
 		// show widget?
 		if(canEdit || !annotationsWidget.isEmpty()) {
 			annotationsPanel.setVisible(true);
