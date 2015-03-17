@@ -1,20 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,18 +43,12 @@ public class SharingAndDataUseConditionWidget implements SharingAndDataUseCondit
 	public void setEntity(String entityId) {
 		//get entity bundle (only the parts required by the public/private widget and restrictions widget
 		int mask = ENTITY | PERMISSIONS |  ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS ;
-		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
+		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
 			
 			@Override
-			public void onSuccess(EntityBundleTransport result) {
-				EntityBundle bundle = null;
-				try {
-					bundle = nodeModelCreator.createEntityBundle(result);
-					EntityPresenter.filterToDownloadARs(bundle);
-					setEntity(bundle);
-				} catch (JSONObjectAdapterException ex) {					
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
-				}		
+			public void onSuccess(EntityBundle bundle) {
+				EntityPresenter.filterToDownloadARs(bundle);
+				setEntity(bundle);	
 			}
 			
 			@Override

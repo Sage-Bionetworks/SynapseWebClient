@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -109,10 +109,10 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	}
 	
 	public void getAcl(final AsyncCallback<AccessControlList> callback) {
-		int partsMask = EntityBundleTransport.ACL;
-		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
+		int partsMask = EntityBundle.ACL;
+		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundleTransport bundle) {
+			public void onSuccess(EntityBundle bundle) {
 				// retrieve ACL and user entity permissions from bundle
 				try {
 					callback.onSuccess(bundle.getAcl());

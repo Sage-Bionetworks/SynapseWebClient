@@ -5,7 +5,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 /**
  * The abstraction of an entity dialog.

@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -11,6 +13,8 @@ import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -33,6 +37,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private String synapseVersion;
 	private boolean isEditing;
 	private HashMap<String, String> synapseProperties;
+	Set<String> wikiBasedEntites;
 	
 	@Inject
 	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient) {
@@ -187,6 +192,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				synapseProperties = properties;
+				initWikiEntities(properties);
 				c.invoke();
 			}
 			
@@ -203,6 +209,28 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			return synapseProperties.get(key);
 		else 
 			return null;
+	}
+
+	@Override
+	public boolean isWikiBasedEntity(String entityId) {
+		if(wikiBasedEntites == null){
+			return false;
+		}else{
+			return wikiBasedEntites.contains(entityId);
+		}
+	}
+	
+	/**
+	 * Setup the wiki based entities.
+	 * @param properties
+	 */
+	private void initWikiEntities(HashMap<String, String> properties) {
+		wikiBasedEntites = new HashSet<String>();
+		wikiBasedEntites.add(properties.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
 	}
 	
 }

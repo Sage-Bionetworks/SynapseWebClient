@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
@@ -29,6 +28,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -50,7 +50,9 @@ public class TableListWidgetTest {
 		permissions.setCanEdit(true);
 		Project project = new Project();
 		project.setId("syn123");
-		parentBundle = new EntityBundle(project, null, permissions, null, null, null, null, null);
+		parentBundle = new EntityBundle();
+		parentBundle.setEntity(project);
+		parentBundle.setPermissions(permissions);
 		mockView = Mockito.mock(TableListWidgetView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockpaginationWidget = Mockito.mock(PaginationWidget.class);

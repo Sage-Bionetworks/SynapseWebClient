@@ -8,6 +8,7 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -122,6 +123,16 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 		for (ActionListener listener : getActionListeners(action)) {
 			listener.onAction(action);
 		}
+	}
+
+	@Override
+	public void addControllerWidget(IsWidget controllerWidget) {
+		view.addControllerWidget(controllerWidget);
+	}
+
+	@Override
+	public void setBasicDivderVisible(boolean visible) {
+		view.setBasicDividerVisible(visible);
 	}
 
 }

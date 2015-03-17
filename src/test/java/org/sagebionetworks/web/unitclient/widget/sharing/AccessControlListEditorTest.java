@@ -27,6 +27,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -41,7 +42,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -73,8 +73,8 @@ public class AccessControlListEditorTest {
 	private static final String INHERITED_ACL_ID = "syn202";
 	private static AccessControlList localACL;
 	private static AccessControlList inheritedACL;
-	private static EntityBundleTransport entityBundleTransport_localACL;
-	private static EntityBundleTransport entityBundleTransport_inheritedACL;
+	private static EntityBundle entityBundleTransport_localACL;
+	private static EntityBundle entityBundleTransport_inheritedACL;
 	private static Project project;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -126,9 +126,9 @@ public class AccessControlListEditorTest {
 		return p;
 	}
 	
-	private static EntityBundleTransport createEBT(AccessControlList acl, UserEntityPermissions uep) {
+	private static EntityBundle createEBT(AccessControlList acl, UserEntityPermissions uep) {
 		try {
-			EntityBundleTransport ebt = new EntityBundleTransport();
+			EntityBundle ebt = new EntityBundle();
 			ebt.setAcl(acl);
 			ebt.setPermissions(uep);
 			return ebt;

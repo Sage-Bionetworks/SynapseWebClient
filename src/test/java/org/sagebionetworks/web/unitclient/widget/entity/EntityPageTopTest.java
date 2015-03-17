@@ -18,6 +18,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
@@ -35,7 +36,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -123,14 +123,17 @@ public class EntityPageTopTest {
 		tableEntity = new TableEntity();
 		tableEntity.setId(entityId);
 		tableEntity.setEntityType(TableEntity.class.getName());
-		entityBundleTable = new EntityBundle(tableEntity, null, null, null, null, null, null, null);
+		entityBundleTable = new EntityBundle();
+		entityBundleTable.setEntity(tableEntity);
 		
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(entity);
 		projectHeader = new EntityHeader();
 		projectHeader.setId(projectId);
 		
 		projectEntity.setId(projectId);
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle();
+		projectBundle.setEntity(projectEntity);
 		
 		// setup a complex query.
 		query = new Query();
@@ -202,7 +205,8 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to the project WIKI area with no subpage token
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle();
+		projectBundle.setEntity(projectEntity);
 		pageTop.configure(projectBundle, entityVersion, projectHeader, EntityArea.WIKI, null);
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
@@ -226,7 +230,8 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to the project WIKI area with no subpage 
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle();
+		projectBundle.setEntity(projectEntity);
 		pageTop.configure(projectBundle, entityVersion, projectHeader, null, null);
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
@@ -257,7 +262,8 @@ public class EntityPageTopTest {
 		assertFalse(newProjectId.equals(projectId)); // assumption check
 		projectEntity = new Project();
 		projectEntity.setId(newProjectId);
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle();
+		projectBundle.setEntity(projectEntity);
 		EntityHeader newProjectHeader = new EntityHeader();
 		newProjectHeader.setId(newProjectId);
 		pageTop.configure(projectBundle, entityVersion, newProjectHeader, EntityArea.WIKI, null);

@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -38,7 +39,6 @@ import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -60,9 +60,9 @@ public interface SynapseClientAsync {
 	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<EntityWrapper> callback);
 	
-	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundleTransport> callback);
+	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundle> callback);
 	
-	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundleTransport> callback);
+	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
 
 	void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<String> callback);
 
@@ -197,8 +197,8 @@ public interface SynapseClientAsync {
 	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
 	public void zipAndUploadFile(String content, String fileName, AsyncCallback<String> callback);
 	
-	public void createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-	public void updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
+	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
 	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
 	
@@ -336,8 +336,8 @@ public interface SynapseClientAsync {
 	void executeEntityQuery(EntityQuery query,
 			AsyncCallback<EntityQueryResults> callback);
 
-	void createTableEntity(TableEntity entity,
-			AsyncCallback<TableEntity> callback);
+	void createEntity(Entity entity,
+			AsyncCallback<Entity> callback);
 
 	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
 	

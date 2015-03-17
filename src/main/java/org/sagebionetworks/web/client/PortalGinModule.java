@@ -121,8 +121,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
 import org.sagebionetworks.web.client.widget.entity.EntityNameModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
-import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListView;
@@ -228,8 +226,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
-import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
-import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
@@ -544,10 +540,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// the logger
 		bind(ClientLoggerImpl.class).in(Singleton.class);
 		bind(ClientLogger.class).to(ClientLoggerImpl.class);
-
-		// the Entity edit view
-		bind(EntityPropertyFormViewImpl.class).in(Singleton.class);
-		bind(EntityPropertyFormView.class).to(EntityPropertyFormViewImpl.class);
 				
 		// The URL cache
 		bind(UrlCacheImpl.class).in(Singleton.class);
@@ -758,10 +750,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Preview
 		bind(PreviewWidgetViewImpl.class).in(Singleton.class);
 		bind(PreviewWidgetView.class).to(PreviewWidgetViewImpl.class);
-		
-		// ActionMenu
-		bind(ActionMenuViewImpl.class).in(Singleton.class);
-		bind(ActionMenuView.class).to(ActionMenuViewImpl.class);
 		
 		// ActionMenu V2
 		bind(ActionMenuWidget.class).to(ActionMenuWidgetImpl.class);

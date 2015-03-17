@@ -1,46 +1,43 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.TABLE_DATA;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
+
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -55,10 +52,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private String entityId;
 	private Long versionNumber;
-	private AdapterFactory adapterFactory;
 	private Synapse.EntityArea area;
 	private String areaToken;
 	private CookieProvider cookies;
@@ -68,15 +63,12 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			AdapterFactory adapterFactory, CookieProvider cookies,
+			SynapseClientAsync synapseClient, CookieProvider cookies,
 			SynapseJSNIUtils synapseJsniUtils) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
-		this.adapterFactory = adapterFactory;
 		this.cookies = cookies;
 		this.synapseJsniUtils = synapseJsniUtils;
 		view.setPresenter(this);
@@ -123,18 +115,14 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA;
-		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID;
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundleTransport transport) {				
-				if (transport.getIsWikiBasedEntity() && !DisplayUtils.isInTestWebsite(cookies)) {
+			public void onSuccess(EntityBundle bundle) {				
+				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}
 				else {
-					EntityBundle bundle = null;
-					try {
-						bundle = nodeModelCreator.createEntityBundle(transport);
-						
 						// Redirect if Entity is a Link
 						if(bundle.getEntity() instanceof Link) {
 							Reference ref = ((Link)bundle.getEntity()).getLinksTo();
@@ -156,9 +144,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 							loadBackgroundImage(projectHeader.getId());
 						EntityPresenter.filterToDownloadARs(bundle);
 						view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
-					} catch (JSONObjectAdapterException ex) {					
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
-					}
 				}
 			}
 			
@@ -233,7 +218,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		List<AccessRequirement> filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
 		bundle.setAccessRequirements(filteredList);
 		
-		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetDownloadAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
-		bundle.setUnmetDownloadAccessRequirements(filteredList);
+		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
+		bundle.setUnmetAccessRequirements(filteredList);
 	}
 }

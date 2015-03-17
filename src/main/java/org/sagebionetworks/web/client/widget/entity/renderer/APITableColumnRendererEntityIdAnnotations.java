@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,17 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -85,12 +84,11 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	 * @param currentIndex
 	 */
 	private void columnDataInit(final List<String> columnData, final int currentIndex) {
-		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundleTransport result) {
+			public void onSuccess(EntityBundle bundle) {
 				
 				try {
-					EntityBundle bundle = nodeModelCreator.createEntityBundle(result);
 					List<EntityRow<?>> entityRowList =  AnnotationsWidget.getRows(bundle.getEntity(), bundle.getAnnotations(), factory, cache);
 
 					if (masterAnnotationList == null && entityRowList.size() > 0)

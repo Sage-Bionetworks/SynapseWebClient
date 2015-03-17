@@ -3,10 +3,10 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -117,6 +117,7 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEdit);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		this.actionMenu.setBasicDivderVisible(canEdit);
 		// Listen to action events.
 		this.actionMenu.addActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override

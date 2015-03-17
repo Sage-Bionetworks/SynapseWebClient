@@ -8,11 +8,11 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementController;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 public class PreflightControllerImplTest {
@@ -33,7 +33,9 @@ public class PreflightControllerImplTest {
 		Project entity = new Project();
 		permissions = new UserEntityPermissions();
 		permissions.setIsCertifiedUser(true);
-		bundle = new EntityBundle(entity, null, permissions, null, null, null, null, null);
+		bundle = new EntityBundle();
+		bundle.setEntity(entity);
+		bundle.setPermissions(permissions);
 	}
 	
 	@Test
