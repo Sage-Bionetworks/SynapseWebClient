@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 
 import java.util.ArrayList;
 import java.util.HashMap;

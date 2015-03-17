@@ -30,7 +30,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
-import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -62,7 +61,6 @@ public class ColumnModelsWidgetTest {
 	PortalGinInjector mockGinInjector;
 	SynapseClientAsync mockSynapseClient;
 	KeyboardNavigationHandler mockKeyboardNavigationHandler;
-	TableModelUtils tableModelUtils;
 	ColumnModelsWidget widget;
 	EntityBundle mockBundle;
 	TableEntity table;
@@ -79,7 +77,6 @@ public class ColumnModelsWidgetTest {
 		mockUpdateHandler = Mockito.mock(EntityUpdatedHandler.class);
 		mockKeyboardNavigationHandler = Mockito.mock(KeyboardNavigationHandler.class);
 		adapterFactory = new AdapterFactoryImpl();
-		tableModelUtils = new TableModelUtils(adapterFactory);
 		table = new TableEntity();
 		table.setId("syn123");
 		tableBundle = new TableBundle();
@@ -101,7 +98,7 @@ public class ColumnModelsWidgetTest {
 			}
 		});
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
-		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, tableModelUtils);
+		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient);
 		verify(mockBaseView, times(1)).setViewer(mockViewer);
 		verify(mockBaseView, times(1)).setEditor(mockEditor);
 	}
@@ -180,7 +177,6 @@ public class ColumnModelsWidgetTest {
 		editor.setColumnName("a name");
 		List<ColumnModel> expectedNewScheam = new LinkedList<ColumnModel>(schema);
 		expectedNewScheam.add(ColumnModelUtils.extractColumnModel(editor));
-		List<String> results = tableModelUtils.toJSONList(expectedNewScheam);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(TableEntity.class), any(List.class), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();

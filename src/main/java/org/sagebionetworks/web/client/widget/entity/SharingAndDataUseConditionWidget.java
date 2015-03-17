@@ -1,19 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;

@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -42,7 +42,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;

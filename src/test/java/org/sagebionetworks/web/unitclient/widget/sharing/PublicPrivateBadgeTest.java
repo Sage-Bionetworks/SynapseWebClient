@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 

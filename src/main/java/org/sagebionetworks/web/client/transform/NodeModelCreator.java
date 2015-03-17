@@ -5,8 +5,6 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
