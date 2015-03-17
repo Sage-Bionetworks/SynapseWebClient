@@ -23,9 +23,7 @@
 						<g:SimplePanel ui:field="projectActionMenuContainer"/>
 					</b:Column>
 				</b:Row>
-				<b:Collapse ui:field="annotationsUI">
-					<g:SimplePanel ui:field="annotationsRendererContainer" />
-				</b:Collapse>
+				
    				<div class="row margin-top-15" ui:field="navtabContainer">
 				    <ul class="nav nav-tabs entity-tabs">				        
 					    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>

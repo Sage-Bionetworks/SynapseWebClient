@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Versionable;
@@ -16,7 +17,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -51,34 +51,51 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SimplePanel favoritePanel;
 	@UiField
 	SimplePanel doiPanel;
+	@UiField
+	Collapse annotationsContent;
+	@UiField
+	SimplePanel annotationsContainer;
 	
 	private Presenter presenter;
 	
 	@UiField(provided = true)
 	final IconsImageBundle icons;
 
+	AnnotationsRendererWidget annotationsWidget;
 	RestrictionWidget restrictionWidget;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			FavoriteWidget favoriteWidget,
 			DoiWidget doiWidget,
+			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget
 			) {
 		this.icons = iconsImageBundle;
 		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
+		this.annotationsWidget = annotationsWidget;
 		this.restrictionWidget = restrictionWidget;
 		initWidget(uiBinder.createAndBindUi(this));
-
 				
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 		
 		doiPanel.addStyleName("inline-block");
 		doiPanel.setWidget(doiWidget.asWidget());
+		annotationsContainer.setWidget(annotationsWidget.asWidget());
+		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 	}
 
+	@Override
+	public void setAnnotationsVisible(boolean visible) {
+		if (visible) {
+			annotationsContainer.setVisible(true);
+			annotationsContent.show();
+		} else {
+			annotationsContent.hide();
+		}
+	}
 	@Override
 	public void setEntityBundle(EntityBundle bundle, boolean canAdmin, boolean canEdit, boolean isShowingOlderVersion) {
 		clearmeta();
@@ -116,6 +133,16 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		//doi widget
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
+		
+		// annotations		
+		configureAnnotations(bundle, canEdit);
+	}
+
+	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {
+		// configure widget
+		annotationsWidget.configure(bundle, canEdit);
+		// reset view
+		annotationsContainer.setVisible(false);
 	}
 	
 	private void clearmeta() {
@@ -168,5 +195,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		annotationsWidget.setEntityUpdatedHandler(handler);
 	}
 }

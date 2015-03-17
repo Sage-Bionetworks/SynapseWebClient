@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.row;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,7 +38,11 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	@Override
 	public void configure(EntityBundle bundle, boolean canEdit) {
 		this.annotations = bundle.getAnnotations();
-		view.configure(annotationTransformer.annotationsToList(annotations));
+		List<Annotation> annotationsList = annotationTransformer.annotationsToList(annotations);
+		if (!annotationsList.isEmpty())
+			view.configure(annotationsList);
+		else
+			view.showNoAnnotations();
 		view.setEditButtonVisible(canEdit);
 	}
 

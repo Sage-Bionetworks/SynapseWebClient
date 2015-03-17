@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.row;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
@@ -26,7 +27,8 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	Button editAnnotationsButton;
 	@UiField
 	TBody tableBody;
-	
+	@UiField
+	Alert noAnnotationsFoundAlert;
 	public interface Binder extends UiBinder<Widget, AnnotationsRendererWidgetViewImpl> {	}
 	
 	private Presenter presenter;
@@ -54,8 +56,10 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	
 
 	public void configure(List<Annotation> annotations) {
-		//now add a row for each annotation
+		//add a row for each annotation
+		noAnnotationsFoundAlert.setVisible(false);
 		tableBody.clear();
+		tableBody.setVisible(true);
 		for (final Annotation row : annotations) {
 			TableRow tableRow = new TableRow();
 			
@@ -76,5 +80,11 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	@Override
 	public void setEditButtonVisible(boolean isVisible) {
 		editAnnotationsButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void showNoAnnotations() {
+		tableBody.setVisible(false);
+		noAnnotationsFoundAlert.setVisible(true);
 	}
 }

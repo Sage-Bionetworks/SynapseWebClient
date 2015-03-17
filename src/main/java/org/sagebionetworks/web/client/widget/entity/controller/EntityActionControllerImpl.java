@@ -13,10 +13,10 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -59,8 +59,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETE_PREFIX = "Delete ";
 	
 	public static final String RENAME_PREFIX = "Rename ";
-	public static final String HIDE_ANNOTATIONS = "Hide Annotations";
-	public static final String SHOW_ANNOTATIONS = "Show Annotations";
 
 	EntityActionControllerView view;
 	PreflightController preflightController;
@@ -174,10 +172,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Override
 	public void onAnnotationsToggled(boolean shown) {
 		if(shown){
-			actionMenu.setActionText(Action.TOGGLE_ANNOTATIONS, HIDE_ANNOTATIONS);
 			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_DOWN);
 		}else{
-			actionMenu.setActionText(Action.TOGGLE_ANNOTATIONS, SHOW_ANNOTATIONS);
 			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_RIGHT);
 		}
 	}

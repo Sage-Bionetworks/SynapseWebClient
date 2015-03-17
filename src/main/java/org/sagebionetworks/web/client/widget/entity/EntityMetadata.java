@@ -62,4 +62,8 @@ public class EntityMetadata implements Presenter {
 		this.entityUpdatedHandler = handler;
 		view.setEntityUpdatedHandler(handler);
 	}
+
+	public void setAnnotationsVisible(boolean visible) {
+		view.setAnnotationsVisible(visible);
+	}
 }

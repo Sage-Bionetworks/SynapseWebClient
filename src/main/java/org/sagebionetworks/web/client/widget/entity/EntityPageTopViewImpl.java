@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
@@ -40,7 +39,6 @@ import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -178,11 +176,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel tableModifiedAndCreatedContainer;
 	@UiField
 	SimplePanel tableListWidgetContainer;
-	@UiField
-	Collapse annotationsUI;
-	@UiField
-	SimplePanel annotationsRendererContainer;
-
+	
 	private SnapshotWidget snapshotWidget;
 	private FileHistoryWidget fileHistoryWidget;
 	private TableListWidget tableListWidget;
@@ -194,7 +188,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
 	private GlobalApplicationState globalApplicationState;
-	private AnnotationsRendererWidget annotationsWidget;
 	private boolean isProject = false;
 	private EntityArea currentArea;
 	private AdministerEvaluationsList evaluationList;
@@ -218,8 +211,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			WikiPageWidget wikiPageWidget,
 			TableListWidget tableListWidget,
 			PreviewWidget previewWidget, CookieProvider cookies,
-			GlobalApplicationState globalApplicationState,
-			AnnotationsRendererWidget annotationsWidget) {
+			GlobalApplicationState globalApplicationState) {
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
 		this.snapshotWidget = snapshotWidget;
@@ -235,14 +227,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.wikiPageWidget = wikiPageWidget;
 		this.tableListWidget = tableListWidget;
 		this.globalApplicationState = globalApplicationState;
-		this.annotationsWidget = annotationsWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.add(fileHistoryWidget.asWidget());
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileSnapshotsContainer.add(snapshotWidget.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
-		annotationsRendererContainer.add(annotationsWidget.asWidget());
+
 		initProjectLayout();
 
 		initClickHandlers();
@@ -394,7 +385,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		annotationsWidget.setEntityUpdatedHandler(handler);
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		projectFilesBrowser.setEntityUpdatedHandler(handler);
 		folderFilesBrowser.setEntityUpdatedHandler(handler);
@@ -437,11 +427,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		} 	
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		// Annotations
-		annotationsWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit());
-
 		fileMetadataContainer.add(entityMetadata.asWidget());
-		
 		// ActionMenu
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
 		fileActionMenuContainer.add(actionMenu.asWidget());
@@ -519,9 +505,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileActionMenuContainer.add(actionMenu.asWidget());
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		// Annotations
-		annotationsWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit());
-
 		fileMetadataContainer.add(entityMetadata.asWidget());
 		
 		// Description
@@ -543,10 +526,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		projectTitleUI.setVisible(false);
 		// Project header: Metadata & Description
-		entityMetadata.setEntityBundle(bundle, versionNumber);
-		// Annotations
-		annotationsWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit());
-
+		entityMetadata.setEntityBundle(bundle, versionNumber); 		
 		projectMetadataContainer.add(entityMetadata.asWidget());
 		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 	
@@ -687,9 +667,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// TODO: Add table name?
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		// Annotations
-		annotationsWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit());
-
 		tableMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
@@ -797,16 +774,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		});
 		annotationsShown = false;
-		annotationsUI.hide();
 		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
 				annotationsShown = !annotationsShown;
 				controller.onAnnotationsToggled(annotationsShown);
-				if (annotationsShown)
-					annotationsUI.show();
-				else
-					annotationsUI.hide();
+				entityMetadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
 
