@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
@@ -60,9 +61,9 @@ public class CreateTableModalWidgetImpl implements EntityNameModalView.Presenter
 		table.setName(name);
 		table.setParentId(parentId);
 		table.setEntityType(TableEntity.class.getName());
-		synapseClient.createTableEntity(table, new AsyncCallback<TableEntity>() {
+		synapseClient.createEntity(table, new AsyncCallback<Entity>() {
 			@Override
-			public void onSuccess(TableEntity table) {
+			public void onSuccess(Entity table) {
 				view.hide();
 				handler.tableCreated();
 			}

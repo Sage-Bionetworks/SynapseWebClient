@@ -15,13 +15,13 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.BatchResults;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
@@ -62,9 +61,6 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.LayerTypeNames;
-import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
@@ -123,14 +119,12 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -185,7 +179,6 @@ public class SynapseClientImplTest {
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
 	MessageToUser sentMessage;
-	TableModelUtils tableModelUtils;
 	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -201,13 +194,11 @@ public class SynapseClientImplTest {
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
-		tableModelUtils = new TableModelUtils(adapterFactory);
 		
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
 		synapseClient.setServiceUrlProvider(mockUrlProvider);
-		synapseClient.setTableModelUtils(tableModelUtils);
 		
 		// Setup the the entity
 		entity = new ExampleEntity();
@@ -430,32 +421,32 @@ public class SynapseClientImplTest {
 		// Make sure we can get all parts of the bundel
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN
 		| ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
-		EntityBundleTransport bundle = synapseClient.getEntityBundle(entityId, mask);
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
-		assertNotNull(bundle.getEntityJson());
-		assertNotNull(bundle.getAnnotationsJson());
-		assertNotNull(bundle.getEntityPath());
+		assertNotNull(bundle.getEntity());
+		assertNotNull(bundle.getAnnotations());
+		assertNotNull(bundle.getPath());
 		assertNotNull(bundle.getPermissions());
 		assertNotNull(bundle.getHasChildren());
-		assertNotNull(bundle.getAccessRequirementsJson());
-		assertNotNull(bundle.getUnmetDownloadAccessRequirementsJson());
+		assertNotNull(bundle.getAccessRequirements());
+		assertNotNull(bundle.getUnmetAccessRequirements());
 	}
 	
 	@Test
 	public void testGetEntityBundleNone() throws RestServiceException{
 		// Make sure all are null
 		int mask = 0x0;
-		EntityBundleTransport bundle = synapseClient.getEntityBundle(entityId, mask);
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
-		assertNull(bundle.getEntityJson());
-		assertNull(bundle.getAnnotationsJson());
-		assertNull(bundle.getEntityPath());
+		assertNull(bundle.getEntity());
+		assertNull(bundle.getAnnotations());
+		assertNull(bundle.getPath());
 		assertNull(bundle.getPermissions());
 		assertNull(bundle.getHasChildren());
-		assertNull(bundle.getAccessRequirementsJson());
-		assertNull(bundle.getUnmetDownloadAccessRequirementsJson());
+		assertNull(bundle.getAccessRequirements());
+		assertNull(bundle.getUnmetAccessRequirements());
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
@@ -755,17 +746,15 @@ public class SynapseClientImplTest {
      
  	@Test
  	public void testCreateV2WikiPageWithV1() throws Exception {
- 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.createV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+		synapseClient.createV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), page);
 	    verify(mockSynapse).createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
  	}
  	
  	@Test
  	public void testUpdateV2WikiPageWithV1() throws Exception {
- 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
 		Mockito.when(mockSynapse.updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.updateV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+		synapseClient.updateV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), page);
 		verify(mockSynapse).updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
  	}
  	
@@ -874,14 +863,6 @@ public class SynapseClientImplTest {
 		synapseClient.getEntityDoi("test entity id", null);
 	    verify(mockSynapse).getEntityDoi(anyString(), anyLong());
 	}
-
-//	@Test
-//	public void testGetParticipant() throws Exception{
-//		//basic wiring test
-//		//String returnJson = synapseClient.createParticipant("myEvalId");
-//		
-//	}
-
 	
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();

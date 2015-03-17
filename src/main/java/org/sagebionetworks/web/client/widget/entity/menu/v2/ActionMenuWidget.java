@@ -65,4 +65,16 @@ public interface ActionMenuWidget extends IsWidget{
 		void onAction(Action action);
 
 	}
+	
+	/**
+	 * Add a controller widget.  These are often hidden modal widgets that need to be on the page.
+	 * @param controllerWidget
+	 */
+	public void addControllerWidget(IsWidget controllerWidget);
+
+	/**
+	 * Show/hide the divider between basic commands and specific commands.
+	 * @param visible
+	 */
+	public void setBasicDivderVisible(boolean visible);
 }

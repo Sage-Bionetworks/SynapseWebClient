@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -11,10 +12,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -37,7 +36,6 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	ColumnModelsView viewer;
 	ColumnModelsView editor;
 	boolean isEditable;
-	TableModelUtils tableModelUtils;
 	SynapseClientAsync synapseClient;
 	String tableId;
 	List<ColumnModel> startingModels;
@@ -55,7 +53,7 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	 * @param view
 	 */
 	@Inject
-	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, TableModelUtils tableModelUtils){
+	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient){
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
@@ -69,7 +67,6 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		this.baseView.setViewer(this.viewer);
 		this.baseView.setEditor(this.editor);
 		this.synapseClient = synapseClient;
-		this.tableModelUtils = tableModelUtils;
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
 	}
 

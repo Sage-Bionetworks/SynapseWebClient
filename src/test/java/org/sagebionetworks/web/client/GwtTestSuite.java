@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -14,25 +12,13 @@ import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
-import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
@@ -40,12 +26,10 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.i18n.client.NumberFormat;
@@ -288,77 +272,7 @@ public class GwtTestSuite extends GWTTestCase {
 		assertTrue("The second fetch from the cache should have returned the same instance as the first call",projectSchema == projectSchemaSecond);
 		
 	}
-	
-	@Test
-	public void testEntityBundleTranslation() throws Exception{
-		// The entity
-		ExampleEntity entity = new ExampleEntity();
-		initilaizedJSONEntityFromSchema(entity);
-		entity.setEntityType(ExampleEntity.class.getName());
-		// annotaions
-		Annotations annos = new Annotations();
-		annos.setId(entity.getId());
-		annos.setEtag(entity.getEtag());
-		annos.addAnnotation("doubleKey", new Double(123.677));
-		// The permission
-		UserEntityPermissions uep = new UserEntityPermissions();
-		uep.setCanAddChild(false);
-		uep.setCanChangePermissions(true);
-		uep.setCanView(false);
-		// The path
-		EntityPath path = new EntityPath();
-		path.setPath(new ArrayList<EntityHeader>());
-		EntityHeader header = new EntityHeader();
-		header.setId(entity.getId());
-		header.setName("RomperRuuuu");
-		path.getPath().add(header);
-		
-		//File Handles
-		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
-		FileHandle fh=new S3FileHandle();
-		fh.setConcreteType(S3FileHandle.class.getName());
-		fh.setFileName("not-a-virus.exe");
-		fh.setId("20");
-		fileHandles.add(fh);
-		
-		TableBundle tableBundle = new TableBundle();
-		ColumnModel cm = new ColumnModel();
-		cm.setColumnType(ColumnType.BOOLEAN);
-		cm.setId("123");
-		tableBundle.setColumnModels(Arrays.asList(cm));
-		tableBundle.setMaxRowsPerPage(new Long(678));
-		
-		List<AccessRequirement> ars = new ArrayList<AccessRequirement>();
-		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
-		ar.setConcreteType(TermsOfUseAccessRequirement.class.getName());
-		ar.setTermsOfUse("foo");
-		ars.add(ar);
-		
-		JSONEntityFactoryImpl factory = new JSONEntityFactoryImpl(new GwtAdapterFactory());
-		// the is our transport object
-		EntityBundleTransport transport = new EntityBundleTransport();
-		transport.setEntityJson(factory.createJsonStringForEntity(entity));
-		transport.setAnnotationsJson(factory.createJsonStringForEntity(annos));
-		transport.setPermissions(uep);
-		transport.setEntityPath(path);
-		transport.setFileHandlesJson(entityListToString(fileHandles));
-		transport.setTableData(tableBundle);
-	
-		transport.setAccessRequirementsJson(entityListToString(ars));
-		transport.setUnmetDownloadAccessRequirementsJson(entityListToString(ars));
-		
-		// Now make sure we can translate it
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(factory, new JSONObjectGwt());
-		EntityBundle results = modelCreator.createEntityBundle(transport);
-		assertNotNull(results);
-		assertEquals(entity, results.getEntity());
-		assertEquals(annos, results.getAnnotations());
-		assertEquals(path, results.getPath());
-		assertEquals(uep, results.getPermissions());
-		assertEquals(ars, results.getAccessRequirements());
-		assertEquals(ars, results.getUnmetDownloadAccessRequirements());
-		assertEquals(fileHandles, results.getFileHandles());
-	}
+
 	
 	@Test
 	public void testDecimalNumberFormat() {

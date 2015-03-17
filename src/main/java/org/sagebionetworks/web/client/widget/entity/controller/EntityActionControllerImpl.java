@@ -2,27 +2,38 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,6 +42,10 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
+	public static final String MOVE_PREFIX = "Move ";
+
+	public static final String ADD_WIKI = "Add wiki";
+
 	public static final String THE = "The ";
 
 	public static final String WAS_SUCCESSFULLY_DELETED = " was successfully deleted.";
@@ -53,6 +68,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
 	RenameEntityModalWidget renameEntityModalWidget;
+	EntityFinder entityFinder;
+	EvaluationSubmitter submitter;
 	
 	EntityBundle entityBundle;
 	Entity entity;
@@ -71,7 +88,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			AccessControlListModalWidget accessControlListModalWidget,
-			RenameEntityModalWidget renameEntityModalWidget) {
+			RenameEntityModalWidget renameEntityModalWidget,
+			EntityFinder entityFinder,
+			EvaluationSubmitter submitter) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -82,6 +101,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.renameEntityModalWidget = renameEntityModalWidget;
+		this.entityFinder = entityFinder;
+		this.submitter = submitter;
 	}
 
 	@Override
@@ -94,11 +115,62 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.enityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityBundle.getEntity());
-		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());  
+		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
+		actionMenu.addControllerWidget(this.submitter.asWidget());
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();
 		configureRenameAction();
+		configureAddWiki();
+		configureMove();
+		configureLink();
+		configureSubmit();
+	}
+	
+	private void configureAddWiki(){
+		if(this.entityBundle.getRootWikiId() == null){
+			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
+			actionMenu.setActionText(Action.ADD_WIKI_PAGE, ADD_WIKI);
+			actionMenu.addActionListener(Action.ADD_WIKI_PAGE, this);
+		}else{
+			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, false);
+			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, false);
+		}
+	}
+	
+	private void configureMove(){
+		if(isMovableType(entityBundle.getEntity()) ){
+			actionMenu.setActionVisible(Action.MOVE_ENTITY, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.MOVE_ENTITY, permissions.getCanEdit());
+			actionMenu.setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+enityTypeDisplay);
+			actionMenu.addActionListener(Action.MOVE_ENTITY, this);
+		}else{
+			actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
+			actionMenu.setActionEnabled(Action.MOVE_ENTITY, false);
+		}
+	}
+	
+	private void configureLink(){
+		if(isLinkType(entityBundle.getEntity())){
+			actionMenu.setActionVisible(Action.CREATE_LINK, true);
+			actionMenu.setActionEnabled(Action.CREATE_LINK, true);
+			actionMenu.addActionListener(Action.CREATE_LINK, this);
+		}else{
+			actionMenu.setActionVisible(Action.CREATE_LINK, false);
+			actionMenu.setActionEnabled(Action.CREATE_LINK, false);
+		}
+	}
+	
+	private void configureSubmit(){
+		if(isSubmittableType(entityBundle.getEntity())){
+			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, true);
+			actionMenu.setActionEnabled(Action.SUBMIT_TO_CHALLENGE, true);
+			actionMenu.addActionListener(Action.SUBMIT_TO_CHALLENGE, this);
+		}else{
+			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, false);
+			actionMenu.setActionEnabled(Action.SUBMIT_TO_CHALLENGE, false);
+		}
 	}
 	
 	private void configureRenameAction(){
@@ -125,6 +197,55 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
 		}
 	}
+	
+	/**
+	 * Can an entity of this type be moved?
+	 * @param entity
+	 * @return
+	 */
+	public boolean isMovableType(Entity entity){
+		if(entity instanceof Project){
+			return false;
+		}else if(entity instanceof TableEntity){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Can an entity of this type have a wiki?
+	 * @param entity
+	 * @return
+	 */
+	public boolean isWikiableType(Entity entity){
+		if(entity instanceof TableEntity){
+			return false;
+		}else if(entity instanceof Link){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Can a link to this type be created?
+	 * @param entity
+	 * @return
+	 */
+	public boolean isLinkType(Entity entity){
+		if(entity instanceof Link){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Can an entity of this type be submitted to a challenge?
+	 * @param entity
+	 * @return
+	 */
+	public boolean isSubmittableType(Entity entity){
+		return entity instanceof Versionable;
+	}
 
 	@Override
 	public void onAction(Action action) {
@@ -137,10 +258,173 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CHANGE_ENTITY_NAME:
 			onRename();
-			break;	
+			break;
+		case ADD_WIKI_PAGE:
+			onAddWiki();
+			break;
+		case MOVE_ENTITY:
+			onMove();
+			break;
+		case CREATE_LINK:
+			onLink();
+			break;
+		case SUBMIT_TO_CHALLENGE:
+			onSubmit();
+			break;
 		default:
 			break;
 		}
+	}
+	
+	private void onSubmit() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postOnSubmit();
+			}
+		});
+	}
+	
+	private void postOnSubmit(){
+		this.submitter.configure(this.entityBundle.getEntity(), null);
+	}
+	
+	private void onLink() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckLink();
+			}
+		});
+	}
+	
+	private void postCheckLink(){
+		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				if(selected.getTargetId() != null) {
+					createLink(selected.getTargetId());
+					entityFinder.hide();
+				} else {
+					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		});
+		entityFinder.show();
+	}
+	
+	/**
+	 * Create a link with the given target as a parent.
+	 * @param target
+	 */
+	public void createLink(String target){
+		Link link = new Link();
+		link.setParentId(target);
+		Reference ref = new Reference();
+		ref.setTargetId(entityBundle.getEntity().getId());
+		link.setLinksTo(ref); // links to this entity
+		link.setLinksToClassName(entityBundle.getEntity().getEntityType());
+		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default
+		link.setEntityType(Link.class.getName());
+		synapseClient.createEntity(link, new AsyncCallback<Entity>() {
+			
+			@Override
+			public void onSuccess(Entity result) {
+				view.showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof BadRequestException) {
+					view.showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
+					return;
+				}
+				if(caught instanceof NotFoundException) {
+					view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+					return;
+				}
+				if (caught instanceof UnauthorizedException) {
+					view.showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
+					return;
+				}
+				view.showErrorMessage(caught.getMessage());
+				
+			}
+		});
+	}
+	
+	private void onMove() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckMove();
+			}
+		});
+	}
+
+	private void postCheckMove(){
+		entityFinder.configure(false, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				if(selected.getTargetId() != null) {
+					moveEntity(selected.getTargetId());
+					entityFinder.hide();
+				} else {
+					view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		});
+		entityFinder.show();
+	}
+	
+	/**
+	 * Move the entity to the given target.
+	 * @param target
+	 */
+	private void moveEntity(String target){
+		Entity entity = entityBundle.getEntity();
+		entity.setParentId(target);
+		synapseClient.updateEntity(entity, new AsyncCallback<Entity>() {
+			
+			@Override
+			public void onSuccess(Entity result) {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+	
+	private void onAddWiki() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckAddWiki();
+			}
+		});
+	}
+	
+	private void postCheckAddWiki(){
+		WikiPage page = new WikiPage();
+		synapseClient.createV2WikiPageWithV1(this.entityBundle.getEntity(). getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(WikiPage result) {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				
+			}});
 	}
 
 	private void onRename() {

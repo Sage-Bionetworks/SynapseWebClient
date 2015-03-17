@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
@@ -40,7 +41,6 @@ import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -120,7 +120,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 * @throws SynapseException 
 	 */
-	public EntityBundleTransport getEntityBundle(String entityId, int partsMask) throws RestServiceException;
+	public EntityBundle getEntityBundle(String entityId, int partsMask) throws RestServiceException;
 
 	/**
 	 * Get a bundle of information about an entity in a single call
@@ -129,7 +129,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 * @throws SynapseException 
 	 */
-	public EntityBundleTransport getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
+	public EntityBundle getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
 
 	public String getEntityReferencedBy(String entityId) throws RestServiceException;
 	
@@ -315,8 +315,8 @@ public interface SynapseClient extends RemoteService {
 	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
 	public String zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
 	
-	public String createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
-	public String updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
+	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
+	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
@@ -458,7 +458,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException 
 	 */
-	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException;
+	public Entity createEntity(Entity entity) throws RestServiceException;
 
 	/**
 	 * Get the file Handle given its ID.
@@ -502,4 +502,5 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
+	
 }

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Locationable;
@@ -18,7 +19,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -126,7 +126,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		allArsIterator = bundle.getAccessRequirements().iterator();
 		if (hasUnmetDownloadAccessRequirements()) {
 			List<AccessRequirement> unmetRequirements = new ArrayList<AccessRequirement>();
-			for (AccessRequirement unmetRequirement : bundle.getUnmetDownloadAccessRequirements()) {
+			for (AccessRequirement unmetRequirement : bundle.getUnmetAccessRequirements()) {
 				unmetRequirements.add(unmetRequirement);
 				if (!(unmetRequirement instanceof SelfSignAccessRequirement)) {
 					break;
@@ -138,12 +138,12 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	public boolean hasUnmetDownloadAccessRequirements() {
-		List<AccessRequirement> unmetArs = bundle.getUnmetDownloadAccessRequirements();
+		List<AccessRequirement> unmetArs = bundle.getUnmetAccessRequirements();
 		return (unmetArs != null && !unmetArs.isEmpty());
 	}
 	
 	public boolean isCurrentAccessRequirementUnmet() {
-		return bundle.getUnmetDownloadAccessRequirements().contains(currentAR);
+		return bundle.getUnmetAccessRequirements().contains(currentAR);
 	}
 
 	private UserProfile getUserProfile() {

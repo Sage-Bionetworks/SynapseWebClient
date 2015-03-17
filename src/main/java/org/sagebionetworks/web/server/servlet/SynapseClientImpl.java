@@ -53,7 +53,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
@@ -78,7 +77,6 @@ import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
@@ -137,10 +135,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -210,7 +206,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	private TableModelUtils tableModelUtils = new TableModelUtils(adapterFactory);
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
 	private volatile HashSet<String> wikiBasedEntities;
 
@@ -252,10 +247,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
-	}
-
-	public void setTableModelUtils(TableModelUtils tableModelUtils) {
-		this.tableModelUtils = tableModelUtils;
 	}
 	
 	public void setMarkdownCache(Cache<MarkdownCacheRequest, WikiPage> wikiToMarkdown) {
@@ -323,53 +314,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public EntityBundleTransport getEntityBundle(String entityId, int partsMask)
+	public EntityBundle getEntityBundle(String entityId, int partsMask)
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			EntityBundle eb;
-			// TODO:remove the try catch when PLFM-1752 is fixed
-			try {
-				eb = synapseClient.getEntityBundle(entityId, partsMask);
-			} catch (SynapseNotFoundException e) {
-				// if we're trying to get the filehandles, then give another try
-				// without the filehandles
-				if ((EntityBundleTransport.FILE_HANDLES & partsMask) != 0) {
-					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES)
-							& partsMask;
-					eb = synapseClient.getEntityBundle(entityId, newPartsMask);
-				} else
-					throw e;
-			}
-			return convertBundleToTransport(entityId, eb, partsMask);
+			return synapseClient.getEntityBundle(entityId, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	@Override
-	public EntityBundleTransport getEntityBundleForVersion(String entityId,
+	public EntityBundle getEntityBundleForVersion(String entityId,
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			EntityBundle eb;
-			// TODO:remove the try catch when PLFM-1752 is fixed
-			try {
-				eb = synapseClient.getEntityBundle(entityId, versionNumber,
-						partsMask);
-			} catch (SynapseNotFoundException e) {
-				// if we're trying to get the filehandles, then give another try
-				// without the filehandles
-				if ((EntityBundleTransport.FILE_HANDLES & partsMask) != 0) {
-					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES)
-							& partsMask;
-					eb = synapseClient.getEntityBundle(entityId, versionNumber,
-							newPartsMask);
-				} else
-					throw e;
-			}
-
-			return convertBundleToTransport(entityId, eb, partsMask);
+			return synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -428,73 +388,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private JSONObject query(String query) throws SynapseException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		return synapseClient.query(query);
-	}
-
-	// Convert repo-side EntityBundle to serializable EntityBundleTransport
-	private EntityBundleTransport convertBundleToTransport(String entityId,
-			EntityBundle eb, int partsMask) throws RestServiceException {
-		EntityBundleTransport ebt = new EntityBundleTransport();
-		try {
-			if ((EntityBundleTransport.ENTITY & partsMask) > 0) {
-				Entity e = eb.getEntity();
-				ebt.setEntityJson(EntityFactory.createJSONStringForEntity(e));
-			}
-			if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
-				Annotations a = eb.getAnnotations();
-				ebt.setAnnotationsJson(EntityFactory.createJSONStringForEntity(a));
-			}
-			if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
-				UserEntityPermissions uep = eb.getPermissions();
-				ebt.setPermissions(uep);
-			}
-			if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
-				EntityPath path = eb.getPath();
-				ebt.setEntityPath(path);
-			}
-			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
-				List<EntityHeader> rbList = eb.getReferencedBy();
-				PaginatedResults<EntityHeader> rb = new PaginatedResults<EntityHeader>();
-				rb.setResults(rbList);
-				ebt.setEntityReferencedByJson(EntityFactory
-						.createJSONStringForEntity(rb));
-			}
-			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
-				Boolean hasChildren = eb.getHasChildren();
-				ebt.setHashChildren(hasChildren);
-			}
-			if ((EntityBundleTransport.ACL & partsMask) > 0) {
-				AccessControlList acl = eb.getAccessControlList();
-				if (acl == null) {
-					// ACL is inherited; fetch benefactor ACL.
-					try {
-						acl = getAcl(entityId);
-					} catch (SynapseException e) {
-						e.printStackTrace();
-					}
-				}
-				ebt.setAcl(acl);
-			}
-			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
-			}
-			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setUnmetDownloadAccessRequirementsJson(createJSONStringFromArray(eb
-						.getUnmetAccessRequirements()));
-			}
-			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
-				ebt.setFileHandlesJson(createJSONStringFromArray(eb.getFileHandles()));
-			
-			if ((EntityBundleTransport.TABLE_DATA & partsMask) != 0
-					&& eb.getTableBundle() != null) {
-				ebt.setTableData(eb.getTableBundle());
-			}
-			
-			ebt.setIsWikiBasedEntity(getWikiBasedEntities().contains(entityId));
-
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-		return ebt;
 	}
 
 	public static String createJSONStringFromArray(
@@ -1827,18 +1720,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String createV2WikiPageWithV1(String ownerId, String ownerType,
-			String wikiPageJson) throws IOException, RestServiceException {
+	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType,
+			WikiPage page) throws IOException, RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			@SuppressWarnings("unchecked")
-			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
-					WikiPage.class);
-			WikiPage returnPage = synapseClient.createWikiPage(ownerId,
-					ObjectType.valueOf(ownerType), page);
-			return EntityFactory.createJSONStringForEntity(returnPage);
+			return synapseClient.createWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -1847,18 +1733,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String updateV2WikiPageWithV1(String ownerId, String ownerType,
-			String wikiPageJson) throws IOException, RestServiceException {
+	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType,
+			WikiPage page) throws IOException, RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			@SuppressWarnings("unchecked")
-			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
-					WikiPage.class);
-			WikiPage returnPage = synapseClient.updateWikiPage(ownerId,
-					ObjectType.valueOf(ownerType), page);
-			return EntityFactory.createJSONStringForEntity(returnPage);
+			return synapseClient.updateWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -3033,23 +2912,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	/**
-	 * Helper to get the entity bundle of a table entity.
-	 * 
-	 * @param synapseClient
-	 * @param tableId
-	 * @return
-	 * @throws SynapseException
-	 * @throws RestServiceException
-	 */
-	private EntityBundleTransport getTableEntityBundle(
-			org.sagebionetworks.client.SynapseClient synapseClient,
-			String tableId) throws SynapseException, RestServiceException {
-		int partsMask = EntityBundle.ENTITY + EntityBundle.TABLE_DATA;
-		EntityBundle bundle = synapseClient.getEntityBundle(tableId, partsMask);
-		return convertBundleToTransport(tableId, bundle, partsMask);
-	}
-	
 	@Override
 	public void setTableSchema(TableEntity table, List<ColumnModel> models)
 			throws RestServiceException {
@@ -3138,7 +3000,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException {
+	public Entity createEntity(Entity entity) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			return synapseClient.createEntity(entity);

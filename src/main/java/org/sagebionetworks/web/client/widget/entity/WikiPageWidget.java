@@ -211,30 +211,23 @@ SynapseWidgetPresenter {
 	}
 	
 	@Override
-	public void saveClicked(String title, String md) 
-	{
-		JSONObjectAdapter json = jsonObjectAdapter.createNew();
-		try {
-			currentPage.setTitle(title);
-			currentPage.setMarkdown(md);
-			currentPage.writeToJSONObject(json);
-			synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					//we have successfully saved, so we are no longer editing
-					setIsEditing(false);
-					//now refresh the page
-					refresh();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-		}
+	public void saveClicked(String title, String md) {
+		currentPage.setTitle(title);
+		currentPage.setMarkdown(md);
+		synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), currentPage, new AsyncCallback<WikiPage>() {
+			@Override
+			public void onSuccess(WikiPage result) {
+				//we have successfully saved, so we are no longer editing
+				setIsEditing(false);
+				//now refresh the page
+				refresh();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
+			}
+		});
 	}
 	
 	@Override
@@ -287,34 +280,28 @@ SynapseWidgetPresenter {
 		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
 		page.setParentWikiId(wikiKey.getWikiPageId());
 		page.setTitle(name);
-		String wikiPageJson;
-		try {
-            wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-            synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
-                @Override
-                public void onSuccess(String result) {
-                	if (isCreatingWiki) {
-                        String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
-                        view.showInfo( type + " Created", "");
-                    } else {
-                        view.showInfo("Page '" + name + "' Added", "");
-                    }
-                	if (onSuccess != null) {
-                		onSuccess.invoke();
-                	}
-                        
-                    refresh();
+        synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), page, new AsyncCallback<WikiPage>() {
+            @Override
+            public void onSuccess(WikiPage result) {
+            	if (isCreatingWiki) {
+                    String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
+                    view.showInfo( type + " Created", "");
+                } else {
+                    view.showInfo("Page '" + name + "' Added", "");
                 }
-                
-                @Override
-                public void onFailure(Throwable caught) {
-                    if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-                        view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-                }
-            });
-	    } catch (JSONObjectAdapterException e) {                        
-	            view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);                
-	    }
+            	if (onSuccess != null) {
+            		onSuccess.invoke();
+            	}
+                    
+                refresh();
+            }
+            
+            @Override
+            public void onFailure(Throwable caught) {
+                if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
+            }
+        });
 			
 	}
 	

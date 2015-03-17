@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -29,7 +30,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -112,7 +112,7 @@ public class RestrictionWidgetTest {
 		allAccessRequirements.add(accessRequirement1);
 		allAccessRequirements.add(accessRequirement2);
 		when(bundle.getAccessRequirements()).thenReturn(allAccessRequirements);
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(Collections.singletonList(accessRequirement1));
+		when(bundle.getUnmetAccessRequirements()).thenReturn(Collections.singletonList(accessRequirement1));
 				
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
@@ -133,7 +133,7 @@ public class RestrictionWidgetTest {
 	private void setupEmptyAccessRequirements() {
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
 	}
@@ -197,7 +197,7 @@ public class RestrictionWidgetTest {
 	
 	@Test
 	public void testConfigureLoggedInControlledMet() {
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(new ArrayList<AccessRequirement>());
+		when(bundle.getUnmetAccessRequirements()).thenReturn(new ArrayList<AccessRequirement>());
 		
 		//is logged in, with our tou restriction set up in before(), has admin access (can change)
 		widget.configure(bundle, 
@@ -348,7 +348,7 @@ public class RestrictionWidgetTest {
 	public void testSelectNextAccessRequirementAllMet() {
 		//in this case, all access requirements have been met. verify all are shown.
 		List<AccessRequirement> emptyList = Collections.emptyList();
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(emptyList);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(emptyList);
 		widget.resetAccessRequirementCount();
 		assertEquals(accessRequirement1, widget.selectNextAccessRequirement());
 		assertEquals(accessRequirement2, widget.selectNextAccessRequirement());
@@ -361,7 +361,7 @@ public class RestrictionWidgetTest {
 		//verify that only the first unmet requirement is selected
 		
 		List<AccessRequirement> list = new ArrayList<AccessRequirement>();
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(list);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(list);
 		ACTAccessRequirement actAccessRequirement = new ACTAccessRequirement();
 		actAccessRequirement.setId(9883L);
 		list.add(accessRequirement1);

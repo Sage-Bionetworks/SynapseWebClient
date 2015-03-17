@@ -41,7 +41,6 @@ import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.JiraGovernanceConstants;
@@ -49,6 +48,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -129,7 +129,9 @@ public class LicensedDownloaderTest {
 		FileHandle mockFileHandle = mock(FileHandle.class);
 		when(mockFileHandle.getId()).thenReturn("123");
 		
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, Collections.singletonList(mockFileHandle), null);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(entity);
+		entityBundle.setFileHandles(Collections.singletonList(mockFileHandle));
 		
 		// path for entity
 		entityPath = new EntityPath();
@@ -164,8 +166,8 @@ public class LicensedDownloaderTest {
 		entity.setId("myFileEntityId");
 		entity.setVersionNumber(4l);
 		resetMocks();
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
-		
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(entity);
 		// Null locations
 		resetMocks();			
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);

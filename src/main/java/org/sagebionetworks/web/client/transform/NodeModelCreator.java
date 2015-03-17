@@ -5,8 +5,6 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -27,13 +25,7 @@ public interface NodeModelCreator {
 	<T extends JSONEntity> BatchResults<T> createBatchResults(String jsonString, Class<? extends JSONEntity> clazz) throws JSONObjectAdapterException;
 
 	JSONEntity newInstance(String className);
-	/**
-	 * Convert the transport object to the bundle
-	 * @param transport
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	EntityBundle createEntityBundle(EntityBundleTransport transport) throws JSONObjectAdapterException;
+	
 	
 	@Deprecated
 	EntityTypeResponse createEntityTypeResponse(String json) throws RestServiceException;

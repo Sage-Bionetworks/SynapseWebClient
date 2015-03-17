@@ -52,7 +52,7 @@ public class CreateTableModalWidgetTest {
 		when(mockView.getName()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockView).showError(CreateTableModalWidgetImpl.TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
-		verify(mockSynapseClient, never()).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).createEntity(any(TableEntity.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -61,7 +61,7 @@ public class CreateTableModalWidgetTest {
 		TableEntity table = new TableEntity();
 		table.setName(tableName);
 		table.setId("syn57");
-		AsyncMockStubber.callSuccessWith(table).when(mockSynapseClient).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(table).when(mockSynapseClient).createEntity(any(TableEntity.class), any(AsyncCallback.class));
 		widget.showCreateModal();
 		when(mockView.getName()).thenReturn(tableName);
 		widget.onPrimary();
@@ -77,7 +77,7 @@ public class CreateTableModalWidgetTest {
 		table.setName(tableName);
 		table.setId("syn57");
 		String error = "name already exists";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createEntity(any(TableEntity.class), any(AsyncCallback.class));
 		widget.showCreateModal();
 		when(mockView.getName()).thenReturn(tableName);
 		widget.onPrimary();

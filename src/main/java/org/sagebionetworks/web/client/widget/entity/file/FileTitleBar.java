@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -25,15 +24,13 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	private EntityBundle entityBundle;
 	private EntityTypeProvider entityTypeProvider;
 	private SynapseClientAsync synapseClient;
-	private EntityEditor entityEditor;
 	
 	@Inject
-	public FileTitleBar(FileTitleBarView view, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, SynapseClientAsync synapseClient, EntityEditor entityEditor) {
+	public FileTitleBar(FileTitleBarView view, AuthenticationController authenticationController, EntityTypeProvider entityTypeProvider, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
 		this.synapseClient = synapseClient;
-		this.entityEditor = entityEditor;
 		view.setPresenter(this);
 	}	
 	
@@ -77,7 +74,6 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
-		entityEditor.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -85,11 +81,6 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		return authenticationController.isLoggedIn();
 	}
 
-	@Override
-	public void addNewChild(EntityType type, String parentId) {
-		entityEditor.addNewEntity(type, parentId);
-		
-	}
 	
 	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
