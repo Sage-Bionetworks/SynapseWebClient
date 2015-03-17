@@ -122,7 +122,7 @@ public class UploadCSVFinalPageImplTest {
 		AsyncMockStubber
 				.callSuccessWith(table)
 				.when(mockSynapseClient)
-				.createTableEntity(any(TableEntity.class),
+				.createEntity(any(TableEntity.class),
 						any(AsyncCallback.class));
 		page.setModalPresenter(mockPresenter);
 		reset(mockView);

@@ -336,8 +336,8 @@ public interface SynapseClientAsync {
 	void executeEntityQuery(EntityQuery query,
 			AsyncCallback<EntityQueryResults> callback);
 
-	void createTableEntity(TableEntity entity,
-			AsyncCallback<TableEntity> callback);
+	void createEntity(Entity entity,
+			AsyncCallback<Entity> callback);
 
 	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
 	

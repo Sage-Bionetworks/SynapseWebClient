@@ -41,7 +41,6 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		
 		boolean isUserLoggedIn();
 		
-		public void addNewChild(EntityType type, String parentId);
 		
 		void queryForSftpLoginInstructions(String directDownloadUrl);
 	}

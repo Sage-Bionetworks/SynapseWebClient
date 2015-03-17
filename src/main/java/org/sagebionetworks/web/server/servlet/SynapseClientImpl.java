@@ -3075,7 +3075,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException {
+	public Entity createEntity(Entity entity) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			return synapseClient.createEntity(entity);

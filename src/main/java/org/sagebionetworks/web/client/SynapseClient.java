@@ -458,7 +458,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException 
 	 */
-	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException;
+	public Entity createEntity(Entity entity) throws RestServiceException;
 
 	/**
 	 * Get the file Handle given its ID.

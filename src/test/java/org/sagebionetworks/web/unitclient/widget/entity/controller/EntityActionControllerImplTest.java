@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -17,9 +15,12 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 
+import java.util.Set;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -46,6 +47,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
@@ -54,6 +56,9 @@ import org.sagebionetworks.web.client.widget.entity.controller.PreflightControll
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -71,6 +76,7 @@ public class EntityActionControllerImplTest {
 	AccessControlListModalWidget mockAccessControlListModalWidget;
 	RenameEntityModalWidget mockRenameEntityModalWidget;
 	EntityFinder mockEntityFinder;
+	EvaluationSubmitter mockSubmitter;
 	
 	ActionMenuWidget mockActionMenu;
 	EntityUpdatedHandler mockEntityUpdatedHandler;
@@ -103,6 +109,7 @@ public class EntityActionControllerImplTest {
 		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
 		mockEntityUpdatedHandler = Mockito.mock(EntityUpdatedHandler.class);
 		mockEntityFinder = Mockito.mock(EntityFinder.class);
+		mockSubmitter = Mockito.mock(EvaluationSubmitter.class);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
@@ -115,7 +122,7 @@ public class EntityActionControllerImplTest {
 				mockPreflightController, mockEntityTypeProvider,
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget, mockEntityFinder);
+				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -433,6 +440,24 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testIsLinkType(){
+		assertTrue(controller.isLinkType(new Project()));
+		assertTrue(controller.isLinkType(new TableEntity()));
+		assertTrue(controller.isLinkType(new FileEntity()));
+		assertTrue(controller.isLinkType(new Folder()));
+		assertFalse(controller.isLinkType(new Link()));
+	}
+	
+	@Test
+	public void testIsSubmittableType(){
+		assertFalse(controller.isSubmittableType(new Project()));
+		assertTrue(controller.isSubmittableType(new TableEntity()));
+		assertTrue(controller.isSubmittableType(new FileEntity()));
+		assertFalse(controller.isSubmittableType(new Folder()));
+		assertFalse(controller.isSubmittableType(new Link()));
+	}
+	
+	@Test
 	public void testOnMoveNoUpdate(){
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		entityBundle.setEntity(new Folder());
@@ -460,7 +485,6 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnMoveCanUpdateSuccess(){
-		String error = "An error";
 		AsyncMockStubber.callSuccessWith(new Folder()).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		entityBundle.setEntity(new Folder());
@@ -469,7 +493,99 @@ public class EntityActionControllerImplTest {
 		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
 		verify(mockEntityFinder).hide();
+		verify(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
-		verify(mockView, never()).showErrorMessage(error);
+		verify(mockView, never()).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testCreateLinkBadRequest(){
+		AsyncMockStubber.callFailureWith(new BadRequestException("bad")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.createLink("syn9876");
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_CANT_MOVE_HERE);
+	}
+	
+	@Test
+	public void testCreateLinkNotFound(){
+		AsyncMockStubber.callFailureWith(new NotFoundException("not found")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.createLink("syn9876");
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
+	}
+	
+	@Test
+	public void testCreateLinkUnauthorizedException(){
+		AsyncMockStubber.callFailureWith(new UnauthorizedException("no way")).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.createLink("syn9876");
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_AUTHORIZED);
+	}
+	
+	@Test
+	public void testCreateLinkUnknownException(){
+		String error = "some error";
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.createLink("syn9876");
+		verify(mockView).showErrorMessage(error);
+	}
+	
+	@Test
+	public void testCreateLink(){
+		entityBundle.getEntity().setId("syn123");
+		ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
+		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		String target = "syn9876";
+		controller.createLink(target);
+		verify(mockView, never()).showErrorMessage(anyString());
+		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+		Entity capture = argument.getValue();
+		assertNotNull(capture);
+		assertTrue(capture instanceof Link);
+		Link link = (Link) capture;
+		assertEquals(target, link.getParentId());
+		assertEquals(entityBundle.getEntity().getName(), link.getName());
+		Reference ref = link.getLinksTo();
+		assertNotNull(ref);
+		assertEquals(entityBundle.getEntity().getId(), ref.getTargetId());
+	}
+	
+	@Test
+	public void testOnLinkNoUpdate(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_LINK);
+		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder, never()).show();
+		verify(mockView, never()).showInfo(anyString(), anyString());
+	}
+	
+	@Test
+	public void testOnLink(){
+		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_LINK);
+		verify(mockEntityFinder).configure(anyBoolean(), any(SelectedHandler.class));
+		verify(mockEntityFinder).show();
+		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+	}
+	
+	@Test
+	public void testOnSubmitNoUpdate(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.SUBMIT_TO_CHALLENGE);
+		verify(mockSubmitter, never()).configure(any(Entity.class), any(Set.class));
+	}
+	
+	@Test
+	public void testOnSubmitWithUdate(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.SUBMIT_TO_CHALLENGE);
+		verify(mockSubmitter).configure(any(Entity.class), any(Set.class));
 	}
 }
