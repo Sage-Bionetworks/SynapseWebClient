@@ -19,7 +19,6 @@ public interface EntityMetadataView extends IsWidget, SynapseView {
 
 	public void showErrorMessage(String message);
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler);
-	
 	public interface Presenter {
 		void fireEntityUpdatedEvent();
 	}

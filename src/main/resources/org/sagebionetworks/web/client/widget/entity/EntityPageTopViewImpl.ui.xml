@@ -15,15 +15,17 @@
 				
 				<!--Project level information -->
 				<b:Row addStyleNames="margin-top-5">
-					<b:Column size="MD_8">
+					<b:Column size="XS_12, MD_7">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 						<g:SimplePanel ui:field="projectDescriptionContainer"/>
 					</b:Column>
-					<b:Column size="MD_4">
+					<b:Column size="XS_12, MD_5">
 						<g:SimplePanel ui:field="projectActionMenuContainer"/>
 					</b:Column>
 				</b:Row>
-				
+				<b:Collapse ui:field="annotationsUI">
+					<g:SimplePanel ui:field="annotationsRendererContainer" />
+				</b:Collapse>
    				<div class="row margin-top-15" ui:field="navtabContainer">
 				    <ul class="nav nav-tabs entity-tabs">				        
 					    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>

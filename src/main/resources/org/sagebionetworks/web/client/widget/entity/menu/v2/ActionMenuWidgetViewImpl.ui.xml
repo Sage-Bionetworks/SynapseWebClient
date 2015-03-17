@@ -7,6 +7,10 @@
 	<g:HTMLPanel>
 		<b:ButtonToolBar ui:field="buttonToolBar" addStyleNames="pull-right">
 			<b:ButtonGroup>
+				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_ANNOTATIONS">Show
+					Annotations</a:ActionButton>
+			</b:ButtonGroup>
+			<b:ButtonGroup>
 				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_TABLE_SCHEMA">Show
 					Schema</a:ActionButton>
 			</b:ButtonGroup>

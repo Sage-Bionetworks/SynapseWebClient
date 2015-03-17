@@ -59,7 +59,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETE_PREFIX = "Delete ";
 	
 	public static final String RENAME_PREFIX = "Rename ";
-	
+	public static final String HIDE_ANNOTATIONS = "Hide Annotations";
+	public static final String SHOW_ANNOTATIONS = "Show Annotations";
+
 	EntityActionControllerView view;
 	PreflightController preflightController;
 	EntityTypeProvider entityTypeProvider;
@@ -125,6 +127,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureMove();
 		configureLink();
 		configureSubmit();
+		configureAnnotations();
 	}
 	
 	private void configureAddWiki(){
@@ -161,6 +164,25 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionEnabled(Action.CREATE_LINK, false);
 		}
 	}
+	
+	private void configureAnnotations(){
+		actionMenu.setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
+		actionMenu.setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
+		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, this);
+	}
+	
+	@Override
+	public void onAnnotationsToggled(boolean shown) {
+		if(shown){
+			actionMenu.setActionText(Action.TOGGLE_ANNOTATIONS, HIDE_ANNOTATIONS);
+			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_DOWN);
+		}else{
+			actionMenu.setActionText(Action.TOGGLE_ANNOTATIONS, SHOW_ANNOTATIONS);
+			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_RIGHT);
+		}
+	}
+
+
 	
 	private void configureSubmit(){
 		if(isSubmittableType(entityBundle.getEntity())){

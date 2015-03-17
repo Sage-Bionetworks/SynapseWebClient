@@ -20,7 +20,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -52,34 +51,23 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SimplePanel favoritePanel;
 	@UiField
 	SimplePanel doiPanel;
-	@UiField
-	HTMLPanel annotationsPanel;
-	@UiField
-	FlowPanel annotationsContent;
-	@UiField
-	InlineLabel showAnnotations;
-
 	
 	private Presenter presenter;
-	private boolean annotationsFilled = false;
-
+	
 	@UiField(provided = true)
 	final IconsImageBundle icons;
 
-	AnnotationsRendererWidget annotationsWidget;
 	RestrictionWidget restrictionWidget;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			FavoriteWidget favoriteWidget,
 			DoiWidget doiWidget,
-			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget
 			) {
 		this.icons = iconsImageBundle;
 		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
-		this.annotationsWidget = annotationsWidget;
 		this.restrictionWidget = restrictionWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
@@ -128,35 +116,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		//doi widget
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
-		
-		// annotations		
-		configureAnnotations(bundle, canEdit);
-	}
-
-	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {
-		// configure widget
-		annotationsWidget.configure(bundle, canEdit);
-		// show widget?
-		if(canEdit || !annotationsWidget.isEmpty()) {
-			annotationsPanel.setVisible(true);
-		} else {
-			annotationsPanel.setVisible(false);
-		}
-		
-		// reset view
-		showAnnotations.setText(DisplayConstants.SHOW_LC);
-		annotationsContent.setVisible(false);
-		if(!annotationsFilled) {
-			DisplayUtils.configureShowHide(showAnnotations, annotationsContent);
-			FlowPanel wrap = new FlowPanel();
-			wrap.addStyleName("highlight-box margin-bottom-15");
-			wrap.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
-			wrap.add(annotationsWidget.asWidget());
-			annotationsContent.add(wrap);
-			
-			annotationsFilled = true;
-		}
-		DisplayUtils.clearElementWidth(annotationsContent.getElement());
 	}
 	
 	private void clearmeta() {
@@ -209,6 +168,5 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		annotationsWidget.setEntityUpdatedHandler(handler);
 	}
 }

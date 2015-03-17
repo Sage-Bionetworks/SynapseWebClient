@@ -15,10 +15,7 @@
 		    <div><span class="boldText margin-right-5">Synapse ID: </span><span ui:field="entityId"></span></div>
 			<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
 			<g:SimplePanel ui:field="doiPanel"/>			
-		    <g:HTMLPanel ui:field="annotationsPanel" visible="false">
-				<span class="boldText">Annotations</span> (<g:InlineLabel ui:field="showAnnotations" styleName="link" />)<br />			
-			</g:HTMLPanel>
-			<g:FlowPanel ui:field="annotationsContent" visible="false" />
+		    <g:FlowPanel ui:field="annotationsContent" visible="false" />
 	    </g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>
