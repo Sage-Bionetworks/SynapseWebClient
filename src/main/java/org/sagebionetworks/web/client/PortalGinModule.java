@@ -121,8 +121,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
 import org.sagebionetworks.web.client.widget.entity.EntityNameModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
-import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListView;
@@ -539,10 +537,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// the logger
 		bind(ClientLoggerImpl.class).in(Singleton.class);
 		bind(ClientLogger.class).to(ClientLoggerImpl.class);
-
-		// the Entity edit view
-		bind(EntityPropertyFormViewImpl.class).in(Singleton.class);
-		bind(EntityPropertyFormView.class).to(EntityPropertyFormViewImpl.class);
 				
 		// The URL cache
 		bind(UrlCacheImpl.class).in(Singleton.class);
