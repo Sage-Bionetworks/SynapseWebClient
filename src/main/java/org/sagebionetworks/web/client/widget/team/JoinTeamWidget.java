@@ -53,7 +53,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
-	private String message, isMemberMessage, successMessage, buttonText;
+	private String message, isMemberMessage, successMessage, buttonText, requestOpenInfoText;
 	private boolean isAcceptingInvite, canPublicJoin;
 	private Callback widgetRefreshRequired;
 	private List<AccessRequirement> accessRequirements;
@@ -90,7 +90,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		wikiPageWidget.showWikiHistory(false);
 	}
 
-	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
+	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText, String requestOpenInfoText) {
 		//set team id
 		this.teamId = teamId;
 		this.canPublicJoin = canPublicJoin;
@@ -99,7 +99,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
 		this.buttonText = buttonText;
-		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage, buttonText, isChallengeSignup);
+		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage, buttonText, requestOpenInfoText, isChallengeSignup);
 	};
 
 	@Override
@@ -123,6 +123,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		
 		this.successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
 		this.buttonText = descriptor.get(WidgetConstants.JOIN_TEAM_BUTTON_TEXT);
+		this.requestOpenInfoText = descriptor.get(WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT);
 		
 		refresh();
 	}
@@ -138,7 +139,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 						TeamMembershipStatus teamMembershipStatus = null;
 						if (result.getTeamMembershipStatusJson() != null)
 							teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText);
+						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -149,7 +150,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 			});
 		} else {
-			configure(teamId, canPublicJoin, isChallengeSignup, null, null, isMemberMessage, successMessage, buttonText);
+			configure(teamId, canPublicJoin, isChallengeSignup, null, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText);
 		}
 	}
 	
