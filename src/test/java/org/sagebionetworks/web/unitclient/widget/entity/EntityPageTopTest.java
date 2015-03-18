@@ -372,7 +372,7 @@ public class EntityPageTopTest {
 	public void testSetTableQuery() {
 		String queryToken = queryTokenProvider.queryToToken(query);
 		pageTop.setTableQuery(query);
-		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(queryToken));		
+		verify(areaChangeHandler).replaceArea(eq(EntityArea.TABLES), contains(queryToken));		
 	}
 	
 	@Test
