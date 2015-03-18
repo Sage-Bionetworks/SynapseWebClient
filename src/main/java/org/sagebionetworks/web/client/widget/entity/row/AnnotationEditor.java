@@ -3,20 +3,20 @@ package org.sagebionetworks.web.client.widget.entity.row;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ServiceConstants.AttachmentType;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorView.AnnotationEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorView.Presenter;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 import com.google.inject.Inject;
 
-public class AnnotationEditor implements AnnotationEditorPresenter {
+public class AnnotationEditor implements Presenter {
 	
 	private AnnotationEditorView view;
 	private Annotation annotation;
-	private CallbackP<AttachmentType> typeChangeCallback;
+	private CallbackP<ANNOTATION_TYPE> typeChangeCallback;
 	private Callback deletedCallback;
 	private List<CellEditor> cellEditors;
 	AnnotationCellFactory factory;
@@ -27,7 +27,7 @@ public class AnnotationEditor implements AnnotationEditorPresenter {
 	}
 	
 	@Override
-	public void configure(Annotation annotation, CallbackP<AttachmentType> typeChangeCallback, Callback deletedCallback) {
+	public void configure(Annotation annotation, CallbackP<ANNOTATION_TYPE> typeChangeCallback, Callback deletedCallback) {
 		this.annotation = annotation;
 		this.typeChangeCallback = typeChangeCallback;
 		this.deletedCallback = deletedCallback;
@@ -62,7 +62,7 @@ public class AnnotationEditor implements AnnotationEditorPresenter {
 	}
 
 	@Override
-	public void onTypeChange(AttachmentType newType) {
+	public void onTypeChange(ANNOTATION_TYPE newType) {
 		if (typeChangeCallback != null)
 			typeChangeCallback.invoke(newType);
 	}

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.row;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ServiceConstants.AttachmentType;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
@@ -13,7 +12,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AnnotationEditorView extends IsWidget {
 	
-	public interface AnnotationEditorPresenter{
+	public interface Presenter{
 		/**
 		 * Called when delete is clicked
 		 */
@@ -21,7 +20,7 @@ public interface AnnotationEditorView extends IsWidget {
 		/**
 		 * Called when type is changed
 		 */
-		void onTypeChange(AttachmentType newType);
+		void onTypeChange(ANNOTATION_TYPE newType);
 		/**
 		 * Can ask if the edited Annotation values are valid (updates UI)
 		 * @return
@@ -34,7 +33,7 @@ public interface AnnotationEditorView extends IsWidget {
 		 * @param deletedCallback
 		 */
 		void configure(Annotation annotation, 
-				CallbackP<AttachmentType> typeChangeCallback, 
+				CallbackP<ANNOTATION_TYPE> typeChangeCallback, 
 				Callback deletedCallback);
 		/**
 		 * Ask the editor for the updated values (based on values entered in the view)
@@ -62,6 +61,4 @@ public interface AnnotationEditorView extends IsWidget {
 	 * @param editor
 	 */
 	void addNewEditor(CellEditor editor);
-	void clearError();
-	void showError(String error);
 }
