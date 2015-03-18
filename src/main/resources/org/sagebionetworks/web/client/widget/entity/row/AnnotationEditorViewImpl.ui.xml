@@ -4,8 +4,24 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<b:Row>
-		<b:Column size="XS_5"><b:TextBox ui:field="keyField"/></b:Column>
-		<b:Column size="XS_2"><g:ListBox ui:field="typeComboBox" styleName="form-control" /></b:Column>
-		<b:Column size="XS_5" ui:field="editorsContainer"/>
+		<b:Column size="XS_11">
+			<b:Panel>
+				<b:PanelBody>
+					<b:Row>
+						<b:Column size="XS_5">
+							<b:FormGroup ui:field="formGroup">
+								<b:TextBox ui:field="keyField"/>
+								<b:HelpBlock ui:field="helpBlock"/>
+							</b:FormGroup>
+						</b:Column>
+						<b:Column size="XS_2"><g:ListBox ui:field="typeComboBox" styleName="form-control" /></b:Column>
+						<b:Column size="XS_5" ui:field="editorsContainer"/>
+					</b:Row>
+				</b:PanelBody>
+			</b:Panel>
+		</b:Column>
+		<b:Column size="XS_1">
+			<b:Button icon="TIMES" size="LARGE" pull="RIGHT" ui:field="deleteAnnotationButton"/>
+		</b:Column>
 	</b:Row>
 </ui:UiBinder>

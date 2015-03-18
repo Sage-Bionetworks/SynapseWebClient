@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.row;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
@@ -10,6 +13,10 @@ import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorView.Presenter;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AnnotationEditor implements Presenter {
@@ -51,6 +58,15 @@ public class AnnotationEditor implements Presenter {
 
 	public CellEditor createNewEditor(){
 		CellEditor editor = factory.createEditor(annotation);
+		editor.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				//on enter, add a new field (empty fields are ignored on save)
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					onEnterClicked();
+				}
+			}
+		});
 		cellEditors.add(editor);
 		return editor;
 	}
@@ -75,23 +91,43 @@ public class AnnotationEditor implements Presenter {
 			if (!isValid)
 				allValid = false;
 		}
+		if (!isKeyValid())
+			allValid = false;
 		return allValid;
 	}
 
+	public boolean isKeyValid() {
+		String value = StringUtils.trimWithEmptyAsNull(view.getKey());
+		if(!DisplayUtils.isDefined(value)){
+			view.setKeyValidationState(ValidationState.ERROR);
+			view.setKeyHelpText("You must provide a key");
+			return false;
+		}
+		view.setKeyValidationState(ValidationState.NONE);
+		view.setKeyHelpText("");
+		return true;
+	}
+	
 	@Override
-	public List<String> getUpdatedValues() {
+	public Annotation getUpdatedAnnotation() {
 		//get the values from the current cell editors
 		List<String> updatedValues = new ArrayList<String>();
 		for (CellEditor cellEditor : cellEditors) {
-			updatedValues.add(cellEditor.getValue());
+			String value = cellEditor.getValue();
+			if (DisplayUtils.isDefined(value))
+				updatedValues.add(value);
 		}
-
-		return updatedValues;
+		Annotation updatedAnnotation = new Annotation(annotation.getType(), view.getKey(), updatedValues);
+		return updatedAnnotation;
 	}
 
 	@Override
 	public void onValueDeleted(CellEditor editor) {
 		cellEditors.remove(editor);
+	}
+	
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 
 }

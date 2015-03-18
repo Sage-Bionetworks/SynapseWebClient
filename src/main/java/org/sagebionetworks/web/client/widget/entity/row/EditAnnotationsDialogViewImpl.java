@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.row;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -14,9 +15,9 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EditAnnotationsDialogImpl extends Composite implements EditAnnotationsDialog{
+public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView{
 	
-	public interface Binder extends UiBinder<Widget, EditAnnotationsDialogImpl> {	}
+	public interface Binder extends UiBinder<Widget, EditAnnotationsDialogViewImpl> {	}
 
 	@UiField
 	FlowPanel editorsPanel;
@@ -27,12 +28,17 @@ public class EditAnnotationsDialogImpl extends Composite implements EditAnnotati
 	@UiField
 	Button cancelButton;
 	@UiField
+	Button addAnnotationButton;
+	
+	@UiField
 	Alert alert;
 	Presenter presenter;
 	
+	Widget widget;
+	
 	@Inject
-	public EditAnnotationsDialogImpl(final Binder uiBinder){
-		initWidget(uiBinder.createAndBindUi(this));
+	public EditAnnotationsDialogViewImpl(final Binder uiBinder){
+		widget = uiBinder.createAndBindUi(this);
 	}
 
 	@Override
@@ -42,6 +48,12 @@ public class EditAnnotationsDialogImpl extends Composite implements EditAnnotati
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onSave();
+			}
+		});
+		addAnnotationButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddNewAnnotation();
 			}
 		});
 	}
@@ -77,7 +89,35 @@ public class EditAnnotationsDialogImpl extends Composite implements EditAnnotati
 		alert.setVisible(false);
 	}
 	
-	public void addEditor(AnnotationEditorView editor) {
-		
-	};
+	@Override
+	public void addAnnotationEditor(Widget editor) {
+		editorsPanel.add(editor);
+	}
+	@Override
+	public void removeAnnotationEditor(Widget editor) {
+		editorsPanel.remove(editor);
+	}
+	@Override
+	public void replaceAnnotationEditor(Widget oldEditor, Widget newEditor) {
+		int index = editorsPanel.getWidgetIndex(oldEditor);
+		oldEditor.setVisible(false);
+		editorsPanel.insert(newEditor, index);
+		editorsPanel.remove(oldEditor);
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return widget;
+	}
+	
+	@Override
+	public void clearAnnotationEditors() {
+		editorsPanel.clear();
+	}
+	
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
 }

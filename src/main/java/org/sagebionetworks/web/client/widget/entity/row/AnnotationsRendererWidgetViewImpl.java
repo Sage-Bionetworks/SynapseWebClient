@@ -15,6 +15,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -29,6 +30,9 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	TBody tableBody;
 	@UiField
 	Alert noAnnotationsFoundAlert;
+	@UiField
+	FlowPanel modalContainer;
+	
 	public interface Binder extends UiBinder<Widget, AnnotationsRendererWidgetViewImpl> {	}
 	
 	private Presenter presenter;
@@ -86,5 +90,10 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	public void showNoAnnotations() {
 		tableBody.setVisible(false);
 		noAnnotationsFoundAlert.setVisible(true);
+	}
+	
+	@Override
+	public void addEditorToPage(Widget editorWidget) {
+		modalContainer.add(editorWidget);
 	}
 }

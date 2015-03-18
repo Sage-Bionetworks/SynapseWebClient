@@ -17,8 +17,10 @@ import com.google.inject.Inject;
 public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.Presenter, IsWidget {
 
 	private Annotations annotations;
+	private EntityBundle bundle;
 	private AnnotationsRendererWidgetView view;
 	private AnnotationTransformer annotationTransformer;
+	private EditAnnotationsDialog editorDialog;
 	EntityUpdatedHandler entityUpdatedHandler;
 
 	/**
@@ -28,15 +30,18 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	 * @param propertyView
 	 */
 	@Inject
-	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, AnnotationTransformer annotationTransformer) {
+	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, AnnotationTransformer annotationTransformer, EditAnnotationsDialog editorDialog) {
 		super();
 		this.view = propertyView;
 		this.annotationTransformer = annotationTransformer;
+		this.editorDialog = editorDialog;
 		this.view.setPresenter(this);
+		this.view.addEditorToPage(editorDialog.asWidget());
 	}
 
 	@Override
 	public void configure(EntityBundle bundle, boolean canEdit) {
+		this.bundle = bundle;
 		this.annotations = bundle.getAnnotations();
 		List<Annotation> annotationsList = annotationTransformer.annotationsToList(annotations);
 		if (!annotationsList.isEmpty())
@@ -62,6 +67,6 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 
 	@Override
 	public void onEdit() {
-		// TODO
+		editorDialog.configure(bundle, entityUpdatedHandler);
 	}
 }

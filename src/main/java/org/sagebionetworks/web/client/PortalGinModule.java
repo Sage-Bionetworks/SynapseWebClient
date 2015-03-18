@@ -275,10 +275,14 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorView;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationTransformerImpl;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidgetView;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationsRendererWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.row.EditAnnotationsDialogView;
+import org.sagebionetworks.web.client.widget.entity.row.EditAnnotationsDialogViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
@@ -1053,5 +1057,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
 		
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);
+		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
+		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
 	}
 }

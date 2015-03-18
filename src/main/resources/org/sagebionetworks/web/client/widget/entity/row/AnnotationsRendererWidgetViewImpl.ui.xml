@@ -22,6 +22,7 @@
 		</b:Alert>
 
 		<b:Button ui:field="editAnnotationsButton" icon="GEAR" type="INFO" visible="false">Edit</b:Button>
+		<g:FlowPanel ui:field="modalContainer"/>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

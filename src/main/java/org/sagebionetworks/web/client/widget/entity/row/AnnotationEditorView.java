@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.row;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
@@ -36,10 +37,10 @@ public interface AnnotationEditorView extends IsWidget {
 				CallbackP<ANNOTATION_TYPE> typeChangeCallback, 
 				Callback deletedCallback);
 		/**
-		 * Ask the editor for the updated values (based on values entered in the view)
+		 * Ask the editor for the updated Annotation (based on values entered in the view)
 		 * @return
 		 */
-		List<String> getUpdatedValues();
+		Annotation getUpdatedAnnotation();
 		
 		/**
 		 * Called when a particular value is deleted from the view
@@ -61,4 +62,18 @@ public interface AnnotationEditorView extends IsWidget {
 	 * @param editor
 	 */
 	void addNewEditor(CellEditor editor);
+	
+	String getKey();
+	
+	/**
+	 * Set the validation state of the key.
+	 * @param state
+	 */
+	public void setKeyValidationState(ValidationState state);
+	
+	/**
+	 * Set the help text of the key.
+	 * @param help
+	 */
+	public void setKeyHelpText(String help);
 }

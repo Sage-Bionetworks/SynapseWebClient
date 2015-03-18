@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface AnnotationsRendererWidgetView extends IsWidget{
 	
@@ -18,4 +19,5 @@ public interface AnnotationsRendererWidgetView extends IsWidget{
 	void setPresenter(Presenter presenter);
 	void setEditButtonVisible(boolean isVisible);
 	void showNoAnnotations();
+	void addEditorToPage(Widget editorWidget);
 }

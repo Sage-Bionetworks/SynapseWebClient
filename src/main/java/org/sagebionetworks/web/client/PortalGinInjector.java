@@ -85,6 +85,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
@@ -308,4 +309,5 @@ public interface PortalGinInjector extends Ginjector {
 	public StaticTableHeader createStaticTableHeader();
 	public EvaluationSubmitter getEvaluationSubmitter();
 	public RegisterTeamDialog getRegisterTeamDialog();
+	public AnnotationEditor getAnnotationEditor();
 }

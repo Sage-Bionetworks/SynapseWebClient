@@ -11,6 +11,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -503,4 +504,5 @@ public interface SynapseClient extends RemoteService {
 	 */
 	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
 	
+	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 }
