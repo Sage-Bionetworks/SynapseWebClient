@@ -1,14 +1,13 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
-public class DreamFilter extends RedirectFilter {
-
+public class UpForAChallengeFilter extends RedirectFilter {
 	@Override
 	protected String getTargetPage() {
-		return "#!Challenges:DREAM";
+		return "#!Synapse:syn3157598";
 	}
 	
 	@Override
 	protected String getUrlPath() {
-		return "dream";
+		return "upforachallenge";
 	}
 }
