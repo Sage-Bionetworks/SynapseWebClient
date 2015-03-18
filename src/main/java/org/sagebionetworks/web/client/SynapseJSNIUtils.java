@@ -61,4 +61,11 @@ public interface SynapseJSNIUtils {
 	public void processWithMathJax(Element element);	
 
 	public void loadCss(String url, Callback<Void, Exception> callback);
+	
+	/**
+	 * Replace the current history state with a new token using history.replaceState().
+	 * @see https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history
+	 * @param token
+	 */
+	public void replaceHistoryState(String token);
 }

@@ -37,6 +37,7 @@ import org.sagebionetworks.web.server.servlet.filter.CRCSCFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
+import org.sagebionetworks.web.server.servlet.filter.UpForAChallengeFilter;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDServlet;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -73,6 +74,9 @@ public class PortalServletModule extends ServletModule {
 		filter("/Portal/*").through(RPCValidationFilter.class);
 		bind(RPCValidationFilter.class).in(Singleton.class);
 
+		bind(UpForAChallengeFilter.class).in(Singleton.class);
+		filter("/upforachallenge").through(UpForAChallengeFilter.class);
+		
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
 		
