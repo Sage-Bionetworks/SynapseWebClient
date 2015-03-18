@@ -503,6 +503,12 @@ public class ProvenanceWidgetTest {
 			public boolean isFileAPISupported() {
 				return true;
 			}
+
+			@Override
+			public void replaceHistoryState(String token) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 

@@ -431,4 +431,18 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 		img.src = cssUrl;
 	}-*/;
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.sagebionetworks.web.client.SynapseJSNIUtils#replaceHistoryState(java.lang.String)
+	 */
+	@Override
+	public void replaceHistoryState(String token) {
+		_replaceHistoryState(token);
+	}
+	
+	private static native void _replaceHistoryState(String token)/*-{
+		$wnd.history.replaceState( {} , '', '#'+token );
+	}-*/;
+	
 }
