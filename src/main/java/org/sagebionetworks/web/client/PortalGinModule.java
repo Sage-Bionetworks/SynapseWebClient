@@ -275,6 +275,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationCellFactory;
+import org.sagebionetworks.web.client.widget.entity.row.AnnotationCellFactoryImpl;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorView;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.row.AnnotationTransformer;
@@ -1059,5 +1061,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
+		
+		bind(AnnotationCellFactoryImpl.class).in(Singleton.class);
+		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class);
+		
 	}
 }

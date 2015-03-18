@@ -46,6 +46,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			createAnnotationEditor(annotation);
 		}
 		this.updateHandler = updateHandler;
+		view.showEditor();
 	}
 	
 	public AnnotationEditor createAnnotationEditor(Annotation annotation) {

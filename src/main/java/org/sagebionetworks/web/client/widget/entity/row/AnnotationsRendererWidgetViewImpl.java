@@ -36,10 +36,12 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	public interface Binder extends UiBinder<Widget, AnnotationsRendererWidgetViewImpl> {	}
 	
 	private Presenter presenter;
+	private AnnotationTransformer transformer;
 	private Widget widget;
 	@Inject
-	public AnnotationsRendererWidgetViewImpl(final Binder uiBinder){
+	public AnnotationsRendererWidgetViewImpl(final Binder uiBinder, AnnotationTransformer transformer){
 		widget = uiBinder.createAndBindUi(this);
+		this.transformer = transformer;
 		editAnnotationsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -73,7 +75,8 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 			tableRow.add(labelCell);
 			
 			TableData valueCell = new TableData();
-			String value = SafeHtmlUtils.htmlEscapeAllowEntities(row.getValuesString());
+			
+			String value = SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(row));
 			valueCell.add(new Text(value));
 			tableRow.add(valueCell);
 			

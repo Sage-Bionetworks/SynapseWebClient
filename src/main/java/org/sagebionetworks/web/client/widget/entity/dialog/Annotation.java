@@ -31,18 +31,4 @@ public class Annotation {
 	public void setValues(List<String> values) {
 		this.values = values;
 	}
-	
-	public String getValuesString() {
-		StringBuilder builder = new StringBuilder();
-		boolean isAfterFirst = false;
-		for(Object value: values){
-			if(isAfterFirst){
-				builder.append(", ");
-			}
-			isAfterFirst = true;
-			builder.append(value);
-		}
-		return builder.toString();
-	}
-	
 }

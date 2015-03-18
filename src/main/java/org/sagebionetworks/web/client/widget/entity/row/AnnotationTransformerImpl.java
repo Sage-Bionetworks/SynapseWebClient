@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.row;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -32,7 +34,7 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	public List<String> datesToStrings(List<Date> list) {
 		List<String> stringList = new ArrayList<String>(list.size());
 		for (Date v : list) {
-			stringList.add(standardFormatter.format(v));
+			stringList.add(Long.toString(v.getTime()));
 		}
 		return stringList;
 	}
@@ -72,10 +74,80 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 		}
 		return results;
 	}
-	
+
 	@Override
 	public Annotations listToAnnotationsToList(List<Annotation> annotationsList) {
-		///TODO
-		return null;
+		Annotations annotations = new Annotations();
+		Map<String, List<Double>> doubleAnnotations = new LinkedHashMap<String, List<Double>>();
+		Map<String, List<String>> stringAnnotations = new LinkedHashMap<String, List<String>>();
+		Map<String, List<Long>> longAnnotations = new LinkedHashMap<String, List<Long>>();
+		Map<String, List<Date>> dateAnnotations = new LinkedHashMap<String, List<Date>>();
+		for (Annotation annotation : annotationsList) {
+			switch (annotation.getType()) {
+			case DATE:
+				dateAnnotations.put(annotation.getKey(), getDates(annotation.getValues()));
+				break;
+			case DOUBLE:
+				doubleAnnotations.put(annotation.getKey(), getDoubles(annotation.getValues()));
+				break;
+			case LONG:
+				longAnnotations.put(annotation.getKey(), getLongs(annotation.getValues()));
+				break;
+			case STRING:
+				stringAnnotations.put(annotation.getKey(), annotation.getValues());
+				break;
+			}
+		}
+		annotations.setStringAnnotations(stringAnnotations);
+		annotations.setDateAnnotations(dateAnnotations);
+		annotations.setDoubleAnnotations(doubleAnnotations);
+		annotations.setLongAnnotations(longAnnotations);
+		return annotations;
+	}
+
+	public List<Double> getDoubles(List<String> stringList) {
+		List<Double> newList = new ArrayList<Double>(stringList.size());
+		for (String s : stringList) {
+			newList.add(Double.parseDouble(s));
+		}
+		return newList;
+	}
+	
+
+	public List<Long> getLongs(List<String> stringList) {
+		List<Long> newList = new ArrayList<Long>(stringList.size());
+		for (String s : stringList) {
+			newList.add(Long.parseLong(s));
+		}
+		return newList;
+	}
+	public List<Date> getDates(List<String> stringList) {
+		List<Date> newList = new ArrayList<Date>(stringList.size());
+		for (String s : stringList) {
+			newList.add(new Date(Long.parseLong(s)));
+		}
+		return newList;
+	}
+
+	@Override
+	public String getFriendlyValues(Annotation annotation) {
+		List<String> values = annotation.getValues();
+		StringBuilder builder = new StringBuilder();
+		boolean isAfterFirst = false;
+		boolean isDate = ANNOTATION_TYPE.DATE.equals(annotation.getType());
+		for (String value : values) {
+			if (isAfterFirst) {
+				builder.append(", ");
+			}
+			isAfterFirst = true;
+			if (isDate)
+				value = friendlyDate(value);
+			builder.append(value);
+		}
+		return builder.toString();
+	}
+
+	public String friendlyDate(String value) {
+		return standardFormatter.format(new Date(Long.parseLong(value)));
 	}
 }

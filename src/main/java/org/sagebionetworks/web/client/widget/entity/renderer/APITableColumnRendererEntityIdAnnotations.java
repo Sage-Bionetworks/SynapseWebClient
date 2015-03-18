@@ -138,7 +138,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 										if (entityRow.getKey().equals(outputColumnName)) {
 											//report this display value
 											if (entityRow.getValues() != null)
-												renderedValue = entityRow.getValuesString();
+												renderedValue = transformer.getFriendlyValues(entityRow);
 											break;
 										}
 									}

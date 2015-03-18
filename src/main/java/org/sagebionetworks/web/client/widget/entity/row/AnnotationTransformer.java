@@ -11,4 +11,6 @@ import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 public interface AnnotationTransformer {
 	List<Annotation> annotationsToList(Annotations annotations);
 	Annotations listToAnnotationsToList(List<Annotation> annotationsList);
+	
+	String getFriendlyValues(Annotation annotation);
 }
