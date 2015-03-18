@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
@@ -41,7 +40,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient) {
 	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
