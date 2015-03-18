@@ -108,6 +108,16 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		place.setNoRestartActivity(true);
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
+	
+	@Override
+	public void replaceArea(EntityArea area, String areaToken) {
+		this.area = area;
+		this.areaToken = areaToken;
+		place.setArea(area);
+		place.setAreaToken(areaToken);
+		place.setNoRestartActivity(true);
+		globalApplicationState.replaceCurrentPlace(place);
+	}
 
 	@Override
     public String mayStop() {

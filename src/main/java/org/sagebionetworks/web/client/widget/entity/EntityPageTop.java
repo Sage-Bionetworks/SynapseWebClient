@@ -200,6 +200,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.areaToken = areaToken;
 		if(areaChangedHandler != null) areaChangedHandler.areaChanged(area, areaToken);
 	}
+	
+	public void replaceArea(EntityArea area, String areaToken){
+		this.area = area;
+		this.areaToken = areaToken;
+		if(areaChangedHandler != null) areaChangedHandler.replaceArea(area, areaToken);
+	}
 
 	@Override
 	public void refreshArea(Synapse.EntityArea area, String areaToken) {
@@ -311,7 +317,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if(newQuery != null){
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null){
-				setArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+				replaceArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
 			}
 		}
 	}

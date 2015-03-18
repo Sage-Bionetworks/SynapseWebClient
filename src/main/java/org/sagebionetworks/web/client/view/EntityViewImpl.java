@@ -90,6 +90,11 @@ public class EntityViewImpl extends Composite implements EntityView {
 			public void areaChanged(EntityArea area, String areaToken) {
 				presenter.updateArea(area, areaToken);
 			}
+
+			@Override
+			public void replaceArea(EntityArea area, String areaToken) {
+				presenter.replaceArea(area, areaToken);
+			}
 		});
 		
 		header.clear();

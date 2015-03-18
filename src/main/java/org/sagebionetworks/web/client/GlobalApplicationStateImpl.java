@@ -33,13 +33,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private String synapseVersion;
 	private boolean isEditing;
 	private HashMap<String, String> synapseProperties;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		isEditing = false;
 	}
 	
@@ -203,6 +205,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			return synapseProperties.get(key);
 		else 
 			return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.sagebionetworks.web.client.GlobalApplicationState#replaceCurrentPlace(com.google.gwt.place.shared.Place)
+	 */
+	@Override
+	public void replaceCurrentPlace(Place currentPlace) {
+		setCurrentPlace(currentPlace);
+		String token = appPlaceHistoryMapper.getToken(currentPlace);
+		this.synapseJSNIUtils.replaceHistoryState(token);
 	}
 	
 }
