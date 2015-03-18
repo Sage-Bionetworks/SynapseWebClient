@@ -43,7 +43,8 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
 		annotationEditors = new ArrayList<AnnotationEditor>();
 		for (Annotation annotation : annotationList) {
-			createAnnotationEditor(annotation);
+			AnnotationEditor newEditor = createAnnotationEditor(annotation);
+			view.addAnnotationEditor(newEditor.asWidget());
 		}
 		this.updateHandler = updateHandler;
 		view.showEditor();
