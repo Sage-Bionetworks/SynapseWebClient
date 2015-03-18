@@ -11,6 +11,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import org.junit.Before;
@@ -19,6 +20,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -44,6 +46,7 @@ public class GlobalApplicationStateImplTest {
 	GlobalApplicationStateImpl globalApplicationState;
 	JiraURLHelper mockJiraURLHelper;
 	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
 	@Before
 	public void before(){
@@ -53,8 +56,9 @@ public class GlobalApplicationStateImplTest {
 		mockJiraURLHelper = Mockito.mock(JiraURLHelper.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient);
+		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -160,6 +164,16 @@ public class GlobalApplicationStateImplTest {
 	public void testClearLastPlace() {
 		globalApplicationState.clearLastPlace();
 		verify(mockCookieProvider).removeCookie(CookieKeys.LAST_PLACE);
+	}
+	
+	@Test
+	public void testReplaceCurrentPlace(){
+		String newToken = "/some/new/token";
+		Place mockPlace = mock(Place.class);
+		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
+		globalApplicationState.replaceCurrentPlace(mockPlace);
+		verify(mockCookieProvider).setCookie(anyString(), anyString(), any(Date.class));
+		verify(mockSynapseJSNIUtils).replaceHistoryState(newToken);
 	}
 	
 }
