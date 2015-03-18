@@ -58,10 +58,17 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage, String buttonText, boolean isSimpleRequestButton) {
+	public void configure(boolean isLoggedIn, 
+			boolean canPublicJoin, 
+			TeamMembershipStatus teamMembershipStatus, 
+			String isMemberMessage, 
+			String buttonText, 
+			String requestOpenInfoText, 
+			boolean isSimpleRequestButton) {
 		clear();
 		String joinButtonText = buttonText == null ? WidgetConstants.JOIN_TEAM_DEFAULT_BUTTON_TEXT : buttonText;
-		initView(joinButtonText);
+		String requestOpenText = requestOpenInfoText == null ? WidgetConstants.JOIN_TEAM_DEFAULT_OPEN_REQUEST_TEXT : requestOpenInfoText;
+		initView(joinButtonText, requestOpenText);
 		add(joinWizard);
 		if (isLoggedIn) {
 			//(note:  in all cases, clicking UI will check for unmet ToU)
@@ -114,7 +121,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		DisplayUtils.showPopup("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, okCallback, cancelCallback);
 	}
 	
-	private void initView(String joinButtonText) {
+	private void initView(String joinButtonText, String requestOpenText) {
 		if (requestUIPanel == null) {
 			anonymousUserButton = new Button(joinButtonText, new ClickHandler() {
 				@Override
@@ -144,7 +151,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			simpleRequestButton.setType(ButtonType.PRIMARY);
 			simpleRequestButton.setSize(ButtonSize.LARGE);
 			
-			requestedMessage = new HTML(DisplayUtils.getAlertHtmlSpan("Request open.", "Your request to join this team has been sent.", BootstrapAlertType.INFO));
+			requestedMessage = new HTML(DisplayUtils.getAlertHtmlSpan("Request open.", requestOpenText, BootstrapAlertType.INFO));
 			requestUIPanel = new FlowPanel();
 			requestUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
 			requestButton = new Button("Request to Join Team", IconType.PLUS, new ClickHandler() {
