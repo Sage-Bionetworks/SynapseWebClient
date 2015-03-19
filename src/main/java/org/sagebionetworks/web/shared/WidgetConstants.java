@@ -103,6 +103,7 @@ public class WidgetConstants {
 	public static final String JOIN_TEAM_BUTTON_TEXT = "text";
 	public static final String JOIN_TEAM_DEFAULT_BUTTON_TEXT = "Join";
 	public static final String JOIN_TEAM_OPEN_REQUEST_TEXT = "requestOpenText";
+	public static final String JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON = "isSimpleRequestButton";
 	public static final String JOIN_TEAM_DEFAULT_OPEN_REQUEST_TEXT = "Your request to join this team has been sent.";
 	public static final String JOIN_TEAM_SUCCESS_MESSAGE = "successMessage";
 	public static final String JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE = "Successfully joined";
