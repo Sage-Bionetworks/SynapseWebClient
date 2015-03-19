@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
