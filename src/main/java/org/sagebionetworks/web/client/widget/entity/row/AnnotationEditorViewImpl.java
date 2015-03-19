@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.row;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
+import org.gwtbootstrap3.client.ui.InputGroup;
+import org.gwtbootstrap3.client.ui.InputGroupButton;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
@@ -32,14 +32,16 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	@UiField
 	TextBox keyField;
 	@UiField
-	Column editorsContainer;
+	FlowPanel editorsContainer;
 	@UiField
 	Button deleteAnnotationButton;
 	@UiField
 	FormGroup formGroup;
 	@UiField
 	HelpBlock helpBlock;
-
+	@UiField
+	Button newValueButton;
+	
 	@Inject
 	public AnnotationEditorViewImpl(Binder uiBinder){
 		widget = uiBinder.createAndBindUi(this);
@@ -59,6 +61,13 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onDelete();
+			}
+		});
+		
+		newValueButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddNewValue();
 			}
 		});
 	}
@@ -81,18 +90,23 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 
 	@Override
 	public void addNewEditor(final CellEditor editor) {
-		final FlowPanel editorAndDelete = new FlowPanel();
-		editorAndDelete.add(editor.asWidget());
+		final InputGroup group = new InputGroup();
+		group.addStyleName("moveup-10");
 		Button deleteButton = new Button("", IconType.TIMES, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				editorsContainer.remove(editorAndDelete);
+				editorsContainer.remove(group);
 				presenter.onValueDeleted(editor);
 			}
 		});
-		deleteButton.setPull(Pull.RIGHT);
-		editorAndDelete.add(deleteButton);
-		editorsContainer.add(editorAndDelete);
+		
+		deleteButton.setHeight("34px");
+		deleteButton.addStyleName("movedown-5");
+		InputGroupButton deleteButtonGroup = new InputGroupButton();
+		deleteButtonGroup.add(deleteButton);
+		group.add(editor.asWidget());
+		group.add(deleteButtonGroup);
+		editorsContainer.add(group);
 	}
 	
 	@Override

@@ -52,7 +52,7 @@ public class AnnotationEditor implements Presenter {
 	}
 	
 	@Override
-	public void onEnterClicked() {
+	public void onAddNewValue() {
 		view.addNewEditor(createNewEditor());
 	}
 
@@ -63,7 +63,7 @@ public class AnnotationEditor implements Presenter {
 			public void onKeyDown(KeyDownEvent event) {
 				//on enter, add a new field (empty fields are ignored on save)
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					onEnterClicked();
+					onAddNewValue();
 				}
 			}
 		});

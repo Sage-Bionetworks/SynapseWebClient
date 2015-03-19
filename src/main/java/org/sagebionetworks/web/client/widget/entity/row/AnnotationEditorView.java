@@ -48,7 +48,7 @@ public interface AnnotationEditorView extends IsWidget {
 		 */
 		void onValueDeleted(CellEditor editor);
 		
-		void onEnterClicked();
+		void onAddNewValue();
 	}
 	/**
 	 * Configure the view with an initial key, type, and editor (based on type)
