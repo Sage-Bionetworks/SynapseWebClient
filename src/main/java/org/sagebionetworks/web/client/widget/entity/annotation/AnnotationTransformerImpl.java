@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.row;
+package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import java.util.ArrayList;
 import java.util.Date;

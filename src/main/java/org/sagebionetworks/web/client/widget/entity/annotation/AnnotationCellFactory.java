@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.row;
+package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;

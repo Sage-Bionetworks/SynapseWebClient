@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.row;
+package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;

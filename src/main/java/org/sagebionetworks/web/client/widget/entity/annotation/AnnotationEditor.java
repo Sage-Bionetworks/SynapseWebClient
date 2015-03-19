@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.row;
+package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +8,9 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.entity.row.AnnotationEditorView.Presenter;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 import com.google.gwt.event.dom.client.KeyCodes;
