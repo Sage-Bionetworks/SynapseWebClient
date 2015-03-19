@@ -12,6 +12,10 @@ public class Annotation {
 		this.key = key;
 		this.values = values;
 	}
+	
+	public Annotation() {
+	}
+	
 	public ANNOTATION_TYPE getType() {
 		return type;
 	}

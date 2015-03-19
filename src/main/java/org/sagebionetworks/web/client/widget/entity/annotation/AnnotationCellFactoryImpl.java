@@ -32,10 +32,10 @@ public class AnnotationCellFactoryImpl implements AnnotationCellFactory {
 				editor = ginInjector.createDateCellEditor();
 				break;
 			case STRING:
-			default:
 				editor = ginInjector.createStringEditorCell();
 				break;
-			
+			default:
+				throw new IllegalArgumentException("Unrecognized annotation type " + annotation.getType());
 		}
 		return editor;
 	}
