@@ -52,7 +52,10 @@ public class AnnotationEditor implements Presenter {
 	
 	@Override
 	public void onAddNewValue() {
-		view.addNewEditor(createNewEditor());
+		CellEditor editor = createNewEditor();
+		view.addNewEditor(editor);
+		//after attaching, set focus to the new editor
+		editor.setFocus(true);
 	}
 
 	public CellEditor createNewEditor(){

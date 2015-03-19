@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.InputGroupButton;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
