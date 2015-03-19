@@ -1058,6 +1058,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
 		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
 		
+		bind(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
