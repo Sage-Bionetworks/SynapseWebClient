@@ -76,12 +76,12 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	}
 
 	@Override
-	public Annotations listToAnnotationsToList(List<Annotation> annotationsList) {
-		Annotations annotations = new Annotations();
+	public void updateAnnotationsFromList(Annotations annotations, List<Annotation> annotationsList) {
 		Map<String, List<Double>> doubleAnnotations = new LinkedHashMap<String, List<Double>>();
 		Map<String, List<String>> stringAnnotations = new LinkedHashMap<String, List<String>>();
 		Map<String, List<Long>> longAnnotations = new LinkedHashMap<String, List<Long>>();
 		Map<String, List<Date>> dateAnnotations = new LinkedHashMap<String, List<Date>>();
+		
 		for (Annotation annotation : annotationsList) {
 			switch (annotation.getType()) {
 			case DATE:
@@ -102,7 +102,6 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 		annotations.setDateAnnotations(dateAnnotations);
 		annotations.setDoubleAnnotations(doubleAnnotations);
 		annotations.setLongAnnotations(longAnnotations);
-		return annotations;
 	}
 
 	public List<Double> getDoubles(List<String> stringList) {

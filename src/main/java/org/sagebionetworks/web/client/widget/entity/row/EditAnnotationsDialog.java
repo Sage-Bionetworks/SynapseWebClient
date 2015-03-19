@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -27,27 +29,39 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	String entityId;
 	List<AnnotationEditor> annotationEditors;
 	EntityUpdatedHandler updateHandler;
+	Annotations copyOfOldAnnotations;
+	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
-	public EditAnnotationsDialog(EditAnnotationsDialogView view, SynapseClientAsync synapseClient, AnnotationTransformer transformer, PortalGinInjector ginInjector)  {
+	public EditAnnotationsDialog(EditAnnotationsDialogView view, SynapseClientAsync synapseClient, AnnotationTransformer transformer, PortalGinInjector ginInjector, JSONObjectAdapter jsonObjectAdapter)  {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.transformer = transformer;
 		this.ginInjector = ginInjector;
+		this.jsonObjectAdapter = jsonObjectAdapter;
+		view.setPresenter(this);
 	}
 
 	@Override
 	public void configure(EntityBundle bundle, EntityUpdatedHandler updateHandler) {
 		view.clearAnnotationEditors();
 		entityId = bundle.getEntity().getId();
-		List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
-		annotationEditors = new ArrayList<AnnotationEditor>();
-		for (Annotation annotation : annotationList) {
-			AnnotationEditor newEditor = createAnnotationEditor(annotation);
-			view.addAnnotationEditor(newEditor.asWidget());
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		try {
+			bundle.getAnnotations().writeToJSONObject(adapter);
+			copyOfOldAnnotations = new Annotations(adapter); 
+			List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
+			annotationEditors = new ArrayList<AnnotationEditor>();
+			for (Annotation annotation : annotationList) {
+				AnnotationEditor newEditor = createAnnotationEditor(annotation);
+				view.addAnnotationEditor(newEditor.asWidget());
+			}
+			this.updateHandler = updateHandler;
+			view.showEditor();
+		} catch (JSONObjectAdapterException e) {
+			view.showError("Could not deep copy annotations");
 		}
-		this.updateHandler = updateHandler;
-		view.showEditor();
+		
 	}
 	
 	public AnnotationEditor createAnnotationEditor(Annotation annotation) {
@@ -118,8 +132,9 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		for (AnnotationEditor annotationEditor : annotationEditors) {
 			updatedAnnotationsList.add(annotationEditor.getUpdatedAnnotation());
 		}
-		Annotations updatedAnnotations = transformer.listToAnnotationsToList(updatedAnnotationsList);
-		synapseClient.updateAnnotations(entityId, updatedAnnotations, new AsyncCallback<Void>() {
+		transformer.updateAnnotationsFromList(copyOfOldAnnotations, updatedAnnotationsList);
+		
+		synapseClient.updateAnnotations(entityId, copyOfOldAnnotations, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Successfully updated the annotations", "");

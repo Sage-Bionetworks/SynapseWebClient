@@ -16,7 +16,7 @@
 			</t:TableData>
 			<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
 				<g:FlowPanel ui:field="editorsContainer" />
-				<b:Button icon="PLUS" ui:field="newValueButton" type="INFO" text="Add New Value"></b:Button>
+				<b:Button icon="PLUS" ui:field="newValueButton" addStyleNames="moveup-5" size="SMALL" text="Add New Value"></b:Button>
 			</t:TableData>
 			<t:TableData addStyleNames="vertical-align-top">
 				<b:Button icon="TIMES" size="LARGE" pull="RIGHT" ui:field="deleteAnnotationButton"/>

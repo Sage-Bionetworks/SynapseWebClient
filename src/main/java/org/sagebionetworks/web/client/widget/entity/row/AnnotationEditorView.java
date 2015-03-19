@@ -76,4 +76,6 @@ public interface AnnotationEditorView extends IsWidget {
 	 * @param help
 	 */
 	public void setKeyHelpText(String help);
+	
+	void setPresenter(Presenter presenter);
 }

@@ -71,6 +71,10 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 			}
 		});
 	}
+	@Override
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
+	}
 
 	@Override
 	public Widget asWidget() {

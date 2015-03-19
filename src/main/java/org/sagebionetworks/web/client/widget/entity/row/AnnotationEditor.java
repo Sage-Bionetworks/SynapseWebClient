@@ -45,9 +45,8 @@ public class AnnotationEditor implements Presenter {
 			editor.setValue(value);
 			view.addNewEditor(editor);
 		}
-		
-		//also add a blank editor
-		view.addNewEditor(createNewEditor());
+		view.setPresenter(this);
+
 		view.configure(annotation.getKey(), annotation.getType());
 	}
 	
