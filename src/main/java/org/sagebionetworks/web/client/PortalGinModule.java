@@ -101,9 +101,6 @@ import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetView;
-import org.sagebionetworks.web.client.widget.entity.AnnotationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -160,6 +157,16 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactoryImpl;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorView;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorViewImpl;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformerImpl;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidgetView;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogView;
+import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
@@ -524,10 +531,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
 		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
 		
-		bind(AnnotationsWidget.class).in(Singleton.class);
-		bind(AnnotationsWidgetViewImpl.class).in(Singleton.class);
-		bind(AnnotationsWidgetView.class).to(AnnotationsWidgetViewImpl.class);
-		
+		bind(AnnotationsRendererWidgetView.class).to(AnnotationsRendererWidgetViewImpl.class);
 		
 		//file history
 		bind(FileHistoryWidget.class).in(Singleton.class);
@@ -1053,5 +1057,14 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
 		bind(ChallengeParticipantsView.class).to(ChallengeParticipantsViewImpl.class);
+		
+		bind(AnnotationTransformerImpl.class).in(Singleton.class);
+		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);
+		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
+		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
+		
+		bind(AnnotationCellFactoryImpl.class).in(Singleton.class);
+		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class);
+		
 	}
 }

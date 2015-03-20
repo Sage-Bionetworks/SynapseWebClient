@@ -292,7 +292,6 @@ public class TableEntityWidgetTest {
 		boolean schemaShown = true;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.onSchemaToggle(schemaShown);
-		verify(mockActionMenu).setActionText(Action.TOGGLE_TABLE_SCHEMA, TableEntityWidget.HIDE_SCHEMA);
 		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
 	}
 	
@@ -302,7 +301,6 @@ public class TableEntityWidgetTest {
 		boolean schemaShown = false;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.onSchemaToggle(schemaShown);
-		verify(mockActionMenu).setActionText(Action.TOGGLE_TABLE_SCHEMA, TableEntityWidget.SHOW_SCHEMA);
 		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 	}
 	

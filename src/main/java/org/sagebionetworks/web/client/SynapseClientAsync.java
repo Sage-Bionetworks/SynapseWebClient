@@ -9,6 +9,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -378,4 +379,5 @@ public interface SynapseClientAsync {
 
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
 
+	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 }

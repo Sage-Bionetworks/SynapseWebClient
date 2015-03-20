@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class APITableColumnRendererDateTest {
@@ -42,7 +43,7 @@ public class APITableColumnRendererDateTest {
 		mockJsniUtils = mock(SynapseJSNIUtils.class);
 		mockGwt = mock(GWTWrapper.class);
 		DateTimeFormat mockDateTimeFormat = mock(DateTimeFormat.class);
-		when(mockGwt.getDateTimeFormat()).thenReturn(mockDateTimeFormat);
+		when(mockGwt.getDateTimeFormat(PredefinedFormat.ISO_8601)).thenReturn(mockDateTimeFormat);
 		when(mockDateTimeFormat.format(any(Date.class))).thenReturn(formattedDate);
 		when(mockJsniUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
 		renderer = new APITableColumnRendererDate(mockJsniUtils, mockGwt);

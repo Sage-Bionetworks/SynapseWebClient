@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -279,7 +280,6 @@ public interface PortalGinInjector extends Ginjector {
 	public LinkCellRenderer createLinkCellRenderer();
 	public FileCellEditor createFileCellEditor();
 	public FileCellRenderer createFileCellRenderer();
-
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();
@@ -309,4 +309,5 @@ public interface PortalGinInjector extends Ginjector {
 	public StaticTableHeader createStaticTableHeader();
 	public EvaluationSubmitter getEvaluationSubmitter();
 	public RegisterTeamDialog getRegisterTeamDialog();
+	public AnnotationEditor getAnnotationEditor();
 }
