@@ -48,11 +48,11 @@ public class AnnotationEditorTest {
 	@Test
 	public void testConfigureSingleValue() {
 		annotationValues.add("value 1");
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		verify(mockAnnotationCellFactory).createEditor(any(Annotation.class));
 		verify(mockView).addNewEditor(any(CellEditor.class));
 		verify(mockView).setPresenter(editor);
-		verify(mockView).configure(ANNOTATION_KEY, ANNOTATION_TYPE.STRING);
+		verify(mockView).configure(ANNOTATION_KEY, editor.getAnnotationTypes().indexOf(ANNOTATION_TYPE.STRING));
 	}
 
 	@Test
@@ -60,25 +60,25 @@ public class AnnotationEditorTest {
 		//configure with many values
 		annotationValues.add("value 1");
 		annotationValues.add("value 2");
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		verify(mockAnnotationCellFactory, times(2)).createEditor(any(Annotation.class));
 		verify(mockView, times(2)).addNewEditor(any(CellEditor.class));
 		verify(mockView).setPresenter(editor);
-		verify(mockView).configure(ANNOTATION_KEY, ANNOTATION_TYPE.STRING);
+		verify(mockView).configure(ANNOTATION_KEY, editor.getAnnotationTypes().indexOf(ANNOTATION_TYPE.STRING));
 	}
 
 	@Test
 	public void testConfigureNoValues() {
 		//configure with no values
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		verify(mockView, never()).addNewEditor(any(CellEditor.class));
 		verify(mockView).setPresenter(editor);
-		verify(mockView).configure(ANNOTATION_KEY, ANNOTATION_TYPE.STRING);
+		verify(mockView).configure(ANNOTATION_KEY, editor.getAnnotationTypes().indexOf(ANNOTATION_TYPE.STRING));
 	}
 
 	@Test
 	public void testOnAddNewValue() {
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		editor.onAddNewValue();
 		verify(mockAnnotationCellFactory).createEditor(any(Annotation.class));
 		verify(mockView).addNewEditor(any(CellEditor.class));
@@ -87,7 +87,7 @@ public class AnnotationEditorTest {
 
 	@Test
 	public void testCreateNewEditor() {
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		CellEditor createdEditor = editor.createNewEditor();
 		assertEquals(mockCellEditor, createdEditor);
 		ArgumentCaptor<KeyDownHandler> captor = ArgumentCaptor.forClass(KeyDownHandler.class);
@@ -104,24 +104,15 @@ public class AnnotationEditorTest {
 	@Test
 	public void testOnDelete() {
 		Callback mockDeletedCallback = mock(Callback.class);
-		editor.configure(annotation, null, mockDeletedCallback);
+		editor.configure(annotation, mockDeletedCallback);
 		editor.onDelete();
 		verify(mockDeletedCallback).invoke();
 	}
 
 	@Test
-	public void testOnTypeChange() {
-		CallbackP<ANNOTATION_TYPE> mockTypeChangeCallback = mock(CallbackP.class);
-		editor.configure(annotation, mockTypeChangeCallback, null);
-		ANNOTATION_TYPE newType = ANNOTATION_TYPE.LONG;
-		editor.onTypeChange(newType);
-		verify(mockTypeChangeCallback).invoke(newType);
-	}
-
-	@Test
 	public void testIsValid() {
 		annotationValues.add("value 1");
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		//by default, valid key is returned from view and cell editor says that it is valid
 		assertTrue(editor.isValid());
 		//but if the key is undefined, then annotation is not valid
@@ -152,7 +143,7 @@ public class AnnotationEditorTest {
 	@Test
 	public void testGetUpdatedAnnotation() {
 		annotationValues.add("value 1");
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		
 		String modifiedValue = "There can be only one.";
 		when(mockCellEditor.getValue()).thenReturn(modifiedValue);
@@ -168,7 +159,7 @@ public class AnnotationEditorTest {
 	@Test
 	public void testOnValueDeleted() {
 		annotationValues.add("value 1");
-		editor.configure(annotation, null, null);
+		editor.configure(annotation, null);
 		
 		editor.onValueDeleted(mockCellEditor);
 		Annotation updatedAnnotation = editor.getUpdatedAnnotation();
@@ -179,6 +170,24 @@ public class AnnotationEditorTest {
 	public void testAsWidget() {
 		editor.asWidget();
 		verify(mockView).asWidget();
+	}
+	
+	@Test
+	public void testOnTypeChange() {
+		annotationValues.add("value 1");
+		editor.configure(annotation, null);
+		verify(mockView).addNewEditor(any(CellEditor.class));
+		
+		int dateIndex = editor.getAnnotationTypes().indexOf(ANNOTATION_TYPE.DATE);
+		editor.onTypeChange(dateIndex);
+		verify(mockView).clearValueEditors();
+		verify(mockView, times(2)).addNewEditor(any(CellEditor.class));
+		verify(mockCellEditor).setFocus(true);
+		
+		assertEquals(ANNOTATION_TYPE.DATE, editor.getAnnotation().getType());
+		//after type change, should clear values
+		Annotation a = editor.getUpdatedAnnotation();
+		assertEquals(0, a.getValues().size());
 	}
 
 }

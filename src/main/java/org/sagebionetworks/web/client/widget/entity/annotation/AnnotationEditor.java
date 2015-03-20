@@ -25,7 +25,7 @@ public class AnnotationEditor implements Presenter {
 	private Callback deletedCallback;
 	private List<CellEditor> cellEditors;
 	AnnotationCellFactory factory;
-	List<ANNOTATION_TYPE> annotationTypes;
+	private List<ANNOTATION_TYPE> annotationTypes;
 	@Inject
 	public AnnotationEditor(AnnotationEditorView view, AnnotationCellFactory factory) {
 		this.view = view;
@@ -142,5 +142,11 @@ public class AnnotationEditor implements Presenter {
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
+	
+	public List<ANNOTATION_TYPE> getAnnotationTypes() {
+		return annotationTypes;
+	}
+	public Annotation getAnnotation() {
+		return annotation;
+	}
 }
