@@ -15,13 +15,13 @@
 				
 				<!--Project level information -->
 				<b:Row addStyleNames="margin-top-5">
-					<b:Column size="XS_12, MD_5" push="MD_7">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="projectActionMenuContainer"/>
-					</b:Column>
-					<b:Column size="XS_12, MD_7" pull="MD_5">
+					</bh:Div>
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 						<g:SimplePanel ui:field="projectDescriptionContainer"/>
-					</b:Column>
+					</bh:Div>
 				</b:Row>
 				
    				<div class="row margin-top-15" ui:field="navtabContainer">
@@ -39,15 +39,15 @@
 					</b:Column>
 				</b:Row>
 				<b:Row ui:field="filesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
-					<b:Column size="MD_4" push="MD_8">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="fileActionMenuContainer"/>
-					</b:Column>
-					<b:Column size="MD_8" pull="MD_4">
+					</bh:Div>
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
 						<g:SimplePanel ui:field="fileTitlebarContainer"/>
 						<g:SimplePanel ui:field="locationableTitlebarContainer"/>
 						<g:SimplePanel ui:field="fileMetadataContainer"/>
-					</b:Column>
+					</bh:Div>
 					<b:Column size="XS_12">
 						<g:SimplePanel ui:field="fileHistoryContainer"/>
 						<g:SimplePanel ui:field="fileDescriptionContainer"/>
@@ -67,13 +67,13 @@
 					</b:Column>
 				</b:Row>
 				<b:Row ui:field="tablesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15 padding-bottom-15">
-					<b:Column size="MD_4" push="MD_8">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="tableActionMenuContainer"/>
-					</b:Column>
-					<b:Column size="MD_8" pull="MD_4">
+					</bh:Div>
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="tableBreadcrumbContainer"/>
 						<g:SimplePanel ui:field="tableMetadataContainer"/>
-					</b:Column>
+					</bh:Div>
 					<b:Column size="XS_12">
 						<g:SimplePanel ui:field="tableListWidgetContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>

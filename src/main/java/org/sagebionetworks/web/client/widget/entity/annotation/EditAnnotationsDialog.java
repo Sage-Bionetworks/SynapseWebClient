@@ -6,13 +6,11 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
@@ -30,19 +28,16 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	List<AnnotationEditor> annotationEditors;
 	EntityUpdatedHandler updateHandler;
 	Annotations annotationsCopy;
-	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
 	public EditAnnotationsDialog(EditAnnotationsDialogView view, 
 			SynapseClientAsync synapseClient, 
 			AnnotationTransformer transformer, 
-			PortalGinInjector ginInjector, 
-			JSONObjectAdapter jsonObjectAdapter)  {
+			PortalGinInjector ginInjector)  {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.transformer = transformer;
 		this.ginInjector = ginInjector;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		view.setPresenter(this);
 	}
 
@@ -50,41 +45,33 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	public void configure(EntityBundle bundle, EntityUpdatedHandler updateHandler) {
 		view.clearAnnotationEditors();
 		entityId = bundle.getEntity().getId();
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		try {
-			bundle.getAnnotations().writeToJSONObject(adapter);
-			annotationsCopy = new Annotations(adapter); 
-			List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
-			annotationEditors = new ArrayList<AnnotationEditor>();
-			for (Annotation annotation : annotationList) {
-				AnnotationEditor newEditor = createAnnotationEditor(annotation);
-				view.addAnnotationEditor(newEditor.asWidget());
-			}
-			this.updateHandler = updateHandler;
-			//if there are no annotations, prepopulate with a single default annotation
-			if (annotationList.isEmpty())
-				onAddNewAnnotation();
-			view.showEditor();
-		} catch (JSONObjectAdapterException e) {
-			view.showError("Could not deep copy annotations");
+		annotationsCopy = new Annotations();
+		Annotations originalAnnotations = bundle.getAnnotations();
+		annotationsCopy.setId(originalAnnotations.getId());
+		annotationsCopy.setEtag(originalAnnotations.getEtag());
+		annotationsCopy.addAll(originalAnnotations);
+		List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
+		annotationEditors = new ArrayList<AnnotationEditor>();
+		for (Annotation annotation : annotationList) {
+			AnnotationEditor newEditor = createAnnotationEditor(annotation);
+			view.addAnnotationEditor(newEditor.asWidget());
 		}
-		
+		this.updateHandler = updateHandler;
+		//if there are no annotations, prepopulate with a single default annotation
+		if (annotationList.isEmpty())
+			onAddNewAnnotation();
+		view.showEditor();
 	}
 	
 	public AnnotationEditor createAnnotationEditor(Annotation annotation) {
 		final AnnotationEditor editor = ginInjector.getAnnotationEditor();
-		CallbackP<ANNOTATION_TYPE> typeChangeCallback = new CallbackP<ANNOTATION_TYPE>() {
-			public void invoke(ANNOTATION_TYPE newType) {
-				onAnnotationTypeChange(newType, editor);
-			};
-		};
 		Callback deletedCallback = new Callback() {
 			@Override
 			public void invoke() {
 				onAnnotationDeleted(editor);
 			}
 		};
-		editor.configure(annotation, typeChangeCallback, deletedCallback);
+		editor.configure(annotation, deletedCallback);
 		annotationEditors.add(editor);
 		return editor;
 	}
@@ -106,13 +93,6 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	public void onAnnotationDeleted(AnnotationEditor editor) {
 		annotationEditors.remove(editor);
 		view.removeAnnotationEditor(editor.asWidget());
-	}
-	
-	@Override
-	public void onAnnotationTypeChange(ANNOTATION_TYPE newType, AnnotationEditor oldEditor) {
-		annotationEditors.remove(oldEditor);
-		AnnotationEditor newEditor = createAnnotationEditor(newType);
-		view.replaceAnnotationEditor(oldEditor.asWidget(), newEditor.asWidget());
 	}
 	
 	@Override

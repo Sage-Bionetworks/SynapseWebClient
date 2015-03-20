@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,10 +29,6 @@ public interface EditAnnotationsDialogView extends IsWidget {
 		 * Called when the add button is clicked in the dialog
 		 */
 		void onAddNewAnnotation();
-		/**
-		 * From the annotation editor
-		 */
-		void onAnnotationTypeChange(ANNOTATION_TYPE newType, AnnotationEditor editor);
 		
 		/**
 		 * From the annotation editor
@@ -71,7 +65,6 @@ public interface EditAnnotationsDialogView extends IsWidget {
 	void hideErrors();
 	
 	void addAnnotationEditor(Widget editor);
-	void replaceAnnotationEditor(Widget oldEditor, Widget newEditor);
 	void removeAnnotationEditor(Widget editor);
 	void clearAnnotationEditors();
 	

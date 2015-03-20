@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -23,20 +22,31 @@ public class AnnotationEditor implements Presenter {
 	
 	private AnnotationEditorView view;
 	private Annotation annotation;
-	private CallbackP<ANNOTATION_TYPE> typeChangeCallback;
 	private Callback deletedCallback;
 	private List<CellEditor> cellEditors;
 	AnnotationCellFactory factory;
+	List<ANNOTATION_TYPE> annotationTypes;
 	@Inject
 	public AnnotationEditor(AnnotationEditorView view, AnnotationCellFactory factory) {
 		this.view = view;
 		this.factory = factory;
+		view.setPresenter(this);
+		
+		List<String> displayTypes = new ArrayList<String>();
+		annotationTypes = new ArrayList<ANNOTATION_TYPE>();
+		annotationTypes.add(ANNOTATION_TYPE.STRING);
+		annotationTypes.add(ANNOTATION_TYPE.LONG);
+		annotationTypes.add(ANNOTATION_TYPE.DOUBLE);
+		annotationTypes.add(ANNOTATION_TYPE.DATE);
+		for (ANNOTATION_TYPE type : annotationTypes) {
+			displayTypes.add(type.getDisplayText());
+		}
+		view.setTypeOptions(displayTypes);
 	}
 	
 	@Override
-	public void configure(Annotation annotation, CallbackP<ANNOTATION_TYPE> typeChangeCallback, Callback deletedCallback) {
+	public void configure(Annotation annotation, Callback deletedCallback) {
 		this.annotation = annotation;
-		this.typeChangeCallback = typeChangeCallback;
 		this.deletedCallback = deletedCallback;
 		cellEditors = new ArrayList<CellEditor>();
 		for (String value : annotation.getValues()) {
@@ -45,9 +55,7 @@ public class AnnotationEditor implements Presenter {
 			editor.setValue(value);
 			view.addNewEditor(editor);
 		}
-		view.setPresenter(this);
-
-		view.configure(annotation.getKey(), annotation.getType());
+		view.configure(annotation.getKey(), annotationTypes.indexOf(annotation.getType()));
 	}
 	
 	@Override
@@ -80,9 +88,12 @@ public class AnnotationEditor implements Presenter {
 	}
 
 	@Override
-	public void onTypeChange(ANNOTATION_TYPE newType) {
-		if (typeChangeCallback != null)
-			typeChangeCallback.invoke(newType);
+	public void onTypeChange(int typeIndex) {
+		//clear values, add an appropriate
+		annotation.setType(annotationTypes.get(typeIndex));
+		cellEditors = new ArrayList<CellEditor>();
+		view.clearValueEditors();
+		onAddNewValue();
 	}
 
 	@Override

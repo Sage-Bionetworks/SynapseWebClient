@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
@@ -46,16 +48,10 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	@Inject
 	public AnnotationEditorViewImpl(Binder uiBinder){
 		widget = uiBinder.createAndBindUi(this);
-		typeComboBox.addItem(ANNOTATION_TYPE.STRING.getDisplayText());
-		typeComboBox.addItem(ANNOTATION_TYPE.LONG.getDisplayText());
-		typeComboBox.addItem(ANNOTATION_TYPE.DOUBLE.getDisplayText());
-		typeComboBox.addItem(ANNOTATION_TYPE.DATE.getDisplayText());
 		typeComboBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				String selectedValue = typeComboBox.getValue(typeComboBox.getSelectedIndex());
-				presenter.onTypeChange(ANNOTATION_TYPE.getTypeForDisplay(selectedValue));
-				
+				presenter.onTypeChange(typeComboBox.getSelectedIndex());
 			}
 		});
 		deleteAnnotationButton.addClickHandler(new ClickHandler() {
@@ -72,6 +68,20 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 			}
 		});
 	}
+	
+	@Override
+	public void clearValueEditors() {
+		editorsContainer.clear();
+	}
+	
+	@Override
+	public void setTypeOptions(List<String> types) {
+		typeComboBox.clear();
+		for (String type : types) {
+			typeComboBox.addItem(type);
+		}
+	}
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -83,14 +93,9 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	}
 
 	@Override
-	public void configure(String key, ANNOTATION_TYPE type) {
+	public void configure(String key, int typeIndex) {
 		keyField.setValue(key);
-		for (int i = 0; i < typeComboBox.getItemCount(); i++) {
-			if (type.getDisplayText().equals(typeComboBox.getItemText(i))) {
-				typeComboBox.setSelectedIndex(i);
-				break;
-			}
-		}
+		typeComboBox.setSelectedIndex(typeIndex);
 	}
 
 	@Override

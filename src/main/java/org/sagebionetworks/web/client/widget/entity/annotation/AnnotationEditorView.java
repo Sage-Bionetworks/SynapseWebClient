@@ -21,7 +21,7 @@ public interface AnnotationEditorView extends IsWidget {
 		/**
 		 * Called when type is changed
 		 */
-		void onTypeChange(ANNOTATION_TYPE newType);
+		void onTypeChange(int typeIndex);
 		/**
 		 * Can ask if the edited Annotation values are valid (updates UI)
 		 * @return
@@ -30,11 +30,9 @@ public interface AnnotationEditorView extends IsWidget {
 		/**
 		 * Configure this Annotation editor with an annotation and callback handlers
 		 * @param annotation
-		 * @param typeChangeCallback
 		 * @param deletedCallback
 		 */
 		void configure(Annotation annotation, 
-				CallbackP<ANNOTATION_TYPE> typeChangeCallback, 
 				Callback deletedCallback);
 		/**
 		 * Ask the editor for the updated Annotation (based on values entered in the view)
@@ -51,12 +49,10 @@ public interface AnnotationEditorView extends IsWidget {
 		void onAddNewValue();
 	}
 	/**
-	 * Configure the view with an initial key, type, and editor (based on type)
+	 * Configure the view with an initial key, type
 	 * @param key
-	 * @param type
-	 * @param editor
 	 */
-	void configure(String key, ANNOTATION_TYPE type);
+	void configure(String key, int typeIndex);
 	/**
 	 * Adds a new cell editor
 	 * @param editor
@@ -78,4 +74,8 @@ public interface AnnotationEditorView extends IsWidget {
 	public void setKeyHelpText(String help);
 	
 	void setPresenter(Presenter presenter);
+	
+	void clearValueEditors();
+	
+	void setTypeOptions(List<String> types);
 }
