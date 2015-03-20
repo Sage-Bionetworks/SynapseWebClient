@@ -150,5 +150,10 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void showLoading() {
 	}
+
+	@Override
+	public void setEmail(String email) {
+		emailAddressField.setText(email);
+	}
 	
 }

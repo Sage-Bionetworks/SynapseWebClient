@@ -26,20 +26,32 @@ import com.google.inject.Inject;
 
 public class OAuth2Servlet extends HttpServlet {
 	
+
+	private ServiceUrlProvider urlProvider;
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+
 	/**
 	 * Injected with Gin
 	 */
 	@Inject
-	private ServiceUrlProvider urlProvider;
-	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	public void setUrlProvider(ServiceUrlProvider urlProvider) {
+		this.urlProvider = urlProvider;
+	}
 
+	/**
+	 * Injected
+	 * @param synapseProvider
+	 */
+	public void setSynapseProvider(SynapseProvider synapseProvider) {
+		this.synapseProvider = synapseProvider;
+	}
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		String provideString = req.getParameter(WebConstants.OAUTH2_PROVIDER);
 		OAuthProvider provider = OAuthProvider.valueOf(provideString);
@@ -52,8 +64,8 @@ public class OAuth2Servlet extends HttpServlet {
 		}else{
 			validateUser(resp, provider, athenticationCode, redirectUrl);
 		}
-		super.doGet(req, resp);
 	}
+
 	
 	/**
 	 * Create a redirect URL.
