@@ -4,7 +4,7 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<g:HTMLPanel>
-		<b:Modal ui:field="editModal" title="Edit Annotations" closable="true"
+		<b:Modal ui:field="editModal" title="Annotations" closable="true"
 			fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="editAnnotationsModal">
 			<b:ModalBody>
 				<t:Table width="80%">

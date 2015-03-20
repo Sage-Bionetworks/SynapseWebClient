@@ -16,6 +16,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -25,9 +26,13 @@ import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDi
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialogView;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class EditAnnotationsDialogTest {
@@ -76,6 +81,7 @@ public class EditAnnotationsDialogTest {
 		mockUpdateHandler = mock(EntityUpdatedHandler.class);
 		mockEditor = mock(AnnotationEditor.class);
 		when(mockPortalGinInjector.getAnnotationEditor()).thenReturn(mockEditor);
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateAnnotations(anyString(), any(Annotations.class), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -159,10 +165,44 @@ public class EditAnnotationsDialogTest {
 	}
 
 	@Test
-	public void testOnSave() {
-		
+	public void testOnSaveHappyCase() {
+		dialog.configure(mockBundle, mockUpdateHandler);
+		when(mockEditor.isValid()).thenReturn(true);
+		dialog.onSave();
+		verify(mockView).setLoading();
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).hideEditor();
+		verify(mockUpdateHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 
+
+	@Test
+	public void testOnSaveInvalidEditor() {
+		dialog.configure(mockBundle, mockUpdateHandler);
+		when(mockEditor.isValid()).thenReturn(false);
+		dialog.onSave();
+		verify(mockView).showError(anyString());
+		//editor detects invalid entry, should not do async call
+		verify(mockView, never()).setLoading();
+		verify(mockView, never()).hideEditor();
+		verify(mockUpdateHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+
+	@Test
+	public void testOnSaveServiceCallFailure() {
+		String errorMessage = "Failure detected on server";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).updateAnnotations(anyString(), any(Annotations.class), any(AsyncCallback.class));
+		
+		dialog.configure(mockBundle, mockUpdateHandler);
+		when(mockEditor.isValid()).thenReturn(true);
+		dialog.onSave();
+		verify(mockView).setLoading();
+		verify(mockView).showError(errorMessage);
+		verify(mockView, never()).hideEditor();
+		verify(mockUpdateHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
 	@Test
 	public void testAsWidget() {
 		dialog.asWidget();
