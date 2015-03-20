@@ -37,6 +37,7 @@ import org.sagebionetworks.web.server.servlet.filter.CRCSCFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
+import org.sagebionetworks.web.server.servlet.oauth2.OAuth2Servlet;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDServlet;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -147,6 +148,10 @@ public class PortalServletModule extends ServletModule {
 		bind(OpenIDServlet.class).in(Singleton.class);
 		serve(WebConstants.OPEN_ID_URI).with(OpenIDServlet.class);
 		serve(OpenIDUtils.OPENID_CALLBACK_URI).with(OpenIDServlet.class);
+		
+		// OAuth2 
+		bind(OAuth2Servlet.class).in(Singleton.class);
+		serve("/Portal/oauth2callback").with(OAuth2Servlet.class);
 		
 		// The Rest template provider should be a singleton.
 		bind(RestTemplateProviderImpl.class).in(Singleton.class);

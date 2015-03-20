@@ -256,4 +256,7 @@ public class WebConstants {
 	public static final String LAST_NAME_PARAM = "lastName";
 	public static final String FIRST_NAME_PARAM = "firstName";
 	
+	public static final String OAUTH2_PROVIDER = "oauth2provider";
+	public static final String OAUTH2_CODE = "code";
+	
 }

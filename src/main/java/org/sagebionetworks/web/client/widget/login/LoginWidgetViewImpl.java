@@ -24,7 +24,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SubmitButton;
@@ -40,8 +39,8 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	FlowPanel synapseLoginFieldsContainer;
 	
-	@UiField
-	SimplePanel googleSSOContainer;
+//	@UiField
+//	SimplePanel googleSSOContainer;
 	@UiField
 	SpanElement messageLabel;
 	Button signInBtn;
@@ -115,7 +114,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	
 	@Override 
 	public void onLoad() {
-		googleSSOContainer.setWidget(new HTML(createSSOLoginButton()));		
+		//googleSSOContainer.setWidget(new HTML(createSSOLoginButton()));		
 	}
 	
 	private SafeHtml createSSOLoginButton() {
