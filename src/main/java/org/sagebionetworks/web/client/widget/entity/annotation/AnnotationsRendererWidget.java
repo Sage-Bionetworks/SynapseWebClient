@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -16,13 +17,14 @@ import com.google.inject.Inject;
  */
 public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.Presenter, IsWidget {
 
-	private Annotations annotations;
+	
 	private EntityBundle bundle;
 	private AnnotationsRendererWidgetView view;
 	private AnnotationTransformer annotationTransformer;
 	private EditAnnotationsDialog editorDialog;
 	EntityUpdatedHandler entityUpdatedHandler;
-
+	List<Annotation> annotationsList;
+	
 	/**
 	 * 
 	 * @param factory
@@ -30,7 +32,9 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	 * @param propertyView
 	 */
 	@Inject
-	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, AnnotationTransformer annotationTransformer, EditAnnotationsDialog editorDialog) {
+	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, 
+			AnnotationTransformer annotationTransformer, 
+			EditAnnotationsDialog editorDialog) {
 		super();
 		this.view = propertyView;
 		this.annotationTransformer = annotationTransformer;
@@ -42,18 +46,19 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	@Override
 	public void configure(EntityBundle bundle, boolean canEdit) {
 		this.bundle = bundle;
-		this.annotations = bundle.getAnnotations();
-		List<Annotation> annotationsList = annotationTransformer.annotationsToList(annotations);
+		annotationsList = annotationTransformer.annotationsToList(bundle.getAnnotations());
 		if (!annotationsList.isEmpty())
 			view.configure(annotationsList);
-		else
+		else {
 			view.showNoAnnotations();
-		view.setEditButtonVisible(canEdit);
+		}
+			
+		view.setEditUIVisible(canEdit);
 	}
 
 
 	public boolean isEmpty() {
-		return annotations.keySet().isEmpty();
+		return annotationsList.isEmpty();
 	}
 
 	@Override

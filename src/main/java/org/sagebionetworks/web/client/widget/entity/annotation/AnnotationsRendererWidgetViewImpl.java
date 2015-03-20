@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
@@ -30,6 +31,9 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	TBody tableBody;
 	@UiField
 	Alert noAnnotationsFoundAlert;
+	@UiField
+	Span clickEditText;
+	
 	@UiField
 	FlowPanel modalContainer;
 	
@@ -85,8 +89,9 @@ public class AnnotationsRendererWidgetViewImpl implements AnnotationsRendererWid
 	}
 	
 	@Override
-	public void setEditButtonVisible(boolean isVisible) {
+	public void setEditUIVisible(boolean isVisible) {
 		editAnnotationsButton.setVisible(isVisible);
+		clickEditText.setVisible(isVisible);
 	}
 	
 	@Override

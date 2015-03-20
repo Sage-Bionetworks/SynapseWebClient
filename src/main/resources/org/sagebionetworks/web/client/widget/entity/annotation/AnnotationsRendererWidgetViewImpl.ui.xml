@@ -18,7 +18,8 @@
 			<t:TBody ui:field="tableBody"></t:TBody>
 		</t:Table>
 		<b:Alert type="INFO" ui:field="noAnnotationsFoundAlert" >
-			<bh:Strong text="No annotations found. Click on the Edit button below to annotate."/>
+			<bh:Strong text="No annotations found."/>
+			<bh:Span ui:field="clickEditText" addStyleNames="margin-left-5"><bh:Text text="Click on the Edit button below to annotate." /></bh:Span>
 		</b:Alert>
 
 		<b:Button ui:field="editAnnotationsButton" icon="GEAR" type="INFO" visible="false">Edit</b:Button>

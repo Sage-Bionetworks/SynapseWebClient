@@ -17,7 +17,7 @@ public interface AnnotationsRendererWidgetView extends IsWidget{
 
 	void configure(List<Annotation> annotations);
 	void setPresenter(Presenter presenter);
-	void setEditButtonVisible(boolean isVisible);
+	void setEditUIVisible(boolean isVisible);
 	void showNoAnnotations();
 	void addEditorToPage(Widget editorWidget);
 }

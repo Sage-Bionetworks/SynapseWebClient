@@ -57,6 +57,9 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 				view.addAnnotationEditor(newEditor.asWidget());
 			}
 			this.updateHandler = updateHandler;
+			//if there are no annotations, prepopulate with a single default annotation
+			if (annotationList.isEmpty())
+				onAddNewAnnotation();
 			view.showEditor();
 		} catch (JSONObjectAdapterException e) {
 			view.showError("Could not deep copy annotations");
