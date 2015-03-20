@@ -29,11 +29,15 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	String entityId;
 	List<AnnotationEditor> annotationEditors;
 	EntityUpdatedHandler updateHandler;
-	Annotations copyOfOldAnnotations;
+	Annotations annotationsCopy;
 	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Inject
-	public EditAnnotationsDialog(EditAnnotationsDialogView view, SynapseClientAsync synapseClient, AnnotationTransformer transformer, PortalGinInjector ginInjector, JSONObjectAdapter jsonObjectAdapter)  {
+	public EditAnnotationsDialog(EditAnnotationsDialogView view, 
+			SynapseClientAsync synapseClient, 
+			AnnotationTransformer transformer, 
+			PortalGinInjector ginInjector, 
+			JSONObjectAdapter jsonObjectAdapter)  {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.transformer = transformer;
@@ -49,7 +53,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
 			bundle.getAnnotations().writeToJSONObject(adapter);
-			copyOfOldAnnotations = new Annotations(adapter); 
+			annotationsCopy = new Annotations(adapter); 
 			List<Annotation> annotationList = transformer.annotationsToList(bundle.getAnnotations());
 			annotationEditors = new ArrayList<AnnotationEditor>();
 			for (Annotation annotation : annotationList) {
@@ -135,9 +139,9 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 		for (AnnotationEditor annotationEditor : annotationEditors) {
 			updatedAnnotationsList.add(annotationEditor.getUpdatedAnnotation());
 		}
-		transformer.updateAnnotationsFromList(copyOfOldAnnotations, updatedAnnotationsList);
+		transformer.updateAnnotationsFromList(annotationsCopy, updatedAnnotationsList);
 		
-		synapseClient.updateAnnotations(entityId, copyOfOldAnnotations, new AsyncCallback<Void>() {
+		synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Successfully updated the annotations", "");
@@ -156,5 +160,19 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 	
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	/**
+	 * For testing purposes only
+	 */
+	public Annotations getAnnotationsCopy() {
+		return annotationsCopy;
+	}
+	
+	/**
+	 * For testing purposes only
+	 */
+	public List<AnnotationEditor> getAnnotationEditors() {
+		return annotationEditors;
 	}
 }
