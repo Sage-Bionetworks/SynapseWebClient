@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
@@ -36,7 +37,9 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -183,16 +186,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private EntityMetadata entityMetadata;
 	private FilesBrowser projectFilesBrowser;
 	private FilesBrowser folderFilesBrowser;
-	private MarkdownWidget markdownWidget;
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
-	private CookieProvider cookies;
 	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	private EntityArea currentArea;
 	private AdministerEvaluationsList evaluationList;
 	private static int WIDGET_HEIGHT_PX = 270;
 	private String currentProjectAnchorTargetId;
+	private boolean annotationsShown;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -207,7 +209,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PortalGinInjector ginInjector, 
 			FilesBrowser projectFilesBrowser,
 			FilesBrowser folderFilesBrowser,
-			MarkdownWidget markdownWidget, 
 			WikiPageWidget wikiPageWidget,
 			TableListWidget tableListWidget,
 			PreviewWidget previewWidget, CookieProvider cookies,
@@ -224,10 +225,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.projectFilesBrowser = projectFilesBrowser;
 		this.previewWidget = previewWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
-		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		this.tableListWidget = tableListWidget;
-		this.cookies = cookies;
 		this.globalApplicationState = globalApplicationState;
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.add(fileHistoryWidget.asWidget());
@@ -388,17 +387,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		};
 		fileTitleBar.setEntityUpdatedHandler(handler);
-		EntityUpdatedHandler fileBrowserUpdateHandler = new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-//				if (isProject)
-//					presenter.refreshTab(Synapse.EntityTab.FILES, null);
-//				else
-					presenter.fireEntityUpdatedEvent();
-			}
-		};
-		projectFilesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
-		folderFilesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
+		projectFilesBrowser.setEntityUpdatedHandler(handler);
+		folderFilesBrowser.setEntityUpdatedHandler(handler);
 		entityMetadata.setEntityUpdatedHandler(handler);
 		fileHistoryWidget.setEntityUpdatedHandler(handler);
 	}
@@ -776,7 +766,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Create a menu
 		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
 		// Create a controller.
-		EntityActionController controller = ginInjector.createEntityActionController();
+		final EntityActionController controller = ginInjector.createEntityActionController();
 		actionMenu.addControllerWidget(controller.asWidget());
 		controller.configure(actionMenu, bundle, new EntityUpdatedHandler() {
 			@Override
@@ -784,6 +774,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
+		annotationsShown = false;
+		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				annotationsShown = !annotationsShown;
+				controller.onAnnotationsToggled(annotationsShown);
+				entityMetadata.setAnnotationsVisible(annotationsShown);
+			}
+		});
+
 		return actionMenu;
 	}
 	

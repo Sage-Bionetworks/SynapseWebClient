@@ -7,12 +7,15 @@
 	<g:HTMLPanel>
 		<b:ButtonToolBar ui:field="buttonToolBar" addStyleNames="pull-right">
 			<b:ButtonGroup>
-				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_TABLE_SCHEMA">Show
-					Schema</a:ActionButton>
-			</b:ButtonGroup>
-			<b:ButtonGroup>
 				<a:ActionButton icon="LOCK" action="SHARE">Share</a:ActionButton>
 			</b:ButtonGroup>
+			<b:ButtonGroup>
+				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_TABLE_SCHEMA">Schema</a:ActionButton>
+			</b:ButtonGroup>
+			<b:ButtonGroup>
+				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_ANNOTATIONS">Annotations</a:ActionButton>
+			</b:ButtonGroup>
+			
 			<b:ButtonGroup>
 				<b:DropDown>
 					<b:Button icon="GEAR" dataToggle="DROPDOWN">Tools</b:Button>

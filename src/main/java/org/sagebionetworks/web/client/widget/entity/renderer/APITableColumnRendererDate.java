@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -26,7 +27,7 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 	@Inject
 	public APITableColumnRendererDate(SynapseJSNIUtils synapseJSNIUtils, GWTWrapper gwt) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		standardFormatter = gwt.getDateTimeFormat();;
+		standardFormatter = gwt.getDateTimeFormat(PredefinedFormat.ISO_8601);
 	}
 	
 	@Override

@@ -101,7 +101,7 @@ public class JoinTeamWidgetTest {
 		status.setCanJoin(false);
 		status.setHasOpenRequest(false);
 		status.setIsMember(false);
-		joinWidget.configure(teamId, false, false, status, mockTeamUpdatedCallback, null, null, null);
+		joinWidget.configure(teamId, false, false, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -135,9 +135,11 @@ public class JoinTeamWidgetTest {
 		String isMemberMessage = "already a member";
 		String successMessage = "successfully joined";
 		String buttonText = "join a team";
-		boolean isChallenge = true;
-		joinWidget.configure(teamId, false, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText);
-		verify(mockView).configure(true, false, status, isMemberMessage, buttonText, isChallenge);
+		String openRequestText = "you have an open request.";
+		boolean isChallenge = false;
+		boolean isSimpleRequestButton = true;
+		joinWidget.configure(teamId, false, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText, openRequestText, isSimpleRequestButton);
+		verify(mockView).configure(true, false, status, isMemberMessage, buttonText, openRequestText, isSimpleRequestButton);
 	}
 	
 	@Test
@@ -147,9 +149,11 @@ public class JoinTeamWidgetTest {
 		String isMemberMessage = "already a member";
 		String successMessage = "successfully joined";
 		String buttonText = "join a team";
-		boolean isChallenge = false;
-		joinWidget.configure(teamId, false, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText);
-		verify(mockView).configure(true, false, status, isMemberMessage, buttonText, isChallenge);
+		String openRequestText = "you have an open request.";
+		boolean isChallenge = true;
+		boolean isSimpleRequestButton = false;
+		joinWidget.configure(teamId, false, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText, openRequestText, isSimpleRequestButton);
+		verify(mockView).configure(true, false, status, isMemberMessage, buttonText, openRequestText, isSimpleRequestButton);
 	}
 	
 	@Test
@@ -212,13 +216,13 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testGetTotalPageCount() throws Exception {
 		boolean isChallengeSignup = true;
-        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //one page for the AR
         Assert.assertEquals(1, joinWidget.getTotalPageCount());
         
         isChallengeSignup = false;
-        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //0 pages
         Assert.assertEquals(0, joinWidget.getTotalPageCount());
@@ -230,13 +234,13 @@ public class JoinTeamWidgetTest {
         ars.add(terms);
         
         isChallengeSignup = true;
-        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //One page for challenge info, one page for the AR
         Assert.assertEquals(2, joinWidget.getTotalPageCount());
         
         isChallengeSignup = false;
-        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //One page for challenge info
         Assert.assertEquals(1, joinWidget.getTotalPageCount());

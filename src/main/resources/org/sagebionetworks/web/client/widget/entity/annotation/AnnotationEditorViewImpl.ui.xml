@@ -1,0 +1,36 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	<t:Table>
+		<t:TableRow>
+			<t:TableData addStyleNames="vertical-align-top" paddingRight="1">
+				<b:Panel>
+					<b:PanelBody>
+						<t:Table>
+							<t:TableRow>
+								<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+									<b:FormGroup ui:field="formGroup">
+										<b:TextBox ui:field="keyField"/>
+										<b:HelpBlock ui:field="helpBlock"/>
+									</b:FormGroup>
+								</t:TableData>
+								<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+									<g:ListBox ui:field="typeComboBox" styleName="form-control" />
+								</t:TableData>
+								<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+									<g:FlowPanel ui:field="editorsContainer" />
+									<b:Button icon="PLUS" ui:field="newValueButton" addStyleNames="moveup-5" size="SMALL" text="Add New Value"></b:Button>
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
+					</b:PanelBody>
+				</b:Panel>
+			</t:TableData>
+			<t:TableData addStyleNames="vertical-align-middle">
+				<b:Button icon="TIMES" size="LARGE" ui:field="deleteAnnotationButton" addStyleNames="moveup-10" height="100%"/>
+			</t:TableData>
+		</t:TableRow>
+	</t:Table>
+</ui:UiBinder>

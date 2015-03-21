@@ -433,10 +433,13 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 				challengeTeamList.add(teamBundle);
 			}
 			if (currentUserId != null) {
-				List<TeamMember> teamMemberList = synapseClient.listTeamMembers(teamIds, currentUserId);
-				for (int i = 0; i < teamMemberList.size(); i++) {
-					Boolean isTeamAdmin = teamMemberList.get(i).getIsAdmin();
-					challengeTeamList.get(i).setIsAdmin(isTeamAdmin);
+				for (int i = 0; i < teamIds.size(); i++) {
+					try {
+						TeamMember member = synapseClient.getTeamMember(teamIds.get(i).toString(), currentUserId);
+						challengeTeamList.get(i).setIsAdmin(member.getIsAdmin());
+					} catch (Exception e) {
+						//do nothing on failure
+					}	
 				}
 			}
 			

@@ -36,8 +36,6 @@ public class TableEntityWidget implements IsWidget,
 		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
-	public static final String HIDE_SCHEMA = "Hide Schema";
-	public static final String SHOW_SCHEMA = "Show Schema";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Show Schema' to add columns to the this table.";
@@ -319,10 +317,8 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onSchemaToggle(boolean shown) {
 		if(shown){
-			actionMenu.setActionText(Action.TOGGLE_TABLE_SCHEMA, HIDE_SCHEMA);
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
 		}else{
-			actionMenu.setActionText(Action.TOGGLE_TABLE_SCHEMA, SHOW_SCHEMA);
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 		}
 	}

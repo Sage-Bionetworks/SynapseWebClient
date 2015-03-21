@@ -63,4 +63,7 @@ public class EntityMetadata implements Presenter {
 		view.setEntityUpdatedHandler(handler);
 	}
 
+	public void setAnnotationsVisible(boolean visible) {
+		view.setAnnotationsVisible(visible);
+	}
 }

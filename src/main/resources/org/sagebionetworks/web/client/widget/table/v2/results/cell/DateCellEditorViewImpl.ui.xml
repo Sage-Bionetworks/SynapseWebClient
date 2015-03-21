@@ -11,8 +11,11 @@
 		less than 1. Make sure the format and showMeridian are consistent with each 
 		other when configuring this widget. There is an open issue for this:
 		https://github.com/gwtbootstrap3/gwtbootstrap3-extras/issues/83 -->
-	<bd:DateTimePicker ui:field="dateTimePicker"
-		autoClose="true" highlightToday="true" showTodayButton="true"
-		showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
-		hasKeyboardNavigation="true" />
+	<b:FormGroup ui:field="formGroup">
+		<bd:DateTimePicker ui:field="dateTimePicker"
+			autoClose="true" highlightToday="true" showTodayButton="true"
+			showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+			hasKeyboardNavigation="true" />
+		<b:HelpBlock ui:field="helpBlock"/>
+	</b:FormGroup>
 </ui:UiBinder>

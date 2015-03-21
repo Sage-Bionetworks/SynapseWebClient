@@ -67,8 +67,8 @@ public class GWTWrapperImpl implements GWTWrapper {
 	}
 	
 	@Override
-	public DateTimeFormat getDateTimeFormat() {
-		return DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
+	public DateTimeFormat getDateTimeFormat(PredefinedFormat format) {
+		return DateTimeFormat.getFormat(format);
 	}
 	
 	@Override

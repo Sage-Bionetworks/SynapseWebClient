@@ -13,10 +13,10 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Profile;
@@ -59,7 +59,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String DELETE_PREFIX = "Delete ";
 	
 	public static final String RENAME_PREFIX = "Rename ";
-	
+
 	EntityActionControllerView view;
 	PreflightController preflightController;
 	EntityTypeProvider entityTypeProvider;
@@ -125,6 +125,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureMove();
 		configureLink();
 		configureSubmit();
+		configureAnnotations();
 	}
 	
 	private void configureAddWiki(){
@@ -161,6 +162,23 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionEnabled(Action.CREATE_LINK, false);
 		}
 	}
+	
+	private void configureAnnotations(){
+		actionMenu.setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
+		actionMenu.setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
+		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, this);
+	}
+	
+	@Override
+	public void onAnnotationsToggled(boolean shown) {
+		if(shown){
+			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_DOWN);
+		}else{
+			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_RIGHT);
+		}
+	}
+
+
 	
 	private void configureSubmit(){
 		if(isSubmittableType(entityBundle.getEntity())){
