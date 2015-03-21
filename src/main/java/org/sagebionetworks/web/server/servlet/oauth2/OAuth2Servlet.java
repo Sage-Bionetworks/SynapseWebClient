@@ -11,6 +11,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
@@ -27,6 +28,9 @@ import com.google.inject.Inject;
 public class OAuth2Servlet extends HttpServlet {
 	
 
+	private static final String REGISTER_ACCOUNT = "/#!RegisterAccount:";
+	private static final String LOGIN_PLACE = "/#!LoginPlace:";
+	
 	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
@@ -94,7 +98,10 @@ public class OAuth2Servlet extends HttpServlet {
 			request.setRedirectUrl(redirectUrl);
 			OAuthUrlResponse respone = client.getOAuth2AuthenticationUrl(request);
 			resp.sendRedirect(respone.getAuthorizationUrl());
-		} catch (SynapseException e) {
+		} catch (SynapseServerException e) {
+			resp.setStatus(e.getStatusCode());
+			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
+		}catch (SynapseException e) {
 			// 400 error
 			resp.setStatus(HttpStatus.BAD_REQUEST.value());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
@@ -117,13 +124,15 @@ public class OAuth2Servlet extends HttpServlet {
 			request.setProvider(provider);
 			request.setRedirectUrl(redirectUrl);
 			Session token = client.validateOAuthAuthenticationCode(request);
-			resp.sendRedirect("/#!LoginPlace:"+token.getSessionToken());
+			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (SynapseNotFoundException e) {
 			// Send the user to register
-			resp.sendRedirect("/#!RegisterAccount:"+e.getMessage());
+			resp.sendRedirect(REGISTER_ACCOUNT+e.getMessage());
 		}catch (SynapseForbiddenException e) {
-			// 400 error
 			resp.setStatus(HttpStatus.FORBIDDEN.value());
+			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
+		}catch (SynapseServerException e) {
+			resp.setStatus(e.getStatusCode());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
 		}catch (SynapseException e) {
 			// 400 error

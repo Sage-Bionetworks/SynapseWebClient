@@ -11,13 +11,16 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
+import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2Servlet;
@@ -46,6 +49,12 @@ public class OAuth2ServletTest {
 		url = "http://127.0.0.1:8888/";
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer(url));
 	}
+	
+	@Test
+	public void testCreateRedirectUrl() throws ServletException, IOException, SynapseException{
+		String url = servlet.createRedirectUrl(mockRequest, OAuthProvider.GOOGLE_OAUTH_2_0);
+		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0", url);
+	}
 
 	@Test
 	public void testAuthUrl() throws ServletException, IOException, SynapseException{
@@ -57,5 +66,28 @@ public class OAuth2ServletTest {
 		// this case we have no code.
 		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(null);
 		servlet.doGet(mockRequest, mockResponse);
+		OAuthUrlRequest request = argument.getValue();
+		assertNotNull(request);
+		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0",request.getRedirectUrl());
+		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
+		verify(mockResponse).sendRedirect(authResponse.getAuthorizationUrl());
+	}
+	
+	@Test
+	public void testValidate() throws ServletException, IOException, SynapseException{
+		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
+		Session session = new Session();
+		session.setSessionToken("sessiontoken");
+		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenReturn(session);
+		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
+		String authCode = "authCode";
+		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
+		servlet.doGet(mockRequest, mockResponse);
+		OAuthValidationRequest request = argument.getValue();
+		assertNotNull(request);
+		assertEquals("http://127.0.0.1:8888/?oauth2provider=GOOGLE_OAUTH_2_0",request.getRedirectUrl());
+		assertEquals(OAuthProvider.GOOGLE_OAUTH_2_0, request.getProvider());
+		assertEquals(authCode, request.getAuthenticationCode());
+		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
 	}
 }
