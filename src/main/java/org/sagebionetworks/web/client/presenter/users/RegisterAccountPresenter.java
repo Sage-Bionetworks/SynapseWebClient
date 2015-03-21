@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -53,6 +54,12 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		this.place = place;
 		view.setPresenter(this);
 		view.showDefault();
+		String token = place.toToken();
+		String email = "";
+		if(token != null && !ClientProperties.DEFAULT_PLACE_TOKEN.equals(token)){
+			email = token.trim();
+		}
+		view.setEmail(email);
 	}
 
 	/**

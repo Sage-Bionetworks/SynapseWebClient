@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -115,5 +116,27 @@ public class RegisterAccountPresenterTest {
 		registerAccountPresenter.registerUser(email);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
+	}
+	
+	@Test
+	public void testRegisterUserNullToken(){
+		RegisterAccount place = new RegisterAccount(null);
+		registerAccountPresenter.setPlace(place);
+		verify(mockView).setEmail("");
+	}
+	
+	@Test
+	public void testRegisterUserDefaultlToken(){
+		RegisterAccount place = new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN);
+		registerAccountPresenter.setPlace(place);
+		verify(mockView).setEmail("");
+	}
+	
+	@Test
+	public void testRegisterUserEmailToken(){
+		String email = "first.last@domain.org";
+		RegisterAccount place = new RegisterAccount(email);
+		registerAccountPresenter.setPlace(place);
+		verify(mockView).setEmail(email);
 	}
 }

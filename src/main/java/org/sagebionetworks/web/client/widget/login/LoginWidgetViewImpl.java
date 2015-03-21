@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -13,8 +12,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
@@ -24,9 +21,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SubmitButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,8 +35,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	FlowPanel synapseLoginFieldsContainer;
 	
-	@UiField
-	SimplePanel googleSSOContainer;
 	@UiField
 	SpanElement messageLabel;
 	Button signInBtn;
@@ -111,41 +104,6 @@ public class LoginWidgetViewImpl extends Composite implements
 				loginUser();
 			}
 		});
-	}
-	
-	@Override 
-	public void onLoad() {
-		googleSSOContainer.setWidget(new HTML(createSSOLoginButton()));		
-	}
-	
-	private SafeHtml createSSOLoginButton() {
-		// Federated login button
-		SafeHtmlBuilder sb = new SafeHtmlBuilder()
-				.appendHtmlConstant(
-						"<form accept-charset=\"UTF-8\" action=\""
-								+ presenter.getOpenIdActionUrl()
-								+ "\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
-				.appendHtmlConstant(
-						"    <input name=\"" + WebConstants.OPEN_ID_PROVIDER
-								+ "\" type=\"hidden\" value=\""
-								+ WebConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE
-								+ "\"/>")
-				.appendHtmlConstant(
-						"    <input name=\"" + WebConstants.RETURN_TO_URL_PARAM
-								+ "\" type=\"hidden\" value=\""
-								+ presenter.getOpenIdReturnUrl() + "\"/>");
-		sb.appendHtmlConstant("    <input name=\"" + WebConstants.OPEN_ID_MODE
-				+ "\" type=\"hidden\" value=\"" + WebConstants.OPEN_ID_MODE_GWT
-				+ "\"/>");
-		sb.appendHtmlConstant(
-				"    <button class=\"btn btn-default btn-lg btn-block\" id=\""
-						+ DisplayConstants.ID_BTN_LOGIN_GOOGLE
-						+ "\" type=\"submit\"><img alt=\""
-						+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT
-						+ " \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "
-						+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT
-						+ "</button>").appendHtmlConstant("</form>");
-		return sb.toSafeHtml();
 	}
 
 	@Override

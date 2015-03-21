@@ -29,4 +29,5 @@ public interface RegisterAccountView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void registerUser(String email);
 	}
+	public void setEmail(String email);
 }
