@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
@@ -90,4 +91,17 @@ public class OAuth2ServletTest {
 		assertEquals(authCode, request.getAuthenticationCode());
 		verify(mockResponse).sendRedirect("/#!LoginPlace:sessiontoken");
 	}
+	
+	@Test
+	public void testValidateNotFound() throws ServletException, IOException, SynapseException{
+		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
+		String email = "first.last@domain.com";
+		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException(email));
+		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
+		String authCode = "authCode";
+		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockResponse).sendRedirect("/#!RegisterAccount:first.last@domain.com");
+	}
+	
 }
