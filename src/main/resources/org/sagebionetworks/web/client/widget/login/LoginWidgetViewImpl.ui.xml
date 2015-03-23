@@ -10,7 +10,7 @@
 		<div>
 			<g:SimplePanel ui:field="googleSSOContainer">
 				<b:AnchorButton size="LARGE" icon="GOOGLE_PLUS_SQUARE"
-					href="/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0">Sign
+					href="/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0" iconSize="LARGE">Sign
 					in with a Google Account</b:AnchorButton>
 			</g:SimplePanel>
 			<div class="signin-panel panel panel-body margin-top-15">
