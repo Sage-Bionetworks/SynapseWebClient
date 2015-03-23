@@ -9,9 +9,8 @@
 	<g:HTMLPanel>
 		<div>
 			<g:SimplePanel ui:field="googleSSOContainer">
-				<b:AnchorButton size="LARGE" icon="GOOGLE_PLUS_SQUARE"
-					href="/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0" iconSize="LARGE">Sign
-					in with a Google Account</b:AnchorButton>
+				<b:Button size="LARGE" icon="GOOGLE_PLUS_SQUARE" ui:field="googleSignInButton" iconSize="LARGE">Sign
+					in with a Google Account</b:Button>
 			</g:SimplePanel>
 			<div class="signin-panel panel panel-body margin-top-15">
 				<h4 class="form-signin-heading">Sign in with a Synapse Account</h4>
