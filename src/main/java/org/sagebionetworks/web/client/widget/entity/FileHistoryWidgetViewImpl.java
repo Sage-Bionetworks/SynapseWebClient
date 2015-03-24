@@ -85,7 +85,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		String modifiedOn = shortDateFormat.format(version.getModifiedOn());
 		String size = "";
 		try{
-			double sizeDouble = Double.parseDouble(size);
+			double sizeDouble = Double.parseDouble(version.getContentSize());
 			size = DisplayUtils.getFriendlySize(sizeDouble, true);
 		} catch (Throwable t) {
 		}
