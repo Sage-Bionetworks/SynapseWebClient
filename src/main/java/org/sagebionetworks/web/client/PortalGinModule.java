@@ -128,6 +128,8 @@ import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryRowViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetViewImpl;
@@ -1065,6 +1067,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(AnnotationCellFactoryImpl.class).in(Singleton.class);
 		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class);
+		
+		bind(FileHistoryRowView.class).to(FileHistoryRowViewImpl.class);
 		
 	}
 }
