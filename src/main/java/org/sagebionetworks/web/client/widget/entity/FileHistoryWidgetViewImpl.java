@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.core.client.GWT;
@@ -41,7 +42,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	@UiField
 	Panel previousVersions;
 	@UiField
-	Table previousVersionsTable;
+	TBody previousVersionsTable;
 	@UiField
 	InlineLabel allVersions;
 	@UiField
@@ -67,7 +68,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		setVersionsVisible(false);
 		if (entity instanceof Versionable) {
 			setVersionsVisible(true);
-			setFileHistoryVisible(false);
+			setFileHistoryVisible(isShowingOlderVersion);
 		}
 	}
 	
@@ -77,7 +78,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	}
 	
 	@Override
-	public void addVersion(final VersionInfo version, boolean canEdit) {
+	public void addVersion(final VersionInfo version, boolean canEdit, boolean isVersionSelected) {
 		FileHistoryRowView fileHistoryRow = ginInjector.getFileHistoryRow();
 		String versionName = version.getVersionLabel();
 		String modifiedByUserId = version.getModifiedByPrincipalId();
@@ -101,8 +102,15 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 				presenter.editCurrentVersionInfo(version.getVersionNumber(), version.getVersionComment());
 			}
 		};
-		fileHistoryRow.configure(versionName, modifiedByUserId, modifiedOn, size, md5, deleteCallback, editCallback);
+		String versionComment = version.getVersionComment();
+		Long versionNumber = version.getVersionNumber();
+		String versionHref = DisplayUtils.
+				getSynapseHistoryToken(version.getId(),
+				version.getVersionNumber());
+		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, editCallback);
 		previousVersionsTable.add(fileHistoryRow.asWidget());
+		fileHistoryRow.setCanEdit(canEdit);
+		fileHistoryRow.setIsVersionLink(!isVersionSelected);
 	}
 
 	@Override

@@ -23,5 +23,5 @@ public interface FileHistoryWidgetView extends IsWidget, SynapseView{
 	void setPresenter(Presenter presenter);
 	void setPaginationWidget(Widget widget);
 	void clearVersions();
-	void addVersion(VersionInfo version, boolean canEdit);
+	void addVersion(VersionInfo version, boolean canEdit, boolean isVersionSelected);
 }

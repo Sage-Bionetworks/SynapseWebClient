@@ -6,7 +6,8 @@
 
 	<t:TableRow>
 		<t:TableData>
-			<b:FormControlStatic ui:field="versionName" />
+			<g:Anchor ui:field="versionNameLink" />
+			<b:FormControlStatic ui:field="versionName" visible="false" />
 		</t:TableData>
 		<t:TableData>
 			<g:SimplePanel ui:field="modifiedByContainer" />
@@ -21,8 +22,11 @@
 			<g:SimplePanel ui:field="md5LinkContainer" />
 		</t:TableData>
 		<t:TableData>
-			<b:Button icon="TIMES" ui:field="deleteButton" addStyleNames="displayInline" />
-			<b:Button icon="EDIT" ui:field="editButton" addStyleNames="displayInline" />
+			<b:FormControlStatic ui:field="versionComment" />
+		</t:TableData>
+		<t:TableData>
+			<b:Button icon="EDIT" ui:field="editButton" size="SMALL" addStyleNames="displayInline" />
+			<b:Button icon="TIMES" ui:field="deleteButton" size="SMALL" addStyleNames="displayInline margin-left-3" />
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

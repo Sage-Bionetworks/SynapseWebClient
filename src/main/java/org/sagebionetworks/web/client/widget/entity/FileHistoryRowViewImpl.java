@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -19,6 +20,10 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	
 	@UiField
 	FormControlStatic versionName;
+	@UiField
+	Anchor versionNameLink;
+	@UiField
+	FormControlStatic versionComment;
 	@UiField
 	SimplePanel modifiedByContainer;
 	@UiField
@@ -60,21 +65,37 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		modifiedByContainer.add(userBadge.asWidget());
 	}
 	
+	
 	@Override
-	public void configure(String versionName, String modifiedByUserId,
-			String modifiedOn, String size, String md5,
-			Callback deleteCallback, Callback editCallback) {
+	public void configure(Long versionNumber, String versionLinkHref, String versionName,
+			String modifiedByUserId, String modifiedOn, String size,
+			String md5, String versionComment, Callback deleteCallback,
+			Callback editCallback) {
 		this.versionName.setText(versionName);
+		this.versionNameLink.setText(versionName);
 		this.modifiedOn.setText(modifiedOn);
+		this.versionComment.setText(versionComment);
 		this.size.setText(size);
 		md5Link.configure(md5);
 		this.deleteCallback = deleteCallback;
 		this.editCallback = editCallback;
 		userBadge.configure(modifiedByUserId);
+		versionNameLink.setHref(versionLinkHref);
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+	
+	@Override
+	public void setCanEdit(boolean canEdit) {
+		editButton.setVisible(canEdit);
+		deleteButton.setVisible(canEdit);
+	}
+	@Override
+	public void setIsVersionLink(boolean isLink) {
+		versionNameLink.setVisible(isLink);
+		versionName.setVisible(!isLink);
 	}
 }

@@ -45,7 +45,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	
 	private DetailedPaginationWidget paginationWidget;
 	private boolean canEdit;
-	
+	private Long versionNumber;
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view, NodeModelCreator nodeModelCreator,
 			 SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
@@ -64,6 +64,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
+		this.versionNumber = versionNumber;
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		view.setEntityBundle(bundle.getEntity(), versionNumber != null);
 		//initialize versions
@@ -181,8 +182,11 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						try {
 							paginatedResults = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
 							paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset + 1, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
+							if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
+								versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
+							}
 							for (VersionInfo versionInfo : paginatedResults.getResults()) {
-								view.addVersion(versionInfo, canEdit);
+								view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
 							}
 						} catch (JSONObjectAdapterException e) {							
 							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
