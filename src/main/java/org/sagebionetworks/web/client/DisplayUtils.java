@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
-import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_TOP_MARGIN_PX;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
 import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.KB;
@@ -26,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
@@ -33,11 +33,13 @@ import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
+
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -47,6 +49,7 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExpressionData;
@@ -92,7 +95,6 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -108,14 +110,8 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
@@ -995,9 +991,8 @@ public class DisplayUtils {
 		return getPlaceString(place.getName());		
 	}
 	
-	public static LayoutContainer wrap(Widget widget) {
-		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("col-md-12");
+	public static Column wrap(Widget widget) {
+		Column lc = new Column(ColumnSize.MD_12);
 		lc.add(widget);
 		return lc;
 	}
@@ -1070,27 +1065,6 @@ public class DisplayUtils {
 		String className = entity == null ? null : entity.getClass().getName();
 		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
-
-	/**
-	 * Create a loading window.
-	 * 
-	 * @param sageImageBundle
-	 * @param message
-	 * @return
-	 */
-	public static Window createLoadingWindow(SageImageBundle sageImageBundle, String message) {
-		Window window = new Window();
-		window.setModal(true);		
-		window.setHeight(114);
-		window.setWidth(221);		
-		window.setBorders(false);
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()));
-		shb.appendEscaped(message);
-		window.add(new Html(shb.toSafeHtml().asString()), new MarginData(20, 0, 0, 45));		
-		window.setBodyStyleName("whiteBackground");
-		return window;
-	}
 	
 	/**
 	 * Create a loading panel with a centered spinner.
@@ -1115,9 +1089,9 @@ public class DisplayUtils {
 	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
 		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
 				DisplayUtils.getIconHtml(sageImageBundle.loading31()) +" "+ message));	
-		LayoutContainer panel = new LayoutContainer();
-		panel.add(w, new MarginData(FULL_ENTITY_TOP_MARGIN_PX, 0, FULL_ENTITY_TOP_MARGIN_PX, 0));
-		panel.addStyleName("center");				
+		SimplePanel panel = new SimplePanel();
+		panel.setWidget(w);
+		panel.addStyleName("margin-top-300 margin-bottom-300 center");
 		return panel;
 	}
 	
@@ -1317,10 +1291,6 @@ public class DisplayUtils {
 		popover.setIsHtml(true);
 		popover.setContent(message);
 		return popover;
-	}
-	
-	public static Tooltip addToolTip(final Component widget, String message) {
-		return addTooltip(widget, message, Placement.AUTO);
 	}
 	
 	/**
@@ -1899,23 +1869,16 @@ public class DisplayUtils {
 	}
 	
 	public static void surroundWidgetWithParens(Panel container, Widget widget) {
-		Text paren = new Text("(");
+		InlineHTML paren = new InlineHTML("(");
 		paren.addStyleName("inline-block margin-left-5");
 		container.add(paren);
 
 		widget.addStyleName("inline-block");
 		container.add(widget);
 
-		paren = new Text(")");
+		paren = new InlineHTML(")");
 		paren.addStyleName("inline-block margin-right-10");
 		container.add(paren);
-	}
-
-	public static LayoutContainer createRowContainer() {
-		LayoutContainer row;
-		row = new LayoutContainer();
-		row.setStyleName("row");
-		return row;
 	}
 	
 	public static FlowPanel createRowContainerFlowPanel() {
@@ -2000,17 +1963,6 @@ public class DisplayUtils {
  			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
  		panel.add(mediaBodyPanel);
  		return panel;
-	}
-	
-	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){
-		final SimpleComboBox<String> cb = new SimpleComboBox<String>();
-		cb.add(values);
-		cb.setSimpleValue(defaultValue);
-		cb.setTypeAhead(false);
-		cb.setEditable(false);
-		cb.setForceSelection(true);
-		cb.setTriggerAction(TriggerAction.ALL);
-		return cb;
 	}
 	
 	public static HTML getNewLabel(boolean superScript) {		
