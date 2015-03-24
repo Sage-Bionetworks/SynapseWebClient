@@ -181,7 +181,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						PaginatedResults<VersionInfo> paginatedResults;
 						try {
 							paginatedResults = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
-							paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset + 1, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
+							paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
 							if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
 								versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
 							}
