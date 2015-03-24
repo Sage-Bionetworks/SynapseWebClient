@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -16,7 +15,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -37,7 +35,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	
@@ -48,12 +45,11 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private Long versionNumber;
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view, NodeModelCreator nodeModelCreator,
-			 SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
+			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
 			 DetailedPaginationWidget paginationWidget) {
 		super();
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
@@ -72,33 +68,17 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 
 	@Override
-	public void editCurrentVersionInfo(final Long version, final String comment) {
-		//SWC-771. The current bundle may be pointing to an old version (not the current version).  
-		//First ask for the current version of the entity
-		synapseClient.getEntity(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>() {
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					Entity entity = nodeModelCreator.createEntity(result);
-					editCurrentVersionInfo(entity, version, comment);
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
-
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught,
-						globalApplicationState,
-						authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED + "\n" + caught.getMessage());
-				}
-
-			}
-		});
+	public void updateVersionComment(String newComment) {
+		String oldLabel = ((Versionable)bundle.getEntity()).getVersionLabel();
+		editCurrentVersionInfo(bundle.getEntity(), oldLabel, newComment);
+	}
+	@Override
+	public void updateVersionLabel(String newLabel) {
+		String oldComment = ((Versionable)bundle.getEntity()).getVersionComment();
+		editCurrentVersionInfo(bundle.getEntity(), newLabel, oldComment);
 	}
 
-	private void editCurrentVersionInfo(Entity entity, Long version, String comment) throws JSONObjectAdapterException {
+	private void editCurrentVersionInfo(Entity entity, String version, String comment) {
 		if (entity instanceof Versionable) {
 			final Versionable vb = (Versionable)entity;
 			if (version != null && version.equals(vb.getVersionLabel()) &&
@@ -111,11 +91,9 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 				versionLabel = version.toString();
 			vb.setVersionLabel(versionLabel);
 			vb.setVersionComment(comment);
-			JSONObjectAdapter joa = jsonObjectAdapter.createNew();
 			
-			vb.writeToJSONObject(joa);
-			synapseClient.updateEntity(joa.toJSONString(),
-					new AsyncCallback<EntityWrapper>() {
+			synapseClient.updateEntity(vb,
+					new AsyncCallback<Entity>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							if (!DisplayUtils.handleServiceException(
@@ -126,7 +104,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 							}
 						}
 						@Override
-						public void onSuccess(EntityWrapper result) {
+						public void onSuccess(Entity result) {
 							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
 							fireEntityUpdatedEvent();
 						}

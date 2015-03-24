@@ -2,7 +2,13 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -35,8 +41,11 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	@UiField
 	Button deleteButton;
 	@UiField
-	Button editButton;
-	Callback deleteCallback, editCallback;
+	Button editNameButton;
+	@UiField
+	Button editCommentButton;
+	Callback deleteCallback;
+	CallbackP<String> editNameCallback, editCommentCallback;
 	UserBadge userBadge;
 	private Widget widget;
 	Md5Link md5Link;
@@ -48,18 +57,44 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		deleteButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (deleteCallback != null)
-					deleteCallback.invoke();
+				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " version?", new ConfirmCallback() {
+					@Override
+					public void callback(boolean confirmed) {
+						if (confirmed && deleteCallback != null) {
+							deleteCallback.invoke();			
+						}
+					}
+				});
 			}
 		});
 		
-		editButton.addClickHandler(new ClickHandler() {
+		editNameButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (editCallback != null)
-					editCallback.invoke();
+				Bootbox.prompt("New version label", new PromptCallback() {
+					@Override
+					public void callback(String result) {
+						if (DisplayUtils.isDefined(result) && editNameCallback != null){
+							editNameCallback.invoke(result);
+						}
+					}
+				});
 			}
 		});
+		editCommentButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Bootbox.prompt("New version comment", new PromptCallback() {
+					@Override
+					public void callback(String result) {
+						if (DisplayUtils.isDefined(result) && editCommentCallback != null){
+							editCommentCallback.invoke(result);
+						}
+					}
+				});
+			}
+		});
+
 		md5LinkContainer.add(md5Link.asWidget());
 		this.userBadge = userBadge;
 		modifiedByContainer.add(userBadge.asWidget());
@@ -70,7 +105,7 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	public void configure(Long versionNumber, String versionLinkHref, String versionName,
 			String modifiedByUserId, String modifiedOn, String size,
 			String md5, String versionComment, Callback deleteCallback,
-			Callback editCallback) {
+			CallbackP<String> editNameCallback, CallbackP<String> editCommentCallback) {
 		this.versionName.setText(versionName);
 		this.versionNameLink.setText(versionName);
 		this.modifiedOn.setText(modifiedOn);
@@ -78,7 +113,8 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		this.size.setText(size);
 		md5Link.configure(md5);
 		this.deleteCallback = deleteCallback;
-		this.editCallback = editCallback;
+		this.editNameCallback = editNameCallback;
+		this.editCommentCallback = editCommentCallback;
 		userBadge.configure(modifiedByUserId);
 		versionNameLink.setHref(versionLinkHref);
 	}
@@ -90,7 +126,8 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 	
 	@Override
 	public void setCanEdit(boolean canEdit) {
-		editButton.setVisible(canEdit);
+		editNameButton.setVisible(canEdit);
+		editCommentButton.setVisible(canEdit);
 		deleteButton.setVisible(canEdit);
 	}
 	@Override

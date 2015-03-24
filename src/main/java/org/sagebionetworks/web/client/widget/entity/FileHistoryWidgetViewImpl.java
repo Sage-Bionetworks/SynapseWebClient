@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
@@ -96,18 +97,26 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 				presenter.deleteVersion(version.getVersionNumber());
 			}
 		};
-		Callback editCallback = new Callback() {
+		CallbackP<String> editNameCallback = new CallbackP<String>() {
 			@Override
-			public void invoke() {
-				presenter.editCurrentVersionInfo(version.getVersionNumber(), version.getVersionComment());
+			public void invoke(String newName) {
+				presenter.updateVersionLabel(newName);
 			}
 		};
+		
+		CallbackP<String> editCommentCallback = new CallbackP<String>() {
+			@Override
+			public void invoke(String newComment) {
+				presenter.updateVersionComment(newComment);
+			}
+		};
+
 		String versionComment = version.getVersionComment();
 		Long versionNumber = version.getVersionNumber();
 		String versionHref = DisplayUtils.
 				getSynapseHistoryToken(version.getId(),
 				version.getVersionNumber());
-		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, editCallback);
+		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, editNameCallback, editCommentCallback);
 		previousVersionsTable.add(fileHistoryRow.asWidget());
 		fileHistoryRow.setCanEdit(canEdit);
 		fileHistoryRow.setIsVersionLink(!isVersionSelected);

@@ -14,7 +14,8 @@ import com.google.gwt.user.client.ui.Widget;
 public interface FileHistoryWidgetView extends IsWidget, SynapseView{
 	
 	interface Presenter {
-		void editCurrentVersionInfo(Long version, String comment);
+		void updateVersionLabel(String newLabel);
+		void updateVersionComment(String comment);
 		void deleteVersion(Long versionNumber);
 	}
 
