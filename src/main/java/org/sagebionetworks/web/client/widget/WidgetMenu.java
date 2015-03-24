@@ -1,15 +1,11 @@
 package org.sagebionetworks.web.client.widget;
 
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,22 +15,19 @@ import com.google.inject.Inject;
  * @author dburdick
  *
  */
-public class WidgetMenu extends LayoutContainer {
+public class WidgetMenu extends FlowPanel {
 
 	public static int COG = 0x1;
 	public static int ADD = 0x2;
 	public static int EDIT = 0x4;
 	public static int DELETE = 0x8;
 
-	private IconsImageBundle iconsImageBundle;
-
+	
 	/**
 	 * Constructor
-	 * @param iconsImageBundle Icons Images Bundle
 	 */
 	@Inject
-	public WidgetMenu(IconsImageBundle iconsImageBundle) {
-		this.iconsImageBundle = iconsImageBundle;
+	public WidgetMenu() {
 	}
 
 	/*
@@ -89,23 +82,12 @@ public class WidgetMenu extends LayoutContainer {
 		deleteHandler.onClick(event);
 	}
 
-
-	/*
-	 * Pseudo View Impl
-	 */
-	@Override
-	protected void onRender(Element parent, int index) {
-		super.onRender(parent, index);
-	}
-
 	public void createMenu(int mask) {
-		boolean showCog = ((mask & COG) > 0) ? true : false;
-		Menu cogMenu = new Menu();
-
 		// Add
 		if((mask & ADD) > 0) {
-			AbstractImagePrototype icon = AbstractImagePrototype.create(iconsImageBundle.add16());
-			Anchor anchor = DisplayUtils.createIconLink(icon, new ClickHandler() {
+			Anchor anchor = new Anchor();
+			anchor.setIcon(IconType.PLUS);
+			anchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					addClicked(event);
@@ -119,8 +101,9 @@ public class WidgetMenu extends LayoutContainer {
 
 		// Edit
 		if((mask & EDIT) > 0) {
-			AbstractImagePrototype icon = AbstractImagePrototype.create(iconsImageBundle.editGrey16());
-			Anchor anchor = DisplayUtils.createIconLink(icon, new ClickHandler() {
+			Anchor anchor = new Anchor();
+			anchor.setIcon(IconType.EDIT);
+			anchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					editClicked(event);
@@ -133,8 +116,9 @@ public class WidgetMenu extends LayoutContainer {
 
 		// Delete
 		if((mask & DELETE) > 0) {
-			AbstractImagePrototype icon = AbstractImagePrototype.create(iconsImageBundle.delete16());
-			Anchor anchor = DisplayUtils.createIconLink(icon, new ClickHandler() {
+			Anchor anchor = new Anchor();
+			anchor.setIcon(IconType.TIMES);
+			anchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					deleteClicked(event);
