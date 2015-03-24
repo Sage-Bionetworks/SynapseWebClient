@@ -39,7 +39,7 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Text;
+
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -1869,14 +1869,14 @@ public class DisplayUtils {
 	}
 	
 	public static void surroundWidgetWithParens(Panel container, Widget widget) {
-		Text paren = new Text("(");
+		InlineHTML paren = new InlineHTML("(");
 		paren.addStyleName("inline-block margin-left-5");
 		container.add(paren);
 
 		widget.addStyleName("inline-block");
 		container.add(widget);
 
-		paren = new Text(")");
+		paren = new InlineHTML(")");
 		paren.addStyleName("inline-block margin-right-10");
 		container.add(paren);
 	}
