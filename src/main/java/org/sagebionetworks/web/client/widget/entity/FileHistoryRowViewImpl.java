@@ -71,7 +71,7 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		editNameButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Bootbox.prompt("New version label", new PromptCallback() {
+				Bootbox.prompt("Edit version label", new PromptCallback() {
 					@Override
 					public void callback(String result) {
 						if (DisplayUtils.isDefined(result) && editNameCallback != null){
@@ -84,7 +84,7 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		editCommentButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Bootbox.prompt("New version comment", new PromptCallback() {
+				Bootbox.prompt("Edit version comment", new PromptCallback() {
 					@Override
 					public void callback(String result) {
 						if (DisplayUtils.isDefined(result) && editCommentCallback != null){
