@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -78,6 +80,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	boolean isUserAuthenticated;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
+	FilesBrowser fileBrowser;
 
 	
 	@Inject
@@ -90,7 +93,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			AccessControlListModalWidget accessControlListModalWidget,
 			RenameEntityModalWidget renameEntityModalWidget,
 			EntityFinder entityFinder,
-			EvaluationSubmitter submitter) {
+			EvaluationSubmitter submitter,
+			FilesBrowser fileBrowser) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -103,6 +107,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.renameEntityModalWidget = renameEntityModalWidget;
 		this.entityFinder = entityFinder;
 		this.submitter = submitter;
+		this.fileBrowser = fileBrowser;
 	}
 
 	@Override
@@ -116,6 +121,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.enityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityBundle.getEntity());
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
+		this.fileBrowser.configure(entity.getParentId(), permissions.getCanCertifiedUserAddChild(), true);
 		actionMenu.addControllerWidget(this.submitter.asWidget());
 		// Setup the actions
 		configureDeleteAction();
@@ -126,8 +132,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureLink();
 		configureSubmit();
 		configureAnnotations();
+		configureFileUpload();
 	}
 	
+	private void configureFileUpload() {
+		if(entityBundle.getEntity() instanceof FileEntity ){
+			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanUpload());
+			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, permissions.getCanUpload());
+			actionMenu.addActionListener(Action.UPLOAD_NEW_FILE, this);
+		}else{
+			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
+			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, false);
+		}
+	}
+
 	private void configureAddWiki(){
 		if(this.entityBundle.getRootWikiId() == null){
 			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
@@ -289,11 +307,28 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case SUBMIT_TO_CHALLENGE:
 			onSubmit();
 			break;
+		case UPLOAD_NEW_FILE:
+			onUploadFile();
+			break;	
 		default:
 			break;
 		}
 	}
 	
+	private void onUploadFile() {
+		// Validate the user can update this entity.
+		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckUploadFile();
+			}
+		});
+	}
+	
+	private void postCheckUploadFile(){
+		this.fileBrowser.showUploadFile();
+	}
+
 	private void onSubmit() {
 		// Validate the user can update this entity.
 		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {

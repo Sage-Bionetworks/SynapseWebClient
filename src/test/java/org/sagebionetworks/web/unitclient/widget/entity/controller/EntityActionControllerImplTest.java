@@ -50,6 +50,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
@@ -77,6 +78,7 @@ public class EntityActionControllerImplTest {
 	RenameEntityModalWidget mockRenameEntityModalWidget;
 	EntityFinder mockEntityFinder;
 	EvaluationSubmitter mockSubmitter;
+	FilesBrowser mockFileBrowser;
 	
 	ActionMenuWidget mockActionMenu;
 	EntityUpdatedHandler mockEntityUpdatedHandler;
@@ -110,6 +112,7 @@ public class EntityActionControllerImplTest {
 		mockEntityUpdatedHandler = Mockito.mock(EntityUpdatedHandler.class);
 		mockEntityFinder = Mockito.mock(EntityFinder.class);
 		mockSubmitter = Mockito.mock(EvaluationSubmitter.class);
+		mockFileBrowser = Mockito.mock(FilesBrowser.class);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
@@ -122,7 +125,7 @@ public class EntityActionControllerImplTest {
 				mockPreflightController, mockEntityTypeProvider,
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter);
+				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockFileBrowser);
 		
 		parentId = "syn456";
 		entityId = "syn123";
