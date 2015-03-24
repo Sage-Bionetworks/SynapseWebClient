@@ -38,7 +38,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	
-	private static final Integer VERSION_LIMIT = 100;
+	public static final Integer VERSION_LIMIT = 100;
 	
 	private DetailedPaginationWidget paginationWidget;
 	private boolean canEdit;
@@ -178,4 +178,12 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 				});
 	}
 
+	
+	/**
+	 * For testing purposes only
+	 * @return
+	 */
+	public Long getVersionNumber() {
+		return versionNumber;
+	}
 }
