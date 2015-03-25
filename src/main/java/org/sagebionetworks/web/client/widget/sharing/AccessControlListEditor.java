@@ -510,7 +510,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED + ": " + caught.getMessage());
 			}
 		});
 	}
