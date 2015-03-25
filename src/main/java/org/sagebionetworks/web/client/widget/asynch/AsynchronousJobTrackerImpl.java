@@ -28,7 +28,6 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	private UpdatingAsynchProgressHandler handler;
 	private OneTimeReference<AsynchronousProgressHandler> oneTimeReference;
 	private boolean isCanceled;
-	private String tableId;
 
 	@Inject
 	public AsynchronousJobTrackerImpl(SynapseClientAsync synapseClient,
@@ -42,12 +41,11 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * Start the job then start tracking the job
 	 */
 	public void startAndTrack(AsynchType type,
-			AsynchronousRequestBody requestBody, String tableId, final int waitTimeMS,
+			final AsynchronousRequestBody requestBody, final int waitTimeMS,
 			final UpdatingAsynchProgressHandler handler) {
 		this.isCanceled = false;
 		this.handler = handler;
 		this.type = type;
-		this.tableId = tableId;
 		/*
 		 * While update can be called many times we only want to call
 		 * onComplete(), onFailure() and onCancel() once. For example, it would
@@ -57,14 +55,14 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		this.oneTimeReference = new OneTimeReference<AsynchronousProgressHandler>(
 				handler);
 		// Start the job.
-		synapseClient.startAsynchJob(type, requestBody, tableId,
+		synapseClient.startAsynchJob(type, requestBody, 
 				new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String jobId) {
 						// nothing to do if canceled.
 						if (!isCanceled) {
 							// Track the job.
-							trackJob(jobId, waitTimeMS);
+							trackJob(jobId, requestBody, waitTimeMS);
 						}
 					}
 
@@ -75,7 +73,6 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 						}
 					}
 				});
-
 	}
 
 	/**
@@ -85,7 +82,7 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * @param waitTimeMS
 	 * @param handler
 	 */
-	private void trackJob(String jobId, int waitTimeMS) {
+	private void trackJob(String jobId, final AsynchronousRequestBody requestBody, int waitTimeMS) {
 		this.waitTimeMS = waitTimeMS;
 		this.jobId = jobId;
 		// Setup the timer
@@ -95,21 +92,21 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 				// Only continue to fire if the handler is still attached to the UI,
 				if(handler.isAttached()){
 					// when the timer fires the status is checked.
-					checkAndWait();
+					checkAndWait(requestBody);
 				}
 			}
 		});
 		// Do the first check and wait.
-		checkAndWait();
+		checkAndWait(requestBody);
 	}
 
 	/**
 	 * Check the current status and if still processing then wait.
 	 * 
 	 */
-	private void checkAndWait() {
+	private void checkAndWait(AsynchronousRequestBody requestBody) {
 		// Get the current status
-		synapseClient.getAsynchJobResults(this.type, this.jobId, this.tableId,
+		synapseClient.getAsynchJobResults(this.type, this.jobId, requestBody,
 				new AsyncCallback<AsynchronousResponseBody>() {
 					@Override
 					public void onSuccess(AsynchronousResponseBody response) {
