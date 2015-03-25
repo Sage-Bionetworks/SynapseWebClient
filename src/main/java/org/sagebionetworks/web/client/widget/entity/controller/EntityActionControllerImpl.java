@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -27,6 +28,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -78,6 +82,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	boolean isUserAuthenticated;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
+	UploadDialogWidget uploader;
 
 	
 	@Inject
@@ -90,7 +95,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			AccessControlListModalWidget accessControlListModalWidget,
 			RenameEntityModalWidget renameEntityModalWidget,
 			EntityFinder entityFinder,
-			EvaluationSubmitter submitter) {
+			EvaluationSubmitter submitter,
+			UploadDialogWidget uploader) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -103,6 +109,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.renameEntityModalWidget = renameEntityModalWidget;
 		this.entityFinder = entityFinder;
 		this.submitter = submitter;
+		this.uploader = uploader;
 	}
 
 	@Override
@@ -117,6 +124,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.enityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityBundle.getEntity());
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
+		actionMenu.addControllerWidget(uploader.asWidget());
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();
@@ -126,8 +134,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureLink();
 		configureSubmit();
 		configureAnnotations();
+		configureFileUpload();
 	}
 	
+	private void configureFileUpload() {
+		if(entityBundle.getEntity() instanceof FileEntity ){
+			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanUpload());
+			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, permissions.getCanUpload());
+			actionMenu.addActionListener(Action.UPLOAD_NEW_FILE, this);
+		}else{
+			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
+			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, false);
+		}
+	}
+
 	private void configureAddWiki(){
 		if(this.entityBundle.getRootWikiId() == null){
 			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
@@ -289,11 +309,30 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case SUBMIT_TO_CHALLENGE:
 			onSubmit();
 			break;
+		case UPLOAD_NEW_FILE:
+			onUploadFile();
+			break;	
 		default:
 			break;
 		}
 	}
 	
+	private void onUploadFile() {
+		// Validate the user can upload to this entity.
+		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckUploadFile();
+			}
+		});
+	}
+	
+	private void postCheckUploadFile(){
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
+		uploader.disableMultipleFileUploads();
+		uploader.show();
+	}
+
 	private void onSubmit() {
 		// Validate the user can update this entity.
 		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {

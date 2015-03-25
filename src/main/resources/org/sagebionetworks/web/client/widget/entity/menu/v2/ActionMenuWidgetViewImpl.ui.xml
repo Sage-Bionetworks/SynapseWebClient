@@ -29,6 +29,7 @@
 							action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Query Results</a:ActionMenuItem>
 						<b:Divider ui:field="basicDivider" visible="false" />
 						<a:ActionMenuItem icon="EDIT" action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
+						<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_NEW_FILE">Upload a New Version of the File</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS" action="ADD_WIKI_PAGE">Add Wiki</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TROPHY" action="SUBMIT_TO_CHALLENGE">Submit To Challenge</a:ActionMenuItem>
 						<a:ActionMenuItem icon="ARROWS" action="MOVE_ENTITY">Move</a:ActionMenuItem>
