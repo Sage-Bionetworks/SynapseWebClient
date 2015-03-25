@@ -129,7 +129,7 @@ public class AccessControlListEditorTest {
 	private static EntityBundle createEBT(AccessControlList acl, UserEntityPermissions uep) {
 		try {
 			EntityBundle ebt = new EntityBundle();
-			ebt.setAcl(acl);
+			ebt.setBenefactorAcl(acl);
 			ebt.setPermissions(uep);
 			return ebt;
 		} catch (Exception e) {
