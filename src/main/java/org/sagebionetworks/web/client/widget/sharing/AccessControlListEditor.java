@@ -354,7 +354,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			return;
 		}		
 		// Fetch parent's benefactor's ACL (candidate benefactor for this entity)
-		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
+		synapseClient.getEntityBenefactorAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
 				try {

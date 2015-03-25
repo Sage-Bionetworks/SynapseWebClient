@@ -233,7 +233,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public void setNotificationEmail(String email) throws RestServiceException;
 	
-	public AccessControlList getNodeAcl(String id) throws RestServiceException;
+	public AccessControlList getEntityBenefactorAcl(String id) throws RestServiceException;
 	
 	public AccessControlList createAcl(AccessControlList acl) throws RestServiceException;
 	
