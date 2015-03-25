@@ -42,7 +42,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WikiPageKey wikiKey;
 	private WidgetSelectionState widgetSelectionState;
 	WidgetDescriptorUpdatedHandler widgetDescriptorUpdatedHandler;
-	private Callback attachmentsHandler, saveHandler, cancelHandler, deleteHandler; 
+	private Callback saveHandler, cancelHandler, deleteHandler; 
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -78,10 +78,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 				deleteHandler = callback;
 				view.setDeleteVisible(true);
 				break;
-			case ATTACHMENTS:
-				attachmentsHandler = callback;
-				view.setAttachmentsButtonVisible(true);
-				break;
 			default:
 				throw new IllegalArgumentException(
 						"Markdown editor does not support callback for the action: " + action);
@@ -103,13 +99,11 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			final WidgetDescriptorUpdatedHandler callback) {
 		this.wikiKey = wikiKey;
 		this.widgetDescriptorUpdatedHandler = callback;
-		attachmentsHandler = null;
 		cancelHandler = null;
 		saveHandler = null;
 		deleteHandler = null;
 		view.setSaveVisible(false);
 		view.setCancelVisible(false);
-		view.setAttachmentsButtonVisible(false);
 		view.setDeleteVisible(false);
 		
 		//clear view state
@@ -334,9 +328,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case SAVE:
 			view.setSaving(true);
 			saveHandler.invoke();
-			break;
-		case ATTACHMENTS:
-			attachmentsHandler.invoke();
 			break;
 		case PREVIEW:
 			showPreview();

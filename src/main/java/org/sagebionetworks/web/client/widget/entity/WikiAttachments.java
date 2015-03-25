@@ -6,7 +6,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -27,12 +26,8 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	private NodeModelCreator nodeModelCreator;
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
-	private Callback callback;
-	
-	public interface Callback{
-		public void attachmentClicked(String fileName);
-		public void attachmentsToDelete(String fileName, List<String> fileHandleIds);
-	}
+	private List<String> toDeleteFileHandles;
+	private String selectedFilename;
 	
 	@Inject
 	public WikiAttachments(WikiAttachmentsView view, SynapseClientAsync synapseClient,
@@ -44,21 +39,11 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, Callback callback) {
+	public void configure(final WikiPageKey wikiKey) {
+		allFileHandles = null;
+		selectedFilename = null;
+		toDeleteFileHandles = new ArrayList<String>();
 		this.wikiKey = wikiKey;
-		if (callback == null) {
-			this.callback = new Callback() {
-				
-				@Override
-				public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
-				}
-				@Override
-				public void attachmentClicked(String fileName) {
-				}
-			};
-		}
-		else
-			this.callback = callback;	
 		synapseClient.getV2WikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String results) {
@@ -94,37 +79,38 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		return view.asWidget();
 	}
 	
+	public boolean isValid() {
+		return selectedFilename != null;
+	}
+	
+	@Override
+	public void setSelectedFilename(String fileName) {
+		selectedFilename = fileName;
+	}
+	
+	public String getSelectedFilename() {
+		return selectedFilename;
+	}
+	
+	public List<String> getFilesHandlesToDelete() {
+		return toDeleteFileHandles;
+	}
+	
 	@Override
 	public void deleteAttachment(final String fileName) {
 		if(fileName != null) {
 			List<FileHandle> attachmentsToDelete = new ArrayList<FileHandle>();
 			//find all file handles with this file name
 			for (FileHandle fileHandle : allFileHandles) {
-				if (fileHandle.getFileName().equals(fileName))
+				if (fileHandle.getFileName().equals(fileName)) {
 					attachmentsToDelete.add(fileHandle);
+					toDeleteFileHandles.add(fileHandle.getId());
+				}
 			}
 			allFileHandles.removeAll(attachmentsToDelete);
-			List<String> fileHandleIds = new ArrayList<String>();
-			for (FileHandle fileHandle : attachmentsToDelete) {
-				fileHandleIds.add(fileHandle.getId());
-			}
 			view.configure(wikiKey, getWorkingSet(allFileHandles));
-			if (fileHandleIds.size() > 0)
-				callback.attachmentsToDelete(fileName, fileHandleIds);
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
 		}
 	}
-
-	@Override
-	public void attachmentClicked(final String fileName) {
-		if(fileName != null) {
-			callback.attachmentClicked(fileName);
-		}
-	}
-	
-	public void show() {
-		view.show();
-	}
-
 }

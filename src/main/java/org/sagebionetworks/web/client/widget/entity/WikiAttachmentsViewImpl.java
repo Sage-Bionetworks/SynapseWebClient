@@ -5,12 +5,11 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.InlineRadio;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.GWT;
@@ -18,21 +17,21 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 	
+	private static final String FILENAMES = "filenames";
+
 	interface WikiAttachmentsViewImplUiBinder extends UiBinder<Widget, WikiAttachmentsViewImpl> {}
 	
 	private static WikiAttachmentsViewImplUiBinder uiBinder = GWT
 			.create(WikiAttachmentsViewImplUiBinder.class);
 
 	private Presenter presenter;
-	private SynapseJSNIUtils synapseJsniUtils;
-	private Modal modal;
+	private Widget widget;
 	
 	@UiField
 	FlowPanel attachmentsPanel;
@@ -42,19 +41,8 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 	Alert alert;
 	
 	@Inject
-	public WikiAttachmentsViewImpl(SynapseJSNIUtils synapseJsniUtils) {
-		this.synapseJsniUtils = synapseJsniUtils;
-		modal = (Modal)uiBinder.createAndBindUi(this);
-	}
-	
-	@Override
-	public void show() {
-		modal.show();
-	}
-	
-	@Override
-	public void hide() {
-		modal.hide();
+	public WikiAttachmentsViewImpl() {
+		widget = uiBinder.createAndBindUi(this);
 	}
 	
 	@Override
@@ -84,13 +72,19 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 			
 			FileHandle data = attachments.get(i);
 			final String fileName = data.getFileName();
-			Anchor attachmentLink = new Anchor(data.getFileName());
+			InlineRadio attachmentLink = new InlineRadio(data.getFileName());
+			attachmentLink.setName(FILENAMES);
 			attachmentLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					presenter.attachmentClicked(fileName);
+					presenter.setSelectedFilename(fileName);
 				}
 			});
+			
+			if (i == 0) {
+				attachmentLink.setActive(true);
+				presenter.setSelectedFilename(fileName);
+			}
 			
 			row.add(attachmentLink);
 			
@@ -101,7 +95,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 				}
 			});
 			button.setSize(ButtonSize.EXTRA_SMALL);
-			button.addStyleName("displayInline margin-left-3");
+			button.addStyleName("displayInline margin-left-5");
 			row.add(button);
 		}
 	}
@@ -109,7 +103,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 
 	@Override
 	public Widget asWidget() {
-		return modal;
+		return widget;
 	}
 
 	@Override

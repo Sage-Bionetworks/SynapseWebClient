@@ -84,7 +84,10 @@ public class ProvenanceConfigEditor implements ProvenanceConfigView.Presenter, W
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
-	
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

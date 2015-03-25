@@ -12,24 +12,22 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.inject.Inject;
 
 public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescriptorView.Presenter {
 	
-	private HandlerManager handlerManager;
 	private BaseEditWidgetDescriptorView view;
 	String contentTypeKey, attachmentName;
 	//contains all of the widget specific parameters
 	Map<String, String> widgetDescriptor;
 	private WidgetRegistrar widgetRegistrar;
+	WidgetDescriptorUpdatedHandler handler;
 	
 	@Inject
 	public BaseEditWidgetDescriptorPresenter(BaseEditWidgetDescriptorView view, WidgetRegistrar widgetRegistrar){
 		this.widgetRegistrar = widgetRegistrar;
 		this.view = view;
 		this.view.setPresenter(this);
-		handlerManager = new HandlerManager(this);
 	}
 
 	@Override
@@ -37,12 +35,13 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		//widgetDescriptor should have all of the updated parameter info.  But we do need to ask for the widget name from the view.
 		//ask for the new file handles that the editor added (if any)
 		List<String> newFileHandleIds = view.getNewFileHandleIds();
+		List<String> deletedFileHandleIds = view.getDeletedFileHandleIds();
 		try {
 			view.updateDescriptorFromView();
 			String textToInsert = view.getTextToInsert();
 			if (textToInsert != null) {
 				//this is it!
-				fireUpdatedEvent(textToInsert, newFileHandleIds);
+				fireUpdatedEvent(textToInsert, newFileHandleIds, deletedFileHandleIds);
 				view.hide();
 				return;
 			}
@@ -52,35 +51,29 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 			return;
 		}
 		try {
-			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(contentTypeKey, widgetDescriptor, widgetRegistrar), newFileHandleIds);
+			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(contentTypeKey, widgetDescriptor, widgetRegistrar), newFileHandleIds, deletedFileHandleIds);
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(e.getMessage());
 		}
 		view.hide();
 	}
 	
-	public void fireUpdatedEvent(String valueToInsert, List<String> newFileHandleIds) {
+	public void fireUpdatedEvent(String valueToInsert, List<String> newFileHandleIds, List<String> deletedFileHandleIds) {
 		//fire event that contains a value to insert into the description
 		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
 		event.setNewFileHandleIds(newFileHandleIds);
+		event.setDeletedFileHandleIds(deletedFileHandleIds);
 		event.setInsertValue(valueToInsert);
 		fireUpdatedEvent(event);
 	}
 	
 	public void fireUpdatedEvent(WidgetDescriptorUpdatedEvent event) {
-		handlerManager.fireEvent(event);
+		handler.onUpdate(event);
 	}
 	
 	@Override
 	public void addWidgetDescriptorUpdatedHandler(WidgetDescriptorUpdatedHandler handler) {
-		clearHandlers();
-		handlerManager.addHandler(WidgetDescriptorUpdatedEvent.getType(), handler);
-	}
-	
-	private void clearHandlers() {
-		while(handlerManager.getHandlerCount(WidgetDescriptorUpdatedEvent.getType()) > 0) {
-			handlerManager.removeHandler(WidgetDescriptorUpdatedEvent.getType(), handlerManager.getHandler(WidgetDescriptorUpdatedEvent.getType(), 0));
-		}
+		this.handler = handler;
 	}
 	
 	@Override

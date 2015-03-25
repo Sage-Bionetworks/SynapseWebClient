@@ -56,7 +56,10 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
-	
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

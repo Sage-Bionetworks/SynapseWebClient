@@ -149,4 +149,8 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 }

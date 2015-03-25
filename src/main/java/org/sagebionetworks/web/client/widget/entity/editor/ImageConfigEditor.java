@@ -138,6 +138,10 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	public List<String> getNewFileHandleIds() {
 		return fileHandleIds;
 	}
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

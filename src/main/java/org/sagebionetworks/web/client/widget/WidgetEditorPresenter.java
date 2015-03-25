@@ -38,4 +38,11 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	 * @return
 	 */
 	public List<String> getNewFileHandleIds();
+	
+	/**
+	 * used when the editor needs to delete wiki attachment file handles (like the image editor)
+	 * @return
+	 */
+	public List<String> getDeletedFileHandleIds();
+
 }
