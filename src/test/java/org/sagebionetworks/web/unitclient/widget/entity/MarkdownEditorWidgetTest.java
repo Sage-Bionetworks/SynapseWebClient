@@ -1,12 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.*;
-import static org.mockito.Matchers.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +87,6 @@ public class MarkdownEditorWidgetTest {
 		//configured in before, verify that view is reset
 		verify(mockView).setSaveVisible(false);
 		verify(mockView).setDeleteVisible(false);
-		verify(mockView).setAttachmentsButtonVisible(false);
 		verify(mockView).clear();
 		verify(mockView).setCancelVisible(false);
 		verify(mockView).setAttachmentCommandsVisible(true);
@@ -180,17 +182,6 @@ public class MarkdownEditorWidgetTest {
 		presenter.setActionHandler(MarkdownEditorAction.CANCEL, callback);
 		verify(mockView).setCancelVisible(true);
 		presenter.handleCommand(MarkdownEditorAction.CANCEL);
-		verify(callback).invoke();
-	}
-	
-	@Test
-	public void testAttachments() {
-		//tests setActionHandler as well
-		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.ATTACHMENTS, callback);
-		verify(mockView).setAttachmentsButtonVisible(true);
-		presenter.handleCommand(MarkdownEditorAction.ATTACHMENTS);
 		verify(callback).invoke();
 	}
 	

@@ -69,7 +69,7 @@ public class WikiAttachmentsTest {
 
 	@Test
 	public void testConfigure() {
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
 		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
 	}
 	
