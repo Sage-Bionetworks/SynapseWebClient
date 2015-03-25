@@ -109,13 +109,13 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	}
 	
 	public void getAcl(final AsyncCallback<AccessControlList> callback) {
-		int partsMask = EntityBundle.ACL;
+		int partsMask = EntityBundle.BENEFACTOR_ACL;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				// retrieve ACL and user entity permissions from bundle
 				try {
-					callback.onSuccess(bundle.getAcl());
+					callback.onSuccess(bundle.getBenefactorAcl());
 				} catch (Exception e) {
 					onFailure(e);
 				}
