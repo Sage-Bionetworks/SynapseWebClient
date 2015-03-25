@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -50,10 +53,10 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
@@ -78,7 +81,7 @@ public class EntityActionControllerImplTest {
 	RenameEntityModalWidget mockRenameEntityModalWidget;
 	EntityFinder mockEntityFinder;
 	EvaluationSubmitter mockSubmitter;
-	FilesBrowser mockFileBrowser;
+	UploadDialogWidget mockUploader;
 	
 	ActionMenuWidget mockActionMenu;
 	EntityUpdatedHandler mockEntityUpdatedHandler;
@@ -112,7 +115,7 @@ public class EntityActionControllerImplTest {
 		mockEntityUpdatedHandler = Mockito.mock(EntityUpdatedHandler.class);
 		mockEntityFinder = Mockito.mock(EntityFinder.class);
 		mockSubmitter = Mockito.mock(EvaluationSubmitter.class);
-		mockFileBrowser = Mockito.mock(FilesBrowser.class);
+		mockUploader = Mockito.mock(UploadDialogWidget.class);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
@@ -125,7 +128,7 @@ public class EntityActionControllerImplTest {
 				mockPreflightController, mockEntityTypeProvider,
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockFileBrowser);
+				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockUploader);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -136,6 +139,7 @@ public class EntityActionControllerImplTest {
 		permissions.setCanChangePermissions(true);
 		permissions.setCanDelete(true);
 		permissions.setCanPublicRead(true);
+		permissions.setCanUpload(true);
 		permissions.setCanEdit(true);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
@@ -173,6 +177,9 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
 		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+entityDispalyType);
 		verify(mockActionMenu).addActionListener(Action.CHANGE_ENTITY_NAME, controller);
+		// upload
+		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
 	}
 	
 	@Test
@@ -222,6 +229,26 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+entityDispalyType);
 		verify(mockActionMenu).addActionListener(Action.MOVE_ENTITY, controller);
+	}
+	
+	@Test
+	public void testConfigureUploadNewFile(){
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, true);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, true);
+		verify(mockActionMenu).addActionListener(Action.UPLOAD_NEW_FILE, controller);
+	}
+	
+	
+	@Test
+	public void testConfigureUploadNewFileNoUpload(){
+		entityBundle.getPermissions().setCanUpload(false);
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		verify(mockActionMenu).addActionListener(Action.UPLOAD_NEW_FILE, controller);
 	}
 	
 	@Test
@@ -590,5 +617,21 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		controller.onAction(Action.SUBMIT_TO_CHALLENGE);
 		verify(mockSubmitter).configure(any(Entity.class), any(Set.class));
+	}
+	
+	@Test
+	public void testOnUploadNewFileNoUpload(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.UPLOAD_NEW_FILE);
+		verify(mockUploader, never()).show();
+	}
+	
+	@Test
+	public void testOnUploadNewFileWithUpload(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.onAction(Action.UPLOAD_NEW_FILE);
+		verify(mockUploader).show();
 	}
 }

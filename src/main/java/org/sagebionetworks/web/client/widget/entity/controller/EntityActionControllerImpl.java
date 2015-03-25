@@ -29,6 +29,8 @@ import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -80,7 +82,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	boolean isUserAuthenticated;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
-	FilesBrowser fileBrowser;
+	UploadDialogWidget uploader;
 
 	
 	@Inject
@@ -94,7 +96,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			RenameEntityModalWidget renameEntityModalWidget,
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
-			FilesBrowser fileBrowser) {
+			UploadDialogWidget uploader) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -107,7 +109,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.renameEntityModalWidget = renameEntityModalWidget;
 		this.entityFinder = entityFinder;
 		this.submitter = submitter;
-		this.fileBrowser = fileBrowser;
+		this.uploader = uploader;
 	}
 
 	@Override
@@ -121,8 +123,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.enityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityBundle.getEntity());
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
-		this.fileBrowser.configure(entity.getParentId(), permissions.getCanCertifiedUserAddChild(), true);
 		actionMenu.addControllerWidget(this.submitter.asWidget());
+		actionMenu.addControllerWidget(uploader.asWidget());
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();
@@ -316,7 +318,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onUploadFile() {
-		// Validate the user can update this entity.
+		// Validate the user can upload to this entity.
 		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
 			@Override
 			public void invoke() {
@@ -326,7 +328,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckUploadFile(){
-		this.fileBrowser.showUploadFile();
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
+		uploader.disableMultipleFileUploads();
+		uploader.show();
 	}
 
 	private void onSubmit() {
