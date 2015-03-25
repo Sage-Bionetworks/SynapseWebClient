@@ -174,7 +174,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	}
 	
 	private WidgetMenu createEditMenu(final EntityGroupDisplay groupDisplay, IconsImageBundle iconsImageBundle) {
-		WidgetMenu widgetMenu = new WidgetMenu(iconsImageBundle);
+		WidgetMenu widgetMenu = new WidgetMenu();
 		widgetMenu.showEdit(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {
@@ -588,7 +588,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		
 		public void setRowEditor(int rowIndex, ClickHandler editRow,
 				ClickHandler deleteRow) {
-			WidgetMenu menu = new WidgetMenu(iconsImageBundle);
+			WidgetMenu menu = new WidgetMenu();
 			if(editRow != null) {
 				menu.showEdit(editRow);
 			}
