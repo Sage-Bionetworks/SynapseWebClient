@@ -110,7 +110,6 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
@@ -2053,8 +2052,6 @@ public class DisplayUtils {
 					content.setVisible(true);
 					label.setText(DisplayConstants.HIDE_LC);
 				}
-				if (content instanceof LayoutContainer)
-					((LayoutContainer)content).layout(true);
 			}
 		});
 	}
