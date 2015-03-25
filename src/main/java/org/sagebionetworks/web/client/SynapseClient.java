@@ -430,18 +430,19 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId) throws RestServiceException;
+	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body) throws RestServiceException;
 	
 	/**
 	 * Get the results of an Asynchronous job identified by the provided jobId.
 	 * @param type
 	 * @param jobId
+	 * @param body The request body
 	 * @return
 	 * @throws RestServiceException
 	 * @throws ResultNotReadyException Thrown when the job is not ready.  The status JOSN of this exception
 	 * is of type AsynchronousJobStatus.
 	 */
-	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, String tableId) throws RestServiceException, ResultNotReadyException;
+	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
 	/**
 	 * Execute a generic entity entity query.
