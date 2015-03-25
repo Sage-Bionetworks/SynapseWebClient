@@ -138,7 +138,7 @@ public class EntityListRenderer extends SimplePanel {
 	
 	public void setRowEditor(int rowIndex, ClickHandler editRow,
 			ClickHandler deleteRow) {
-		WidgetMenu menu = new WidgetMenu(iconsImageBundle);
+		WidgetMenu menu = new WidgetMenu();
 		if(editRow != null) {
 			menu.showEdit(editRow);
 		}

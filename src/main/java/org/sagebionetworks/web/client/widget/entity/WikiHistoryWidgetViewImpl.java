@@ -1,60 +1,32 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
-import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.CompositeCell;
 import com.google.gwt.cell.client.DateCell;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.AsyncDataProvider;
-import com.google.gwt.view.client.HasData;
-import com.google.gwt.view.client.ProvidesKey;
-import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
-import com.google.gwt.dom.client.NativeEvent;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.cell.client.ValueUpdater;
 
-public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHistoryWidgetView {
+public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryWidgetView {
 	CellTable<HistoryEntry> historyTable;
 	Button loadMoreHistoryButton;
 	HTMLPanel inlineErrorMessagePanel;
@@ -260,8 +232,6 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		historyPanel.add(wrapWidget(historyTable, "margin-top-5"));
 		historyPanel.add(loadMoreHistoryButton);
 		add(historyPanel);
-		layout(true);
-		
 	}
 	
 	@Override
@@ -272,7 +242,6 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		if(inlineErrorMessagePanel != null) {
 			inlineErrorMessagePanel.setVisible(false);
 		}
-		layout(true);
 	}
 	
 	@Override
@@ -328,12 +297,6 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		builder.appendHtmlConstant(message);
 		inlineErrorMessagePanel = new HTMLPanel(builder.toSafeHtml());
 		add(inlineErrorMessagePanel);
-		layout(true);
-	}
-
-	@Override
-	public void clear() {
-		removeAll(true);
 	}
 
 	@Override
