@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static junit.framework.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -39,6 +41,8 @@ public class WikiAttachmentsTest {
 	NodeModelCreator mockNodeModelCreator;
 	String testFileName ="a file";
 	String testFileId = "13";
+	List<FileHandle> handles;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -52,7 +56,7 @@ public class WikiAttachmentsTest {
 		FileHandle testHandle = new S3FileHandle();
 		testHandle.setFileName("testfilename.jpg");
 		testHandle.setId("12");
-		List<FileHandle> handles = new ArrayList<FileHandle>();
+		handles = new ArrayList<FileHandle>();
 		handles.add(testHandle);
 		FileHandle testHandle2 = new S3FileHandle();
 		testHandle2.setFileName(testFileName);
@@ -71,20 +75,24 @@ public class WikiAttachmentsTest {
 	public void testConfigure() {
 		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
 		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
+		
+		assertFalse(presenter.isValid());
+		presenter.setSelectedFilename(testFileName);
+		assertTrue(presenter.isValid());
 	}
+	
 	
 	@Test
 	public void testConfigureFail() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testDelete(){
-		WikiAttachments.Callback callback = Mockito.mock(WikiAttachments.Callback.class);
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), callback);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
 		presenter.deleteAttachment(testFileName);
-		verify(callback).attachmentsToDelete(eq(testFileName), eq(Arrays.asList(testFileId)));
+		assertEquals(Arrays.asList(testFileId), presenter.getFilesHandlesToDelete());
 	}
 }
