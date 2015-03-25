@@ -82,6 +82,7 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 		if(this.tableId != null){
 			// This is an append.
 			uploadRequest.setTableId(this.tableId);
+			uploadRequest.setEntityId(this.tableId);
 			this.appendNextPage.configure(uploadRequest, suggestedSchema);
 			this.presenter.setNextActivePage(this.appendNextPage);
 			// For now just execute the next page.  This may change in the future.
@@ -133,7 +134,7 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 				.getCurrentOptions();
 		// Start the job
 		jobTrackingWidget.startAndTrackJob(ANALYZING_FILE, false,
-				AsynchType.TableCSVUploadPreview, previewRequest, this.tableId,
+				AsynchType.TableCSVUploadPreview, previewRequest,
 				new AsynchronousProgressHandler() {
 
 					@Override

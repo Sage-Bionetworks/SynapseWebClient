@@ -154,9 +154,10 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	public void applyCSVToTable(final TableEntity table) {
 		// Get the preview request.
 		this.uploadtoTableRequest.setTableId(table.getId());
+		this.uploadtoTableRequest.setEntityId(table.getId());
 		this.view.setTrackerVisible(true);
 		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
-				AsynchType.TableCSVUpload, this.uploadtoTableRequest, table.getId(),
+				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
 				new AsynchronousProgressHandler() {
 
 					@Override

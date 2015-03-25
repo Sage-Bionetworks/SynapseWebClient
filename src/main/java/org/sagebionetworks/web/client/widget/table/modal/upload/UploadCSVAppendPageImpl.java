@@ -42,6 +42,8 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 	public void configure(UploadToTableRequest request,
 			List<ColumnModel> suggestedSchema) {
 		this.request = request;
+		if (this.request.getEntityId() == null)
+			this.request.setEntityId(this.request.getTableId());
 	}
 
 	@Override
@@ -49,7 +51,7 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 		presenter.setLoading(true);
 		view.setTrackingWidgetVisible(true);
 		// Start the job.
-		this.jobTrackingWidget.startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableCSVUpload, this.request, this.request.getTableId(), new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableCSVUpload, this.request, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {
