@@ -1157,46 +1157,6 @@ public class DisplayUtils {
 		}
 		return icon;
 	}
-
-	/**
-	 * Maps mime types to icons.
-	 */
-	private static Map<String, String> attachmentMap = new HashMap<String, String>();
-	public static String UNKNOWN_ICON 				= "220";
-	public static String DEFAULT_PDF_ICON 			= "222";
-	public static String DEFAULT_IMAGE_ICON			= "242";
-	public static String DEFAULT_TEXT_ICON 			= "224";
-	public static String DEFAULT_COMPRESSED_ICON	= "226";
-	static{
-		attachmentMap.put("pdf", DEFAULT_PDF_ICON);
-		attachmentMap.put("txt", DEFAULT_TEXT_ICON);
-		attachmentMap.put("doc", DEFAULT_TEXT_ICON);
-		attachmentMap.put("doc", DEFAULT_TEXT_ICON);
-		attachmentMap.put("docx", DEFAULT_TEXT_ICON);
-		attachmentMap.put("docx", DEFAULT_TEXT_ICON);
-		attachmentMap.put("zip", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("tar", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("gz", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("rar", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("png", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("gif", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("jpg", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("jpeg", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
-	}
-	
-	/**
-	 * Get the icon to be used with a given file type.
-	 */
-	public static String getAttachmentIcon(String fileName){
-		if(fileName == null) return UNKNOWN_ICON;
-		String mimeType = getMimeType(fileName);
-		if(mimeType == null) return UNKNOWN_ICON;
-		String icon = attachmentMap.get(mimeType.toLowerCase());
-		if(icon == null) return UNKNOWN_ICON;
-		return icon;
-	}
 	
 	/**
 	 * Get the mime type from a file name.

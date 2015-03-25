@@ -462,6 +462,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				});
 				
 				add(markdownEditorWidget.asWidget());
+				//also add the wiki attachments dialog
+				add(wikiAttachments.asWidget());
 			}
 		});
 
@@ -545,7 +547,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				}
 			});
 		}
-		showDialog(wikiAttachments);
+		wikiAttachments.show();
 	}
 	
 	public void saveClicked(TextBox titleField, MarkdownEditorWidget editorWidget) {
@@ -581,23 +583,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		DisplayUtils.showInfo(title, message);
 	}
 	
-	public static void showDialog(WikiAttachments wikiAttachments) {
-        final Dialog window = new Dialog();
-        window.setMaximizable(false);
-        window.setSize(400, 400);
-        window.setPlain(true); 
-        window.setModal(true); 
-        
-        window.setHeading("Attachments"); 
-        window.setButtons(Dialog.OK);
-        window.setHideOnButtonClick(true);
-
-        window.setLayout(new FitLayout());
-        ScrollPanel scrollPanelWrapper = new ScrollPanel();
-        scrollPanelWrapper.add(wikiAttachments.asWidget());
-	    window.add(scrollPanelWrapper);
-	    window.show();		
-	}
 	@Override
 	public void showLoading() {
 		clear();

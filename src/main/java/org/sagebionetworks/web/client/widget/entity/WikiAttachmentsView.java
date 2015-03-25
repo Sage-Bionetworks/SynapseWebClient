@@ -28,10 +28,15 @@ public interface WikiAttachmentsView extends IsWidget, SynapseView {
 		 */
 		void deleteAttachment(String fileName);
 		void attachmentClicked(final String fileName);
-		void setAttachmentColumnWidth(int width);
 	}
 
 	public void configure(WikiPageKey wikiKey, List<FileHandle> list);
-	public void setAttachmentColumnWidth(int width);
-	public void attachmentDeleted(String fileHandleId);
+	/**
+	 * Show attachments dialog
+	 */
+	void show();
+	/**
+	 * Hide attachments dialog
+	 */
+	void hide();
 }
