@@ -20,11 +20,12 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 */
 	public boolean isExternal();
 	public boolean isSynapseEntity();
-	
+	boolean isFromAttachments();
 	public String getImageUrl();
 	public String getAltText();
 	public void setImageUrl(String url);
 	void setFileInputWidget(Widget fileInputWidget);
+	void setWikiAttachmentsWidget(Widget widget);
 	void showUploadFailureUI(String error);
 	void showUploadSuccessUI();
 	void setUploadButtonEnabled(boolean enabled);

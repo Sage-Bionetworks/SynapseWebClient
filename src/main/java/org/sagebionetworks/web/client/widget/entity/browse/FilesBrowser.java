@@ -216,4 +216,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	public void setCurrentFolderEntityId(String currentFolderEntityId) {
 		this.currentFolderEntityId = currentFolderEntityId;
 	}
+
+	public void showUploadFile() {
+		view.showUploadDialog(this.configuredEntityId);
+	}
 }

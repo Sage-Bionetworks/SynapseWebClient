@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -12,7 +11,6 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -29,15 +27,10 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
@@ -50,7 +43,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -73,9 +65,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
-	private WikiAttachments wikiAttachments;
 	private WikiPageKey wikiKey;
-	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isDescription = false;
 	private WikiHistoryWidget historyWidget;
@@ -86,7 +76,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private Long versionInView;
 	private FlowPanel wikiPagePanel;
 	private boolean isEmbeddedInOwnerPage;
-	private boolean isAttachmentsWidgetConfigured;
 	private HorizontalPanel modifiedPanel, createdPanel;
 	private SimplePanel historyPanel;
 	
@@ -101,16 +90,14 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Inject
 	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
-			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments,
-			WidgetRegistrar widgetRegistrar, WikiHistoryWidget historyWidget, PortalGinInjector ginInjector, SageImageBundle sageImageBundle) {
+			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb,
+			WikiHistoryWidget historyWidget, PortalGinInjector ginInjector, SageImageBundle sageImageBundle) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
-		this.wikiAttachments = wikiAttachments;
-		this.widgetRegistrar = widgetRegistrar;
 		this.historyWidget = historyWidget;
 		this.ginInjector = ginInjector;
 		modifiedPanel = new HorizontalPanel();
@@ -162,7 +149,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.isCurrentVersion = isCurrentVersion;
 		this.versionInView = versionInView;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
-		isAttachmentsWidgetConfigured = false;
 		if(!isCurrentVersion) {
 			markdownWidget.setMarkdown(markdown, wikiKey, false, versionInView);
 		} else {
@@ -429,6 +415,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.addFileHandles(event.getNewFileHandleIds());
+						presenter.removeFileHandles(event.getDeletedFileHandleIds());
 					}
 				});
 				
@@ -444,13 +431,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 					@Override
 					public void invoke() {
 						cancelClicked();
-					}
-				});
-				
-				markdownEditorWidget.setActionHandler(MarkdownEditorAction.ATTACHMENTS, new Callback() {
-					@Override
-					public void invoke() {
-						attachmentsClicked();
 					}
 				});
 				
@@ -511,43 +491,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		});
 	}
 	
-	public void attachmentsClicked() {
-		if (!isAttachmentsWidgetConfigured) {
-			isAttachmentsWidgetConfigured = true;
-			wikiAttachments.configure(wikiKey, presenter.getWikiPage(), new WikiAttachments.Callback() {
-				@Override
-				public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
-					//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
-					//delete previews, and image references
-					presenter.removeFileHandles(fileHandleIds);
-					Map<String, String> descriptor = new HashMap<String, String>();
-					descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
-					try {
-						String imageMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.IMAGE_CONTENT_TYPE, descriptor , widgetRegistrar);
-						markdownEditorWidget.deleteMarkdown(imageMD);
-						//works because AttachmentPreviewWidget looks for the same parameter ImageWidget
-						String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
-						markdownEditorWidget.deleteMarkdown(previewMD);
-					} catch (JSONObjectAdapterException e) {
-					}
-				}
-				
-				@Override
-				public void attachmentClicked(String fileName) {
-					//when an attachment is clicked in the wiki attachments dialog, let's add a reference in the markdown editor
-					Map<String, String> descriptor = new HashMap<String, String>();
-					descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
-					try {
-						String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
-						markdownEditorWidget.insertMarkdown(previewMD);
-					} catch (JSONObjectAdapterException e) {
-					}						
-				}
-			});
-		}
-		showDialog(wikiAttachments);
-	}
-	
 	public void saveClicked(TextBox titleField, MarkdownEditorWidget editorWidget) {
 		presenter.saveClicked(titleField.getValue(), editorWidget.getMarkdown());
 	}
@@ -581,23 +524,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		DisplayUtils.showInfo(title, message);
 	}
 	
-	public static void showDialog(WikiAttachments wikiAttachments) {
-        final Dialog window = new Dialog();
-        window.setMaximizable(false);
-        window.setSize(400, 400);
-        window.setPlain(true); 
-        window.setModal(true); 
-        
-        window.setHeading("Attachments"); 
-        window.setButtons(Dialog.OK);
-        window.setHideOnButtonClick(true);
-
-        window.setLayout(new FitLayout());
-        ScrollPanel scrollPanelWrapper = new ScrollPanel();
-        scrollPanelWrapper.add(wikiAttachments.asWidget());
-	    window.add(scrollPanelWrapper);
-	    window.show();		
-	}
 	@Override
 	public void showLoading() {
 		clear();

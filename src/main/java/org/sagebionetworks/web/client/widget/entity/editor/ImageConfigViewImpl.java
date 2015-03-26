@@ -44,13 +44,15 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@UiField
 	Button findEntitiesButton;
 	
-	
 	@UiField
 	Button uploadButton;
 	@UiField
 	SimplePanel fileInputWidgetContainer;
 	@UiField
 	SimplePanel uploadParamsPanelContainer;
+	@UiField
+	SimplePanel wikiAttachmentsContainer;
+
 	
 	@UiField
 	SimplePanel synapseParamsPanelContainer;
@@ -61,6 +63,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	TabListItem externalTabListItem;
 	@UiField
 	TabListItem synapseTabListItem;
+	@UiField
+	TabListItem existingAttachmentListItem;
 	@UiField
 	FlowPanel uploadSuccessUI;
 	@UiField
@@ -168,7 +172,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		fileInputWidgetContainer.clear();
 		fileInputWidgetContainer.setWidget(fileInputWidget);
 	}
-	
+	@Override
+	public void setWikiAttachmentsWidget(Widget widget) {
+		wikiAttachmentsContainer.clear();
+		wikiAttachmentsContainer.add(widget);
+	}
 	@Override
 	public void setUploadButtonEnabled(boolean enabled) {
 		uploadButton.setEnabled(enabled);
@@ -249,6 +257,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public boolean isSynapseEntity() {
 		return synapseTabListItem.isActive();
+	}
+	
+	@Override
+	public boolean isFromAttachments() {
+		return existingAttachmentListItem.isActive();
 	}
 	
 	@Override

@@ -50,7 +50,6 @@ public enum MarkdownEditorAction {
 	H5,
 	H6,
 	SAVE,
-	ATTACHMENTS,
 	PREVIEW,
 	CANCEL,
 	DELETE

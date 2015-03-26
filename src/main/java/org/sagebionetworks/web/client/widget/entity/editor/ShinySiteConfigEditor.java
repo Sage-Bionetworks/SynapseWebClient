@@ -61,7 +61,10 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
-	
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

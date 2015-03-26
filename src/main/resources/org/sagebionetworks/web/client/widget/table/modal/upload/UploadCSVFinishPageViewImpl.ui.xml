@@ -5,12 +5,12 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<b:Form>
+		<bh:Div>
 			<b:FormGroup>
 				<b:FormLabel for="tableName">Table Name</b:FormLabel>
 				<b:TextBox name="tableName" ui:field="tableName" />
 			</b:FormGroup>
-		</b:Form>
+		</bh:Div>
 		<g:SimplePanel ui:field="trackerPanel" />
 		<bh:Div styleName="margin-top-15" />
 		<b:Button dataToggle="COLLAPSE" dataTarget="#optionsCollapse"
@@ -19,7 +19,7 @@
 		<b:Collapse b:id="optionsCollapse" toggle="false">
 			<b:Panel>
 				<b:PanelBody>
-					<b:Form>
+					<bh:Div>
 						<b:FormGroup>
 							<b:FormLabel for="table">Table Schema</b:FormLabel>
 							<t:Table ui:field="table" styleName="table table-striped table-condensed">
@@ -47,7 +47,7 @@
 								<t:TBody ui:field="tableBody"></t:TBody>
 							</t:Table>
 						</b:FormGroup>
-					</b:Form>
+					</bh:Div>
 				</b:PanelBody>
 			</b:Panel>
 		</b:Collapse>

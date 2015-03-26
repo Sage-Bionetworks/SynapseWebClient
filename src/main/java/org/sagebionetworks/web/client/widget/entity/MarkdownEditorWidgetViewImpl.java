@@ -169,8 +169,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button saveButton;
 	@UiField
-	public Button attachmentsButton;
-	@UiField
 	public Button cancelButton;
 	@UiField
 	public Button deleteButton;
@@ -240,7 +238,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
 		deleteButton.addClickHandler(getClickHandler(MarkdownEditorAction.DELETE));
-		attachmentsButton.addClickHandler(getClickHandler(MarkdownEditorAction.ATTACHMENTS));
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
@@ -314,11 +311,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				Window.scrollTo(0, mdCommands.getAbsoluteTop());		
 			}
 		});
-	}
-	
-	@Override
-	public void setAttachmentsButtonVisible(boolean visible) {
-		attachmentsButton.setVisible(visible);
 	}
 	
 	@Override

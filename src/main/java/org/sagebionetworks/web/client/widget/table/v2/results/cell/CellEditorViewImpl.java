@@ -75,6 +75,7 @@ public class CellEditorViewImpl implements CellEditorView {
 	@Override
 	public void setFocus(boolean focused) {
 		textBox.setFocus(focused);
+		textBox.selectAll();
 	}
 
 	@Override

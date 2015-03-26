@@ -9,12 +9,12 @@
 	<b:Modal ui:field="modal" title="Title goes here" closable="true" fade="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
-			<b:Form>
+			<bh:Div>
 				<b:FormGroup>
 					<b:FormLabel ui:field="nameLabel" for="formName">Label goes here</b:FormLabel>
 					<b:TextBox b:id="formName" ui:field="nameField" />
 				</b:FormGroup>
-			</b:Form>
+			</bh:Div>
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 		</b:ModalBody>
 		<b:ModalFooter>

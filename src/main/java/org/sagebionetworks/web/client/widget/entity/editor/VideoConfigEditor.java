@@ -69,7 +69,10 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
-	
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

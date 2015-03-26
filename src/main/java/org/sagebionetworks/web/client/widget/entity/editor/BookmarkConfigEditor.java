@@ -50,5 +50,9 @@ public class BookmarkConfigEditor implements BookmarkConfigView.Presenter, Widge
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
-
+	
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 }

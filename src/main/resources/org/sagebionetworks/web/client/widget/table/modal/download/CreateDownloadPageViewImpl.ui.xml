@@ -7,7 +7,7 @@
 	xmlns:b.select="urn:import:org.gwtbootstrap3.extras.select.client.ui">
 
 	<bh:Div>
-		<b:Form>
+		<bh:Div>
 			<b:FormGroup>
 				<b:FormLabel for="fileType">File type</b:FormLabel>
 				<b:Radio name="fileType" ui:field="commaRadio">Comma Separated Values
@@ -22,7 +22,7 @@
 				<b:CheckBox ui:field="includeMetadata">Include row metadata (Row Id and Row
 					Version).</b:CheckBox>
 			</b:FormGroup>
-		</b:Form>
+		</bh:Div>
 		<g:SimplePanel ui:field="trackerPanel" />
 	</bh:Div>
 </ui:UiBinder>
