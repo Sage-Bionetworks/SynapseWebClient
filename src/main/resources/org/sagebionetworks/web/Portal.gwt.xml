@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='Portal'>
+	<define-property name="gwt.logging.popupHandler" values="ENABLED, DISABLED" />
+	<define-property name="gwt.logging.firebugHandler" values="ENABLED, DISABLED" />
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name='com.google.gwt.user.User' />
 	
