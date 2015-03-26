@@ -39,7 +39,8 @@ public class WikiAttachmentsTest {
 	WikiAttachmentsView mockView;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
-	String testFileName ="a file";
+	String testFileName1 = "testfilename.jpg";
+	String testFileName2 ="a file";
 	String testFileId = "13";
 	List<FileHandle> handles;
 	
@@ -54,12 +55,12 @@ public class WikiAttachmentsTest {
 		
 		FileHandleResults testResults = new FileHandleResults();
 		FileHandle testHandle = new S3FileHandle();
-		testHandle.setFileName("testfilename.jpg");
+		testHandle.setFileName(testFileName1);
 		testHandle.setId("12");
 		handles = new ArrayList<FileHandle>();
 		handles.add(testHandle);
 		FileHandle testHandle2 = new S3FileHandle();
-		testHandle2.setFileName(testFileName);
+		testHandle2.setFileName(testFileName2);
 		testHandle2.setId(testFileId);
 		handles.add(testHandle2);
 		testResults.setList(handles);
@@ -77,9 +78,10 @@ public class WikiAttachmentsTest {
 		verify(mockView).reset();
 		verify(mockView).addFileHandles(anyList());
 		
-		assertFalse(presenter.isValid());
-		presenter.setSelectedFilename(testFileName);
+		//first item is selected by default
 		assertTrue(presenter.isValid());
+		presenter.setSelectedFilename(null);
+		assertFalse(presenter.isValid());
 	}
 	
 	
@@ -93,8 +95,14 @@ public class WikiAttachmentsTest {
 	@Test
 	public void testDelete(){
 		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
-		presenter.deleteAttachment(testFileName);
+
+		//first item is selected by default
+		assertTrue(presenter.isValid());
+
+		presenter.deleteAttachment(testFileName2);
 		assertEquals(Arrays.asList(testFileId), presenter.getFilesHandlesToDelete());
+		
+		assertTrue(presenter.isValid());
 	}
 	
 	@Test
@@ -103,5 +111,6 @@ public class WikiAttachmentsTest {
 		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
 		verify(mockView).reset();
 		verify(mockView).showNoAttachmentRow();
+		assertNull(presenter.getSelectedFilename());
 	}
 }

@@ -74,7 +74,6 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 			
 			if (i == 0) {
 				attachmentLink.setActive(true);
-				presenter.setSelectedFilename(fileName);
 			}
 			
 			row.add(attachmentLink);

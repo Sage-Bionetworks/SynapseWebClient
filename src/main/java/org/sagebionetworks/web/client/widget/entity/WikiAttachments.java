@@ -68,8 +68,10 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		view.reset();
 		if (workingSet == null || workingSet.isEmpty()) {
 			view.showNoAttachmentRow();
+			selectedFilename = null;
 		} else {
 			view.addFileHandles(workingSet);
+			selectedFilename = workingSet.get(0).getFileName();
 		}
 	}
 	
