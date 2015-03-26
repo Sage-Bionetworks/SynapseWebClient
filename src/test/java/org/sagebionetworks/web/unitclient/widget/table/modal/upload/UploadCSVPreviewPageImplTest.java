@@ -139,7 +139,6 @@ public class UploadCSVPreviewPageImplTest {
 		page.setModalPresenter(mockPresenter);
 		page.onPrimary();
 		this.uploadRequest.setTableId(tableId);
-		this.uploadRequest.setEntityId(tableId);
 		verify(mockAppendNextPage).configure(this.uploadRequest, schema);
 		verify(mockPresenter).setNextActivePage(mockAppendNextPage);
 	}

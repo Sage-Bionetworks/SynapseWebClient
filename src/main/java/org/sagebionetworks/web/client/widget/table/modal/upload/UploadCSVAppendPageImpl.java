@@ -42,8 +42,6 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 	public void configure(UploadToTableRequest request,
 			List<ColumnModel> suggestedSchema) {
 		this.request = request;
-		if (this.request.getEntityId() == null)
-			this.request.setEntityId(this.request.getTableId());
 	}
 
 	@Override
