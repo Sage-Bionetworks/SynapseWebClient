@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,7 +74,8 @@ public class WikiAttachmentsTest {
 	@Test
 	public void testConfigure() {
 		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
-		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
+		verify(mockView).reset();
+		verify(mockView).addFileHandles(anyList());
 		
 		assertFalse(presenter.isValid());
 		presenter.setSelectedFilename(testFileName);
@@ -94,5 +95,13 @@ public class WikiAttachmentsTest {
 		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
 		presenter.deleteAttachment(testFileName);
 		assertEquals(Arrays.asList(testFileId), presenter.getFilesHandlesToDelete());
+	}
+	
+	@Test
+	public void testNoAttachments(){
+		handles.clear();
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
+		verify(mockView).reset();
+		verify(mockView).showNoAttachmentRow();
 	}
 }

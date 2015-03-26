@@ -10,7 +10,6 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -45,27 +44,19 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 		widget = uiBinder.createAndBindUi(this);
 	}
 	
-	@Override
-	public void configure(WikiPageKey wikiKey, List<FileHandle> list) {		
-		reset();
-		if(list == null || list.size() == 0){
-			showNoAttachmentRow();
-		} else {
-			populateStore(wikiKey, list);			
-		}
-	}
-	
 	public void reset(){
 		attachmentsPanel.clear();
 		alert.setVisible(false);
 		noAttachmentsUI.setVisible(false);
 	}
 	
-	private void showNoAttachmentRow() {
+	@Override
+	public void showNoAttachmentRow() {
 		noAttachmentsUI.setVisible(true);
 	}
 	
-	private void populateStore(WikiPageKey wikiKey, List<FileHandle> attachments) {
+	@Override
+	public void addFileHandles(List<FileHandle> attachments) {
 		for (int i = 0; i < attachments.size(); i++) {
 			FlowPanel row = new FlowPanel();
 			attachmentsPanel.add(row);

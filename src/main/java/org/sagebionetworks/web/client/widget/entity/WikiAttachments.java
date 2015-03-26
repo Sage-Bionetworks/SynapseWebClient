@@ -50,7 +50,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				try {
 					FileHandleResults fileHandleResults = nodeModelCreator.createJSONEntity(results, FileHandleResults.class);
 					allFileHandles = fileHandleResults.getList();
-					view.configure(wikiKey, getWorkingSet(allFileHandles));
+					updateFileList();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -61,6 +61,16 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+	
+	public void updateFileList() {
+		List<FileHandle> workingSet = getWorkingSet(allFileHandles);
+		view.reset();
+		if (workingSet == null || workingSet.isEmpty()) {
+			view.showNoAttachmentRow();
+		} else {
+			view.addFileHandles(workingSet);
+		}
 	}
 	
 	private List<FileHandle> getWorkingSet(List<FileHandle> allFileHandles){
@@ -108,7 +118,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				}
 			}
 			allFileHandles.removeAll(attachmentsToDelete);
-			view.configure(wikiKey, getWorkingSet(allFileHandles));
+			updateFileList();
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
 		}
