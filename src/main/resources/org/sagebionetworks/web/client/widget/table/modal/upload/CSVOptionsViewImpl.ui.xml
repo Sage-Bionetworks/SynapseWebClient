@@ -7,7 +7,7 @@
 
 	<b:Panel>
 		<b:PanelBody>
-			<b:Form>
+			<bh:Div>
 				<b:FormGroup>
 					<b:FormLabel for="separator">Separator</b:FormLabel>
 					<b:Row>
@@ -28,7 +28,7 @@
 				<b:FormGroup>
 					<b:CheckBox ui:field="firstLineHeader">First line is the header</b:CheckBox>
 				</b:FormGroup>
-			</b:Form>
+			</bh:Div>
 			<b:Button ui:field="refreshButton" icon="REFRESH">Refresh preview</b:Button>
 		</b:PanelBody>
 	</b:Panel>

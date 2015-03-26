@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<b:Form>
+		<bh:Div>
 			<b:FieldSet>
 				<b:FormGroup>
 					<b:FormLabel for="query">Query</b:FormLabel>
@@ -18,7 +18,7 @@
 					<b:CheckBox ui:field="isRowVisibleField" text="Show row numbers"/>
 				</b:FormGroup>
 			</b:FieldSet>
-		</b:Form>
+		</bh:Div>
 		<b:Panel>
 			<b:PanelBody>
 				<g:SimplePanel ui:field="columnManagerContainer"/>
