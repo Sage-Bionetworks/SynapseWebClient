@@ -46,7 +46,7 @@
 				</b:Form>
 			</b:TabPane>
 			<b:TabPane b:id="tab3" addStyleNames="panel margin-top-15">
-				<b:Form>
+				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup>
 							<b:FormLabel for="url">Image file entity</b:FormLabel>
@@ -58,7 +58,7 @@
 							</b:InputGroup>
 						</b:FormGroup>
 					</b:FieldSet>
-				</b:Form>
+				</bh:Div>
 				<g:SimplePanel ui:field="synapseParamsPanelContainer" />
 			</b:TabPane>
 			<b:TabPane b:id="tab4" addStyleNames="panel margin-top-15">

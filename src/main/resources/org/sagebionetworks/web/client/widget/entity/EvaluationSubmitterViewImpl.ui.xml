@@ -11,7 +11,7 @@
 	  	<b:Modal title="Submit to Challenge"
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
 			<b:ModalBody>
-				<b:Form>
+				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup ui:field="entityFinderUI">
 							<b:FormGroup>
@@ -33,7 +33,7 @@
 							<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
 						</b:FormGroup>
 					</b:FieldSet>
-				</b:Form>
+				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
