@@ -12,7 +12,7 @@ public class WidgetDescriptorUpdatedEvent extends GwtEvent<WidgetDescriptorUpdat
 	private String name, oldName;
 	private EntityWrapper entityWrapper;
 	private boolean isDeleted;
-	private List<String> newFileHandleIds;
+	private List<String> newFileHandleIds, deletedFileHandleIds;
 	
 	//some entities might want to simply insert some constant text into the description instead of updating the attachments (external image will do this)
 	private String insertValue;
@@ -79,5 +79,11 @@ public class WidgetDescriptorUpdatedEvent extends GwtEvent<WidgetDescriptorUpdat
 	}
 	public void setNewFileHandleIds(List<String> newFileHandleIds) {
 		this.newFileHandleIds = newFileHandleIds;
+	}
+	public List<String> getDeletedFileHandleIds() {
+		return deletedFileHandleIds;
+	}
+	public void setDeletedFileHandleIds(List<String> deletedFileHandleIds) {
+		this.deletedFileHandleIds = deletedFileHandleIds;
 	}
 }

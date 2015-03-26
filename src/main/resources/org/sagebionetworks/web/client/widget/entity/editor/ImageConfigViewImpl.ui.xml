@@ -11,6 +11,7 @@
 			<b:TabListItem ui:field="uploadTabListItem" active="true" dataTarget="#tab1" text="Upload"/>
 			<b:TabListItem ui:field="externalTabListItem" dataTarget="#tab2" text="From the Web"/>
 			<b:TabListItem ui:field="synapseTabListItem" dataTarget="#tab3" text="From Synapse File"/>
+			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab4" text="From Attachments"/>
 		</b:NavTabs>
 		<b:TabContent>
 			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
@@ -59,6 +60,9 @@
 					</b:FieldSet>
 				</b:Form>
 				<g:SimplePanel ui:field="synapseParamsPanelContainer" />
+			</b:TabPane>
+			<b:TabPane b:id="tab4" addStyleNames="panel margin-top-15">
+				<g:SimplePanel ui:field="wikiAttachmentsContainer" />
 			</b:TabPane>
 			
 		</b:TabContent>

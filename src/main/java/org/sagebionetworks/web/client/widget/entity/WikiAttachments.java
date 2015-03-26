@@ -6,13 +6,9 @@ import java.util.List;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -30,12 +26,8 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	private NodeModelCreator nodeModelCreator;
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
-	private Callback callback;
-	
-	public interface Callback{
-		public void attachmentClicked(String fileName);
-		public void attachmentsToDelete(String fileName, List<String> fileHandleIds);
-	}
+	private List<String> toDeleteFileHandles;
+	private String selectedFilename;
 	
 	@Inject
 	public WikiAttachments(WikiAttachmentsView view, SynapseClientAsync synapseClient,
@@ -47,28 +39,18 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, Callback callback) {
+	public void configure(final WikiPageKey wikiKey) {
+		allFileHandles = null;
+		selectedFilename = null;
+		toDeleteFileHandles = new ArrayList<String>();
 		this.wikiKey = wikiKey;
-		if (callback == null) {
-			this.callback = new Callback() {
-				
-				@Override
-				public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
-				}
-				@Override
-				public void attachmentClicked(String fileName) {
-				}
-			};
-		}
-		else
-			this.callback = callback;	
 		synapseClient.getV2WikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String results) {
 				try {
 					FileHandleResults fileHandleResults = nodeModelCreator.createJSONEntity(results, FileHandleResults.class);
 					allFileHandles = fileHandleResults.getList();
-					view.configure(wikiKey, getWorkingSet(allFileHandles));
+					updateFileList();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -79,6 +61,18 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+	
+	public void updateFileList() {
+		List<FileHandle> workingSet = getWorkingSet(allFileHandles);
+		view.reset();
+		if (workingSet == null || workingSet.isEmpty()) {
+			view.showNoAttachmentRow();
+			selectedFilename = null;
+		} else {
+			view.addFileHandles(workingSet);
+			selectedFilename = workingSet.get(0).getFileName();
+		}
 	}
 	
 	private List<FileHandle> getWorkingSet(List<FileHandle> allFileHandles){
@@ -97,38 +91,38 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		return view.asWidget();
 	}
 	
+	public boolean isValid() {
+		return selectedFilename != null;
+	}
+	
+	@Override
+	public void setSelectedFilename(String fileName) {
+		selectedFilename = fileName;
+	}
+	
+	public String getSelectedFilename() {
+		return selectedFilename;
+	}
+	
+	public List<String> getFilesHandlesToDelete() {
+		return toDeleteFileHandles;
+	}
+	
 	@Override
 	public void deleteAttachment(final String fileName) {
 		if(fileName != null) {
 			List<FileHandle> attachmentsToDelete = new ArrayList<FileHandle>();
 			//find all file handles with this file name
 			for (FileHandle fileHandle : allFileHandles) {
-				if (fileHandle.getFileName().equals(fileName))
+				if (fileHandle.getFileName().equals(fileName)) {
 					attachmentsToDelete.add(fileHandle);
+					toDeleteFileHandles.add(fileHandle.getId());
+				}
 			}
 			allFileHandles.removeAll(attachmentsToDelete);
-			List<String> fileHandleIds = new ArrayList<String>();
-			for (FileHandle fileHandle : attachmentsToDelete) {
-				fileHandleIds.add(fileHandle.getId());
-			}
-			view.configure(wikiKey, getWorkingSet(allFileHandles));
-			if (fileHandleIds.size() > 0)
-				callback.attachmentsToDelete(fileName, fileHandleIds);
+			updateFileList();
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
 		}
 	}
-
-	@Override
-	public void attachmentClicked(final String fileName) {
-		if(fileName != null) {
-			callback.attachmentClicked(fileName);
-		}
-	}
-	
-	@Override
-	public void setAttachmentColumnWidth(int width) {
-		view.setAttachmentColumnWidth(width);
-	}
-
 }

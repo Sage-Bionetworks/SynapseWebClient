@@ -68,24 +68,6 @@ public class DisplayUtilsTest {
 	}
 	
 	@Test
-	public void testGetIcon(){
-		Map<String, String> expected = new HashMap<String, String>();
-		String compressed = 
-		expected.put("test.tar.GZ", DisplayUtils.DEFAULT_COMPRESSED_ICON);
-		expected.put("test.doc", DisplayUtils.DEFAULT_TEXT_ICON);
-		expected.put("test", DisplayUtils.UNKNOWN_ICON);
-		expected.put("test.", DisplayUtils.UNKNOWN_ICON);
-		expected.put("test.PDF", DisplayUtils.DEFAULT_PDF_ICON);
-		expected.put("test.Zip", DisplayUtils.DEFAULT_COMPRESSED_ICON);
-		expected.put("test.png", DisplayUtils.DEFAULT_IMAGE_ICON);
-		for(String fileName: expected.keySet()){
-			String expectedIcon = expected.get(fileName);
-			String icon = DisplayUtils.getAttachmentIcon(fileName);
-			assertEquals(expectedIcon, icon);
-		}
-	}
-	
-	@Test
 	public void testFixWikiLinks(){
 		String testHref = "Hello <a href=\"/wiki/HelloWorld.html\">World</a>";
 		String expectedHref = "Hello <a href=\"https://sagebionetworks.jira.com/wiki/HelloWorld.html\">World</a>";

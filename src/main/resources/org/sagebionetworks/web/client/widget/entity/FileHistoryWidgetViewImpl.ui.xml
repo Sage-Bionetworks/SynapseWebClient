@@ -12,6 +12,17 @@
 			</g:HTMLPanel>
 			<b:Panel ui:field="previousVersions" visible="false">
 				<t:Table addStyleNames="table table-condensed">
+					<t:THead>
+						<t:TableRow>
+							<t:TableHeader text="Label" />
+							<t:TableHeader text="Modified By" />
+							<t:TableHeader text="Modified On" />
+							<t:TableHeader text="Size" />
+							<t:TableHeader text="md5" />
+							<t:TableHeader text="Comment" />
+							<t:TableHeader text="" />
+						</t:TableRow>
+					</t:THead>
 					<t:TBody ui:field="previousVersionsTable"></t:TBody>
 				</t:Table>
 				<g:SimplePanel ui:field="paginationWidgetContainer" addStyleNames="margin-10" />

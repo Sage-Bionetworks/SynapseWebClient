@@ -121,6 +121,11 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 	}
 	
 	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return widgetDescriptorPresenter.getDeletedFileHandleIds();
+	}
+	
+	@Override
 	public void clear() {
 	}
 }

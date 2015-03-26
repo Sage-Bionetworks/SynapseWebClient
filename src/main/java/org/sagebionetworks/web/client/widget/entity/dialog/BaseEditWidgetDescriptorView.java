@@ -35,6 +35,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	public String getTextToInsert();
 	
 	public List<String> getNewFileHandleIds();
+	public List<String> getDeletedFileHandleIds();
 	
 	public interface Presenter {
 		
