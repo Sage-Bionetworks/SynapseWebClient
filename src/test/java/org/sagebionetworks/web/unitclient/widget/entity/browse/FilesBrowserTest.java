@@ -1,17 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-
-import static junit.framework.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -20,16 +19,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -45,7 +39,6 @@ public class FilesBrowserTest {
 	FilesBrowser filesBrowser;
 	CookieProvider mockCookies;
 	String configuredEntityId = "syn123";
-	EntityAccessRequirementsWidget mockAccessRequirementsWidget;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -54,12 +47,11 @@ public class FilesBrowserTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockAccessRequirementsWidget = mock(EntityAccessRequirementsWidget.class);
 		adapterFactory = new AdapterFactoryImpl();
 		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView, mockSynapseClient,
 				mockNodeModelCreator, adapterFactory,
-				mockGlobalApplicationState, mockAuthenticationController, mockCookies, mockAccessRequirementsWidget);
+				mockGlobalApplicationState, mockAuthenticationController, mockCookies);
 		verify(mockView).setPresenter(filesBrowser);
 		boolean isCertified = true;
 		boolean canCertifiedUserAddChild = true;
@@ -158,39 +150,16 @@ public class FilesBrowserTest {
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
 	}
 	
-
-	@Test
-	public void testUploadStep1ARsAccepted(){
-		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
-		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
-		CallbackP callback = arg.getValue();
-		callback.invoke(true);
-		//verify if accepted then it should continue (eventually showing the upload dialog)
-		verify(mockView).showUploadDialog(anyString());
-	}
-	
-	@Test
-	public void testUploadStep1ARsNotAccepted(){
-		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
-		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
-		CallbackP callback = arg.getValue();
-		callback.invoke(false);
-		//verify if not accepted then the upload dialog is not shown
-		verify(mockView, never()).showUploadDialog(anyString());
-	}
-	
 	@Test
 	public void testUploadStep2Certified(){
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
+		FilesBrowser.uploadButtonClicked(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
 		verify(mockView).showUploadDialog(anyString());
 	}
 	
 	@Test
 	public void testUploadStep2NotCertified(){
 		boolean isCertifiedUser = false;
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, isCertifiedUser);
+		FilesBrowser.uploadButtonClicked(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, isCertifiedUser);
 		verify(mockView).showQuizInfoDialog();
 	}
 	

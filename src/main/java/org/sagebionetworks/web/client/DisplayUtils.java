@@ -110,7 +110,6 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.widget.Window;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
@@ -713,12 +712,6 @@ public class DisplayUtils {
 		builder.appendEscaped(message);
 		builder.appendHtmlConstant("</div></div>");
 		return builder.toSafeHtml();
-	}
-	
-	public static void center(Window window) {
-		int left = (com.google.gwt.user.client.Window.getClientWidth() - window.getOffsetWidth()) / 2;
-		window.setPosition(left, 150);
-		scrollToTop();
 	}
 	
 	public static void scrollToTop(){

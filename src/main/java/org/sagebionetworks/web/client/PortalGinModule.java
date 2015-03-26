@@ -107,8 +107,6 @@ import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetView;
-import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
@@ -1042,7 +1040,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SharingAndDataUseConditionWidgetView.class).to(SharingAndDataUseConditionWidgetViewImpl.class);
 		
 		bind(WizardProgressWidgetView.class).to(WizardProgressWidgetViewImpl.class);
-		bind(EntityAccessRequirementsWidgetView.class).to(EntityAccessRequirementsWidgetViewImpl.class);
 		bind(UploadDialogWidgetView.class).to(UploadDialogWidgetViewImpl.class);
 		
 		bind(LoginModalView.class).to(LoginModalViewImpl.class);
