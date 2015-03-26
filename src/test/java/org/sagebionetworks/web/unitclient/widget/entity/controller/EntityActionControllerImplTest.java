@@ -198,6 +198,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureNoWiki(){
+		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, true);
@@ -208,7 +209,17 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureWiki(){
+		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId("7890");
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, false);
+	}
+	
+	@Test
+	public void testConfigureWikiNoWikiTable(){
+		entityBundle.setEntity(new TableEntity());
+		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, false);
 		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, false);
@@ -481,7 +492,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testIsSubmittableType(){
 		assertFalse(controller.isSubmittableType(new Project()));
-		assertTrue(controller.isSubmittableType(new TableEntity()));
+		assertFalse(controller.isSubmittableType(new TableEntity()));
 		assertTrue(controller.isSubmittableType(new FileEntity()));
 		assertFalse(controller.isSubmittableType(new Folder()));
 		assertFalse(controller.isSubmittableType(new Link()));

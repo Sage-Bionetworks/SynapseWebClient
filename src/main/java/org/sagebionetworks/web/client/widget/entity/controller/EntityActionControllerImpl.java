@@ -28,9 +28,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -149,7 +147,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureAddWiki(){
-		if(this.entityBundle.getRootWikiId() == null){
+		if(this.entityBundle.getRootWikiId() == null && isWikiableType(entityBundle.getEntity())){
 			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionText(Action.ADD_WIKI_PAGE, ADD_WIKI);
@@ -282,6 +280,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isSubmittableType(Entity entity){
+		if(entity instanceof TableEntity){
+			return false;
+		}
 		return entity instanceof Versionable;
 	}
 
