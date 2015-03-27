@@ -471,6 +471,10 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetView;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadViewImpl;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileInputView;
 import org.sagebionetworks.web.client.widget.upload.FileInputViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
@@ -783,6 +787,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
 		bind(FileInputWidget.class).to(FileInputWidgetImpl.class);
 		bind(FileInputView.class).to(FileInputViewImpl.class);
+		
+		bind(FileHandleUploadView.class).to(FileHandleUploadViewImpl.class);
+		bind(FileHandleUploadWidget.class).to(FileHandleUploadWidgetImpl.class);
 
 		// LocationableUploader
 		bind(UploaderView.class).to(UploaderViewImpl.class);
