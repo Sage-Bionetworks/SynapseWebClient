@@ -5,7 +5,7 @@
 	<ShortName>Synapse</ShortName>
 	<Description>Search Synapse</Description>
 	<Url method="GET" type="text/html"
-		template="https://www.synapse.org/%23%21Search:{searchTerms}" />
+		template="https://www.synapse.org/#!Search:{searchTerms}" />
 	<Image height="16" width="16" type="image/vnd.microsoft.icon">https://www.synapse.org/favicon.ico</Image>
 	<OutputEncoding>UTF-8</OutputEncoding>
 	<InputEncoding>UTF-8</InputEncoding>
