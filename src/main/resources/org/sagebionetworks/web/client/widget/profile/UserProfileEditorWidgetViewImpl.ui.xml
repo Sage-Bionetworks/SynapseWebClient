@@ -18,15 +18,6 @@
 					<b:Column size="XS_8">
 						<g:SimplePanel ui:field="fileInputWidgetPanel" />
 					</b:Column>
-					<b:Column size="XS_4">
-						<b:Button ui:field="uploadFileButton" type="INFO"
-							dataLoadingText="Uploading...">Upload</b:Button>
-					</b:Column>
-				</b:Row>
-				<b:Row>
-					<b:Column size="XS_8">
-						<b:Alert ui:field="uploadAlert" type="DANGER" visible="false" />
-					</b:Column>
 				</b:Row>
 			</b:Column>
 		</b:Row>

@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
@@ -28,7 +29,7 @@ public class UserProfileEditorWidgetImplTest {
 	
 	UserProfileEditorWidgetView mockView;
 	ProfileImageWidget mockImageWidget;
-	FileInputWidget mockFileInputWidget;
+	FileHandleUploadWidget mockfileHandleUploadWidget;
 	UserProfileEditorWidgetImpl widget;
 	
 	UserProfile profile;
@@ -37,8 +38,8 @@ public class UserProfileEditorWidgetImplTest {
 	public void before(){
 		mockView = Mockito.mock(UserProfileEditorWidgetView.class);
 		mockImageWidget = Mockito.mock(ProfileImageWidget.class);
-		mockFileInputWidget = Mockito.mock(FileInputWidget.class);
-		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockFileInputWidget);
+		mockfileHandleUploadWidget = Mockito.mock(FileHandleUploadWidget.class);
+		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget);
 		
 		profile = new UserProfile();
 		profile.setOwnerId("123");
@@ -59,7 +60,6 @@ public class UserProfileEditorWidgetImplTest {
 	public void testConfigure(){
 		widget.configure(profile);
 		verify(mockView).hideLinkError();
-		verify(mockView).hideUploadError();
 		verify(mockView).hideUsernameError();
 		verify(mockView).setFirstName(profile.getFirstName());
 		verify(mockView).setLastName(profile.getLastName());
@@ -87,7 +87,6 @@ public class UserProfileEditorWidgetImplTest {
 		when(mockView.getUsername()).thenReturn("valid");
 		assertTrue(widget.isValid());
 		verify(mockView).hideLinkError();
-		verify(mockView).hideUploadError();
 		verify(mockView).hideUsernameError();
 	}
 	
@@ -98,7 +97,6 @@ public class UserProfileEditorWidgetImplTest {
 		when(mockView.getUsername()).thenReturn("12");
 		assertFalse(widget.isValid());
 		verify(mockView).hideLinkError();
-		verify(mockView).hideUploadError();
 		verify(mockView).hideUsernameError();
 		verify(mockView).showUsernameError(UserProfileEditorWidgetImpl.MUST_BE_AT_LEAST_3_CHARACTERS);
 	}
@@ -110,78 +108,32 @@ public class UserProfileEditorWidgetImplTest {
 		when(mockView.getUsername()).thenReturn("ABC@");
 		assertFalse(widget.isValid());
 		verify(mockView).hideLinkError();
-		verify(mockView).hideUploadError();
 		verify(mockView).hideUsernameError();
 		verify(mockView).showUsernameError(UserProfileEditorWidgetImpl.CAN_ONLY_INCLUDE);
 	}
 	
-	@Test
-	public void testIsValidFileSelected(){
-		widget.configure(profile);
-		reset(mockView);
-		when(mockView.getUsername()).thenReturn("valid");
-		// select a file
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("foo.bar", "text/plain")});
-		assertFalse(widget.isValid());
-		verify(mockView).hideLinkError();
-		verify(mockView).hideUploadError();
-		verify(mockView).hideUsernameError();
-		verify(mockView).showUploadError(UserProfileEditorWidgetImpl.FILE_WAS_SELECTED_BUT_NOT_UPLOADED);
-	}
 	
-	@Test
-	public void testOnUploadFileNothingSelected(){
-		widget.configure(profile);
-		reset(mockView);
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(null);
-		widget.onUploadFile();
-		verify(mockView).showUploadError(UserProfileEditorWidgetImpl.PLEASE_SELECT_A_FILE);
-		verify(mockView, never()).setUploading(anyBoolean());
-	}
 	
-	@Test
-	public void testOnUploadFile(){
-		widget.configure(profile);
-		reset(mockView);
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("foo.bar", "text/plain")});
-		final String fileHandleId = "9999";
-		doAnswer(new Answer<Void>() {
-	        public Void answer(InvocationOnMock invocation) {
-	        	FileUploadHandler handler = (FileUploadHandler) invocation.getArguments()[0];
-	        	handler.uploadSuccess(fileHandleId);
-	            return null;
-	        }
-	    }).when(mockFileInputWidget).uploadSelectedFile(any(FileUploadHandler.class));
-		widget.onUploadFile();
-		verify(mockView, never()).showUploadError(anyString());
-		// Loading start
-		verify(mockView).setUploading(true);
-		verify(mockView).setUploading(false);
-		verify(mockImageWidget).configure(fileHandleId);
-		verify(mockFileInputWidget).reset();
-	}
+//	@Test
+//	public void testOnUploadFile(){
+//		widget.configure(profile);
+//		reset(mockView);
+//		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("foo.bar", "text/plain")});
+//		final String fileHandleId = "9999";
+//		doAnswer(new Answer<Void>() {
+//	        public Void answer(InvocationOnMock invocation) {
+//	        	FileUploadHandler handler = (FileUploadHandler) invocation.getArguments()[0];
+//	        	handler.uploadSuccess(fileHandleId);
+//	            return null;
+//	        }
+//	    }).when(mockFileInputWidget).uploadSelectedFile(any(FileUploadHandler.class));
+//		widget.onUploadFile();
+//		verify(mockView, never()).showUploadError(anyString());
+//		// Loading start
+//		verify(mockView).setUploading(true);
+//		verify(mockView).setUploading(false);
+//		verify(mockImageWidget).configure(fileHandleId);
+//		verify(mockFileInputWidget).reset();
+//	}
 	
-	@Test
-	public void testOnUploadFileFailed(){
-		widget.configure(profile);
-		reset(mockView);
-		reset(mockImageWidget);
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("foo.bar", "text/plain")});
-		final String error = "An error";
-		doAnswer(new Answer<Void>() {
-	        public Void answer(InvocationOnMock invocation) {
-	        	FileUploadHandler handler = (FileUploadHandler) invocation.getArguments()[0];
-	        	handler.uploadFailed(error);
-	            return null;
-	        }
-	    }).when(mockFileInputWidget).uploadSelectedFile(any(FileUploadHandler.class));
-		widget.onUploadFile();
-		// Loading start
-		verify(mockView).setUploading(true);
-		verify(mockView).setUploading(false);
-		verify(mockImageWidget, never()).configure(anyString());
-		verify(mockFileInputWidget, never()).reset();
-		verify(mockView).showUploadError(error);
-	}
-
 }

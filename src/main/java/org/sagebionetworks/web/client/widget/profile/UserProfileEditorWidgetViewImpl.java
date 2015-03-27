@@ -27,10 +27,6 @@ public class UserProfileEditorWidgetViewImpl implements
 	@UiField
 	SimplePanel fileInputWidgetPanel;
 	@UiField
-	Alert uploadAlert;
-	@UiField
-	Button uploadFileButton;
-	@UiField
 	FormGroup usernameFormGroup;
 	@UiField
 	HelpBlock usernameHelpBlock;	
@@ -133,32 +129,7 @@ public class UserProfileEditorWidgetViewImpl implements
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		uploadFileButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onUploadFile();
-			}
-		});
-	}
 
-	@Override
-	public void showUploadError(String string) {
-		uploadAlert.setText(string);
-		uploadAlert.setVisible(true);
-	}
-
-	@Override
-	public void hideUploadError() {
-		uploadAlert.setVisible(false);
-	}
-
-	@Override
-	public void setUploading(boolean uploading) {
-		if(uploading){
-			uploadFileButton.state().loading(); 
-		}else{
-			uploadFileButton.state().reset(); 
-		}
 	}
 
 	@Override
