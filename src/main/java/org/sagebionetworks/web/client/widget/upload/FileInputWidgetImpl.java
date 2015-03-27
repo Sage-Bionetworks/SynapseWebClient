@@ -8,7 +8,9 @@ import com.google.inject.Inject;
  * 
  * @author jhill
  *
+ *
  */
+@Deprecated // Use org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget
 public class FileInputWidgetImpl implements FileInputWidget,
 		FileInputView.Presenter {
 
