@@ -176,8 +176,9 @@ public class QueryResultEditorWidget implements
 		setJobRunning(true);
 		AppendableRowSetRequest request = new AppendableRowSetRequest();
 		request.setToAppend(prs);
+		request.setEntityId(this.tableId);
 		editJobTrackingWidget.startAndTrackJob("Applying changes...", false,
-				AsynchType.TableAppendRowSet, request, this.tableId,
+				AsynchType.TableAppendRowSet, request,
 				new AsynchronousProgressHandler() {
 
 					@Override

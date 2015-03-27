@@ -133,7 +133,7 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 				.getCurrentOptions();
 		// Start the job
 		jobTrackingWidget.startAndTrackJob(ANALYZING_FILE, false,
-				AsynchType.TableCSVUploadPreview, previewRequest, this.tableId,
+				AsynchType.TableCSVUploadPreview, previewRequest,
 				new AsynchronousProgressHandler() {
 
 					@Override
