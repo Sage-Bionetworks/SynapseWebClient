@@ -31,8 +31,6 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setSaving(boolean isSaving);
 	
 	void setDeleteVisible(boolean visible);
-	
-	public void setAttachmentsButtonVisible(boolean visible);
 	public void setAttachmentCommandsVisible(boolean visible);
 	void setSaveVisible(boolean visible);
 	void setCancelVisible(boolean visible);

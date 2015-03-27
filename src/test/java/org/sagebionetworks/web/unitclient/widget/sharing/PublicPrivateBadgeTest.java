@@ -71,7 +71,7 @@ public class PublicPrivateBadgeTest {
 		publicPrincipalIds=new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		EntityBundle transport = new EntityBundle();
-		transport.setAcl(acl);
+		transport.setBenefactorAcl(acl);
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(publicPrincipalIds).when(mockUserService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		DisplayUtils.publicPrincipalIds = null;

@@ -543,8 +543,11 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetNodeAcl() throws Exception {
-		AccessControlList clone = synapseClient.getNodeAcl("syn101");
+	public void testGetEntityBenefactorAcl() throws Exception {
+		EntityBundle bundle = new EntityBundle();
+		bundle.setBenefactorAcl(acl);
+		when(mockSynapse.getEntityBundle("syn101", EntityBundle.BENEFACTOR_ACL)).thenReturn(bundle);
+		AccessControlList clone = synapseClient.getEntityBenefactorAcl("syn101");
 		assertEquals(acl, clone);
 	}
 	
@@ -569,6 +572,9 @@ public class SynapseClientImplTest {
 
 	@Test
 	public void testDeleteAcl() throws Exception {
+		EntityBundle bundle = new EntityBundle();
+		bundle.setBenefactorAcl(acl);
+		when(mockSynapse.getEntityBundle("syn101", EntityBundle.BENEFACTOR_ACL)).thenReturn(bundle);
 		AccessControlList clone = synapseClient.deleteAcl("syn101");
 		assertEquals(acl, clone);
 	}

@@ -41,6 +41,8 @@ public class LoginWidgetViewImpl extends Composite implements
 	Anchor forgotPasswordLink;
 	@UiField
 	Button registerBtn;
+	@UiField
+	org.gwtbootstrap3.client.ui.Button googleSignInButton;
 	
 	PasswordTextBox password = null;
 	TextBox username = null;
@@ -72,6 +74,15 @@ public class LoginWidgetViewImpl extends Composite implements
 				presenter.goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
+		
+		googleSignInButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0", "_self", "");
+			}
+		});
+		
 		
 		username = TextBox.wrap(DOM.getElementById("synapse_username"));
 	    username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);

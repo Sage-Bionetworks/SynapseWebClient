@@ -16,8 +16,6 @@ import com.google.inject.Inject;
  * Render entity annotations
  */
 public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.Presenter, IsWidget {
-
-	
 	private EntityBundle bundle;
 	private AnnotationsRendererWidgetView view;
 	private AnnotationTransformer annotationTransformer;

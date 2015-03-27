@@ -106,7 +106,6 @@
 			<b:Column size="SM_6">
 			    <bh:Div styleName="margin-right-3-buttons margin-top-5">
 				    <b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." >Save</b:Button>
-					<b:Button ui:field="attachmentsButton" >Attachments</b:Button>    
 					<b:Button ui:field="previewButton"  >Preview</b:Button>    
 			    </bh:Div>
 			</b:Column>

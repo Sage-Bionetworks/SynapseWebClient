@@ -144,13 +144,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		hasChangesHandler.hasChanges(false);
 		
-		int partsMask = EntityBundle.ACL | EntityBundle.PERMISSIONS;
+		int partsMask = EntityBundle.BENEFACTOR_ACL | EntityBundle.PERMISSIONS;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				try {
 					// retrieve ACL and user entity permissions from bundle
-					acl = bundle.getAcl();
+					acl = bundle.getBenefactorAcl();
 					uep = bundle.getPermissions();
 					//initialize original principal id set
 					originalPrincipalIdSet = new HashSet<String>();
@@ -354,7 +354,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			return;
 		}		
 		// Fetch parent's benefactor's ACL (candidate benefactor for this entity)
-		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
+		synapseClient.getEntityBenefactorAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
 				try {
@@ -510,7 +510,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED + ": " + caught.getMessage());
 			}
 		});
 	}

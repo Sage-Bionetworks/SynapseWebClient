@@ -62,8 +62,6 @@ public class ClientProperties {
 	public static final String ERROR_OBJ_REASON_KEY = "reason";
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
-	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
-	public static final int FULL_ENTITY_TOP_MARGIN_PX = 250;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
 	public static final int MARKDOWN_WIDTH_WIDE_PX = 940;
 	public static final int MARKDOWN_WIDTH_NARROW_PX = 660;

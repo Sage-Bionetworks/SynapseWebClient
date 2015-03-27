@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +39,11 @@ public class WikiAttachmentsTest {
 	WikiAttachmentsView mockView;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
-	String testFileName ="a file";
+	String testFileName1 = "testfilename.jpg";
+	String testFileName2 ="a file";
 	String testFileId = "13";
+	List<FileHandle> handles;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -50,12 +55,12 @@ public class WikiAttachmentsTest {
 		
 		FileHandleResults testResults = new FileHandleResults();
 		FileHandle testHandle = new S3FileHandle();
-		testHandle.setFileName("testfilename.jpg");
+		testHandle.setFileName(testFileName1);
 		testHandle.setId("12");
-		List<FileHandle> handles = new ArrayList<FileHandle>();
+		handles = new ArrayList<FileHandle>();
 		handles.add(testHandle);
 		FileHandle testHandle2 = new S3FileHandle();
-		testHandle2.setFileName(testFileName);
+		testHandle2.setFileName(testFileName2);
 		testHandle2.setId(testFileId);
 		handles.add(testHandle2);
 		testResults.setList(handles);
@@ -69,22 +74,43 @@ public class WikiAttachmentsTest {
 
 	@Test
 	public void testConfigure() {
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
-		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
+		verify(mockView).reset();
+		verify(mockView).addFileHandles(anyList());
+		
+		//first item is selected by default
+		assertTrue(presenter.isValid());
+		presenter.setSelectedFilename(null);
+		assertFalse(presenter.isValid());
 	}
+	
 	
 	@Test
 	public void testConfigureFail() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testDelete(){
-		WikiAttachments.Callback callback = Mockito.mock(WikiAttachments.Callback.class);
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), callback);
-		presenter.deleteAttachment(testFileName);
-		verify(callback).attachmentsToDelete(eq(testFileName), eq(Arrays.asList(testFileId)));
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
+
+		//first item is selected by default
+		assertTrue(presenter.isValid());
+
+		presenter.deleteAttachment(testFileName2);
+		assertEquals(Arrays.asList(testFileId), presenter.getFilesHandlesToDelete());
+		
+		assertTrue(presenter.isValid());
+	}
+	
+	@Test
+	public void testNoAttachments(){
+		handles.clear();
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""));
+		verify(mockView).reset();
+		verify(mockView).showNoAttachmentRow();
+		assertNull(presenter.getSelectedFilename());
 	}
 }

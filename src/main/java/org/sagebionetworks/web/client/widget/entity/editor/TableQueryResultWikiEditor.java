@@ -58,7 +58,10 @@ public class TableQueryResultWikiEditor implements TableQueryResultWikiView.Pres
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
-	
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

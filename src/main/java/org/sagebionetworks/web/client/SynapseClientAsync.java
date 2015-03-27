@@ -133,7 +133,7 @@ public interface SynapseClientAsync {
 	
 	void setNotificationEmail(String email, AsyncCallback<Void> callback);
 	
-	public void getNodeAcl(String id, AsyncCallback<AccessControlList> callback);
+	public void getEntityBenefactorAcl(String id, AsyncCallback<AccessControlList> callback);
 	
 	public void createAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
 	

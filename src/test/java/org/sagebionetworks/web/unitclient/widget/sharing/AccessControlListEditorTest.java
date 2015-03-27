@@ -129,7 +129,7 @@ public class AccessControlListEditorTest {
 	private static EntityBundle createEBT(AccessControlList acl, UserEntityPermissions uep) {
 		try {
 			EntityBundle ebt = new EntityBundle();
-			ebt.setAcl(acl);
+			ebt.setBenefactorAcl(acl);
 			ebt.setPermissions(uep);
 			return ebt;
 		} catch (Exception e) {
@@ -419,7 +419,7 @@ public class AccessControlListEditorTest {
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).getNodeAcl(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
 		
 		// update
 		acle.refresh();

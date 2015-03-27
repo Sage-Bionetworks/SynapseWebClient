@@ -881,20 +881,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public AccessControlList getAcl(String id) throws SynapseException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		EntityHeader benefactor = synapseClient.getEntityBenefactor(id);
-		String benefactorId = benefactor.getId();
-		return synapseClient.getACL(benefactorId);
+	public AccessControlList getBenefactorAcl(String id) throws RestServiceException {
+		EntityBundle bundle = getEntityBundle(id, EntityBundle.BENEFACTOR_ACL);
+		return bundle.getBenefactorAcl();
 	}
 
 	@Override
-	public AccessControlList getNodeAcl(String id) throws RestServiceException {
-		try {
-			return getAcl(id);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
+	public AccessControlList getEntityBenefactorAcl(String id) throws RestServiceException {
+		return getBenefactorAcl(id);
 	}
 
 	@Override
@@ -934,7 +928,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			synapseClient.deleteACL(ownerEntityId);
 			// now get the ACL governing this entity, which will be some
 			// ancestor, the 'permissions benefactor'
-			return getAcl(ownerEntityId);
+			return getBenefactorAcl(ownerEntityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
