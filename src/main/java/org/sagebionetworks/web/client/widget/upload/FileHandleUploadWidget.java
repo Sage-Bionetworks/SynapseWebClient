@@ -13,7 +13,7 @@ public interface FileHandleUploadWidget extends IsWidget{
 
 	/**
 	 * Configure the widget before using.
-	 * @param callback Will be called with a file handle Id if the user successfully uploads a file.
+	 * @param callback Will be called with the uploaded fileHandleId if the user successfully uploads a file.
 	 */
 	public void configure(String buttonText, CallbackP<String> callback);
 }
