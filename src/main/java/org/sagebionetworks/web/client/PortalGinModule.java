@@ -480,7 +480,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
 
-import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -710,9 +709,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// The ImagePrototySingleton should be...well a singleton
 		bind(ImagePrototypeSingleton.class).in(Singleton.class);
-		
-		// ClientBundle for Custom widgets
-		bind(CustomWidgetImageBundle.class).in(Singleton.class);
 		
 		// The runtime provider
 		bind(CellTableProvider.class).to(CellTableProviderImpl.class);

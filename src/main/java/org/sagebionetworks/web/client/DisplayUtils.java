@@ -1091,21 +1091,6 @@ public class DisplayUtils {
 		ImageResource icon = null;
 		if(Link.class.getName().equals(className)) {
 			icon = iconsImageBundle.synapseLink16();
-		} else if(Analysis.class.getName().equals(className)) {
-			// Analysis
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseAnalysis16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseAnalysis24();			
-		} else if(Code.class.getName().equals(className)) {
-			// Code
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
-		} else if(Data.class.getName().equals(className) ||
-				ExpressionData.class.getName().equals(className) ||
-				GenotypeData.class.getName().equals(className) ||
-				PhenotypeData.class.getName().equals(className)) {
-			// Data
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
@@ -1118,26 +1103,6 @@ public class DisplayUtils {
 			// Project
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseProject24();			
-		} else if(RObject.class.getName().equals(className)) {
-			// RObject
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseRObject16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseRObject24();			
-		} else if(Summary.class.getName().equals(className)) {
-			// Summary
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseSummary16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseSummary24();			
-		} else if(Step.class.getName().equals(className)) {
-			// Step
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStep16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStep24();			
-		} else if(Study.class.getName().equals(className)) {
-			// Study
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();
-		} else if(Page.class.getName().equals(className)) {
-			// Page
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
