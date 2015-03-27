@@ -13,9 +13,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -33,7 +31,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	CookieProvider cookies;
-	EntityAccessRequirementsWidget accessRequirementsWidget;
 	boolean isCertifiedUser,canCertifiedUserAddChild;
 	private String currentFolderEntityId;
 	
@@ -44,8 +41,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			AdapterFactory adapterFactory,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			CookieProvider cookies,
-			EntityAccessRequirementsWidget accessRequirementsWidget) {
+			CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -53,7 +49,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
-		this.accessRequirementsWidget = accessRequirementsWidget;
 		view.setPresenter(this);
 	}	
 	
@@ -88,25 +83,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, authenticationController, isCertifiedUser);
-	}
-	
-	//any access requirements to accept?
-	public static void uploadButtonClickedStep1(
-			EntityAccessRequirementsWidget accessRequirementsWidget, 
-			final String entityId, 
-			final UploadView view,
-			final SynapseClientAsync synapseClient,
-			final AuthenticationController authenticationController,
-			final boolean isCertifiedUser) {
-		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean accepted) {
-				if (accepted)
-					uploadButtonClickedStep2(entityId, view, synapseClient, authenticationController, isCertifiedUser);
-			}
-		};
-		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
+		uploadButtonClicked(configuredEntityId, view, synapseClient, authenticationController, isCertifiedUser);
 	}
 
 	/**
@@ -120,7 +97,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	 * @param authenticationController
 	 * @param isCertificationRequired
 	 */
-	public static void uploadButtonClickedStep2(
+	public static void uploadButtonClicked(
 			final String entityId, 
 			final UploadView view,
 			SynapseClientAsync synapseClient,
