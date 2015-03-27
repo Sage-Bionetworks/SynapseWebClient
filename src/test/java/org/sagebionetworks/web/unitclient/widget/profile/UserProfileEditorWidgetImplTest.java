@@ -112,28 +112,4 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).showUsernameError(UserProfileEditorWidgetImpl.CAN_ONLY_INCLUDE);
 	}
 	
-	
-	
-//	@Test
-//	public void testOnUploadFile(){
-//		widget.configure(profile);
-//		reset(mockView);
-//		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("foo.bar", "text/plain")});
-//		final String fileHandleId = "9999";
-//		doAnswer(new Answer<Void>() {
-//	        public Void answer(InvocationOnMock invocation) {
-//	        	FileUploadHandler handler = (FileUploadHandler) invocation.getArguments()[0];
-//	        	handler.uploadSuccess(fileHandleId);
-//	            return null;
-//	        }
-//	    }).when(mockFileInputWidget).uploadSelectedFile(any(FileUploadHandler.class));
-//		widget.onUploadFile();
-//		verify(mockView, never()).showUploadError(anyString());
-//		// Loading start
-//		verify(mockView).setUploading(true);
-//		verify(mockView).setUploading(false);
-//		verify(mockImageWidget).configure(fileHandleId);
-//		verify(mockFileInputWidget).reset();
-//	}
-	
 }
