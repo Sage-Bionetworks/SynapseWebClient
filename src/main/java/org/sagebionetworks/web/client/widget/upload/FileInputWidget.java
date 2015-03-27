@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jhill
  *
  */
+@Deprecated // Use org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget
 public interface FileInputWidget extends IsWidget {
 	
 	

@@ -40,8 +40,9 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 		view.setTrackerVisible(true);
 		
 		DownloadFromTableRequest request = getDownloadFromTableRequest();
+		request.setEntityId(this.tableId);
 		
-		this.jobTrackingWidget.startAndTrackJob(CREATING_THE_FILE, false, AsynchType.TableCSVDownload, request, tableId, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob(CREATING_THE_FILE, false, AsynchType.TableCSVDownload, request, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {

@@ -328,10 +328,9 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId,
-			AsyncCallback<String> callback);
+	void startAsynchJob(AsynchType type, AsynchronousRequestBody body, AsyncCallback<String> callback);
 
-	void getAsynchJobResults(AsynchType type, String jobId, String tableId,
+	void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
 	void executeEntityQuery(EntityQuery query,

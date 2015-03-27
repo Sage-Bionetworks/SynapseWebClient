@@ -1,45 +1,49 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import org.sagebionetworks.web.client.utils.CallbackP;
+
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-/**
- * All business logic for this widget can be found here.
- * 
- * @author jhill
- *
- *
- */
-@Deprecated // Use org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget
-public class FileInputWidgetImpl implements FileInputWidget,
-		FileInputView.Presenter {
+public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  FileHandleUploadView.Presenter {
 
-	FileInputView view;
-	MultipartUploader multipartUploader;
-	FileUploadHandler handler;
+	private FileHandleUploadView view;
+	private MultipartUploader multipartUploader;
+	private CallbackP<String> callback;
 	
 	@Inject
-	public FileInputWidgetImpl(FileInputView view,
-			MultipartUploader multipartUploader) {
+	public FileHandleUploadWidgetImpl(FileHandleUploadView view, MultipartUploader multipartUploader) {
+		super();
 		this.view = view;
-		this.view.setPresenter(this);
 		this.multipartUploader = multipartUploader;
+		this.view.setPresenter(this);
 	}
 
 	@Override
 	public Widget asWidget() {
-		return view.asWidget();
+		return this.view.asWidget();
 	}
 
+
 	@Override
-	public void uploadSelectedFile(final FileUploadHandler handler) {
-		this.handler = handler;
+	public void configure(String buttonText, CallbackP<String> callback) {
+		this.callback = callback;
+		view.showProgress(false);
+		view.hideError();
+		view.setButtonText(buttonText);
+	}
+
+
+	@Override
+	public void onFileSelected() {
 		view.updateProgress(1, "1%");
 		view.showProgress(true);
 		view.setInputEnabled(false);
+		view.hideError();
 		doMultipartUpload();
 	}
 
+	
 	private void doMultipartUpload() {
 		// The uploader does the real work
 		multipartUploader.uploadSelectedFile(view.getInputId(),
@@ -48,14 +52,16 @@ public class FileInputWidgetImpl implements FileInputWidget,
 					public void uploadSuccess(String fileHandleId) {
 						// Set the view at 100%
 						view.updateProgress(100, "100%");
-						handler.uploadSuccess(fileHandleId);
+						view.showProgress(false);
+						view.setInputEnabled(true);
+						callback.invoke(fileHandleId);
 					}
 
 					@Override
 					public void uploadFailed(String error) {
 						view.showProgress(false);
 						view.setInputEnabled(true);
-						handler.uploadFailed(error);
+						view.showError(error);
 					}
 
 					@Override
@@ -65,17 +71,4 @@ public class FileInputWidgetImpl implements FileInputWidget,
 					}
 				});
 	}
-
-	@Override
-	public void reset() {
-		view.showProgress(false);
-		view.setInputEnabled(true);
-		view.resetForm();
-	}
-
-	@Override
-	public FileMetadata[] getSelectedFileMetadata() {
-		return this.multipartUploader.getSelectedFileMetadata(view.getInputId());
-	}
-
 }
