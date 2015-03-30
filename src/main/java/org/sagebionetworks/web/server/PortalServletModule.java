@@ -58,10 +58,9 @@ import com.google.inject.servlet.ServletModule;
 public class PortalServletModule extends ServletModule {
 	
 	private static Logger logger = Logger.getLogger(PortalServletModule.class.getName());
-	private boolean debugRpcInitialized = false;
+	
 	@Override
 	protected void configureServlets() {
-		debugCopyCodeServerRPCPolicies();
 //		// This is not working yet
 //		filter("/Portal/*").through(SimpleAuthFilter.class);
 //		bind(SimpleAuthFilter.class).in(Singleton.class);
@@ -161,39 +160,6 @@ public class PortalServletModule extends ServletModule {
 		
 		// JSONObjectAdapter
 		bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
-	}
-	
-	private void debugCopyCodeServerRPCPolicies() {
-		try {
-			String gwtCodeServerPort = System.getProperty("gwt.codeserver.port");
-			if (!debugRpcInitialized && gwtCodeServerPort != null && gwtCodeServerPort.trim().length() > 0) { 
-				//until we upgrade to gwt 2.6 or later, we need to manually copy the gwt.rpc files to the Portal directory.
-				String targetDir = System.getProperty("user.dir") + "/Portal/";
-				new File(targetDir).mkdirs();
-				WebClient webClient = new WebClient();
-				String rootPage = "http://127.0.0.1:"+gwtCodeServerPort+"/Portal/";
-				HtmlPage page = webClient.getPage(rootPage);
-				final List<?> anchors = page.getByXPath("//a");
-				for (Object object : anchors) {
-					HtmlAnchor anchor = (HtmlAnchor)object;
-					String href = anchor.getHrefAttribute();
-					if (href.endsWith("gwt.rpc")) {
-						//now copy gwt.rpc file to the target directory!
-						URL website = new URL(rootPage + href);
-						ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-						FileOutputStream fos = new FileOutputStream(targetDir + href);
-						fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-						fos.close();
-					}
-				}
-				
-				debugRpcInitialized = true;
-				webClient.closeAllWindows();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	
 	}
 	
 	/**
