@@ -76,7 +76,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
 		qbr.setQuery(this.startingQuery);
-		qbr.setEntityId(QueryBundleUtils.getTableId(this.bundle));
+		qbr.setEntityId(QueryBundleUtils.getTableId(this.startingQuery));
 		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			
 			@Override
