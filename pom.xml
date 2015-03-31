@@ -26,6 +26,7 @@
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.0-beta8</log4j.version>
 		<gwtboostrap3.version>0.8.7-gwt-2.5.1</gwtboostrap3.version>
+		<asm.version>5.0.3</asm.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -265,7 +266,11 @@
 	</build>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>${asm.version}</version>
+		</dependency>
 		<!-- Provides light-weight GWT wrappers for boostrap support
 			Currently, using a modified (forked from the origial) of this
 			libray to support gwt 2.5.1 as the origial libary requires 2.6+.
