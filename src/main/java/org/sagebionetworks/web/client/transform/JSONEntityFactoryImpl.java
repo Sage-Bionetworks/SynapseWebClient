@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.transform;
 
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityInstanceFactory;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -18,13 +19,14 @@ import com.google.inject.Inject;
 public class JSONEntityFactoryImpl implements JSONEntityFactory {
 	// This factory allows the creation of new class instances using only the class name.
 	// Since reflection is not allowed in GWT, it uses an auto-generated swtich.
-	AutoGenFactory internalFactory;
+	AutoGenFactory internalFactory = null;
+	EntityInstanceFactory entityInstanceFactory;
 	// This factory creates any needed adapters
 	AdapterFactory adapterFactory;
 	
 	@Inject
 	public JSONEntityFactoryImpl(AdapterFactory adapterFactory){
-		internalFactory = new AutoGenFactory();
+		entityInstanceFactory = new EntityInstanceFactory();
 		this.adapterFactory = adapterFactory;
 	}
 
@@ -51,13 +53,20 @@ public class JSONEntityFactoryImpl implements JSONEntityFactory {
 		if(json == null) throw new IllegalArgumentException("Json string cannot be null");
 		if(className == null) throw new IllegalArgumentException("Classname cannot be null");
 		// Use the factory to create the instance
-		JSONEntity entity = this.internalFactory.newInstance(className);
+		JSONEntity entity = this.newInstance(className);
 		return initializeEntity(json, entity);
 	}
 	
 	@Override
 	public JSONEntity newInstance(String className) {
-		return this.internalFactory.newInstance(className);
+		try {
+			return entityInstanceFactory.newInstance(className);
+		} catch (Exception e) {
+			//not found in entity instance factory, try the full autogen factory (lazy construction)
+			if (internalFactory == null)
+				internalFactory = new AutoGenFactory();
+			return internalFactory.newInstance(className);	
+		}
 	}
 
 	/**
@@ -90,7 +99,7 @@ public class JSONEntityFactoryImpl implements JSONEntityFactory {
 		if(!adapter.has("entityType")) throw new IllegalArgumentException("Cannot determine the entity type because the 'entityType' is null");
 		String entityType = adapter.getString("entityType");
 		// create a new isntance
-		Entity entity = (Entity) internalFactory.newInstance(entityType);
+		Entity entity = (Entity) newInstance(entityType);
 		entity.initializeFromJSONObject(adapter);
 		return entity;
 	}

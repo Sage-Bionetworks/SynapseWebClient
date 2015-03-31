@@ -39,7 +39,6 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
-
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -57,14 +56,12 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
-import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -183,15 +180,6 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and description for a special user or group
-	 * @param name of user or group
-	 * @return
-	 */
-	public static String getUserNameDescriptionHtml(String name, String description) {
-		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
-	}
-	
-	/**
 	 * Returns an HTML String of the suggestion of the user/group associated with the given header.
 	 * @param header header of the displayed usergroup.
 	 * @param width css style width of the created element (e.g. "150px", "3em")
@@ -222,19 +210,6 @@ public class DisplayUtils {
 		result.append("</div>");
 		return result.toString();
 	}
-	
-	
-	/**
-	 * Returns html for a thumbnail image.
-	 * 
-	 * @param url
-	 * @return
-	 */
-	public static String getThumbnailPicHtml(String url) {
-		if(url == null) return null;
-		return DisplayUtilsGWT.TEMPLATES.profilePicture(url).asString();
-	}
-
 	
 	/**
 	 * Converts all hrefs to gwt anchors, and handles the anchors by sending them to a new window.
