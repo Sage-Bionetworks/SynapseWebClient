@@ -559,13 +559,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.extjs</groupId>
-			<artifactId>gxt</artifactId>
-			<version>2.2.5</version>
-			<classifier>gwt22</classifier>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>${org.json.version}</version>
