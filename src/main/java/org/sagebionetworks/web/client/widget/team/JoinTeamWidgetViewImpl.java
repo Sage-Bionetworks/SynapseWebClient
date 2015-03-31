@@ -279,7 +279,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		joinWizard.getPrimaryButton().setText(DisplayConstants.BUTTON_CONTINUE);
 		currentWizardContent.clear();
 		externalFrame = new Frame(url);
-		externalFrame.setHeight("840px");
+		externalFrame.setHeight("920px");
 		externalFrame.getElement().setAttribute("seamless", "true");
 		currentWizardContent.add(externalFrame);
 		okButtonCallback = touAcceptanceCallback;
