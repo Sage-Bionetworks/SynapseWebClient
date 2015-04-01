@@ -47,6 +47,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private Callback okButtonCallback;
 	private WizardProgressWidget progressWidget;
 	private HandlerRegistration messageHandler;
+	private Frame externalFrame;
 	
 	@Inject
 	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
@@ -277,10 +278,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		joinWizard.getPrimaryButton().setEnabled(false);
 		joinWizard.getPrimaryButton().setText(DisplayConstants.BUTTON_CONTINUE);
 		currentWizardContent.clear();
-		Frame frame = new Frame(url);
-		frame.setHeight("800px");
-		frame.getElement().setAttribute("seamless", "true");
-		currentWizardContent.add(frame);
+		externalFrame = new Frame(url);
+		externalFrame.setHeight("920px");
+		externalFrame.getElement().setAttribute("seamless", "true");
+		currentWizardContent.add(externalFrame);
 		okButtonCallback = touAcceptanceCallback;
 	}
 	
@@ -296,11 +297,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		//register to listen for the "message" events
 		if (messageHandler == null) {
 			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
-				
 				@Override
 				public void invoke(JavaScriptObject event) {
 					if (_isSuccessMessage(event)) {
 						enablePrimaryButton();
+					} else if (_isSetHeightMessage(event)) {
+						if (externalFrame != null)
+							externalFrame.setHeight(_getSetHeight(event));
 					}
 				}
 			});
@@ -311,8 +314,20 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private static native boolean _isSuccessMessage(JavaScriptObject event) /*-{
 		console.log("event received: "+event);
 		console.log("event.data received: "+event.data);
-		return (event !== undefined && event.data !== undefined && 'success' === event.data.toLowerCase());
+		return (event !== undefined && event.data !== undefined && typeof event.data === 'string'  && 'success' === event.data.toLowerCase());
     }-*/;
+	
+	private static native boolean _isSetHeightMessage(JavaScriptObject event) /*-{
+		return (event !== undefined && event.data !== undefined && 
+			Object.prototype.toString.call( event.data ) === '[object Array]' &&
+			'setHeight' === event.data[0]
+			);
+	}-*/;
+	
+	private static native String _getSetHeight(JavaScriptObject event) /*-{
+		return event.data[1]; 
+	}-*/;
+
 	
 	@Override
 	protected void onDetach() {
