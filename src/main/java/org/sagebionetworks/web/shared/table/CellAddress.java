@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.shared.table;
 
+import org.sagebionetworks.repo.model.table.ColumnModel;
+
 /**
  * The full address of a cell.
  * 
@@ -11,7 +13,7 @@ package org.sagebionetworks.web.shared.table;
 public class CellAddress {
 	
 	String tableId;
-	String columnId;
+	ColumnModel column;
 	Long rowId;
 	Long rowVersion;
 	
@@ -21,10 +23,10 @@ public class CellAddress {
 	 * @param rowId The ID of the row.
 	 * @param rowVersion The version number of the row.
 	 */
-	public CellAddress(String tableId, String columnId, Long rowId, Long rowVersion) {
+	public CellAddress(String tableId, ColumnModel column, Long rowId, Long rowVersion) {
 		super();
 		this.tableId = tableId;
-		this.columnId = columnId;
+		this.column = column;
 		this.rowId = rowId;
 		this.rowVersion = rowVersion;
 	}
@@ -41,16 +43,15 @@ public class CellAddress {
 		return rowVersion;
 	}
 
-	public String getColumnId() {
-		return columnId;
+	public ColumnModel getColumn() {
+		return column;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((columnId == null) ? 0 : columnId.hashCode());
+		result = prime * result + ((column == null) ? 0 : column.hashCode());
 		result = prime * result + ((rowId == null) ? 0 : rowId.hashCode());
 		result = prime * result
 				+ ((rowVersion == null) ? 0 : rowVersion.hashCode());
@@ -67,10 +68,10 @@ public class CellAddress {
 		if (getClass() != obj.getClass())
 			return false;
 		CellAddress other = (CellAddress) obj;
-		if (columnId == null) {
-			if (other.columnId != null)
+		if (column == null) {
+			if (other.column != null)
 				return false;
-		} else if (!columnId.equals(other.columnId))
+		} else if (!column.equals(other.column))
 			return false;
 		if (rowId == null) {
 			if (other.rowId != null)

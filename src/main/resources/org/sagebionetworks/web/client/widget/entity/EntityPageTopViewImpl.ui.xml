@@ -51,7 +51,6 @@
 					<b:Column size="XS_12">
 						<g:SimplePanel ui:field="fileHistoryContainer"/>
 						<g:SimplePanel ui:field="fileDescriptionContainer"/>
-						<g:SimplePanel addStyleNames="panel panel-body margin-top-15" ui:field="fileSnapshotsContainer"/>
 						<g:SimplePanel ui:field="filesWikiPageContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
 						<b:Row>

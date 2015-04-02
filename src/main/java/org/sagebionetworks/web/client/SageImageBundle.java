@@ -5,114 +5,114 @@ import com.google.gwt.resources.client.ImageResource;
 
 public interface SageImageBundle extends ClientBundle {
 
-	@Source("images/icon-gene-expression-16.gif")
+	@Source("resource/images/icon-gene-expression-16.gif")
 	ImageResource iconGeneExpression16();
 
-	@Source("images/icon-phenotypes-16.gif")
+	@Source("resource/images/icon-phenotypes-16.gif")
 	ImageResource iconPhenotypes16();
 	
-	@Source("images/icon-genotypes-16.gif")
+	@Source("resource/images/icon-genotypes-16.gif")
 	ImageResource iconGenotype16();
 		
-	@Source("images/Sage-Header.png")
+	@Source("resource/images/Sage-Header.png")
 	ImageResource sageLogoAndTitle();
 	
-	@Source("images/loading-16.gif")
+	@Source("resource/images/loading-16.gif")
 	ImageResource loading16();	
 	
-	@Source("images/loading-31.gif")
+	@Source("resource/images/loading-31.gif")
 	ImageResource loading31();	
 	
-	@Source("images/transparent-16.png")
+	@Source("resource/images/transparent-16.png")
 	ImageResource iconTransparent16();
 	
-	@Source("images/upArrow.png")
+	@Source("resource/images/upArrow.png")
 	ImageResource iconUpArrow();
 	
-	@Source("images/downArrow.png")
+	@Source("resource/images/downArrow.png")
 	ImageResource iconDownArrow();
 	
-	@Source("images/searchButtonIcon.png")
+	@Source("resource/images/searchButtonIcon.png")
 	ImageResource searchButtonIcon();
 
-	@Source("images/headerSearchButtonIcon.png")
+	@Source("resource/images/headerSearchButtonIcon.png")
 	ImageResource searchButtonHeaderIcon();
 	
-	@Source("images/expand.png")
+	@Source("resource/images/expand.png")
 	ImageResource expand();
 
-	@Source("images/logo-R.png")
+	@Source("resource/images/logo-R.png")
 	ImageResource logoR45();
 	
-	@Source("images/logo-java.png")
+	@Source("resource/images/logo-java.png")
 	ImageResource logoJava45();
 	
-	@Source("images/logo-python.png")
+	@Source("resource/images/logo-python.png")
 	ImageResource logoPython45();
 	
-	@Source("images/logo-Shell.png")
+	@Source("resource/images/logo-Shell.png")
 	ImageResource logoCommandLine45();
 	
-	@Source("images/genomeSpace-logo-title-16.gif")
+	@Source("resource/images/genomeSpace-logo-title-16.gif")
 	ImageResource genomeSpaceLogoTitle16();
 	
-	@Source("images/SynapseHeader.png")
+	@Source("resource/images/SynapseHeader.png")
 	ImageResource synaspseHeader();
 	
-	@Source("images/SynapseTextHeader.png")
+	@Source("resource/images/SynapseTextHeader.png")
 	ImageResource synapseTextHeader();
 	
-	@Source("images/LogoHeader.png")
+	@Source("resource/images/LogoHeader.png")
 	ImageResource logoHeader();
 	
-	@Source("images/SynapseLogo-small.png")
+	@Source("resource/images/SynapseLogo-small.png")
 	ImageResource synapseLogoSmall();
 	
-	@Source("images/NCI_logo.jpg")
+	@Source("resource/images/NCI_logo.jpg")
 	ImageResource nciLogo();
 	
-	@Source("images/CTF_logo.png")
+	@Source("resource/images/CTF_logo.png")
 	ImageResource ctfLogo();
 
-	@Source("images/LSDF_logo.jpg")
+	@Source("resource/images/LSDF_logo.jpg")
 	ImageResource lsdfLogo();
 
-	@Source("images/NHLBI_logo.jpg")
+	@Source("resource/images/NHLBI_logo.jpg")
 	ImageResource nhlbiLogo();
 
-	@Source("images/Sloan_logo.jpg")
+	@Source("resource/images/Sloan_logo.jpg")
 	ImageResource sloanLogo();
 	
-	@Source("images/NIA_logo.jpg")
+	@Source("resource/images/NIA_logo.jpg")
 	ImageResource niaLogo();
 	
-	@Source("images/NIMH_logo.jpg")
+	@Source("resource/images/NIMH_logo.jpg")
 	ImageResource nimhLogo();
 
-	@Source("images/spotlight/Dream85_Banner.jpg")
+	@Source("resource/images/spotlight/Dream85_Banner.jpg")
 	ImageResource dream85Banner();
 	
-	@Source("images/spotlight/Olfaction_Prediction_banner.jpg")
+	@Source("resource/images/spotlight/Olfaction_Prediction_banner.jpg")
 	ImageResource dreamOP();
 	
-	@Source("images/spotlight/AMP-AD-banner.jpg")
+	@Source("resource/images/spotlight/AMP-AD-banner.jpg")
 	ImageResource ampAd();
 	
-	@Source("images/spotlight/Project_datasphere_banner.jpg")
+	@Source("resource/images/spotlight/Project_datasphere_banner.jpg")
 	ImageResource dreamPDS();
 	
-	@Source("images/spotlight/SMC-Het_banner.jpg")
+	@Source("resource/images/spotlight/SMC-Het_banner.jpg")
 	ImageResource dreamSMCHet();
 	
-	@Source("images/spotlight/SMC-RNA_banner.jpg")
+	@Source("resource/images/spotlight/SMC-RNA_banner.jpg")
 	ImageResource dreamSMCRNA();
 	
-	@Source("images/spotlight/TcgaPancancer.jpg")
+	@Source("resource/images/spotlight/TcgaPancancer.jpg")
 	ImageResource tcgaPancancer();
 	
-	@Source("images/certificate.png")
+	@Source("resource/images/certificate.png")
 	ImageResource certificate();
 
-	@Source("images/greyArrow.png")
+	@Source("resource/images/greyArrow.png")
 	ImageResource greyArrow();
 }

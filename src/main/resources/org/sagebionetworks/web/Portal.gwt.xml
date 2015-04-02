@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='Portal'>
+	<define-property name="gwt.logging.popupHandler" values="ENABLED, DISABLED" />
+	<define-property name="gwt.logging.firebugHandler" values="ENABLED, DISABLED" />
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name='com.google.gwt.user.User' />
 	
@@ -57,7 +59,6 @@
 	<inherits name="org.sagebionetworks.web.Portal"/>
 	<inherits name="org.sagebionetworks.web.client.PortalResources"/>
 	<inherits name="com.gwtplatform.mvp.Mvp"/>
-	<inherits name="com.extjs.gxt.ui.GXT" />
 	<inherits name="org.sagebionetworks.repo.SharedSynpaseDTOs"/>
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>

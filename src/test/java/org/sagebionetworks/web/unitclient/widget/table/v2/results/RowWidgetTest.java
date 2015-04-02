@@ -118,8 +118,8 @@ public class RowWidgetTest {
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenReturn(mockTakesAddress);
 		boolean isEditor = false;
 		rowWidget.configure(tableId, types, isEditor, aRow, mockListner);
-		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(0).getId(), aRow.getRowId(), aRow.getVersionNumber()));
-		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(1).getId(), aRow.getRowId(), aRow.getVersionNumber()));
+		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(0), aRow.getRowId(), aRow.getVersionNumber()));
+		verify(mockTakesAddress).setCellAddresss(new CellAddress(tableId, types.get(1), aRow.getRowId(), aRow.getVersionNumber()));
 	}
 
 }

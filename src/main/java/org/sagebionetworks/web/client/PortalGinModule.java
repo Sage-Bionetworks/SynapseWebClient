@@ -147,8 +147,6 @@ import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
-import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
@@ -486,7 +484,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
 
-import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -717,9 +714,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// The ImagePrototySingleton should be...well a singleton
 		bind(ImagePrototypeSingleton.class).in(Singleton.class);
 		
-		// ClientBundle for Custom widgets
-		bind(CustomWidgetImageBundle.class).in(Singleton.class);
-		
 		// The runtime provider
 		bind(CellTableProvider.class).to(CellTableProviderImpl.class);
 		
@@ -816,10 +810,6 @@ public class PortalGinModule extends AbstractGinModule {
 		//Administer Evaluations list 
 		bind(AdministerEvaluationsListView.class).to(AdministerEvaluationsListViewImpl.class);
 		
-		
-		// SnapshotWidget		
-		bind(SnapshotWidgetView.class).to(SnapshotWidgetViewImpl.class);
-
 		// EntitySearchBox		
 		bind(EntitySearchBoxView.class).to(EntitySearchBoxViewImpl.class);
 
