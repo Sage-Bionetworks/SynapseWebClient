@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -34,6 +36,7 @@ public class UserTeamBadgeTest {
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
+		GWTMockUtilities.disarm();
 		mockGinInjector = mock(PortalGinInjector.class);
 		mockUserBadge = mock(UserBadge.class);
 		mockTeamBadge = mock(TeamBadge.class);
@@ -48,7 +51,13 @@ public class UserTeamBadgeTest {
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "true");
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, principalId);
 	}
-	
+
+	@After
+	public void tearDown(){
+		// Be nice to the next test
+		GWTMockUtilities.restore();
+	}
+
 	@Test
 	public void testConfigure(){
 		badge.configure(null, widgetDescriptor, null, null);
