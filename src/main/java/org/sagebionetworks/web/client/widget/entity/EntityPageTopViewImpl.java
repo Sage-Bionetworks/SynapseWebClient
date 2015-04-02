@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Analysis;
@@ -16,7 +15,6 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Study;
-import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.table.Query;
@@ -140,8 +138,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel fileDescriptionContainer;
 	@UiField
-	SimplePanel fileSnapshotsContainer;
-	@UiField
 	SimplePanel fileBrowserContainer;
 	@UiField
 	SimplePanel filesWikiPageContainer;
@@ -178,7 +174,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel tableListWidgetContainer;
 	
-	private SnapshotWidget snapshotWidget;
 	private FileHistoryWidget fileHistoryWidget;
 	private TableListWidget tableListWidget;
 	private Long versionNumber;
@@ -201,7 +196,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			SageImageBundle sageImageBundle,
 			FileTitleBar fileTitleBar,
 			Breadcrumb breadcrumb,
-			SnapshotWidget snapshotWidget,
 			EntityMetadata entityMetadata, 
 			FileHistoryWidget fileHistoryWidget, 
 			SynapseJSNIUtils synapseJSNIUtils,
@@ -215,7 +209,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			GlobalApplicationState globalApplicationState) {
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
-		this.snapshotWidget = snapshotWidget;
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.evaluationList = evaluationList;
@@ -231,7 +224,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.add(fileHistoryWidget.asWidget());
 		evaluationListContainer.add(evaluationList.asWidget());
-		fileSnapshotsContainer.add(snapshotWidget.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
 
@@ -315,9 +307,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
 			renderFolderEntity(bundle, entityTypeDisplay, wikiPageId, projectHeader);
 			if (currentArea == null) currentArea = EntityArea.FILES;
-		} else if (bundle.getEntity() instanceof Summary) {
-		    renderSummaryEntity(bundle, entityTypeDisplay, versionNumber);
-		    if (currentArea == null) currentArea = EntityArea.FILES;
 		} else if(bundle.getEntity() instanceof TableEntity) {
 			renderTableEntity(bundle, entityTypeDisplay, projectHeader, areaToken);
 		} else {
@@ -356,7 +345,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileModifiedAndCreatedContainer.clear();
 		wikiPageContainer.clear();
 		fileHistoryContainer.setVisible(false);
-		fileSnapshotsContainer.setVisible(false);
 		
 		tableBreadcrumbContainer.clear();
 		tableMetadataContainer.clear();
@@ -635,30 +623,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}
 	}
 	
-	// Render Snapshot Entity
-	// TODO: This rendering should be phased out in favor of a regular wiki page
-	private void renderSummaryEntity(EntityBundle bundle,
-			String entityTypeDisplay, Long versionNumber) {
-		// tab container
-		setTabSelected(EntityArea.FILES, false); // select files tab for summary
-		
-		// File tab: everything
-		entityMetadata.setEntityBundle(bundle, versionNumber);		
-		fileMetadataContainer.add(entityMetadata.asWidget());		
-		//File History
-		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-		fileHistoryContainer.setVisible(true);
-		// Description
-		fileDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
-
-		// Snapshot entity
-		boolean readOnly = versionNumber != null;
-		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), readOnly);		
-		fileSnapshotsContainer.setVisible(true);		
-		// Created By/Modified By
-		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
-	}
-
 	private void renderTableEntity(EntityBundle bundle, String entityTypeDisplay, EntityHeader projectHeader, String areaToken) {
 		// tab container
 		setTabSelected(EntityArea.TABLES, false); 

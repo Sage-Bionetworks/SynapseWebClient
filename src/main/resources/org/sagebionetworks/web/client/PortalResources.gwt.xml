@@ -2,6 +2,7 @@
 <module>
     <public path="resource">
         <include name="css/*.css"/>
+        <include name="images/*"/>
     </public>
 
     <stylesheet src="css/SynapseColor.css"/>

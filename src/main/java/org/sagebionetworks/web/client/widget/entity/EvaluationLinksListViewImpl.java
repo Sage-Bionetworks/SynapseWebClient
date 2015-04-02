@@ -36,7 +36,6 @@ public class EvaluationLinksListViewImpl extends FlowPanel implements Evaluation
 			FlowPanel linkContainer = new FlowPanel();
 			linkContainer.addStyleName("margin-10");
 		    
-			String iconHtml = DisplayUtils.getIconHtml(imageBundle.synapseStep16());
 			for (Evaluation evaluation : evaluations) {
 				SimplePanel wrapper = new SimplePanel();
 				Anchor a = new Anchor();

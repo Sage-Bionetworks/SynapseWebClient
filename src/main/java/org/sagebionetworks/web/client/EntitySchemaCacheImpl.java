@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityInstanceFactory;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -25,13 +25,13 @@ public class EntitySchemaCacheImpl implements EntitySchemaCache {
 	private Map<Class<? extends Entity>, ObjectSchema> cache = new HashMap<Class<? extends Entity>, ObjectSchema>();
 	//JSONEntityFactory factory = null;
 	AdapterFactory adapterFactory;
-	AutoGenFactory entityFactory;
+	EntityInstanceFactory entityFactory;
 	
 	@Inject
 	public EntitySchemaCacheImpl(AdapterFactory adapterFactory){
 		if(adapterFactory == null) throw new IllegalArgumentException("The AdapterFactory cannot be null");
 		this.adapterFactory = adapterFactory;
-		this.entityFactory = new AutoGenFactory();
+		this.entityFactory = new EntityInstanceFactory();
 	}
 	
 	/**
