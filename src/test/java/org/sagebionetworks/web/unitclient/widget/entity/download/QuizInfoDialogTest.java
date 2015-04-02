@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -31,6 +33,7 @@ public class QuizInfoDialogTest {
 	
 	@Before
 	public void before() throws Exception {
+		GWTMockUtilities.disarm();
 		mockModal = mock(Dialog.class);
 		mockQuizInfo = mock(QuizInfoWidget.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -39,6 +42,11 @@ public class QuizInfoDialogTest {
 		widget = new QuizInfoDialog(mockModal, mockQuizInfo, mockGlobalApplicationState);
 	}
 
+	@After
+	public void tearDown(){
+		// Be nice to the next test
+		GWTMockUtilities.restore();
+	}
 	
 	@Test
 	public void testShowAndBecomeCertifiedClick(){
