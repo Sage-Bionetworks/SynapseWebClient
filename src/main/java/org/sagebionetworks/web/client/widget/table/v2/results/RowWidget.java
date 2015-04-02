@@ -66,7 +66,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 			// Pass the address to cells the need it.
 			if(cell instanceof TakesAddressCell){
 				TakesAddressCell takesAddress = (TakesAddressCell) cell;
-				takesAddress.setCellAddresss(new CellAddress(tableId, type.getId(), rowId, rowVersion));
+				takesAddress.setCellAddresss(new CellAddress(tableId, type, rowId, rowVersion));
 			}
 		}
 		// Set each cell with the data from the row.
