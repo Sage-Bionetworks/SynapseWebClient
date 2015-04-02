@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
@@ -30,7 +31,7 @@ public class AsynchTableFileHandleProviderSingletonTest {
 	AsynchTableFileHandleProviderSingleton singleton;
 	String fileHandleId;
 	String tableId;
-	String columnId;
+	ColumnModel column;
 	Long rowId;
 	Long rowVersion;
 	CellAddress address;
@@ -48,14 +49,17 @@ public class AsynchTableFileHandleProviderSingletonTest {
 		
 		fileHandleId = "123";
 		tableId = "syn456";
-		columnId = "999";
+		column = new ColumnModel();
+		column.setId("999");
+		column.setName("foo");
+
 		rowId = 3L;
 		rowVersion = 2L;
-		address = new CellAddress(tableId, columnId, rowId, rowVersion);
+		address = new CellAddress(tableId, column, rowId, rowVersion);
 		mockCallback = Mockito.mock(Callback.class);
 		// Results
 		selectColumn = new SelectColumn();
-		selectColumn.setId(columnId);
+		selectColumn.setId(column.getId());
 		fhr = new FileHandleResults();
 		handle = new S3FileHandle();
 		handle.setId(fileHandleId);
