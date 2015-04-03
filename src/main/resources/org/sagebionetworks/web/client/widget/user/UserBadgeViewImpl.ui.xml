@@ -18,7 +18,7 @@
 				<g:Image ui:field="userPicture" addStyleNames="userProfileImage imageButton margin-right-2" />
 			</bh:Div>
 			<bh:Div>
-				<b:Tooltip placement="BOTTOM" text="" ui:field="usernameTooltip">
+				<b:Tooltip placement="BOTTOM" title="" ui:field="usernameTooltip">
 					<b:Anchor ui:field="usernameLink" />
 				</b:Tooltip>
 				<bh:Div>

@@ -6,12 +6,12 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
 	    <bh:Div ui:field="mdCommands" styleName="view md-command-bar">
-	        <b:Tooltip placement="BOTTOM" text="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
+	        <b:Tooltip placement="BOTTOM" title="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
 	        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" />
 	        </b:Tooltip>
 	        <b:Button dataTarget="#formattingGuideModal" dataToggle="MODAL" icon="QUESTION_CIRCLE" size="EXTRA_SMALL">Formatting Guide</b:Button>
 	        <b:ButtonGroup>
-				<b:Tooltip placement="BOTTOM" text="Insert Synapse Widget">
+				<b:Tooltip placement="BOTTOM" title="Insert Synapse Widget">
 					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
 				</b:Tooltip>
 			  <b:DropDownMenu>
@@ -33,7 +33,7 @@
 			  </b:DropDownMenu>
 			</b:ButtonGroup>
 	        <b:ButtonGroup>
-	            <b:Tooltip placement="BOTTOM" text="WARNING! These are unreleased widgets, whose syntax may change in the future.">
+	            <b:Tooltip placement="BOTTOM" title="WARNING! These are unreleased widgets, whose syntax may change in the future.">
 					<b:Button dataToggle="DROPDOWN" visible="false" ui:field="alphaInsertButton" size="EXTRA_SMALL">@ Insert</b:Button>
 				</b:Tooltip>
 				  <b:DropDownMenu>
@@ -50,31 +50,31 @@
 				  </b:DropDownMenu>
 			</b:ButtonGroup>
 			
-	        <b:Tooltip placement="BOTTOM" text="Bold">
+	        <b:Tooltip placement="BOTTOM" title="Bold">
 	        	<b:Button ui:field="boldButton" icon="BOLD" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="Italic">
+	        <b:Tooltip placement="BOTTOM" title="Italic">
 	        	<b:Button ui:field="italicButton" icon="ITALIC" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="Strike-through">
+	        <b:Tooltip placement="BOTTOM" title="Strike-through">
 	        	<b:Button ui:field="strikeButton" icon="STRIKETHROUGH" size="EXTRA_SMALL" height="22px" />
 	        </b:Tooltip>
 	        
-	        <b:Tooltip placement="BOTTOM" text="Optionally specify the language for syntax highlighting.">
+	        <b:Tooltip placement="BOTTOM" title="Optionally specify the language for syntax highlighting.">
 	        	<b:Button ui:field="codeBlockButton" size="EXTRA_SMALL">Code Block</b:Button>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="LaTeX math equation.">
+	        <b:Tooltip placement="BOTTOM" title="LaTeX math equation.">
 	        	<b:Button ui:field="mathButton" size="EXTRA_SMALL">TeX</b:Button>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="Subscript">
+	        <b:Tooltip placement="BOTTOM" title="Subscript">
 	        	<b:Button ui:field="subscriptButton" icon="SUBSCRIPT" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="Superscript">
+	        <b:Tooltip placement="BOTTOM" title="Superscript">
 	        	<b:Button ui:field="superscriptButton" icon="SUPERSCRIPT" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
 	        
 	        <b:ButtonGroup>
-				<b:Tooltip placement="BOTTOM" text="Headings">
+				<b:Tooltip placement="BOTTOM" title="Headings">
 					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
 				</b:Tooltip>
 			  <b:DropDownMenu>
@@ -86,16 +86,16 @@
 			    <b:AnchorListItem ui:field="heading6Link">Heading 6</b:AnchorListItem>
 			  </b:DropDownMenu>
 			</b:ButtonGroup>
-	        <b:Tooltip placement="BOTTOM" text="Insert Attachment">
+	        <b:Tooltip placement="BOTTOM" title="Insert Attachment">
 	        	<b:Button ui:field="attachmentButton" icon="PAPERCLIP" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="Insert Image">
+	        <b:Tooltip placement="BOTTOM" title="Insert Image">
 	        	<b:Button ui:field="imageButton" icon="CAMERA" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="Insert Video">
+	        <b:Tooltip placement="BOTTOM" title="Insert Video">
 	        	<b:Button ui:field="videoButton" icon="VIDEO_CAMERA" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
-	        <b:Tooltip placement="BOTTOM" text="Insert Link">
+	        <b:Tooltip placement="BOTTOM" title="Insert Link">
 	        	<b:Button ui:field="linkButton" icon="LINK" size="EXTRA_SMALL" height="22px"/>
 	        </b:Tooltip>
 	    </bh:Div>

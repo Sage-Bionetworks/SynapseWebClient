@@ -334,7 +334,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	@Override
 	public void setIsIndividualSubmissionActive(boolean isActive) {
-		isIndividualRadioButton.setActive(isActive);	
+		isIndividualRadioButton.setValue(isActive, true);	
 	}
 	@Override
 	public void hideTeamsUI() {

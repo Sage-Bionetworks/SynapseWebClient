@@ -8,7 +8,7 @@
 		<t:TableData>
 			<g:Anchor ui:field="versionNameLink" />
 			<b:FormControlStatic ui:field="versionName" visible="false" addStyleNames="displayInline" />
-			<b:Tooltip text="Edit version label">
+			<b:Tooltip title="Edit version label">
 				<b:Button icon="EDIT" ui:field="editNameButton" size="EXTRA_SMALL" addStyleNames="displayInline margin-left-3" />
 			</b:Tooltip>
 		</t:TableData>
@@ -26,12 +26,12 @@
 		</t:TableData>
 		<t:TableData>
 			<b:FormControlStatic ui:field="versionComment" addStyleNames="displayInline" />
-			<b:Tooltip text="Edit version comment">
+			<b:Tooltip title="Edit version comment">
 				<b:Button icon="EDIT" ui:field="editCommentButton" size="EXTRA_SMALL" addStyleNames="displayInline margin-left-3" />
 			</b:Tooltip>
 		</t:TableData>
 		<t:TableData>
-			<b:Tooltip text="Delete version">
+			<b:Tooltip title="Delete version">
 				<b:Button icon="TIMES" ui:field="deleteButton" size="SMALL" addStyleNames="displayInline margin-left-3" />
 			</b:Tooltip>
 		</t:TableData>
