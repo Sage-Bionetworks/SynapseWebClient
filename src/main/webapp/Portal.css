@@ -1490,6 +1490,11 @@ ol.lowerroman {
 	position: relative;
 	top: -70px;
 }
+.moveup-18 {
+	position: relative;
+	top: -18px;
+}
+
 .moveup-10 {
 	position: relative;
 	top: -10px;

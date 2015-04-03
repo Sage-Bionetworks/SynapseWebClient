@@ -296,7 +296,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {
 		Div row = new Div();
 		InlineCheckBox cb = new InlineCheckBox();
-		cb.addStyleName("moveup-8");
+		cb.addStyleName("moveup-18");
 		cb.setValue(selectCheckbox);
 		cb.setEnabled(false);
 		row.add(cb);
