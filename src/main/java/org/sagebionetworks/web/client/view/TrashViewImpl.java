@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
@@ -29,7 +29,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -144,14 +143,14 @@ public class TrashViewImpl extends Composite implements TrashView {
 				if (checked) {
 		        	// Select all of the trash entities.
 		        	for (CheckBox checkBox : checkBoxes) {
-		        		checkBox.setChecked(true);
+		        		checkBox.setValue(true);
 		        	}
 		        	selectedTrash.addAll(trash2Row.keySet());
 		        	ButtonUtils.setEnabledAndType(true, deleteSelectedButton, ButtonType.DANGER);
 		        } else {
 		        	// Deselect all of the trash.
 		        	for (CheckBox checkBox : checkBoxes) {
-		        		checkBox.setChecked(false);
+		        		checkBox.setValue(false);
 		        	}
 		        	selectedTrash.removeAll(trash2Row.keySet());
 		        	ButtonUtils.setEnabledAndType(false, deleteSelectedButton, ButtonType.DANGER);
@@ -182,7 +181,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		
 		// Disable delete selected button and uncheck select all checkbox.
 		ButtonUtils.setEnabledAndType(false, deleteSelectedButton, ButtonType.DANGER);
-		selectAllCheckBox.setChecked(false);
+		selectAllCheckBox.setValue(false);
 		
 		showButtons();
 		ButtonUtils.setEnabledAndType(false, deleteSelectedButton, ButtonType.DANGER);
@@ -290,7 +289,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 					selectedTrash.add(trashedEntity);
 				} else {
 					selectedTrash.remove(trashedEntity);
-					selectAllCheckBox.setChecked(false);
+					selectAllCheckBox.setValue(false);
 					if (selectedTrash.isEmpty()) {
 						ButtonUtils.setEnabledAndType(false, deleteSelectedButton, ButtonType.DANGER);					}
 				}
