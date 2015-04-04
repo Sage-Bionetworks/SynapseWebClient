@@ -89,7 +89,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setAnnotationsVisible(boolean visible) {
-		GWT.debugger();
 		if (visible) {
 			annotationsContent.show();
 		} else {
