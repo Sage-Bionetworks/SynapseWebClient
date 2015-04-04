@@ -5,18 +5,24 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -32,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
@@ -47,7 +54,7 @@ public class GlobalApplicationStateImplTest {
 	JiraURLHelper mockJiraURLHelper;
 	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	
+	ClientLogger mockLogger;
 	@Before
 	public void before(){
 		mockCookieProvider = Mockito.mock(CookieProvider.class);
@@ -57,8 +64,9 @@ public class GlobalApplicationStateImplTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
+		mockLogger = mock(ClientLogger.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils);
+		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -80,6 +88,30 @@ public class GlobalApplicationStateImplTest {
 		// Since this is not the current place it should actaully go there.
 		verify(mockPlaceController).goTo(newPlace);
 		
+	}
+	
+	@Test
+	public void testUncaughtJSExceptions() {
+		Throwable t = new RuntimeException("uncaught");
+		globalApplicationState.handleUncaughtException(t);
+		verify(mockLogger).errorToRepositoryServices(anyString(), eq(t));
+	}
+	
+	@Test
+	public void testUnwrap(){
+		Throwable actualException = new Exception("I am dead, Horatio");
+		Set<Throwable> causes = new HashSet<Throwable>();
+		causes.add(actualException);
+		UmbrellaException umbrellaException = new UmbrellaException(causes);
+		
+		//single exception being wrapped, unwrap it!
+		assertEquals(actualException, globalApplicationState.unwrap(umbrellaException));
+		//pass through for non-umbrella exceptions
+		assertEquals(actualException, globalApplicationState.unwrap(actualException));
+		
+		//more than one cause, just log the umbrella exception
+		causes.add(new Exception("more than one"));
+		assertEquals(umbrellaException, globalApplicationState.unwrap(umbrellaException));
 	}
 	
 	@Test
