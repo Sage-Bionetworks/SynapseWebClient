@@ -17,11 +17,13 @@
 				<b:Tooltip placement="BOTTOM" title="Log out">
 					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" addStyleNames="right margin-5" height="26px" />	
 				</b:Tooltip>
-				<b:ButtonGroup ui:field="headerFavButtonGroup" addStyleNames="right margin-5">
-					<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px"></b:Button>
-					<b:DropDownMenu ui:field="headerFavList">
-					</b:DropDownMenu>
-				</b:ButtonGroup>
+				<b:Tooltip placement="BOTTOM" title="Favorite">
+					<b:ButtonGroup ui:field="headerFavButtonGroup" addStyleNames="right margin-5">
+						<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px"></b:Button>
+						<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
+						</b:DropDownMenu>
+					</b:ButtonGroup>
+				</b:Tooltip>
 			    <b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-5" height="26px" >@ Trash can</b:Button>
 			    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-5">
 					<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="26px">Log in</b:Button>
