@@ -12,7 +12,7 @@
 					<g:SimplePanel ui:field="iconContainer" />
 				</td>
 				<td>
-				    <b:Tooltip text="..." placement="RIGHT" ui:field="tooltip" trigger="MANUAL" container="body">
+				    <b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" selector="data-toggle=tooltip" >
 			    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
 					</b:Tooltip>
 				</td>

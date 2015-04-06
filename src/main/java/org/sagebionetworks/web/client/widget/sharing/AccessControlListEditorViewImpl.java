@@ -64,7 +64,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			
 		toolTipAndDeleteAclButton = new Tooltip();
 		toolTipAndDeleteAclButton.setWidget(deleteAclButton);
-		toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
+		toolTipAndDeleteAclButton.setTitle(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
 		toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
 	}
 	
@@ -167,7 +167,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				
 				Tooltip toolTipAndCreateAclButton = new Tooltip();
 				toolTipAndCreateAclButton.setWidget(createAclButton);
-				toolTipAndCreateAclButton.setText(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
+				toolTipAndCreateAclButton.setTitle(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
 				toolTipAndCreateAclButton.setPlacement(Placement.BOTTOM);
 				add(toolTipAndCreateAclButton);
 			} else {

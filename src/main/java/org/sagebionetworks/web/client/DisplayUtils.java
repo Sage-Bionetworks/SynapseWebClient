@@ -1213,7 +1213,7 @@ public class DisplayUtils {
 	public static Tooltip addTooltip(Widget widget, String tooltipText, Placement pos){
 		Tooltip t = new Tooltip();
 		t.setPlacement(pos);
-		t.setText(tooltipText);
+		t.setTitle(tooltipText);
 		t.setIsHtml(true);
 		t.setIsAnimated(false);
 		t.setTrigger(Trigger.HOVER);

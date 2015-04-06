@@ -47,8 +47,7 @@ public class EvaluationListViewImpl extends Panel implements EvaluationListView 
 		ButtonGroup group = new ButtonGroup();
 		for(final Evaluation data: list){
 			Div row = new Div();
-			final InlineRadio selectBox = new InlineRadio(data.getName());
-			selectBox.setName("evaluationButtons");
+			final InlineRadio selectBox = new InlineRadio("evaluationButtons", data.getName());
 			selectBox.addStyleName("margin-left-10");
 			row.add(selectBox);
 			evaluationCheckboxes.add(selectBox);

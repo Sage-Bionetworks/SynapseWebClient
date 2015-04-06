@@ -18,7 +18,7 @@
 							<t:Table ui:field="trashTable" styleName="table trashTable-striped trashTable-bordered trashTable-condensed" >
 							    <t:THead>
 							        <t:TableRow>
-							            <t:TableHeader width="10%"><g:CheckBox ui:field="selectAllCheckBox" /></t:TableHeader>
+							            <t:TableHeader width="10%"><bb:CheckBox ui:field="selectAllCheckBox" /></t:TableHeader>
 							            <t:TableHeader width="35%"		text="Name" />
 							            <t:TableHeader width="41%"		text="Deleted On" />
 							            <t:TableHeader width="14%" />

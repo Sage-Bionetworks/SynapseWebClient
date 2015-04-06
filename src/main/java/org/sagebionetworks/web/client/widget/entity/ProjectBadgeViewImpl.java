@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -12,9 +11,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
@@ -43,8 +39,7 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	@UiField
 	Span favoritesWidgetContainer;
 	
-	boolean isPopoverInitialized;
-	boolean isPopover;
+	boolean isPopoverInitialized, isPopover;
 	SageImageBundle sageImageBundle;
 	
 	Widget widget;
@@ -55,31 +50,26 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 			) {
 		widget = uiBinder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
-		
 		isPopover = false;
 		anchor.addMouseOverHandler(new MouseOverHandler() {
-			
-			@Override
-			public void onMouseOver(MouseOverEvent event) {
-				showPopover();
-				isPopover = true;
-			}
+	        @Override
+	        public void onMouseOver(MouseOverEvent event) {
+	                showPopover();
+	                isPopover = true;
+	        }
 		});
 		anchor.addMouseOutHandler(new MouseOutHandler() {
-			@Override
-			public void onMouseOut(MouseOutEvent event) {
-				isPopover = false;
-				tooltip.hide();
-			}
+	        @Override
+	        public void onMouseOut(MouseOutEvent event) {
+	                isPopover = false;
+	                tooltip.hide();
+	        }
 		});
 	}
 	
 	@Override
 	public void setProject(String projectName, String href) {
 		isPopoverInitialized = false;
-		tooltip.setIsHtml(true);
-		tooltip.setTitle(projectName);
-		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 		anchor.setText(projectName);
 		anchor.setHref(href);
 	}
@@ -109,19 +99,17 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 				
 				private void renderPopover(final String content) {
 					isPopoverInitialized = true;
-					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-						@Override
-						public void execute() {
-							tooltip.setText(content);
-							tooltip.reconfigure();
-							if (isPopover)
-								tooltip.show();
-						}
-					});
+					if (widget.isAttached()) {
+						tooltip.setTitle(content);
+						tooltip.reconfigure();
+						if (isPopover)
+							tooltip.show();
+					}
 				}
 			});
+		} else {
+			tooltip.show();
 		}
-		tooltip.show();
 	}
 	
 	@Override

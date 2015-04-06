@@ -81,7 +81,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void setDisplayName(String displayName, String shortDisplayName) {
 		loadingUI.setVisible(false);
 		usernameLink.setText(shortDisplayName);
-		usernameTooltip.setText(displayName);
+		usernameTooltip.setTitle(displayName);
 	}
 	
 	@Override
