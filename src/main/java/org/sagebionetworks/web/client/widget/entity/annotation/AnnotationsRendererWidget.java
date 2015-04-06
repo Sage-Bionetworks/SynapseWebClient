@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.annotation;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -22,6 +22,7 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	private EditAnnotationsDialog editorDialog;
 	EntityUpdatedHandler entityUpdatedHandler;
 	List<Annotation> annotationsList;
+	private PreflightController preflightController;
 	
 	/**
 	 * 
@@ -32,11 +33,13 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	@Inject
 	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, 
 			AnnotationTransformer annotationTransformer, 
-			EditAnnotationsDialog editorDialog) {
+			EditAnnotationsDialog editorDialog, 
+			PreflightController preflightController) {
 		super();
 		this.view = propertyView;
 		this.annotationTransformer = annotationTransformer;
 		this.editorDialog = editorDialog;
+		this.preflightController = preflightController;
 		this.view.setPresenter(this);
 		this.view.addEditorToPage(editorDialog.asWidget());
 	}
@@ -70,6 +73,11 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 
 	@Override
 	public void onEdit() {
-		editorDialog.configure(bundle, entityUpdatedHandler);
+		preflightController.checkUploadToEntity(bundle, new Callback() {
+			@Override
+			public void invoke() {
+				editorDialog.configure(bundle, entityUpdatedHandler);
+			}
+		});
 	}
 }

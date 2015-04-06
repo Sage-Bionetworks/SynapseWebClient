@@ -58,7 +58,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 		suggestBox.asWidget().addStyleName("form-control input-sm");
 		
 		suggestBoxPanel.add(suggestBox.asWidget());
-		notifyTooltip.setText(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
+		notifyTooltip.setTitle(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 	}
 	
 	public UserGroupSuggestBox getSuggestBox() {

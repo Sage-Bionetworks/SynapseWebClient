@@ -94,4 +94,16 @@
 		<welcome-file>Portal.html</welcome-file>
 	</welcome-file-list>
 
+	<servlet>
+		<servlet-name>jUnitHostImpl</servlet-name>
+		<servlet-class>com.google.gwt.junit.server.JUnitHostImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jUnitHostImpl</servlet-name>
+		<url-pattern>/Portal/junithost/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>jUnitHostImpl</servlet-name>
+	  <url-pattern>/Portal/remote_logging</url-pattern>
+	</servlet-mapping>
 </web-app>

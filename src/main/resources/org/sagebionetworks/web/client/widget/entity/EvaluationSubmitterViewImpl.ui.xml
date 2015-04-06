@@ -46,8 +46,8 @@
 				<b:FieldSet>
 					<bh:Div>
 						<b:ButtonGroup>
-							<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
-							<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team"/>
+							<b:Radio ui:field="isIndividualRadioButton" value="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
+							<b:Radio ui:field="isTeamRadioButton" value="false" name="submitAsTeamGroup" text="I am submitting as part of a team"/>
 						</b:ButtonGroup>
 						<bh:Div ui:field="teamsUI">
 							<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" />

@@ -39,7 +39,6 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
-
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -57,14 +56,12 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
-import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -183,15 +180,6 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and description for a special user or group
-	 * @param name of user or group
-	 * @return
-	 */
-	public static String getUserNameDescriptionHtml(String name, String description) {
-		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
-	}
-	
-	/**
 	 * Returns an HTML String of the suggestion of the user/group associated with the given header.
 	 * @param header header of the displayed usergroup.
 	 * @param width css style width of the created element (e.g. "150px", "3em")
@@ -222,19 +210,6 @@ public class DisplayUtils {
 		result.append("</div>");
 		return result.toString();
 	}
-	
-	
-	/**
-	 * Returns html for a thumbnail image.
-	 * 
-	 * @param url
-	 * @return
-	 */
-	public static String getThumbnailPicHtml(String url) {
-		if(url == null) return null;
-		return DisplayUtilsGWT.TEMPLATES.profilePicture(url).asString();
-	}
-
 	
 	/**
 	 * Converts all hrefs to gwt anchors, and handles the anchors by sending them to a new window.
@@ -1091,21 +1066,6 @@ public class DisplayUtils {
 		ImageResource icon = null;
 		if(Link.class.getName().equals(className)) {
 			icon = iconsImageBundle.synapseLink16();
-		} else if(Analysis.class.getName().equals(className)) {
-			// Analysis
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseAnalysis16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseAnalysis24();			
-		} else if(Code.class.getName().equals(className)) {
-			// Code
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
-		} else if(Data.class.getName().equals(className) ||
-				ExpressionData.class.getName().equals(className) ||
-				GenotypeData.class.getName().equals(className) ||
-				PhenotypeData.class.getName().equals(className)) {
-			// Data
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
@@ -1118,26 +1078,6 @@ public class DisplayUtils {
 			// Project
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseProject24();			
-		} else if(RObject.class.getName().equals(className)) {
-			// RObject
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseRObject16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseRObject24();			
-		} else if(Summary.class.getName().equals(className)) {
-			// Summary
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseSummary16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseSummary24();			
-		} else if(Step.class.getName().equals(className)) {
-			// Step
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStep16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStep24();			
-		} else if(Study.class.getName().equals(className)) {
-			// Study
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();
-		} else if(Page.class.getName().equals(className)) {
-			// Page
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
@@ -1273,7 +1213,7 @@ public class DisplayUtils {
 	public static Tooltip addTooltip(Widget widget, String tooltipText, Placement pos){
 		Tooltip t = new Tooltip();
 		t.setPlacement(pos);
-		t.setText(tooltipText);
+		t.setTitle(tooltipText);
 		t.setIsHtml(true);
 		t.setIsAnimated(false);
 		t.setTrigger(Trigger.HOVER);

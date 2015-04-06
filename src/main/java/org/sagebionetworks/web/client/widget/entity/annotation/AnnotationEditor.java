@@ -137,6 +137,9 @@ public class AnnotationEditor implements Presenter {
 	@Override
 	public void onValueDeleted(CellEditor editor) {
 		cellEditors.remove(editor);
+		if (cellEditors.size() == 0) {
+			onDelete();
+		}
 	}
 	
 	public Widget asWidget() {

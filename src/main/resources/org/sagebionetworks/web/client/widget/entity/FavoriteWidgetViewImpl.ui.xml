@@ -7,7 +7,7 @@
   >
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<bh:Span addStyleNames="margin-left-2">
-		<b:Tooltip ui:field="tip" text="Click the star to add this to your favorites!" trigger="HOVER" placement="RIGHT">
+		<b:Tooltip ui:field="tip" title="Click the star to add this to your favorites!" trigger="HOVER" placement="RIGHT">
 			<b:Anchor ui:field="favoriteIcon" icon="STAR"/>
 		</b:Tooltip>
 		<g:Image ui:field="loadingUI" styleName="displayInline" resource='{sageImageBundle.loading16}' />

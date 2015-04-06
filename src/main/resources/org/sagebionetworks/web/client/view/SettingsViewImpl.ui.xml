@@ -32,7 +32,7 @@
 					</div>
 				    <g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box">
 					    <g:FlowPanel styleName="checkbox margin-left-10">
-					       <g:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
+					       <b:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
 					    </g:FlowPanel>
 					</g:SimplePanel>
 				</div>

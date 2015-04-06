@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
@@ -53,7 +54,7 @@ public class BatchTableFileHandleRequests {
 		// Key track of the rows keys so we only request each row once.
 		Set<String> rowKeys = new HashSet<String>();
 		// Keep the columnIds in the order we find them.
-		Set<String> columnIds = new LinkedHashSet<String>();
+		Set<ColumnModel> columns = new LinkedHashSet<ColumnModel>();
 		for(TableFileHandleRequest request: requests){
 			// row key = 'rowId-rowVersionNumber'
 			String rowKey = request.getAddress().getRowKey();
@@ -66,13 +67,14 @@ public class BatchTableFileHandleRequests {
 				rowKeys.add(rowKey);
 			}
 			// Add each columnId to the set.
-			columnIds.add(request.getAddress().getColumnId());
+			columns.add(request.getAddress().getColumn());
 		}
 		// Build the header from the unique columnIds.
 		List<SelectColumn> header = new LinkedList<SelectColumn>();
-		for(String columnId: columnIds){
+		for(ColumnModel column: columns){
 			SelectColumn sc = new SelectColumn();
-			sc.setId(columnId);
+			sc.setId(column.getId());
+			sc.setName(column.getName());
 			header.add(sc);
 		}
 		set.setHeaders(header);

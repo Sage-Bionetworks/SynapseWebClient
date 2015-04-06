@@ -14,7 +14,7 @@
 						<g:Image ui:field="logoSmall" resource="{sageImages.synapseLogoSmall}" />
 					</a>
 			    </div>
-				<b:Tooltip placement="BOTTOM" text="Log out">
+				<b:Tooltip placement="BOTTOM" title="Log out">
 					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" addStyleNames="right margin-5" height="26px" />	
 				</b:Tooltip>
 				<b:ButtonGroup ui:field="headerFavButtonGroup" addStyleNames="right margin-5">

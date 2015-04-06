@@ -10,17 +10,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidgetView;
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -33,12 +37,14 @@ public class AnnotationsRendererWidgetTest {
 	EditAnnotationsDialog mockEditAnnotationsDialog;
 	EntityBundle mockBundle;
 	List<Annotation> annotationList;
+	PreflightController mockPreflightController;
 	@Before
 	public void setUp() throws Exception {
 		mockEditAnnotationsDialog = mock(EditAnnotationsDialog.class);
 		mockView = mock(AnnotationsRendererWidgetView.class);
 		mockAnnotationTransformer = mock(AnnotationTransformer.class);
-		widget = new AnnotationsRendererWidget(mockView, mockAnnotationTransformer, mockEditAnnotationsDialog);
+		mockPreflightController = mock(PreflightController.class);
+		widget = new AnnotationsRendererWidget(mockView, mockAnnotationTransformer, mockEditAnnotationsDialog, mockPreflightController);
 		mockBundle = mock(EntityBundle.class);
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key", Collections.EMPTY_LIST));
@@ -81,6 +87,7 @@ public class AnnotationsRendererWidgetTest {
 
 	@Test
 	public void testOnEdit() {
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
 		EntityUpdatedHandler updateHandler = mock(EntityUpdatedHandler.class);
 		widget.configure(mockBundle, true);
 		widget.setEntityUpdatedHandler(updateHandler);
@@ -96,5 +103,16 @@ public class AnnotationsRendererWidgetTest {
 		assertEquals(updateCaptor.getValue(), updateHandler);
 		assertEquals(bundleCaptor.getValue(), mockBundle);
 	}
+	
+	@Test
+	public void testOnEditFailedPreflight() {
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		widget.configure(mockBundle, true);
+		//test that on edit, we pass the bundle and update handler to the edit dialog
+		widget.onEdit();
+		
+		verify(mockEditAnnotationsDialog, never()).configure(any(EntityBundle.class), any(EntityUpdatedHandler.class));
+	}
+	
 
 }

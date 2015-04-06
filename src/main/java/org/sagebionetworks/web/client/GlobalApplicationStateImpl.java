@@ -15,7 +15,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
@@ -25,6 +27,7 @@ import com.google.inject.Inject;
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 
+	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -38,17 +41,49 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private HashMap<String, String> synapseProperties;
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private ClientLogger logger;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, ClientLogger logger) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.logger = logger;
 		isEditing = false;
+		initUncaughtExceptionHandler();
 	}
 	
+	public void initUncaughtExceptionHandler() {
+		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
+			public void onUncaughtException(Throwable e) {
+				handleUncaughtException(e);
+			}
+		});
+	}
+	
+	public void handleUncaughtException(Throwable e) {
+		try {
+			Throwable unwrapped = unwrap(e);
+			logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
+		} catch (Throwable t) {
+			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
+		} finally {
+			synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage());
+		}
+	}
+	
+	public Throwable unwrap(Throwable e) {
+		if (e instanceof UmbrellaException) {
+			UmbrellaException ue = (UmbrellaException) e;
+			if (ue.getCauses().size() == 1) {
+				return unwrap(ue.getCauses().iterator().next());
+			}
+		}
+		return e;
+	}
+
 	@Override
 	public PlaceChanger getPlaceChanger() {
 		if(placeChanger == null) {
