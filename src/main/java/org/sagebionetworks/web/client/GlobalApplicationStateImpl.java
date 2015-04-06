@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 
+	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -64,7 +65,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	public void handleUncaughtException(Throwable e) {
 		Throwable unwrapped = unwrap(e);
-		logger.errorToRepositoryServices("Uncaught JS Exception", unwrapped);
+		synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage());
+		logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
 	}
 	
 	public Throwable unwrap(Throwable e) {
