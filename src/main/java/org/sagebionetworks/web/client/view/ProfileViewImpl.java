@@ -14,8 +14,10 @@ import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -27,6 +29,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
+import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -148,6 +151,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button moreProjectsButton;
 	
+	//Project tab
+	//sort
+	@UiField
+	Button projectSortButton;
+	@UiField
+	DropDownMenu sortProjectsDropDownMenu;
+	
 	//Teams tab
 	@UiField
 	TextBox createTeamTextBox;
@@ -163,7 +173,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button teamSearchButton;
 	@UiField
 	Button projectSearchButton;
-	
+		
 	//Challenges
 	@UiField
 	FlowPanel challengesTabContent;
@@ -311,7 +321,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
 			}
-		});
+		});		
+		
 		showProfileButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -344,6 +355,25 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.welcomeToDashboardDismissed();
 			}
 		});
+	}
+	
+	public void clearSortOptions() {
+		sortProjectsDropDownMenu.clear();
+	}
+	
+	public void setSortText(String text) {
+		projectSortButton.setText(text);
+	}
+	
+	public void addSortOption(SortOptionEnum sortOption) {
+		final AnchorListItem newSortOption = new AnchorListItem(sortOption.sortText);
+		newSortOption.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.resort(newSortOption.getText());
+			}	
+		});
+		sortProjectsDropDownMenu.add(newSortOption);
 	}
 	
 	private void initCertificationBadge() {
