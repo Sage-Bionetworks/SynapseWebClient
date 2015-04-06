@@ -99,10 +99,12 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 				
 				private void renderPopover(final String content) {
 					isPopoverInitialized = true;
-					tooltip.setTitle(content);
-					tooltip.reconfigure();
-					if (isPopover)
-						tooltip.show();
+					if (widget.isAttached()) {
+						tooltip.setTitle(content);
+						tooltip.reconfigure();
+						if (isPopover)
+							tooltip.show();
+					}
 				}
 			});
 		} else {

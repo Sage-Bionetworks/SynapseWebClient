@@ -64,9 +64,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	public void handleUncaughtException(Throwable e) {
-		Throwable unwrapped = unwrap(e);
-		synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage());
-		logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
+		try {
+			Throwable unwrapped = unwrap(e);
+			logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
+		} catch (Throwable t) {
+			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
+		} finally {
+			synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage());
+		}
 	}
 	
 	public Throwable unwrap(Throwable e) {

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -96,6 +96,19 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.handleUncaughtException(t);
 		verify(mockSynapseJSNIUtils).consoleError(anyString());
 		verify(mockLogger).errorToRepositoryServices(anyString(), eq(t));
+	}
+	
+	@Test
+	public void testUncaughtJSExceptionsFailedServiceLog() {
+		Throwable t = new RuntimeException("uncaught");
+		//when we try to log the error to the repository services, 
+		//make sure we still send the error to the console, 
+		//and that calling does not throw any other uncaught exception.
+		doThrow(new NullPointerException()).when(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
+		globalApplicationState.handleUncaughtException(t);
+		verify(mockLogger).errorToRepositoryServices(anyString(), eq(t));
+		//called twice.  Once for the uncaught exception, and once to inform that the repo call method failed
+		verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());
 	}
 	
 	@Test
