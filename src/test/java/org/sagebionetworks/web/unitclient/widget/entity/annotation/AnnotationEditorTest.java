@@ -27,7 +27,7 @@ public class AnnotationEditorTest {
 	AnnotationEditor editor;
 	AnnotationEditorView mockView;
 	AnnotationCellFactory mockAnnotationCellFactory;
-	CellEditor mockCellEditor;
+	CellEditor mockCellEditor, mockCellEditor2;
 	Annotation annotation;
 	static String ANNOTATION_KEY = "size";
 	static String ANNOTATION_KEY_FROM_VIEW = "different_key";
@@ -39,9 +39,10 @@ public class AnnotationEditorTest {
 		editor = new AnnotationEditor(mockView, mockAnnotationCellFactory);
 		annotationValues = new ArrayList<String>();
 		mockCellEditor = mock(CellEditor.class);
+		mockCellEditor2 = mock(CellEditor.class);
 		when(mockView.getKey()).thenReturn(ANNOTATION_KEY_FROM_VIEW);
 		when(mockCellEditor.isValid()).thenReturn(true);
-		when(mockAnnotationCellFactory.createEditor(any(Annotation.class))).thenReturn(mockCellEditor);
+		when(mockAnnotationCellFactory.createEditor(any(Annotation.class))).thenReturn(mockCellEditor, mockCellEditor2);
 		annotation = new Annotation(ANNOTATION_TYPE.STRING, ANNOTATION_KEY, annotationValues);
 	}
 
@@ -98,7 +99,7 @@ public class AnnotationEditorTest {
 		verify(mockView, never()).addNewEditor(any(CellEditor.class));
 		captor.getValue().onKeyDown(mockEvent);
 		verify(mockView).addNewEditor(any(CellEditor.class));
-		verify(mockCellEditor).setFocus(true);
+		verify(mockCellEditor2).setFocus(true);
 	}
 
 	@Test
@@ -158,12 +159,20 @@ public class AnnotationEditorTest {
 
 	@Test
 	public void testOnValueDeleted() {
+		//also verify that when all values are deleted, then the annotation deleted callback in invoked
+		Callback mockDeletedCallback = mock(Callback.class);
 		annotationValues.add("value 1");
-		editor.configure(annotation, null);
-		
+		annotationValues.add("value 2");
+		editor.configure(annotation, mockDeletedCallback);
 		editor.onValueDeleted(mockCellEditor);
+		verify(mockDeletedCallback, never()).invoke();
+		
+		editor.onValueDeleted(mockCellEditor2);
+		verify(mockDeletedCallback).invoke();
+		
 		Annotation updatedAnnotation = editor.getUpdatedAnnotation();
 		assertEquals(0, updatedAnnotation.getValues().size());
+		
 	}
 
 	@Test
@@ -182,7 +191,7 @@ public class AnnotationEditorTest {
 		editor.onTypeChange(dateIndex);
 		verify(mockView).clearValueEditors();
 		verify(mockView, times(2)).addNewEditor(any(CellEditor.class));
-		verify(mockCellEditor).setFocus(true);
+		verify(mockCellEditor2).setFocus(true);
 		
 		assertEquals(ANNOTATION_TYPE.DATE, editor.getAnnotation().getType());
 		//after type change, should clear values
