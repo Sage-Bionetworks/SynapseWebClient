@@ -73,7 +73,7 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 
 	@Override
 	public void onEdit() {
-		preflightController.checkUploadToEntity(bundle, new Callback() {
+		preflightController.checkUpdateEntity(bundle, new Callback() {
 			@Override
 			public void invoke() {
 				editorDialog.configure(bundle, entityUpdatedHandler);

@@ -87,7 +87,7 @@ public class AnnotationsRendererWidgetTest {
 
 	@Test
 	public void testOnEdit() {
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		EntityUpdatedHandler updateHandler = mock(EntityUpdatedHandler.class);
 		widget.configure(mockBundle, true);
 		widget.setEntityUpdatedHandler(updateHandler);
@@ -106,7 +106,7 @@ public class AnnotationsRendererWidgetTest {
 	
 	@Test
 	public void testOnEditFailedPreflight() {
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		widget.configure(mockBundle, true);
 		//test that on edit, we pass the bundle and update handler to the edit dialog
 		widget.onEdit();
