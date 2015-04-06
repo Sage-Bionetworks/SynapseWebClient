@@ -323,12 +323,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void addFavorite(List<EntityHeader> headers) {
 		for (final EntityHeader header : headers) {
 			AnchorListItem favItem = new AnchorListItem(header.getName());
-			favItem.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.applyFavClick(header);
-				}
-			});
+			favItem.setHref(DisplayUtils.getSynapseHistoryToken(header.getId()));
 			headerFavList.add(favItem);
 		}
 	}

@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -134,13 +133,5 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView).clearFavorite();
 		verify(mockView).addFavorite(entityHeaders);
-	}
-
-	@Test
-	public void testApplyFavClick() {
-		EntityHeader entityHeader = new EntityHeader();
-		entityHeader.setId("syn012345");
-		header.applyFavClick(entityHeader);
-		verify(mockPlaceChanger).goTo(any(Synapse.class));
 	}
 }

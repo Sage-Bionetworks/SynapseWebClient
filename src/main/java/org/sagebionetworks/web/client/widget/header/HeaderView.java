@@ -41,7 +41,6 @@ public interface HeaderView extends IsWidget {
 		void onLoginClick();
 		void onRegisterClick();
 		void onFavoriteClick();
-		void applyFavClick(EntityHeader header);
 	}
 
 	public void setLargeLogo(boolean isHome);

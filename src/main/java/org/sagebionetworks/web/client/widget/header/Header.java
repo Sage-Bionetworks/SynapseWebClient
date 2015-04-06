@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -103,10 +102,5 @@ public class Header implements HeaderView.Presenter {
 		} else {
 			view.addFavorite(headers);
 		}
-	}
-
-	@Override
-	public void applyFavClick(EntityHeader header) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(header.getId()));
 	}
 }
