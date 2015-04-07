@@ -10,8 +10,11 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
@@ -57,6 +60,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -151,12 +155,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button moreProjectsButton;
 	
+	//Headings
+	@UiField
+	Heading projectsHeading;
+	@UiField
+	Heading teamsHeading;
+	@UiField
+	Heading challengesHeading;
+	
+	
 	//Project tab
-	//sort
 	@UiField
 	Button projectSortButton;
 	@UiField
-	DropDownMenu sortProjectsDropDownMenu;
+	DropDownMenu sortProjectsDropDownMenu;	
 	
 	//Teams tab
 	@UiField
@@ -432,7 +444,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
-			
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			//show create project and team UI
@@ -448,19 +459,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void resetHighlightBoxes() {
-		projectsHighlightBox.removeClassName("highlight-box");
-		challengesHighlightBox.removeClassName("highlight-box");
-		teamsHighlightBox.removeClassName("highlight-box");
+		projectsHeading.setText("");
+		teamsHeading.setText("");
+		challengesHeading.setText("");
+		projectsHeading.setVisible(false);
+		teamsHeading.setVisible(false);
+		challengesHeading.setVisible(false);
 	}
 	
 	private void setHighlightBoxUser(String displayName) {
-		projectsHighlightBox.addClassName("highlight-box");
-		challengesHighlightBox.addClassName("highlight-box");
-		teamsHighlightBox.addClassName("highlight-box");
-
-		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
-		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
-		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
+		projectsHeading.setText(displayName + "'s Projects");
+		teamsHeading.setText(displayName + "'s Teams");
+		challengesHeading.setText(displayName + "'s Challenges");
+		projectsHeading.setVisible(true);
+		teamsHeading.setVisible(true);
+		challengesHeading.setVisible(true);
 	}
 	
 	@Override
