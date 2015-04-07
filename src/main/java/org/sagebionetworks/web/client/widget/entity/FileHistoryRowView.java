@@ -16,9 +16,7 @@ public interface FileHistoryRowView extends IsWidget {
 			String size,
 			String md5,
 			String versionComment,
-			Callback deleteCallback, 
-			CallbackP<String> editNameCallback,
-			CallbackP<String> editCommentCallback);
+			Callback deleteCallback);
 	
 	void setCanEdit(boolean canEdit);
 	void setIsVersionLink(boolean isLink);

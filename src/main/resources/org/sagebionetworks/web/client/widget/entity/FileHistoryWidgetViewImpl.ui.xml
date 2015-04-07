@@ -11,6 +11,14 @@
 				<g:Hyperlink ui:field="currentVersionLink" text="Go to the current version" styleName="link" visible="false" />			
 			</g:HTMLPanel>
 			<b:Panel ui:field="previousVersions" visible="false">
+				<g:FlowPanel>
+					<b:Tooltip text="Edit version label">
+						<b:Button icon="EDIT" ui:field="editNameButton" addStyleNames="displayInline margin-left-3" text="Edit Version Label" />
+					</b:Tooltip>
+					<b:Tooltip text="Edit version comment">
+						<b:Button icon="EDIT" ui:field="editCommentButton" addStyleNames="displayInline margin-left-3" text="Edit Version Comment"/>
+					</b:Tooltip>
+				</g:FlowPanel>
 				<t:Table addStyleNames="table table-condensed">
 					<t:THead>
 						<t:TableRow>
