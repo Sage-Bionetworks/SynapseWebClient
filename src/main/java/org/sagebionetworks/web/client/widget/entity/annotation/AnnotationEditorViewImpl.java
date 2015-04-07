@@ -7,11 +7,9 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.InputGroupButton;
-import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -37,13 +35,9 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 	@UiField
 	FlowPanel editorsContainer;
 	@UiField
-	Button deleteAnnotationButton;
-	@UiField
 	FormGroup formGroup;
 	@UiField
 	HelpBlock helpBlock;
-	@UiField
-	Button newValueButton;
 	
 	@Inject
 	public AnnotationEditorViewImpl(Binder uiBinder){
@@ -52,19 +46,6 @@ public class AnnotationEditorViewImpl implements AnnotationEditorView {
 			@Override
 			public void onChange(ChangeEvent event) {
 				presenter.onTypeChange(typeComboBox.getSelectedIndex());
-			}
-		});
-		deleteAnnotationButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onDelete();
-			}
-		});
-		
-		newValueButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddNewValue();
 			}
 		});
 	}

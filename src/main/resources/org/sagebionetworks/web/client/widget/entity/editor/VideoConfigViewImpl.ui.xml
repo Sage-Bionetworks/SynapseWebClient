@@ -11,7 +11,7 @@
 		</g:FlowPanel>
 		<b:Row addStyleNames="margin-10">
 			<b:Column size="XS_6">
-				<b:Tooltip text="MPEG 4 files with H264 video codec and AAC audio codec">
+				<b:Tooltip title="MPEG 4 files with H264 video codec and AAC audio codec">
 					<b:InputGroup>
 						<b:TextBox ui:field="mp4Entity" autoComplete="false" enabled="false" />
 						<b:InputGroupButton>
@@ -24,7 +24,7 @@
 		</b:Row>
 		<b:Row addStyleNames="margin-10">
 			<b:Column size="XS_6">
-				<b:Tooltip text="Ogg files with Theora video codec and Vorbis audio codec">
+				<b:Tooltip title="Ogg files with Theora video codec and Vorbis audio codec">
 					<b:InputGroup>
 						<b:TextBox ui:field="oggEntity" autoComplete="false" enabled="false" />
 						<b:InputGroupButton>
@@ -37,7 +37,7 @@
 		</b:Row>
 		<b:Row addStyleNames="margin-10">
 			<b:Column size="XS_6">
-				<b:Tooltip text="WebM files with VP8 video codec and Vorbis audio codec">
+				<b:Tooltip title="WebM files with VP8 video codec and Vorbis audio codec">
 					<b:InputGroup>
 						<b:TextBox ui:field="webmEntity" autoComplete="false" enabled="false" />
 						<b:InputGroupButton>

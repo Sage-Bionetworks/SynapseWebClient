@@ -239,8 +239,7 @@ public class ProvViewUtil {
 	public static void createMessageConfig(String title, String text, Widget widget) {
 		Tooltip tip = new Tooltip(widget);
 		tip.setIsHtml(true);
-		tip.setTitle(title);
-		tip.setText(text);
+		tip.setTitle(text);
 		tip.setPlacement(Placement.BOTTOM);
 		tip.setShowDelayMs(200);
 	}

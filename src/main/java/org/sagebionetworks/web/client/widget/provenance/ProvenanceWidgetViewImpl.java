@@ -196,7 +196,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	}
 
 	private void addToolTipToContainer(final ProvGraphNode node, final ProvNodeContainer nodeContainer, final String title) {					
-		nodeContainer.getTip().setText(DisplayUtils.getLoadingHtml(sageImageBundle));
+		nodeContainer.getTip().setTitle(DisplayUtils.getLoadingHtml(sageImageBundle));
 		nodeContainer.getTip().addShowHandler(new ShowHandler() {
 			@Override
 			public void onShow(ShowEvent showEvent) {
@@ -226,7 +226,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 							 @Override
 							public void execute() {
 								boolean isShowingTooltip = node.isShowingTooltip();
-								nodeContainer.getTip().setText(rendered);
+								nodeContainer.getTip().setTitle(rendered);
 								nodeContainer.getTip().reconfigure();
 								if (isShowingTooltip)
 									nodeContainer.getTip().show();

@@ -63,8 +63,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 			
 			FileHandle data = attachments.get(i);
 			final String fileName = data.getFileName();
-			InlineRadio attachmentLink = new InlineRadio(data.getFileName());
-			attachmentLink.setName(FILENAMES);
+			InlineRadio attachmentLink = new InlineRadio(FILENAMES, data.getFileName());
 			attachmentLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -73,7 +72,7 @@ public class WikiAttachmentsViewImpl implements WikiAttachmentsView {
 			});
 			
 			if (i == 0) {
-				attachmentLink.setActive(true);
+				attachmentLink.setValue(true,  true);
 			}
 			
 			row.add(attachmentLink);

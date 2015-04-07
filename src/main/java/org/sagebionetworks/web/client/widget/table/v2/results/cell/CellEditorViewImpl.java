@@ -5,6 +5,10 @@ import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -12,6 +16,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
  * View with zero business logic.
  * 
@@ -19,23 +24,35 @@ import com.google.inject.Inject;
  *
  */
 public class CellEditorViewImpl implements CellEditorView {
-	
-	public interface Binder extends UiBinder<Widget, CellEditorViewImpl> {}
-	
+
+	public interface Binder extends UiBinder<Widget, CellEditorViewImpl> {
+	}
+
 	@UiField
 	FormGroup formGroup;
 	@UiField
 	TextBox textBox;
 	@UiField
 	HelpBlock helpBlock;
-	
+
 	Widget widget;
-	
+
 	@Inject
-	public CellEditorViewImpl(Binder binder){
+	public CellEditorViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
+		// users want us to select all on focus see SWC-2213
+		textBox.addFocusHandler(new FocusHandler() {
+			@Override
+			public void onFocus(FocusEvent event) {
+				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+					@Override
+					public void execute() {
+						textBox.selectAll();
+					}
+				});
+			}
+		});
 	}
-	
 
 	@Override
 	public Widget asWidget() {
@@ -75,7 +92,6 @@ public class CellEditorViewImpl implements CellEditorView {
 	@Override
 	public void setFocus(boolean focused) {
 		textBox.setFocus(focused);
-		textBox.selectAll();
 	}
 
 	@Override
@@ -92,7 +108,6 @@ public class CellEditorViewImpl implements CellEditorView {
 	public void setHelpText(String help) {
 		this.helpBlock.setText(help);
 	}
-
 
 	@Override
 	public void setPlaceholder(String placeholder) {
