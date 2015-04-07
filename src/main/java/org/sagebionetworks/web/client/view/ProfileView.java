@@ -93,8 +93,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void onEditProfile();
 		void onImportLinkedIn();
 		void welcomeToDashboardDismissed();
-		void resort(String text);
+		void resort(SortOptionEnum sortOption);
 	}
+
 
 
 }

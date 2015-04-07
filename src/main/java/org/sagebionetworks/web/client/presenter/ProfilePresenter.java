@@ -107,14 +107,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
 	}
-	
-	public SortOptionEnum getSort(String text) {
-		for (SortOptionEnum sort: SortOptionEnum.values()) {
-			if (text.equals(sort.sortText))
-				return sort;
-		}
-		return SortOptionEnum.values()[0];
-	}
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
@@ -162,7 +154,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	// Configuration
-	private void updateProfileView(String userId, final ProfileArea initialTab) {
+	public void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
 		view.showLoading();
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
@@ -372,9 +364,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			getUserProjects(currentProjectOffset);
 	}
 	
-	public void resort(String sortText) {
-		currentProjectSort = getSort(sortText);
-		view.setSortText(sortText);
+	@Override
+	public void resort(SortOptionEnum sort) {
+		currentProjectSort = sort;
+		view.setSortText(sort.sortText);
 		refreshProjects();
 	}	
 	

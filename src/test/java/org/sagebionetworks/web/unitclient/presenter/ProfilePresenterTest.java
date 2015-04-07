@@ -594,14 +594,20 @@ public class ProfilePresenterTest {
 	// Project Sorting tests
 	@Test
 	public void testOptionsAdded() {
-		// 4 is currently the number of sort options
-		verify(mockView, times(4)).addSortOption(any(SortOptionEnum.class));	
+		for (SortOptionEnum sort: SortOptionEnum.values())
+			verify(mockView).addSortOption(sort);	
+	}
+	
+	@Test
+	public void testDefaultSortOption() throws JSONObjectAdapterException {
+		profilePresenter.updateProfileView("valid name", ProfileArea.PROJECTS);
+		verify(mockView).setSortText(SortOptionEnum.LATEST_ACTIVITY.sortText);
 	}
 	
 	@Test
 	public void testSortedByLatestActivity() {
 		SortOptionEnum latestActivity = SortOptionEnum.LATEST_ACTIVITY;
-		profilePresenter.resort(SortOptionEnum.LATEST_ACTIVITY.sortText);
+		profilePresenter.resort(SortOptionEnum.LATEST_ACTIVITY);
 		verify(mockView).setSortText(eq(latestActivity.sortText));
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(latestActivity.sortBy), eq(latestActivity.sortDir), any(AsyncCallback.class));
 	}
@@ -609,7 +615,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testSortedByEarliestActivity() {
 		SortOptionEnum earliestActivity = SortOptionEnum.EARLIEST_ACTIVITY;
-		profilePresenter.resort(earliestActivity.sortText);
+		profilePresenter.resort(earliestActivity);
 		verify(mockView).setSortText(eq(earliestActivity.sortText));
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(earliestActivity.sortBy), eq(earliestActivity.sortDir), any(AsyncCallback.class));
 	}
@@ -617,7 +623,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testSortedByNameAZ() {
 		SortOptionEnum nameAZ = SortOptionEnum.NAME_A_Z;
-		profilePresenter.resort(nameAZ.sortText);
+		profilePresenter.resort(nameAZ);
 		verify(mockView).setSortText(eq(nameAZ.sortText));
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(nameAZ.sortBy), eq(nameAZ.sortDir), any(AsyncCallback.class));	
 	}
@@ -625,7 +631,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testSortedByLastNameZA() {
 		SortOptionEnum nameZA = SortOptionEnum.NAME_Z_A;
-		profilePresenter.resort(nameZA.sortText);
+		profilePresenter.resort(nameZA);
 		verify(mockView).setSortText(nameZA.sortText);
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), eq(nameZA.sortBy), eq(nameZA.sortDir), any(AsyncCallback.class));
 	}
