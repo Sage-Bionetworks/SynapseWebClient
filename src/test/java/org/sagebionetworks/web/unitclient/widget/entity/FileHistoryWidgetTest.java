@@ -236,4 +236,51 @@ public class FileHistoryWidgetTest {
 		verify(mockView, never()).showEditVersionComment(anyString());
 	}
 	
+	@Test
+	public void testSetEntityBundleCanEditCurrent() {
+		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		
+		//auto expand version history = false
+		verify(mockView).setEntityBundle(vb, false);
+		verify(mockView).setEditVersionCommentButtonVisible(true);
+		verify(mockView).setEditVersionLabelButtonVisible(true);
+	}
+	
+	@Test
+	public void testSetEntityBundleCanEditPrevious() {
+		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
+		fileHistoryWidget.setEntityBundle(bundle, 24L);
+
+		//auto expand version history = true
+		verify(mockView).setEntityBundle(vb, true);
+		verify(mockView).setEditVersionCommentButtonVisible(false);
+		verify(mockView).setEditVersionLabelButtonVisible(false);
+	}
+	
+	@Test
+	public void testSetEntityBundleNoEditCurrent() {
+		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(false);
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		
+		//auto expand version history = false
+		verify(mockView).setEntityBundle(vb, false);
+		verify(mockView).setEditVersionCommentButtonVisible(false);
+		verify(mockView).setEditVersionLabelButtonVisible(false);
+	}
+	
+	@Test
+	public void testSetEntityBundleNoEditPrevious() {
+		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(false);
+		fileHistoryWidget.setEntityBundle(bundle, 24L);
+
+		//auto expand version history = false
+		verify(mockView).setEntityBundle(vb, true);
+		verify(mockView).setEditVersionCommentButtonVisible(false);
+		verify(mockView).setEditVersionLabelButtonVisible(false);
+
+	}
+	
+	
+	
 }
