@@ -10,6 +10,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,11 +40,14 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -63,6 +67,7 @@ public class FileHistoryWidgetTest {
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	JiraURLHelper mockJiraURLHelper;
+	PreflightController mockPreflightController;
 	FileHistoryWidget fileHistoryWidget;
 	Versionable vb;
 	String entityId = "syn123";
@@ -82,7 +87,7 @@ public class FileHistoryWidgetTest {
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
-
+		mockPreflightController = mock(PreflightController.class);
 		UserSessionData usd = new UserSessionData();
 		UserProfile up = new UserProfile();
 		up.setOwnerId("101");
@@ -92,7 +97,7 @@ public class FileHistoryWidgetTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 
-		fileHistoryWidget = new FileHistoryWidget(mockView, mockNodeModelCreator, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPaginationWidget);
+		fileHistoryWidget = new FileHistoryWidget(mockView, mockNodeModelCreator, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPaginationWidget, mockPreflightController);
 
 		vb = new FileEntity();
 		vb.setId(entityId);
@@ -193,4 +198,42 @@ public class FileHistoryWidgetTest {
 		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 	}
+	
+	@Test
+	public void testOnEdit() {
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		String oldValue = "an old comment";
+		vb.setVersionComment(oldValue);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		fileHistoryWidget.onEditVersionCommentClicked();
+		verify(mockView).showEditVersionComment(oldValue);
+	}
+	
+	@Test
+	public void testOnEditFailedPreflight() {
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		fileHistoryWidget.onEditVersionCommentClicked();
+		verify(mockView, never()).showEditVersionComment(anyString());
+	}
+	
+
+	@Test
+	public void testOnEditLabel() {
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		String oldValue = "an old label";
+		vb.setVersionLabel(oldValue);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		fileHistoryWidget.onEditVersionLabelClicked();
+		verify(mockView).showEditVersionLabel(oldValue);
+	}
+	
+	@Test
+	public void testOnEditLabelFailedPreflight() {
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		fileHistoryWidget.onEditVersionCommentClicked();
+		verify(mockView, never()).showEditVersionComment(anyString());
+	}
+	
 }
