@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -46,6 +47,10 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	private MarkdownWidget markdownWidget;
 	private Presenter presenter;
 	
+	@UiField
+	public Modal editorDialog;
+	@UiField
+	public TextBox titleField;
 	//dialog for the formatting guide
 	@UiField
 	public Div mdCommands;
@@ -194,7 +199,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.resourceLoader = resourceLoader;
 		this.markdownWidget = markdownWidget;
 		markdownWidget.addStyleName("margin-10");
-		
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		buttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BUTTON_LINK));
@@ -248,7 +252,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading4Link.addStyleName("font-size-18");
 		heading5Link.addStyleName("font-size-14");
 		heading6Link.addStyleName("font-size-12");
-		
 		markdownTextArea.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -260,6 +263,11 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				presenter.markdownEditorClicked();
+			}
+		});
+		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
 				resizeMarkdownTextArea();
 			}
 		});
@@ -337,9 +345,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		formattingGuideContainer.clear();
 		formattingGuideContainer.add(markdownWidget);
 	}
-	
+
 	private void resizeMarkdownTextArea() {
-		markdownTextArea.setHeight(Integer.toString((int)(Window.getClientHeight() * .7)) + "px");
+		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight()) + "px");
 	}
 	
 	@Override
@@ -347,6 +355,15 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		alphaInsertButton.setVisible(visible);
 	}
 	
+	@Override
+	public void showEditorModal() {
+		editorDialog.show();
+	}
+	
+	@Override
+	public void hideEditorModal() {
+		editorDialog.hide();
+	}
 	
 	@Override
 	public void setEditButtonEnabled(boolean enabled) {
@@ -427,5 +444,15 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setSelectionRange(int pos, int length) {
 		markdownTextArea.setSelectionRange(pos, length);
+	}
+	
+	@Override
+	public void setTitleEditorVisible(boolean visible) {
+		titleField.setVisible(visible);
+	}
+	
+	@Override
+	public String getTitle() {
+		return titleField.getValue();
 	}
 }

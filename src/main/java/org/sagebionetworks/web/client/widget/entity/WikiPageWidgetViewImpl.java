@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -398,19 +397,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				if(isHistoryOpen) {
 					historyWidget.hideHistoryWidget();
 				}
-				//change to edit mode
-				clear();
 				//inform presenter that edit was clicked
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
-				final TextBox titleField = new TextBox();
-				if (!isRootWiki) {
-					titleField.setValue(presenter.getWikiPage().getTitle());
-					titleField.addStyleName("font-size-32 margin-bottom-10");
-					titleField.setHeight("45px");					
-					add(titleField);
-				}
-				//also add commands at the bottom
+				markdownEditorWidget.setTitleEditorVisible(!isRootWiki);
+				markdownEditorWidget.setTitle(presenter.getWikiPage().getTitle());
+				//also add commands to the bottom
 				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
@@ -423,7 +415,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				markdownEditorWidget.setActionHandler(MarkdownEditorAction.SAVE, new Callback() {
 					@Override
 					public void invoke() {
-						saveClicked(titleField, markdownEditorWidget);
+						saveClicked();
 					}
 				});
 				
@@ -440,8 +432,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 						deleteClicked();
 					}
 				});
-				
-				add(markdownEditorWidget.asWidget());
+				markdownEditorWidget.showEditorModal();
 			}
 		});
 
@@ -491,12 +482,17 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		});
 	}
 	
-	public void saveClicked(TextBox titleField, MarkdownEditorWidget editorWidget) {
-		presenter.saveClicked(titleField.getValue(), editorWidget.getMarkdown());
+	public void saveClicked() {
+		presenter.saveClicked(markdownEditorWidget.getTitle(), markdownEditorWidget.getMarkdown());
 	}
 	
 	public void cancelClicked() {
 		presenter.cancelClicked();
+	}
+	
+	@Override
+	public void hideEditor() {
+		markdownEditorWidget.hideEditorModal();
 	}
 	
 	public void showErrorMessage(String message) {

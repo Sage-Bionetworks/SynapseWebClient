@@ -470,6 +470,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckAddWiki(){
+		//is there already a wiki?
 		WikiPage page = new WikiPage();
 		synapseClient.createV2WikiPageWithV1(this.entityBundle.getEntity(). getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>(){
 

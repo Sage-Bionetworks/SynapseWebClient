@@ -219,6 +219,7 @@ SynapseWidgetPresenter {
 			public void onSuccess(WikiPage result) {
 				//we have successfully saved, so we are no longer editing
 				setIsEditing(false);
+				view.hideEditor();
 				//now refresh the page
 				refresh();
 			}
@@ -237,6 +238,7 @@ SynapseWidgetPresenter {
 			@Override
 			public void onSuccess(Void result) {
 				setIsEditing(false);
+				view.hideEditor();
 				//clear the now invalid page id from the wiki key
 				wikiKey.setWikiPageId(null);
 				if (isEmbeddedInOwnerPage)
@@ -256,7 +258,7 @@ SynapseWidgetPresenter {
 	@Override
 	public void cancelClicked() {
 		setIsEditing(false);
-		refresh();
+		view.hideEditor();
 	}
 	
 	private void setIsEditing(boolean isEditing) {

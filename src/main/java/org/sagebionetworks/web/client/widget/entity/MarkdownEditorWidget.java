@@ -125,6 +125,14 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		}
 	}
 	
+	public void showEditorModal(){
+		view.showEditorModal();
+	}
+	
+	public void hideEditorModal(){
+		view.hideEditorModal();
+	}
+	
 	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {
 		synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
 			@Override
@@ -424,5 +432,12 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	 */
 	public WidgetSelectionState getWidgetSelectionState() {
 		return widgetSelectionState;
+	}
+	
+	public void setTitleEditorVisible(boolean visible){
+		view.setTitleEditorVisible(visible);
+	}
+	public String getTitle() {
+		return view.getTitle();
 	}
 }
