@@ -3,13 +3,16 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
+import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
@@ -44,6 +47,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
 	void clearProjects();
+	void setSortText(String text);
 	void setIsMoreProjectsVisible(boolean isVisible);
 	void clearTeamNotificationCount();
 	void refreshTeamInvites();
@@ -66,8 +70,10 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setHideProfileButtonVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
-	
+	void addSortOption(SortOptionEnum sort);
+	void clearSortOptions();
 	void setWelcomeToDashboardVisible(boolean isVisible);
+	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
@@ -87,5 +93,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void onEditProfile();
 		void onImportLinkedIn();
 		void welcomeToDashboardDismissed();
+		void resort(SortOptionEnum sortOption);
 	}
+
+
+
 }
