@@ -54,7 +54,7 @@ import com.google.inject.Inject;
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
-	public static final String USER_PROFILE_WELCOME_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.welcome.message.visible.state";
+	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
 	
 	private Profile place;
 	private ProfileView view;
@@ -182,7 +182,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(UserProfile profile) {
 					initializeShowHideProfile(isOwner);
-					initializeShowHideWelcome(isOwner);
+					initializeShowHideCertification(isOwner);
 					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 				}
 			@Override
@@ -239,22 +239,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void initializeShowHideWelcome(boolean isOwner) {
+	public void initializeShowHideCertification(boolean isOwner) {
 		if (isOwner) {
-			boolean isWelcomeMessageVisible = true;
+			boolean isCertificationMessageVisible = true;
 			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY);
+				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY);
 				if (cookieValue != null && !cookieValue.isEmpty()) {
-					isWelcomeMessageVisible = Boolean.valueOf(cookieValue);	
+					isCertificationMessageVisible = Boolean.valueOf(cookieValue);	
 				}
 			} catch (Exception e) {
-				//if there are any problems getting the welcome message visibility state, ignore and use default (show)
+				//if there are any problems getting the certification message visibility state, ignore and use default (show)
 			}
-			view.setWelcomeToDashboardVisible(isWelcomeMessageVisible);
+			view.setGetCertifiedVisible(isCertificationMessageVisible);
 		} else {
 			//not the owner
-			//hide welcome message
-			view.setWelcomeToDashboardVisible(false);
+			//hide certification message
+			view.setGetCertifiedVisible(false);
 		}
 	}
 	
@@ -773,11 +773,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void welcomeToDashboardDismissed() {
-		//set welcome message visible=false for a year
+	public void setGetCertifiedDismissed() {
+		//set certification message visible=false for a year
 		Date yearFromNow = new Date();
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		cookies.setCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
+		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
 	}
 	
 	/**

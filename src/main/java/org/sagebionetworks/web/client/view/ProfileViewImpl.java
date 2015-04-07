@@ -216,7 +216,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button hideProfileButton;
 	@UiField
-	Alert welcomeToDashboardAlert;
+	Alert getCertifiedAlert;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -356,10 +356,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.onImportLinkedIn();
 			}
 		});
-		welcomeToDashboardAlert.addClosedHandler(new AlertClosedHandler() {
+		getCertifiedAlert.addClosedHandler(new AlertClosedHandler() {
 			@Override
 			public void onClosed(AlertClosedEvent evt) {
-				presenter.welcomeToDashboardDismissed();
+				presenter.setGetCertifiedDismissed();
 			}
 		});
 	}
@@ -906,7 +906,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setWelcomeToDashboardVisible(boolean isVisible) {
-		welcomeToDashboardAlert.setVisible(isVisible);	
+	public void setGetCertifiedVisible(boolean isVisible) {
+		getCertifiedAlert.setVisible(isVisible);	
 	}
 }

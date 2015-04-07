@@ -982,44 +982,44 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testInitShowHideWelcomeNotOwner() {
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn(null);
-		profilePresenter.initializeShowHideWelcome(false);
-		verify(mockView).setWelcomeToDashboardVisible(false);
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn(null);
+		profilePresenter.initializeShowHideCertification(false);
+		verify(mockView).setGetCertifiedVisible(false);
 	}
 	
 	@Test
 	public void testInitShowHideWelcomeNullCookieValue() {
 		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn(null);
-		profilePresenter.initializeShowHideWelcome(true);
-		verify(mockView).setWelcomeToDashboardVisible(true);
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn(null);
+		profilePresenter.initializeShowHideCertification(true);
+		verify(mockView).setGetCertifiedVisible(true);
 	}
 	
 	@Test
 	public void testInitShowHideWelcomeEmptyCookieValue() {
 		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn("");
-		profilePresenter.initializeShowHideWelcome(true);
-		verify(mockView).setWelcomeToDashboardVisible(true);
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("");
+		profilePresenter.initializeShowHideCertification(true);
+		verify(mockView).setGetCertifiedVisible(true);
 	}
 	@Test
 	public void testInitShowHideWelcomeTrueCookieValue() {
 		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn("true");
-		profilePresenter.initializeShowHideWelcome(true);
-		verify(mockView).setWelcomeToDashboardVisible(true);
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("true");
+		profilePresenter.initializeShowHideCertification(true);
+		verify(mockView).setGetCertifiedVisible(true);
 	}
 	@Test
 	public void testInitShowHideWelcomeFalseCookieValue() {
 		//return null
-		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY))).thenReturn("false");
-		profilePresenter.initializeShowHideWelcome(true);
-		verify(mockView).setWelcomeToDashboardVisible(false);
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("false");
+		profilePresenter.initializeShowHideCertification(true);
+		verify(mockView).setGetCertifiedVisible(false);
 	}
 	@Test
 	public void testWelcomeToDashboardDismissed() {
-		profilePresenter.welcomeToDashboardDismissed();
-		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_WELCOME_VISIBLE_STATE_KEY), eq(Boolean.FALSE.toString()), any(Date.class));
+		profilePresenter.setGetCertifiedDismissed();
+		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY), eq(Boolean.FALSE.toString()), any(Date.class));
 	}
 
 }
