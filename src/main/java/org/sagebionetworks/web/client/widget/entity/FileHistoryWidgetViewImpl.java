@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -8,11 +9,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -50,15 +51,49 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	SimplePanel paginationWidgetContainer;
 	@UiField
 	Hyperlink currentVersionLink;
-
+	@UiField
+	Button editNameButton;
+	@UiField
+	Button editCommentButton;
+	EntityNameModalView editCommentModal, editLabelModal;
+	
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private Presenter presenter;
 	
 	@Inject
-	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector) {
+	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, EntityNameModalView editCommentDialog, EntityNameModalView editLabelDialog) {
 		this.ginInjector = ginInjector;
+		this.editCommentModal = editCommentDialog;
+		this.editLabelModal = editLabelDialog;
+		
 		initWidget(uiBinder.createAndBindUi(this));
 		DisplayUtils.configureShowHide(allVersions, previousVersions);
+		
+		editLabelModal.setPresenter(new EntityNameModalView.Presenter() {
+			@Override
+			public void onPrimary() {
+				presenter.updateVersionLabel(editLabelModal.getName());
+			}
+		});
+		editCommentModal.setPresenter(new EntityNameModalView.Presenter() {
+			@Override
+			public void onPrimary() {
+				presenter.updateVersionComment(editCommentModal.getName());
+			}
+		});
+		
+		editNameButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onEditVersionLabelClicked();
+			}
+		});
+		editCommentButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onEditVersionCommentClicked();
+			}
+		});
 	}
 	
 	@Override
@@ -97,26 +132,13 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 				presenter.deleteVersion(version.getVersionNumber());
 			}
 		};
-		CallbackP<String> editNameCallback = new CallbackP<String>() {
-			@Override
-			public void invoke(String newName) {
-				presenter.updateVersionLabel(newName);
-			}
-		};
-		
-		CallbackP<String> editCommentCallback = new CallbackP<String>() {
-			@Override
-			public void invoke(String newComment) {
-				presenter.updateVersionComment(newComment);
-			}
-		};
 
 		String versionComment = version.getVersionComment();
 		Long versionNumber = version.getVersionNumber();
 		String versionHref = DisplayUtils.
 				getSynapseHistoryToken(version.getId(),
 				version.getVersionNumber());
-		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback, editNameCallback, editCommentCallback);
+		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback);
 		previousVersionsTable.add(fileHistoryRow.asWidget());
 		fileHistoryRow.setCanEdit(canEdit);
 		fileHistoryRow.setIsVersionLink(!isVersionSelected);
@@ -164,4 +186,32 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	public void setPaginationWidget(Widget widget) {
 		paginationWidgetContainer.setWidget(widget);
 	}
+	
+	@Override
+	public void setEditVersionCommentButtonVisible(boolean isVisible) {
+		editCommentButton.setVisible(isVisible);
+	}
+	@Override
+	public void setEditVersionLabelButtonVisible(boolean isVisible) {
+		editNameButton.setVisible(isVisible);
+	}
+	@Override
+	public void showEditVersionLabel(String oldValue) {
+		editLabelModal.configure("Edit Version Label", "Version label", DisplayConstants.OK, oldValue);
+		editLabelModal.show();
+	}
+	@Override
+	public void showEditVersionComment(String oldValue) {
+		editCommentModal.configure("Edit Version Comment", "Version comment", DisplayConstants.OK, oldValue);
+		editCommentModal.show();
+	}
+	@Override
+	public void hideEditVersionLabel() {
+		editLabelModal.hide();
+	}
+	@Override
+	public void hideEditVersionComment() {
+		editCommentModal.hide();
+	}
+	
 }
