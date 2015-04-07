@@ -55,13 +55,13 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	Button editNameButton;
 	@UiField
 	Button editCommentButton;
-	EntityNameModalView editCommentModal, editLabelModal;
+	PromptModalView editCommentModal, editLabelModal;
 	
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private Presenter presenter;
 	
 	@Inject
-	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, EntityNameModalView editCommentDialog, EntityNameModalView editLabelDialog) {
+	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptModalView editCommentDialog, PromptModalView editLabelDialog) {
 		this.ginInjector = ginInjector;
 		this.editCommentModal = editCommentDialog;
 		this.editLabelModal = editLabelDialog;
@@ -69,13 +69,13 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		initWidget(uiBinder.createAndBindUi(this));
 		DisplayUtils.configureShowHide(allVersions, previousVersions);
 		
-		editLabelModal.setPresenter(new EntityNameModalView.Presenter() {
+		editLabelModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
 			public void onPrimary() {
 				presenter.updateVersionLabel(editLabelModal.getName());
 			}
 		});
-		editCommentModal.setPresenter(new EntityNameModalView.Presenter() {
+		editCommentModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
 			public void onPrimary() {
 				presenter.updateVersionComment(editCommentModal.getName());
