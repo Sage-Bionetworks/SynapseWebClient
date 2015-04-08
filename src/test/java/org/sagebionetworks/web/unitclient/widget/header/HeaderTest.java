@@ -15,10 +15,13 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -29,6 +32,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class HeaderTest {
 
@@ -36,6 +40,7 @@ public class HeaderTest {
 	HeaderView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
+	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
@@ -46,8 +51,9 @@ public class HeaderTest {
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient);
 		entityHeaders = new ArrayList<EntityHeader>();
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
 	}
@@ -133,5 +139,35 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView).clearFavorite();
 		verify(mockView).addFavorite(entityHeaders);
+	}
+
+	@Test
+	public void testFavoriteRoundTrip() {
+		// Anonymous User
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		header.refresh();
+		verify(mockSynapseClient, Mockito.never()).getFavorites(any(AsyncCallback.class));
+
+		// After User Logged in
+		UserSessionData userSessionData = new UserSessionData();
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
+		header.refresh();
+		verify(mockSynapseClient, Mockito.times(1)).getFavorites(any(AsyncCallback.class));
+
+		// User refresh
+		header.refresh();
+		verify(mockSynapseClient, Mockito.times(1)).getFavorites(any(AsyncCallback.class));
+
+		// A different user was returned
+		UserSessionData userSessionData2 = new UserSessionData();
+		userSessionData2.setProfile(new UserProfile());
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData2);
+		header.refresh();
+		verify(mockSynapseClient, Mockito.times(2)).getFavorites(any(AsyncCallback.class));
+
+		// User logged out
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		header.refresh();
+		verify(mockSynapseClient, Mockito.times(2)).getFavorites(any(AsyncCallback.class));
 	}
 }
