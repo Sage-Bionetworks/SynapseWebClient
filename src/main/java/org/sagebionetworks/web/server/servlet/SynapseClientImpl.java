@@ -157,7 +157,6 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -3047,23 +3046,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@Override
-	public ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset) throws RestServiceException {
+	public ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(projectListType, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC, limit, offset);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset);
 			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	
-	@Override
-	public ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset) throws RestServiceException {
+	
+	public ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long teamIdLong = Long.parseLong(teamId);
-			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC, limit, offset);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset);
 			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -3071,12 +3069,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	
-	@Override
-	public ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException {
+	
+	public ProjectPagedResults getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long userIdLong = Long.parseLong(userId);
-			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC, limit, offset);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset);
 			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -3117,7 +3115,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	@Override
 	public void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
