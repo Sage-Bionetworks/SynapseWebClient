@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -151,22 +152,22 @@ public class HeaderTest {
 		UserSessionData userSessionData = new UserSessionData();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
 		header.refresh();
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseClient, Mockito.times(1)).getFavorites(any(AsyncCallback.class));
 
 		// User refresh
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
 		header.refresh();
-		verify(mockSynapseClient, Mockito.times(2)).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseClient, Mockito.times(1)).getFavorites(any(AsyncCallback.class));
 
 		// A different user was returned
-		userSessionData = new UserSessionData();
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
+		UserSessionData userSessionData2 = new UserSessionData();
+		userSessionData2.setProfile(new UserProfile());
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData2);
 		header.refresh();
-		verify(mockSynapseClient, Mockito.times(3)).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseClient, Mockito.times(2)).getFavorites(any(AsyncCallback.class));
 
 		// User logged out
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
 		header.refresh();
-		verify(mockSynapseClient, Mockito.times(3)).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseClient, Mockito.times(2)).getFavorites(any(AsyncCallback.class));
 	}
 }

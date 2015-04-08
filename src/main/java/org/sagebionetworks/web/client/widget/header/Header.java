@@ -64,18 +64,18 @@ public class Header implements HeaderView.Presenter {
 
 	public void refresh() {
 		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
-		if (cachedUserSessionData == null || cachedUserSessionData.equals(userSessionData)) {
+		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)) {
 			cachedUserSessionData = userSessionData;
 			view.setUser(userSessionData);
-		}
-		if (userSessionData != null) {
-			initUserFavorites(new Callback(){
-				@Override
-				public void invoke() {
-					// only get called on failure
-					view.clearFavorite();
-				}
-			});
+			if (userSessionData != null) {
+				initUserFavorites(new Callback(){
+					@Override
+					public void invoke() {
+						// only get called on failure
+						view.clearFavorite();
+					}
+				});
+			}
 		}
 		view.refresh();
 		view.setSearchVisible(true);
@@ -126,7 +126,6 @@ public class Header implements HeaderView.Presenter {
 		}
 	}
 
-	//TODO: should this be public?
 	@Override
 	public void initUserFavorites(final Callback callback) {
 		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
