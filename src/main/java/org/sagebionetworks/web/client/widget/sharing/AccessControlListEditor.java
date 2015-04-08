@@ -49,7 +49,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private AccessControlListEditorView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
-	private boolean unsavedViewChanges;
 	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
@@ -106,10 +105,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	 */
 	public String getResourceId() {
 		return entity == null ? null : entity.getId();
-	}
-	
-	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
-		this.unsavedViewChanges = unsavedViewChanges;
 	}
 	
 	/**
@@ -374,17 +369,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	public void pushChangesToSynapse(final boolean recursive, final Callback changesPushedCallback) {
-		if(unsavedViewChanges) {
-			view.alertUnsavedViewChanges(new Callback() {
-				
-				@Override
-				public void invoke() {
-					pushChangesToSynapse(recursive, changesPushedCallback);
-				}
-			});
-			return;
-		}
-		
 		validateEditorState();
 		
 		// Create an async callback to receive the updated ACL from Synapse

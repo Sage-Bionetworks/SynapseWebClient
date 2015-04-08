@@ -53,7 +53,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private AuthenticationController authenticationController;
 	private JSONObjectAdapter jsonObjectAdapter;
 	
-	private boolean unsavedViewChanges;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
 	
@@ -112,10 +111,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	 */
 	public String getResourceId() {
 		return evaluation == null ? null : evaluation.getId();
-	}
-	
-	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
-		this.unsavedViewChanges = unsavedViewChanges;
 	}
 	
 	public PermissionLevel[] getPermList() {
@@ -372,16 +367,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	}
 	
 	public void pushChangesToSynapse(final Callback changesPushedCallback) {
-		if(unsavedViewChanges) {
-			view.alertUnsavedViewChanges(new Callback() {
-				@Override
-				public void invoke() {
-					pushChangesToSynapse(changesPushedCallback);
-				}
-			});
-			return;
-		}
-		
 		validateEditorState();
 		
 		// Create an async callback to receive the updated ACL from Synapse
