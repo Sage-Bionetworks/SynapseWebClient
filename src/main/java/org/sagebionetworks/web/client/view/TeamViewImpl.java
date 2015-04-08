@@ -160,6 +160,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 			};
 			uploader.configure("Update Icon", null, null, null, fileHandleIdCallback, false);
 			Anchor uploadLink = new Anchor("Update Icon");
+			//void enableMultipleFileUploads(boolean isEnabled);
+
 			uploadLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

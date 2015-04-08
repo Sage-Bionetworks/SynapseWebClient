@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -89,7 +90,23 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		init();
 	}
 	
+	// Apply to all input fields if clickEvent is enter
 	public void init() {
+		ClickHandler register = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					registerBtn.click();
+				}
+			}
+		};
+		emailField.addClickHandler(register);
+		firstNameField.addClickHandler(register);
+		lastNameField.addClickHandler(register);
+		userNameField.addClickHandler(register);
+		password1Field.addClickHandler(register);
+		password2Field.addClickHandler(register);
+		
 		registerBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

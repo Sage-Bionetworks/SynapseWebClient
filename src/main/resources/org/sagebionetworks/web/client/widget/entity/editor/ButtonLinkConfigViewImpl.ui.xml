@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<b:Form type="HORIZONTAL">
+		<g:FlowPanel>
 			<b:FieldSet>
 				<b:FormGroup>
 					<b:FormLabel for="url" addStyleNames="col-xs-2">URL</b:FormLabel>
@@ -20,7 +20,7 @@
 					</g:FlowPanel>
 				</b:FormGroup>
 			</b:FieldSet>
-		</b:Form>
+		</g:FlowPanel>
 	</bh:Div>
 	
 </ui:UiBinder>

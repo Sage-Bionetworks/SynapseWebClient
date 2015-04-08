@@ -14,7 +14,7 @@
 		<b:Modal ui:field="newColumnModal" title="Column Configuration"
 			fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
-				<b:Form type="HORIZONTAL">
+				<g:FlowPanel>
 					<b:FieldSet>
 						<b:FormGroup>
 							<b:FormLabel for="renderer" addStyleNames="col-xs-4">Renderer</b:FormLabel>
@@ -52,7 +52,7 @@
 							</g:FlowPanel>
 						</b:FormGroup>
 					</b:FieldSet>
-				</b:Form>
+				</g:FlowPanel>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="newColumnCancelButton" type="DEFAULT">Cancel</b:Button>
