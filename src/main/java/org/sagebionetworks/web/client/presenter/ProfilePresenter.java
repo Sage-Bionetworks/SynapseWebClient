@@ -6,11 +6,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -76,7 +74,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public final static int CHALLENGE_PAGE_SIZE=100;
 	public ProjectFilterEnum filterType;
 	public Team filterTeam;
-	public SortOptionEnum currentProjectSort;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -99,11 +96,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.linkedInService = linkedInServic;
 		this.gwt = gwt;
-		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
-		view.clearSortOptions();
-		for (SortOptionEnum sort: SortOptionEnum.values()) {
-			view.addSortOption(sort);
-		}
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
 	}
@@ -153,17 +145,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 
-	// Configuration
-	public void updateProfileView(String userId, final ProfileArea initialTab) {
+	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
 		view.showLoading();
-		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
-		view.setSortText(currentProjectSort.sortText);
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
-		view.setProfileEditButtonVisible(isOwner);	
-		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
+		view.setProfileEditButtonVisible(isOwner);	currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
 			initUserFavorites(new Callback() {
@@ -365,13 +353,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void resort(SortOptionEnum sort) {
-		currentProjectSort = sort;
-		view.setSortText(sort.sortText);
-		refreshProjects();
-	}	
-	
-	@Override
 	public void refreshTeams() {
 		view.showTeamsLoading();
 		teamNotificationCount = 0;
@@ -410,7 +391,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == filter) {
@@ -428,7 +409,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
@@ -446,7 +427,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				List<ProjectHeader> headers = projectHeaders.getResults();

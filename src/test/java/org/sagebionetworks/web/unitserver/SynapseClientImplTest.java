@@ -1412,7 +1412,7 @@ public class SynapseClientImplTest {
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
-		synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC);
+		synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset);
 		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
@@ -1422,7 +1422,7 @@ public class SynapseClientImplTest {
 		int offset = 20;
 		Long userId = 133l;
 		String userIdString = userId.toString();
-		synapseClient.getUserProjects(userIdString, limit, offset, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC);
+		synapseClient.getUserProjects(userIdString, limit, offset);
 		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 	
@@ -1432,7 +1432,7 @@ public class SynapseClientImplTest {
 		int offset = 40;
 		Long teamId = 144l;
 		String teamIdString = teamId.toString();
-		synapseClient.getProjectsForTeam(teamIdString, limit, offset, ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC);
+		synapseClient.getProjectsForTeam(teamIdString, limit, offset);
 		verify(mockSynapse).getProjectsForTeam(eq(teamId), eq(ProjectListSortColumn.LAST_ACTIVITY), eq(SortDirection.DESC), eq(limit), eq(offset));
 	}
 
