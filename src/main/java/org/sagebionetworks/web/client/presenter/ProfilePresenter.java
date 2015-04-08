@@ -182,7 +182,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(UserProfile profile) {
 					initializeShowHideProfile(isOwner);
-					initializeShowHideCertification(isOwner);
 					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 				}
 			@Override
@@ -202,9 +201,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, isOwner, passingRecord);
 					tabClicked(area);
-					if (passingRecord == null) {
-						initializeShowHideCertification(isOwner);
-					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -248,7 +244,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			boolean isCertificationMessageVisible = false;
 			try {
 				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY);
-				if (cookieValue == null || Boolean.valueOf(cookieValue)) {
+				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
 					isCertificationMessageVisible = true;	
 				}
 			} catch (Exception e) {

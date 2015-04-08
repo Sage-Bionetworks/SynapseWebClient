@@ -1039,8 +1039,9 @@ public class ProfilePresenterTest {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("");
 		profilePresenter.initializeShowHideCertification(true);
-		verify(mockView).setGetCertifiedVisible(false);
+		verify(mockView).setGetCertifiedVisible(true);
 	}
+	
 	@Test
 	public void testInitShowHideGetCertifiedTrueCookieValue() {
 		//return null

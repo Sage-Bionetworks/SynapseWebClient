@@ -729,6 +729,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		challengesTabContent.clear();
 		hideTabContainers();
+		getCertifiedAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
