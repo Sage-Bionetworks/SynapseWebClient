@@ -505,13 +505,4 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView).showErrorMessage(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 	}
-
-	@Test
-	public void testUnsavedViewChanges() {
-		acle.setUnsavedViewChanges(true);
-		acle.pushChangesToSynapse(false, null);
-		
-		verify(mockACLEView).alertUnsavedViewChanges(any(Callback.class));
-	}
-	
 }

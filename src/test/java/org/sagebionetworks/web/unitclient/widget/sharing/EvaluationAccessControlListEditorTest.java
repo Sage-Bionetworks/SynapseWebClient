@@ -311,13 +311,4 @@ public class EvaluationAccessControlListEditorTest {
 
 		verify(mockACLEView).showErrorMessage(anyString());
 	}
-
-	@Test
-	public void testUnsavedViewChanges() {
-		acle.setUnsavedViewChanges(true);
-		acle.pushChangesToSynapse(null);
-		
-		verify(mockACLEView).alertUnsavedViewChanges(any(Callback.class));
-	}
-	
 }
