@@ -202,6 +202,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, isOwner, passingRecord);
 					tabClicked(area);
+					if (passingRecord == null) {
+						initializeShowHideCertification(isOwner);
+					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -212,6 +215,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if (caught instanceof NotFoundException) {
 					view.updateView(profile, isOwner, null);
 					tabClicked(area);
+					initializeShowHideCertification(isOwner);
 				}
 				else
 					view.showErrorMessage(caught.getMessage());
@@ -241,14 +245,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void initializeShowHideCertification(boolean isOwner) {
 		if (isOwner) {
-			boolean isCertificationMessageVisible = true;
+			boolean isCertificationMessageVisible = false;
 			try {
 				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY);
-				if (cookieValue != null && !cookieValue.isEmpty()) {
-					isCertificationMessageVisible = Boolean.valueOf(cookieValue);	
+				if (cookieValue == null || Boolean.valueOf(cookieValue)) {
+					isCertificationMessageVisible = true;	
 				}
 			} catch (Exception e) {
-				//if there are any problems getting the certification message visibility state, ignore and use default (show)
+				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
 			}
 			view.setGetCertifiedVisible(isCertificationMessageVisible);
 		} else {

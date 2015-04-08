@@ -318,6 +318,45 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testCertifiedAlertHiddenAndUserCertified() throws JSONObjectAdapterException {
+		PassingRecord myPassingRecord = new PassingRecord();
+		String passingRecordJson = myPassingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(passingRecordJson).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		verify(mockView, never()).setGetCertifiedVisible(anyBoolean());		
+	}
+	
+	@Test
+	public void testNotCertifiedAlertShownAndUserNotCertifiedCookieNull() throws JSONObjectAdapterException {
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn(null);
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		verify(mockView).setGetCertifiedVisible(true);
+	}
+	
+	@Test
+	public void testNotCertifiedAlertShownAndUserNotCertifiedCookieTrue() throws JSONObjectAdapterException {
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("true");
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		verify(mockView).setGetCertifiedVisible(true);
+	}
+	
+	
+	@Test
+	public void testNotCertifiedAlertHiddenAndUserNotCertifiedCookieFalse() throws JSONObjectAdapterException {
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("false");
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		verify(mockView).setGetCertifiedVisible(false);
+	}
+	
+	
+	@Test
 	public void testRefreshProjects() {
 		profilePresenter.setCurrentOffset(22);
 		//on refresh, current project offset should be reset to 0
@@ -981,14 +1020,14 @@ public class ProfilePresenterTest {
 	
 	
 	@Test
-	public void testInitShowHideWelcomeNotOwner() {
+	public void testInitShowHideGetCertifiedNotOwner() {
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn(null);
 		profilePresenter.initializeShowHideCertification(false);
 		verify(mockView).setGetCertifiedVisible(false);
 	}
 	
 	@Test
-	public void testInitShowHideWelcomeNullCookieValue() {
+	public void testInitShowHideGetCertifiedNullCookieValue() {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn(null);
 		profilePresenter.initializeShowHideCertification(true);
@@ -996,28 +1035,28 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
-	public void testInitShowHideWelcomeEmptyCookieValue() {
+	public void testInitShowHideGetCertifiedEmptyCookieValue() {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("");
 		profilePresenter.initializeShowHideCertification(true);
-		verify(mockView).setGetCertifiedVisible(true);
+		verify(mockView).setGetCertifiedVisible(false);
 	}
 	@Test
-	public void testInitShowHideWelcomeTrueCookieValue() {
+	public void testInitShowHideGetCertifiedTrueCookieValue() {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("true");
 		profilePresenter.initializeShowHideCertification(true);
 		verify(mockView).setGetCertifiedVisible(true);
 	}
 	@Test
-	public void testInitShowHideWelcomeFalseCookieValue() {
+	public void testInitShowHideGetCertifiedFalseCookieValue() {
 		//return null
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY))).thenReturn("false");
 		profilePresenter.initializeShowHideCertification(true);
 		verify(mockView).setGetCertifiedVisible(false);
 	}
 	@Test
-	public void testWelcomeToDashboardDismissed() {
+	public void testGetCertifiedDismissed() {
 		profilePresenter.setGetCertifiedDismissed();
 		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY), eq(Boolean.FALSE.toString()), any(Date.class));
 	}
