@@ -12,6 +12,7 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true" visible="false">
+		    <g:Image styleName="displayInline margin-right-10" height="32px" width="25px" resource='{sageImageBundle.certificate}'/>			
 			<bh:Strong text="Get Certified!"/>
 			<bh:Paragraph text="There are times where human data can only be shared with certain restrictions. 
 					Learn what the rules are and how to apply and comply with data privacy levels. 

@@ -431,7 +431,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
 			viewProfilePanel.add(certifiedUserBadgePanel);
-				}
+			getCertifiedAlert.setVisible(false);
+		}
 			
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
