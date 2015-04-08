@@ -10,9 +10,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -35,6 +35,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	private UserGroupSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
+	private CallbackP<UserGroupSuggestion> callback;
 	
 	@Inject
 	public UserGroupSuggestBox(UserGroupSuggestBoxView view,
@@ -134,6 +135,9 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	@Override
 	public void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion) {
 		this.selectedSuggestion = selectedSuggestion;
+		if(callback != null && selectedSuggestion != null) {
+			callback.invoke(selectedSuggestion);
+		}
 	}
 	
 	public String getText() {
@@ -151,5 +155,10 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	 */
 	public void setOracle(UserGroupSuggestOracle oracle) {
 		this.oracle = oracle;
+	}
+	
+	@Override
+	public void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback) {
+		this.callback = callback;
 	}
 }
