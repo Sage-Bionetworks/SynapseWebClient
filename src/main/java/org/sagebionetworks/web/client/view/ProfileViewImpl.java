@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
+import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -148,6 +150,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button moreProjectsButton;
 	
+	//Headings
+	@UiField
+	Heading projectsHeading;
+	@UiField
+	Heading teamsHeading;
+	@UiField
+	Heading challengesHeading;
+	
+	
+	//Project tab
+	@UiField
+	Button projectSortButton;
+	@UiField
+	DropDownMenu sortProjectsDropDownMenu;	
+	
 	//Teams tab
 	@UiField
 	TextBox createTeamTextBox;
@@ -163,7 +180,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button teamSearchButton;
 	@UiField
 	Button projectSearchButton;
-	
+		
 	//Challenges
 	@UiField
 	FlowPanel challengesTabContent;
@@ -311,7 +328,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
 			}
-		});
+		});		
+		
 		showProfileButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -344,6 +362,25 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.welcomeToDashboardDismissed();
 			}
 		});
+	}
+	
+	public void clearSortOptions() {
+		sortProjectsDropDownMenu.clear();
+	}
+	
+	public void setSortText(String text) {
+		projectSortButton.setText(text);
+	}
+	
+	public void addSortOption(final SortOptionEnum sortOption) {
+		final AnchorListItem newSortOption = new AnchorListItem(sortOption.sortText);
+		newSortOption.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.resort(sortOption);
+			}	
+		});
+		sortProjectsDropDownMenu.add(newSortOption);
 	}
 	
 	private void initCertificationBadge() {
@@ -402,7 +439,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
-			
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			//show create project and team UI
@@ -418,19 +454,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void resetHighlightBoxes() {
-		projectsHighlightBox.removeClassName("highlight-box");
-		challengesHighlightBox.removeClassName("highlight-box");
-		teamsHighlightBox.removeClassName("highlight-box");
+		projectsHeading.setText("");
+		teamsHeading.setText("");
+		challengesHeading.setText("");
+		projectsHeading.setVisible(false);
+		teamsHeading.setVisible(false);
+		challengesHeading.setVisible(false);
 	}
 	
 	private void setHighlightBoxUser(String displayName) {
-		projectsHighlightBox.addClassName("highlight-box");
-		challengesHighlightBox.addClassName("highlight-box");
-		teamsHighlightBox.addClassName("highlight-box");
-
-		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
-		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
-		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
+		projectsHeading.setText(displayName + "'s Projects");
+		teamsHeading.setText(displayName + "'s Teams");
+		challengesHeading.setText(displayName + "'s Challenges");
+		projectsHeading.setVisible(true);
+		teamsHeading.setVisible(true);
+		challengesHeading.setVisible(true);
 	}
 	
 	@Override
