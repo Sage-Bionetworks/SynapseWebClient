@@ -12,7 +12,7 @@
 	        <b:PanelBody>
 	            <!-- <b:Container> -->
 					<b:FormGroup>
-						<b:FormLabel for="formPassword">Name</b:FormLabel>
+						<b:FormLabel>Name</b:FormLabel>
 						<bh:Div ui:field="suggestBoxPanel" />
 					</b:FormGroup>
 	            <!-- </b:Container> -->
