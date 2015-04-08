@@ -80,7 +80,7 @@
 									</b:Column>
 									<b:Column size="XS_12 SM_11" pull="SM_1" ui:field="projectRows">
 										<b:Heading ui:field="projectsHeading" size="H3"></b:Heading>
-										<b:ButtonGroup ui:field="projectFiltersUI" addStyleNames="margin-10">
+										<b:ButtonGroup ui:field="projectFiltersUI">
 											<b:Button ui:field="allProjectsFilter">All</b:Button>
 											<b:Button ui:field="myProjectsFilter">Created by me</b:Button>
 											<b:Button ui:field="favoritesFilter" icon="STAR" addStyleNames="favoriteIcon">Favorites</b:Button>
