@@ -216,7 +216,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button hideProfileButton;
 	@UiField
-	Alert welcomeToDashboardAlert;
+	Alert getCertifiedAlert;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -356,10 +356,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.onImportLinkedIn();
 			}
 		});
-		welcomeToDashboardAlert.addClosedHandler(new AlertClosedHandler() {
+		getCertifiedAlert.addClosedHandler(new AlertClosedHandler() {
 			@Override
 			public void onClosed(AlertClosedEvent evt) {
-				presenter.welcomeToDashboardDismissed();
+				presenter.setGetCertifiedDismissed();
 			}
 		});
 	}
@@ -431,7 +431,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
 			viewProfilePanel.add(certifiedUserBadgePanel);
-				}
+		}
 			
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
@@ -729,6 +729,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		challengesTabContent.clear();
 		hideTabContainers();
+		getCertifiedAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
@@ -906,7 +907,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setWelcomeToDashboardVisible(boolean isVisible) {
-		welcomeToDashboardAlert.setVisible(isVisible);	
+	public void setGetCertifiedVisible(boolean isVisible) {
+		getCertifiedAlert.setVisible(isVisible);	
 	}
 }
