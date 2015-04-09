@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -117,7 +118,7 @@ public class WikiSubpagesTest {
 	@Test
 	public void testGetLinkPlaceSynapse() throws Exception {
 		boolean embeddedInOwnerPage = true;
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage, null);
 		String targetEntityId = "syn938";
 		Long targetEntityVersion = 4L;
 		String targetWikiId = "888";
@@ -133,7 +134,7 @@ public class WikiSubpagesTest {
 	@Test
 	public void testGetLinkPlaceWiki() throws Exception {
 		boolean embeddedInOwnerPage = false;
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage, null);
 		String targetEntityId = "syn938";
 		Long targetEntityVersion = 4L;
 		String targetWikiId = "888";
@@ -151,14 +152,3 @@ public class WikiSubpagesTest {
 		verify(mockView).asWidget();
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
