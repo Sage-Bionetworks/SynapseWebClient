@@ -125,7 +125,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		
 		header.clear();
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -160,8 +159,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 			};
 			uploader.configure("Update Icon", null, null, null, fileHandleIdCallback, false);
 			Anchor uploadLink = new Anchor("Update Icon");
-			//void enableMultipleFileUploads(boolean isEnabled);
-
 			uploadLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -202,6 +199,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		Widget memberListView = memberListWidget.asWidget();
 		memberListView.addStyleName("margin-top-15");
 		mainContainer.add(memberListView);
+		uploader.disableMultipleFileUploads();
 	}
 	
 	private void showEditMode() {

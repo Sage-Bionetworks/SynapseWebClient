@@ -18,6 +18,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -102,6 +103,17 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				presenter.uploadFileClicked();				
 			}
 		});
+		
+		ClickHandler upload = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					presenter.uploadFileClicked();
+				}
+			}
+		};
+		urlField.addClickHandler(upload);
+		nameField.addClickHandler(upload);
 		
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
