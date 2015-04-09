@@ -77,7 +77,6 @@ public class CSVOptionsViewImpl implements CSVOptionsView {
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		// Add enter handler?
 		commaRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.profile;
 
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction for an editor of a user's profile.

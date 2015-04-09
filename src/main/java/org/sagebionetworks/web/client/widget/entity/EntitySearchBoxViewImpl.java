@@ -34,7 +34,6 @@ public class EntitySearchBoxViewImpl extends SuggestBox implements EntitySearchB
 	public EntitySearchBoxViewImpl(
 			EntitySearchBoxOracle oracle,
 			SageImageBundle sageImageBundle) {
-		// Should I modify the TextBox passed below?
 		super(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		addStyleName("form-control");
 		getElement().setAttribute("placeholder", "Enter search terms");

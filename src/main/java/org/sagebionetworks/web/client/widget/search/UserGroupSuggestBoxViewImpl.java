@@ -28,7 +28,6 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	@Inject
 	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracle oracle, SageImageBundle sageImageBundle) {
-		// Textbox? Or discuss functionality.
 		super(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		addStyleName("userGroupSuggestBox");
 		getValueBox().addStyleName("form-control");
