@@ -28,7 +28,7 @@
 				<g:SimplePanel ui:field="uploadParamsPanelContainer" />
 			</b:TabPane>
 			<b:TabPane b:id="tab2" addStyleNames="panel margin-top-15">
-				<g:FlowPanel>
+				<bh:Div addStyleNames="form-horizontal">
 					<b:FieldSet>
 						<b:FormGroup>
 							<b:FormLabel for="url" addStyleNames="col-xs-2">Image URL</b:FormLabel>
@@ -43,7 +43,7 @@
 							</g:FlowPanel>
 						</b:FormGroup>
 					</b:FieldSet>
-				</g:FlowPanel>
+				</bh:Div>
 			</b:TabPane>
 			<b:TabPane b:id="tab3" addStyleNames="panel margin-top-15">
 				<bh:Div>

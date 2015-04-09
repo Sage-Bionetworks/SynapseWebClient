@@ -103,18 +103,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				presenter.uploadFileClicked();				
 			}
 		});
-		
-		ClickHandler upload = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					presenter.uploadFileClicked();
-				}
-			}
-		};
-		urlField.addClickHandler(upload);
-		nameField.addClickHandler(upload);
-		
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

@@ -12,6 +12,9 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -48,8 +51,17 @@ public class LoginModalViewImpl implements LoginModalView {
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		primaryButton.addClickHandler(new ClickHandler() {
-			
+		KeyDownHandler login = new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					primaryButton.click();
+				}
+			}
+		};
+		usernameField.addKeyDownHandler(login);
+		passwordField.addKeyDownHandler(login);
+		primaryButton.addClickHandler(new ClickHandler() {	
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onPrimary();

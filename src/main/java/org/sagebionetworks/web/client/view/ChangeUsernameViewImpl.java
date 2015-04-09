@@ -10,6 +10,9 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -56,6 +59,13 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 		
 		username.getElement().setAttribute("placeholder", "Username");
 		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
+		username.addKeyDownHandler(new KeyDownHandler() {				
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) 
+					changeUsernameButton.click();				
+			}
+		});
 		changeUsernameButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {

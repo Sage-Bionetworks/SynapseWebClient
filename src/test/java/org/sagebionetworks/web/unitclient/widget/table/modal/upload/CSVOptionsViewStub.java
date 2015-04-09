@@ -38,11 +38,7 @@ public class CSVOptionsViewStub implements CSVOptionsView {
 		// TODO Auto-generated method stub
 		
 	}
-	@Override
-	public void setPresetner(Presenter presenter) {
-		// TODO Auto-generated method stub
-		
-	}
+
 	@Override
 	public void setFirsLineIsHeader(boolean isFirstLineHeader) {
 		this.isFirstLineHeader = isFirstLineHeader;
@@ -50,6 +46,11 @@ public class CSVOptionsViewStub implements CSVOptionsView {
 	@Override
 	public boolean getIsFristLineHeader() {
 		return this.isFirstLineHeader;
+	}
+	@Override
+	public void setPresenter(Presenter presenter) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

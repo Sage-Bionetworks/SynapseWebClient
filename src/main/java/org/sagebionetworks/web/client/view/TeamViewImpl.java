@@ -22,6 +22,9 @@ import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -225,7 +228,17 @@ public class TeamViewImpl extends Composite implements TeamView {
 		cbPanel.addStyleName("checkbox margin-left-10");
 		cbPanel.add(publicJoinCb);
 		form.add(DisplayUtils.wrap(cbPanel));
-		Button saveButton = DisplayUtils.createButton(DisplayConstants.SAVE_BUTTON_LABEL, ButtonType.PRIMARY);
+		final Button saveButton = DisplayUtils.createButton(DisplayConstants.SAVE_BUTTON_LABEL, ButtonType.PRIMARY);
+		KeyDownHandler saveInfo = new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					saveButton.click();
+				}
+			}
+		};
+		nameField.addKeyDownHandler(saveInfo);
+		descriptionField.addKeyDownHandler(saveInfo);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
