@@ -68,22 +68,15 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		boolean isShowingCurrentVersion = versionNumber == null;
 		view.setEntityBundle(bundle.getEntity(), !isShowingCurrentVersion);
-		view.setEditVersionCommentButtonVisible(isShowingCurrentVersion && canEdit);
-		view.setEditVersionLabelButtonVisible(isShowingCurrentVersion && canEdit);
+		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
 		
 		//initialize versions
 		onPageChange(0L);
 	}
 
 	@Override
-	public void updateVersionComment(String newComment) {
-		String oldLabel = ((Versionable)bundle.getEntity()).getVersionLabel();
-		editCurrentVersionInfo(bundle.getEntity(), oldLabel, newComment);
-	}
-	@Override
-	public void updateVersionLabel(String newLabel) {
-		String oldComment = ((Versionable)bundle.getEntity()).getVersionComment();
-		editCurrentVersionInfo(bundle.getEntity(), newLabel, oldComment);
+	public void updateVersionInfo(String newLabel, String newComment) {
+		editCurrentVersionInfo(bundle.getEntity(), newLabel, newComment);
 	}
 
 	private void editCurrentVersionInfo(Entity entity, String version, String comment) {
@@ -113,8 +106,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						}
 						@Override
 						public void onSuccess(Entity result) {
-							view.hideEditVersionComment();
-							view.hideEditVersionLabel();
+							view.hideEditVersionInfo();
 							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
 							fireEntityUpdatedEvent();
 						}
@@ -198,23 +190,12 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 	
 	@Override
-	public void onEditVersionCommentClicked() {
+	public void onEditVersionInfoClicked() {
 		preflightController.checkUploadToEntity(bundle, new Callback() {
 			@Override
 			public void invoke() {
 				final Versionable vb = (Versionable)bundle.getEntity();
-				view.showEditVersionComment(vb.getVersionComment());
-			}
-		});
-	}
-	
-	@Override
-	public void onEditVersionLabelClicked() {
-		preflightController.checkUploadToEntity(bundle, new Callback() {
-			@Override
-			public void invoke() {
-				final Versionable vb = (Versionable)bundle.getEntity();
-				view.showEditVersionLabel(vb.getVersionLabel());
+				view.showEditVersionInfo(vb.getVersionLabel(), vb.getVersionComment());
 			}
 		});
 	}

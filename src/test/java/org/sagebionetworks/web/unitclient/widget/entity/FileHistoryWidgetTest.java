@@ -171,25 +171,16 @@ public class FileHistoryWidgetTest {
 	}
 
 	@Test
-	public void testUpdateVersionLabel() throws Exception {
+	public void testUpdateVersionInfo() throws Exception {
 		String testLabel = "testLabel";
-		fileHistoryWidget.setEntityBundle(bundle, null);
-		fileHistoryWidget.updateVersionLabel(testLabel);
-		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
-		verify(mockSynapseClient).updateEntity(entityCaptor.capture(), (AsyncCallback<Entity>) any());
-		Versionable capturedEntity = (Versionable)entityCaptor.getValue();
-		assertEquals(testLabel, capturedEntity.getVersionLabel());
-	}
-	
-	@Test
-	public void testUpdateVersionComment() throws Exception {
 		String testComment = "testComment";
 		fileHistoryWidget.setEntityBundle(bundle, null);
-		fileHistoryWidget.updateVersionComment(testComment);
+		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
 		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
 		verify(mockSynapseClient).updateEntity(entityCaptor.capture(), (AsyncCallback<Entity>) any());
 		Versionable capturedEntity = (Versionable)entityCaptor.getValue();
 		assertEquals(testComment, capturedEntity.getVersionComment());
+		assertEquals(testLabel, capturedEntity.getVersionLabel());
 	}
 
 	@Test
@@ -202,38 +193,29 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testOnEdit() {
 		fileHistoryWidget.setEntityBundle(bundle, null);
-		String oldValue = "an old comment";
-		vb.setVersionComment(oldValue);
+		String oldComment = "an old comment";
+		vb.setVersionComment(oldComment);
+		String oldLabel = "an old label";
+		vb.setVersionLabel(oldLabel);
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		fileHistoryWidget.onEditVersionCommentClicked();
-		verify(mockView).showEditVersionComment(oldValue);
+		fileHistoryWidget.onEditVersionInfoClicked();
+		verify(mockView).showEditVersionInfo(oldLabel, oldComment);
 	}
 	
 	@Test
 	public void testOnEditFailedPreflight() {
 		fileHistoryWidget.setEntityBundle(bundle, null);
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		fileHistoryWidget.onEditVersionCommentClicked();
-		verify(mockView, never()).showEditVersionComment(anyString());
-	}
-	
-
-	@Test
-	public void testOnEditLabel() {
-		fileHistoryWidget.setEntityBundle(bundle, null);
-		String oldValue = "an old label";
-		vb.setVersionLabel(oldValue);
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		fileHistoryWidget.onEditVersionLabelClicked();
-		verify(mockView).showEditVersionLabel(oldValue);
+		fileHistoryWidget.onEditVersionInfoClicked();
+		verify(mockView, never()).showEditVersionInfo(anyString(), anyString());
 	}
 	
 	@Test
 	public void testOnEditLabelFailedPreflight() {
 		fileHistoryWidget.setEntityBundle(bundle, null);
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		fileHistoryWidget.onEditVersionCommentClicked();
-		verify(mockView, never()).showEditVersionComment(anyString());
+		fileHistoryWidget.onEditVersionInfoClicked();
+		verify(mockView, never()).showEditVersionInfo(anyString(), anyString());
 	}
 	
 	@Test
@@ -243,8 +225,7 @@ public class FileHistoryWidgetTest {
 		
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, false);
-		verify(mockView).setEditVersionCommentButtonVisible(true);
-		verify(mockView).setEditVersionLabelButtonVisible(true);
+		verify(mockView).setEditVersionInfoButtonVisible(true);
 	}
 	
 	@Test
@@ -254,8 +235,7 @@ public class FileHistoryWidgetTest {
 
 		//auto expand version history = true
 		verify(mockView).setEntityBundle(vb, true);
-		verify(mockView).setEditVersionCommentButtonVisible(false);
-		verify(mockView).setEditVersionLabelButtonVisible(false);
+		verify(mockView).setEditVersionInfoButtonVisible(false);
 	}
 	
 	@Test
@@ -265,8 +245,7 @@ public class FileHistoryWidgetTest {
 		
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, false);
-		verify(mockView).setEditVersionCommentButtonVisible(false);
-		verify(mockView).setEditVersionLabelButtonVisible(false);
+		verify(mockView).setEditVersionInfoButtonVisible(false);
 	}
 	
 	@Test
@@ -276,9 +255,7 @@ public class FileHistoryWidgetTest {
 
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, true);
-		verify(mockView).setEditVersionCommentButtonVisible(false);
-		verify(mockView).setEditVersionLabelButtonVisible(false);
-
+		verify(mockView).setEditVersionInfoButtonVisible(false);
 	}
 	
 	

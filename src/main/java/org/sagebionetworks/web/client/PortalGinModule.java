@@ -139,6 +139,8 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.PromptTwoValuesModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptTwoValuesModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -761,6 +763,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
 		bind(PromptModalView.class).to(PromptModalViewImpl.class);
+		bind(PromptTwoValuesModalView.class).to(PromptTwoValuesModalViewImpl.class);
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
 		
 		// FileBox

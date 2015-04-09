@@ -52,46 +52,32 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	@UiField
 	Hyperlink currentVersionLink;
 	@UiField
-	Button editNameButton;
-	@UiField
-	Button editCommentButton;
-	PromptModalView editCommentModal, editLabelModal;
+	Button editInfoButton;
+	
+	PromptTwoValuesModalView editVersionInfoModal;
 	
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private Presenter presenter;
 	
 	@Inject
-	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptModalView editCommentDialog, PromptModalView editLabelDialog) {
+	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptTwoValuesModalView editVersionInfoDialog) {
 		this.ginInjector = ginInjector;
-		this.editCommentModal = editCommentDialog;
-		this.editLabelModal = editLabelDialog;
+		this.editVersionInfoModal = editVersionInfoDialog;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		DisplayUtils.configureShowHide(allVersions, previousVersions);
 		
-		editLabelModal.setPresenter(new PromptModalView.Presenter() {
+		editVersionInfoModal.setPresenter(new PromptTwoValuesModalView.Presenter() {
 			@Override
 			public void onPrimary() {
-				presenter.updateVersionLabel(editLabelModal.getName());
-			}
-		});
-		editCommentModal.setPresenter(new PromptModalView.Presenter() {
-			@Override
-			public void onPrimary() {
-				presenter.updateVersionComment(editCommentModal.getName());
+				presenter.updateVersionInfo(editVersionInfoModal.getValue1(), editVersionInfoModal.getValue2());
 			}
 		});
 		
-		editNameButton.addClickHandler(new ClickHandler() {
+		editInfoButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onEditVersionLabelClicked();
-			}
-		});
-		editCommentButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditVersionCommentClicked();
+				presenter.onEditVersionInfoClicked();
 			}
 		});
 	}
@@ -188,30 +174,17 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	}
 	
 	@Override
-	public void setEditVersionCommentButtonVisible(boolean isVisible) {
-		editCommentButton.setVisible(isVisible);
-	}
-	@Override
-	public void setEditVersionLabelButtonVisible(boolean isVisible) {
-		editNameButton.setVisible(isVisible);
-	}
-	@Override
-	public void showEditVersionLabel(String oldValue) {
-		editLabelModal.configure("Edit Version Label", "Version label", DisplayConstants.OK, oldValue);
-		editLabelModal.show();
-	}
-	@Override
-	public void showEditVersionComment(String oldValue) {
-		editCommentModal.configure("Edit Version Comment", "Version comment", DisplayConstants.OK, oldValue);
-		editCommentModal.show();
-	}
-	@Override
-	public void hideEditVersionLabel() {
-		editLabelModal.hide();
-	}
-	@Override
-	public void hideEditVersionComment() {
-		editCommentModal.hide();
+	public void setEditVersionInfoButtonVisible(boolean isVisible) {
+		editInfoButton.setVisible(isVisible);
 	}
 	
+	@Override
+	public void showEditVersionInfo(String oldLabel, String oldComment) {
+		editVersionInfoModal.configure("Edit Version Info", "Version label", oldLabel, "Version comment", oldComment, DisplayConstants.OK);
+		editVersionInfoModal.show();
+	}
+	@Override
+	public void hideEditVersionInfo() {
+		editVersionInfoModal.hide();
+	}
 }

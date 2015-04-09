@@ -14,11 +14,9 @@ import com.google.gwt.user.client.ui.Widget;
 public interface FileHistoryWidgetView extends IsWidget, SynapseView{
 	
 	interface Presenter {
-		void updateVersionLabel(String newLabel);
-		void updateVersionComment(String comment);
+		void updateVersionInfo(String newLabel, String newComment);
 		void deleteVersion(Long versionNumber);
-		void onEditVersionLabelClicked();
-		void onEditVersionCommentClicked();
+		void onEditVersionInfoClicked();
 	}
 
 	
@@ -28,11 +26,8 @@ public interface FileHistoryWidgetView extends IsWidget, SynapseView{
 	void setPaginationWidget(Widget widget);
 	void clearVersions();
 	void addVersion(VersionInfo version, boolean canEdit, boolean isVersionSelected);
-	void setEditVersionLabelButtonVisible(boolean isVisible);
-	void setEditVersionCommentButtonVisible(boolean isVisible);
+	void setEditVersionInfoButtonVisible(boolean isVisible);
 	
-	void showEditVersionLabel(String oldValue);
-	void showEditVersionComment(String oldValue);
-	void hideEditVersionLabel();
-	void hideEditVersionComment();
+	void showEditVersionInfo(String oldLabel, String oldComment);
+	void hideEditVersionInfo();
 }
