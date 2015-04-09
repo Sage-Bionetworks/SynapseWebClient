@@ -1,7 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,16 +16,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -63,6 +72,12 @@ public class EntityTreeBrowserTest {
 		AsyncMockStubber.callSuccessWith(searchResults).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		entityTreeBrowser.getFolderChildren("123", mockCallback);
+		
+		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor.forClass(EntityQuery.class);
+		verify(mockSynapseClient, times(2)).executeEntityQuery(captor.capture(), any(AsyncCallback.class));
+		List<EntityQuery> queries = captor.getAllValues();
+		assertEquals(EntityType.folder, queries.get(0).getFilterByType());
+		assertEquals(EntityType.file, queries.get(1).getFilterByType());
 		verify(mockCallback).onSuccess(anyList());
 	}
 	
@@ -72,10 +87,23 @@ public class EntityTreeBrowserTest {
 		entityTreeBrowser.getFolderChildren("123", mockCallback);
 		//capture the servlet call
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), captor.capture());
 		//before invoking asynccallback.success, set the current entity id to something else (simulating that the user has selected a different folder while this was still processing)
 		entityTreeBrowser.setCurrentFolderChildrenEntityId("456");
 		captor.getValue().onSuccess(searchResults);
 		verify(mockCallback, never()).onSuccess(anyList());
+	}
+
+	@Test
+	public void testCreateGetChildrenQuery() {
+		String parentId = "9";
+		EntityQuery query = entityTreeBrowser.createGetChildrenQuery(parentId, EntityType.folder);
+		
+		//verify sort
+		assertEquals(EntityFieldName.name.name(), query.getSort().getColumnName());
+		assertEquals(SortDirection.ASC, query.getSort().getDirection());
+		List<Condition> conditions = query.getConditions();
+		assertEquals(1, conditions.size());
+		assertEquals(EntityType.folder, query.getFilterByType());
 	}
 }

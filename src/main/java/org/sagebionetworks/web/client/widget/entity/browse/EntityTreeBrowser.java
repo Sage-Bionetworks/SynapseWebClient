@@ -123,13 +123,30 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 	
 	@Override
-	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
-		EntityQuery childrenQuery = createGetChildrenQuery(entityId);
-		
+	public void getFolderChildren(final String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
+		EntityQuery childrenQuery = createGetChildrenQuery(entityId, org.sagebionetworks.repo.model.entity.query.EntityType.folder);
+		//ask for the folder children, then the files
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
 			public void onSuccess(EntityQueryResults results) {
-				asyncCallback.onSuccess(getHeadersFromQueryResults(results));
+				getChildrenFiles(entityId, getHeadersFromQueryResults(results), asyncCallback);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);				
+				asyncCallback.onFailure(caught);
+			}
+		});
+		
+	}
+	
+	public void getChildrenFiles(String entityId, final List<EntityHeader> entityHeaders, final AsyncCallback<List<EntityHeader>> asyncCallback) {
+		EntityQuery childrenQuery = createGetChildrenQuery(entityId, org.sagebionetworks.repo.model.entity.query.EntityType.file);
+		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
+			@Override
+			public void onSuccess(EntityQueryResults results) {
+				entityHeaders.addAll(getHeadersFromQueryResults(results));
+				asyncCallback.onSuccess(entityHeaders);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -238,7 +255,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		handlerManager.fireEvent(new EntitySelectedEvent());
 	}
 	
-	private EntityQuery createGetChildrenQuery(String parentId) {
+	public EntityQuery createGetChildrenQuery(String parentId, org.sagebionetworks.repo.model.entity.query.EntityType type) {
 		EntityQuery newQuery = new EntityQuery();
 		Sort sort = new Sort();
 		sort.setColumnName(EntityFieldName.name.name());
@@ -246,12 +263,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		newQuery.setSort(sort);
 		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
 		newQuery.setConditions(Arrays.asList(condition));
+		newQuery.setFilterByType(type);
 		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
 		newQuery.setOffset(OFFSET_ZERO);
 		return newQuery;
 	}
 	
-	private List<EntityHeader> getHeadersFromQueryResults(EntityQueryResults results) {
+	public List<EntityHeader> getHeadersFromQueryResults(EntityQueryResults results) {
 		List<EntityHeader> headerList = new LinkedList<EntityHeader>();
 		for (EntityQueryResult result : results.getEntities()) {
 			EntityHeader header = new EntityHeader();
