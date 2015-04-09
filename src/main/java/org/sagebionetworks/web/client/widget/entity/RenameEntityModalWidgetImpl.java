@@ -16,7 +16,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presenter, RenameEntityModalWidget {
+public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, RenameEntityModalWidget {
 
 	public static final String BUTTON_TEXT = "Rename";
 	public static final String LABLE_SUFFIX = " name";
@@ -24,7 +24,7 @@ public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presente
 
 	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
 	
-	EntityNameModalView view;
+	PromptModalView view;
 	SynapseClientAsync synapseClient;
 	EntityTypeProvider typeProvider;
 	String parentId;
@@ -33,7 +33,7 @@ public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presente
 	Callback handler;
 	
 	@Inject
-	public RenameEntityModalWidgetImpl(EntityNameModalView view,
+	public RenameEntityModalWidgetImpl(PromptModalView view,
 			SynapseClientAsync synapseClient, EntityTypeProvider typeProvider) {
 		super();
 		this.view = view;
