@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
-
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 

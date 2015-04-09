@@ -43,15 +43,7 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 		initClickHandlers();
 	}
 	
-	private void initClickHandlers() {
-		entityListField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					entityFinderButton.click();
-				}				
-			}
-		});		
+	private void initClickHandlers() {	
 		entityFinderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

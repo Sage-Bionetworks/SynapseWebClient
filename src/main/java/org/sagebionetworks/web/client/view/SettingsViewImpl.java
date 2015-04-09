@@ -158,17 +158,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 					presenter.addEmail(newEmailField.getValue());
 				}
 			}
-		});
-		newEmailField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (checkEmailFormat()) {
-					addEmailButton.setEnabled(false);
-					presenter.addEmail(newEmailField.getValue());
-				}
-			}
-		});
-		
+		});		
 	}
 
 
