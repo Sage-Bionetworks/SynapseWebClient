@@ -10,5 +10,11 @@ public interface WikiSubpageNavigationTreeView extends IsWidget, SynapseView {
 	void configure(SubpageNavTreeNode overallRoot);
 	
 	public interface Presenter {
+
+		public void reloadWiki(SubpageNavTreeNode node);
+
+		public boolean isCurrentPage(SubpageNavTreeNode root);
 	}
+
+	public void setPresenter(Presenter presenter);
 }

@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -15,99 +16,117 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.Presenter, SynapseWidgetPresenter {
-	
+
 	private WikiSubpageNavigationTreeView view;
-	
-	private Map<V2WikiHeader, SubpageNavTreeNode> header2node;
-	private Map<String, SubpageNavTreeNode> id2node;
-	
+	private GlobalApplicationState globalApplicationState;
+
+	private Map<V2WikiHeader, SubpageNavTreeNode> headerToNode;
+	private Map<String, SubpageNavTreeNode> idToNode;
+
 	private SubpageNavTreeNode overallRoot;
-	
+	CallbackP<WikiPageKey> reloadWikiPageCallback;
+	WikiPageKey currentWikiKey;
+
 	@Inject
-	public WikiSubpageNavigationTree(WikiSubpageNavigationTreeView view) {
+	public WikiSubpageNavigationTree(WikiSubpageNavigationTreeView view, GlobalApplicationState globalApplicationState) {
+		this.globalApplicationState = globalApplicationState;
 		this.view = view;
-		
-		header2node = new HashMap<V2WikiHeader, SubpageNavTreeNode>();
-		id2node = new HashMap<String, SubpageNavTreeNode>();
+		view.setPresenter(this);
+
+		headerToNode = new HashMap<V2WikiHeader, SubpageNavTreeNode>();
+		idToNode = new HashMap<String, SubpageNavTreeNode>();
 	}
-	
-	public void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName, Place ownerObjectLink, WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage) {
+
+	public void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName, Place ownerObjectLink, WikiPageKey currentWikiKey,
+			boolean isEmbeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
 		view.clear();
-		
+		this.reloadWikiPageCallback = reloadWikiPageCallback;
+		this.currentWikiKey = currentWikiKey;
+
 		// Make nodes for each header. Populate id2node map and header2node map.
 		for (V2WikiHeader header : wikiHeaders) {
-			
-			boolean isCurrentPage = header.getId().equals(curWikiKey.getWikiPageId());
-			
+
 			Place targetPlace = null;
-			String text;
+			String pageTitle;
 			if (header.getParentId() == null) {
 				targetPlace = ownerObjectLink;
-				text = ownerObjectName;
+				pageTitle = ownerObjectName;
 			} else {
-				targetPlace = WikiSubpagesWidget.getLinkPlace(curWikiKey.getOwnerObjectId(), curWikiKey.getVersion(),
-											header.getId(), isEmbeddedInOwnerPage);
-				text = header.getTitle();
+				targetPlace = WikiSubpagesWidget.getLinkPlace(currentWikiKey.getOwnerObjectId(), currentWikiKey.getVersion(), header.getId(), isEmbeddedInOwnerPage);
+				pageTitle = header.getTitle();
 			}
-			
-			SubpageNavTreeNode node = new SubpageNavTreeNode(header, text, targetPlace, isCurrentPage);
-			header2node.put(header, node);
-			id2node.put(header.getId(), node);
+			WikiPageKey wikiPageKey = new WikiPageKey(currentWikiKey.getOwnerObjectId(), currentWikiKey.getOwnerObjectType(), header.getId(), currentWikiKey.getVersion());
+
+			SubpageNavTreeNode node = new SubpageNavTreeNode(pageTitle, targetPlace, wikiPageKey);
+			headerToNode.put(header, node);
+			idToNode.put(header.getId(), node);
 		}
-		
+
 		// Assign child references.
 		for (V2WikiHeader header : wikiHeaders) {
 			
 			if (header.getParentId() == null) {
-				overallRoot = header2node.get(header);
+				overallRoot = headerToNode.get(header);
 			} else {
-				SubpageNavTreeNode child = header2node.get(header);
-				SubpageNavTreeNode parent = id2node.get(header.getParentId());
+				SubpageNavTreeNode child = headerToNode.get(header);
+				SubpageNavTreeNode parent = idToNode.get(header.getParentId());
 				parent.getChildren().add(child);
 			}
 		}
-		
+
 		view.configure(overallRoot);
 	}
-	
+
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
+
 	public int getRootChildrenCount() {
 		return overallRoot.getChildren().size();
 	}
-	
+
 	/*
 	 * For testing
 	 */
 	public SubpageNavTreeNode getOverallRoot() {
 		return overallRoot;
 	}
-	
+
 	public class SubpageNavTreeNode {
-		private V2WikiHeader header;
 		private List<SubpageNavTreeNode> children;
-		private String text;
+		private String pageTitle;
 		private Place targetPlace;
-		private boolean isCurrentPage;
-		
-		public SubpageNavTreeNode(V2WikiHeader header, String text, Place targetPlace, boolean isCurrentPage) {
-			this.header = header;
-			this.text = text;
+		private WikiPageKey wikiPageKey;
+
+		public SubpageNavTreeNode(String pageTitle, Place targetPlace, WikiPageKey wikiPageKey) {
+			this.pageTitle = pageTitle;
 			this.targetPlace = targetPlace;
-			this.isCurrentPage = isCurrentPage;
-			children = new ArrayList<SubpageNavTreeNode>();
+			this.children = new ArrayList<SubpageNavTreeNode>();
+			this.wikiPageKey = wikiPageKey;
 		}
-		
+
 		/*
 		 * Getters
 		 */
-		public V2WikiHeader getHeader()                     {       return header;          }
-		public List<SubpageNavTreeNode> getChildren()       {       return children;        }
-		public String getText()                             {       return text;            }
-		public Place getTargetPlace()                       {       return targetPlace;	    }
-		public boolean isCurrentPage()                      {       return isCurrentPage;   }
+		public List<SubpageNavTreeNode> getChildren()       {       return this.children;        }
+		public String getPageTitle()                             {       return this.pageTitle;       }
+		public Place getTargetPlace()                       {       return this.targetPlace;     }
+		public WikiPageKey getWikiPageKey()                 {       return this.wikiPageKey;     }
+	}
+
+	@Override
+	public void reloadWiki(SubpageNavTreeNode node) {
+		if (reloadWikiPageCallback != null) {
+			reloadWikiPageCallback.invoke(node.getWikiPageKey());
+			globalApplicationState.replaceCurrentPlace(node.getTargetPlace());
+			this.currentWikiKey = node.getWikiPageKey();
+			view.configure(this.overallRoot);
+		}
+	}
+
+	@Override
+	public boolean isCurrentPage(SubpageNavTreeNode root) {
+		return root.getWikiPageKey().getWikiPageId().equals(this.currentWikiKey.getWikiPageId());
 	}
 }
