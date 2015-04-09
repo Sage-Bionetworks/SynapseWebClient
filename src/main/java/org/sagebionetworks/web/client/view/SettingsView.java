@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -54,6 +55,5 @@ public interface SettingsView extends IsWidget, SynapseView {
 	}
 
 	public void setApiKey(String apiKey);
-
 
 }

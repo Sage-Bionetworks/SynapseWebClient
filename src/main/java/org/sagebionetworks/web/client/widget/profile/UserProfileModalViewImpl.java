@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -41,7 +42,7 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	}
 
 	@Override
-	public void setPreseneter(final Presenter presenter) {
+	public void setPresenter(final Presenter presenter) {
 		primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -90,5 +91,5 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	public void addEditorWidget(IsWidget editorWidget) {
 		this.bodyPanel.add(editorWidget);
 	}
-
+	
 }

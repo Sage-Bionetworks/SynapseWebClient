@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -35,6 +36,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.view.setPresenter(this);
 	}
 
+	
 	@Override
 	public Widget asWidget() {
 		return this.view.asWidget();
@@ -142,6 +144,11 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	private void setNewFileHandle(String fileHandleId) {
 		this.fileHandleId = fileHandleId;
 		this.imageWidget.configure(this.fileHandleId);
+	}
+
+	@Override
+	public void addKeyDownHandler(KeyDownHandler keyDownHandler) {
+		view.addKeyDownHandlerToFields(keyDownHandler);
 	}
 	
 

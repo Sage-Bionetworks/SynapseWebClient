@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction for an editor of a user's profile.
@@ -22,7 +23,7 @@ public interface UserProfileModalView extends IsWidget {
 	 * Bind the view to its presenter.
 	 * @param presenter
 	 */
-	public void setPreseneter(Presenter presenter);
+	public void setPresenter(Presenter presenter);
 
 	/**
 	 * Show/hide the loading state of the view.
