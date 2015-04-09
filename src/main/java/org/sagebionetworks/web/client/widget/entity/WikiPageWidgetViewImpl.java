@@ -403,6 +403,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				//inform presenter that edit was clicked
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
+				//should edit for enter handler?
 				final TextBox titleField = new TextBox();
 				if (!isRootWiki) {
 					titleField.setValue(presenter.getWikiPage().getTitle());

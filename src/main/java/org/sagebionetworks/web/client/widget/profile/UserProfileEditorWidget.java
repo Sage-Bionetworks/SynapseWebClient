@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UserProfileEditorWidget extends IsWidget {
@@ -77,5 +78,7 @@ public interface UserProfileEditorWidget extends IsWidget {
 	 * @return
 	 */
 	String getSummary();
+
+	void addKeyDownHandler(KeyDownHandler keyDownHandler);
 
 }

@@ -47,6 +47,9 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -258,13 +261,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		initTabs();
 		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
-		createProjectButton.addClickHandler(new ClickHandler() {
+		createProjectTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
-			public void onClick(ClickEvent event) {
-				presenter.createProject(createProjectTextBox.getValue());
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					presenter.createProject(createProjectTextBox.getValue());
+				}
 			}
 		});
-		
 		createTeamTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
 		createTeamButton.addClickHandler(new ClickHandler() {
 			@Override

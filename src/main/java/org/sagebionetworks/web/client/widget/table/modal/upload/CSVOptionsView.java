@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView.Presenter;
+
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * A view of the CSV options used for CSV file upload.
@@ -61,7 +63,7 @@ public interface CSVOptionsView extends IsWidget {
 	 * 
 	 * @param presenter
 	 */
-	void setPresetner(Presenter presenter);
+	void setPresenter(Presenter presenter);
 
 	/**
 	 * Is the first line the header.
@@ -74,4 +76,5 @@ public interface CSVOptionsView extends IsWidget {
 	 * @return
 	 */
 	boolean getIsFristLineHeader();
+
 }
