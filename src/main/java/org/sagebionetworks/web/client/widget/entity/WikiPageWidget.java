@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -55,6 +56,7 @@ SynapseWidgetPresenter {
 	boolean isDescription = false;
 	private boolean isCurrentVersion;
 	private Long versionInView;
+	CallbackP<WikiPageKey> reloadWikiPageCallback;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -99,6 +101,12 @@ SynapseWidgetPresenter {
 	}
 	
 	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage) {
+		reloadWikiPageCallback = new CallbackP<WikiPageKey>() {
+            @Override
+            public void invoke(WikiPageKey param) {
+                configure(param, canEdit, callback, isEmbeddedInOwnerPage);
+            }
+        };
 		view.showLoading();
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
@@ -392,5 +400,10 @@ SynapseWidgetPresenter {
 					view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+
+	@Override
+	public CallbackP<WikiPageKey> getReloadWikiPageCallback() {
+		return this.reloadWikiPageCallback;
 	}
 }

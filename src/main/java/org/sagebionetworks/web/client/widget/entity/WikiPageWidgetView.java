@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -32,6 +33,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void addFileHandles(List<String> fileHandleIds);
 		public void removeFileHandles(List<String> fileHandleIds);
 		public WikiPage getWikiPage();
+		public CallbackP<WikiPageKey> getReloadWikiPageCallback();
 	}
 	
 	public void configure(String markdown, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isDescription, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);

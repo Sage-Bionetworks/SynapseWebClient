@@ -172,7 +172,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiSubpagesPanel.add(widget.asWidget());
 		add(wikiSubpagesPanel);
 		add(wikiPagePanel);
-		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage);
+		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
 		
 		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
