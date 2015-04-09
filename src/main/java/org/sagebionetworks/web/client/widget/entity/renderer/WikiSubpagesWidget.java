@@ -12,7 +12,6 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -20,6 +19,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -47,6 +47,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
+	private CallbackP<WikiPageKey> reloadWikiPageCallback;
 	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
@@ -60,10 +61,11 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	}	
 	@Override
 	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null, true);
+		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null, true, null);
 	}
 
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
+		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiKey = wikiKey;
@@ -191,5 +193,9 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	public interface UpdateOrderHintCallback {
 		void updateOrderHint(List<String> newOrderHintIdList);
 	}
-	
+
+	@Override
+	public CallbackP<WikiPageKey> getReloadWikiPageCallback() {
+		return this.reloadWikiPageCallback;
+	}
 }

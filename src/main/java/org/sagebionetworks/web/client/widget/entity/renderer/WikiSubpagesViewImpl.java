@@ -2,12 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -60,7 +57,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 						final UpdateOrderHintCallback updateOrderHintCallback) {
 		clear();
 		
-		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage);
+		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		navTreeContainer = new FlowPanel();
