@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -17,7 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -99,6 +100,11 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem youTubeLink;
 	
+	@UiField
+	public Button formattingGuideButton;
+	@UiField
+	public Modal formattingGuideModal;
+	
 	//Alpha mode button and commands
 	@UiField
 	public Button alphaInsertButton;
@@ -175,8 +181,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button saveButton;
 	@UiField
-	public Button cancelButton;
-	@UiField
 	public Button deleteButton;
 	
 	//this UI widget
@@ -242,9 +246,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
-		deleteButton.addClickHandler(getClickHandler(MarkdownEditorAction.DELETE));
+		deleteButton.addClickHandler(getDeleteClickHandler());
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
-		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		heading1Link.addStyleName("font-size-36");
@@ -253,6 +256,14 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading4Link.addStyleName("font-size-18");
 		heading5Link.addStyleName("font-size-14");
 		heading6Link.addStyleName("font-size-12");
+		
+		formattingGuideButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				formattingGuideModal.show();
+			}
+		});
+		
 		markdownTextArea.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -279,6 +290,21 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.handleCommand(action);		
+			}
+		};
+	}
+	
+	private ClickHandler getDeleteClickHandler() {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
+					@Override
+					public void callback(boolean isConfirmed) {
+						if (isConfirmed)
+							presenter.handleCommand(MarkdownEditorAction.DELETE);
+					}
+				});
 			}
 		};
 	}
@@ -328,19 +354,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		attachmentButton.setVisible(visible);
 	}
 	
-	@Override
-	public void setCancelVisible(boolean visible) {
-		cancelButton.setVisible(visible);
-	}
-	@Override
-	public void setSaveVisible(boolean visible) {
-		saveButton.setVisible(visible);
-	}
-	@Override
-	public void setDeleteVisible(boolean visible) {
-		deleteButton.setVisible(visible);
-	}
-
 	public void initFormattingGuide(WikiPageKey formattingGuideWikiPageKey) {
 		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
 		formattingGuideContainer.clear();

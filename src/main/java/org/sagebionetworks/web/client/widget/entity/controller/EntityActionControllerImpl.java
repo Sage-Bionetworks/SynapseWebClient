@@ -25,7 +25,9 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -46,7 +49,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	public static final String MOVE_PREFIX = "Move ";
 
-	public static final String ADD_WIKI = "Add wiki";
+	public static final String EDIT_WIKI = "Edit Wiki";
 
 	public static final String THE = "The ";
 
@@ -74,6 +77,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EvaluationSubmitter submitter;
 	
 	EntityBundle entityBundle;
+	String wikiPageId;
 	Entity entity;
 	UserEntityPermissions permissions;
 	String enityTypeDisplay;
@@ -81,7 +85,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
-
+	MarkdownEditorWidget wikiEditor;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -94,7 +98,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			RenameEntityModalWidget renameEntityModalWidget,
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
-			UploadDialogWidget uploader) {
+			UploadDialogWidget uploader,
+			MarkdownEditorWidget wikiEditor) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -108,12 +113,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.entityFinder = entityFinder;
 		this.submitter = submitter;
 		this.uploader = uploader;
+		this.wikiEditor = wikiEditor;
 	}
 
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
-			EntityBundle entityBundle, EntityUpdatedHandler handler) {
+			EntityBundle entityBundle, String wikiPageId, EntityUpdatedHandler handler) {
 		this.entityBundle = entityBundle;
+		this.wikiPageId = wikiPageId;
 		this.entityUpdateHandler = handler;
 		this.permissions = entityBundle.getPermissions();
 		this.actionMenu = actionMenu;
@@ -147,14 +154,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureAddWiki(){
-		if(this.entityBundle.getRootWikiId() == null && isWikiableType(entityBundle.getEntity())){
-			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
-			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, permissions.getCanEdit());
-			actionMenu.setActionText(Action.ADD_WIKI_PAGE, ADD_WIKI);
-			actionMenu.addActionListener(Action.ADD_WIKI_PAGE, this);
+		if(isWikiableType(entityBundle.getEntity())){
+			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
+			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI);
+			actionMenu.addActionListener(Action.EDIT_WIKI_PAGE, this);
 		}else{
-			actionMenu.setActionVisible(Action.ADD_WIKI_PAGE, false);
-			actionMenu.setActionEnabled(Action.ADD_WIKI_PAGE, false);
+			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
+			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, false);
 		}
 	}
 	
@@ -298,8 +305,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CHANGE_ENTITY_NAME:
 			onRename();
 			break;
-		case ADD_WIKI_PAGE:
-			onAddWiki();
+		case EDIT_WIKI_PAGE:
+			onEditWiki();
 			break;
 		case MOVE_ENTITY:
 			onMove();
@@ -459,31 +466,25 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 	
-	private void onAddWiki() {
+	private void onEditWiki() {
 		// Validate the user can update this entity.
 		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
 			@Override
 			public void invoke() {
-				postCheckAddWiki();
+				postCheckEditWiki();
 			}
 		});
 	}
 	
-	private void postCheckAddWiki(){
-		//is there already a wiki?
-		WikiPage page = new WikiPage();
-		synapseClient.createV2WikiPageWithV1(this.entityBundle.getEntity(). getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>(){
-
+	private void postCheckEditWiki(){
+		//markdown editor will create a wiki if it does not already exist
+		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		wikiEditor.configure(key, new CallbackP<WikiPage>() {
 			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(WikiPage result) {
+			public void invoke(WikiPage param) {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-				
-			}});
+			}
+		});
 	}
 
 	private void onRename() {

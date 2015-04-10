@@ -10,7 +10,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ADD_WIKI;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
@@ -201,10 +201,10 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
-		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, true);
-		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, true);
-		verify(mockActionMenu).setActionText(Action.ADD_WIKI_PAGE, ADD_WIKI);
-		verify(mockActionMenu).addActionListener(Action.ADD_WIKI_PAGE, controller);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, true);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
+		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI);
+		verify(mockActionMenu).addActionListener(Action.EDIT_WIKI_PAGE, controller);
 	}
 	
 	@Test
@@ -212,8 +212,8 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Folder());
 		entityBundle.setRootWikiId("7890");
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
-		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, false);
-		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
 	}
 	
 	@Test
@@ -221,8 +221,8 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new TableEntity());
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
-		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_PAGE, false);
-		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
 	}
 	
 	@Test
@@ -433,7 +433,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
-		controller.onAction(Action.ADD_WIKI_PAGE);
+		controller.onAction(Action.EDIT_WIKI_PAGE);
 		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
@@ -444,7 +444,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
-		controller.onAction(Action.ADD_WIKI_PAGE);
+		controller.onAction(Action.EDIT_WIKI_PAGE);
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
@@ -456,7 +456,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId(null);
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
-		controller.onAction(Action.ADD_WIKI_PAGE);
+		controller.onAction(Action.EDIT_WIKI_PAGE);
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 		mockView.showErrorMessage(error);

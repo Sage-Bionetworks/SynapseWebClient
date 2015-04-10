@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.BatchResults;
@@ -18,7 +17,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -140,11 +138,7 @@ SynapseWidgetPresenter {
 						if (caught instanceof NotFoundException) {
 							//show insert wiki button if user can edit and it's embedded in another entity page
 							if (isEmbeddedInOwnerPage) {
-								if (canEdit) {
-									view.showCreateWiki(isDescription);	
-								} else {
-									view.showWarningMessageInPage(DisplayConstants.NO_WIKI_FOUND);
-								}
+								view.showWarningMessageInPage(DisplayConstants.NO_WIKI_FOUND);
 							} else //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
 							
@@ -209,66 +203,6 @@ SynapseWidgetPresenter {
 			callback.ownerObjectNameInitialized("", isDescription);
 		} 
 	}
-	
-	@Override
-	public void saveClicked(String title, String md) {
-		currentPage.setTitle(title);
-		currentPage.setMarkdown(md);
-		synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), currentPage, new AsyncCallback<WikiPage>() {
-			@Override
-			public void onSuccess(WikiPage result) {
-				//we have successfully saved, so we are no longer editing
-				setIsEditing(false);
-				view.hideEditor();
-				//now refresh the page
-				refresh();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
-			}
-		});
-	}
-	
-	@Override
-	public void deleteButtonClicked() {
-		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
-			
-			@Override
-			public void onSuccess(Void result) {
-				setIsEditing(false);
-				view.hideEditor();
-				//clear the now invalid page id from the wiki key
-				wikiKey.setWikiPageId(null);
-				if (isEmbeddedInOwnerPage)
-					refresh();
-				else
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-			}
-		});	
-	}
-	
-	@Override
-	public void cancelClicked() {
-		setIsEditing(false);
-		view.hideEditor();
-	}
-	
-	private void setIsEditing(boolean isEditing) {
-		globalApplicationState.setIsEditing(isEditing);
-	}
-	
-	@Override
-	public void editClicked() {
-		setIsEditing(true);
-	}
 	 
 	@Override
 	public void createPage(final String name) {
@@ -278,19 +212,12 @@ SynapseWidgetPresenter {
 	
 	public void createPage(final String name, final org.sagebionetworks.web.client.utils.Callback onSuccess) {
 		WikiPage page = new WikiPage();
-		//if this is creating the root wiki, then refresh the full page
-		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
 		page.setParentWikiId(wikiKey.getWikiPageId());
 		page.setTitle(name);
         synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), page, new AsyncCallback<WikiPage>() {
             @Override
             public void onSuccess(WikiPage result) {
-            	if (isCreatingWiki) {
-                    String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
-                    view.showInfo( type + " Created", "");
-                } else {
-                    view.showInfo("Page '" + name + "' Added", "");
-                }
+                view.showInfo("Page '" + name + "' Added", "");
             	if (onSuccess != null) {
             		onSuccess.invoke();
             	}
@@ -358,25 +285,6 @@ SynapseWidgetPresenter {
 	@Override
 	public WikiPage getWikiPage() {
 		return currentPage;
-	}
-	
-	@Override
-    public void addFileHandles(List<String> fileHandleIds) {
-		//update file handle ids if set
-        if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
-	        HashSet<String> fileHandleIdsSet = new HashSet<String>();
-	        fileHandleIdsSet.addAll(currentPage.getAttachmentFileHandleIds());
-	        fileHandleIdsSet.addAll(fileHandleIds);
-	        currentPage.getAttachmentFileHandleIds().clear();
-	        currentPage.getAttachmentFileHandleIds().addAll(fileHandleIdsSet);
-        }
-	}
-	
-	@Override
-	public void removeFileHandles(List<String> fileHandleIds) {
-	    if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
-	    	currentPage.getAttachmentFileHandleIds().removeAll(fileHandleIds);
-	    }	
 	}
 	
 	

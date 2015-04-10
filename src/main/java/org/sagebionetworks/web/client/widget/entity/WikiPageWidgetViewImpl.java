@@ -118,18 +118,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	
 	@Override
-	public void showCreateWiki(boolean isDescription) {
-		clear();
-		this.isDescription = isDescription;
-		if (!isDescription) {
-			SimplePanel createWikiButtonWrapper = new SimplePanel();		
-			Button insertBtn = createInsertOrAddPageButton(true);		
-			createWikiButtonWrapper.add(insertBtn);
-			add(createWikiButtonWrapper);
-		}
-	}
-	
-	@Override
 	public void showWarningMessageInPage(String message) {
 		clear();
 		add(new Alert(message, AlertType.WARNING));
@@ -307,12 +295,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			commandBar.clear();
 		}
 			
-		Button editButton = createEditButton();
-		editButton.addStyleName("margin-left-10");
-		commandBar.add(editButton);			
-		
 		if(!isDescription) {
-			Button addPageButton = createInsertOrAddPageButton(false);
+			Button addPageButton = createAddPageButton();
 			commandBar.add(addPageButton);
 			addPageButton.addStyleName("margin-left-5");
 		}
@@ -386,114 +370,21 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return btn;
 	}
 	
-	private Button createEditButton() {
-		String editLabel = isDescription ? DisplayConstants.EDIT_DESCRIPTION : DisplayConstants.BUTTON_EDIT_WIKI;
-		Button btn = DisplayUtils.createIconButton(editLabel, DisplayUtils.ButtonType.DEFAULT, "glyphicon-pencil");			
-		btn.addStyleName("display-inline");			
-		btn.getElement().setId(DisplayConstants.ID_BTN_EDIT);
-		
-		btn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				if(isHistoryOpen) {
-					historyWidget.hideHistoryWidget();
-				}
-				//inform presenter that edit was clicked
-				presenter.editClicked();
-
-				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), new WidgetDescriptorUpdatedHandler() {
-					@Override
-					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						presenter.addFileHandles(event.getNewFileHandleIds());
-						presenter.removeFileHandles(event.getDeletedFileHandleIds());
-					}
-				});
-				markdownEditorWidget.setTitleEditorVisible(!isRootWiki);
-				markdownEditorWidget.setTitle(presenter.getWikiPage().getTitle());
-				
-				//register to handle these events
-				markdownEditorWidget.setActionHandler(MarkdownEditorAction.SAVE, new Callback() {
-					@Override
-					public void invoke() {
-						saveClicked();
-					}
-				});
-				
-				markdownEditorWidget.setActionHandler(MarkdownEditorAction.CANCEL, new Callback() {
-					@Override
-					public void invoke() {
-						cancelClicked();
-					}
-				});
-				
-				markdownEditorWidget.setActionHandler(MarkdownEditorAction.DELETE, new Callback() {
-					@Override
-					public void invoke() {
-						deleteClicked();
-					}
-				});
-				
-				markdownEditorWidget.showEditorModal();
-			}
-		});
-
-		return btn;
-	}
-
-	private Button createInsertOrAddPageButton(final boolean isFirstPage) {
-		Button btn = DisplayUtils.createIconButton(getInsertBtnText(isFirstPage), DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
+	private Button createAddPageButton() {
+		Button btn = DisplayUtils.createIconButton(DisplayConstants.ADD_PAGE, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
 		btn.addStyleName("display-inline");
 		btn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (isFirstPage) {
-					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
-				}
-				else {
-					Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
-						@Override
-						public void callback(String name) {
-							presenter.createPage(name);
-						}
-					});
-				}
+				Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
+					@Override
+					public void callback(String name) {
+						presenter.createPage(name);
+					}
+				});
 			}
 		});
 		return btn;
-	}
-
-	private String getInsertBtnText(final boolean isFirstPage) {
-		String buttonText;
-		if(isFirstPage) {
-			buttonText = DisplayConstants.CREATE_WIKI;
-		} else {
-			buttonText = DisplayConstants.ADD_PAGE;
-		}
-		return buttonText;
-	}
-	
-	public void deleteClicked() {
-		//delete wiki
-		Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
-			@Override
-			public void callback(boolean isConfirmed) {
-				if (isConfirmed)
-					presenter.deleteButtonClicked();
-			}
-		});
-	}
-	
-	public void saveClicked() {
-		presenter.saveClicked(markdownEditorWidget.getTitle(), markdownEditorWidget.getMarkdown());
-	}
-	
-	public void cancelClicked() {
-		presenter.cancelClicked();
-	}
-	
-	@Override
-	public void hideEditor() {
-		markdownEditorWidget.hideEditorModal();
 	}
 	
 	public void showErrorMessage(String message) {

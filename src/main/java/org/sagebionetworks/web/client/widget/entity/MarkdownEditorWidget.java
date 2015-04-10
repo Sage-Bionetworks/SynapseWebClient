@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -12,20 +15,21 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Widget used to edit markdown
+ * Modal used to edit a wiki page.  Knows how to Save, Delete, and user can cancel. 
  * 
  * @author Jay
  *
@@ -39,10 +43,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private MarkdownEditorWidgetView view;
 	private BaseEditWidgetDescriptorPresenter widgetDescriptorEditor;
 	private WidgetRegistrar widgetRegistrar;
-	private WikiPageKey wikiKey;
 	private WidgetSelectionState widgetSelectionState;
-	WidgetDescriptorUpdatedHandler widgetDescriptorUpdatedHandler;
-	private Callback saveHandler, cancelHandler, deleteHandler; 
+	private WikiPage currentPage;
+	private WikiPageKey wikiKey;
+	private CallbackP<WikiPage> wikiPageUpdatedHandler;
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -63,28 +67,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.setPresenter(this);
 	}
 	
-	public void setActionHandler(MarkdownEditorAction action, Callback callback) {
-		if (callback != null) {
-			switch (action) {
-			case SAVE:
-				saveHandler = callback;
-				view.setSaveVisible(true);
-				break;
-			case CANCEL:
-				cancelHandler = callback;
-				view.setCancelVisible(true);
-				break;
-			case DELETE:
-				deleteHandler = callback;
-				view.setDeleteVisible(true);
-				break;
-			default:
-				throw new IllegalArgumentException(
-						"Markdown editor does not support callback for the action: " + action);
-			}
-		}
-	}
-	
 	/**
 	 * 
 	 * @param ownerId
@@ -94,17 +76,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	 * @param callback
 	 * @param closeHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
-	public void configure(final WikiPageKey wikiKey,
-			final String markdown,
-			final WidgetDescriptorUpdatedHandler callback) {
+	public void configure(final WikiPageKey wikiKey, CallbackP<WikiPage> wikiPageUpdatedHandler) {
+		this.wikiPageUpdatedHandler = wikiPageUpdatedHandler;
 		this.wikiKey = wikiKey;
-		this.widgetDescriptorUpdatedHandler = callback;
-		cancelHandler = null;
-		saveHandler = null;
-		deleteHandler = null;
-		view.setSaveVisible(false);
-		view.setCancelVisible(false);
-		view.setDeleteVisible(false);
 		
 		//clear view state
 		view.clear();
@@ -117,20 +91,58 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 				@Override
 				public void invoke(WikiPageKey key) {
 					formattingGuideWikiPageKey = key;
-					view.configure(formattingGuideWikiPageKey, markdown);
+					initWikiPage();
 				}
 			});
 		} else {
-			view.configure(formattingGuideWikiPageKey, markdown);
+			initWikiPage();
 		}
 	}
 	
-	public void showEditorModal(){
-		view.showEditorModal();
+	public void initWikiPage() {
+		//get the wiki page
+		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
+			@Override
+			public void onSuccess(WikiPage result) {
+				try {
+					configure(result);
+				} catch (Exception e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//if it is because of a missing root (and we have edit permission), then the pages browser should have a Create Wiki button
+				if (caught instanceof NotFoundException) {
+					//create a wiki page and configure with that
+					createNewWiki();
+				} else {
+					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+				}
+			}
+		});
 	}
 	
-	public void hideEditorModal(){
-		view.hideEditorModal();
+	public void createNewWiki() {
+		WikiPage page = new WikiPage();
+		synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), page, new AsyncCallback<WikiPage>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(WikiPage result) {
+				configure(result);
+			}});
+	}
+	
+	public void configure(WikiPage page) {
+		currentPage = page;
+		view.configure(formattingGuideWikiPageKey, currentPage.getMarkdown());
+		view.setTitleEditorVisible(currentPage.getParentWikiId() != null);
+		view.setTitle(currentPage.getTitle());
+		view.showEditorModal();
 	}
 	
 	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {
@@ -334,17 +346,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			surroundWithTag("######", "", false);
 			break;
 		case SAVE:
-			view.setSaving(true);
-			saveHandler.invoke();
+			saveClicked();
 			break;
 		case PREVIEW:
 			showPreview();
 			break;
-		case CANCEL:
-			cancelHandler.invoke();
-			break;
 		case DELETE:
-			deleteHandler.invoke();
+			deleteClicked();
 			break;
 		case SET_PROJECT_BACKGROUND:
 			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
@@ -352,6 +360,42 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			throw new IllegalArgumentException(
 					"Unrecognized markdown editor action: " + action);
 		}
+	}
+	
+	public void saveClicked() {
+		view.setSaving(true);
+		currentPage.setTitle(view.getTitle());
+		currentPage.setMarkdown(view.getMarkdown());
+		synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), currentPage, new AsyncCallback<WikiPage>() {
+			@Override
+			public void onSuccess(WikiPage result) {
+				//we have successfully saved, so we are no longer editing
+				view.hideEditorModal();
+				if (wikiPageUpdatedHandler != null)
+					wikiPageUpdatedHandler.invoke(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
+			}
+		});
+	}
+	
+	public void deleteClicked() {
+		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
+			
+			@Override
+			public void onSuccess(Void result) {
+				view.hideEditorModal();
+				if (wikiPageUpdatedHandler != null)
+					wikiPageUpdatedHandler.invoke(null);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});	
 	}
 	
 	public void surroundWithTag(String tag) {
@@ -381,8 +425,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 				if (event.getInsertValue()!=null) {
 					insertMarkdown(event.getInsertValue());
 				}
-				if (widgetDescriptorUpdatedHandler != null)
-					widgetDescriptorUpdatedHandler.onUpdate(event);
+				handleDescriptorUpdatedEvent(event);
 			}
 		};
 		widgetDescriptorEditor.addWidgetDescriptorUpdatedHandler(handler);
@@ -415,8 +458,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 						if (event.getInsertValue()!=null) {
 							insertMarkdown(event.getInsertValue());
 						}
-						if (widgetDescriptorUpdatedHandler != null)
-							widgetDescriptorUpdatedHandler.onUpdate(event);
+						handleDescriptorUpdatedEvent(event);
 					}
 				}
 			};
@@ -426,6 +468,27 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		}
 	}
 
+	public void handleDescriptorUpdatedEvent(WidgetDescriptorUpdatedEvent event) {
+		addFileHandles(event.getNewFileHandleIds());
+		removeFileHandles(event.getDeletedFileHandleIds());
+	}
+
+	public void addFileHandles(List<String> fileHandleIds) {
+		//update file handle ids if set
+        if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
+	        HashSet<String> fileHandleIdsSet = new HashSet<String>();
+	        fileHandleIdsSet.addAll(currentPage.getAttachmentFileHandleIds());
+	        fileHandleIdsSet.addAll(fileHandleIds);
+	        currentPage.getAttachmentFileHandleIds().clear();
+	        currentPage.getAttachmentFileHandleIds().addAll(fileHandleIdsSet);
+        }
+	}
+	
+	public void removeFileHandles(List<String> fileHandleIds) {
+	    if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
+	    	currentPage.getAttachmentFileHandleIds().removeAll(fileHandleIds);
+	    }	
+	}
 	/**
 	 * For testing purposes only
 	 * @return

@@ -12,11 +12,9 @@
 			        <b:Tooltip placement="BOTTOM" title="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
 			        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" />
 			        </b:Tooltip>
-			        <b:Button dataTarget="#formattingGuideModal" dataToggle="MODAL" icon="QUESTION_CIRCLE" size="EXTRA_SMALL">Formatting Guide</b:Button>
+			        <b:Button ui:field="formattingGuideButton" icon="QUESTION_CIRCLE" size="EXTRA_SMALL">Formatting Guide</b:Button>
 			        <b:ButtonGroup>
-						<b:Tooltip placement="BOTTOM" title="Insert Synapse Widget">
-							<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
-						</b:Tooltip>
+					  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
 					  <b:DropDownMenu>
 					    <b:AnchorListItem ui:field="attachmentLink">Attachment</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="buttonLink">Button Link</b:AnchorListItem>
@@ -77,9 +75,7 @@
 			        </b:Tooltip>
 			        
 			        <b:ButtonGroup>
-						<b:Tooltip placement="BOTTOM" title="Headings">
-							<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
-						</b:Tooltip>
+					  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
 					  <b:DropDownMenu>
 					    <b:AnchorListItem ui:field="heading1Link">Heading 1</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="heading2Link">Heading 2</b:AnchorListItem>
@@ -109,12 +105,12 @@
 			<b:ModalFooter>
 			    <b:Button ui:field="deleteButton" pull="LEFT" type="DANGER" >Delete Page</b:Button>
 			    <b:Button ui:field="previewButton" pull="LEFT" >Preview</b:Button>
-			    <b:Button ui:field="cancelButton" pull="RIGHT">Cancel</b:Button>
+			    <b:Button pull="RIGHT" dataDismiss="MODAL">Cancel</b:Button>
 			    <b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." pull="RIGHT">Save</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		
-	    <b:Modal b:id="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
+	    <b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
 		    <g:FlowPanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>
