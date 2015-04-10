@@ -440,4 +440,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public String getTitle() {
 		return view.getTitle();
 	}
+	public void setTitle(String title) {
+		view.setTitle(title);
+	}
 }

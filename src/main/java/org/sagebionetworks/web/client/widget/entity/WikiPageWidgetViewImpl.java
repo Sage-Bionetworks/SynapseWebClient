@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -399,16 +400,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				}
 				//inform presenter that edit was clicked
 				presenter.editClicked();
-				//create the editor textarea, and configure the editor widget
-				//should edit for enter handler?
-				final TextBox titleField = new TextBox();
-				if (!isRootWiki) {
-					titleField.setValue(presenter.getWikiPage().getTitle());
-					titleField.addStyleName("font-size-32 margin-bottom-10");
-					titleField.setHeight("45px");					
-					add(titleField);
-				}
-				//also add commands at the bottom
+
 				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
@@ -416,6 +408,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 						presenter.removeFileHandles(event.getDeletedFileHandleIds());
 					}
 				});
+				markdownEditorWidget.setTitleEditorVisible(!isRootWiki);
+				markdownEditorWidget.setTitle(presenter.getWikiPage().getTitle());
 				
 				//register to handle these events
 				markdownEditorWidget.setActionHandler(MarkdownEditorAction.SAVE, new Callback() {
@@ -438,6 +432,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 						deleteClicked();
 					}
 				});
+				
 				markdownEditorWidget.showEditorModal();
 			}
 		});

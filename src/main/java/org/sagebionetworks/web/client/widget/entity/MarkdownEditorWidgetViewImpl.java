@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -268,7 +269,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea();
+				resizeMarkdownTextArea(2);
 			}
 		});
 	}
@@ -310,7 +311,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.setText(markdown);
 		if (formattingGuideWikiPageKey != null)
 			initFormattingGuide(formattingGuideWikiPageKey);
-		resizeMarkdownTextArea();
+		resizeMarkdownTextArea(300);
 		
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			
@@ -346,8 +347,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		formattingGuideContainer.add(markdownWidget);
 	}
 
-	private void resizeMarkdownTextArea() {
-		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight()) + "px");
+	private void resizeMarkdownTextArea(int extra) {
+		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight() + extra) + "px");
 	}
 	
 	@Override
@@ -454,5 +455,10 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public String getTitle() {
 		return titleField.getValue();
+	}
+	
+	@Override
+	public void setTitle(String title) {
+		titleField.setValue(title);
 	}
 }

@@ -37,6 +37,7 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setAlphaCommandsVisible(boolean visible);
 	void setTitleEditorVisible(boolean visible);
 	String getTitle();
+	void setTitle(String title);
 	
 	void showEditorModal();
 	void hideEditorModal();

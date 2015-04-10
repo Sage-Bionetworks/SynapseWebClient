@@ -103,7 +103,7 @@
 			        </b:Tooltip>
 			    </bh:Div>
 			    <bh:Div>
-			        <b:TextArea ui:field="markdownTextArea" addStyleNames="min-height-200 hide-y-overflow hide-resize"/>
+			        <b:TextArea ui:field="markdownTextArea" addStyleNames="hide-resize"/>
 			    </bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
