@@ -76,54 +76,54 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 			public void onClick(ClickEvent event) {
 				//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
 				presenter.addFolderClicked();
-			}
+	}
 		});
-		
+
 		uploadButton.addClickHandler(new ClickHandler() {
-			@Override
+	@Override
 			public void onClick(ClickEvent event) {
 				presenter.uploadButtonClicked();
-			}
+	}		
 		});
-		
+	
 		okNewFolderButton.addClickHandler(new ClickHandler() {
-			@Override
+	@Override
 			public void onClick(ClickEvent event) {
 				newFolderDialog.hide();
 				presenter.updateFolderName(folderNameField.getText());
-			}
+		}
 		});
 		cancelNewFolderButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
+				@Override
+				public void onClick(ClickEvent event) {
 				presenter.deleteFolder(true);	
-			}
-		});
+				}
+			});
 		folderNameField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 					okNewFolderButton.click();
-		        }
+		}
 			}
 		});
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
-	}
-
-	@Override
-	public void configure(String entityId, boolean canCertifiedUserAddChild) {
-		entityTreeBrowser.configure(entityId, true);
-		if (canCertifiedUserAddChild) {
-			topBar.setVisible(true);
 		}
-	}
 	
 	@Override
+	public void configure(String entityId, boolean canCertifiedUserAddChild) {
+		entityTreeBrowser.configure(entityId);
+		if (canCertifiedUserAddChild) {
+			topBar.setVisible(true);
+	}
+	}
+	
+			@Override
 	public void showQuizInfoDialog() {
 		quizInfoDialog.show();
-	}
+			}
 	
 	@Override
 	public void showUploadDialog(String entityId){
@@ -149,9 +149,9 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		};
 		sharingAndDataUseWidget.configure(folderEntityId, true, refreshSharingAndDataUseWidget);
 		newFolderDialog.show();
-	}
-
-	@Override
+			}
+		
+			@Override
 	public Widget asWidget() {
 		return widget;
 	}	
@@ -182,7 +182,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	@Override
 	public void refreshTreeView(String entityId) {
-		entityTreeBrowser.configure(entityId, true);
+		entityTreeBrowser.configure(entityId);
 	}
-
 }
