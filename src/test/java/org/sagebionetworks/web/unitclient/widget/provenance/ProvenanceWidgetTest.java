@@ -509,6 +509,12 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				
 			}
+
+			@Override
+			public void pushHistoryState(String token) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 

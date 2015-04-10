@@ -110,7 +110,7 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		 * Getters
 		 */
 		public List<SubpageNavTreeNode> getChildren()       {       return this.children;        }
-		public String getPageTitle()                             {       return this.pageTitle;       }
+		public String getPageTitle()                        {       return this.pageTitle;       }
 		public Place getTargetPlace()                       {       return this.targetPlace;     }
 		public WikiPageKey getWikiPageKey()                 {       return this.wikiPageKey;     }
 	}
@@ -119,7 +119,7 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 	public void reloadWiki(SubpageNavTreeNode node) {
 		if (reloadWikiPageCallback != null) {
 			reloadWikiPageCallback.invoke(node.getWikiPageKey());
-			globalApplicationState.replaceCurrentPlace(node.getTargetPlace());
+			globalApplicationState.pushCurrentPlace(node.getTargetPlace());
 			this.currentWikiKey = node.getWikiPageKey();
 			view.configure(this.overallRoot);
 		}

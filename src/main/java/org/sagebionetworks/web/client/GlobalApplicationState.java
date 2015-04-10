@@ -112,4 +112,11 @@ public interface GlobalApplicationState {
 	void clearLastPlace();
 	
 	public boolean isWikiBasedEntity(String entityId);
+
+	/**
+	 * This can be used to change the URL in the browser without reloading the page.
+	 * 
+	 * @param currentPlace
+	 */
+	public void pushCurrentPlace(Place targetPlace);
 }

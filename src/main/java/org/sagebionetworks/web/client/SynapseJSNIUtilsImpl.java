@@ -444,5 +444,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _replaceHistoryState(String token)/*-{
 		$wnd.history.replaceState( {} , '', '#'+token );
 	}-*/;
-	
+
+	@Override
+	public void pushHistoryState(String token) {
+		_pushHistoryState(token);
+	}
+
+	private static native void _pushHistoryState(String token)/*-{
+		$wnd.history.pushState( {} , '', '#'+token );
+	}-*/;
 }

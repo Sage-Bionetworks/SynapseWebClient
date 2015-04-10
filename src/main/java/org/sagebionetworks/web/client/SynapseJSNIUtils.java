@@ -68,4 +68,10 @@ public interface SynapseJSNIUtils {
 	 * @param token
 	 */
 	public void replaceHistoryState(String token);
+
+	/**
+	 * push a new state to the current history state with a token using history.pushState().
+	 * @param token
+	 */
+	public void pushHistoryState(String token);
 }
