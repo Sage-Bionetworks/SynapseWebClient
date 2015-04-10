@@ -4,6 +4,9 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,10 +25,18 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		this.modalView = view;
 		this.editorWidget = editorWidget;
 		this.synapse = synapse;
-		this.modalView.setPreseneter(this);
+		this.modalView.setPresenter(this);
 		this.modalView.addEditorWidget(editorWidget);
+		editorWidget.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					onSave();
+				}
+			}
+		});
 	}
-
+	
 	@Override
 	public Widget asWidget() {
 		return modalView.asWidget();

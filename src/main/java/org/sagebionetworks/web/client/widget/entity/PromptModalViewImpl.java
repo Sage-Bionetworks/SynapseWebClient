@@ -19,14 +19,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * A basic implementation of EntityNameModalView with zero business logic.
+ * A basic implementation of PromptModalView with zero business logic.
  * 
  * @author jhill
  *
  */
-public class EntityNameModalViewImpl implements EntityNameModalView {
+public class PromptModalViewImpl implements PromptModalView {
 	
-	public interface Binder extends UiBinder<Modal, EntityNameModalViewImpl> {}
+	public interface Binder extends UiBinder<Modal, PromptModalViewImpl> {}
 	
 	@UiField
 	Modal modal;
@@ -42,7 +42,7 @@ public class EntityNameModalViewImpl implements EntityNameModalView {
 	Modal createTableModal;
 
 	@Inject
-	public EntityNameModalViewImpl(Binder binder){
+	public PromptModalViewImpl(Binder binder){
 		createTableModal = binder.createAndBindUi(this);
 		modal.addShownHandler(new ModalShownHandler() {
 			

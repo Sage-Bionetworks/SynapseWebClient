@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.client.widget.header;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -37,7 +42,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private static final String HEADER_LARGE_STYLE = "largeHeader";
 	private static final String HEADER_SMALL_STYLE = "smallHeader";
 
-	private UserSessionData cachedUserSessionData = null;
 	@UiField
 	Image logoSmall;
 	@UiField
@@ -46,10 +50,16 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DivElement headerDiv;
 	@UiField
 	DivElement headerImageDiv;
-	
+
 	@UiField
 	Button dashboardButton;
-	
+	@UiField
+	ButtonGroup headerFavButtonGroup;
+	@UiField
+	Button headerFavButton;
+	@UiField
+	DropDownMenu headerFavList;
+
 	@UiField
 	AnchorListItem gettingStartedLink;
 	@UiField
@@ -62,7 +72,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem commandLineLink;
 	@UiField
 	AnchorListItem restAPILink;
-	
+
 	@UiField
 	SimplePanel registerLinkUI;
 	@UiField
@@ -73,12 +83,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SimplePanel loginLinkUI;
 	@UiField
 	Button loginLink;
-	
+
 	@UiField
 	Button trashLink;
 	@UiField
 	Button logoutLink;
-	
+
 	@UiField
 	FlowPanel testSitePanel;
 	@UiField
@@ -86,14 +96,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	SimplePanel searchBoxContainer;
 	private Presenter presenter;
-	private SearchBox searchBox;	
+	private SearchBox searchBox;
 	private CookieProvider cookies;
 	SageImageBundle sageImageBundle;
 	boolean showLargeLogo;
 	UserBadge userBadge;
 	Span userBadgeText;
 	HorizontalPanel myDashboardButtonContents;
-	
+
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -114,13 +124,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		myDashboardButtonContents.add(userBadge.asWidget());
 		userBadgeText = new Span();
 		myDashboardButtonContents.add(userBadgeText);
-		
+
 		addUserPicturePanel();
 		showLargeLogo = false; // default
 		initClickHandlers();
 		refreshTestSiteHeader();
 	}
-	
+
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button
@@ -133,7 +143,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
             }
         });
 	}
-	
+
 	public void initClickHandlers() {
 		goToStandardSite.addClickHandler(new ClickHandler() {
 			@Override
@@ -154,14 +164,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     			presenter.onTrashClick();
 			}
     	});
-		
 		logoutLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onLogoutClick();
 			}
 		});
-		
 		dashboardButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -192,7 +200,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				DisplayUtils.newWindow(ClientProperties.CLIENT_R_API_URL, "", "");
 			}
 		});
-		
 		pythonLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -211,9 +218,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				DisplayUtils.newWindow(ClientProperties.REST_API_URL, "", "");
 			}
 		});
+		headerFavButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onFavoriteClick();
+			}
+		});
 	}
-	
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -228,33 +240,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void removeMenuItemActive(MenuItems menuItem) {
 	}
 
-	private void refreshTestSiteHeader() {
-		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));
-	}
-	
 	@Override
 	public void refresh() {
 		setLogo();
 		refreshTestSiteHeader();
-		UserSessionData userSessionData = presenter.getUser();
-		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)){
-			cachedUserSessionData = userSessionData;
-			setUser(cachedUserSessionData);
-		}
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-	 	trashLink.setVisible(isInTestWebsite);
+		trashLink.setVisible(isInTestWebsite);
 	}
 
 	@Override
 	public void setSearchVisible(boolean searchVisible) {
 		searchBox.setVisible(searchVisible);
 	}
-	
-	/*
-	 * Private Methods
-	 */
-	
-	private void setUser(UserSessionData userData) {
+
+	@Override
+	public void setUser(UserSessionData userData) {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
 	 	userBadge.clearState();
@@ -266,31 +266,60 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			registerLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 			dashboardButtonUI.setVisible(true);
+			headerFavButtonGroup.setVisible(true);
 		} else {
 			loginLinkUI.setVisible(true);
 			registerLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
 			dashboardButtonUI.setVisible(false);
+			headerFavButtonGroup.setVisible(false);
 		}
 	}
-	
+
+	@Override
+	public void clearFavorite() {
+		headerFavList.clear();
+	}
+
+	@Override
+	public void setEmptyFavorite() {
+		AnchorListItem defaultItem = new AnchorListItem("Empty");
+		headerFavList.add(defaultItem);
+	}
+
+	@Override
+	public void addFavorite(List<EntityHeader> headers) {
+		for (final EntityHeader header : headers) {
+			AnchorListItem favItem = new AnchorListItem(header.getName());
+			favItem.setHref(DisplayUtils.getSynapseHistoryToken(header.getId()));
+			headerFavList.add(favItem);
+		}
+	}
+
 	@Override
 	public void setLargeLogo(boolean isLarge) {
 		this.showLargeLogo = isLarge;
 	}
-	
+
+	/*
+	 * Private Methods
+	 */
+
 	private void setLogo() {
 		if(showLargeLogo) {
 			logoLarge.setVisible(true);
 			logoSmall.setVisible(false);
 			headerDiv.removeClassName(HEADER_SMALL_STYLE);
 			headerDiv.addClassName(HEADER_LARGE_STYLE);
-		} else {						
+		} else {
 			logoLarge.setVisible(false);
 			logoSmall.setVisible(true);
 			headerDiv.removeClassName(HEADER_LARGE_STYLE);
 			headerDiv.addClassName(HEADER_SMALL_STYLE);
 		}
 	}
-	
+
+	private void refreshTestSiteHeader() {
+		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));
+	}
 }

@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -491,9 +493,9 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset) throws RestServiceException;
-	ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset) throws RestServiceException;
-	ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
+	ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
+	ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
+	ProjectPagedResults getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
 	
 	String getHost(String urlString) throws RestServiceException;
 
@@ -504,6 +506,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
-	
+
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
+	
 }

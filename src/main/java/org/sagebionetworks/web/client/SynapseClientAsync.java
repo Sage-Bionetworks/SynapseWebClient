@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -23,6 +24,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -50,7 +52,6 @@ import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
@@ -360,7 +361,7 @@ public interface SynapseClientAsync {
 	 * @param offset
 	 * @param projectHeaders
 	 */
-	void getMyProjects(ProjectListType projectListType, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
 	/**
 	 * Return projects that the current user can access due to being on a particular team. 
 	 * @param teamId
@@ -368,8 +369,8 @@ public interface SynapseClientAsync {
 	 * @param offset
 	 * @param projectHeaders
 	 */
-	void getProjectsForTeam(String teamId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
-	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	void getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
+	void getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
 

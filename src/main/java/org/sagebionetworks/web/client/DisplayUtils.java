@@ -1998,8 +1998,4 @@ public class DisplayUtils {
 		else return s;
 	 }
 
-	public static void setHighlightBoxUser(DivElement highlightBox, String displayName, String title) {
-		String prefix = displayName != null ? displayName+"'s " : "";
-		highlightBox.setAttribute("highlight-box-title", prefix + title);
-	}
 }

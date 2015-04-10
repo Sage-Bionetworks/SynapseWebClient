@@ -6,9 +6,11 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -52,7 +54,7 @@ import com.google.inject.Inject;
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
-	public static final String USER_PROFILE_WELCOME_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.welcome.message.visible.state";
+	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
 	
 	private Profile place;
 	private ProfileView view;
@@ -74,6 +76,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public final static int CHALLENGE_PAGE_SIZE=100;
 	public ProjectFilterEnum filterType;
 	public Team filterTeam;
+	public SortOptionEnum currentProjectSort;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -96,6 +99,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.linkedInService = linkedInServic;
 		this.gwt = gwt;
+		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		view.clearSortOptions();
+		for (SortOptionEnum sort: SortOptionEnum.values()) {
+			view.addSortOption(sort);
+		}
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
 	}
@@ -145,13 +153,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 
-	private void updateProfileView(String userId, final ProfileArea initialTab) {
+	// Configuration
+	public void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
 		view.showLoading();
+		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		view.setSortText(currentProjectSort.sortText);
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
-		view.setProfileEditButtonVisible(isOwner);	currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
+		view.setProfileEditButtonVisible(isOwner);	
+		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
 			initUserFavorites(new Callback() {
@@ -170,7 +182,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(UserProfile profile) {
 					initializeShowHideProfile(isOwner);
-					initializeShowHideWelcome(isOwner);
 					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 				}
 			@Override
@@ -200,6 +211,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if (caught instanceof NotFoundException) {
 					view.updateView(profile, isOwner, null);
 					tabClicked(area);
+					initializeShowHideCertification(isOwner);
 				}
 				else
 					view.showErrorMessage(caught.getMessage());
@@ -227,22 +239,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void initializeShowHideWelcome(boolean isOwner) {
+	public void initializeShowHideCertification(boolean isOwner) {
 		if (isOwner) {
-			boolean isWelcomeMessageVisible = true;
+			boolean isCertificationMessageVisible = false;
 			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY);
-				if (cookieValue != null && !cookieValue.isEmpty()) {
-					isWelcomeMessageVisible = Boolean.valueOf(cookieValue);	
+				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY);
+				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
+					isCertificationMessageVisible = true;	
 				}
 			} catch (Exception e) {
-				//if there are any problems getting the welcome message visibility state, ignore and use default (show)
+				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
 			}
-			view.setWelcomeToDashboardVisible(isWelcomeMessageVisible);
+			view.setGetCertifiedVisible(isCertificationMessageVisible);
 		} else {
 			//not the owner
-			//hide welcome message
-			view.setWelcomeToDashboardVisible(false);
+			//hide certification message
+			view.setGetCertifiedVisible(false);
 		}
 	}
 	
@@ -353,6 +365,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
+	public void resort(SortOptionEnum sort) {
+		currentProjectSort = sort;
+		view.setSortText(sort.sortText);
+		refreshProjects();
+	}	
+	
+	@Override
 	public void refreshTeams() {
 		view.showTeamsLoading();
 		teamNotificationCount = 0;
@@ -391,7 +410,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == filter) {
@@ -409,7 +428,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
@@ -427,7 +446,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				List<ProjectHeader> headers = projectHeaders.getResults();
@@ -754,11 +773,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void welcomeToDashboardDismissed() {
-		//set welcome message visible=false for a year
+	public void setGetCertifiedDismissed() {
+		//set certification message visible=false for a year
 		Date yearFromNow = new Date();
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		cookies.setCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
+		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
 	}
 	
 	/**

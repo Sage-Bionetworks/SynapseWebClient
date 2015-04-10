@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.table.modal;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -16,7 +16,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class CreateTableModalWidgetImpl implements EntityNameModalView.Presenter, CreateTableModalWidget {
+public class CreateTableModalWidgetImpl implements PromptModalView.Presenter, CreateTableModalWidget {
 
 	public static final String BUTTON_TEXT = "Create";
 	public static final String LABEL = "Table name";
@@ -24,13 +24,13 @@ public class CreateTableModalWidgetImpl implements EntityNameModalView.Presenter
 
 	public static final String TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Table name must include at least one character.";
 	
-	EntityNameModalView view;
+	PromptModalView view;
 	SynapseClientAsync synapseClient;
 	String parentId;
 	TableCreatedHandler handler;
 	
 	@Inject
-	public CreateTableModalWidgetImpl(EntityNameModalView view,
+	public CreateTableModalWidgetImpl(PromptModalView view,
 			SynapseClientAsync synapseClient) {
 		super();
 		this.view = view;

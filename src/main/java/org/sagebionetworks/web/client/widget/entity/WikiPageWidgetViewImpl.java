@@ -400,9 +400,15 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				//inform presenter that edit was clicked
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
-				markdownEditorWidget.setTitleEditorVisible(!isRootWiki);
-				markdownEditorWidget.setTitle(presenter.getWikiPage().getTitle());
-				//also add commands to the bottom
+				//should edit for enter handler?
+				final TextBox titleField = new TextBox();
+				if (!isRootWiki) {
+					titleField.setValue(presenter.getWikiPage().getTitle());
+					titleField.addStyleName("font-size-32 margin-bottom-10");
+					titleField.setHeight("45px");					
+					add(titleField);
+				}
+				//also add commands at the bottom
 				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {

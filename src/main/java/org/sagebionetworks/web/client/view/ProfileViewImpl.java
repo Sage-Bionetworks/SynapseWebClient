@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
@@ -27,6 +28,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
+import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -45,6 +47,9 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -148,6 +153,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button moreProjectsButton;
 	
+	//Headings
+	@UiField
+	Heading projectsHeading;
+	@UiField
+	Heading teamsHeading;
+	@UiField
+	Heading challengesHeading;
+	
+	
+	//Project tab
+	@UiField
+	Button projectSortButton;
+	@UiField
+	DropDownMenu sortProjectsDropDownMenu;	
+	
 	//Teams tab
 	@UiField
 	TextBox createTeamTextBox;
@@ -163,7 +183,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button teamSearchButton;
 	@UiField
 	Button projectSearchButton;
-	
+		
 	//Challenges
 	@UiField
 	FlowPanel challengesTabContent;
@@ -199,7 +219,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button hideProfileButton;
 	@UiField
-	Alert welcomeToDashboardAlert;
+	Alert getCertifiedAlert;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -241,13 +261,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		initTabs();
 		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
-		createProjectButton.addClickHandler(new ClickHandler() {
+		createProjectTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
-			public void onClick(ClickEvent event) {
-				presenter.createProject(createProjectTextBox.getValue());
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					presenter.createProject(createProjectTextBox.getValue());
+				}
 			}
 		});
-		
 		createTeamTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
 		createTeamButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -311,7 +332,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.MY_PARTICIPATED_PROJECTS, null);
 			}
-		});
+		});		
+		
 		showProfileButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -338,12 +360,31 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.onImportLinkedIn();
 			}
 		});
-		welcomeToDashboardAlert.addClosedHandler(new AlertClosedHandler() {
+		getCertifiedAlert.addClosedHandler(new AlertClosedHandler() {
 			@Override
 			public void onClosed(AlertClosedEvent evt) {
-				presenter.welcomeToDashboardDismissed();
+				presenter.setGetCertifiedDismissed();
 			}
 		});
+	}
+	
+	public void clearSortOptions() {
+		sortProjectsDropDownMenu.clear();
+	}
+	
+	public void setSortText(String text) {
+		projectSortButton.setText(text);
+	}
+	
+	public void addSortOption(final SortOptionEnum sortOption) {
+		final AnchorListItem newSortOption = new AnchorListItem(sortOption.sortText);
+		newSortOption.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.resort(sortOption);
+			}	
+		});
+		sortProjectsDropDownMenu.add(newSortOption);
 	}
 	
 	private void initCertificationBadge() {
@@ -394,7 +435,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
 			viewProfilePanel.add(certifiedUserBadgePanel);
-				}
+		}
 			
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
@@ -402,7 +443,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
-			
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			//show create project and team UI
@@ -418,19 +458,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void resetHighlightBoxes() {
-		projectsHighlightBox.removeClassName("highlight-box");
-		challengesHighlightBox.removeClassName("highlight-box");
-		teamsHighlightBox.removeClassName("highlight-box");
+		projectsHeading.setText("");
+		teamsHeading.setText("");
+		challengesHeading.setText("");
+		projectsHeading.setVisible(false);
+		teamsHeading.setVisible(false);
+		challengesHeading.setVisible(false);
 	}
 	
 	private void setHighlightBoxUser(String displayName) {
-		projectsHighlightBox.addClassName("highlight-box");
-		challengesHighlightBox.addClassName("highlight-box");
-		teamsHighlightBox.addClassName("highlight-box");
-
-		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
-		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
-		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
+		projectsHeading.setText(displayName + "'s Projects");
+		teamsHeading.setText(displayName + "'s Teams");
+		challengesHeading.setText(displayName + "'s Challenges");
+		projectsHeading.setVisible(true);
+		teamsHeading.setVisible(true);
+		challengesHeading.setVisible(true);
 	}
 	
 	@Override
@@ -691,6 +733,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		challengesTabContent.clear();
 		hideTabContainers();
+		getCertifiedAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
@@ -868,7 +911,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setWelcomeToDashboardVisible(boolean isVisible) {
-		welcomeToDashboardAlert.setVisible(isVisible);	
+	public void setGetCertifiedVisible(boolean isVisible) {
+		getCertifiedAlert.setVisible(isVisible);	
 	}
 }

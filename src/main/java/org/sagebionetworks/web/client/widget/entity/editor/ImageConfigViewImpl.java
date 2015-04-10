@@ -102,7 +102,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				presenter.uploadFileClicked();				
 			}
 		});
-		
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

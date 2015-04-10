@@ -23,6 +23,9 @@ import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.Sel
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Event;
@@ -234,6 +237,14 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	}	
 
 	private void createEnterIdWidget() {
+		synapseIdTextBox.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					lookupSynapseIdButton.click();
+				}
+			}
+		});
 		lookupSynapseIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

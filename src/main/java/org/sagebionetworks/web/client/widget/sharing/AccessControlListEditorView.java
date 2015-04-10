@@ -46,11 +46,6 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	void showInfoSuccess(String title, String message);
 	
 	void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay);
-	/**
-	 * Prompt about unsaved view changes
-	 * @param saveCallback 
-	 */
-	public void alertUnsavedViewChanges(Callback saveCallback);
 	
 	/**
 	 * true if user would like to notify newly added people that this item has been shared with them.
@@ -94,12 +89,6 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * pushed to Synapse.		 * 
 		 */
 		void deleteAcl();
-		
-		/**
-		 * The view tells the presenter that there are unsaved changes in the view
-		 * @param unsavedChanges
-		 */
-		public void setUnsavedViewChanges(boolean unsavedChanges);
 		
 		void makePrivate();
 	}

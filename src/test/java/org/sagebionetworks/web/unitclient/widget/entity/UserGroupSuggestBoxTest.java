@@ -13,9 +13,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -85,5 +87,33 @@ public class UserGroupSuggestBoxTest {
 		testPage.setTotalNumberOfResults((long) 6);
 		
 		return testPage;
+	}
+	
+	@Test
+	public void testSelectedSuggestionCallback() {
+		CallbackP<UserGroupSuggestion> mockCallback = mock(CallbackP.class);
+		suggestBox.addItemSelectedHandler(mockCallback);
+		UserGroupSuggestion suggestion = mock(UserGroupSuggestion.class);
+		suggestBox.setSelectedSuggestion(suggestion);
+		
+		verify(mockCallback).invoke(suggestion);
+	}
+	
+	@Test
+	public void testSelectedSuggestionCallbackNullSelection() {
+		CallbackP<UserGroupSuggestion> mockCallback = mock(CallbackP.class);
+		suggestBox.addItemSelectedHandler(mockCallback);
+		suggestBox.setSelectedSuggestion(null);
+		
+		verify(mockCallback, never()).invoke(any(UserGroupSuggestion.class));
+	}
+	
+	@Test
+	public void testSelectedSuggestionNullCallback() {
+		suggestBox.addItemSelectedHandler(null);
+		
+		UserGroupSuggestion suggestion = mock(UserGroupSuggestion.class);
+		suggestBox.setSelectedSuggestion(suggestion);
+		//no error
 	}
 }
