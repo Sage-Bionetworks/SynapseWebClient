@@ -75,21 +75,21 @@
 							</div>
 							<div class="panel panel-default padding-5 min-height-200" ui:field="projectsHighlightBox">
 								<b:Row>
-									<b:Column size="XS_12 SM_1" push="SM_11">
-										<b:ButtonGroup pull="RIGHT" addStyleNames="topLevelZIndex">
+									<b:Column size="XS_12 SM_1 MD_3" push="SM_11 MD_9">
+										<b:ButtonGroup pull="RIGHT">
 											<b:Button ui:field="projectSortButton" dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px"></b:Button>
 											<b:DropDownMenu ui:field="sortProjectsDropDownMenu"></b:DropDownMenu>
 										</b:ButtonGroup>
 									</b:Column>
-									<b:Column size="XS_12 SM_11" pull="SM_1" ui:field="projectRows">
+									<b:Column size="XS_12 SM_11 MD_9" pull="SM_1 MD_3" ui:field="projectRows">
 										<b:Heading ui:field="projectsHeading" size="H3"></b:Heading>
 										<b:ButtonGroup ui:field="projectFiltersUI">
-											<b:Button ui:field="allProjectsFilter">All</b:Button>
-											<b:Button ui:field="myProjectsFilter">Created by me</b:Button>
-											<b:Button ui:field="favoritesFilter" icon="STAR" addStyleNames="favoriteIcon">Favorites</b:Button>
-											<b:Button ui:field="sharedDirectlyWithMeFilter">Shared directly with me</b:Button>
+											<b:Button ui:field="allProjectsFilter" size="SMALL">All</b:Button>
+											<b:Button ui:field="myProjectsFilter" size="SMALL">Created by me</b:Button>
+											<b:Button ui:field="favoritesFilter" icon="STAR" addStyleNames="favoriteIcon" size="SMALL">Favorites</b:Button>
+											<b:Button ui:field="sharedDirectlyWithMeFilter" size="SMALL">Shared directly with me</b:Button>
 											<b:ButtonGroup>
-												<b:Button ui:field="teamFilters" dataToggle="DROPDOWN">By Team</b:Button>
+												<b:Button ui:field="teamFilters" dataToggle="DROPDOWN" size="SMALL">By Team</b:Button>
 												<b:DropDownMenu ui:field="teamFiltersDropDownMenu">
 												</b:DropDownMenu>
 											</b:ButtonGroup>
