@@ -21,6 +21,8 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -280,7 +282,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea(2);
+				resizeMarkdownTextArea(0);
+			}
+		});
+		markdownTextArea.addFocusHandler(new FocusHandler() {
+			@Override
+			public void onFocus(FocusEvent event) {
+				resizeMarkdownTextArea(0);
 			}
 		});
 	}
@@ -361,7 +369,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	private void resizeMarkdownTextArea(int extra) {
-		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight() + extra) + "px");
+		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight()+ 2 + extra) + "px");
 	}
 	
 	@Override

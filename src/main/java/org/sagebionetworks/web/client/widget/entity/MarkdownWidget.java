@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -108,6 +109,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
+		GWT.debugger();
 		final SynapseView view = this;
 		this.md = md;
 		this.wikiKey = wikiKey;
@@ -173,6 +175,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 			final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, 
 			IconsImageBundle iconsImageBundle, Boolean isPreview, Callback widgetRefreshRequired, 
 			Long wikiVersionInView) throws JSONObjectAdapterException {
+		GWT.debugger();
 		Set<String> contentTypes = new HashSet<String>();
 		final String suffix = DisplayUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format

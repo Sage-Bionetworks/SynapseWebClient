@@ -5,10 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -19,11 +17,8 @@ import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
@@ -56,7 +51,6 @@ import com.google.inject.Inject;
 public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetView {
 
 	private MarkdownWidget markdownWidget;
-	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
 	private FlowPanel commandBar;
@@ -89,12 +83,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, 
 			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb,
 			WikiHistoryWidget historyWidget, PortalGinInjector ginInjector, SageImageBundle sageImageBundle) {
 		super();
 		this.markdownWidget = markdownWidget;
-		this.markdownEditorWidget = markdownEditorWidget;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
