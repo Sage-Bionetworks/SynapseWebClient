@@ -77,7 +77,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private UploadType currentUploadType;
 	private String currentExternalUploadUrl;
 	private ClientLogger logger;
-	
+	private Long storageLocationId;
+
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -205,6 +206,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void queryForUploadDestination() {
 		enableMultipleFileUploads();
+		storageLocationId = null;
 		if (parentEntityId == null && entity == null) {
 			currentUploadType = UploadType.S3;
 			view.showUploadingToSynapseStorage();
@@ -216,11 +218,15 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
 						currentUploadType = UploadType.S3;
 						view.showUploadingToSynapseStorage();
+						// never have a storageLocation
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
+						UploadDestination d = uploadDestinations.get(0);
+						storageLocationId = d.getStorageLocationId();
 						updateS3UploadBannerView(uploadDestinations.get(0).getBanner());
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
+						storageLocationId = d.getStorageLocationId();
 						if (UploadType.SFTP == d.getUploadType()){
 							currentUploadType = UploadType.SFTP;
 							currentExternalUploadUrl = d.getUrl();
@@ -415,7 +421,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void directUploadStep2(String fileName) {
-		this.multiPartUploader.uploadFile(fileName, UploaderViewImpl.FILE_FIELD_ID, this.currIndex, this);
+		this.multiPartUploader.uploadFile(fileName, UploaderViewImpl.FILE_FIELD_ID, this.currIndex, this, storageLocationId);
 	}
 
 	private void handleCancelledFileUpload() {

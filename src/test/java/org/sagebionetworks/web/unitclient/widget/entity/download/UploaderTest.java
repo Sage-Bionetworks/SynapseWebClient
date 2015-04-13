@@ -117,7 +117,7 @@ public class UploaderTest {
 		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		
 		S3UploadDestination d = new S3UploadDestination();
