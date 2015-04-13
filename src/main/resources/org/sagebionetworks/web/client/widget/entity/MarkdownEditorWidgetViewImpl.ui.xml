@@ -105,7 +105,7 @@
 			<b:ModalFooter>
 			    <b:Button ui:field="deleteButton" pull="LEFT" type="DANGER" >Delete Page</b:Button>
 			    <b:Button ui:field="previewButton" pull="LEFT" >Preview</b:Button>
-			    <b:Button pull="RIGHT" dataDismiss="MODAL">Cancel</b:Button>
+			    <b:Button ui:field="cancelButton" pull="RIGHT" dataDismiss="MODAL">Cancel</b:Button>
 			    <b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." pull="RIGHT">Save</b:Button>
 			</b:ModalFooter>
 		</b:Modal>

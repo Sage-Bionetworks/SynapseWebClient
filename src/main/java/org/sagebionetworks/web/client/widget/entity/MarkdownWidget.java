@@ -175,7 +175,6 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 			final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, 
 			IconsImageBundle iconsImageBundle, Boolean isPreview, Callback widgetRefreshRequired, 
 			Long wikiVersionInView) throws JSONObjectAdapterException {
-		GWT.debugger();
 		Set<String> contentTypes = new HashSet<String>();
 		final String suffix = DisplayUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format

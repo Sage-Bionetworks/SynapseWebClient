@@ -353,12 +353,22 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case DELETE:
 			deleteClicked();
 			break;
+		case CANCEL:
+			cancelClicked();
+			break;
 		case SET_PROJECT_BACKGROUND:
 			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
 		default:
 			throw new IllegalArgumentException(
 					"Unrecognized markdown editor action: " + action);
 		}
+	}
+	
+	public void cancelClicked() {
+		view.hideEditorModal();
+		//TODO: update should not be necessary, but widget loading is based on div ids that are overloaded when the formatting guide is initialized
+		if (wikiPageUpdatedHandler != null)
+			wikiPageUpdatedHandler.invoke(currentPage);
 	}
 	
 	public void saveClicked() {

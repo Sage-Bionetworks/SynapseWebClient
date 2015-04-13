@@ -28,6 +28,7 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -183,6 +184,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button saveButton;
 	@UiField
+	public Button cancelButton;
+	@UiField
 	public Button deleteButton;
 	
 	//this UI widget
@@ -250,6 +253,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
 		deleteButton.addClickHandler(getDeleteClickHandler());
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
+		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
 		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		heading1Link.addStyleName("font-size-36");
@@ -258,7 +262,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading4Link.addStyleName("font-size-18");
 		heading5Link.addStyleName("font-size-14");
 		heading6Link.addStyleName("font-size-12");
-		
+		editorDialog.addCloseHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.handleCommand(MarkdownEditorAction.CANCEL);
+			}
+		});
 		formattingGuideButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -282,12 +291,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea(0);
-			}
-		});
-		markdownTextArea.addFocusHandler(new FocusHandler() {
-			@Override
-			public void onFocus(FocusEvent event) {
 				resizeMarkdownTextArea(0);
 			}
 		});
@@ -345,16 +348,28 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.setText(markdown);
 		if (formattingGuideWikiPageKey != null)
 			initFormattingGuide(formattingGuideWikiPageKey);
-		resizeMarkdownTextArea(300);
 		
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-			
 			@Override
 			public void execute() {
-				Window.scrollTo(0, mdCommands.getAbsoluteTop());		
+				Window.scrollTo(0, mdCommands.getAbsoluteTop());
 			}
 		});
+		
+		//init markdown text area height
+		Timer t = new Timer() {
+	      @Override
+	      public void run() {
+	    	  if (markdownTextArea.getElement().getScrollHeight() > 0) {
+	    		  resizeMarkdownTextArea(120);
+	    	  } else {
+	    		  this.schedule(100);
+	    	  }
+	      }
+	    };
+	    t.schedule(100);
 	}
+	
 	
 	@Override
 	public void setAttachmentCommandsVisible(boolean visible) {
@@ -441,7 +456,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@Override
 	public void setMarkdown(String markdown) {
-		DisplayUtils.updateTextArea(markdownTextArea, markdown);
+		markdownTextArea.setValue(markdown);
 	}
 	
 	@Override
