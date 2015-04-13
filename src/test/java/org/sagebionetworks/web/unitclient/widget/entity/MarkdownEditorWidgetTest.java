@@ -11,7 +11,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -19,8 +21,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -30,7 +34,6 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
@@ -59,8 +62,12 @@ public class MarkdownEditorWidgetTest {
 	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
-	WidgetDescriptorUpdatedHandler mockDescriptorUpdatedHandler;
-	
+	CallbackP<WikiPage> mockDescriptorUpdatedHandler;
+	GlobalApplicationState mockGlobalApplicationState;
+	WikiPage testPage;
+	String fileHandleId1 = "44";
+	String fileHandleId2 = "45";
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
@@ -73,24 +80,44 @@ public class MarkdownEditorWidgetTest {
 		mockGwt = mock(GWTWrapper.class);
 		mockView = mock(MarkdownEditorWidgetView.class);
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState);
 		
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
-		mockDescriptorUpdatedHandler = mock(WidgetDescriptorUpdatedHandler.class);
+		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
-		presenter.configure(wikiPageKey, initialMarkdown, mockDescriptorUpdatedHandler);
+		presenter.configure(wikiPageKey, mockDescriptorUpdatedHandler);
+		
+		
+		testPage = new WikiPage();
+		testPage.setId("wikiPageId");
+		testPage.setMarkdown("my test markdown");
+		testPage.setTitle("My Test Wiki Title");
+		List<String> fileHandleIds = new ArrayList<String>();
+		//our page has two file handles already
+		fileHandleIds.add(fileHandleId1);
+		fileHandleIds.add(fileHandleId2);
+		testPage.setAttachmentFileHandleIds(fileHandleIds);
+		
+
+		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
+		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		WikiPage fakeWiki = new WikiPage();
+		fakeWiki.setMarkdown("Fake wiki");
+		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	
 	@Test
 	public void testConfigure() {
 		//configured in before, verify that view is reset
-		verify(mockView).setSaveVisible(false);
-		verify(mockView).setDeleteVisible(false);
 		verify(mockView).clear();
-		verify(mockView).setCancelVisible(false);
 		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
+		
 	}
 	
 	@Test
@@ -164,43 +191,26 @@ public class MarkdownEditorWidgetTest {
 	
 	@Test
 	public void testSave() {
-		//tests setActionHandler as well
 		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.SAVE, callback);
-		verify(mockView).setSaveVisible(true);
 		presenter.handleCommand(MarkdownEditorAction.SAVE);
 		verify(mockView).setSaving(true);
-		verify(callback).invoke();
+		verify(mockSynapseClient).updateV2WikiPageWithV1(eq(wikiPageKey.getOwnerObjectId()), eq(wikiPageKey.getOwnerObjectType()), eq(testPage), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testCancel() {
 		//tests setActionHandler as well
 		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.CANCEL, callback);
-		verify(mockView).setCancelVisible(true);
 		presenter.handleCommand(MarkdownEditorAction.CANCEL);
-		verify(callback).invoke();
+		verify(mockView).hideEditorModal();
 	}
 	
 	@Test
 	public void testDelete() {
 		//tests setActionHandler as well
 		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.DELETE, callback);
-		verify(mockView).setDeleteVisible(true);
 		presenter.handleCommand(MarkdownEditorAction.DELETE);
-		verify(callback).invoke();
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testInvalidActionHandler() {
-		Callback callback = mock(Callback.class);
-		//we do not provide callback functionality to BOLD
-		presenter.setActionHandler(MarkdownEditorAction.BOLD, callback);
+		verify(mockSynapseClient).deleteV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));	fds	
 	}
 	
 	@Test

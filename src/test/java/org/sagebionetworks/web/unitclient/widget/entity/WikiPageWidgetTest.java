@@ -58,10 +58,6 @@ public class WikiPageWidgetTest {
 	WikiPage testPage;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
 	
-	String fileHandleId1 = "44";
-	String fileHandleId2 = "45";
-
-	
 	@Before
 	public void before() throws Exception{
 		mockView = mock(WikiPageWidgetView.class);
@@ -88,20 +84,12 @@ public class WikiPageWidgetTest {
 		testPage.setId("wikiPageId");
 		testPage.setMarkdown("my test markdown");
 		testPage.setTitle("My Test Wiki Title");
-		List<String> fileHandleIds = new ArrayList<String>();
-		//our page has two file handles already
-		fileHandleIds.add(fileHandleId1);
-		fileHandleIds.add(fileHandleId2);
-		testPage.setAttachmentFileHandleIds(fileHandleIds);
-		
 
 		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
 		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		WikiPage fakeWiki = new WikiPage();
 		fakeWiki.setMarkdown("Fake wiki");
 		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-		
-		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -114,13 +102,6 @@ public class WikiPageWidgetTest {
 	public void testConfigure() throws JSONObjectAdapterException{
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		verify(mockView).configure(anyString(), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), eq(false), eq(true), any(Long.class), eq(true));
-	}
-
-	@Test
-	public void testConfigureNoWikiPage(){
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		verify(mockView).showCreateWiki(false);
 	}
 	
 	@Test
