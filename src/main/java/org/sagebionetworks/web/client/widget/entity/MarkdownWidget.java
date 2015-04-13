@@ -109,7 +109,6 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
-		GWT.debugger();
 		final SynapseView view = this;
 		this.md = md;
 		this.wikiKey = wikiKey;
