@@ -218,11 +218,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
 						currentUploadType = UploadType.S3;
 						view.showUploadingToSynapseStorage();
-						// never have a storageLocation
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
-						UploadDestination d = uploadDestinations.get(0);
-						storageLocationId = d.getStorageLocationId();
+						storageLocationId = uploadDestinations.get(0).getStorageLocationId();
 						updateS3UploadBannerView(uploadDestinations.get(0).getBanner());
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
