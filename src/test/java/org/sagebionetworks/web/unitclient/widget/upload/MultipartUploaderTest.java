@@ -55,6 +55,7 @@ public class MultipartUploaderTest {
 	String MD5;
 	UploadDaemonStatus status;
 	String[] fileNames;
+	Long storageLocationId = 9090L;
 	
 	@Before
 	public void before() throws Exception {
@@ -69,7 +70,7 @@ public class MultipartUploaderTest {
 		//direct upload
 		//by default, do not support direct upload (direct upload tests will turn on)
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(token).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(token).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(Long.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		status = new UploadDaemonStatus();
 		status.setState(State.COMPLETED);
@@ -112,16 +113,16 @@ public class MultipartUploaderTest {
 	@Test
 	public void testNothingSelected(){
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		verify(mockHandler).uploadFailed(MultipartUploaderImpl.PLEASE_SELECT_A_FILE);
 	}
 	
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		// jump to step three
 		uploader.attemptCombineChunks(null, 1);
-		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(Long.class), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
@@ -133,8 +134,8 @@ public class MultipartUploaderTest {
 	@Test
 	public void testDirectUploadStep3Failure() throws Exception {
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		uploader.uploadSelectedFile("123", mockHandler);
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(Long.class), any(AsyncCallback.class));
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		verify(mockHandler).uploadFailed(error);
 	}
 
@@ -142,7 +143,7 @@ public class MultipartUploaderTest {
 	public void testDirectUploadStep4Failure() throws Exception {
 		String error = "failed";
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		// It should try until the max retries are exceeded
 		verify(synapseClient, Mockito.times(MAX_RETRY)).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		// Things should end with an error.s
@@ -153,7 +154,7 @@ public class MultipartUploaderTest {
 	public void testDirectUploadStep5Failure() throws Exception {
 		String error = "failed";
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		// jump to the end
 		uploader.attemptCombineChunks(null, 1);
 		verify(synapseClient, Mockito.times(MAX_RETRY)).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
@@ -170,7 +171,7 @@ public class MultipartUploaderTest {
 		status.setFileHandleId("fake handle");
 		status.setErrorMessage("an error");
 		AsyncMockStubber.callSuccessWith(status).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		// jump to the end
 		uploader.attemptCombineChunks(null, 1);
 		verify(synapseClient, Mockito.times(MAX_RETRY)).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
@@ -212,7 +213,7 @@ public class MultipartUploaderTest {
 		//verify that request json is added to the list, and it calls step 2 (upload the next chunk) since there are more chunks to upload.
 		List<ChunkRequest> requestList = new ArrayList<ChunkRequest>();
 		ChunkRequest request = new ChunkRequest();
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		uploader.chunkUploadSuccess(request, 1, 2, 1024, requestList);
 		assertTrue(requestList.size() == 1);
 		//and it should try to get the url for the next chunk
@@ -224,7 +225,7 @@ public class MultipartUploaderTest {
 		//verify that request json is added to the list, and it calls step 3 since the current chunk number is equal to the total chunk count
 		List<ChunkRequest> requestList = new ArrayList<ChunkRequest>();
 		ChunkRequest request = new ChunkRequest();
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		uploader.chunkUploadSuccess(request, 2, 2, 1024, requestList);
 		assertTrue(requestList.size() == 1);
 		//and it should try to get the url for the next chunk
@@ -235,7 +236,7 @@ public class MultipartUploaderTest {
 	public void testChunkUploadFailureFirstAttempt() throws RestServiceException, InterruptedException {
 		List<ChunkRequest> requestList = new ArrayList<ChunkRequest>();
 		int attempt = 1;
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		uploader.chunkUploadFailure(2, attempt, 2, 1024, requestList, "");
 		verify(synapseClient, times(2)).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 	}
@@ -244,7 +245,7 @@ public class MultipartUploaderTest {
 	public void testChunkUploadFailureFinalAttempt() throws RestServiceException {
 		List<ChunkRequest> requestList = new ArrayList<ChunkRequest>();
 		int attempt = MAX_RETRY;
-		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId);
 		uploader.chunkUploadFailure(2, attempt, 2, 1024, requestList, "");
 		verify(mockHandler).uploadFailed(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK);
 		verify(mockLogger).errorToRepositoryServices(anyString(), any(CombineFileChunksException.class));
