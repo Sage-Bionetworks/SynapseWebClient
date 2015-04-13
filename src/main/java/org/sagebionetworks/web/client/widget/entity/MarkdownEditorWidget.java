@@ -10,10 +10,12 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -46,6 +48,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WikiPage currentPage;
 	private WikiPageKey wikiKey;
 	private CallbackP<WikiPage> wikiPageUpdatedHandler;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -53,7 +56,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			CookieProvider cookies,
 			GWTWrapper gwt,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
-			WidgetRegistrar widgetRegistrar
+			WidgetRegistrar widgetRegistrar,
+			GlobalApplicationState globalApplicationState
 			) {
 		super();
 		this.view = view;
@@ -62,6 +66,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.cookies = cookies;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
+		this.globalApplicationState = globalApplicationState;
+		
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
 	}
@@ -392,12 +398,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void deleteClicked() {
 		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
-			
 			@Override
 			public void onSuccess(Void result) {
 				view.hideEditorModal();
-				if (wikiPageUpdatedHandler != null)
-					wikiPageUpdatedHandler.invoke(null);
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
 			}
 			
 			@Override

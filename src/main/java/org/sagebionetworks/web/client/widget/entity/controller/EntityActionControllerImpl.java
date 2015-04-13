@@ -482,7 +482,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		wikiEditor.configure(key, new CallbackP<WikiPage>() {
 			@Override
 			public void invoke(WikiPage param) {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());	
 			}
 		});
 	}
