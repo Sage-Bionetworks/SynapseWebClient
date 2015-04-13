@@ -1,19 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,24 +34,19 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public static final String EMPTY_DISPLAY = "&#8212" + " " + DisplayConstants.EMPTY;
 	
 	private Presenter presenter;
-	private PortalGinInjector ginInjector;
 	private IconsImageBundle iconsImageBundle;
 		
 	private boolean isSelectable = false;
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
-	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
 	private EntityTreeItem selectedItem;
 	private SageImageBundle sageImageBundle;
 
 	@Inject
-	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
-		this.ginInjector = ginInjector;
+	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
-		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
-		header2entityTreeItem = new HashMap<EntityHeader, EntityTreeItem>();
-		
+		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();		
 		entityTree = new Tree(new EntityTreeResources());
 		
 		this.add(entityTree);
@@ -100,22 +92,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public void clear() {
 		entityTree.clear();
 		treeItem2entityTreeItem.clear();
-		header2entityTreeItem.clear();
 		presenter.clearRecordsFetchedChildren();
 	}
 
 	@Override
-	public void setRootEntities(List<EntityHeader> rootEntities) {
+	public void setRootEntitiesFromTreeItem(List<EntityTreeItem> rootEntities) {
 		clear();
-		
-		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();
+		if(rootEntities == null) rootEntities = new ArrayList<EntityTreeItem>();
 		if(rootEntities.size() == 0) {
 			TreeItem emptyItem = new TreeItem(new HTMLPanel("<div>" + EMPTY_DISPLAY + "</div>"));
 			emptyItem.addStyleName("entityTreeItem-font");
 			entityTree.addItem(emptyItem);
 		} else {
-			for (final EntityHeader header : rootEntities) {
-				createAndPlaceRootTreeItem(header);
+			for (final EntityTreeItem item : rootEntities) {
+				placeEntityTreeItem(item, null, true);
 			}
 		}
 	}
@@ -133,52 +123,46 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			
 		});
 	}
-
-	@Override
-	public void removeEntity(EntityHeader entityHeader) {
-		header2entityTreeItem.get(entityHeader).asTreeItem().remove();
-	}
 	
 	@Override
-	public void createAndPlaceTreeItem(EntityHeader childToCreate, EntityTreeItem parent, boolean isRootItem) {
+	public void placeEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent, boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
-		
-		// Make tree item.
-		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		if (isSelectable) {
 			// Add select functionality.
-			childItem.setClickHandler(new ClickHandler() {
-
+			childToAdd.setClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					selectEntity(childItem);
+					selectEntity(childToAdd);
 				}
-				
 			});
-			
 		}
-		childItem.configure(childToCreate, isRootItem);
-		
 		// Update fields.
-		treeItem2entityTreeItem.put(childItem.asTreeItem(), childItem);
-		header2entityTreeItem.put(childToCreate,  childItem);
-				
+		treeItem2entityTreeItem.put(childToAdd.asTreeItem(), childToAdd);
 		// Add dummy item to childItem to make expandable.
-		childItem.asTreeItem().addItem(createDummyItem());
-		
+		childToAdd.asTreeItem().addItem(createDummyItem());
 		// Place the created child in the tree as the child of the given parent entity.
 		if (isRootItem) {
-			entityTree.addItem(childItem);
+			entityTree.addItem(childToAdd);
 		} else {
-			parent.asTreeItem().addItem(childItem);
+			parent.asTreeItem().addItem(childToAdd);
 		}
 	}
 	
-	@Override
-	public void createAndPlaceRootTreeItem(EntityHeader toCreate) {
-		createAndPlaceTreeItem(toCreate, null, true);
-	}
-	
+	//@Override
+	public void placeMoreTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent) {
+		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+		final int currOffset = parent.asTreeItem().getChildCount();
+		childToCreate.setClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (childToCreate.type == MoreTreeItem.MORE_TYPE.FILE)
+					presenter.getChildrenFiles(parent, currOffset);
+				else
+					presenter.getFolderChildren(parent, currOffset);
+			}
+		});
+		parent.asTreeItem().insertItem((int) currOffset, childToCreate.asTreeItem());
+	}	
 	
 	/*
 	 * Private Methods
@@ -202,7 +186,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		result.setVisible(false);
 		return result;
 	}
-	
 	
 	/*
 	 * Image Resources for Tree Expand/Collapse Icons

@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
@@ -29,6 +30,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -49,14 +51,15 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	AdapterFactory adapterFactory;
 	EntityTypeProvider entityTypeProvider;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
-	
+	private PortalGinInjector ginInjector;
 	private String currentSelection;
 	
 	private final int MAX_FOLDER_LIMIT = 500;
 	private String currentFolderChildrenEntityId;
 	
 	@Inject
-	public EntityTreeBrowser(EntityTreeBrowserView view,
+	public EntityTreeBrowser(PortalGinInjector ginInjector, 
+			EntityTreeBrowserView view,
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
@@ -70,8 +73,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		this.globalApplicationState = globalApplicationState;
 		this.iconsImageBundle = iconsImageBundle;
 		this.adapterFactory = adapterFactory;
+		this.ginInjector = ginInjector;
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
-		
+
 		view.setPresenter(this);
 	}	
 	
@@ -90,19 +94,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 * Note: Root entities are sorted by default.
 	 * @param entityId
 	 */
-	public void configure(String entityId) {
+	public void configure(EntityTreeItem parent) {
 		view.clear();
 		view.showLoading();
-		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> results) {
-				view.setRootEntities(results);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
-			}
-		});
+		getFolderChildren(parent, parent.asTreeItem().getChildCount());
+		getChildrenFiles(parent, parent.asTreeItem().getChildCount());
 	}
 
 	
@@ -113,7 +109,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void configure(List<EntityHeader> rootEntities, boolean sort) {
 		if (sort)
 			EntityBrowserUtils.sortEntityHeadersByName(rootEntities);
-		view.setRootEntities(rootEntities);
+		
+		view.setRootEntitiesFromTreeItem(getEntityTreeItemsFromHeaders(rootEntities));
 	}
 	
 	@Override
@@ -123,35 +120,40 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 	
 	@Override
-	public void getFolderChildren(final String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
-		EntityQuery childrenQuery = createGetChildrenQuery(entityId, org.sagebionetworks.repo.model.entity.query.EntityType.folder);
+	public void getFolderChildren(final EntityTreeItem parent, final long offset) {
+		EntityQuery childrenQuery = createGetChildrenQueryFromTreeItem(parent, org.sagebionetworks.repo.model.entity.query.EntityType.folder);
 		//ask for the folder children, then the files
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
 			public void onSuccess(EntityQueryResults results) {
-				getChildrenFiles(entityId, getHeadersFromQueryResults(results), asyncCallback);
+				addResultsToParent(parent, results);
+				if (results.getTotalEntityCount() > offset + results.getEntities().size() + MAX_FOLDER_LIMIT) {
+					final MoreTreeItem moreItem = new MoreTreeItem(MoreTreeItem.MORE_TYPE.FOLDER);
+					view.placeMoreTreeItem(moreItem, parent);
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);				
-				asyncCallback.onFailure(caught);
 			}
 		});
-		
 	}
 	
-	public void getChildrenFiles(String entityId, final List<EntityHeader> entityHeaders, final AsyncCallback<List<EntityHeader>> asyncCallback) {
-		EntityQuery childrenQuery = createGetChildrenQuery(entityId, org.sagebionetworks.repo.model.entity.query.EntityType.file);
+	@Override
+	public void getChildrenFiles(final EntityTreeItem parent, final long offset) {
+		EntityQuery childrenQuery = createGetChildrenQueryFromTreeItem(parent, org.sagebionetworks.repo.model.entity.query.EntityType.file);
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
 			public void onSuccess(EntityQueryResults results) {
-				entityHeaders.addAll(getHeadersFromQueryResults(results));
-				asyncCallback.onSuccess(entityHeaders);
+				addResultsToParent(parent, results);
+				if (results.getTotalEntityCount() > offset + results.getEntities().size() + MAX_FOLDER_LIMIT) {
+					final MoreTreeItem moreItem = new MoreTreeItem(MoreTreeItem.MORE_TYPE.FILE);
+					view.placeMoreTreeItem(moreItem, parent);
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);				
-				asyncCallback.onFailure(caught);
 			}
 		});
 		
@@ -211,35 +213,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void expandTreeItemOnOpen(final EntityTreeItem target) {
 		if (!alreadyFetchedEntityChildren.contains(target)) {
 			// We have not already fetched children for this entity.
-			
+			alreadyFetchedEntityChildren.add(target);
 			// Change to loading icon.
 			target.showLoadingIcon();
-			
-			getFolderChildren(target.getHeader().getId(), new AsyncCallback<List<EntityHeader>>() {
-				
-				@Override
-				public void onSuccess(List<EntityHeader> result) {
-					// We got the children.
-					alreadyFetchedEntityChildren.add(target);
-					target.asTreeItem().removeItems();	// Remove the dummy item.
-					
-					// Make a tree item for each child and place them in the tree.
-					for (EntityHeader header : result) {
-						view.createAndPlaceTreeItem(header, target, false);
-					}
-					
-					// Change back to type icon.
-					target.showTypeIcon();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
-						view.showErrorMessage(caught.getMessage());
-					}
-				}
-				
-			});
+			getFolderChildren(target, target.asTreeItem().getChildCount());
+			getChildrenFiles(target, target.asTreeItem().getChildCount());
+			target.showTypeIcon();
 		}
 	}
 	
@@ -269,6 +248,34 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return newQuery;
 	}
 	
+	public EntityQuery createGetChildrenQueryFromTreeItem(EntityTreeItem parent, org.sagebionetworks.repo.model.entity.query.EntityType type) {
+		EntityQuery newQuery = new EntityQuery();
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
+		newQuery.setSort(sort);
+		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parent.getHeader().getId());
+		newQuery.setConditions(Arrays.asList(condition));
+		newQuery.setFilterByType(type);
+		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
+		newQuery.setOffset(OFFSET_ZERO);
+		return newQuery;
+	}
+	
+	public List<EntityTreeItem> getEntityTreeItemsFromHeaders(List<EntityHeader> results) {
+		List<EntityTreeItem> treeItems = new LinkedList<EntityTreeItem>();
+		for (EntityHeader header : results) {
+			final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
+			childItem.configure(header, false);
+			treeItems.add(childItem);
+		}
+		return treeItems;
+	}
+	
+	public List<EntityTreeItem> getEntityTreeItemsFromQueryResults(EntityQueryResults results) {
+		return getEntityTreeItemsFromHeaders(getHeadersFromQueryResults(results));
+	}
+	
 	public List<EntityHeader> getHeadersFromQueryResults(EntityQueryResults results) {
 		List<EntityHeader> headerList = new LinkedList<EntityHeader>();
 		for (EntityQueryResult result : results.getEntities()) {
@@ -280,6 +287,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			headerList.add(header);
 		}
 		return headerList;
+	}
+	
+	public void addResultsToParent(final EntityTreeItem parent, EntityQueryResults results) {		
+		for (EntityTreeItem toAdd: getEntityTreeItemsFromQueryResults(results)) {
+			view.placeEntityTreeItem(toAdd, parent, false);
+		}
 	}
 
 	@Override
@@ -302,5 +315,5 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 */
 	public void setCurrentFolderChildrenEntityId(String currentFolderChildrenEntityId) {
 		this.currentFolderChildrenEntityId = currentFolderChildrenEntityId;
-}
+	}
 }

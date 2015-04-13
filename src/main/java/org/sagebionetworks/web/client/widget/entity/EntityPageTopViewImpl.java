@@ -695,7 +695,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private Widget configureFilesBrowser(FilesBrowser filesBrowser, Entity entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
-		filesBrowser.configure(entity.getId(), canCertifiedUserAddChild, isCertifiedUser);
+		filesBrowser.configure(entity, canCertifiedUserAddChild, isCertifiedUser);
 		return filesBrowser.asWidget();
 	}
 	

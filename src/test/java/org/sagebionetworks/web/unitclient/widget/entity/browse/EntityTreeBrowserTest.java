@@ -29,6 +29,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -45,6 +46,7 @@ public class EntityTreeBrowserTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	IconsImageBundle mockIconsImageBundle;
 	AdapterFactory adapterFactory;
+	PortalGinInjector injector;
 	
 	EntityTreeBrowser entityTreeBrowser;
 	EntityQueryResults searchResults;
@@ -59,7 +61,8 @@ public class EntityTreeBrowserTest {
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		adapterFactory = new AdapterFactoryImpl();
 		
-		entityTreeBrowser = new EntityTreeBrowser(mockView, mockSynapseClient, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockIconsImageBundle, adapterFactory);
+		// Injector?
+		entityTreeBrowser = new EntityTreeBrowser(injector, mockView, mockSynapseClient, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockIconsImageBundle, adapterFactory);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
 		searchResults = new EntityQueryResults();

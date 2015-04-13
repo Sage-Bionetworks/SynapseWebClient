@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -23,7 +24,7 @@ import com.google.inject.Inject;
 public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private FilesBrowserView view;
-	private String configuredEntityId;
+	private EntityTreeItem configuredEntity;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
@@ -53,15 +54,15 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}	
 	
 	/**
-	 * Configure tree view with given entityId's children as start set
+	 * Configure tree view with given entity's children as start set
 	 * @param entityId
 	 */
-	public void configure(String entityId, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
+	public void configure(EntityTreeItem entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
 		view.clear();
-		this.configuredEntityId = entityId;
+		this.configuredEntity = entity;
 		this.isCertifiedUser = isCertifiedUser;
 		this.canCertifiedUserAddChild = canCertifiedUserAddChild;
-		view.configure(entityId, canCertifiedUserAddChild);
+		view.configure(entity, canCertifiedUserAddChild);
 		currentFolderEntityId = null;
 	}
 	
@@ -83,7 +84,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClicked(configuredEntityId, view, synapseClient, authenticationController, isCertifiedUser);
+		uploadButtonClicked(configuredEntity, view, synapseClient, authenticationController, isCertifiedUser);
 	}
 
 	/**
@@ -120,7 +121,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	
 	public void createFolder() {
 		Folder folder = new Folder();
-		folder.setParentId(configuredEntityId);
+		folder.setParentId(configuredEntity);
 		folder.setEntityType(Folder.class.getName());
 		String entityJson;
 		try {
@@ -149,7 +150,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			@Override
 			public void onSuccess(Void na) {
 				//folder is deleted when folder creation is canceled.  refresh the tree for updated information 
-				view.refreshTreeView(configuredEntityId);
+				view.refreshTreeView(configuredEntity);
 			}
 			
 			@Override
@@ -166,7 +167,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				@Override
 				public void onSuccess(EntityWrapper result) {
 					view.showInfo("Folder '" + folder.getName() + "' Added", "");
-					view.refreshTreeView(configuredEntityId);
+					view.refreshTreeView(configuredEntity);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -218,6 +219,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}
 
 	public void showUploadFile() {
-		view.showUploadDialog(this.configuredEntityId);
+		view.showUploadDialog(this.configuredEntity);
 	}
 }
