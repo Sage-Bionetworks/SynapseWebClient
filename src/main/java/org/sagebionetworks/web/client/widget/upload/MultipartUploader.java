@@ -16,7 +16,7 @@ public interface MultipartUploader {
 	 * @param fileIndex
 	 * @param handler
 	 */
-	void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler);
+	void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler, Long storageLocationId);
 	
 	/**
 	 * Upload a single file using multi-part upload.
@@ -25,7 +25,7 @@ public interface MultipartUploader {
 	 * @param inputFile
 	 * @param handler
 	 */
-	void uploadFile(String fileName, String fileInputId, int fileIndex, ProgressingFileUploadHandler handler);
+	void uploadFile(String fileName, String fileInputId, int fileIndex, ProgressingFileUploadHandler handler, Long storageLocationId);
 	
 
 	/**

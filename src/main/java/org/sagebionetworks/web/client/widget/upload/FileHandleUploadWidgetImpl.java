@@ -67,6 +67,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 							String progressText) {
 						view.updateProgress(currentProgress*100, progressText);
 					}
-				});
+				}, null);
 	}
 }

@@ -179,6 +179,7 @@ public class SynapseClientImplTest {
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
 	MessageToUser sentMessage;
+	Long storageLocationId = 9090L;
 	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -1021,9 +1022,10 @@ public class SynapseClientImplTest {
 		testToken.setKey("a key 42");
 		testToken.setUploadId("upload ID 123");
 		testToken.setContentMD5(md5);
+		testToken.setStorageLocationId(storageLocationId);
 		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
 		
-		ChunkedFileToken token = synapseClient.getChunkedFileToken(fileName, contentType, md5);
+		ChunkedFileToken token = synapseClient.getChunkedFileToken(fileName, contentType, md5, storageLocationId);
 		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
 		assertEquals(testToken, token);
 	}

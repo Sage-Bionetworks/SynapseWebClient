@@ -2437,13 +2437,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	@Override
 	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType,
-			String contentMD5) throws RestServiceException {
+			String contentMD5, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			CreateChunkedFileTokenRequest ccftr = new CreateChunkedFileTokenRequest();
 			ccftr.setFileName(fileName);
 			ccftr.setContentType(contentType);
 			ccftr.setContentMD5(contentMD5);
+			ccftr.setStorageLocationId(storageLocationId);
 			// Start the upload
 			return synapseClient.createChunkedFileUploadToken(ccftr);
 

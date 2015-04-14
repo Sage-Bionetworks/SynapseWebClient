@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -87,6 +86,7 @@ public class UploaderTest {
 	FileEntity testEntity;
 	CancelHandler cancelHandler;
 	String parentEntityId;
+	private Long storageLocationId;
 	
 	@Before
 	public void before() throws Exception {
@@ -117,7 +117,7 @@ public class UploaderTest {
 		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		
 		S3UploadDestination d = new S3UploadDestination();
@@ -159,6 +159,7 @@ public class UploaderTest {
 		
 		when(synapseJsniUtils.getFileSize(anyString(), anyInt())).thenReturn(1.0);
 		when(synapseJsniUtils.isFileAPISupported()).thenReturn(true);
+		storageLocationId = 9090L;
 	}
 	
 	@Test
@@ -331,7 +332,7 @@ public class UploaderTest {
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
-		
+		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
 	}
 	
@@ -342,6 +343,7 @@ public class UploaderTest {
 		destinations.add(mock(UploadDestination.class));
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
+		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
 	}
 	
@@ -355,12 +357,14 @@ public class UploaderTest {
 		ExternalUploadDestination d = new ExternalUploadDestination();
 		d.setUploadType(UploadType.SFTP);
 		d.setUrl(url);
+		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("ok.net").when(synapseClient).getHost(anyString(), any(AsyncCallback.class));
 		
 		uploader.queryForUploadDestination();
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 		assertEquals(UploadType.SFTP, uploader.getCurrentUploadType());
 		verify(view).showUploadingToExternalStorage(anyString(), anyString());
 		verify(view).enableMultipleFileUploads(false);
@@ -376,8 +380,18 @@ public class UploaderTest {
 		assertTrue(target.startsWith(sftpProxy));
 		assertTrue(target.contains("?url=" + url));
 	}
-	
-	
+
+	@Test
+	public void testQueryForUploadDestinationsWithUploadToS3() {
+		S3UploadDestination d = new S3UploadDestination();
+		d.setUploadType(UploadType.S3);
+		d.setStorageLocationId(storageLocationId);
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(d);
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
+	}
 
 	@Test
 	public void testQueryForUploadDestinationsWithoutParentEntityId() {
@@ -389,12 +403,18 @@ public class UploaderTest {
 		
 		Mockito.reset(synapseClient);
 		uploader.asWidget(fileEntity);
-		
+		assertNull(uploader.getStorageLocationId());
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
 		verify(synapseClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
 		assertEquals(entityId, stringCaptor.getValue());
 	}
-	
+
+	@Test
+	public void testQueryForUploadDestinationsWithNullEntity() {
+		Mockito.reset(synapseClient);
+		uploader.asWidget((FileEntity)null);
+		assertNull(uploader.getStorageLocationId());
+	}
 
 	@Test
 	public void testUploadNoCredentials() {

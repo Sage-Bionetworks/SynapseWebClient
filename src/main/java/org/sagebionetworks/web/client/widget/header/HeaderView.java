@@ -33,8 +33,6 @@ public interface HeaderView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
-		void onGettingStartedClick();
 		void onTrashClick();
 		void onLogoutClick();
 		void onDashboardClick();
