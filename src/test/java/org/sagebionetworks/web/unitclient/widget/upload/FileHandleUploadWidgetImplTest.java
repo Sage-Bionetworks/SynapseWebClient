@@ -59,7 +59,7 @@ public class FileHandleUploadWidgetImplTest {
 				handler.uploadSuccess(successFileHandle);
 				return null;
 			}
-		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class));
+		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
 		reset(mockView);
@@ -92,7 +92,7 @@ public class FileHandleUploadWidgetImplTest {
 				handler.uploadFailed(error);
 				return null;
 			}
-		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class));
+		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
 		reset(mockView);

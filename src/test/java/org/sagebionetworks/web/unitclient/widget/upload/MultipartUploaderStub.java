@@ -16,13 +16,13 @@ public class MultipartUploaderStub implements MultipartUploader {
 	String[] progressText;
 
 	@Override
-	public void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler) {
+	public void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler, Long storageLocationId) {
 		respond(handler);
 	}
 
 	@Override
 	public void uploadFile(String fileName, String fileInputId, int fileIndex,
-			ProgressingFileUploadHandler handler) {
+			ProgressingFileUploadHandler handler, Long storageLocationId) {
 		respond(handler);
 	}
 	
