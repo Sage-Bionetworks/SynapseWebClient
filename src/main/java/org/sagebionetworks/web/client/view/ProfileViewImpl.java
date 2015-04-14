@@ -261,11 +261,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		initTabs();
 		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
+		createProjectButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createProject(createProjectTextBox.getValue());
+			}
+		});
 		createProjectTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					presenter.createProject(createProjectTextBox.getValue());
+					createProjectButton.click();
 				}
 			}
 		});
@@ -274,6 +280,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.createTeam(createTeamTextBox.getValue());
+			}
+		});
+		
+		createTeamTextBox.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					createTeamButton.click();
+				}
 			}
 		});
 		
