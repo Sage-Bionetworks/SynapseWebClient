@@ -18,7 +18,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 	 * Configure the view with the parent id
 	 * @param entityId
 	 */
-	void configure(EntityTreeItem entity, boolean canCertifiedUserAddChild);
+	void configure(String entityId, boolean canCertifiedUserAddChild);
 
 	public void refreshTreeView(String entityId);
 	

@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.shared.EntityType;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -54,7 +55,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
 	
-	private final int MAX_FOLDER_LIMIT = 500;
+	private final int MAX_FOLDER_LIMIT = 3;
 	private String currentFolderChildrenEntityId;
 	
 	@Inject
@@ -94,23 +95,20 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 * Note: Root entities are sorted by default.
 	 * @param entityId
 	 */
-	public void configure(EntityTreeItem parent) {
+	public void configure(String searchId, EntityTreeItem parent) {
 		view.clear();
 		view.showLoading();
-		getFolderChildren(parent, parent.asTreeItem().getChildCount());
-		getChildrenFiles(parent, parent.asTreeItem().getChildCount());
+		// Chains to get also the file children
+		long childCount = parent == null ? 0 : parent.asTreeItem().getChildCount();
+		getFolderChildren(searchId, parent, childCount);
 	}
-
 	
-	/**
-	 * Configure tree view to be filled initially with the given headers.
-	 * @param rootEntities
-	 */
-	public void configure(List<EntityHeader> rootEntities, boolean sort) {
-		if (sort)
-			EntityBrowserUtils.sortEntityHeadersByName(rootEntities);
-		
-		view.setRootEntitiesFromTreeItem(getEntityTreeItemsFromHeaders(rootEntities));
+	public void configure(List<EntityHeader> headers) {
+		view.clear();
+		List<EntityTreeItem> treeItems = getEntityTreeItemsFromHeaders(headers);
+		for (EntityTreeItem toAdd: treeItems) {
+			view.placeEntityTreeItem(toAdd, null, true);
+		}
 	}
 	
 	@Override
@@ -120,17 +118,25 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 	
 	@Override
-	public void getFolderChildren(final EntityTreeItem parent, final long offset) {
-		EntityQuery childrenQuery = createGetChildrenQueryFromTreeItem(parent, org.sagebionetworks.repo.model.entity.query.EntityType.folder);
+	public void getFolderChildren(final String parentId, final EntityTreeItem parent, final long offset) {
+		EntityQuery childrenQuery = createGetChildrenQuery(parentId, org.sagebionetworks.repo.model.entity.query.EntityType.folder);
+		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
+		childrenQuery.setOffset(offset);
 		//ask for the folder children, then the files
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
 			public void onSuccess(EntityQueryResults results) {
-				addResultsToParent(parent, results);
-				if (results.getTotalEntityCount() > offset + results.getEntities().size() + MAX_FOLDER_LIMIT) {
-					final MoreTreeItem moreItem = new MoreTreeItem(MoreTreeItem.MORE_TYPE.FOLDER);
-					view.placeMoreTreeItem(moreItem, parent);
+				if (!results.getEntities().isEmpty()) {
+					addResultsToParent(parent, results);
+					if (results.getTotalEntityCount() > offset + results.getEntities().size()) {
+						GWT.debugger();
+						final MoreTreeItem moreItem = ginInjector.getMoreTreeWidget();
+						moreItem.configure(MoreTreeItem.MORE_TYPE.FOLDER);
+						view.placeMoreTreeItem(moreItem, parent, parentId, parent == null);
+					}
 				}
+				long childCount = parent == null ? 0 : parent.asTreeItem().getChildCount();
+				getChildrenFiles(parentId, parent, childCount);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -140,15 +146,20 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 	
 	@Override
-	public void getChildrenFiles(final EntityTreeItem parent, final long offset) {
-		EntityQuery childrenQuery = createGetChildrenQueryFromTreeItem(parent, org.sagebionetworks.repo.model.entity.query.EntityType.file);
+	public void getChildrenFiles(final String parentId, final EntityTreeItem parent, final long offset) {
+		EntityQuery childrenQuery = createGetChildrenQuery(parentId, org.sagebionetworks.repo.model.entity.query.EntityType.file);
+		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
+		childrenQuery.setOffset(offset);
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
 			public void onSuccess(EntityQueryResults results) {
-				addResultsToParent(parent, results);
-				if (results.getTotalEntityCount() > offset + results.getEntities().size() + MAX_FOLDER_LIMIT) {
-					final MoreTreeItem moreItem = new MoreTreeItem(MoreTreeItem.MORE_TYPE.FILE);
-					view.placeMoreTreeItem(moreItem, parent);
+				if (!results.getEntities().isEmpty()) {
+					addResultsToParent(parent, results);
+					if (results.getTotalEntityCount() > offset + results.getEntities().size()) {
+						final MoreTreeItem moreItem = ginInjector.getMoreTreeWidget();
+						moreItem.configure(MoreTreeItem.MORE_TYPE.FILE);
+						view.placeMoreTreeItem(moreItem, parent, parentId, false);
+					}
 				}
 			}
 			@Override
@@ -216,8 +227,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			alreadyFetchedEntityChildren.add(target);
 			// Change to loading icon.
 			target.showLoadingIcon();
-			getFolderChildren(target, target.asTreeItem().getChildCount());
-			getChildrenFiles(target, target.asTreeItem().getChildCount());
+			long childCount = target == null ? 0 : target.asTreeItem().getChildCount();
+			getFolderChildren(target.getHeader().getId(), target, childCount);
 			target.showTypeIcon();
 		}
 	}
@@ -241,20 +252,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		sort.setDirection(SortDirection.ASC);
 		newQuery.setSort(sort);
 		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
-		newQuery.setConditions(Arrays.asList(condition));
-		newQuery.setFilterByType(type);
-		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
-		newQuery.setOffset(OFFSET_ZERO);
-		return newQuery;
-	}
-	
-	public EntityQuery createGetChildrenQueryFromTreeItem(EntityTreeItem parent, org.sagebionetworks.repo.model.entity.query.EntityType type) {
-		EntityQuery newQuery = new EntityQuery();
-		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.name.name());
-		sort.setDirection(SortDirection.ASC);
-		newQuery.setSort(sort);
-		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parent.getHeader().getId());
 		newQuery.setConditions(Arrays.asList(condition));
 		newQuery.setFilterByType(type);
 		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
@@ -289,9 +286,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return headerList;
 	}
 	
-	public void addResultsToParent(final EntityTreeItem parent, EntityQueryResults results) {		
-		for (EntityTreeItem toAdd: getEntityTreeItemsFromQueryResults(results)) {
-			view.placeEntityTreeItem(toAdd, parent, false);
+	// Don't always pass false? Because parent can be null?
+	public void addResultsToParent(final EntityTreeItem parent, EntityQueryResults results) {
+		List<EntityHeader> headers = getHeadersFromQueryResults(results);
+		List<EntityTreeItem> treeItems = getEntityTreeItemsFromHeaders(headers);
+		for (EntityTreeItem toAdd: treeItems) {
+			view.placeEntityTreeItem(toAdd, parent, parent == null);
 		}
 	}
 
@@ -316,4 +316,5 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void setCurrentFolderChildrenEntityId(String currentFolderChildrenEntityId) {
 		this.currentFolderChildrenEntityId = currentFolderChildrenEntityId;
 	}
+
 }

@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
@@ -114,11 +113,11 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		}
 	
 	@Override
-	public void configure(EntityTreeItem entity, boolean canCertifiedUserAddChild) {
-		entityTreeBrowser.configure(entity);
+	public void configure(String entityId, boolean canCertifiedUserAddChild) {
+		entityTreeBrowser.configure(entityId, null);
 		if (canCertifiedUserAddChild) {
 			topBar.setVisible(true);
-		}
+	}
 	}
 	
 			@Override
@@ -183,6 +182,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	@Override
 	public void refreshTreeView(String entityId) {
-		entityTreeBrowser.configure(entityId);
+		entityTreeBrowser.configure(entityId, null);
 	}
 }

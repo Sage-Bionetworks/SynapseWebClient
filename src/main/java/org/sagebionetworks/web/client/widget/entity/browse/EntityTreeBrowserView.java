@@ -40,18 +40,18 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		
 		void clearRecordsFetchedChildren();
 
-		void getFolderChildren(EntityTreeItem parent, long offset);
+		void getChildrenFiles(String parentId, EntityTreeItem parent,
+				long offset);
 
-		void getChildrenFiles(EntityTreeItem parent, long offset);
+		void getFolderChildren(String parentId, EntityTreeItem parent,
+				long offset);
 
 	}
 
 	void placeEntityTreeItem(EntityTreeItem childToCreate,
 			EntityTreeItem parent, boolean isRootItem);
 
-	void placeMoreTreeItem(MoreTreeItem moreItem, EntityTreeItem parent);
-
-	void setRootEntitiesFromTreeItem(List<EntityTreeItem> rootEntities);
-
+	void placeMoreTreeItem(MoreTreeItem childToCreate, EntityTreeItem parent,
+			String parentId, boolean isRootItem);
 
 }
