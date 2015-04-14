@@ -711,4 +711,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		double percentOfAllFiles = percentPerFile*percentOfCurrentFile + (percentPerFile*currentFileIndex);
 		return percentOfAllFiles;
 	}
+
+	// for JUnit tests
+	public Long getStorageLocationId(){
+		return this.storageLocationId;
+	}
 }
