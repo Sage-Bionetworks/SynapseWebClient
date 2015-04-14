@@ -61,8 +61,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DropDownMenu headerFavList;
 
 	@UiField
-	AnchorListItem gettingStartedLink;
-	@UiField
 	AnchorListItem forumLink;
 	@UiField
 	AnchorListItem rLink;
@@ -124,7 +122,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		myDashboardButtonContents.add(userBadge.asWidget());
 		userBadgeText = new Span();
 		myDashboardButtonContents.add(userBadgeText);
-
 		addUserPicturePanel();
 		showLargeLogo = false; // default
 		initClickHandlers();
@@ -150,12 +147,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			public void onClick(ClickEvent event) {
 				DisplayUtils.setTestWebsite(false, cookies);
 				Window.Location.reload();
-			}
-		});
-		gettingStartedLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onGettingStartedClick();
 			}
 		});
 		trashLink.addClickHandler(new ClickHandler() {

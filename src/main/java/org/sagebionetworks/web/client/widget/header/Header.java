@@ -7,14 +7,12 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -79,11 +77,6 @@ public class Header implements HeaderView.Presenter {
 		}
 		view.refresh();
 		view.setSearchVisible(true);
-	}
-
-	@Override
-	public void onGettingStartedClick() {
-		globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));	
 	}
 
 	@Override
