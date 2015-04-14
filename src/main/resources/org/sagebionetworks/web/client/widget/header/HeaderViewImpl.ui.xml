@@ -17,7 +17,7 @@
 				<b:Tooltip placement="BOTTOM" title="Log out">
 					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-5" height="26px" />	
 				</b:Tooltip>
-				<b:Tooltip placement="BOTTOM" title="Favorite">
+				<b:Tooltip placement="BOTTOM" title="Favorites">
 					<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-5">
 						<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px"></b:Button>
 						<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
