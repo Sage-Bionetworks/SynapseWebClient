@@ -61,7 +61,6 @@ public class EntityTreeBrowserTest {
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockInjector = mock(PortalGinInjector.class);
 		adapterFactory = new AdapterFactoryImpl();
-		// Injector?
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView, mockSynapseClient, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockIconsImageBundle, adapterFactory);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
@@ -108,5 +107,25 @@ public class EntityTreeBrowserTest {
 		List<Condition> conditions = query.getConditions();
 		assertEquals(1, conditions.size());
 		assertEquals(EntityType.folder, query.getFilterByType());
+	}
+	
+	@Test
+	public void testMoreButtonRootLevel() {
+		
+	}
+	
+	@Test
+	public void testMoreButtonMultilevel() {
+		
+	}
+	
+	@Test
+	public void testMaxFolderValueAdaptation() {
+		
+	}	
+	
+	@Test
+	public void testCreateFolderMoreButton() {
+		
 	}
 }

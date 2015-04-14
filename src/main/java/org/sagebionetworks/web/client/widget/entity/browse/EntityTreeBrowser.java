@@ -122,6 +122,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, org.sagebionetworks.repo.model.entity.query.EntityType.folder);
 		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
 		childrenQuery.setOffset(offset);
+		GWT.debugger();
 		//ask for the folder children, then the files
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
@@ -228,7 +229,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			// Change to loading icon.
 			target.showLoadingIcon();
 			long childCount = target == null ? 0 : target.asTreeItem().getChildCount();
-			getFolderChildren(target.getHeader().getId(), target, childCount);
+			getFolderChildren(target.getHeader().getId(), target, 0);
 			target.showTypeIcon();
 		}
 	}

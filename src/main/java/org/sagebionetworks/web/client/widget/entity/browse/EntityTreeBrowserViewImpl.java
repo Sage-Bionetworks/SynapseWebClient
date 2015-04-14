@@ -136,24 +136,31 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	@Override
 	public void placeMoreTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final String parentId, final boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
-		final long currOffset = parent == null ? entityTree.getItemCount() : parent.asTreeItem().getChildCount();
-		final Widget moreButton = childToCreate.asWidget();
+		final long currOffset = parent == null ? 1 + entityTree.getItemCount() - (entityTree.getItemCount() / presenter.getMaxLimit()) : 
+				parent.asTreeItem().getChildCount() - (parent.asTreeItem().getChildCount() / presenter.getMaxLimit());
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (childToCreate.type == MoreTreeItem.MORE_TYPE.FILE) {
+					GWT.debugger();
 					presenter.getChildrenFiles(parentId, parent, currOffset);
-					moreButton.setVisible(false);
+					childToCreate.setVisible(false);
 				} else {
+					GWT.debugger();
 					presenter.getFolderChildren(parentId, parent, currOffset);
-					moreButton.setVisible(false);
+					childToCreate.setVisible(false);
+				}
+				if (parent == null) {
+					entityTree.addItem(childToCreate);
+				} else {
+					parent.asTreeItem().addItem(childToCreate);
 				}
 			}
 		});
 		if (isRootItem) {
-			entityTree.addItem(moreButton);
+			entityTree.addItem(childToCreate);
 		} else {
-			parent.asTreeItem().addItem(moreButton);
+			parent.asTreeItem().addItem(childToCreate);
 		}
 	}	
 	
