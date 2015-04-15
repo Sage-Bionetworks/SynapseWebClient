@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -23,6 +21,7 @@ import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -42,13 +41,16 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private EntityTreeItem selectedItem;
 	private SageImageBundle sageImageBundle;
 	private long offset;
-
+	private HTML emptyUI = new HTML(EMPTY_DISPLAY);
+	private TreeItem loadingTreeItem;
+	
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();		
 		entityTree = new Tree(new EntityTreeResources());
+		
 		this.add(entityTree);
 		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
 			@Override
@@ -58,6 +60,23 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			}
 			
 		});
+		// Why does this NOT mess up all the root node indexing?
+		loadingTreeItem = new TreeItem(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		loadingTreeItem.addStyleName("entityTreeItem-font");
+		entityTree.addItem(loadingTreeItem);
+		// Make sure to show this and hide the tree on empty.
+		this.add(emptyUI);
+		hideEmptyUI();
+	}
+	
+	@Override
+	public void hideEmptyUI() {
+		emptyUI.setVisible(false);
+	}	
+	
+	@Override
+	public void showEmptyUI() {
+		emptyUI.setVisible(true);
 	}
 	
 	@Override
@@ -74,18 +93,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-
+	
 	@Override
-	public void showLoading() {
-		//Don't add as a tree item!
-//		TreeItem loadingTreeItem = new TreeItem(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
-//		loadingTreeItem.addStyleName("entityTreeItem-font");
-//		entityTree.addItem(loadingTreeItem);
+	public void hideLoading() {
+		loadingTreeItem.setVisible(false);
 	}
 
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+	
+	@Override
+	public int getRootCount() {
+		return entityTree.getItemCount();
 	}
 
 	@Override
@@ -110,31 +131,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		});
 	}
 	
-//	@Override
-//	public void placeEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent, boolean isRootItem) {
-//		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
-//		if (isSelectable) {
-//			// Add select functionality.
-//			childToAdd.setClickHandler(new ClickHandler() {
-//				@Override
-//				public void onClick(ClickEvent event) {
-//					selectEntity(childToAdd);
-//				}
-//			});
-//		}
-//		// Update fields.
-//		treeItem2entityTreeItem.put(childToAdd.asTreeItem(), childToAdd);
-//		// Add dummy item to childItem to make expandable.
-//		childToAdd.asTreeItem().addItem(createDummyItem());
-//		// Place the created child in the tree as the child of the given parent entity.
-//		if (isRootItem) {
-//			entityTree.addItem(childToAdd);
-//		} else {
-//			parent.asTreeItem().addItem(childToAdd);
-//		}
-//	}
-	
-	
+	//When empty...
 	@Override
 	public void appendRootEntityTreeItem(final EntityTreeItem childToAdd) {
 		configureEntityTreeItem(childToAdd);
@@ -163,11 +160,14 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		// Update fields.
 		treeItem2entityTreeItem.put(childToAdd.asTreeItem(), childToAdd);
 		// Add dummy item to childItem to make expandable.
-		childToAdd.asTreeItem().addItem(createDummyItem());
+		// Pass in something to tell it to add a createDummy item for folder expansion or not
+		if (childToAdd.isExpandable())
+			childToAdd.asTreeItem().addItem(createDummyItem());
 	}
 	
 	@Override
 	public void appendChildEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent) {
+		//(Re)move the error to presenter
 		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		configureEntityTreeItem(childToAdd);
 		// Place the created child in the tree as the child of the given parent entity.
@@ -176,11 +176,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	
 	@Override
 	public void insertChildEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent, long offset) {
+		//(Re)move the error to presenter
 		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		configureEntityTreeItem(childToAdd);
 		// Place the created child in the tree as the child of the given parent entity.
 		parent.asTreeItem().insertItem((int) offset, childToAdd.asTreeItem());
-
 	}
 	
 	/**
@@ -224,13 +224,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	 */
 	@Override
 	public void placeChildMoreFoldersTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final long offset) {
-		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.getFolderChildren(parent.getHeader().getId(), parent, offset);
-				childToCreate.setVisible(false);
-				
+				childToCreate.setVisible(false);				
 			}
 		});
 		parent.asTreeItem().addItem(childToCreate);		
@@ -243,7 +241,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	 */
 	@Override
 	public void placeChildMoreFilesTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final long offset) {
-		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -252,37 +249,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			}
 		});
 		parent.asTreeItem().addItem(childToCreate);
-	}
-	
-//	@Override
-//	public void placeMoreTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final String parentId, final boolean isRootItem) {
-//		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
-//		final long currOffset = parent == null ? 1 + entityTree.getItemCount() - (entityTree.getItemCount() / presenter.getMaxLimit()) : 
-//				parent.asTreeItem().getChildCount() - (parent.asTreeItem().getChildCount() / presenter.getMaxLimit());
-//		childToCreate.setClickHandler(new ClickHandler() {
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				if (childToCreate.type == MoreTreeItem.MORE_TYPE.FILE) {
-//					presenter.getChildrenFiles(parentId, parent, currOffset);
-//				} else {
-//					presenter.getFolderChildren(parentId, parent, currOffset);
-//				}
-//				childToCreate.setVisible(false);
-//				if (parent == null) {
-//					entityTree.addItem(childToCreate);
-//				} else {
-//					parent.asTreeItem().addItem(childToCreate);
-//				}
-//			}
-//		});
-//		if (isRootItem) {
-//			entityTree.addItem(childToCreate);
-//		} else {
-//			parent.asTreeItem().addItem(childToCreate);
-//		}
-//	}	
-	
-	
+	}	
 	
 	/*
 	 * Private Methods
@@ -331,5 +298,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public interface EntityTreeImageBundle extends ClientBundle, ClientBundleWithLookup {
 		Tree.Resources DEFAULT_RESOURCES = GWT.create(Tree.Resources.class);
 	}
-	
+
+	@Override
+	public void showLoading() {
+		loadingTreeItem.setVisible(true);
+	}
+
 }

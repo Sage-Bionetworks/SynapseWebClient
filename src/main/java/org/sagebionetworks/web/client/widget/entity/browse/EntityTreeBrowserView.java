@@ -1,14 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityTreeBrowserView extends IsWidget, SynapseView {
@@ -38,14 +33,14 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		
 		void clearRecordsFetchedChildren();
 
+		void addMoreButton(MoreTreeItem moreItem, String parentId,
+				EntityTreeItem parent, long offset);
+
 		void getChildrenFiles(String parentId, EntityTreeItem parent,
 				long offset);
 
 		void getFolderChildren(String parentId, EntityTreeItem parent,
 				long offset);
-
-		void addMoreButton(MoreTreeItem moreItem, String parentId,
-				EntityTreeItem parent, long offset);
 
 	}
 
@@ -72,5 +67,13 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 
 	void placeRootMoreFoldersTreeItem(MoreTreeItem childToCreate,
 			String parentId, long offset);
+
+	void showEmptyUI();
+
+	void hideLoading();
+
+	int getRootCount();
+
+	void hideEmptyUI();
 
 }

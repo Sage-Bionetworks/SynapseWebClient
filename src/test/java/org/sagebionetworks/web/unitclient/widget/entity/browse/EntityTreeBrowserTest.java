@@ -54,7 +54,6 @@ public class EntityTreeBrowserTest {
 	IconsImageBundle mockIconsImageBundle;
 	PortalGinInjector mockInjector;
 	AdapterFactory adapterFactory;
-	FilesBrowser filesBrowser;
 	EntityTreeBrowser entityTreeBrowser;
 	EntityQueryResults searchResults;
 	EntityTreeItem mockEntityTreeItem;
@@ -101,6 +100,19 @@ public class EntityTreeBrowserTest {
 		assertEquals(EntityType.file, queries.get(1).getFilterByType());
 	}
 	
+	@Test
+	public void testCreateGetChildrenQuery() {
+		String parentId = "9";
+		EntityQuery query = entityTreeBrowser.createGetChildrenQuery(parentId, 0, EntityType.folder);
+		
+		//verify sort
+		assertEquals(EntityFieldName.name.name(), query.getSort().getColumnName());
+		assertEquals(SortDirection.ASC, query.getSort().getDirection());
+		List<Condition> conditions = query.getConditions();
+		assertEquals(1, conditions.size());
+		assertEquals(EntityType.folder, query.getFilterByType());
+	}	
+	
 	// Look into better race condition case
 	@Test
 	public void testGetFolderChildrenRaceCondition() {
@@ -113,7 +125,6 @@ public class EntityTreeBrowserTest {
 		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), captor.capture());
 		//before invoking asynccallback.success, set the current entity id to something else (simulating that the user 
 		//has selected a different folder while this was still processing)
-		entityTreeBrowser.setCurrentFolderChildrenEntityId("456");
 		captor.getValue().onSuccess(searchResults);
 		verify(mockCallback, never()).onSuccess(anyList());
 	}

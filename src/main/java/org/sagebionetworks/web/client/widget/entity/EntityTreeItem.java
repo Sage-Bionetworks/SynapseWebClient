@@ -13,20 +13,26 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 
 	private TreeItem treeItem;
 	private EntityBadge entityBadge;
+	private boolean isExpandable;
 	
 	@Inject
 	public EntityTreeItem(EntityBadge entityBadge) { 
 		this.entityBadge = entityBadge;
 	}
 	
-	public void configure(EntityHeader header, boolean isRootItem) {
+	public void configure(EntityHeader header,  boolean isRootItem, boolean isExpandable) {
 		entityBadge.configure(header);
 		entityBadge.asWidget().addStyleName("padding-bottom-4-imp");
 		treeItem = new TreeItem(asWidget());
+		this.isExpandable = isExpandable;
 		if (isRootItem)
 			treeItem.addStyleName("entityTreeItem padding-left-0-imp");
 		else
 			treeItem.addStyleName("entityTreeItem");
+	}
+	
+	public boolean isExpandable() {
+		return isExpandable;
 	}
 
 	@Override
