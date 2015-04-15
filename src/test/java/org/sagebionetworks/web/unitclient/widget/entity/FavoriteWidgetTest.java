@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -14,10 +13,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -29,6 +30,7 @@ public class FavoriteWidgetTest {
 
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
+	AuthenticationController mockAuthenticationController;
 	FavoriteWidgetView mockView;
 	String entityId = "syn123";
 	FavoriteWidget favoriteWidget;
@@ -36,6 +38,7 @@ public class FavoriteWidgetTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(FavoriteWidgetView.class);
 		List<EntityHeader> favs = new ArrayList<EntityHeader>();
@@ -43,7 +46,7 @@ public class FavoriteWidgetTest {
 		fav.setId("syn456");
 		favs.add(fav);
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(favs);
-		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockGlobalApplicationState);
+		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
 		favoriteWidget.configure(entityId);
 		reset(mockView);
 	}
@@ -85,6 +88,7 @@ public class FavoriteWidgetTest {
 		favoriteWidget.updateIsFavoriteView();
 		verify(mockView).hideLoading();
 		verify(mockView).showIsNotFavorite();
+		verify(mockView, Mockito.never()).hideFavorite();
 	}
 	
 	@Test
@@ -98,7 +102,16 @@ public class FavoriteWidgetTest {
 		favoriteWidget.updateIsFavoriteView();
 		verify(mockView).hideLoading();
 		verify(mockView).showIsFavorite();
+		verify(mockView, Mockito.never()).hideFavorite();
 	}
 
-	
+	@Test
+	public void testFavoriteAnynomous(){
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		favoriteWidget.configure(entityId);
+		verify(mockView).hideFavorite();
+		verify(mockView).hideLoading();
+		verify(mockView, Mockito.never()).showIsFavorite();
+		verify(mockView, Mockito.never()).showIsNotFavorite();
+	}
 }
