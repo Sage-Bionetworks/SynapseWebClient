@@ -25,8 +25,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
-
-
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
@@ -42,15 +40,22 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ClientLogger logger;
-	
+	private GlobalApplicationStateView view;
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils, ClientLogger logger) {
+	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
+			CookieProvider cookieProvider,
+			JiraURLHelper jiraUrlHelper, 
+			EventBus eventBus, 
+			SynapseClientAsync synapseClient, 
+			SynapseJSNIUtils synapseJSNIUtils, 
+			ClientLogger logger) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.logger = logger;
+		this.view = view;
 		isEditing = false;
 		initUncaughtExceptionHandler();
 	}
@@ -193,7 +198,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Override
-	public void checkVersionCompatibility(final SynapseView view) {
+	public void checkVersionCompatibility(final AsyncCallback<String> callback) {
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
@@ -201,13 +206,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 					synapseVersion = versions;
 				} else {
 					if(!synapseVersion.equals(versions)) {
-						view.showErrorMessage(DisplayConstants.NEW_VERSION_INSTRUCTIONS);
+						view.showVersionOutOfDateGlobalMessage();
 					}
+				}
+				if (callback != null) {
+					callback.onSuccess(versions);
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				if (callback != null) {
+					callback.onFailure(caught);	
+				}
 			}
 		});
 	}

@@ -509,6 +509,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// GlobalApplicationState
 		bind(GlobalApplicationStateImpl.class).in(Singleton.class);
 		bind(GlobalApplicationState.class).to(GlobalApplicationStateImpl.class);
+		bind(GlobalApplicationStateView.class).to(GlobalApplicationStateViewImpl.class);
 		
 		bind(ResourceLoaderImpl.class).in(Singleton.class);
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
