@@ -41,6 +41,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private EntityTreeItem selectedItem;
 	private SageImageBundle sageImageBundle;
+	private long offset;
 
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
@@ -109,9 +110,47 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		});
 	}
 	
+//	@Override
+//	public void placeEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent, boolean isRootItem) {
+//		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+//		if (isSelectable) {
+//			// Add select functionality.
+//			childToAdd.setClickHandler(new ClickHandler() {
+//				@Override
+//				public void onClick(ClickEvent event) {
+//					selectEntity(childToAdd);
+//				}
+//			});
+//		}
+//		// Update fields.
+//		treeItem2entityTreeItem.put(childToAdd.asTreeItem(), childToAdd);
+//		// Add dummy item to childItem to make expandable.
+//		childToAdd.asTreeItem().addItem(createDummyItem());
+//		// Place the created child in the tree as the child of the given parent entity.
+//		if (isRootItem) {
+//			entityTree.addItem(childToAdd);
+//		} else {
+//			parent.asTreeItem().addItem(childToAdd);
+//		}
+//	}
+	
+	
 	@Override
-	public void placeEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent, boolean isRootItem) {
-		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+	public void appendRootEntityTreeItem(final EntityTreeItem childToAdd) {
+		configureEntityTreeItem(childToAdd);
+		// Place the created child in the tree as the child of the given parent entity.
+		entityTree.addItem(childToAdd);
+	}
+	
+	@Override
+	public void insertRootEntityTreeItem(final EntityTreeItem childToAdd, long offset) {
+		configureEntityTreeItem(childToAdd);
+		// Place the created child in the tree as the child of the given parent entity.
+		entityTree.insertItem((int) offset, childToAdd.asTreeItem());
+	}
+	
+	@Override
+	public void configureEntityTreeItem(final EntityTreeItem childToAdd) {
 		if (isSelectable) {
 			// Add select functionality.
 			childToAdd.setClickHandler(new ClickHandler() {
@@ -125,44 +164,123 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		treeItem2entityTreeItem.put(childToAdd.asTreeItem(), childToAdd);
 		// Add dummy item to childItem to make expandable.
 		childToAdd.asTreeItem().addItem(createDummyItem());
-		// Place the created child in the tree as the child of the given parent entity.
-		if (isRootItem) {
-			entityTree.addItem(childToAdd);
-		} else {
-			parent.asTreeItem().addItem(childToAdd);
-		}
 	}
 	
 	@Override
-	public void placeMoreTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final String parentId, final boolean isRootItem) {
-		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
-		final long currOffset = parent == null ? 1 + entityTree.getItemCount() - (entityTree.getItemCount() / presenter.getMaxLimit()) : 
-				parent.asTreeItem().getChildCount() - (parent.asTreeItem().getChildCount() / presenter.getMaxLimit());
+	public void appendChildEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent) {
+		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+		configureEntityTreeItem(childToAdd);
+		// Place the created child in the tree as the child of the given parent entity.
+		parent.asTreeItem().addItem(childToAdd);
+	}
+	
+	@Override
+	public void insertChildEntityTreeItem(final EntityTreeItem childToAdd, EntityTreeItem parent, long offset) {
+		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+		configureEntityTreeItem(childToAdd);
+		// Place the created child in the tree as the child of the given parent entity.
+		parent.asTreeItem().insertItem((int) offset, childToAdd.asTreeItem());
+
+	}
+	
+	/**
+	 * 
+	 * @param childToCreate - the button to place into the current root-level tree.
+	 * @param parentId - when not adding to the parent tree item, still need the parentId to conduct searches.
+	 */
+	@Override
+	public void placeRootMoreFoldersTreeItem(final MoreTreeItem childToCreate, final String parentId, final long offset) {
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (childToCreate.type == MoreTreeItem.MORE_TYPE.FILE) {
-					GWT.debugger();
-					presenter.getChildrenFiles(parentId, parent, currOffset);
-					childToCreate.setVisible(false);
-				} else {
-					GWT.debugger();
-					presenter.getFolderChildren(parentId, parent, currOffset);
-					childToCreate.setVisible(false);
-				}
-				if (parent == null) {
-					entityTree.addItem(childToCreate);
-				} else {
-					parent.asTreeItem().addItem(childToCreate);
-				}
+				presenter.getFolderChildren(parentId, null, offset);
+				childToCreate.setVisible(false);
 			}
 		});
-		if (isRootItem) {
-			entityTree.addItem(childToCreate);
-		} else {
-			parent.asTreeItem().addItem(childToCreate);
-		}
+		entityTree.addItem(childToCreate);
 	}	
+	
+	/**
+	 * 
+	 * @param childToCreate - the button to place into the current root-level tree.
+	 * @param parentId - when not adding to the parent tree item, still need the parentId to conduct searches.
+	 */
+	@Override
+	public void placeRootMoreFilesTreeItem(final MoreTreeItem childToCreate, final String parentId, final long offset) {
+		childToCreate.setClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getChildrenFiles(parentId, null, offset);
+				childToCreate.setVisible(false);
+			}
+		});
+		entityTree.addItem(childToCreate);
+	}	
+	
+	/**
+	 * 
+	 * @param childToCreate - the button to place under the passed parent.
+	 * @param parent - where to place the new child, where the id can be ascertained from the header.
+	 */
+	@Override
+	public void placeChildMoreFoldersTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final long offset) {
+		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+		childToCreate.setClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getFolderChildren(parent.getHeader().getId(), parent, offset);
+				childToCreate.setVisible(false);
+				
+			}
+		});
+		parent.asTreeItem().addItem(childToCreate);		
+	}
+	
+	/**
+	 * 
+	 * @param childToCreate - the button to place under the passed parent.
+	 * @param parent - where to place the new child, where the id can be ascertained from the header.
+	 */
+	@Override
+	public void placeChildMoreFilesTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final long offset) {
+		if (parent == null) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+		childToCreate.setClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getChildrenFiles(parent.getHeader().getId(), parent, offset);
+				childToCreate.setVisible(false);
+			}
+		});
+		parent.asTreeItem().addItem(childToCreate);
+	}
+	
+//	@Override
+//	public void placeMoreTreeItem(final MoreTreeItem childToCreate, final EntityTreeItem parent, final String parentId, final boolean isRootItem) {
+//		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+//		final long currOffset = parent == null ? 1 + entityTree.getItemCount() - (entityTree.getItemCount() / presenter.getMaxLimit()) : 
+//				parent.asTreeItem().getChildCount() - (parent.asTreeItem().getChildCount() / presenter.getMaxLimit());
+//		childToCreate.setClickHandler(new ClickHandler() {
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				if (childToCreate.type == MoreTreeItem.MORE_TYPE.FILE) {
+//					presenter.getChildrenFiles(parentId, parent, currOffset);
+//				} else {
+//					presenter.getFolderChildren(parentId, parent, currOffset);
+//				}
+//				childToCreate.setVisible(false);
+//				if (parent == null) {
+//					entityTree.addItem(childToCreate);
+//				} else {
+//					parent.asTreeItem().addItem(childToCreate);
+//				}
+//			}
+//		});
+//		if (isRootItem) {
+//			entityTree.addItem(childToCreate);
+//		} else {
+//			parent.asTreeItem().addItem(childToCreate);
+//		}
+//	}	
 	
 	
 	

@@ -55,6 +55,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
 	
+	private long folderOffset;
 	private final int MAX_FOLDER_LIMIT = 3;
 	private String currentFolderChildrenEntityId;
 	
@@ -98,6 +99,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void configure(String searchId, EntityTreeItem parent) {
 		view.clear();
 		view.showLoading();
+		folderOffset = 0;
 		// Chains to get also the file children
 		long childCount = parent == null ? 0 : parent.asTreeItem().getChildCount();
 		getFolderChildren(searchId, parent, childCount);
@@ -107,7 +109,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		view.clear();
 		List<EntityTreeItem> treeItems = getEntityTreeItemsFromHeaders(headers);
 		for (EntityTreeItem toAdd: treeItems) {
-			view.placeEntityTreeItem(toAdd, null, true);
+			view.appendRootEntityTreeItem(toAdd);
 		}
 	}
 	
@@ -122,22 +124,21 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, org.sagebionetworks.repo.model.entity.query.EntityType.folder);
 		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
 		childrenQuery.setOffset(offset);
-		GWT.debugger();
 		//ask for the folder children, then the files
 		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
 			@Override
 			public void onSuccess(EntityQueryResults results) {
 				if (!results.getEntities().isEmpty()) {
-					addResultsToParent(parent, results);
+					addResultsToParent(parent, results, org.sagebionetworks.repo.model.entity.query.EntityType.folder, offset);
+					// More total entities than able to be displayed, so must add a "More Folders" button
 					if (results.getTotalEntityCount() > offset + results.getEntities().size()) {
-						GWT.debugger();
 						final MoreTreeItem moreItem = ginInjector.getMoreTreeWidget();
 						moreItem.configure(MoreTreeItem.MORE_TYPE.FOLDER);
-						view.placeMoreTreeItem(moreItem, parent, parentId, parent == null);
+						addMoreButton(moreItem, parentId, parent, offset);
 					}
 				}
-				long childCount = parent == null ? 0 : parent.asTreeItem().getChildCount();
-				getChildrenFiles(parentId, parent, childCount);
+				if (offset == 0)
+					getChildrenFiles(parentId, parent, 0);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -145,6 +146,24 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 		});
 	}
+	
+	/**
+	 * Multiplexor to call all the variants of buttons requesting more folders or more files.
+	 */
+	@Override
+	public void addMoreButton(MoreTreeItem moreItem, String parentId, EntityTreeItem parent, long offset) {
+		if (parent == null) {
+			if (moreItem.type == MoreTreeItem.MORE_TYPE.FOLDER)
+				view.placeRootMoreFoldersTreeItem(moreItem, parentId, offset + MAX_FOLDER_LIMIT);
+			else
+				view.placeRootMoreFilesTreeItem(moreItem, parentId, offset + MAX_FOLDER_LIMIT);
+		} else {
+			if (moreItem.type == MoreTreeItem.MORE_TYPE.FOLDER)
+				view.placeChildMoreFoldersTreeItem(moreItem, parent, offset + MAX_FOLDER_LIMIT);
+			else
+				view.placeChildMoreFilesTreeItem(moreItem, parent, offset + MAX_FOLDER_LIMIT);
+		}
+	}	
 	
 	@Override
 	public void getChildrenFiles(final String parentId, final EntityTreeItem parent, final long offset) {
@@ -155,11 +174,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			@Override
 			public void onSuccess(EntityQueryResults results) {
 				if (!results.getEntities().isEmpty()) {
-					addResultsToParent(parent, results);
+					addResultsToParent(parent, results, org.sagebionetworks.repo.model.entity.query.EntityType.file, offset);
+					// More total entities than able to be displayed, so must add a "More Files" button
 					if (results.getTotalEntityCount() > offset + results.getEntities().size()) {
 						final MoreTreeItem moreItem = ginInjector.getMoreTreeWidget();
 						moreItem.configure(MoreTreeItem.MORE_TYPE.FILE);
-						view.placeMoreTreeItem(moreItem, parent, parentId, false);
+						addMoreButton(moreItem, parentId, parent, offset);
 					}
 				}
 			}
@@ -228,7 +248,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			alreadyFetchedEntityChildren.add(target);
 			// Change to loading icon.
 			target.showLoadingIcon();
-			long childCount = target == null ? 0 : target.asTreeItem().getChildCount();
 			getFolderChildren(target.getHeader().getId(), target, 0);
 			target.showTypeIcon();
 		}
@@ -270,10 +289,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return treeItems;
 	}
 	
-	public List<EntityTreeItem> getEntityTreeItemsFromQueryResults(EntityQueryResults results) {
-		return getEntityTreeItemsFromHeaders(getHeadersFromQueryResults(results));
-	}
-	
 	public List<EntityHeader> getHeadersFromQueryResults(EntityQueryResults results) {
 		List<EntityHeader> headerList = new LinkedList<EntityHeader>();
 		for (EntityQueryResult result : results.getEntities()) {
@@ -287,18 +302,32 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return headerList;
 	}
 	
-	// Don't always pass false? Because parent can be null?
-	public void addResultsToParent(final EntityTreeItem parent, EntityQueryResults results) {
+	public void addResultsToParent(final EntityTreeItem parent, EntityQueryResults results,
+			org.sagebionetworks.repo.model.entity.query.EntityType type, long offset) {
 		List<EntityHeader> headers = getHeadersFromQueryResults(results);
 		List<EntityTreeItem> treeItems = getEntityTreeItemsFromHeaders(headers);
-		for (EntityTreeItem toAdd: treeItems) {
-			view.placeEntityTreeItem(toAdd, parent, parent == null);
-		}
-	}
+		if (parent == null) {
+			if (type == org.sagebionetworks.repo.model.entity.query.EntityType.file) {
+				for (EntityTreeItem toAdd: treeItems) {
+					view.appendRootEntityTreeItem(toAdd);
+				}
+			} else {
+				for (EntityTreeItem toAdd: treeItems) {
+					view.insertRootEntityTreeItem(toAdd, folderOffset++);
+				}
+			}
+		} else {
+			if (type == org.sagebionetworks.repo.model.entity.query.EntityType.file) {
+				for (EntityTreeItem toAdd: treeItems) {
+					view.appendChildEntityTreeItem(toAdd, parent);
+				}
+			} else {
+				for (EntityTreeItem toAdd: treeItems) {
+					view.insertChildEntityTreeItem(toAdd, parent, offset++);
+				}
+			}
 
-	@Override
-	public ImageResource getIconForType(String type) {
-		return getIconForType(type, entityTypeProvider, iconsImageBundle);
+		}
 	}
 	
 	public static ImageResource getIconForType(String type, EntityTypeProvider entityTypeProvider, IconsImageBundle iconsImageBundle) {

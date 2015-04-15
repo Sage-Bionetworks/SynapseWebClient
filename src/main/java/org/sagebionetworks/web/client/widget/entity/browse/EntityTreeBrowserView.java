@@ -33,8 +33,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		void setSelection(String id);
 
 		int getMaxLimit();
-
-		ImageResource getIconForType(String type);
 		
 		void expandTreeItemOnOpen(final EntityTreeItem target);
 		
@@ -46,12 +44,33 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		void getFolderChildren(String parentId, EntityTreeItem parent,
 				long offset);
 
+		void addMoreButton(MoreTreeItem moreItem, String parentId,
+				EntityTreeItem parent, long offset);
+
 	}
 
-	void placeEntityTreeItem(EntityTreeItem childToCreate,
-			EntityTreeItem parent, boolean isRootItem);
+	void appendRootEntityTreeItem(EntityTreeItem childToAdd);
 
-	void placeMoreTreeItem(MoreTreeItem childToCreate, EntityTreeItem parent,
-			String parentId, boolean isRootItem);
+	void appendChildEntityTreeItem(EntityTreeItem childToAdd,
+			EntityTreeItem parent);
+	
+	void insertRootEntityTreeItem(EntityTreeItem childToAdd, long offset);
+
+	void insertChildEntityTreeItem(EntityTreeItem childToAdd,
+			EntityTreeItem parent, long offset);
+
+	void configureEntityTreeItem(EntityTreeItem childToAdd);
+
+	void placeChildMoreFilesTreeItem(MoreTreeItem childToCreate,
+			EntityTreeItem parent, long offset);
+
+	void placeChildMoreFoldersTreeItem(MoreTreeItem childToCreate,
+			EntityTreeItem parent, long offset);
+
+	void placeRootMoreFilesTreeItem(MoreTreeItem childToCreate,
+			String parentId, long offset);
+
+	void placeRootMoreFoldersTreeItem(MoreTreeItem childToCreate,
+			String parentId, long offset);
 
 }
