@@ -135,4 +135,9 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 		view.setBasicDividerVisible(visible);
 	}
 
+	@Override
+	public void setToolsButtonVisible(boolean visible) {
+		view.setToolsButtonVisible(visible);
+	}
+
 }

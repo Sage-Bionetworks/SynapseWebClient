@@ -81,4 +81,9 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 		this.basicDivider.setVisible(visible);
 	}
 
+	@Override
+	public void setToolsButtonVisible(boolean visible) {
+		buttonToolBar.setVisible(visible);
+	}
+
 }
