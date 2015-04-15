@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FooterViewImpl extends Composite implements FooterView {
-
+	
 	public interface Binder extends UiBinder<Widget, FooterViewImpl> {
 	}
 
@@ -96,5 +96,4 @@ public class FooterViewImpl extends Composite implements FooterView {
 		portalVersionSpan.setInnerHTML(portalVersion);
 		repoVersionSpan.setInnerHTML(repoVersion);		
 	}
-
 }
