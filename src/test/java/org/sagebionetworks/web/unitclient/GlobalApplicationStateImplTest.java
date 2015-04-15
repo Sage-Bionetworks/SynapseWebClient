@@ -6,14 +6,14 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,10 +24,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
+import org.sagebionetworks.web.client.GlobalApplicationStateView;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
@@ -55,6 +55,8 @@ public class GlobalApplicationStateImplTest {
 	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	ClientLogger mockLogger;
+	GlobalApplicationStateView mockView;
+	
 	@Before
 	public void before(){
 		mockCookieProvider = Mockito.mock(CookieProvider.class);
@@ -65,8 +67,9 @@ public class GlobalApplicationStateImplTest {
 		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockLogger = mock(ClientLogger.class);
+		mockView = mock(GlobalApplicationStateView.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -144,18 +147,16 @@ public class GlobalApplicationStateImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckVersionCompatibility() {
-		SynapseView mockView = mock(SynapseView.class);
-		globalApplicationState.checkVersionCompatibility(mockView);
+		globalApplicationState.checkVersionCompatibility(null);
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		verify(mockView, never()).showErrorMessage(anyString());
+		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
 		
 		// simulate change repo version
 		reset(mockSynapseClient);
 		AsyncMockStubber.callSuccessWith("v2").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState.checkVersionCompatibility(mockView);
+		globalApplicationState.checkVersionCompatibility(null);
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-		
+		verify(mockView).showVersionOutOfDateGlobalMessage();
 	}
 	
 	@Test
