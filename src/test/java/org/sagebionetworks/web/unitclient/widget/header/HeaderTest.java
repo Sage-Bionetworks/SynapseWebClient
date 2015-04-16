@@ -69,12 +69,6 @@ public class HeaderTest {
 	}
 
 	@Test
-	public void testOnGettingStartedClick() {
-		header.onGettingStartedClick();
-		verify(mockPlaceChanger).goTo(any(Help.class));
-	}
-
-	@Test
 	public void testOnDashboardClickLoggedIn() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("008");

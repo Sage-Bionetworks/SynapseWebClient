@@ -62,7 +62,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		this.place = place;
 		view.clear();
 		this.view.setPresenter(this);
-		emailValidationToken = place.getFixedToken();
+		emailValidationToken = place.toToken();
 		emailValidationTokenParams = parseEmailValidationToken(emailValidationToken);
 		String email = emailValidationTokenParams.get(EMAIL_KEY);
 		view.setEmail(email);

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.footer;
 
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -9,13 +10,13 @@ import com.google.inject.Inject;
 public class Footer implements FooterView.Presenter {
 
 	private FooterView view;
-	SynapseClientAsync synapseClient;
+	GlobalApplicationState globalAppState;
 	private boolean isInitialized = false;
 	
 	@Inject
-	public Footer(FooterView view, SynapseClientAsync synapseClient) {
+	public Footer(FooterView view, GlobalApplicationState globalAppState) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 	}
 
@@ -23,11 +24,10 @@ public class Footer implements FooterView.Presenter {
 		view.setPresenter(this);
 		if (!isInitialized) {
 			isInitialized = true; 
-			synapseClient.getSynapseVersions(new AsyncCallback<String>() {
-				
+			globalAppState.checkVersionCompatibility(new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(String result) {
-					String[] vals = result.split(",");
+				public void onSuccess(String versions) {
+					String[] vals = versions.split(",");
 					if(vals.length == 2)
 						view.setVersion(vals[0],vals[1]);
 					else 

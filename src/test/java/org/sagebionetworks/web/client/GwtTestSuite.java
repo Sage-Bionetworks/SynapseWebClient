@@ -302,41 +302,6 @@ public class GwtTestSuite extends GWTTestCase {
 		return aa.toJSONString();
 	}
 	
-
-	@Test
-	public void testEncodeTokenFFRealWorld() {
-		//email validation token is decoded in FF only!
-		//first, real world case.  This was the actual token read in by FF:
-		String token = "userid=273960&email=scicomp@sagebase.org&timestamp=2014-08-04T15:06:48.257+0000&domain=SYNAPSE&mac=XI45by8krakTcSPS7mEthZtQYrk=";
-		String result = AccountPresenter.encodeTokenKeysAndValues(token);
-		//should contain encoded version of "+0000"
-		Assert.assertTrue(result.contains("%2B0000"));
-		//should contain the entire mac address, which has "=" in it that must be encoded
-		Assert.assertTrue(result.contains("mac=XI45by8krakTcSPS7mEthZtQYrk%3D"));
-		//should still contain ampersands and equals
-		Assert.assertTrue(result.contains("&"));
-		Assert.assertTrue(result.contains("="));
-	}
-	
-	@Test
-	public void testEncodeTokenEmptyString() {
-		String token = "";
-		String result = AccountPresenter.encodeTokenKeysAndValues(token);
-		Assert.assertEquals("", result);
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testEncodeTokenInvalid() {
-		String key = "mac";
-		String value = "Many=Equal=Signs";
-		String encodedValue = "Many%3DEqual%3DSigns";
-		
-		String token = "userid=273960&"+key + "=" + value + "&anotherkey=andvalue";
-		String result = AccountPresenter.encodeTokenKeysAndValues(token);
-		Assert.assertTrue(result.contains(key));
-		Assert.assertTrue(result.contains(encodedValue));
-	}
-	
 	@Override
 	public String toString() {
 		return "GwtTestSuite for Module: "+getModuleName();

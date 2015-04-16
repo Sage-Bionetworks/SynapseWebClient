@@ -41,7 +41,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 	public void setPlace(Account place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		String emailValidationToken = place.getFixedToken();
+		String emailValidationToken = place.toToken();
 		validateToken(emailValidationToken);
 	}
 	
@@ -58,27 +58,6 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 				view.showErrorInPage(DisplayConstants.EMAIL_FAILURE, caught.getMessage());
 			}
 		});
-	}
-	
-	public static String encodeTokenKeysAndValues(String validationToken) {
-		if (validationToken == null || validationToken.trim().length() == 0) 
-			return validationToken;
-		StringBuilder encodedToken = new StringBuilder();
-		String[] keyValues = validationToken.split("&");
-		boolean isFirst = true;
-		for (String keyValue : keyValues) {
-			if (!isFirst) 
-				encodedToken.append("&");
-			int index = keyValue.indexOf("=");
-			if (index == -1)
-				throw new IllegalArgumentException("Missing '=' sign in key value:" + keyValue);
-			encodedToken.append(URL.encodePathSegment(keyValue.substring(0, index)));
-			encodedToken.append("=");
-			encodedToken.append(URL.encodePathSegment(keyValue.substring(index+1)));
-			isFirst = false;
-		}
-		
-		return encodedToken.toString();
 	}
 	
 	@Override

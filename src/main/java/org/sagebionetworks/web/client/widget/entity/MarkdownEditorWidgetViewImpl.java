@@ -4,7 +4,10 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,11 +21,14 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -46,6 +52,10 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	private MarkdownWidget markdownWidget;
 	private Presenter presenter;
 	
+	@UiField
+	public Modal editorDialog;
+	@UiField
+	public TextBox titleField;
 	//dialog for the formatting guide
 	@UiField
 	public Div mdCommands;
@@ -92,6 +102,11 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem videoLink;
 	@UiField
 	public AnchorListItem youTubeLink;
+	
+	@UiField
+	public Button formattingGuideButton;
+	@UiField
+	public Modal formattingGuideModal;
 	
 	//Alpha mode button and commands
 	@UiField
@@ -194,7 +209,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.resourceLoader = resourceLoader;
 		this.markdownWidget = markdownWidget;
 		markdownWidget.addStyleName("margin-10");
-		
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		buttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BUTTON_LINK));
@@ -237,7 +251,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
-		deleteButton.addClickHandler(getClickHandler(MarkdownEditorAction.DELETE));
+		deleteButton.addClickHandler(getDeleteClickHandler());
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
@@ -248,6 +262,18 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading4Link.addStyleName("font-size-18");
 		heading5Link.addStyleName("font-size-14");
 		heading6Link.addStyleName("font-size-12");
+		editorDialog.addCloseHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.handleCommand(MarkdownEditorAction.CANCEL);
+			}
+		});
+		formattingGuideButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				formattingGuideModal.show();
+			}
+		});
 		
 		markdownTextArea.addClickHandler(new ClickHandler() {
 			@Override
@@ -260,7 +286,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				presenter.markdownEditorClicked();
-				resizeMarkdownTextArea();
+			}
+		});
+		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				resizeMarkdownTextArea(0);
 			}
 		});
 	}
@@ -270,6 +301,21 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.handleCommand(action);		
+			}
+		};
+	}
+	
+	private ClickHandler getDeleteClickHandler() {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
+					@Override
+					public void callback(boolean isConfirmed) {
+						if (isConfirmed)
+							presenter.handleCommand(MarkdownEditorAction.DELETE);
+					}
+				});
 			}
 		};
 	}
@@ -302,16 +348,28 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.setText(markdown);
 		if (formattingGuideWikiPageKey != null)
 			initFormattingGuide(formattingGuideWikiPageKey);
-		resizeMarkdownTextArea();
 		
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-			
 			@Override
 			public void execute() {
-				Window.scrollTo(0, mdCommands.getAbsoluteTop());		
+				Window.scrollTo(0, mdCommands.getAbsoluteTop());
 			}
 		});
+		
+		//init markdown text area height
+		Timer t = new Timer() {
+	      @Override
+	      public void run() {
+	    	  if (markdownTextArea.getElement().getScrollHeight() > 0) {
+	    		  resizeMarkdownTextArea(120);
+	    	  } else {
+	    		  this.schedule(100);
+	    	  }
+	      }
+	    };
+	    t.schedule(100);
 	}
+	
 	
 	@Override
 	public void setAttachmentCommandsVisible(boolean visible) {
@@ -319,27 +377,14 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		attachmentButton.setVisible(visible);
 	}
 	
-	@Override
-	public void setCancelVisible(boolean visible) {
-		cancelButton.setVisible(visible);
-	}
-	@Override
-	public void setSaveVisible(boolean visible) {
-		saveButton.setVisible(visible);
-	}
-	@Override
-	public void setDeleteVisible(boolean visible) {
-		deleteButton.setVisible(visible);
-	}
-
 	public void initFormattingGuide(WikiPageKey formattingGuideWikiPageKey) {
 		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
 		formattingGuideContainer.clear();
 		formattingGuideContainer.add(markdownWidget);
 	}
-	
-	private void resizeMarkdownTextArea() {
-		markdownTextArea.setHeight(Integer.toString((int)(Window.getClientHeight() * .7)) + "px");
+
+	private void resizeMarkdownTextArea(int extra) {
+		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight()+ 2 + extra) + "px");
 	}
 	
 	@Override
@@ -347,6 +392,15 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		alphaInsertButton.setVisible(visible);
 	}
 	
+	@Override
+	public void showEditorModal() {
+		editorDialog.show();
+	}
+	
+	@Override
+	public void hideEditorModal() {
+		editorDialog.hide();
+	}
 	
 	@Override
 	public void setEditButtonEnabled(boolean enabled) {
@@ -402,7 +456,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@Override
 	public void setMarkdown(String markdown) {
-		DisplayUtils.updateTextArea(markdownTextArea, markdown);
+		markdownTextArea.setValue(markdown);
 	}
 	
 	@Override
@@ -427,5 +481,20 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setSelectionRange(int pos, int length) {
 		markdownTextArea.setSelectionRange(pos, length);
+	}
+	
+	@Override
+	public void setTitleEditorVisible(boolean visible) {
+		titleField.setVisible(visible);
+	}
+	
+	@Override
+	public String getTitle() {
+		return titleField.getValue();
+	}
+	
+	@Override
+	public void setTitle(String title) {
+		titleField.setValue(title);
 	}
 }

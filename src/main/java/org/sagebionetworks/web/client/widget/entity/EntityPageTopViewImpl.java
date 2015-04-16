@@ -418,7 +418,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 				
 		// File History
@@ -490,7 +490,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
 		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES));
 		// ActionMenu
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
@@ -520,7 +520,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 	
 		// ActionMenu
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		projectActionMenuContainer.add(actionMenu.asWidget());
 
 		// Wiki Tab: Wiki
@@ -634,7 +634,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		tableMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, null);
 		tableActionMenuContainer.add(actionMenu.asWidget());
 
 		// Table
@@ -726,13 +726,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @param bundle
 	 * @return
 	 */
-	public ActionMenuWidget createEntityActionMenu(EntityBundle bundle){
+	public ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId){
 		// Create a menu
 		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
 		// Create a controller.
 		final EntityActionController controller = ginInjector.createEntityActionController();
 		actionMenu.addControllerWidget(controller.asWidget());
-		controller.configure(actionMenu, bundle, new EntityUpdatedHandler() {
+		controller.configure(actionMenu, bundle, wikiPageId, new EntityUpdatedHandler() {
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				presenter.fireEntityUpdatedEvent();

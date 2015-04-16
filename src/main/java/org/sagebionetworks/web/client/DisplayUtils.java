@@ -1401,11 +1401,6 @@ public class DisplayUtils {
 	    return output.toString();
 	  }
 	
-	public static void updateTextArea(org.gwtbootstrap3.client.ui.TextArea textArea, String newValue) {
-		textArea.setValue(newValue);
-		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
-	}
-
 	public static boolean isInTestWebsite(CookieProvider cookies) {
 		return isInCookies(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
