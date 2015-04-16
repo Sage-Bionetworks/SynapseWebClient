@@ -135,7 +135,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureDeleteAction();
 		configureShareAction();
 		configureRenameAction();
-		configureAddWiki();
+		configureEditWiki();
 		configureMove();
 		configureLink();
 		configureSubmit();
@@ -154,7 +154,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private void configureAddWiki(){
+	private void configureEditWiki(){
 		if(isWikiableType(entityBundle.getEntity())){
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
