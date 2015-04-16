@@ -645,4 +645,17 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.UPLOAD_NEW_FILE);
 		verify(mockUploader).show();
 	}
+
+	@Test
+	public void testToolsButtonVisibilityForAnonymous() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setToolsButtonVisible(false);
+	}
+
+	@Test
+	public void testToolsButtonVisibilityForLogin() {
+		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setToolsButtonVisible(true);
+	}
 }

@@ -123,16 +123,21 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
 		actionMenu.addControllerWidget(uploader.asWidget());
-		// Setup the actions
-		configureDeleteAction();
-		configureShareAction();
-		configureRenameAction();
-		configureAddWiki();
-		configureMove();
-		configureLink();
-		configureSubmit();
-		configureAnnotations();
-		configureFileUpload();
+		if (!isUserAuthenticated) {
+			actionMenu.setToolsButtonVisible(false);
+		} else {
+			actionMenu.setToolsButtonVisible(true);
+			// Setup the actions
+			configureDeleteAction();
+			configureShareAction();
+			configureRenameAction();
+			configureAddWiki();
+			configureMove();
+			configureLink();
+			configureSubmit();
+			configureAnnotations();
+			configureFileUpload();
+		}
 	}
 	
 	private void configureFileUpload() {
