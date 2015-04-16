@@ -3,17 +3,13 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl.GetOrderHintCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Tree;
 
 public interface WikiSubpagesView extends IsWidget, SynapseView {
 
@@ -35,6 +31,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	
 	void hideSubpages();
 	void showSubpages();
+	void setEditOrderButtonVisible(boolean visible);
 	
 	// List<String> getCurrentOrderHintIdList();
 	

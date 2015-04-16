@@ -11,12 +11,12 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -63,7 +63,7 @@ public class WikiSubpagesTest {
 		autoGenFactory = new AutoGenFactory();		
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockNodeModelCreator, adapterFactory);
+		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockNodeModelCreator, adapterFactory, mockAuthenticationController);
 		verify(mockView).setPresenter(widget);
 		ArrayList<JSONEntity> results = new ArrayList<JSONEntity>();
 		results.add(new EntityHeader());
@@ -149,6 +149,20 @@ public class WikiSubpagesTest {
 	public void testAsWidget() {
 		widget.asWidget();
 		verify(mockView).asWidget();
+	}
+
+	@Test
+	public void testEditOrderButtonVisibilityForAnonymous(){
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		widget.setEditOrderButtonVisible();
+		verify(mockView).setEditOrderButtonVisible(false);
+	}
+
+	@Test
+	public void testEditOrderButtonVisibilityForLogin(){
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		widget.setEditOrderButtonVisible();
+		verify(mockView).setEditOrderButtonVisible(true);
 	}
 }
 

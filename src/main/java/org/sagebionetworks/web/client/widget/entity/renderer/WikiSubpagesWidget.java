@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -44,17 +45,20 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
 	private V2WikiOrderHint subpageOrderHint;
+	private AuthenticationController authenticationController;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
 	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
-							NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
+							NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
+							AuthenticationController authenticationController) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
+		this.authenticationController = authenticationController;
 		
 		view.setPresenter(this);
 	}	
@@ -141,12 +145,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							
 							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 											ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
+							view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
 						}
 						@Override
 						public void onFailure(Throwable caught) {
 							// Failed to get order hint. Just ignore it.
 							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
+							view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
 						}
 					});
 					
@@ -167,8 +173,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			}
 		});
 	}
-	
-	
+
 	private UpdateOrderHintCallback getUpdateOrderHintCallback() {
 		return new UpdateOrderHintCallback() {
 			@Override
@@ -187,9 +192,13 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				}
 		};
 	}
-	
+
 	public interface UpdateOrderHintCallback {
 		void updateOrderHint(List<String> newOrderHintIdList);
 	}
-	
+
+	// for test only
+	public void setEditOrderButtonVisible(){
+		view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
+	}
 }
