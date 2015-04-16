@@ -165,6 +165,9 @@ public class WikiSubpagesTest {
 		verify(mockView).setEditOrderButtonVisible(false);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true);
 		verify(mockView, Mockito.times(2)).setEditOrderButtonVisible(false);
+		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true);
+		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(false);
 	}
 
 	@Test
@@ -174,6 +177,9 @@ public class WikiSubpagesTest {
 		verify(mockView).setEditOrderButtonVisible(true);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true);
 		verify(mockView, Mockito.times(2)).setEditOrderButtonVisible(true);
+		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, false);
+		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(true);
 	}
 }
 
