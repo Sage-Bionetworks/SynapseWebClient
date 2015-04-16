@@ -77,4 +77,10 @@ public interface ActionMenuWidget extends IsWidget{
 	 * @param visible
 	 */
 	public void setBasicDivderVisible(boolean visible);
+
+	/**
+	 * Show/hide the Tools button
+	 * @param visible
+	 */
+	public void setToolsButtonVisible(boolean visible);
 }

@@ -86,7 +86,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
 	MarkdownEditorWidget wikiEditor;
-	
+
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
@@ -131,16 +131,21 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
 		actionMenu.addControllerWidget(uploader.asWidget());
-		// Setup the actions
-		configureDeleteAction();
-		configureShareAction();
-		configureRenameAction();
+		if (!isUserAuthenticated) {
+			actionMenu.setToolsButtonVisible(false);
+		} else {
+			actionMenu.setToolsButtonVisible(true);
+			// Setup the actions
+			configureDeleteAction();
+			configureShareAction();
+			configureRenameAction();
 		configureEditWiki();
-		configureMove();
-		configureLink();
-		configureSubmit();
-		configureAnnotations();
-		configureFileUpload();
+			configureMove();
+			configureLink();
+			configureSubmit();
+			configureAnnotations();
+			configureFileUpload();
+		}
 	}
 	
 	private void configureFileUpload() {
@@ -483,8 +488,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		wikiEditor.configure(key, new CallbackP<WikiPage>() {
 			@Override
 			public void invoke(WikiPage param) {
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());	
-			}
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+	}
 		});
 	}
 
