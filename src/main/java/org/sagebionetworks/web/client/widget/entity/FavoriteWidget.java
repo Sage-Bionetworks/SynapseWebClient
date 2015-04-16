@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView.Presenter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -17,6 +18,7 @@ public class FavoriteWidget implements Presenter {
 	private FavoriteWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
+	private AuthenticationController authenticationController;
 	
 	String entityId;
 	
@@ -25,11 +27,13 @@ public class FavoriteWidget implements Presenter {
 	@Inject
 	public FavoriteWidget(FavoriteWidgetView view,
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
 	}
 	
 	public void configure(String entityId) {
@@ -62,7 +66,9 @@ public class FavoriteWidget implements Presenter {
 	}
 	
 	public void configureIsFavorite() {
-		if(globalApplicationState.getFavorites() != null) {
+		if (!authenticationController.isLoggedIn()) {
+			view.hideFavoriteAndLoading();
+		} else if(globalApplicationState.getFavorites() != null) {
 			updateIsFavoriteView();
 		} else { 
 			updateStoredFavorites(new AsyncCallback<Void>() {
@@ -78,7 +84,7 @@ public class FavoriteWidget implements Presenter {
 	}
 
 	public void updateIsFavoriteView() {
-		view.hideLoading();
+		view.hideFavoriteAndLoading();
 		if (isFavorite(entityId))
 			view.showIsFavorite();
 		else
