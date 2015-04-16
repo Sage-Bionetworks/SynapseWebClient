@@ -40,6 +40,8 @@ public class PlacesRedirectFilter implements Filter {
 	}
 	
 	public String fixPath(String requestPath) {
+		if (requestPath == null)
+			return null;
 		StringBuilder path = new StringBuilder(requestPath);
 		if (path.length() > 1 && path.charAt(0) == '/')
 			path.insert(1, "#!");
