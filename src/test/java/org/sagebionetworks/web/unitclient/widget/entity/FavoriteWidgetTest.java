@@ -105,7 +105,7 @@ public class FavoriteWidgetTest {
 
 	@Test
 	public void testFavoriteAnynomous(){
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		favoriteWidget.configure(entityId);
 		verify(mockView).hideFavoriteAndLoading();
 		verify(mockView, Mockito.never()).showIsFavorite();
