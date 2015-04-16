@@ -110,7 +110,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
-		}
+	}
 	
 	@Override
 	public void configure(String entityId, boolean canCertifiedUserAddChild) {
@@ -168,6 +168,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	@Override
 	public void showLoading() {
+		
 	}
 
 	@Override

@@ -4,7 +4,9 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
+import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.TreeItem;
 
 public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 
@@ -36,11 +38,11 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		void addMoreButton(MoreTreeItem moreItem, String parentId,
 				EntityTreeItem parent, long offset);
 
-		void getChildrenFiles(String parentId, EntityTreeItem parent,
-				long offset);
-
 		void getFolderChildren(String parentId, EntityTreeItem parent,
-				long offset);
+				long offset, IsTreeItem loading);
+
+		void getChildrenFiles(String parentId, EntityTreeItem parent,
+				long offset, IsTreeItem loading);
 
 	}
 
@@ -70,10 +72,14 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 
 	void showEmptyUI();
 
-	void hideLoading();
-
 	int getRootCount();
 
 	void hideEmptyUI();
+
+	IsTreeItem appendLoading(EntityTreeItem parent);
+
+	IsTreeItem insertLoading(EntityTreeItem parent, int offset);
+
+	void hide(IsTreeItem loading);
 
 }

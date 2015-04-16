@@ -37,6 +37,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsTreeItem;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -54,7 +56,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
-	private final int MAX_FOLDER_LIMIT = 100;
+	private final int MAX_FOLDER_LIMIT = 3;
 	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
@@ -71,7 +73,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
-
 		view.setPresenter(this);
 	}
 
@@ -97,14 +98,17 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		// Chains to get also the file children
 		long childCount = parent == null ? 0 : parent.asTreeItem()
 				.getChildCount();
-		getFolderChildren(searchId, parent, childCount);
+		GWT.debugger();
+		getFolderChildren(searchId, parent, childCount, view.appendLoading(parent));
 	}
 
 	public void configure(List<EntityHeader> headers) {
 		view.clear();
+		IsTreeItem loading = view.appendLoading(null);
 		for (EntityHeader header : headers) {
 			view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true, false));
 		}
+		view.hide(loading);
 	}
 
 	@Override
@@ -113,9 +117,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		return view.asWidget();
 	}
 
+	// Have each have a hideLoading...
 	@Override
 	public void getFolderChildren(final String parentId,
-			final EntityTreeItem parent, final long offset) {
+			final EntityTreeItem parent, final long offset, final IsTreeItem loading) {
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
 				org.sagebionetworks.repo.model.entity.query.EntityType.folder);
 		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
@@ -142,7 +147,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 							}
 						}
 						if (offset == 0)
-							getChildrenFiles(parentId, parent, 0);
+							getChildrenFiles(parentId, parent, 0, loading);
+						else 
+							view.hide(loading);
 					}
 
 					@Override
@@ -180,7 +187,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 	@Override
 	public void getChildrenFiles(final String parentId,
-			final EntityTreeItem parent, final long offset) {
+			final EntityTreeItem parent, final long offset, final IsTreeItem loading) {
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
 				org.sagebionetworks.repo.model.entity.query.EntityType.file);
 		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
@@ -205,9 +212,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 										offset);
 							}
 						}
-						view.hideLoading();
+						view.hide(loading);
+						// Root should only have the now hidden loading UI, which amounts to a single child.
 						if (parent == null
-								&& view.getRootCount() == 0) {
+								&& view.getRootCount() == 1) {
 							view.showEmptyUI();
 						} else {
 							view.hideEmptyUI();
@@ -280,7 +288,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			alreadyFetchedEntityChildren.add(target);
 			// Change to loading icon.
 			target.showLoadingIcon();
-			getFolderChildren(target.getHeader().getId(), target, 0);
+			getFolderChildren(target.getHeader().getId(), target, 0, view.appendLoading(target));
+			GWT.debugger();
 			target.showTypeIcon();
 		}
 	}
