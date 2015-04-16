@@ -147,6 +147,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.configure(formattingGuideWikiPageKey, currentPage.getMarkdown());
 		view.setTitleEditorVisible(currentPage.getParentWikiId() != null);
 		view.setTitle(currentPage.getTitle());
+		globalApplicationState.setIsEditing(true);
 		view.showEditorModal();
 	}
 	
@@ -371,6 +372,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 	
 	public void cancelClicked() {
+		globalApplicationState.setIsEditing(false);
 		view.hideEditorModal();
 		//TODO: update should not be necessary, but widget loading is based on div ids that are overloaded when the formatting guide is initialized
 		if (wikiPageUpdatedHandler != null)
@@ -385,6 +387,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			@Override
 			public void onSuccess(WikiPage result) {
 				//we have successfully saved, so we are no longer editing
+				globalApplicationState.setIsEditing(false);
 				view.hideEditorModal();
 				if (wikiPageUpdatedHandler != null)
 					wikiPageUpdatedHandler.invoke(result);
@@ -400,6 +403,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
+				globalApplicationState.setIsEditing(false);
 				view.hideEditorModal();
 				globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
 			}

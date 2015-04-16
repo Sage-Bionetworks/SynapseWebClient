@@ -114,6 +114,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.submitter = submitter;
 		this.uploader = uploader;
 		this.wikiEditor = wikiEditor;
+		this.view.addMarkdownEditorModalWidget(wikiEditor.asWidget());
 	}
 
 	@Override
