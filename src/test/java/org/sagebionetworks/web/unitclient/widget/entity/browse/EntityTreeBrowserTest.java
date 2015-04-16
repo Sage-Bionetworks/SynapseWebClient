@@ -188,25 +188,11 @@ public class EntityTreeBrowserTest {
 	}
 
 	@Test
-	public void testExpandTreeItemMoreButton() {
-		long maxLim = entityTreeBrowser.getMaxLimit();
-		setQueryResults(2 * maxLim, 0, maxLim);
-		entityTreeBrowser.expandTreeItemOnOpen(mockEntityTreeItem);
-		// Creates the limited number of entity items
-		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
-				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.anyLong());
-		// Calls once for folders, once for files.
-		verify(mockView, times(2)).placeChildMoreFoldersTreeItem(
-				any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.eq(maxLim));
-	}
-
-	@Test
 	public void testGetMoreButtonRequery() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
 		setQueryResults(2 * maxLim, 0, maxLim);
-		entityTreeBrowser.expandTreeItemOnOpen(mockEntityTreeItem);
+		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem,
+				0, mockView.appendLoading(mockEntityTreeItem));
 		// Adds the limited number of entity items
 		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
 				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),

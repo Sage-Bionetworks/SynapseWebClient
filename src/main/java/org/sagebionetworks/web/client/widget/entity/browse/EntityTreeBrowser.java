@@ -186,7 +186,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			final IsTreeItem loading) {
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
 				org.sagebionetworks.repo.model.entity.query.EntityType.file);
-		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
 		synapseClient.executeEntityQuery(childrenQuery,
 				new AsyncCallback<EntityQueryResults>() {
 					@Override
@@ -369,7 +368,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 							parent, offset++);
 				}
 			}
-
 		}
 	}
 
