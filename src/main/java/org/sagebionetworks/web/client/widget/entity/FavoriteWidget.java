@@ -67,8 +67,7 @@ public class FavoriteWidget implements Presenter {
 	
 	public void configureIsFavorite() {
 		if (authenticationController.getCurrentUserSessionData() == null) {
-			view.hideLoading();
-			view.hideFavorite();
+			view.hideFavoriteAndLoading();
 		} else if(globalApplicationState.getFavorites() != null) {
 			updateIsFavoriteView();
 		} else { 
@@ -85,7 +84,7 @@ public class FavoriteWidget implements Presenter {
 	}
 
 	public void updateIsFavoriteView() {
-		view.hideLoading();
+		view.hideFavoriteAndLoading();
 		if (isFavorite(entityId))
 			view.showIsFavorite();
 		else

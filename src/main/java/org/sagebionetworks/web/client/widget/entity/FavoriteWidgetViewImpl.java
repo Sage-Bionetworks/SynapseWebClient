@@ -57,8 +57,9 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 	}
 
 	@Override
-	public void hideFavorite() {
+	public void hideFavoriteAndLoading() {
 		favoriteIcon.setVisible(false);
+		loadingUI.setVisible(false);
 	}
 
 	@Override
@@ -68,14 +69,7 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 
 	@Override
 	public void showLoading() {
-		favoriteIcon.setVisible(false);
 		loadingUI.setVisible(true);
-	}
-	
-	@Override
-	public void hideLoading() {
-		loadingUI.setVisible(false);
-		favoriteIcon.setVisible(true);
 	}
 
 	@Override

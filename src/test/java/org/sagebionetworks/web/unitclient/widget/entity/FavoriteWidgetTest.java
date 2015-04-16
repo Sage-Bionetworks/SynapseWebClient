@@ -86,9 +86,8 @@ public class FavoriteWidgetTest {
 		//test when current entity is not a favorite
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(new ArrayList<EntityHeader>());
 		favoriteWidget.updateIsFavoriteView();
-		verify(mockView).hideLoading();
 		verify(mockView).showIsNotFavorite();
-		verify(mockView, Mockito.never()).hideFavorite();
+		verify(mockView).hideFavoriteAndLoading();
 	}
 	
 	@Test
@@ -100,17 +99,15 @@ public class FavoriteWidgetTest {
 		favorites.add(fav);
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(favorites);
 		favoriteWidget.updateIsFavoriteView();
-		verify(mockView).hideLoading();
 		verify(mockView).showIsFavorite();
-		verify(mockView, Mockito.never()).hideFavorite();
+		verify(mockView).hideFavoriteAndLoading();
 	}
 
 	@Test
 	public void testFavoriteAnynomous(){
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
 		favoriteWidget.configure(entityId);
-		verify(mockView).hideFavorite();
-		verify(mockView).hideLoading();
+		verify(mockView).hideFavoriteAndLoading();
 		verify(mockView, Mockito.never()).showIsFavorite();
 		verify(mockView, Mockito.never()).showIsNotFavorite();
 	}
