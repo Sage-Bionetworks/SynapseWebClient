@@ -56,8 +56,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
-	private final int MAX_FOLDER_LIMIT = 3;
-	
+	private final int MAX_FOLDER_LIMIT = 100;
+
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, SynapseClientAsync synapseClient,
@@ -92,22 +92,17 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 * 
 	 * @param entityId
 	 */
-	public void configure(String searchId, EntityTreeItem parent) {
+	public void configure(String searchId) {
 		view.clear();
-		// Chains to get also the file children
-		long childCount = parent == null ? 0 : parent.asTreeItem()
-				.getChildCount();
-		GWT.debugger();
-		getFolderChildren(searchId, parent, childCount, view.appendLoading(parent));
+		getFolderChildren(searchId, null, 0, view.appendLoading(null));
 	}
 
 	public void configure(List<EntityHeader> headers) {
 		view.clear();
-		IsTreeItem loading = view.appendLoading(null);
 		for (EntityHeader header : headers) {
-			view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true, false));
+			view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true,
+					false));
 		}
-		view.removeLoading(loading);
 	}
 
 	@Override
@@ -119,7 +114,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	// Have each have a hideLoading...
 	@Override
 	public void getFolderChildren(final String parentId,
-			final EntityTreeItem parent, final long offset, final IsTreeItem loading) {
+			final EntityTreeItem parent, final long offset,
+			final IsTreeItem loading) {
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
 				org.sagebionetworks.repo.model.entity.query.EntityType.folder);
 		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
@@ -147,8 +143,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 						}
 						if (offset == 0) {
 							getChildrenFiles(parentId, parent, 0, loading);
-						}
-						else 
+						} else
 							view.removeLoading(loading);
 					}
 
@@ -187,7 +182,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 	@Override
 	public void getChildrenFiles(final String parentId,
-			final EntityTreeItem parent, final long offset, final IsTreeItem loading) {
+			final EntityTreeItem parent, final long offset,
+			final IsTreeItem loading) {
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
 				org.sagebionetworks.repo.model.entity.query.EntityType.file);
 		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
@@ -212,14 +208,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 										offset);
 							}
 						}
-						GWT.debugger();
 						view.removeLoading(loading);
-						if (parent != null && parent.asTreeItem().getChildCount() == 1) {
-							parent.asTreeItem().removeItems();
-						}
-						// Root should only have the now hidden loading UI, which amounts to a single child.
+						// Root should only have the now hidden loading UI,
+						// which amounts to a single child.
 						if (parent == null && view.getRootCount() == 0) {
-								view.showEmptyUI();
+							view.showEmptyUI();
 						} else {
 							view.hideEmptyUI();
 						}
@@ -289,8 +282,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		if (!alreadyFetchedEntityChildren.contains(target)) {
 			// We have not already fetched children for this entity.
 			alreadyFetchedEntityChildren.add(target);
-			// Change to loading icon.
-			getFolderChildren(target.getHeader().getId(), target, 0, view.appendLoading(target));
+			target.asTreeItem().removeItems();
+			getFolderChildren(target.getHeader().getId(), target, 0,
+					view.appendLoading(target));
 		}
 	}
 
@@ -320,7 +314,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
 		newQuery.setOffset(offset);
 		return newQuery;
-	}	
+	}
 
 	public List<EntityHeader> getHeadersFromQueryResults(
 			EntityQueryResults results) {
@@ -336,13 +330,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		return headerList;
 	}
 
-	public EntityTreeItem makeTreeItemFromHeader(EntityHeader header, boolean isRootItem, boolean isExpandable) {
-		final EntityTreeItem childItem = ginInjector
-				.getEntityTreeItemWidget();
+	public EntityTreeItem makeTreeItemFromHeader(EntityHeader header,
+			boolean isRootItem, boolean isExpandable) {
+		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
 		return childItem;
 	}
-	
+
 	public void addResultsToParent(final EntityTreeItem parent,
 			EntityQueryResults results,
 			org.sagebionetworks.repo.model.entity.query.EntityType type,
@@ -351,21 +345,28 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		if (parent == null) {
 			if (type == org.sagebionetworks.repo.model.entity.query.EntityType.file) {
 				for (EntityHeader header : headers) {
-					view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true, false));
+					view.appendRootEntityTreeItem(makeTreeItemFromHeader(
+							header, true, false));
 				}
 			} else {
 				for (EntityHeader header : headers) {
-					view.insertRootEntityTreeItem(makeTreeItemFromHeader(header, true, true), offset++);
+					view.insertRootEntityTreeItem(
+							makeTreeItemFromHeader(header, true, true),
+							offset++);
 				}
 			}
 		} else {
 			if (type == org.sagebionetworks.repo.model.entity.query.EntityType.file) {
 				for (EntityHeader header : headers) {
-					view.appendChildEntityTreeItem(makeTreeItemFromHeader(header, false, false), parent);
+					view.appendChildEntityTreeItem(
+							makeTreeItemFromHeader(header, false, false),
+							parent);
 				}
 			} else {
 				for (EntityHeader header : headers) {
-					view.insertChildEntityTreeItem(makeTreeItemFromHeader(header, false, true), parent, offset++);
+					view.insertChildEntityTreeItem(
+							makeTreeItemFromHeader(header, false, true),
+							parent, offset++);
 				}
 			}
 
