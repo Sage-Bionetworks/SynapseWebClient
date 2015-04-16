@@ -56,7 +56,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
-	private final int MAX_FOLDER_LIMIT = 100;
+	private final int MAX_FOLDER_LIMIT = 3;
 	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
@@ -94,7 +94,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 */
 	public void configure(String searchId, EntityTreeItem parent) {
 		view.clear();
-		view.showLoading();
 		// Chains to get also the file children
 		long childCount = parent == null ? 0 : parent.asTreeItem()
 				.getChildCount();
@@ -108,7 +107,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		for (EntityHeader header : headers) {
 			view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true, false));
 		}
-		view.hide(loading);
+		view.removeLoading(loading);
 	}
 
 	@Override
@@ -146,10 +145,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 										offset);
 							}
 						}
-						if (offset == 0)
+						if (offset == 0) {
 							getChildrenFiles(parentId, parent, 0, loading);
+						}
 						else 
-							view.hide(loading);
+							view.removeLoading(loading);
 					}
 
 					@Override
@@ -212,11 +212,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 										offset);
 							}
 						}
-						view.hide(loading);
+						GWT.debugger();
+						view.removeLoading(loading);
+						if (parent != null && parent.asTreeItem().getChildCount() == 1) {
+							parent.asTreeItem().removeItems();
+						}
 						// Root should only have the now hidden loading UI, which amounts to a single child.
-						if (parent == null
-								&& view.getRootCount() == 1) {
-							view.showEmptyUI();
+						if (parent == null && view.getRootCount() == 0) {
+								view.showEmptyUI();
 						} else {
 							view.hideEmptyUI();
 						}
@@ -287,10 +290,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			// We have not already fetched children for this entity.
 			alreadyFetchedEntityChildren.add(target);
 			// Change to loading icon.
-			target.showLoadingIcon();
 			getFolderChildren(target.getHeader().getId(), target, 0, view.appendLoading(target));
-			GWT.debugger();
-			target.showTypeIcon();
 		}
 	}
 

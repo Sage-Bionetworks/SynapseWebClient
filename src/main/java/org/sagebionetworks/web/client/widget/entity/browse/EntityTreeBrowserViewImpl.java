@@ -131,7 +131,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		configureEntityTreeItem(childToAdd);
 		// Place the created child in the tree as the child of the given parent
 		// entity.
-		entityTree.addItem(childToAdd);
+		entityTree.insertItem(entityTree.getItemCount() - 1, childToAdd.asTreeItem());
 	}
 
 	@Override
@@ -159,8 +159,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		// Add dummy item to childItem to make expandable.
 		// Pass in something to tell it to add a createDummy item for folder
 		// expansion or not
-		if (childToAdd.isExpandable())
+		if (childToAdd.isExpandable()) {
 			childToAdd.asTreeItem().addItem(createDummyItem());
+		}
 	}
 
 	@Override
@@ -202,7 +203,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		entityTree.addItem(childToCreate);
+		entityTree.insertItem(entityTree.getItemCount() - 1, childToCreate.asTreeItem());
 	}
 
 	/**
@@ -224,7 +225,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		entityTree.addItem(childToCreate);
+		entityTree.insertItem(entityTree.getItemCount() - 1, childToCreate.asTreeItem());
 	}
 
 	/**
@@ -246,7 +247,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		parent.asTreeItem().addItem(childToCreate);
+		parent.asTreeItem().insertItem(parent.asTreeItem().getChildCount() - 1, childToCreate.asTreeItem());
 	}
 
 	/**
@@ -268,7 +269,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		parent.asTreeItem().addItem(childToCreate);
+		parent.asTreeItem().insertItem(parent.asTreeItem().getChildCount() - 1, childToCreate.asTreeItem());
 	}
 
 	/*
@@ -326,8 +327,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void hide(IsTreeItem toHide) {
-		toHide.asTreeItem().setVisible(false);
+	public void removeLoading(IsTreeItem toHide) {
+		toHide.asTreeItem().remove();
 	}
 
 	@Override

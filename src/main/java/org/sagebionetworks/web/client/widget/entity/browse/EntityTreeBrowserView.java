@@ -79,7 +79,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	IsTreeItem appendLoading(EntityTreeItem parent);
 
 	IsTreeItem insertLoading(EntityTreeItem parent, int offset);
-
-	void hide(IsTreeItem loading);
+	
+	void removeLoading(IsTreeItem loading);
 
 }
