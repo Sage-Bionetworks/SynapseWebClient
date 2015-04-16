@@ -643,13 +643,13 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testToolsButtonVisibilityForAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setToolsButtonVisible(false);
 	}
 
 	@Test
 	public void testToolsButtonVisibilityForLogin() {
-		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setToolsButtonVisible(true);
 	}
 }
