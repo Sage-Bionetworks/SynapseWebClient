@@ -85,7 +85,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			try {
 				synapseClient.getEntityHeaderBatch(list.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
 					@Override
-					public void onSuccess(String result) {					
+					public void onSuccess(String result) {
 						BatchResults<EntityHeader> headers;
 						try {
 							headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
@@ -101,7 +101,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 					}
 					
 					@Override
-					public void onFailure(Throwable caught) {					
+					public void onFailure(Throwable caught) {
 						view.showErrorMessage(caught.getMessage());
 					}
 				});
@@ -195,10 +195,5 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 
 	public interface UpdateOrderHintCallback {
 		void updateOrderHint(List<String> newOrderHintIdList);
-	}
-
-	// for test only
-	public void setEditOrderButtonVisible(){
-		view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
 	}
 }
