@@ -519,4 +519,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public void setTitle(String title) {
 		view.setTitle(title);
 	}
+	public WikiPage getWikiPage() {
+		return currentPage;
+	}
 }

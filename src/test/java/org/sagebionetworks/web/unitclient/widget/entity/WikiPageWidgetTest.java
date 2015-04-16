@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -9,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +20,6 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -35,7 +32,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -49,7 +45,6 @@ public class WikiPageWidgetTest {
 	WikiPageWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
-	JSONObjectAdapter mockJsonObjectAdapter;
 	AdapterFactory adapterFactory = new JSONObjectAdapterImpl();
 	WikiPageWidget presenter;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -63,11 +58,10 @@ public class WikiPageWidgetTest {
 		mockView = mock(WikiPageWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockJsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient,
-				mockNodeModelCreator, mockJsonObjectAdapter, adapterFactory,
+				mockNodeModelCreator, adapterFactory,
 				mockGlobalApplicationState, mockAuthenticationController);
 		BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
@@ -151,37 +145,6 @@ public class WikiPageWidgetTest {
 	}
 	
 	@Test
-	public void testAddAttachments() throws IOException, RestServiceException, JSONObjectAdapterException{		
-		String fileHandleId3 = "46";
-		
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		
-		List<String> newFileHandles = new ArrayList<String>();
-		newFileHandles.add(fileHandleId2);
-		newFileHandles.add(fileHandleId3);
-		presenter.addFileHandles(newFileHandles);
-		
-		List<String> currentFileHandleIds = presenter.getWikiPage().getAttachmentFileHandleIds();
-		//should be unique values only, so there should be 3
-		assertTrue(currentFileHandleIds.size() == 3);
-		assertTrue(currentFileHandleIds.contains(fileHandleId1));
-		assertTrue(currentFileHandleIds.contains(fileHandleId2));
-		assertTrue(currentFileHandleIds.contains(fileHandleId3));
-	}
-
-	@Test
-	public void testDeleteAttachments() throws IOException, RestServiceException, JSONObjectAdapterException{
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		List<String> deleteHandleIds = new ArrayList<String>();
-		deleteHandleIds.add(fileHandleId2);
-		
-		presenter.removeFileHandles(deleteHandleIds);
-		List<String> currentFileHandleIds = presenter.getWikiPage().getAttachmentFileHandleIds();
-		assertTrue(currentFileHandleIds.size() == 1);
-		assertTrue(currentFileHandleIds.contains(fileHandleId1));
-	}
-	
-	@Test
 	public void testCreatePage() throws JSONObjectAdapterException{
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.createPage("a new wiki page with this title");
@@ -206,36 +169,6 @@ public class WikiPageWidgetTest {
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
 	}
 
-	@Test
-	public void testCancelClicked(){
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		presenter.cancelClicked();
-		verify(mockGlobalApplicationState).setIsEditing(eq(false));
-	}
-
-	@Test
-	public void testSaveClicked() throws JSONObjectAdapterException{
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		presenter.saveClicked("", "");
-		verify(mockGlobalApplicationState).setIsEditing(eq(false));
-	}
-	
-	@Test
-	public void testSaveFailure() throws JSONObjectAdapterException{
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-		presenter.saveClicked("", "");
-		
-		verify(mockGlobalApplicationState, Mockito.times(0)).setIsEditing(anyBoolean());
-	}
-	
-	@Test
-	public void testEditClicked(){
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		presenter.editClicked();
-		verify(mockGlobalApplicationState).setIsEditing(eq(true));
-	}
-	
 	@Test
 	public void testShowCreatedBy(){
 		presenter.showCreatedBy(false);

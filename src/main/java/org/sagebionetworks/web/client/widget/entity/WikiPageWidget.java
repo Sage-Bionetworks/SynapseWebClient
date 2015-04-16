@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -42,7 +41,6 @@ SynapseWidgetPresenter {
 	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
 	private Callback callback;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
 	private WikiPage currentPage;
@@ -67,14 +65,13 @@ SynapseWidgetPresenter {
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter, AdapterFactory adapterFactory,
+			AdapterFactory adapterFactory,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
