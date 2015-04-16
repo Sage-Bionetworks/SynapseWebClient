@@ -5,10 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -19,11 +17,8 @@ import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
@@ -56,7 +51,6 @@ import com.google.inject.Inject;
 public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetView {
 
 	private MarkdownWidget markdownWidget;
-	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
 	private FlowPanel commandBar;
@@ -89,12 +83,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, 
 			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb,
 			WikiHistoryWidget historyWidget, PortalGinInjector ginInjector, SageImageBundle sageImageBundle) {
 		super();
 		this.markdownWidget = markdownWidget;
-		this.markdownEditorWidget = markdownEditorWidget;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
@@ -115,18 +108,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void show403() {
 		clear();
 		add(new HTML(DisplayUtils.get403Html()));
-	}
-	
-	@Override
-	public void showCreateWiki(boolean isDescription) {
-		clear();
-		this.isDescription = isDescription;
-		if (!isDescription) {
-			SimplePanel createWikiButtonWrapper = new SimplePanel();		
-			Button insertBtn = createInsertOrAddPageButton(true);		
-			createWikiButtonWrapper.add(insertBtn);
-			add(createWikiButtonWrapper);
-		}
 	}
 	
 	@Override
@@ -307,12 +288,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			commandBar.clear();
 		}
 			
-		Button editButton = createEditButton();
-		editButton.addStyleName("margin-left-10");
-		commandBar.add(editButton);			
-		
 		if(!isDescription) {
-			Button addPageButton = createInsertOrAddPageButton(false);
+			Button addPageButton = createAddPageButton();
 			commandBar.add(addPageButton);
 			addPageButton.addStyleName("margin-left-5");
 		}
@@ -386,118 +363,21 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return btn;
 	}
 	
-	private Button createEditButton() {
-		String editLabel = isDescription ? DisplayConstants.EDIT_DESCRIPTION : DisplayConstants.BUTTON_EDIT_WIKI;
-		Button btn = DisplayUtils.createIconButton(editLabel, DisplayUtils.ButtonType.DEFAULT, "glyphicon-pencil");			
-		btn.addStyleName("display-inline");			
-		btn.getElement().setId(DisplayConstants.ID_BTN_EDIT);
-		
-		btn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				if(isHistoryOpen) {
-					historyWidget.hideHistoryWidget();
-				}
-				//change to edit mode
-				clear();
-				//inform presenter that edit was clicked
-				presenter.editClicked();
-				//create the editor textarea, and configure the editor widget
-				//should edit for enter handler?
-				final TextBox titleField = new TextBox();
-				if (!isRootWiki) {
-					titleField.setValue(presenter.getWikiPage().getTitle());
-					titleField.addStyleName("font-size-32 margin-bottom-10");
-					titleField.setHeight("45px");					
-					add(titleField);
-				}
-				//also add commands at the bottom
-				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), new WidgetDescriptorUpdatedHandler() {
-					@Override
-					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						presenter.addFileHandles(event.getNewFileHandleIds());
-						presenter.removeFileHandles(event.getDeletedFileHandleIds());
-					}
-				});
-				
-				//register to handle these events
-				markdownEditorWidget.setActionHandler(MarkdownEditorAction.SAVE, new Callback() {
-					@Override
-					public void invoke() {
-						saveClicked(titleField, markdownEditorWidget);
-					}
-				});
-				
-				markdownEditorWidget.setActionHandler(MarkdownEditorAction.CANCEL, new Callback() {
-					@Override
-					public void invoke() {
-						cancelClicked();
-					}
-				});
-				
-				markdownEditorWidget.setActionHandler(MarkdownEditorAction.DELETE, new Callback() {
-					@Override
-					public void invoke() {
-						deleteClicked();
-					}
-				});
-				
-				add(markdownEditorWidget.asWidget());
-			}
-		});
-
-		return btn;
-	}
-
-	private Button createInsertOrAddPageButton(final boolean isFirstPage) {
-		Button btn = DisplayUtils.createIconButton(getInsertBtnText(isFirstPage), DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
+	private Button createAddPageButton() {
+		Button btn = DisplayUtils.createIconButton(DisplayConstants.ADD_PAGE, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
 		btn.addStyleName("display-inline");
 		btn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (isFirstPage) {
-					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
-				}
-				else {
-					Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
-						@Override
-						public void callback(String name) {
-							presenter.createPage(name);
-						}
-					});
-				}
+				Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
+					@Override
+					public void callback(String name) {
+						presenter.createPage(name);
+					}
+				});
 			}
 		});
 		return btn;
-	}
-
-	private String getInsertBtnText(final boolean isFirstPage) {
-		String buttonText;
-		if(isFirstPage) {
-			buttonText = DisplayConstants.CREATE_WIKI;
-		} else {
-			buttonText = DisplayConstants.ADD_PAGE;
-		}
-		return buttonText;
-	}
-	
-	public void deleteClicked() {
-		//delete wiki
-		Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
-			@Override
-			public void callback(boolean isConfirmed) {
-				if (isConfirmed)
-					presenter.deleteButtonClicked();
-			}
-		});
-	}
-	
-	public void saveClicked(TextBox titleField, MarkdownEditorWidget editorWidget) {
-		presenter.saveClicked(titleField.getValue(), editorWidget.getMarkdown());
-	}
-	
-	public void cancelClicked() {
-		presenter.cancelClicked();
 	}
 	
 	public void showErrorMessage(String message) {

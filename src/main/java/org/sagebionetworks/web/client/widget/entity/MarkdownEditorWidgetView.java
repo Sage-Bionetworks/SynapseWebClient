@@ -29,12 +29,14 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	
 	void setEditButtonEnabled(boolean enabled);
 	void setSaving(boolean isSaving);
-	
-	void setDeleteVisible(boolean visible);
 	public void setAttachmentCommandsVisible(boolean visible);
-	void setSaveVisible(boolean visible);
-	void setCancelVisible(boolean visible);
 	void setAlphaCommandsVisible(boolean visible);
+	void setTitleEditorVisible(boolean visible);
+	String getTitle();
+	void setTitle(String title);
+	
+	void showEditorModal();
+	void hideEditorModal();
 	
 	/**
 	 * Presenter interface

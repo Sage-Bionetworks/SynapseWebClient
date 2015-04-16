@@ -19,6 +19,8 @@ public class EntityActionControllerViewImpl implements
 
 	@UiField
 	SimplePanel aclPanel;
+	@UiField
+	SimplePanel markdownEditorPanel;
 	
 	Widget widget;
 	
@@ -51,6 +53,11 @@ public class EntityActionControllerViewImpl implements
 	public void addAccessControlListModalWidget(
 			IsWidget accessControlListModalWidget) {
 		aclPanel.add(accessControlListModalWidget);
+	}
+	
+	@Override
+	public void addMarkdownEditorModalWidget(IsWidget modalWidget) {
+		markdownEditorPanel.add(modalWidget);
 	}
 
 }
