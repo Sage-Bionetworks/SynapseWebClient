@@ -329,7 +329,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
-				setProjectSortVisible(false);
 			}
 		});
 		allProjectsFilter.addClickHandler(new ClickHandler() {

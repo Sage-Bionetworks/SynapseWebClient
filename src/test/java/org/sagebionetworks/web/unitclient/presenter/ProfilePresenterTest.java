@@ -426,6 +426,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addProjects(anyList());
+		verify(mockView).setProjectSortVisible(false);
 	}
 	
 	@Test
@@ -452,6 +453,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setFavoritesHelpPanelVisible(true);
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockView, never()).addProjects(anyList());
+		verify(mockView).setProjectSortVisible(false);
 	}
 
 	
@@ -527,6 +529,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockView).setProjectSortVisible(false);
 	}
 	
 	
