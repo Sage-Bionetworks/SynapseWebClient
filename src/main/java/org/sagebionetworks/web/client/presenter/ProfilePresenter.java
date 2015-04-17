@@ -173,7 +173,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			});
 		} else {
-			getUserProfile(initialTab);
+			if (initialTab == ProfileArea.SETTINGS) 
+				getUserProfile(ProfileArea.PROJECTS);
+			else
+				getUserProfile(initialTab);
 		}
 	}
 	

@@ -288,6 +288,14 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testSettingsNotOwner() {
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("2");
+		profilePresenter.updateProfileView("1", ProfileArea.SETTINGS);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		verify(mockView).setTabSelected(eq(ProfileArea.PROJECTS));
+	}		
+	
+	@Test
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
