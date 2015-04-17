@@ -51,7 +51,7 @@
 	<set-property name="compiler.useSourceMaps" value="true"/>
 	
     <!-- Uncomment to limit compilation permutations to FF <set-property name="user.agent" value="gecko1_8" /> -->
-
+    
 	<!-- Specify the paths for translatable code -->
 	<source path='client' />
 	<source path='shared' />
