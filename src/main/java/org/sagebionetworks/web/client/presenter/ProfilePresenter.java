@@ -323,7 +323,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @param team
 	 */
 	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
-		this.filterType =filterType;
+		view.setProjectSortVisible(true);
+		this.filterType = filterType;
 		filterTeam = team;
 		refreshProjects();
 	}

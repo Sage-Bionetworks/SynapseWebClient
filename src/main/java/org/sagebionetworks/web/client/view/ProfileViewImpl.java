@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -328,6 +329,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
+				setProjectSortVisible(false);
 			}
 		});
 		allProjectsFilter.addClickHandler(new ClickHandler() {
@@ -432,6 +434,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
+	}
+	
+	@Override 
+	public void setProjectSortVisible(boolean isVisible) {
+		projectSortButton.setVisible(isVisible);
 	}
 	
 	@Override
