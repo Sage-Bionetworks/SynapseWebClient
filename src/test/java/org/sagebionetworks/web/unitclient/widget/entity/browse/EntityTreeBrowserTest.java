@@ -43,8 +43,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.user.client.ui.UIObject;
-import com.google.gwt.user.client.ui.TreeItem.TreeItemImpl;
 
 public class EntityTreeBrowserTest {
 	EntityTreeBrowserView mockView;
@@ -73,7 +71,6 @@ public class EntityTreeBrowserTest {
 		mockInjector = mock(PortalGinInjector.class);
 		mockEntityTreeItem = mock(EntityTreeItem.class);
 		mockMoreTreeItem = mock(MoreTreeItem.class);
-		// How do I mock this? I don't have the dependencies apparently.
 		mockLoadingItem = mock(IsTreeItem.class);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,

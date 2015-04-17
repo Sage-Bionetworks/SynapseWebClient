@@ -33,12 +33,10 @@ import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -273,8 +271,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	/**
 	 * When a node is expanded, if its children have not already been fetched
 	 * and placed into the tree, it will delete the dummy child node and fetch
-	 * the actual children of the expanded node. During this process, the icon
-	 * of the expanded node is switched to a loading indicator.
+	 * the actual children of the expanded node. During this process, a loading
+	 * icon is appended below the folder.
 	 */
 	@Override
 	public void expandTreeItemOnOpen(final EntityTreeItem target) {

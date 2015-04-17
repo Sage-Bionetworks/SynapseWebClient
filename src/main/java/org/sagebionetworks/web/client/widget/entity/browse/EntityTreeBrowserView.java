@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
 import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.TreeItem;
 
 public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 

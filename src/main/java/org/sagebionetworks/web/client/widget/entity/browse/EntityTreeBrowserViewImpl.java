@@ -43,7 +43,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private EntityTreeItem selectedItem;
 	private SageImageBundle sageImageBundle;
-	private long offset;
 	private HTML emptyUI = new HTML(EMPTY_DISPLAY);
 
 	@Inject
