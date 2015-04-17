@@ -2,10 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.header;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +28,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -55,6 +54,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient);
 		entityHeaders = new ArrayList<EntityHeader>();
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
 	}
 
@@ -137,31 +137,26 @@ public class HeaderTest {
 
 	@Test
 	public void testFavoriteRoundTrip() {
-		// Anonymous User
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
-		header.refresh();
-		verify(mockSynapseClient, Mockito.never()).getFavorites(any(AsyncCallback.class));
-
 		// After User Logged in
 		UserSessionData userSessionData = new UserSessionData();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
-		header.refresh();
-		verify(mockSynapseClient, Mockito.times(1)).getFavorites(any(AsyncCallback.class));
-
-		// User refresh
-		header.refresh();
-		verify(mockSynapseClient, Mockito.times(1)).getFavorites(any(AsyncCallback.class));
-
-		// A different user was returned
-		UserSessionData userSessionData2 = new UserSessionData();
-		userSessionData2.setProfile(new UserProfile());
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData2);
-		header.refresh();
-		verify(mockSynapseClient, Mockito.times(2)).getFavorites(any(AsyncCallback.class));
-
-		// User logged out
-		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(null);
-		header.refresh();
-		verify(mockSynapseClient, Mockito.times(2)).getFavorites(any(AsyncCallback.class));
+		header.onFavoriteClick();
+		verify(mockView).showFavoritesLoading();
+		verify(mockView).clearFavorite();
+		verify(mockSynapseClient, times(1)).getFavorites(any(AsyncCallback.class));
+		//initially empty
+		verify(mockView).setEmptyFavorite();
+		
+		//say the user set something as a favorite
+		EntityHeader entityHeader1 = new EntityHeader();
+		entityHeader1.setId("syn012345");
+		entityHeaders.add(entityHeader1);
+		
+		// User should ask for favorites each time favorites button is clicked
+		header.onFavoriteClick();
+		verify(mockView, times(2)).showFavoritesLoading();
+		verify(mockView, times(2)).clearFavorite();
+		verify(mockSynapseClient, times(2)).getFavorites(any(AsyncCallback.class));
+		verify(mockView).addFavorite(entityHeaders);
 	}
 }

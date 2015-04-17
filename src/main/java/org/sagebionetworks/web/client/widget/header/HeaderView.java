@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -39,7 +38,6 @@ public interface HeaderView extends IsWidget {
 		void onLoginClick();
 		void onRegisterClick();
 		void onFavoriteClick();
-		void initUserFavorites(Callback callback);
 	}
 
 	public void setLargeLogo(boolean isHome);
@@ -49,6 +47,7 @@ public interface HeaderView extends IsWidget {
 	public void setEmptyFavorite();
 
 	public void addFavorite(List<EntityHeader> headers);
+	public void showFavoritesLoading();
 
 	void setUser(UserSessionData userData);
 
