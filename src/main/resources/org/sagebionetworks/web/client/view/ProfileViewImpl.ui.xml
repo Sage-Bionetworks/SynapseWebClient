@@ -3,7 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" 
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
     
@@ -12,11 +13,19 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true" visible="false">
-		    <g:Image styleName="displayInline margin-right-10" height="32px" width="25px" resource='{sageImageBundle.certificate}'/>			
-			<bh:Strong text="Get Certified!"/>
-			<bh:Paragraph text="There are times where human data can only be shared with certain restrictions. 
-					Learn what the rules are and how to apply and comply with data privacy levels. 
-					This topic is covered during certification."/>
+			<t:Table>
+				<t:TableRow>
+					<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+						<g:Image addStyleNames="displayInline margin-right-10" height="64px" width="50px" resource='{sageImageBundle.certificate}'/>
+					</t:TableData>
+					<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+					    <b:Anchor addStyleNames="boldText" href="#!Quiz:Certification" text="Get Certified!"></b:Anchor>
+						<bh:Paragraph text="There are times where human data can only be shared with certain restrictions. 
+								Learn what the rules are and how to apply and comply with data privacy levels. 
+								This topic is covered during certification."/>
+					</t:TableData>
+				</t:TableRow>
+			</t:Table>
 		</b:Alert>
 		<div class="margin-10">
 			<div class="row margin-top-5">
