@@ -326,13 +326,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @param team
 	 */
 	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
-		this.filterType =filterType;
+		this.filterType = filterType;
 		filterTeam = team;
 		refreshProjects();
 	}
 
 	public void getMoreProjects() {
 		if (isOwner) {
+			view.setProjectSortVisible(true);
 			view.showProjectFiltersUI();
 			//this depends on the active filter
 			switch (filterType) {
@@ -354,6 +355,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
+					view.setProjectSortVisible(false);
 					getFavorites();
 					break;
 				case TEAM:

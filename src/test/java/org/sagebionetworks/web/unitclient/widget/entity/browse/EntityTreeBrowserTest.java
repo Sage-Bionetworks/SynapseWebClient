@@ -91,7 +91,6 @@ public class EntityTreeBrowserTest {
 		when(mockEntityTreeItem.getHeader()).thenReturn(header);
 		when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
 		when(mockView.insertLoading(any(EntityTreeItem.class), Mockito.anyInt())).thenReturn(mockLoadingItem);
-		Mockito.doNothing().when(mockView).removeLoading(any(TreeItem.class));
 		Mockito.when(mockInjector.getMoreTreeWidget()).thenReturn(mockMoreTreeItem);
 		AsyncMockStubber
 				.callSuccessWith(searchResults)
