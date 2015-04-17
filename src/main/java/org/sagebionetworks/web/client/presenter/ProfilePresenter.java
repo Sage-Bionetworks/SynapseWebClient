@@ -246,7 +246,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (isOwner) {
 			boolean isCertificationMessageVisible = false;
 			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY);
+				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
 				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
 					isCertificationMessageVisible = true;	
 				}
@@ -780,7 +780,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//set certification message visible=false for a year
 		Date yearFromNow = new Date();
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
+		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
 	}
 	
 	/**
