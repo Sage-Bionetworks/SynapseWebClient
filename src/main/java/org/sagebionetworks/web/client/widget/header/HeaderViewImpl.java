@@ -313,4 +313,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private void refreshTestSiteHeader() {
 		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
+	
+	@Override
+	public void showFavoritesLoading() {
+		headerFavList.clear();
+		AnchorListItem loading = new AnchorListItem("Loading...");
+		loading.setEnabled(false);
+		headerFavList.add(loading);
+	}
+	
 }

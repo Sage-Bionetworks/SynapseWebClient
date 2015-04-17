@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,8 +27,7 @@ public class Header implements HeaderView.Presenter {
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private UserSessionData cachedUserSessionData = null;
-
+	
 	@Inject
 	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient) {
 		this.view = view;
@@ -62,19 +60,7 @@ public class Header implements HeaderView.Presenter {
 
 	public void refresh() {
 		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
-		if (cachedUserSessionData == null || !cachedUserSessionData.equals(userSessionData)) {
-			cachedUserSessionData = userSessionData;
-			view.setUser(userSessionData);
-			if (userSessionData != null) {
-				initUserFavorites(new Callback(){
-					@Override
-					public void invoke() {
-						// only get called on failure
-						view.clearFavorite();
-					}
-				});
-			}
-		}
+		view.setUser(userSessionData);
 		view.refresh();
 		view.setSearchVisible(true);
 	}
@@ -110,25 +96,22 @@ public class Header implements HeaderView.Presenter {
 
 	@Override
 	public void onFavoriteClick() {
-		List<EntityHeader> headers = globalApplicationState.getFavorites();
-		view.clearFavorite();
-		if (headers == null || headers.size() == 0) {
-			view.setEmptyFavorite();
-		} else {
-			view.addFavorite(headers);
-		}
-	}
-
-	@Override
-	public void initUserFavorites(final Callback callback) {
+		view.showFavoritesLoading();
 		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
+				view.clearFavorite();
 				globalApplicationState.setFavorites(favorites);
+				if (favorites == null || favorites.size() == 0) {
+					view.setEmptyFavorite();
+				} else {
+					view.addFavorite(favorites);
+				}		
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.invoke();
+				view.clearFavorite();
+				view.setEmptyFavorite();	
 			}
 		});
 	}
