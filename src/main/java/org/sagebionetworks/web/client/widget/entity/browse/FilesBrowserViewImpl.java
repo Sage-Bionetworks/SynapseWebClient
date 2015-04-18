@@ -71,63 +71,66 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		uploaderContainer.setWidget(uploader.asWidget());
 		quizInfoDialogContainer.setWidget(quizInfoDialog.asWidget());
 		sharingAndDataUseContainer.setWidget(sharingAndDataUseWidget.asWidget());
-		addFolderButton.addClickHandler(new ClickHandler() {				
+
+		addFolderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
 				presenter.addFolderClicked();
-	}
+			}
 		});
 
 		uploadButton.addClickHandler(new ClickHandler() {
-	@Override
+			@Override
 			public void onClick(ClickEvent event) {
 				presenter.uploadButtonClicked();
-	}		
+			}
 		});
-	
+
 		okNewFolderButton.addClickHandler(new ClickHandler() {
-	@Override
+			@Override
 			public void onClick(ClickEvent event) {
-				newFolderDialog.hide();
 				presenter.updateFolderName(folderNameField.getText());
-		}
+			}
 		});
+
 		cancelNewFolderButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-				presenter.deleteFolder(true);	
-				}
-			});
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.deleteFolder(true);
+			}
+		});
+
 		folderNameField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 					okNewFolderButton.click();
-		}
+				}
 			}
 		});
+
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
-		}
-	
+	}
+
 	@Override
 	public void configure(String entityId, boolean canCertifiedUserAddChild) {
 		entityTreeBrowser.configure(entityId);
 		if (canCertifiedUserAddChild) {
 			topBar.setVisible(true);
+		}
 	}
-	}
-	
-			@Override
+
+	@Override
 	public void showQuizInfoDialog() {
 		quizInfoDialog.show();
-			}
-	
+	}
+
 	@Override
 	public void showUploadDialog(String entityId){
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				presenter.fireEntityUpdatedEvent();
@@ -136,7 +139,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null, entityId, handler, null, true);
 		uploader.show();
 	}
-	
+
 	@Override
 	public void showFolderEditDialog(final String folderEntityId) {
 		folderNameField.setText("");
@@ -149,18 +152,18 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		};
 		sharingAndDataUseWidget.configure(folderEntityId, true, refreshSharingAndDataUseWidget);
 		newFolderDialog.show();
-			}
-		
-			@Override
+	}
+
+	@Override
 	public Widget asWidget() {
 		return widget;
-	}	
+	}
 
-	@Override 
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
+
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -183,5 +186,14 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@Override
 	public void refreshTreeView(String entityId) {
 		entityTreeBrowser.configure(entityId);
+	}
+
+	@Override
+	public void setNewFolderDialogVisible(boolean visible) {
+		if (visible) {
+			newFolderDialog.show();
+		} else {
+			newFolderDialog.hide();
+		}
 	}
 }

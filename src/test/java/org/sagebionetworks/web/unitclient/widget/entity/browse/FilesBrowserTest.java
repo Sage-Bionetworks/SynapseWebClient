@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -105,11 +106,12 @@ public class FilesBrowserTest {
 		String id = "syn456";
 		boolean skipTrashCan = true;
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
-		
+
 		filesBrowser.setCurrentFolderEntityId(id);
 		filesBrowser.deleteFolder(skipTrashCan);
 		verify(mockSynapseClient).deleteEntityById(eq(id), eq(skipTrashCan), any(AsyncCallback.class));
 		verify(mockView).refreshTreeView(anyString());
+		verify(mockView).setNewFolderDialogVisible(false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -117,12 +119,12 @@ public class FilesBrowserTest {
 	public void testDeleteFolderFail() throws Exception {
 		String id = "syn456";
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
-		
+
 		filesBrowser.setCurrentFolderEntityId(id);
 		filesBrowser.deleteFolder(true);
 		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
-		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
+		verify(mockView, Mockito.never()).setNewFolderDialogVisible(false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -135,6 +137,7 @@ public class FilesBrowserTest {
 		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockView).refreshTreeView(configuredEntityId);
+		verify(mockView).setNewFolderDialogVisible(false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -148,6 +151,7 @@ public class FilesBrowserTest {
 		
 		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
+		verify(mockView, Mockito.never()).setNewFolderDialogVisible(false);
 	}
 	
 	@Test

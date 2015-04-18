@@ -20,9 +20,11 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 	public void configure(String entityId, boolean canCertifiedUserAddChild);
 
 	public void refreshTreeView(String entityId);
-	
+
 	public void showFolderEditDialog(final String folderEntityId);
-	
+
+	public void setNewFolderDialogVisible(boolean visible);
+
 	/**
 	 * Presenter interface
 	 */
@@ -33,5 +35,4 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 		void deleteFolder(boolean skipTrashCan);
 		void fireEntityUpdatedEvent();
 	}
-
 }

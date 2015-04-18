@@ -77,7 +77,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public Widget asWidget() {
-		view.setPresenter(this);		
+		view.setPresenter(this);
 		return view.asWidget();
 	}
 
@@ -136,10 +136,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				public void onFailure(Throwable caught) {
 					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
-				}			
+				}
 			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}
 	}
 	
@@ -150,12 +150,12 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			public void onSuccess(Void na) {
 				//folder is deleted when folder creation is canceled.  refresh the tree for updated information 
 				view.refreshTreeView(configuredEntityId);
+				view.setNewFolderDialogVisible(false);
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
-			}			
+			}
 		});
 	}
 	
@@ -167,16 +167,16 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				public void onSuccess(EntityWrapper result) {
 					view.showInfo("Folder '" + folder.getName() + "' Added", "");
 					view.refreshTreeView(configuredEntityId);
+					view.setNewFolderDialogVisible(false);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
 				}
 			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}
-
 	}
 	
 	@Override
@@ -188,16 +188,15 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 					Folder folder = nodeModelCreator.createJSONEntity(result.getEntityJson(), Folder.class);
 					folder.setName(newFolderName);
 					updateFolderName(folder);
-				} catch (JSONObjectAdapterException e) {			
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
-			}			
+			}
 		});
 	}
 	
