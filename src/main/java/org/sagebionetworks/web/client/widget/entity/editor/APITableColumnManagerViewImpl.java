@@ -14,6 +14,9 @@ import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -25,12 +28,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class APITableColumnManagerViewImpl implements APITableColumnManagerView {
-	public interface APITableColumnManagerViewImplUiBinder extends UiBinder<Widget, APITableColumnManagerViewImpl> {}
-	
+	public interface APITableColumnManagerViewImplUiBinder extends
+			UiBinder<Widget, APITableColumnManagerViewImpl> {
+	}
+
 	@UiField
 	Button addColumnButton;
-	
-	//new column modal
+
+	// new column modal
 	@UiField
 	Modal newColumnModal;
 	@UiField
@@ -46,15 +51,16 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 	@UiField
 	Button newColumnCancelButton;
 	@UiField
-	FlowPanel columnRenderersTable;
-	
+	Div columnRenderersTable;
 
 	private Presenter presenter;
 	private boolean isEmpty;
 	private Widget widget;
 	IconsImageBundle iconsImageBundle;
+
 	@Inject
-	public APITableColumnManagerViewImpl(APITableColumnManagerViewImplUiBinder binder,
+	public APITableColumnManagerViewImpl(
+			APITableColumnManagerViewImplUiBinder binder,
 			IconsImageBundle iconsImageBundle) {
 		widget = binder.createAndBindUi(this);
 		this.iconsImageBundle = iconsImageBundle;
@@ -65,12 +71,24 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 				newColumnModal.show();
 			}
 		});
+		KeyDownHandler newColumn = new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					newColumnOkButton.click();
+				}
+			}
+		};
+		displayColumnNamesField.addKeyDownHandler(newColumn);
+		inputColumnNamesField.addKeyDownHandler(newColumn);
 		newColumnOkButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.addColumnConfig(rendererField.getValue(rendererField.getSelectedIndex()),
-						inputColumnNamesField.getValue(), displayColumnNamesField.getValue(), 
-						COLUMN_SORT_TYPE.valueOf(sortField.getValue(sortField.getSelectedIndex())));
+				presenter.addColumnConfig(rendererField.getValue(rendererField
+						.getSelectedIndex()), inputColumnNamesField.getValue(),
+						displayColumnNamesField.getValue(), COLUMN_SORT_TYPE
+								.valueOf(sortField.getValue(sortField
+										.getSelectedIndex())));
 				newColumnModal.hide();
 			}
 		});
@@ -81,21 +99,21 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 			}
 		});
 	}
-	
+
 	private void resetColumnModal() {
 		rendererField.setSelectedIndex(0);
 		sortField.setSelectedIndex(0);
 		inputColumnNamesField.setValue("");
 		displayColumnNamesField.setValue("");
 	}
-	
+
 	@Override
 	public void configure(List<APITableColumnConfig> configs) {
 		isEmpty = configs == null || configs.size() == 0;
-		if(isEmpty){
+		if (isEmpty) {
 			addNoConfigRow();
 		} else {
-			populateTable(configs);			
+			populateTable(configs);
 		}
 	}
 
@@ -103,26 +121,27 @@ public class APITableColumnManagerViewImpl implements APITableColumnManagerView 
 		columnRenderersTable.clear();
 		columnRenderersTable.add(new HTML(DisplayConstants.TEXT_NO_COLUMNS));
 	}
-	
+
 	private void populateTable(List<APITableColumnConfig> configs) {
 		columnRenderersTable.clear();
-		for(final APITableColumnConfig data: configs){
+		for (final APITableColumnConfig data : configs) {
 			Div row = new Div();
 			row.add(new InlineHTML(data.getDisplayColumnName()));
-			
-			AbstractImagePrototype img = AbstractImagePrototype.create(iconsImageBundle.deleteButtonGrey16());
-			Anchor deleteColumnButton = DisplayUtils.createIconLink(img, new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.deleteColumnConfig(data);
-				}
-			});
+
+			AbstractImagePrototype img = AbstractImagePrototype
+					.create(iconsImageBundle.deleteButtonGrey16());
+			Anchor deleteColumnButton = DisplayUtils.createIconLink(img,
+					new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							presenter.deleteColumnConfig(data);
+						}
+					});
 			deleteColumnButton.addStyleName("margin-left-5");
 			row.add(deleteColumnButton);
 			columnRenderersTable.add(row);
 		}
 	}
-
 
 	@Override
 	public Widget asWidget() {

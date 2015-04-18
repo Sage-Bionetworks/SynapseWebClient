@@ -69,10 +69,11 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setShowProfileButtonVisible(boolean isVisible);
 	void setHideProfileButtonVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
+	void setProjectSortVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
 	void addSortOption(SortOptionEnum sort);
 	void clearSortOptions();
-	void setWelcomeToDashboardVisible(boolean isVisible);
+	void setGetCertifiedVisible(boolean isVisible);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
@@ -92,10 +93,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
 		void onImportLinkedIn();
-		void welcomeToDashboardDismissed();
+		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 	}
-
-
-
 }

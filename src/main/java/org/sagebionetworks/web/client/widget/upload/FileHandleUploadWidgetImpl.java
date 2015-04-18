@@ -24,7 +24,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		return this.view.asWidget();
 	}
 
-
 	@Override
 	public void configure(String buttonText, CallbackP<String> callback) {
 		this.callback = callback;
@@ -32,7 +31,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		view.hideError();
 		view.setButtonText(buttonText);
 	}
-
 
 	@Override
 	public void onFileSelected() {
@@ -69,6 +67,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 							String progressText) {
 						view.updateProgress(currentProgress*100, progressText);
 					}
-				});
+				}, null);
 	}
 }

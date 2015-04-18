@@ -42,7 +42,7 @@ public class ProvenanceConfigViewImpl implements ProvenanceConfigView {
 		initClickHandlers();
 	}
 	
-	private void initClickHandlers() {
+	private void initClickHandlers() {	
 		entityFinderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

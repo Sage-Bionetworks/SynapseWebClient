@@ -43,10 +43,14 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -216,7 +220,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button hideProfileButton;
 	@UiField
-	Alert welcomeToDashboardAlert;
+	Alert getCertifiedAlert;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -264,12 +268,28 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.createProject(createProjectTextBox.getValue());
 			}
 		});
-		
+		createProjectTextBox.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					createProjectButton.click();
+				}
+			}
+		});
 		createTeamTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
 		createTeamButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.createTeam(createTeamTextBox.getValue());
+			}
+		});
+		
+		createTeamTextBox.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					createTeamButton.click();
+				}
 			}
 		});
 		
@@ -356,10 +376,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.onImportLinkedIn();
 			}
 		});
-		welcomeToDashboardAlert.addClosedHandler(new AlertClosedHandler() {
+		getCertifiedAlert.addClosedHandler(new AlertClosedHandler() {
 			@Override
 			public void onClosed(AlertClosedEvent evt) {
-				presenter.welcomeToDashboardDismissed();
+				presenter.setGetCertifiedDismissed();
 			}
 		});
 	}
@@ -415,6 +435,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
+	@Override 
+	public void setProjectSortVisible(boolean isVisible) {
+		projectSortButton.setVisible(isVisible);
+	}
+	
 	@Override
 	public void setFavoritesHelpPanelVisible(boolean isVisible) {
 		favoritesHelpPanel.setVisible(isVisible);
@@ -431,7 +456,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
 			viewProfilePanel.add(certifiedUserBadgePanel);
-				}
+		}
 			
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
@@ -729,6 +754,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		challengesTabContent.clear();
 		hideTabContainers();
+		getCertifiedAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
@@ -906,7 +932,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setWelcomeToDashboardVisible(boolean isVisible) {
-		welcomeToDashboardAlert.setVisible(isVisible);	
+	public void setGetCertifiedVisible(boolean isVisible) {
+		getCertifiedAlert.setVisible(isVisible);	
 	}
 }

@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jhill
  *
  */
-public interface EntityNameModalView extends IsWidget {
+public interface PromptModalView extends IsWidget {
 	
 	/**
 	 * Business logic handler for this view.

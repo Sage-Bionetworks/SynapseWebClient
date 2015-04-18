@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.profile;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -41,7 +40,7 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	}
 
 	@Override
-	public void setPreseneter(final Presenter presenter) {
+	public void setPresenter(final Presenter presenter) {
 		primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -90,5 +89,5 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	public void addEditorWidget(IsWidget editorWidget) {
 		this.bodyPanel.add(editorWidget);
 	}
-
+	
 }

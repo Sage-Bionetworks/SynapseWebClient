@@ -61,6 +61,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private String contentType;
 	private String md5;
 	private ProgressingFileUploadHandler handler;
+	private Long storageLocationId;
 	
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
@@ -79,12 +80,13 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * 
 	 */
 	@Override
-	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler) {
+	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler, Long storageLocationId) {
 		this.token = null;
 		this.fileName = fileName;
 		this.fileInputId = fileInputId;
 		this.fileIndex = fileIndex;
 		this.handler = handler;
+		this.storageLocationId = storageLocationId;
 		uploadLog = new StringBuilder();
 		uploadLog.append(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
 		
@@ -107,7 +109,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 */
 	private void directUploadStep2(){
 		try {
-			synapseClient.getChunkedFileToken(fileName, contentType, md5, new AsyncCallback<ChunkedFileToken>() {
+			synapseClient.getChunkedFileToken(fileName, contentType, md5, storageLocationId, new AsyncCallback<ChunkedFileToken>() {
 				@Override
 				public void onSuccess(ChunkedFileToken result) {
 					token = result;
@@ -370,7 +372,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 
 
 	@Override
-	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler) {
+	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler, Long storageLocationId) {
 		// First get the name of the file
 		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
 		if(names == null || names.length < 1){
@@ -379,7 +381,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		}
 		int index = 0;
 		String fileName = names[0];
-		uploadFile(fileName, fileInputId, index, handler);
+		uploadFile(fileName, fileInputId, index, handler, null);
 	}
 
 	@Override

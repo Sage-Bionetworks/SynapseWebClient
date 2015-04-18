@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<b:Form type="HORIZONTAL">
+		<bh:Div addStyleNames="form-horizontal">
 			<b:FieldSet>
 				<b:FormGroup>
 					<b:FormLabel for="reference" addStyleNames="col-xs-2">Reference</b:FormLabel>
@@ -14,7 +14,7 @@
 					</g:FlowPanel>
 				</b:FormGroup>
 			</b:FieldSet>
-		</b:Form>
+		</bh:Div>
 	</bh:Div>
 	
 </ui:UiBinder>

@@ -13,6 +13,8 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -37,8 +39,8 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	
 	public static final Integer VERSION_LIMIT = 100;
+	public PreflightController preflightController;
 	
 	private DetailedPaginationWidget paginationWidget;
 	private boolean canEdit;
@@ -46,7 +48,8 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view, NodeModelCreator nodeModelCreator,
 			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
-			 DetailedPaginationWidget paginationWidget) {
+			 DetailedPaginationWidget paginationWidget,
+			 PreflightController preflightController) {
 		super();
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
@@ -54,6 +57,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.paginationWidget = paginationWidget;
+		this.preflightController = preflightController;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		this.view.setPresenter(this);
 	}
@@ -62,20 +66,17 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		this.bundle = bundle;
 		this.versionNumber = versionNumber;
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		view.setEntityBundle(bundle.getEntity(), versionNumber != null);
+		boolean isShowingCurrentVersion = versionNumber == null;
+		view.setEntityBundle(bundle.getEntity(), !isShowingCurrentVersion);
+		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
+		
 		//initialize versions
 		onPageChange(0L);
 	}
 
 	@Override
-	public void updateVersionComment(String newComment) {
-		String oldLabel = ((Versionable)bundle.getEntity()).getVersionLabel();
-		editCurrentVersionInfo(bundle.getEntity(), oldLabel, newComment);
-	}
-	@Override
-	public void updateVersionLabel(String newLabel) {
-		String oldComment = ((Versionable)bundle.getEntity()).getVersionComment();
-		editCurrentVersionInfo(bundle.getEntity(), newLabel, oldComment);
+	public void updateVersionInfo(String newLabel, String newComment) {
+		editCurrentVersionInfo(bundle.getEntity(), newLabel, newComment);
 	}
 
 	private void editCurrentVersionInfo(Entity entity, String version, String comment) {
@@ -105,6 +106,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						}
 						@Override
 						public void onSuccess(Entity result) {
+							view.hideEditVersionInfo();
 							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
 							fireEntityUpdatedEvent();
 						}
@@ -185,5 +187,16 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	 */
 	public Long getVersionNumber() {
 		return versionNumber;
+	}
+	
+	@Override
+	public void onEditVersionInfoClicked() {
+		preflightController.checkUploadToEntity(bundle, new Callback() {
+			@Override
+			public void invoke() {
+				final Versionable vb = (Versionable)bundle.getEntity();
+				view.showEditVersionInfo(vb.getVersionLabel(), vb.getVersionComment());
+			}
+		});
 	}
 }

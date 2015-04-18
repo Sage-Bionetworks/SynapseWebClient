@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UserProfileEditorWidgetView extends IsWidget {
@@ -56,5 +57,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	String getLocation();
 
 	void setLink(String url);
+
+	void addKeyDownHandlerToFields(KeyDownHandler keyDownHandler);
 
 }

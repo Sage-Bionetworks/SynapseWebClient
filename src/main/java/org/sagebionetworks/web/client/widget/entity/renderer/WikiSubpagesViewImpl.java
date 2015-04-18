@@ -197,4 +197,11 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public interface GetOrderHintCallback {
 		public List<String> getCurrentOrderHint();
 	}
+
+	@Override
+	public void setEditOrderButtonVisible(boolean visible) {
+		if (editOrderButton != null) {
+			editOrderButton.setVisible(visible);
+		}
+	}
 }

@@ -14,6 +14,9 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
@@ -142,7 +145,17 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	public void init() {
 		isShowingResetUI = false;
-		
+		KeyDownHandler submit = new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					submitBtn.click();
+				}
+			}
+		};
+		password1Field.addKeyDownHandler(submit);
+		password2Field.addKeyDownHandler(submit);
+		emailAddressField.addKeyDownHandler(submit);
 		submitBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -161,6 +174,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 				}
 			}
 		});
+		
 		emailAddressField.getElement().setAttribute("placeholder", "Enter username or email");
 		password1Field.getElement().setAttribute("placeholder", "Enter password");
 		password2Field.getElement().setAttribute("placeholder", "Confirm password");

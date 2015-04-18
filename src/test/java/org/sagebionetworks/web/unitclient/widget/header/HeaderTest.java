@@ -2,10 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.header;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +13,13 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -27,8 +28,10 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class HeaderTest {
 
@@ -36,6 +39,7 @@ public class HeaderTest {
 	HeaderView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
+	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
@@ -46,9 +50,11 @@ public class HeaderTest {
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient);
 		entityHeaders = new ArrayList<EntityHeader>();
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
 	}
 
@@ -60,12 +66,6 @@ public class HeaderTest {
 	@Test
 	public void testAsWidget(){
 		header.asWidget();
-	}
-
-	@Test
-	public void testOnGettingStartedClick() {
-		header.onGettingStartedClick();
-		verify(mockPlaceChanger).goTo(any(Help.class));
 	}
 
 	@Test
@@ -132,6 +132,31 @@ public class HeaderTest {
 		entityHeaders.add(entityHeader2);
 		header.onFavoriteClick();
 		verify(mockView).clearFavorite();
+		verify(mockView).addFavorite(entityHeaders);
+	}
+
+	@Test
+	public void testFavoriteRoundTrip() {
+		// After User Logged in
+		UserSessionData userSessionData = new UserSessionData();
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
+		header.onFavoriteClick();
+		verify(mockView).showFavoritesLoading();
+		verify(mockView).clearFavorite();
+		verify(mockSynapseClient, times(1)).getFavorites(any(AsyncCallback.class));
+		//initially empty
+		verify(mockView).setEmptyFavorite();
+		
+		//say the user set something as a favorite
+		EntityHeader entityHeader1 = new EntityHeader();
+		entityHeader1.setId("syn012345");
+		entityHeaders.add(entityHeader1);
+		
+		// User should ask for favorites each time favorites button is clicked
+		header.onFavoriteClick();
+		verify(mockView, times(2)).showFavoritesLoading();
+		verify(mockView, times(2)).clearFavorite();
+		verify(mockSynapseClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
 	}
 }

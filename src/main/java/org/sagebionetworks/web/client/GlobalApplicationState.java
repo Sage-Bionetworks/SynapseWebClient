@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface GlobalApplicationState {
 
@@ -98,7 +99,7 @@ public interface GlobalApplicationState {
 	
 	public void setFavorites(List<EntityHeader> favorites);
 	
-	public void checkVersionCompatibility(SynapseView view);
+	public void checkVersionCompatibility(AsyncCallback<String> callback);
 	public boolean isEditing();
 	public void setIsEditing(boolean isEditing);
 	

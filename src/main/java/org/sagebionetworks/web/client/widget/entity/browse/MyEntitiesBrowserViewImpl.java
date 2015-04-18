@@ -76,12 +76,12 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	
 	@Override
 	public void setUpdatableEntities(List<EntityHeader> rootEntities) {
-		myTreeBrowser.configure(rootEntities, true);		
+		myTreeBrowser.configure(rootEntities);		
 	}
 	
 	@Override
 	public void setFavoriteEntities(List<EntityHeader> favoriteEntities) {
-		favoritesTreeBrowser.configure(favoriteEntities, true);
+		favoritesTreeBrowser.configure(favoriteEntities);
 	}
 	
 	@Override

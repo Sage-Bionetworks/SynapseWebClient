@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.entity.EntityNameModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -21,7 +21,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class CreateTableModalWidgetTest {
 
-	EntityNameModalView mockView;
+	PromptModalView mockView;
 	SynapseClientAsync mockSynapseClient;
 	TableCreatedHandler mockHandler;
 	
@@ -30,7 +30,7 @@ public class CreateTableModalWidgetTest {
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(EntityNameModalView.class);
+		mockView = Mockito.mock(PromptModalView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockHandler = Mockito.mock(TableCreatedHandler.class);
 		widget = new CreateTableModalWidgetImpl(mockView, mockSynapseClient);

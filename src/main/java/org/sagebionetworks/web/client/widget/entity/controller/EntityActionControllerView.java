@@ -32,5 +32,11 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param accessControlListModalWidget
 	 */
 	void addAccessControlListModalWidget(IsWidget accessControlListModalWidget);
+	
+	/**
+	 * This dialog must be added to the page.
+	 * @param modalWidget
+	 */
+	void addMarkdownEditorModalWidget(IsWidget modalWidget);
 
 }

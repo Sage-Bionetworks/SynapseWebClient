@@ -63,7 +63,7 @@ public class FileInputWidgetImpl implements FileInputWidget,
 							String progressText) {
 						view.updateProgress(currentProgress*100, progressText);
 					}
-				});
+				}, null);
 	}
 
 	@Override

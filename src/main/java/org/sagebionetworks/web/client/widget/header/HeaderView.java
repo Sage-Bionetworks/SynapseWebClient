@@ -32,9 +32,6 @@ public interface HeaderView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
-		UserSessionData getUser();
-		void onGettingStartedClick();
 		void onTrashClick();
 		void onLogoutClick();
 		void onDashboardClick();
@@ -50,6 +47,9 @@ public interface HeaderView extends IsWidget {
 	public void setEmptyFavorite();
 
 	public void addFavorite(List<EntityHeader> headers);
+	public void showFavoritesLoading();
+
+	void setUser(UserSessionData userData);
 
 
 }
