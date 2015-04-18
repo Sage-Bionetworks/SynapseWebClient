@@ -26,14 +26,17 @@ import com.google.inject.Inject;
 
 public class FilesBrowserViewImpl implements FilesBrowserView {
 
-	public interface FilesBrowserViewImplUiBinder extends UiBinder<Widget, FilesBrowserViewImpl> {}
+	public interface FilesBrowserViewImplUiBinder extends
+			UiBinder<Widget, FilesBrowserViewImpl> {
+	}
+
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
 	private UploadDialogWidget uploader;
 	private QuizInfoDialog quizInfoDialog;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	private Widget widget;
-	
+
 	@UiField
 	SimplePanel uploaderContainer;
 	@UiField
@@ -56,13 +59,12 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	Button cancelNewFolderButton;
 	@UiField
 	Button okNewFolderButton;
-	
+
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
 			UploadDialogWidget uploader,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
-			QuizInfoDialog quizInfoDialog,
-			EntityTreeBrowser entityTreeBrowser) {
+			QuizInfoDialog quizInfoDialog, EntityTreeBrowser entityTreeBrowser) {
 		widget = binder.createAndBindUi(this);
 		this.uploader = uploader;
 		this.entityTreeBrowser = entityTreeBrowser;
@@ -71,11 +73,12 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		uploaderContainer.setWidget(uploader.asWidget());
 		quizInfoDialogContainer.setWidget(quizInfoDialog.asWidget());
 		sharingAndDataUseContainer.setWidget(sharingAndDataUseWidget.asWidget());
-
 		addFolderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
+				// for additional functionality, it now creates the folder up
+				// front, and the dialog will rename (and change share and data
+				// use)
 				presenter.addFolderClicked();
 			}
 		});
@@ -136,7 +139,8 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null, entityId, handler, null, true);
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
+				entityId, handler, null, true);
 		uploader.show();
 	}
 
@@ -146,11 +150,12 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		Callback refreshSharingAndDataUseWidget = new Callback() {
 			@Override
 			public void invoke() {
-				//entity was updated by the sharing and data use widget.
+				// entity was updated by the sharing and data use widget.
 				sharingAndDataUseWidget.setEntity(folderEntityId);
 			}
 		};
-		sharingAndDataUseWidget.configure(folderEntityId, true, refreshSharingAndDataUseWidget);
+		sharingAndDataUseWidget.configure(folderEntityId, true,
+				refreshSharingAndDataUseWidget);
 		newFolderDialog.show();
 	}
 
@@ -171,6 +176,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	@Override
 	public void showLoading() {
+
 	}
 
 	@Override

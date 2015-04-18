@@ -173,7 +173,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			});
 		} else {
-			getUserProfile(initialTab);
+			if (initialTab == ProfileArea.SETTINGS) 
+				getUserProfile(ProfileArea.PROJECTS);
+			else
+				getUserProfile(initialTab);
 		}
 	}
 	
@@ -243,7 +246,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (isOwner) {
 			boolean isCertificationMessageVisible = false;
 			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY);
+				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
 				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
 					isCertificationMessageVisible = true;	
 				}
@@ -323,13 +326,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @param team
 	 */
 	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
-		this.filterType =filterType;
+		this.filterType = filterType;
 		filterTeam = team;
 		refreshProjects();
 	}
 
 	public void getMoreProjects() {
 		if (isOwner) {
+			view.setProjectSortVisible(true);
 			view.showProjectFiltersUI();
 			//this depends on the active filter
 			switch (filterType) {
@@ -351,6 +355,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
+					view.setProjectSortVisible(false);
 					getFavorites();
 					break;
 				case TEAM:
@@ -777,7 +782,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//set certification message visible=false for a year
 		Date yearFromNow = new Date();
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
+		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
 	}
 	
 	/**
