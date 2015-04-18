@@ -1,8 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +16,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
@@ -27,9 +34,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -270,33 +275,49 @@ public class RestrictionWidgetTest {
 	public void testImposeRestrictionClickedNoSelectionNulls() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(null);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(null);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showErrorMessage(anyString());
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 
 	@Test
 	public void testImposeRestrictionClickedNoSelection2() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(false);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showErrorMessage(anyString());
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 	
 	@Test
 	public void testImposeRestrictionClickedNoIsSelected() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(true);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(false);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showErrorMessage(anyString());
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 	
 	@Test
 	public void testImposeRestrictionClickedYesIsSelected() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(true);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showLoading();
 		verify(mockAccessRequirementDialog).imposeRestriction(anyString(), any(Callback.class));
+	}
+
+	@Test
+	public void testImposeRestrictionClickedYesIsSelectedThenCancel() {
+		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
+		when(mockView.isYesHumanDataRadioSelected()).thenReturn(true);
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView, Mockito.never()).showLoading();
+		verify(mockAccessRequirementDialog, Mockito.never()).imposeRestriction(anyString(), any(Callback.class));
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 
 	@Test
