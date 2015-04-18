@@ -45,8 +45,7 @@ public class Header implements HeaderView.Presenter {
 		view.removeMenuItemActive(menuItem);
 	}
 	
-	public void configure(boolean largeLogo) {
-		view.setLargeLogo(largeLogo);
+	public void configure() {
 	}
 
 	public Widget asWidget() {

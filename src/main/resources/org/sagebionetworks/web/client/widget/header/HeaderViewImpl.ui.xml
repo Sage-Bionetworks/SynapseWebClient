@@ -8,10 +8,9 @@
 	<g:HTMLPanel>
 		<div ui:field="headerDiv" class="notopmargin small-header">
 			<div class="margin-top-3">
-			    <div ui:field="headerImageDiv" class="left logo margin-top-4 margin-left-5">
+			    <div ui:field="headerImageDiv" class="left logo margin-top-4 margin-left-5 smallHeader">
 			        <a href="#!Home:0"> 
-				    	<g:Image ui:field="logoLarge" resource="{sageImages.synaspseHeader}" />
-						<g:Image ui:field="logoSmall" resource="{sageImages.synapseLogoSmall}" />
+				    	<g:Image ui:field="logoSmall" resource="{sageImages.synapseLogo}" height="40px" width="201px" />
 					</a>
 			    </div>
 				<b:Tooltip placement="BOTTOM" title="Log out">

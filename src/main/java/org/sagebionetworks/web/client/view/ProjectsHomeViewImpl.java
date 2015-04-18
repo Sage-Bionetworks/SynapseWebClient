@@ -53,7 +53,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 		this.footerWidget = footerWidget;
 		this.icons = icons;
 		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -63,7 +63,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

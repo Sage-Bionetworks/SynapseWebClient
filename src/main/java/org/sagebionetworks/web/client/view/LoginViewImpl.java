@@ -87,7 +87,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		this.loginWidget = loginWidget;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		toUInitialized = false;
@@ -98,7 +98,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

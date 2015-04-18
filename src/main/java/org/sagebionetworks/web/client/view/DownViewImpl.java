@@ -37,7 +37,7 @@ public class DownViewImpl extends Composite implements DownView {
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 
@@ -47,7 +47,7 @@ public class DownViewImpl extends Composite implements DownView {
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

@@ -5,11 +5,9 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<g:HTMLPanel>
-        <div class="color-line"></div>
         <div class="clear"></div>
 		<g:SimplePanel ui:field="header" />
-        <div class="separator margin-top-10-imp"></div>
-    	<div class="container margin-top-15">
+        <div class="container margin-top-15">
     	    <span ui:field="loadingUI" class="center-block center margin-150"><g:Image resource='{sageImageBundle.loading31}' />&nbsp;Loading...</span>
     	    <g:SimplePanel ui:field="successContainer" visible="false">	</g:SimplePanel>
     	    <div ui:field="quizFailure" style="display:none" class="row">

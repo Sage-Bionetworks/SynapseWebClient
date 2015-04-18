@@ -39,13 +39,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
-	private static final String HEADER_LARGE_STYLE = "largeHeader";
-	private static final String HEADER_SMALL_STYLE = "smallHeader";
-
 	@UiField
 	Image logoSmall;
-	@UiField
-	Image logoLarge;
 	@UiField
 	DivElement headerDiv;
 	@UiField
@@ -97,7 +92,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private SearchBox searchBox;
 	private CookieProvider cookies;
 	SageImageBundle sageImageBundle;
-	boolean showLargeLogo;
 	UserBadge userBadge;
 	Span userBadgeText;
 	HorizontalPanel myDashboardButtonContents;
@@ -123,7 +117,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		userBadgeText = new Span();
 		myDashboardButtonContents.add(userBadgeText);
 		addUserPicturePanel();
-		showLargeLogo = false; // default
 		initClickHandlers();
 		refreshTestSiteHeader();
 	}
@@ -233,7 +226,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void refresh() {
-		setLogo();
 		refreshTestSiteHeader();
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 		trashLink.setVisible(isInTestWebsite);
@@ -287,28 +279,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 	}
 
-	@Override
-	public void setLargeLogo(boolean isLarge) {
-		this.showLargeLogo = isLarge;
-	}
-
 	/*
 	 * Private Methods
 	 */
-
-	private void setLogo() {
-		if(showLargeLogo) {
-			logoLarge.setVisible(true);
-			logoSmall.setVisible(false);
-			headerDiv.removeClassName(HEADER_SMALL_STYLE);
-			headerDiv.addClassName(HEADER_LARGE_STYLE);
-		} else {
-			logoLarge.setVisible(false);
-			logoSmall.setVisible(true);
-			headerDiv.removeClassName(HEADER_LARGE_STYLE);
-			headerDiv.addClassName(HEADER_SMALL_STYLE);
-		}
-	}
 
 	private void refreshTestSiteHeader() {
 		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));

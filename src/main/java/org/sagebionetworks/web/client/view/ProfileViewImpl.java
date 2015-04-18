@@ -255,7 +255,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.myTeamsWidget = myTeamsWidget;
 		this.settingsPresenter = settingsPresenter;
 		this.ginInjector = ginInjector;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
@@ -427,7 +427,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

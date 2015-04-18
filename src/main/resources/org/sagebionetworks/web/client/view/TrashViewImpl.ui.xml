@@ -5,9 +5,7 @@
 	xmlns:bb="urn:import:org.gwtbootstrap3.client.ui">
 	
 	<g:HTMLPanel>
-		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator margin-top-10-imp "></div>
 		
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
 			<div class="well col-md-offset-1 col-md-10 col-sm-offset-2 col-sm-8">

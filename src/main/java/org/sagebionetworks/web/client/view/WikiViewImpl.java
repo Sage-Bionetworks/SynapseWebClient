@@ -40,7 +40,7 @@ public class WikiViewImpl extends Composite implements WikiView {
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -51,7 +51,7 @@ public class WikiViewImpl extends Composite implements WikiView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

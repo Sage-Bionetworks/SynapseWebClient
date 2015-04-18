@@ -40,8 +40,6 @@ public interface HeaderView extends IsWidget {
 		void onFavoriteClick();
 	}
 
-	public void setLargeLogo(boolean isHome);
-
 	public void clearFavorite();
 
 	public void setEmptyFavorite();

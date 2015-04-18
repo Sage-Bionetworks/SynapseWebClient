@@ -567,11 +567,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void showUploadingToSynapseStorage() {
 		uploadDestinationContainer.clear();
 		uploadDestinationContainer.add(new InlineHTML(DisplayConstants.UPLOAD_DESTINATION));
-		Image icon = new Image(sageImageBundle.logoHeader().getURL());
-		icon.addStyleName("displayInline moveup-2");
-		icon.setPixelSize(25, 25);
-		uploadDestinationContainer.add(icon);
-		icon = new Image(sageImageBundle.synapseTextHeader().getURL());
+		Image icon = new Image(sageImageBundle.synapseLogo().getURL());
 		icon.setPixelSize(88, 20);
 		icon.addStyleName("displayInline margin-right-5");
 		uploadDestinationContainer.add(icon);

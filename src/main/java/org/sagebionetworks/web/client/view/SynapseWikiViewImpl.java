@@ -41,7 +41,7 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.wikiPage = wikiPage;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -52,7 +52,7 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

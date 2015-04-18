@@ -139,7 +139,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		addUserPicturePanel();
 		
-		headerWidget.configure(true);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
@@ -222,13 +222,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			userBadge.configure(profile);
 		}
 	}
-
-	
-	@Override
-	public void onAttach() {
-		super.onAttach();
-		startCarousel();
-	}
 	
 	@Override
 	public void setPresenter(Presenter presenter) {
@@ -247,7 +240,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void refresh() {
 		header.clear();
-		headerWidget.configure(true);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
@@ -310,10 +303,4 @@ public class HomeViewImpl extends Composite implements HomeView {
 		a.setHref(href);
 		a.setText(text);
 	}
-
-	private static native void startCarousel() /*-{
-		$wnd.jQuery('#myCarousel').carousel('cycle');
-	}-*/;
-
-	
 }

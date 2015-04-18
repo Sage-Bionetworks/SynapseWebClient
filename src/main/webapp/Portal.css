@@ -1390,6 +1390,10 @@ ol.lowerroman {
 .displayInlineBlock {
 	display: inline-block;
 }
+.displayBlock {
+	display: block;
+}
+
 
 .smallerText {
 	font-size: 0.8em;
@@ -1641,7 +1645,9 @@ ol.lowerroman {
 }
 
 .small-header {
-	height: 45px;
+	height: 90px;
+	background-color:#005f88;
+	padding: 20px;
 }
 
 .largeHeader {

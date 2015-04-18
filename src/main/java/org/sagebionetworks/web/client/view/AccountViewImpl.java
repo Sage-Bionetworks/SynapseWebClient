@@ -38,7 +38,7 @@ public class AccountViewImpl extends Composite implements AccountView {
 		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -48,7 +48,7 @@ public class AccountViewImpl extends Composite implements AccountView {
 		this.presenter = presenter;
 		mainContainer.clear();
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

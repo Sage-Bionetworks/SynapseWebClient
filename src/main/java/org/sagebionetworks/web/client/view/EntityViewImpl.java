@@ -69,7 +69,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 		this.sageImageBundle = sageImageBundle;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		// TODO : need to dynamically set the header widget
@@ -98,7 +98,7 @@ public class EntityViewImpl extends Composite implements EntityView {
 		});
 		
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

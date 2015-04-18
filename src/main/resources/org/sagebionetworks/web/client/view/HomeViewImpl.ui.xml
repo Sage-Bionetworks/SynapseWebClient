@@ -11,10 +11,27 @@
 	</ui:style>
 	<g:HTMLPanel>
 		<!-- HEADER -->
-		<div class="color-line"></div>
-		<g:SimplePanel ui:field="header" styleName="container"/>
-		<div class="separator separator-header-home"></div>
-		
+		<g:SimplePanel ui:field="header"/>
+		<b:Row>
+			<b:Column size="SM_6">
+				<b:Heading size="H1" text="Contribute to the Cure" alignment="CENTER" addStyleNames="margin-left-35 margin-right-40" />
+			</b:Column>
+			<b:Column ui:field="registerUI" size="SM_6">
+			</b:Column>
+			<b:Column ui:field="loggedInUI" size="SM_6" visible="false">
+			</b:Column>
+		</b:Row>
+		<b:Row>
+			<b:Column size="SM_4">
+				<g:Image resource='{sageImageBundle.directory}' addStyleNames="displayBlock margin-auto" />
+			</b:Column>
+			<b:Column  size="SM_4">
+				<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="displayBlock margin-auto" />
+			</b:Column>
+			<b:Column size="SM_4">
+				<g:Image resource='{sageImageBundle.prov}' addStyleNames="displayBlock margin-auto" />
+			</b:Column>
+		</b:Row>
 		<!-- TOP 3 COLUMNS -->		
 		<div class="container margin-top-30">
 		    <div class="row">
@@ -88,78 +105,6 @@
 				<div class="well" style="margin-bottom: 0px !important;">
 					<g:SimplePanel ui:field="bigSearchBox" />
 				</div>
-			</div> <!-- end row -->				
-
-            <!-- SLIDER -->
-			<div class="row margin-top-15">
-			    <!-- Carousel
-			    ================================================== -->
-			    <div id="myCarousel" class="carousel slide">
-			      <!-- Indicators -->
-			      <ol class="carousel-indicators">
-			        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-			        <li data-target="#myCarousel" data-slide-to="1"></li>
-			        <li data-target="#myCarousel" data-slide-to="2"></li>
-			        <li data-target="#myCarousel" data-slide-to="3"></li>
-   			        <li data-target="#myCarousel" data-slide-to="4"></li>
-					<li data-target="#myCarousel" data-slide-to="5"></li>
-				  </ol>
-			      <div class="carousel-inner">
-			        <div class="item active">
-			          <a href="#!Challenges:DREAM"><g:Image resource='{sageImageBundle.dream85Banner}' /></a>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2580853"><g:Image resource='{sageImageBundle.ampAd}' /></a>
-			        </div>
-					<div class="item">
-			          <a href="#!Synapse:syn2813589"><g:Image resource='{sageImageBundle.dreamSMCRNA}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">			              
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 20px;" href="#!Synapse:syn2813589">Challenge Details &amp; Pre-registration</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2813581"><g:Image resource='{sageImageBundle.dreamSMCHet}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 20px; " href="#!Synapse:syn2813581">Challenge Details &amp; Pre-registration</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2811262"><g:Image resource='{sageImageBundle.dreamOP}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 10px; left: 50px;" href="#!Synapse:syn2811262">Challenge Details &amp; Sign Up</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2813558"><g:Image resource='{sageImageBundle.dreamPDS}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			                <p><a class="btn btn-large btn-primary" style="position: relative; top: 5px;" href="#!Synapse:syn2813558">Challenge Details &amp; Sign Up</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        
-			        <div class="item">
-			          <a href="#!Synapse:syn300013"><g:Image resource='{sageImageBundle.tcgaPancancer}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn300013">TCGA Pancancer Project</a></p>
-			            </div>
-			          </div>
-			        </div>			        			       
-			      </div>
-			      <a class="left carousel-control-clean" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
-			      <a class="right carousel-control-clean" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-			    </div><!-- /.carousel -->
-			</div> <!-- end row -->		
-
-			<div class="row">
-				<div class="separator separator-margin"></div>						
 			</div> <!-- end row -->				
 
 			<!-- PROGRAMMATIC CLIENTS -->

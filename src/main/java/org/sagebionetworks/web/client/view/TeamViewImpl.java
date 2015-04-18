@@ -97,7 +97,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.uploader = uploader;
 		uploader.disableMultipleFileUploads();
 		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -129,7 +129,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

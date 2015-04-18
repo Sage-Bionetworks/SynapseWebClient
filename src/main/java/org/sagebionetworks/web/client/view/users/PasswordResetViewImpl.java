@@ -92,7 +92,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		init();
@@ -243,7 +243,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		
 		header.clear();
 		footer.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}

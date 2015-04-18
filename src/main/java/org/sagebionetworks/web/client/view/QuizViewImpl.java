@@ -102,7 +102,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.certificateWidget = certificateWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		successContainer.setWidget(certificateWidget.asWidget());
@@ -131,7 +131,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
 		header.clear();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
