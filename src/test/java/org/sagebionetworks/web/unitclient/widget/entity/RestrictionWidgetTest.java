@@ -311,7 +311,7 @@ public class RestrictionWidgetTest {
 	}
 
 	@Test
-	public void testImposeRestrictionClickedYesIsSelectedThenCancel() {
+	public void testImposeRestrictionCancelButtonClicked() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(true);
 		widget.imposeRestrictionCancelClicked();
