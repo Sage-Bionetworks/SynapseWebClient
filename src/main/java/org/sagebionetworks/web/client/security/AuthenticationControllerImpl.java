@@ -42,17 +42,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void loginUser(final String username, String password, final AsyncCallback<UserSessionData> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
-		userAccountService.initiateSession(username, password, new AsyncCallback<String>() {		
+		userAccountService.initiateSession(username, password, new AsyncCallback<Session>() {		
 			@Override
-			public void onSuccess(String sessionJson) {
-				Session session = null;
-				try {
-					session = new Session(adapterFactory.createNew(sessionJson));
-				} catch (JSONObjectAdapterException e) {
-					//can't save the cookie
-					e.printStackTrace();
-				}
-				
+			public void onSuccess(Session session) {				
 				revalidateSession(session.getSessionToken(), callback);
 			}
 

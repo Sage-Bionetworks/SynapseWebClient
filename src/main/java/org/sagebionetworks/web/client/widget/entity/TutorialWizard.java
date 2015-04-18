@@ -9,16 +9,12 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,7 +24,6 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 
 	private TutorialWizardView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private Callback callback;
 	private String entityId, tutorialButtonText;
 	
@@ -42,10 +37,9 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 	}
 
 	@Inject
-	public TutorialWizard(TutorialWizardView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public TutorialWizard(TutorialWizardView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	
@@ -74,34 +68,30 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 	 */
 	public void configure(final String entityId, Callback callback) {
 		this.callback = callback;
-		synapseClient.getWikiHeaderTree(entityId, ObjectType.ENTITY.toString(), new AsyncCallback<String>() {
+		synapseClient.getWikiHeaderTree(entityId, ObjectType.ENTITY.toString(), new AsyncCallback<PaginatedResults<WikiHeader>>() {
 			@Override
-			public void onSuccess(String results) {
-				try {
-					PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, WikiHeader.class);
-					
-					//sort them so that they are always in a predictable order for the wizard.
-					List<WikiHeader> sortedHeaders= new ArrayList<WikiHeader>();
-					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-						WikiHeader header = (WikiHeader) headerEntity;
-						//ignore root page to simplify setup
-						if (header.getParentId() != null)
-							sortedHeaders.add(header);
-					}
-					if (sortedHeaders.size() == 0) {
-						onFailure(new NotFoundException("Wiki subpages not found for tutorial: " + entityId));
-						return;
-					}
-					Collections.sort(sortedHeaders, new Comparator<WikiHeader>() {
-					    @Override
-				        public int compare(WikiHeader o1, WikiHeader o2) {
-				        	return o1.getTitle().compareTo(o2.getTitle());
-				        }
-					});
-					view.showWizard(entityId, sortedHeaders);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+			public void onSuccess(PaginatedResults<WikiHeader> results) {
+				PaginatedResults<WikiHeader> wikiHeaders = results;
+				
+				//sort them so that they are always in a predictable order for the wizard.
+				List<WikiHeader> sortedHeaders= new ArrayList<WikiHeader>();
+				for (JSONEntity headerEntity : wikiHeaders.getResults()) {
+					WikiHeader header = (WikiHeader) headerEntity;
+					//ignore root page to simplify setup
+					if (header.getParentId() != null)
+						sortedHeaders.add(header);
 				}
+				if (sortedHeaders.size() == 0) {
+					onFailure(new NotFoundException("Wiki subpages not found for tutorial: " + entityId));
+					return;
+				}
+				Collections.sort(sortedHeaders, new Comparator<WikiHeader>() {
+				    @Override
+			        public int compare(WikiHeader o1, WikiHeader o2) {
+			        	return o1.getTitle().compareTo(o2.getTitle());
+			        }
+				});
+				view.showWizard(entityId, sortedHeaders);
 			}
 			
 			@Override

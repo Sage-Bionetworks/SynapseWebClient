@@ -3,14 +3,12 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TeamSearchView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
@@ -29,7 +27,6 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	private TeamSearch place;
 	private TeamSearchView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private int offset;
@@ -41,13 +38,11 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
 			CookieProvider cookieProvider) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		
 		view.setPresenter(this);
 	}
@@ -86,15 +81,11 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 		else
 			this.offset = offset;
 		//execute search, and update view with the results
-		synapseClient.getTeamsBySearch(searchTerm, SEARCH_TEAM_LIMIT, offset, new AsyncCallback<String>() {
+		synapseClient.getTeamsBySearch(searchTerm, SEARCH_TEAM_LIMIT, offset, new AsyncCallback<PaginatedResults<Team>>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					teamList = nodeModelCreator.createPaginatedResults(result, Team.class);
-					view.configure(teamList.getResults(), searchTerm);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void onSuccess(PaginatedResults<Team> result) {
+				teamList = result;
+				view.configure(teamList.getResults(), searchTerm);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -12,6 +13,7 @@ import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -20,9 +22,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface ChallengeClientAsync {
 
 	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<String> callback) throws RestServiceException;
-	void getSharableEvaluations(String entityId, AsyncCallback<ArrayList<String>> callback);
+	void getAvailableEvaluations(AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
+	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
+	void getSharableEvaluations(String entityId, AsyncCallback<List<Evaluation>> asyncCallback);
 	
 	/**
 	 * Create a new Submission object.  Callback returning the updated version of the Submission object

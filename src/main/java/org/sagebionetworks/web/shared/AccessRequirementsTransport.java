@@ -2,37 +2,36 @@ package org.sagebionetworks.web.shared;
 
 
 
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.UserProfile;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class AccessRequirementsTransport implements IsSerializable {
-	private String entityString;
-	private String entityClassAsString;
-	private String accessRequirementsString;
-	private String userProfileString;
+	private Entity entity;
+	private PaginatedResults<AccessRequirement> accessRequirements;
+	private UserProfile userProfile;
 	
-	public String getEntityString() {
-		return entityString;
+	
+	public Entity getEntity() {
+		return entity;
 	}
-	public void setEntityString(String entityString) {
-		this.entityString = entityString;
+	public void setEntity(Entity entity) {
+		this.entity = entity;
 	}
-	public String getEntityClassAsString() {
-		return entityClassAsString;
+	public PaginatedResults<AccessRequirement> getAccessRequirements() {
+		return accessRequirements;
 	}
-	public void setEntityClassAsString(String entityClassAsString) {
-		this.entityClassAsString = entityClassAsString;
+	public void setAccessRequirements(
+			PaginatedResults<AccessRequirement> accessRequirements) {
+		this.accessRequirements = accessRequirements;
 	}
-	public String getAccessRequirementsString() {
-		return accessRequirementsString;
+	public UserProfile getUserProfile() {
+		return userProfile;
 	}
-	public void setAccessRequirementsString(String accessRequirementsString) {
-		this.accessRequirementsString = accessRequirementsString;
-	}
-	public String getUserProfileString() {
-		return userProfileString;
-	}
-	public void setUserProfileString(String userProfileString) {
-		this.userProfileString = userProfileString;
+	public void setUserProfile(UserProfile userProfile) {
+		this.userProfile = userProfile;
 	}
 	@Override
 	public int hashCode() {
@@ -40,18 +39,11 @@ public class AccessRequirementsTransport implements IsSerializable {
 		int result = 1;
 		result = prime
 				* result
-				+ ((accessRequirementsString == null) ? 0
-						: accessRequirementsString.hashCode());
-		result = prime
-				* result
-				+ ((entityClassAsString == null) ? 0 : entityClassAsString
+				+ ((accessRequirements == null) ? 0 : accessRequirements
 						.hashCode());
+		result = prime * result + ((entity == null) ? 0 : entity.hashCode());
 		result = prime * result
-				+ ((entityString == null) ? 0 : entityString.hashCode());
-		result = prime
-				* result
-				+ ((userProfileString == null) ? 0 : userProfileString
-						.hashCode());
+				+ ((userProfile == null) ? 0 : userProfile.hashCode());
 		return result;
 	}
 	@Override
@@ -63,38 +55,22 @@ public class AccessRequirementsTransport implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		AccessRequirementsTransport other = (AccessRequirementsTransport) obj;
-		if (accessRequirementsString == null) {
-			if (other.accessRequirementsString != null)
+		if (accessRequirements == null) {
+			if (other.accessRequirements != null)
 				return false;
-		} else if (!accessRequirementsString
-				.equals(other.accessRequirementsString))
+		} else if (!accessRequirements.equals(other.accessRequirements))
 			return false;
-		if (entityClassAsString == null) {
-			if (other.entityClassAsString != null)
+		if (entity == null) {
+			if (other.entity != null)
 				return false;
-		} else if (!entityClassAsString.equals(other.entityClassAsString))
+		} else if (!entity.equals(other.entity))
 			return false;
-		if (entityString == null) {
-			if (other.entityString != null)
+		if (userProfile == null) {
+			if (other.userProfile != null)
 				return false;
-		} else if (!entityString.equals(other.entityString))
-			return false;
-		if (userProfileString == null) {
-			if (other.userProfileString != null)
-				return false;
-		} else if (!userProfileString.equals(other.userProfileString))
+		} else if (!userProfile.equals(other.userProfile))
 			return false;
 		return true;
 	}
-	@Override
-	public String toString() {
-		return "AccessRequirementsTransport [entityString=" + entityString
-				+ ", entityClassAsString=" + entityClassAsString
-				+ ", accessRequirementsString=" + accessRequirementsString
-				+ ", userProfileString=" + userProfileString + "]";
-	}
-
-	
-	
 	
 }

@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
@@ -31,7 +30,6 @@ import com.google.inject.Inject;
 public class APITableColumnRendererEntityIdAnnotations implements APITableColumnRenderer {
 
 	SynapseClientAsync synapseClient;
-	NodeModelCreator nodeModelCreator;
 	AsyncCallback<APITableInitializedColumnRenderer> finalCallback;
 	Map<String, List<Annotation>> value2Annotations;
 	Map<String, String> value2Error;
@@ -45,9 +43,8 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	private List<String> sourceColumnData;
 	
 	@Inject
-	public APITableColumnRendererEntityIdAnnotations(AdapterFactory factory, EntitySchemaCache cache, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AnnotationTransformer transformer) {
+	public APITableColumnRendererEntityIdAnnotations(AdapterFactory factory, EntitySchemaCache cache, SynapseClientAsync synapseClient, AnnotationTransformer transformer) {
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.factory = factory;
 		this.cache = cache;
 		this.transformer = transformer;

@@ -2,17 +2,14 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView.Presenter;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -25,7 +22,6 @@ public class DoiWidget implements Presenter {
 	public static final int REFRESH_TIME = 13 * 1000; //13 seconds
 	private DoiWidgetView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private StackConfigServiceAsync stackConfigService;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
@@ -40,14 +36,12 @@ public class DoiWidget implements Presenter {
 	@Inject
 	public DoiWidget(DoiWidgetView view,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState, 
 			StackConfigServiceAsync stackConfigService,
 			AuthenticationController authenticationController) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.stackConfigService = stackConfigService;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
@@ -69,25 +63,20 @@ public class DoiWidget implements Presenter {
 		//get this entity's Doi (if it has one)
 		doi = null;
 		timer = null;
-		synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<String>() {
+		synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<Doi>() {
 			@Override
-			public void onSuccess(String result) {
-				//construct the DOI
-				try {
-					doi = nodeModelCreator.createJSONEntity(result, Doi.class);
-					view.showDoi(doi.getDoiStatus());
-					if ((doi.getDoiStatus() == DoiStatus.IN_PROCESS) && timer == null) {
-						timer = new Timer() {
-							public void run() {
-								configureDoi();
-							};
+			public void onSuccess(Doi result) {
+				doi = result;
+				view.showDoi(doi.getDoiStatus());
+				if ((doi.getDoiStatus() == DoiStatus.IN_PROCESS) && timer == null) {
+					timer = new Timer() {
+						public void run() {
+							configureDoi();
 						};
-						//schedule a timer to update the DOI status later
-						timer.schedule(REFRESH_TIME);
 					};
-				} catch (JSONObjectAdapterException e) {							
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+					//schedule a timer to update the DOI status later
+					timer.schedule(REFRESH_TIME);
+				};
 			}
 			@Override
 			public void onFailure(Throwable caught) {

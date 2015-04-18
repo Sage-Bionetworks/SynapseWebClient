@@ -1,16 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -35,21 +31,13 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	 * @param evaluationCallback call back with the evaluation if it is selected
 	 */
 	public void configure(String entityId, final CallbackP<Boolean> isChallengeCallback) {
-		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<ArrayList<String>>() {
+		challengeClient.getSharableEvaluations(entityId, new AsyncCallback<List<Evaluation>>() {
 			
 			@Override
-			public void onSuccess(ArrayList<String> results) {					
-				try {	
-					List<Evaluation> evaluations = new ArrayList<Evaluation>();
-					for(String eh : results) {
-						evaluations.add(new Evaluation(adapterFactory.createNew(eh)));
-					}
-					view.configure(evaluations);
-					if (isChallengeCallback != null)
-						isChallengeCallback.invoke(evaluations.size() > 0);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(List<Evaluation> evaluations) {					
+				view.configure(evaluations);
+				if (isChallengeCallback != null)
+					isChallengeCallback.invoke(evaluations.size() > 0);
 			}
 			
 			@Override

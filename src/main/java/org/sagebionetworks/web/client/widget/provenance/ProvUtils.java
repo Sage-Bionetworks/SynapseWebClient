@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
@@ -19,16 +18,12 @@ import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.ActivityTypeUtil;
@@ -167,7 +162,7 @@ public class ProvUtils {
 		return allRefs;
 	}
 	
-	public static Map<Reference, EntityHeader> mapReferencesToHeaders(BatchResults<EntityHeader> headers) {
+	public static Map<Reference, EntityHeader> mapReferencesToHeaders(PaginatedResults<EntityHeader> headers) {
 		Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
 		for(EntityHeader header : headers.getResults()) {
 			Reference equivalentRef = new Reference();
@@ -257,7 +252,6 @@ public class ProvUtils {
 	 */
 	public static void getInfo(String nodeId,			
 			SynapseClientAsync synapseClient,
-			final NodeModelCreator nodeModelCreator,
 			AdapterFactory adapterFactory,
 			ClientCache clientCache,
 			Map<String, ProvGraphNode> idToNode,
@@ -269,9 +263,9 @@ public class ProvUtils {
 		if(node == null) callback.onFailure(null);
 		
 		if(node instanceof EntityGraphNode) {
-			getInfoEntityTreeNode(synapseClient, nodeModelCreator, adapterFactory, clientCache, callback, (EntityGraphNode)node);
+			getInfoEntityTreeNode(synapseClient, adapterFactory, clientCache, callback, (EntityGraphNode)node);
 		} else if(node instanceof ActivityGraphNode) { 
-			getInfoActivityTreeNode(synapseClient, nodeModelCreator, adapterFactory, clientCache, callback, (ActivityGraphNode)node);
+			getInfoActivityTreeNode(synapseClient, adapterFactory, clientCache, callback, (ActivityGraphNode)node);
 		} else if(node instanceof ExternalGraphNode) {
 			callback.onSuccess(ProvUtils.externalNodeToKeyValueDisplay((ExternalGraphNode) node));
 		}
@@ -283,7 +277,6 @@ public class ProvUtils {
 	 */
 	private static void getInfoActivityTreeNode(
 			final SynapseClientAsync synapseClient,
-			final NodeModelCreator nodeModelCreator,
 			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
@@ -311,31 +304,24 @@ public class ProvUtils {
 	}
 
 	private static void getInfoEntityTreeNode(final SynapseClientAsync synapseClient,
-			final NodeModelCreator nodeModelCreator,
 			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			EntityGraphNode etNode) {
-		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<EntityWrapper>() {
+		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<Entity>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					final Entity entity = nodeModelCreator.createEntity(result);
-					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-						@Override
-						public void onSuccess(UserProfile profile) {
-							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile)));		
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-					});
-						
-					
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(Entity result) {
+				final Entity entity = result;
+				UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+					@Override
+					public void onSuccess(UserProfile profile) {
+						callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile)));		
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);
+					}
+				});
 			}
 			@Override
 			public void onFailure(Throwable caught) {

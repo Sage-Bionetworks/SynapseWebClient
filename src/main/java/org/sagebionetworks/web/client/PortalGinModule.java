@@ -27,8 +27,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
@@ -77,8 +75,6 @@ import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.client.view.WikiViewImpl;
-import org.sagebionetworks.web.client.view.table.ColumnFactory;
-import org.sagebionetworks.web.client.view.table.ColumnFactoryImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
@@ -112,8 +108,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
-import org.sagebionetworks.web.client.widget.entity.PromptModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
@@ -139,6 +133,8 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.PromptModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PromptTwoValuesModalView;
 import org.sagebionetworks.web.client.widget.entity.PromptTwoValuesModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialogView;
@@ -575,9 +571,6 @@ public class PortalGinModule extends AbstractGinModule {
 		 * Vanilla Implementation binding
 		 */
 		
-		// Node Model Creator
-		bind(NodeModelCreator.class).to(NodeModelCreatorImpl.class);
-		
 		// JSNI impls
 		bind(SynapseJSNIUtils.class).to(SynapseJSNIUtilsImpl.class);
 		
@@ -710,9 +703,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Bind the cookie provider
 		bind(GWTCookieImpl.class).in(Singleton.class);
 		bind(CookieProvider.class).to(GWTCookieImpl.class);
-
-		// ColumnFactory
-		bind(ColumnFactory.class).to(ColumnFactoryImpl.class);
 		
 		// The ImagePrototySingleton should be...well a singleton
 		bind(ImagePrototypeSingleton.class).in(Singleton.class);

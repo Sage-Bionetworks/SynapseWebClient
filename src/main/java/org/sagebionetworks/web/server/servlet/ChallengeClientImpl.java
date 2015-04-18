@@ -25,7 +25,6 @@ import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedIds;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
@@ -38,6 +37,7 @@ import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -205,7 +205,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getAvailableEvaluations() throws RestServiceException {
+	public PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			PaginatedResults<Evaluation> results = synapseClient

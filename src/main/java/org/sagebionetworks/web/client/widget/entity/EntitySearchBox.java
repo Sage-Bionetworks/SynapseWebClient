@@ -8,14 +8,11 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle.EntitySearchBoxSuggestion;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,7 +34,6 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	private EntitySearchBoxView view;
 	private EntitySelectedHandler handler;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private EntitySearchBoxOracle oracle;
 	private boolean retrieveVersions = false;
 	private EntitySearchBoxSuggestion selectedSuggestion;
@@ -50,11 +46,10 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 	 */
 	@Inject
 	public EntitySearchBox(EntitySearchBoxView view,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient) {
 		super();		
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		oracle = view.getOracle();
 		view.setPresenter(this);
 	}
@@ -90,16 +85,12 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 		if(handler != null) {
 			List<VersionInfo> versions = null;
 			if(retrieveVersions) {
-				synapseClient.getEntityVersions(entityId, 1, 20, new AsyncCallback<String>() {
+				synapseClient.getEntityVersions(entityId, 1, 20, new AsyncCallback<PaginatedResults<VersionInfo>>() {
 					@Override
-					public void onSuccess(String result) {
+					public void onSuccess(PaginatedResults<VersionInfo> result) {
 						PaginatedResults<VersionInfo> versions;
-						try {
-							versions = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
-							handler.onSelected(entityId, name, versions.getResults());
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-						}
+						versions = result;
+						handler.onSelected(entityId, name, versions.getResults());
 					}
 					@Override
 					public void onFailure(Throwable caught) {
