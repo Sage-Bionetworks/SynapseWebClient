@@ -6,9 +6,9 @@
 
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	<g:HTMLPanel>
-		<div ui:field="headerDiv" class="notopmargin small-header">
+		<div ui:field="headerDiv" class="notopmargin small-header synapse-blue-bg">
 			<div class="margin-top-3">
-			    <div ui:field="headerImageDiv" class="left logo margin-top-4 margin-left-5 smallHeader">
+			    <div ui:field="headerImageDiv" class="left logo margin-top-4 smallHeader margin-left-35">
 			        <a href="#!Home:0"> 
 				    	<g:Image ui:field="logoSmall" resource="{sageImages.synapseLogo}" height="40px" width="201px" />
 					</a>

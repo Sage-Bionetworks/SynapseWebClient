@@ -6,6 +6,16 @@ a:visited{color:#3a5bdc; text-decoration:none;}
 a:hover{color:#3a5bdc; text-decoration:underline;}
 a:focus{color:#3a5bdc; text-decoration:underline;}
 
+.synapse-yellow {color:#f19223;}
+.synapse-blue {color:#207da8;}
+.synapse-purple {color:#7772b4;}
+.synapse-green {color:#17a666;}
+
+.synapse-yellow-bg {background-color:#f19223;}
+.synapse-blue-bg {background-color:#207da8;}
+.synapse-purple-bg {background-color:#7772b4;}
+.synapse-green-bg {background-color:#17a666;}
+
 .pagination>li>a, .pagination>li>span
 {
 	color: #3a5bdc;

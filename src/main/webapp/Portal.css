@@ -1191,7 +1191,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /**********************************/
 	
-.wikifilepreviewimg {
+.center-in-div {
 	margin:auto; 
 	display:block;
 }
@@ -1645,9 +1645,8 @@ ol.lowerroman {
 }
 
 .small-header {
-	height: 90px;
-	background-color:#005f88;
-	padding: 20px;
+	height: 70px;
+	padding: 10px;
 }
 
 .largeHeader {

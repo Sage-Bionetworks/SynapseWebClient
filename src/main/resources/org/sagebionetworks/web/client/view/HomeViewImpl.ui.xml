@@ -22,14 +22,14 @@
 			</b:Column>
 		</b:Row>
 		<b:Row>
-			<b:Column size="SM_4">
-				<g:Image resource='{sageImageBundle.directory}' addStyleNames="displayBlock margin-auto" />
-			</b:Column>
 			<b:Column  size="SM_4">
-				<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="displayBlock margin-auto" />
+				<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="center-in-div" />
 			</b:Column>
 			<b:Column size="SM_4">
-				<g:Image resource='{sageImageBundle.prov}' addStyleNames="displayBlock margin-auto" />
+				<g:Image resource='{sageImageBundle.prov}' addStyleNames="center-in-div" />
+			</b:Column>
+			<b:Column size="SM_4">
+				<g:Image resource='{sageImageBundle.directory}' addStyleNames="center-in-div" />
 			</b:Column>
 		</b:Row>
 		<!-- TOP 3 COLUMNS -->		
