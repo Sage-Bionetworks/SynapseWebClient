@@ -45,8 +45,8 @@ public class ProjectSearchRedirectFilter implements Filter {
 			HttpServletRequest httpRqst = (HttpServletRequest)rqst;
 			
 			URL requestURL = new URL(httpRqst.getRequestURL().toString());
-			//use path as the search string, but replace all '-' with spaces
-			String searchString = requestURL.getPath().substring(PROJECT.length()).replace('-', ' ');
+			//use path as the search string, but replace all '_' with spaces
+			String searchString = requestURL.getPath().substring(PROJECT.length()).replace('_', ' ');
 			
 			//do the search
 			EntityQuery query = getEntityQuery(searchString);
