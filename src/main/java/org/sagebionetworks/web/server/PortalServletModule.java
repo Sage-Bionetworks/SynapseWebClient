@@ -31,6 +31,7 @@ import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.filter.CRCSCFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
+import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
 import org.sagebionetworks.web.server.servlet.filter.UpForAChallengeFilter;
@@ -155,6 +156,12 @@ public class PortalServletModule extends ServletModule {
 		
 		// JSONObjectAdapter
 		bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
+		
+		//search by public project name
+		bind(ProjectSearchRedirectFilter.class).in(Singleton.class);
+		filter(ProjectSearchRedirectFilter.PROJECT+"*").through(ProjectSearchRedirectFilter.class);
+		
+		
 		
 		handleGWTPlaces();
 	}
