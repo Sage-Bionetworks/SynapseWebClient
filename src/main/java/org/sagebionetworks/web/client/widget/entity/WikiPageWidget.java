@@ -96,19 +96,14 @@ SynapseWidgetPresenter {
 	}
 	
 	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage) {
-		reloadWikiPageCallback = new CallbackP<WikiPageKey>() {
-            @Override
-            public void invoke(WikiPageKey param) {
-                configure(param, canEdit, callback, isEmbeddedInOwnerPage);
-            }
-        };
 		view.showLoading();
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
-		//set up callback
+
+		/* set up callbacks */
 		if (callback != null)
 			this.callback = callback;
 		else 
@@ -120,7 +115,14 @@ SynapseWidgetPresenter {
 				public void noWikiFound() {
 				}
 			};
-		
+		// this callback is used to reload the wiki markdown without reloading the entire page
+		reloadWikiPageCallback = new CallbackP<WikiPageKey>() {
+            @Override
+            public void invoke(WikiPageKey param) {
+                configure(param, canEdit, callback, isEmbeddedInOwnerPage);
+            }
+        };
+
 		setOwnerObjectName(new OwnerObjectNameCallback() {
 			@Override
 			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
@@ -159,7 +161,7 @@ SynapseWidgetPresenter {
 								view.showWarningMessageInPage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
-				});				
+				});
 			}
 		});
 	}

@@ -61,7 +61,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiPageKey wikiKey;
 	WikiPageWidgetView.Presenter presenter;
-	private boolean isDescription = false;
 	private WikiHistoryWidget historyWidget;
 	PortalGinInjector ginInjector;
 	private boolean isHistoryOpen;
@@ -118,11 +117,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void configure(String markdown, final WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, boolean isDescription, 
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki,
 			boolean isCurrentVersion, final Long versionInView, boolean isEmbeddedInOwnerPage) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
-		this.isDescription = isDescription;
 		this.ownerObjectName = ownerObjectName;
 		this.isRootWiki = isRootWiki;
 		this.isHistoryOpen = false;
@@ -288,12 +286,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			commandBar.clear();
 		}
 			
-		if(!isDescription) {
-			Button addPageButton = createAddPageButton();
-			commandBar.add(addPageButton);
-			addPageButton.addStyleName("margin-left-5");
-		}
-		
+		Button addPageButton = createAddPageButton();
+		commandBar.add(addPageButton);
+		addPageButton.addStyleName("margin-left-5");
+
 		commandBarWrapper.setVisible(canEdit);
 		return commandBarWrapper;
 	}
