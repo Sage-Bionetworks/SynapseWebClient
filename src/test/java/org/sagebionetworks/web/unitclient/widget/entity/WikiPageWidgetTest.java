@@ -117,6 +117,15 @@ public class WikiPageWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureNoWikiPageEmbeddedCanEdit(){
+		//if page is not embedded in the owner page, and the user can't edit, then it should show a 404
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, mockCallback, true);
+		verify(mockView).showWarningMessageInPage(anyString());
+	}
+	
+	@Test
 	public void testConfigureWikiForbiddenNotEmbedded(){
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false);
