@@ -781,18 +781,6 @@ a.shortBtn {
 	top: -160px;
 }
 
-.dragAndDropUploadBox {
-	width: 100%;
-	padding: zem 0 6em 38%;
-	opacity: 0;
-	filter: alpha(opacity=0);
-}
-.dragAndDropBorder {
-	border: 2px dashed;
-	border-radius: 3em;
-}
-
-
 .userGroupSuggestBoxPopup {
 	z-index: 2000;
 	background-color: #fff;

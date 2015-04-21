@@ -483,7 +483,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadInput = new Input(InputType.FILE);
 		fileUploadInput.setId(FILE_FIELD_ID);
 		fileUploadInput.setName("uploads[]");
-		fileUploadInput.setStyleName("hide");
+		fileUploadInput.setVisible(false);
 		fileUploadLabel.addStyleName("displayInline margin-left-5");
 		fileUploadInput.addValueChangeHandler(new ValueChangeHandler<String>() {
 			@Override
