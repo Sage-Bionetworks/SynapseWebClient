@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.TreeItem;
