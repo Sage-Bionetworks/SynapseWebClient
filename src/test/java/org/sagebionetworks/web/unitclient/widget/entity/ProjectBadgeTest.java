@@ -139,7 +139,7 @@ public class ProjectBadgeTest {
 	}
 	
 	@Test
-	public void testprofileToKeyValueDisplay() throws Exception {
+	public void testprofileToKeyValueDisplay() {
 		ProjectHeader header = new ProjectHeader();
 		String id = "syn37373";
 		String name = "a name";
@@ -151,8 +151,8 @@ public class ProjectBadgeTest {
 			
 		// getMap() is directly called when used, so it's tested directly 
 		Map<String,String> tooltipMap = widget.profileToKeyValueDisplay(userProfile, "Bilbo").getMap();
-		assert(tooltipMap.get("ID").equals(header.getId()));
-		assert(tooltipMap.get("Modified By").equals(Long.valueOf(userProfile.getOwnerId())));
+		assertTrue(tooltipMap.get("ID").equals(header.getId()));
+		assertTrue(tooltipMap.get("Modified By").equals(Long.valueOf(userProfile.getUserName())));
 	}
 
 	@Test
