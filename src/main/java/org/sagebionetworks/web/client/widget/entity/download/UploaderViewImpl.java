@@ -73,8 +73,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	private PasswordTextBox externalPassword;
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
-	//public static final String FILE_FIELD_STYLENAME = "dragAndDropUploadBox";
-	//public static final String FILE_UPLOAD_LABEL_STYLENAME = "fileUploadLabel";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
 
