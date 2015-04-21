@@ -542,7 +542,7 @@ public class UploaderTest {
 	@Test
 	public void testGetSelectedFilesTextNoFiles() {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
-		assertEquals(UploaderViewImpl.DRAG_AND_DROP, uploader.getSelectedFilesText());
+		assert(uploader.getSelectedFilesText().isEmpty());
 	}
 	
 	@Test
