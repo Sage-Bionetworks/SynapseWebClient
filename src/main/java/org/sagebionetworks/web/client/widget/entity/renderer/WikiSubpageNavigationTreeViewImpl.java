@@ -15,6 +15,7 @@ import com.google.inject.Inject;
 public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements WikiSubpageNavigationTreeView {
 
 	private WikiSubpageNavigationTreeView.Presenter presenter;
+	private UnorderedListPanel ulNavTree;
 
 	@Inject
 	public WikiSubpageNavigationTreeViewImpl() {
@@ -34,10 +35,16 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 
 	@Override
 	public void configure(SubpageNavTreeNode overallRoot) {
-		UnorderedListPanel ul = new UnorderedListPanel();
-		ul.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
-		addTreeItemsRecursive(ul, overallRoot);
-		this.add(ul);
+		ulNavTree = new UnorderedListPanel();
+		ulNavTree.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
+		addTreeItemsRecursive(ulNavTree, overallRoot);
+		this.add(ulNavTree);
+	}
+
+	@Override
+	public void resetNavTree(SubpageNavTreeNode overallRoot) {
+		ulNavTree.clear();
+		addTreeItemsRecursive(ulNavTree, overallRoot);
 	}
 
 	private void addTreeItemsRecursive(UnorderedListPanel ul, SubpageNavTreeNode root) {

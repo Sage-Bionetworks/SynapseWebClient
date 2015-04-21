@@ -17,4 +17,6 @@ public interface WikiSubpageNavigationTreeView extends IsWidget, SynapseView {
 	}
 
 	public void setPresenter(Presenter presenter);
+
+	public void resetNavTree(SubpageNavTreeNode overallRoot);
 }
