@@ -195,7 +195,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
 		}
 		resetWikiPagePanel();
-		removeNotice();
+		// removeNotice();
 	}
 
 	private void removeNotice(){
@@ -208,6 +208,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	private void resetWikiPagePanel() {
 		wikiPagePanel.clear();
+		if(!isCurrentVersion) {
+			// Create warning that user is viewing a different version
+			FlowPanel noticePanel = createDifferentVersionNotice();
+			noticeWidget = wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice");
+			wikiPagePanel.add(noticeWidget);
+		}
+
 		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
 		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
@@ -225,14 +232,30 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiPagePanel.add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
 	}
 
+	/*
+	 *     ________
+	 *     | Wiki |
+	 * ___________________________________________________________
+	 * | ___________ ___________________________________________ |
+	 * | | 2       | | _______________________________________ | |
+	 * | |         | | | Notice                              | | |
+	 * | |         | | |_____________________________________| | |
+	 * | |_________| |  Wiki content                           | |
+	 * |             |                                         | |
+	 * |             |                                         | |
+	 * |             |                                         | |
+	 * |             |                                         | |
+	 * |             | Modified/Created by                     | |
+	 * |             | Show Wiki History                     3 | |
+	 * | 1           |_________________________________________| |
+	 * |_________________________________________________________|
+	 * 
+	 * 1 - this widget
+	 * 2 - WikiSubpagesWidget widget
+	 * 3 - wikiPagePanel
+	 */
 	private void showDefaultViewWithWiki() {
 		clear();
-		if(!isCurrentVersion) {
-			// Create warning that user is viewing a different version
-			FlowPanel noticePanel = createDifferentVersionNotice();
-			noticeWidget = wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice");
-			add(noticeWidget);
-		}
 
 		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
