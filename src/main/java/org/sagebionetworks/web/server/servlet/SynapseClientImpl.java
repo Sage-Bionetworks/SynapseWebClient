@@ -502,24 +502,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@Override
-	public String createOrUpdateEntity(String entityJson, String annoJson,
-			boolean isNew) throws RestServiceException {
-		// First read the entity
-		try {
-			Entity entity = parseEntityFromJson(entityJson);
-			Annotations annos = null;
-			if (annoJson != null) {
-				annos = EntityFactory.createEntityFromJSONString(annoJson,
-						Annotations.class);
-			}
-			return createOrUpdateEntity(entity, annos, isNew);
-		} catch (JSONObjectAdapterException e) {
-			throw new BadRequestException(e.getMessage());
-		}
-
-	}
-
 	/**
 	 * Create or update an entity
 	 * 
@@ -529,6 +511,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 * @return
 	 * @throws RestServiceException
 	 */
+	@Override
 	public String createOrUpdateEntity(Entity entity, Annotations annos,
 			boolean isNew) throws RestServiceException {
 		// First read the entity
@@ -2934,4 +2917,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		// This method does nothing?
 		
 	}
+
 }

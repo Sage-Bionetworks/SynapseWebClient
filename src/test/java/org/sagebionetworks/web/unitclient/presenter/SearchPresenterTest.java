@@ -30,7 +30,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
@@ -43,7 +42,6 @@ public class SearchPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	JSONObjectAdapter jsonObjectAdapter;
 	PlaceChanger mockPlaceChanger;
 	EntityTypeProvider mockEntityTypeProvider;
@@ -56,7 +54,6 @@ public class SearchPresenterTest {
 	public void setup() throws Exception{
 		mockView = mock(SearchView.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -68,7 +65,7 @@ public class SearchPresenterTest {
 		
 		searchPresenter = new SearchPresenter(mockView,
 				mockGlobalApplicationState, mockAuthenticationController,
-				mockSynapseClient, mockNodeModelCreator,
+				mockSynapseClient,
 				new JSONObjectAdapterImpl(), mockEntityTypeProvider,
 				mockIconsImageBundle);
 		

@@ -118,25 +118,19 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		Folder folder = new Folder();
 		folder.setParentId(configuredEntityId);
 		folder.setEntityType(Folder.class.getName());
-		String entityJson;
-		try {
-			entityJson = folder.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String newId) {
-					currentFolderEntityId = newId;
-					view.showFolderEditDialog(newId);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
-				}			
-			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-		}
+		synapseClient.createOrUpdateEntity(folder, null, true, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String newId) {
+				currentFolderEntityId = newId;
+				view.showFolderEditDialog(newId);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
+			}			
+		});
 	}
 	
 	@Override

@@ -109,7 +109,7 @@ public interface SynapseClientAsync {
 
 	void getRepositoryServiceUrl(AsyncCallback<String> callback);
 
-	void createOrUpdateEntity(String entityJson, String annoJson,
+	void createOrUpdateEntity(Entity entity, Annotations annos,
 			boolean isNew, AsyncCallback<String> callback);
 	
 	void getEntityTypeBatch(List<String> entityIds,
@@ -262,7 +262,6 @@ public interface SynapseClientAsync {
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
-//	void getTeamMembershipState(String currentUserId, String teamId, AsyncCallback<String> callback);
 	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
 	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);

@@ -29,13 +29,13 @@ public interface ChallengeClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
+	public PaginatedResults<Evaluation> getEvaluations(List<String> evaluationIds) throws RestServiceException;
 	
-	PaginatedResults<Evaluation> getAvailableEvaluations();
+	PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException;
 	PaginatedResults<Evaluation> getAvailableEvaluations(
-			Set<String> targetEvaluationIds);
+			Set<String> targetEvaluationIds) throws RestServiceException;
 	
-	List<Evaluation> getSharableEvaluations(String entityId);
+	List<Evaluation> getSharableEvaluations(String entityId) throws RestServiceException;
 	
 	public Submission createIndividualSubmission(Submission submission, String etag) throws RestServiceException;
 	public Submission createTeamSubmission(Submission submission, String etag, String memberStateHash) throws RestServiceException;

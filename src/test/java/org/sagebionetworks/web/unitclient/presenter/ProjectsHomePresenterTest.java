@@ -12,7 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -26,7 +27,6 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -40,7 +40,6 @@ public class ProjectsHomePresenterTest {
 	ProjectsHomeView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	NodeModelCreator mockNodeModelCreator;
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
@@ -53,7 +52,6 @@ public class ProjectsHomePresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);	
 		projectsHomePresenter = new ProjectsHomePresenter(mockView,
 				mockGlobalApplicationState, 
@@ -75,13 +73,13 @@ public class ProjectsHomePresenterTest {
 		String newId = "syn123";
 		String name = "name";
 		
-		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), eq(true), any(AsyncCallback.class));
 		
 		projectsHomePresenter.createProject(name);
 		
-		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).createOrUpdateEntity(arg.capture(), anyString(), eq(true), any(AsyncCallback.class));
-		Project proj = new Project(new JSONObjectAdapterImpl(arg.getValue()));
+		ArgumentCaptor<Entity> arg = ArgumentCaptor.forClass(Entity.class);
+		verify(mockSynapseClient).createOrUpdateEntity(arg.capture(), any(Annotations.class), eq(true), any(AsyncCallback.class));
+		Project proj = (Project) arg.getValue();
 		assertEquals(name, proj.getName());
 		
 		verify(mockView).showInfo(anyString(), anyString());
@@ -99,7 +97,7 @@ public class ProjectsHomePresenterTest {
 		String name = "name";
 		
 		ConflictException ex = new ConflictException();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), eq(true), any(AsyncCallback.class));
 		
 		projectsHomePresenter.createProject(name);
 
