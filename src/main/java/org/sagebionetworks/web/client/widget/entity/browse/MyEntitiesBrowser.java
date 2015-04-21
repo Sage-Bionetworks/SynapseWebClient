@@ -24,13 +24,14 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, SynapseWidgetPresenter {
 	
+	public static final Long ZERO_OFFSET = 0L;
+	public static final Long PROJECT_LIMIT = 1000L;
 	private MyEntitiesBrowserView view;	
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -99,7 +100,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		view.showLoading();
 		view.getEntityTreeBrowser().clear();
 		if (authenticationController.isLoggedIn()) {
-			synapseClient.executeEntityQuery(createGetMyProjectQuery(), new AsyncCallback<EntityQueryResults>() {
+			synapseClient.executeEntityQuery(createMyProjectQuery(), new AsyncCallback<EntityQueryResults>() {
 				@Override
 				public void onSuccess(EntityQueryResults results) {
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
@@ -115,13 +116,13 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.setUpdatableEntities(new ArrayList<EntityHeader>());
+					view.showErrorMessage(caught.getMessage());
 				}
 			});
 		}
 	}
 	
-	public EntityQuery createGetMyProjectQuery() {
+	public EntityQuery createMyProjectQuery() {
 		EntityQuery newQuery = new EntityQuery();
 		Sort sort = new Sort();
 		sort.setColumnName(EntityFieldName.name.name());
@@ -131,8 +132,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 				EntityFieldName.createdByPrincipalId, Operator.EQUALS, authenticationController.getCurrentUserPrincipalId());
 		newQuery.setConditions(Arrays.asList(condition));
 		newQuery.setFilterByType(org.sagebionetworks.repo.model.entity.query.EntityType.project);
-		newQuery.setLimit(1000L);
-		newQuery.setOffset(0L);
+		newQuery.setLimit(PROJECT_LIMIT);
+		newQuery.setOffset(ZERO_OFFSET);
 		return newQuery;
 	}
 
