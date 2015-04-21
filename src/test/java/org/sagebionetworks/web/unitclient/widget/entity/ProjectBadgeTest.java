@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
-
-import static junit.framework.Assert.*;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +25,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
@@ -44,6 +46,7 @@ public class ProjectBadgeTest {
 	AsyncCallback<KeyValueDisplay<String>> getInfoCallback;
 	ProjectBadgeView mockView;
 	String entityId = "syn123";
+	UserProfile userProfile;
 	ProjectBadge widget;
 	FavoriteWidget mockFavoriteWidget;
 
@@ -63,7 +66,7 @@ public class ProjectBadgeTest {
 		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget);
 		
 		//set up user profile
-		UserProfile userProfile =  new UserProfile();
+		userProfile =  new UserProfile();
 		userProfile.setOwnerId("4444");
 		userProfile.setUserName("Bilbo");
 		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
@@ -87,6 +90,7 @@ public class ProjectBadgeTest {
 		header.setId(id);
 		header.setName(name);
 		header.setLastActivity(lastActivity);
+		
 		
 		widget.configure(header);
 		verify(mockView).setProject(eq(name), anyString());
@@ -135,14 +139,21 @@ public class ProjectBadgeTest {
 	}
 	
 	@Test
-	public void testGetInfoFailure() throws Exception {
-		setupEntity(new Project(), null);
-		//failure to get entity
-		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getProject(anyString(), any(AsyncCallback.class));
-		widget.getInfo(getInfoCallback);
-		//exception should be passed back to callback
-		verify(getInfoCallback).onFailure(eq(ex));
+	public void testprofileToKeyValueDisplay() {
+		ProjectHeader header = new ProjectHeader();
+		String id = "syn37373";
+		String name = "a name";
+		header.setId(id);
+		header.setName(name);
+		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
+		widget.configure(header);
+		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+			
+		// getMap() is directly called when used, so it's tested directly 
+		Map<String,String> tooltipMap = widget.profileToKeyValueDisplay(userProfile, "Bilbo").getMap();
+		assert(3 == tooltipMap.size());
+		assert(tooltipMap.get("ID").equals(header.getId()));
+		assert(tooltipMap.get("Modified By").equals(Long.valueOf(userProfile.getOwnerId())));
 	}
 
 	@Test
