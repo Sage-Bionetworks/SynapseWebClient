@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.HasDirection.Direction;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -303,8 +305,7 @@ public class DisplayConstants {
 	public static final String STATUS_CREATED_BY = "Owner";
 	public static final String EMPTY = "Empty";
 	public static final String NONE_FOUND = "None Found";
-	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
-	public static final String LABEL_NO_MARKDOWN = "There is no content. Please edit to add information.";
+	public static final String LABEL_NO_MARKDOWN = "There is no content. Please click \""+EntityActionControllerImpl.EDIT_WIKI+"\" from the Tools menu.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";

@@ -102,7 +102,7 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPageCannotEditIsEmbedded(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
-		verify(mockView).showWarningMessageInPage(anyString());
+		verify(mockView).clear();
 	}
 
 	
