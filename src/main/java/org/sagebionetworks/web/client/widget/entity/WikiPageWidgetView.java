@@ -36,4 +36,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void showWikiHistory(boolean isVisible);
 	public void showCreatedBy(boolean isVisible);
 	public void showModifiedBy(boolean isVisible);
+	public void resetWikiMarkdown(String markdown, final WikiPageKey wikiKey,
+			boolean isRootWiki, boolean isCurrentVersion, final Long versionInView);
 }

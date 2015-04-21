@@ -61,6 +61,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiPageKey wikiKey;
 	WikiPageWidgetView.Presenter presenter;
+	private boolean isDescription = false;
 	private WikiHistoryWidget historyWidget;
 	PortalGinInjector ginInjector;
 	private boolean isHistoryOpen;
@@ -119,23 +120,101 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void configure(String markdown, final WikiPageKey wikiKey,
 			String ownerObjectName, Boolean canEdit, boolean isRootWiki,
 			boolean isCurrentVersion, final Long versionInView, boolean isEmbeddedInOwnerPage) {
-		this.wikiKey = wikiKey;
-		this.canEdit = canEdit;
 		this.ownerObjectName = ownerObjectName;
+		this.canEdit = canEdit;
+		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.wikiPagePanel = new FlowPanel();
+		resetWikiMarkdown(markdown, wikiKey, isRootWiki, isCurrentVersion, versionInView);
+		showDefaultViewWithWiki();
+	}
+	
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+
+	public void showRestorationWarning(final Long wikiVersion) {
+		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+				presenter.restoreClicked(wikiVersion);
+			}	
+		};
+		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+		DisplayUtils.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
+				MessagePopup.WARNING, okCallback, cancelCallback);
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showLoading() {
+		clear();
+		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+	}
+
+	@Override
+	public Widget asWidget() {
+		return this;
+	}
+
+	@Override
+	public void showCreatedBy(boolean isVisible) {
+		createdPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void showModifiedBy(boolean isVisible) {
+		modifiedPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void showWikiHistory(boolean isVisible) {
+		historyPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void resetWikiMarkdown(String markdown, final WikiPageKey wikiKey,
+			boolean isRootWiki, boolean isCurrentVersion, final Long versionInView) {
+		this.wikiKey = wikiKey;
 		this.isRootWiki = isRootWiki;
 		this.isHistoryOpen = false;
 		this.isHistoryWidgetBuilt = false;
 		this.isCurrentVersion = isCurrentVersion;
 		this.versionInView = versionInView;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		if(!isCurrentVersion) {
 			markdownWidget.setMarkdown(markdown, wikiKey, false, versionInView);
 		} else {
 			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
 		}
-		showDefaultViewWithWiki();
+		resetWikiPagePanel();
 	}
-	
+
+	private void resetWikiPagePanel() {
+		wikiPagePanel.clear();
+		wikiPagePanel.add(getBreadCrumbs());
+		SimplePanel topBarWrapper = new SimplePanel();
+		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
+		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
+		wikiPagePanel.add(topBarWrapper);
+
+		FlowPanel mainPanel = new FlowPanel();
+		if(isCurrentVersion) {
+			mainPanel.add(getCommands(canEdit));
+		}
+		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
+		wikiPagePanel.add(mainPanel);
+
+		FlowPanel modifiedCreatedSection = createdModifiedCreatedSection();
+		wikiPagePanel.add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
+	}
+
 	private void showDefaultViewWithWiki() {
 		clear();
 		if(!isCurrentVersion) {
@@ -143,7 +222,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			FlowPanel noticePanel = createDifferentVersionNotice();
 			add(wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice"));
 		}
-		wikiPagePanel = new FlowPanel();
+
 		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
 		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
@@ -152,24 +231,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		add(wikiSubpagesPanel);
 		add(wikiPagePanel);
 		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
-		
-		wikiPagePanel.add(getBreadCrumbs());
-		SimplePanel topBarWrapper = new SimplePanel();
-		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
-		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
-		wikiPagePanel.add(topBarWrapper);
-		
-		FlowPanel mainPanel = new FlowPanel();
-		if(isCurrentVersion) {
-			mainPanel.add(getCommands(canEdit));
-		}
-		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
-		wikiPagePanel.add(mainPanel);
-		
-		FlowPanel modifiedCreatedSection = createdModifiedCreatedSection();
-		wikiPagePanel.add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
 	}
-	
+
 	private FlowPanel createdModifiedCreatedSection() {
 		// Add created/modified information at the end
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
@@ -286,10 +349,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			commandBar.clear();
 		}
 			
-		Button addPageButton = createAddPageButton();
-		commandBar.add(addPageButton);
-		addPageButton.addStyleName("margin-left-5");
-
+		if(!isDescription) {
+			Button addPageButton = createAddPageButton();
+			commandBar.add(addPageButton);
+			addPageButton.addStyleName("margin-left-5");
+		}
+		
 		commandBarWrapper.setVisible(canEdit);
 		return commandBarWrapper;
 	}
@@ -374,54 +439,5 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			}
 		});
 		return btn;
-	}
-	
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-	
-	public void showRestorationWarning(final Long wikiVersion) {
-		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
-			@Override
-			public void invoke() {
-				presenter.restoreClicked(wikiVersion);
-			}	
-		};
-		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
-			@Override
-			public void invoke() {
-			}	
-		};
-		DisplayUtils.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
-				MessagePopup.WARNING, okCallback, cancelCallback);
-	}
-	
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-	
-	@Override
-	public void showLoading() {
-		clear();
-		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
-	}
-	
-	@Override
-	public Widget asWidget() {
-		return this;
-	}
-	
-	@Override
-	public void showCreatedBy(boolean isVisible) {
-		createdPanel.setVisible(isVisible);
-	}
-	@Override
-	public void showModifiedBy(boolean isVisible) {
-		modifiedPanel.setVisible(isVisible);
-	}
-	@Override
-	public void showWikiHistory(boolean isVisible) {
-		historyPanel.setVisible(isVisible);
 	}
 }
