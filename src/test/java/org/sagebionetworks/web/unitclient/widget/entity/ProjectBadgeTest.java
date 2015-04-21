@@ -151,9 +151,8 @@ public class ProjectBadgeTest {
 			
 		// getMap() is directly called when used, so it's tested directly 
 		Map<String,String> tooltipMap = widget.profileToKeyValueDisplay(userProfile, "Bilbo").getMap();
-		assert(3 == tooltipMap.size());
-		assert(tooltipMap.get("ID").equals(header.getId()));
-		assert(tooltipMap.get("Modified By").equals(Long.valueOf(userProfile.getOwnerId())));
+		assertTrue(tooltipMap.get("ID").equals(header.getId()));
+		assertTrue(tooltipMap.get("Modified By").equals(userProfile.getOwnerId()));
 	}
 
 	@Test

@@ -563,8 +563,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void addProjects(List<ProjectHeader> projectHeaders) {
-		addProjectBadges(projectHeaders, projectsTabContent);
+	public void addProjects(List<ProjectHeader> projectHeaders, List<UserProfile> modifiedBy) {
+		addProjectBadges(projectHeaders, modifiedBy, projectsTabContent);
 	}
 
 	@Override
@@ -589,11 +589,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		moreProjectsButton.setVisible(isVisible);
 	}
 	
-	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
+	private void addProjectBadges(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedBy, FlowPanel targetPanel) {
 		//uses ProjectBadge to show more information (additional info available from ProjectHeader)
-		for (ProjectHeader projectHeader : projectHeaders) {
+		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
-			badge.configure(projectHeader);
+			badge.configure(projectHeaders.get(i), lastModifiedBy.get(i));
 			Widget widget = badge.asWidget();
 			widget.addStyleName("margin-bottom-10 col-xs-12");
 			targetPanel.add(widget);

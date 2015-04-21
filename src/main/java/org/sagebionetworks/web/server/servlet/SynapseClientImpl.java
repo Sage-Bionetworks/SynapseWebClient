@@ -157,9 +157,11 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -3050,8 +3052,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset);
-			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+			List<ProjectHeader> headers = (List<ProjectHeader>)synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset).getResults();
+			List<String> lastModifiedBy = new LinkedList<String>();
+			for (ProjectHeader header: headers) {
+				lastModifiedBy.add(header.getModifiedBy().toString());
+			}			
+			return new ProjectPagedResults(headers, headers.size(), listUserProfiles(lastModifiedBy));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -3062,8 +3068,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long teamIdLong = Long.parseLong(teamId);
-			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset);
-			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+			List<ProjectHeader> headers = (List<ProjectHeader>)synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset).getResults();
+			List<String> lastModifiedBy = new LinkedList<String>();
+			for (ProjectHeader header: headers) {
+				lastModifiedBy.add(header.getModifiedBy().toString());
+			}
+			return new ProjectPagedResults(headers, headers.size(), listUserProfiles(lastModifiedBy));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -3075,8 +3085,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long userIdLong = Long.parseLong(userId);
-			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset);
-			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+			List<ProjectHeader> headers = (List<ProjectHeader>)synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset).getResults();
+			List<String> lastModifiedBy = new LinkedList<String>();
+			for (ProjectHeader header: headers) {
+				lastModifiedBy.add(header.getModifiedBy().toString());
+			}
+			return new ProjectPagedResults(headers, headers.size(), listUserProfiles(lastModifiedBy));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

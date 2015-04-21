@@ -419,7 +419,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == filter) {
-					addProjectResults(projectHeaders.getResults());
+					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				}
 			}
@@ -437,7 +437,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(projectHeaders.getResults());
+					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				}
 			}
@@ -454,8 +454,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				List<ProjectHeader> headers = projectHeaders.getResults();
-				addProjectResults(headers);
+				addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
@@ -466,9 +465,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> headers) {
+	public void addProjectResults(List<ProjectHeader> headers, List<UserProfile> lastModifiedBy) {
 		view.showProjectsLoading(false);
-		view.addProjects(headers);
+		view.addProjects(headers, lastModifiedBy);
 	}
 	
 	public void addChallengeResults(List<ChallengeBundle> challenges) {
@@ -499,13 +498,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						view.setFavoritesHelpPanelVisible(true);
 					} else {
 						List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
+						List<String> lastModifiedBy = new ArrayList<String>(result.size());
 						for (EntityHeader header : result) {
+							lastModifiedBy.add(header.getId());
 							ProjectHeader projectHeader = new ProjectHeader();
 							projectHeader.setId(header.getId());
 							projectHeader.setName(header.getName());
 							headers.add(projectHeader);
 						}
-						addProjectResults(headers);
+						addProjectResults(headers, null);
 						view.setIsMoreProjectsVisible(false);	
 					}
 				}
