@@ -158,7 +158,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public String getSelectedFilesText() {
 		String[] selectedFiles = getSelectedFileNames();
 		if (selectedFiles == null)
-			return UploaderViewImpl.DRAG_AND_DROP;
+			return "";
 		else if (selectedFiles.length == 1) {
 			return selectedFiles[0];
 		} else {
