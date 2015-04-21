@@ -72,6 +72,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private boolean isEmbeddedInOwnerPage;
 	private HorizontalPanel modifiedPanel, createdPanel;
 	private SimplePanel historyPanel;
+	private SimplePanel noticeWidget;
 	
 	public interface OwnerObjectNameCallback{
 		public void ownerObjectNameInitialized();
@@ -194,6 +195,15 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
 		}
 		resetWikiPagePanel();
+		removeNotice();
+	}
+
+	private void removeNotice(){
+		if (noticeWidget != null) {
+			noticeWidget.clear();
+			noticeWidget.setStyleName("none");
+			noticeWidget.setVisible(false);
+		}
 	}
 
 	private void resetWikiPagePanel() {
@@ -220,7 +230,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			FlowPanel noticePanel = createDifferentVersionNotice();
-			add(wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice"));
+			noticeWidget = wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice");
+			add(noticeWidget);
 		}
 
 		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
