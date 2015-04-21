@@ -12,7 +12,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-@RemoteServiceRelativePath("search")
+@RemoteServiceRelativePath("searchclient")
 public interface SearchService extends RemoteService{
 	
 	public static final String KEY_RESULTS = "results";
@@ -26,18 +26,6 @@ public interface SearchService extends RemoteService{
 	 * @return
 	 */
 	public TableResults executeSearch(SearchParameters params);	
-	
-	/**
-	 * Execute a Search and return results as a list of entity headers
-	 * @param fromType
-	 * @param where
-	 * @param offset
-	 * @param limit
-	 * @param sort
-	 * @param ascending
-	 * @return
-	 */
-	public List<String> searchEntities(String fromType, List<WhereCondition> where,	int offset,	int limit, String sort,	boolean ascending) throws RestServiceException;
 	
 	/**
 	 * Gets all of the column metadata for a given type.

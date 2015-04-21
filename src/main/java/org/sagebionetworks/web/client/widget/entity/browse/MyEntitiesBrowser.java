@@ -1,20 +1,30 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,10 +32,8 @@ import com.google.inject.Inject;
 public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, SynapseWidgetPresenter {
 	
 	private MyEntitiesBrowserView view;	
-	private SearchServiceAsync searchService;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private HandlerManager handlerManager = new HandlerManager(this);
 	private SynapseClientAsync synapseClient;
 	private SelectedHandler selectedHandler;
 	AdapterFactory adapterFactory;
@@ -40,10 +48,8 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			final GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter, 
-			SearchServiceAsync searchService,
 			AdapterFactory adapterFactory) {
 		this.view = view;
-		this.searchService = searchService;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
@@ -61,8 +67,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 
 	public void clearState() {
 		view.clear();
-		// remove handlers
-		handlerManager = new HandlerManager(this);	
 	}
 
 	@Override
@@ -94,16 +98,42 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public void loadUserUpdateable() {
 		view.showLoading();
 		view.getEntityTreeBrowser().clear();
-		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setUpdatableEntities(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setUpdatableEntities(new ArrayList<EntityHeader>());
-			}
-		});
+		if (authenticationController.isLoggedIn()) {
+			synapseClient.executeEntityQuery(createGetMyProjectQuery(), new AsyncCallback<EntityQueryResults>() {
+				@Override
+				public void onSuccess(EntityQueryResults results) {
+					List<EntityHeader> headers = new ArrayList<EntityHeader>();
+					for (EntityQueryResult result : results.getEntities()) {
+						EntityHeader h = new EntityHeader();
+						h.setType(EntityType.project.name());
+						h.setId(result.getId());
+						h.setName(result.getName());
+						headers.add(h);
+					}
+					
+					view.setUpdatableEntities(headers);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setUpdatableEntities(new ArrayList<EntityHeader>());
+				}
+			});
+		}
+	}
+	
+	public EntityQuery createGetMyProjectQuery() {
+		EntityQuery newQuery = new EntityQuery();
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
+		newQuery.setSort(sort);
+		Condition condition = EntityQueryUtils.buildCondition(
+				EntityFieldName.createdByPrincipalId, Operator.EQUALS, authenticationController.getCurrentUserPrincipalId());
+		newQuery.setConditions(Arrays.asList(condition));
+		newQuery.setFilterByType(org.sagebionetworks.repo.model.entity.query.EntityType.project);
+		newQuery.setLimit(1000L);
+		newQuery.setOffset(0L);
+		return newQuery;
 	}
 
 	public EntityTreeBrowser getEntityTreeBrowser() {
