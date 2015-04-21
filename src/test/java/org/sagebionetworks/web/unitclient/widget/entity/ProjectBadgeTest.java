@@ -6,6 +6,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Date;
+import java.util.Map;
 
 import static junit.framework.Assert.*;
 
@@ -44,6 +45,7 @@ public class ProjectBadgeTest {
 	AsyncCallback<KeyValueDisplay<String>> getInfoCallback;
 	ProjectBadgeView mockView;
 	String entityId = "syn123";
+	UserProfile userProfile;
 	ProjectBadge widget;
 	FavoriteWidget mockFavoriteWidget;
 
@@ -63,7 +65,7 @@ public class ProjectBadgeTest {
 		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget);
 		
 		//set up user profile
-		UserProfile userProfile =  new UserProfile();
+		userProfile =  new UserProfile();
 		userProfile.setOwnerId("4444");
 		userProfile.setUserName("Bilbo");
 		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
@@ -87,6 +89,7 @@ public class ProjectBadgeTest {
 		header.setId(id);
 		header.setName(name);
 		header.setLastActivity(lastActivity);
+		
 		
 		widget.configure(header);
 		verify(mockView).setProject(eq(name), anyString());
@@ -135,14 +138,21 @@ public class ProjectBadgeTest {
 	}
 	
 	@Test
-	public void testGetInfoFailure() throws Exception {
-		setupEntity(new Project(), null);
-		//failure to get entity
-		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getProject(anyString(), any(AsyncCallback.class));
-		widget.getInfo(getInfoCallback);
-		//exception should be passed back to callback
-		verify(getInfoCallback).onFailure(eq(ex));
+	public void testprofileToKeyValueDisplay() {
+		ProjectHeader header = new ProjectHeader();
+		String id = "syn37373";
+		String name = "a name";
+		header.setId(id);
+		header.setName(name);
+		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
+		widget.configure(header);
+		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+			
+		// getMap() is directly called when used, so it's tested directly 
+		Map<String,String> tooltipMap = widget.profileToKeyValueDisplay(userProfile, "Bilbo").getMap();
+		assert(3 == tooltipMap.size());
+		assert(tooltipMap.get("ID").equals(header.getId()));
+		assert(tooltipMap.get("Modified By").equals(Long.valueOf(userProfile.getOwnerId())));
 	}
 
 	@Test
