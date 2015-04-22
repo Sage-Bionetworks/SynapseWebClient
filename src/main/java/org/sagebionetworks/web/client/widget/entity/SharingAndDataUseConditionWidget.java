@@ -8,7 +8,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREME
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -20,16 +19,13 @@ public class SharingAndDataUseConditionWidget implements SharingAndDataUseCondit
 	
 	private SharingAndDataUseConditionWidgetView view;
 	SynapseClientAsync synapseClient;
-	NodeModelCreator nodeModelCreator;
 	Callback entityUpdatedCallback;
 	boolean showChangeLink;
 	
 	@Inject
 	public SharingAndDataUseConditionWidget(SharingAndDataUseConditionWidgetView view, 
-			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator) {
+			SynapseClientAsync synapseClient) {
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.view = view;
 		view.setPresenter(this);
 	}

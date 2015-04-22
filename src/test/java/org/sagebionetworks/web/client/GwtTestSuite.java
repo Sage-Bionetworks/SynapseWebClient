@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -14,11 +12,8 @@ import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Step;
-import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
@@ -26,11 +21,8 @@ import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.junit.client.GWTTestCase;
@@ -54,87 +46,9 @@ public class GwtTestSuite extends GWTTestCase {
 	public void gwtSetUp() {
 		// Create a dataset with all fields filled in
 	}
+
 	
-	@Test
-	public void testNodeModelCreatorImpl_createDataset() throws JSONObjectAdapterException, RestServiceException{
-		Study populatedDataset = new Study();
-		initilaizedJSONEntityFromSchema(populatedDataset);
-		assertNotNull(populatedDataset);
-		// Get the JSON for the populate dataset
-		JSONObjectAdapter adapter = populatedDataset.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		String json = adapter.toJSONString();
-		assertNotNull(json);
-		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Study clone = modelCreator.createJSONEntity(json, Study.class);
-		assertNotNull(clone);
-		assertEquals(populatedDataset, clone);
-	}
-	
-	@Test
-	public void testNodeModelCreatorImpl_createLayer() throws JSONObjectAdapterException, RestServiceException{
-		Data populatedLayer = new Data();
-		initilaizedJSONEntityFromSchema(populatedLayer);
-		assertNotNull(populatedLayer);
-		// Get the JSON for the populate dataset
-		JSONObjectAdapter adapter = populatedLayer.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		String json = adapter.toJSONString();
-		assertNotNull(json);
-		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Data clone = modelCreator.createJSONEntity(json, Data.class);
-		assertNotNull(clone);
-		assertEquals(populatedLayer, clone);
-	}
-	
-	@Test
-	public void testNodeModelCreatorImpl_createProject() throws JSONObjectAdapterException, RestServiceException{
-		Project populatedProject = new Project();
-		initilaizedJSONEntityFromSchema(populatedProject);
-		assertNotNull(populatedProject);
-		// Get the JSON for the populate dataset
-		JSONObjectAdapter adapter = populatedProject.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		String json = adapter.toJSONString();
-		assertNotNull(json);
-		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Project clone = modelCreator.createJSONEntity(json, Project.class);
-		assertNotNull(clone);
-		assertEquals(populatedProject, clone);
-	}
-	
-	
-	@Test
-	public void testNodeModelCreatorImpl_createAnalysis() throws JSONObjectAdapterException, RestServiceException{
-		Analysis populatedAnalysis = new Analysis();
-		initilaizedJSONEntityFromSchema(populatedAnalysis);
-		assertNotNull(populatedAnalysis);
-		// Get the JSON for the populate dataset
-		JSONObjectAdapter adapter = populatedAnalysis.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		String json = adapter.toJSONString();
-		assertNotNull(json);
-		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Analysis clone = modelCreator.createJSONEntity(json, Analysis.class);
-		assertNotNull(clone);
-		assertEquals(populatedAnalysis, clone);
-	}
-	
-	@Test
-	public void testNodeModelCreatorImpl_createStep() throws JSONObjectAdapterException, RestServiceException{
-		Step populatedStep = new Step();
-		initilaizedJSONEntityFromSchema(populatedStep);
-		assertNotNull(populatedStep);
-		// Get the JSON for the populate dataset
-		JSONObjectAdapter adapter = populatedStep.writeToJSONObject(JSONObjectGwt.createNewAdapter());
-		String json = adapter.toJSONString();
-		assertNotNull(json);
-		// Use the factor to create a clone
-		NodeModelCreatorImpl modelCreator = new NodeModelCreatorImpl(new JSONEntityFactoryImpl(new GwtAdapterFactory()), new JSONObjectGwt()); // jsonadapter and entitytypeprovider not needed for this deprecated model creation
-		Step clone = modelCreator.createJSONEntity(json, Step.class);
-		assertNotNull(clone);
-		assertEquals(populatedStep, clone);
-	}
+
 	
 	/**
 	 * Populate a given entity using all of the fields from the schema.

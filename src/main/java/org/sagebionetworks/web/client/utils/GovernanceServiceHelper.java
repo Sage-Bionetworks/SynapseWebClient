@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.utils;
 import java.util.Collection;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessApproval;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
@@ -12,13 +13,12 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GovernanceServiceHelper {
 	
-	public static EntityWrapper getAccessApproval(
+	public static AccessApproval getAccessApproval(
 			String principalId, 
 			AccessRequirement ar, 
 			JSONObjectAdapter jsonObjectAdapter) throws JSONObjectAdapterException {
@@ -36,9 +36,7 @@ public class GovernanceServiceHelper {
 
 		approval.setAccessorId(principalId);
 		approval.setRequirementId(ar.getId());
-		JSONObjectAdapter approvalJson = null;
-		approvalJson = approval.writeToJSONObject(jsonObjectAdapter.createNew());
-		return new EntityWrapper(approvalJson.toJSONString(), approval.getClass().getName());
+		return approval;
 	}
 	
 	public static void signTermsOfUse(
@@ -49,16 +47,16 @@ public class GovernanceServiceHelper {
 			final SynapseClientAsync synapseClient,
 			final JSONObjectAdapter jsonObjectAdapter
 			) {
-		EntityWrapper ew;
+		AccessApproval ew;
 		try {
 			ew = getAccessApproval(principalId, ar, jsonObjectAdapter);
 		} catch (JSONObjectAdapterException e) {
 			onFailure.invoke(e);
 			return;
 		}
-		synapseClient.createAccessApproval(ew, new AsyncCallback<EntityWrapper>(){
+		synapseClient.createAccessApproval(ew, new AsyncCallback<AccessApproval>(){
 			@Override
-			public void onSuccess(EntityWrapper result) {
+			public void onSuccess(AccessApproval result) {
 				onSuccess.invoke();
 			}
 			@Override

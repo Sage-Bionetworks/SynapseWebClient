@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.shared;
 
+import org.sagebionetworks.repo.model.MembershipRequest;
+import org.sagebionetworks.repo.model.UserProfile;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class MembershipRequestBundle implements IsSerializable {
 
-	private String userProfileJson, membershipRequestJson;
+	private UserProfile userProfile;
+	private MembershipRequest membershipRequest;
 	
 	/**
 	 * Default constructor
@@ -13,23 +17,27 @@ public class MembershipRequestBundle implements IsSerializable {
 		
 	}
 
-	public MembershipRequestBundle(String userProfileJson, String membershipRequestJson) {
+	public MembershipRequestBundle(UserProfile userProfile,
+			MembershipRequest membershipRequest) {
 		super();
-		this.userProfileJson = userProfileJson;
-		this.membershipRequestJson = membershipRequestJson;
+		this.userProfile = userProfile;
+		this.membershipRequest = membershipRequest;
 	}
 
-	public String getMembershipRequestJson() {
-		return membershipRequestJson;
+	public UserProfile getUserProfile() {
+		return userProfile;
 	}
-	public void setMembershipRequestJson(String membershipRequestJson) {
-		this.membershipRequestJson = membershipRequestJson;
+
+	public void setUserProfile(UserProfile userProfile) {
+		this.userProfile = userProfile;
 	}
-	public String getUserProfileJson() {
-		return userProfileJson;
+
+	public MembershipRequest getMembershipRequest() {
+		return membershipRequest;
 	}
-	public void setUserProfileJson(String userProfileJson) {
-		this.userProfileJson = userProfileJson;
+
+	public void setMembershipRequest(MembershipRequest membershipRequest) {
+		this.membershipRequest = membershipRequest;
 	}
 
 	@Override
@@ -38,10 +46,10 @@ public class MembershipRequestBundle implements IsSerializable {
 		int result = 1;
 		result = prime
 				* result
-				+ ((membershipRequestJson == null) ? 0 : membershipRequestJson
+				+ ((membershipRequest == null) ? 0 : membershipRequest
 						.hashCode());
 		result = prime * result
-				+ ((userProfileJson == null) ? 0 : userProfileJson.hashCode());
+				+ ((userProfile == null) ? 0 : userProfile.hashCode());
 		return result;
 	}
 
@@ -54,24 +62,23 @@ public class MembershipRequestBundle implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		MembershipRequestBundle other = (MembershipRequestBundle) obj;
-		if (membershipRequestJson == null) {
-			if (other.membershipRequestJson != null)
+		if (membershipRequest == null) {
+			if (other.membershipRequest != null)
 				return false;
-		} else if (!membershipRequestJson.equals(other.membershipRequestJson))
+		} else if (!membershipRequest.equals(other.membershipRequest))
 			return false;
-		if (userProfileJson == null) {
-			if (other.userProfileJson != null)
+		if (userProfile == null) {
+			if (other.userProfile != null)
 				return false;
-		} else if (!userProfileJson.equals(other.userProfileJson))
+		} else if (!userProfile.equals(other.userProfile))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "MembershipRequestBundle [userProfileJson=" + userProfileJson
-				+ ", membershipRequestJson=" + membershipRequestJson + "]";
+		return "MembershipRequestBundle [userProfile=" + userProfile
+				+ ", membershipRequest=" + membershipRequest + "]";
 	}
-	
-	
+
 }

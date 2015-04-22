@@ -3,8 +3,8 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.web.NotFoundException;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -29,7 +28,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -46,7 +44,6 @@ public class TrashPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserAccountServiceAsync;
 	GlobalApplicationState mockGlobalApplicationState;
-	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapse;
 	PaginatedResults<TrashedEntity> trashList;
 	
@@ -56,12 +53,11 @@ public class TrashPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserAccountServiceAsync = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapse = mock(SynapseClientAsync.class);
-		presenter = new TrashPresenter(mockView, mockSynapse, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator);
+		presenter = new TrashPresenter(mockView, mockSynapse, mockGlobalApplicationState, mockAuthenticationController);
 		trashList = getTestTrash();
 		
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(trashList);
+//		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(trashList);
 		verify(mockView).setPresenter(presenter);
 	}
 	
@@ -73,7 +69,7 @@ public class TrashPresenterTest {
 	
 	@Test
 	public void testGetTrash() {
-		AsyncMockStubber.callSuccessWith("").when(mockSynapse).viewTrashForUser(
+		AsyncMockStubber.callSuccessWith(trashList).when(mockSynapse).viewTrashForUser(
 				anyInt(), anyInt(), any(AsyncCallback.class));
 		presenter.getTrash(ARBITRARY_OFFSET);
 		verify(mockView).configure(anyList());

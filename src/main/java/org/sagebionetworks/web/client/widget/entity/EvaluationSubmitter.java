@@ -25,9 +25,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -43,7 +41,6 @@ public class EvaluationSubmitter implements Presenter {
 	private EvaluationSubmitterView view;
 	private SynapseClientAsync synapseClient;
 	private ChallengeClientAsync challengeClient;
-	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private Entity submissionEntity;
@@ -60,14 +57,12 @@ public class EvaluationSubmitter implements Presenter {
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			ChallengeClientAsync challengeClient) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
@@ -116,22 +111,17 @@ public class EvaluationSubmitter implements Presenter {
 		}
 	}
 	
-	private AsyncCallback<String> getEvalCallback() {
-		return new AsyncCallback<String>() {
+	private AsyncCallback<PaginatedResults<Evaluation>> getEvalCallback() {
+		return new AsyncCallback<PaginatedResults<Evaluation>>() {
 			@Override
-			public void onSuccess(String jsonString) {
-				try {
-					PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-					List<Evaluation> evaluations = results.getResults();
-					if (evaluations == null || evaluations.size() == 0) {
-						//no available evaluations, pop up an info dialog
-						view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
-					} 
-					else {
-						view.showModal1(submissionEntity == null, evaluations);
-					}
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+			public void onSuccess(PaginatedResults<Evaluation> results) {
+				List<Evaluation> evaluations = results.getResults();
+				if (evaluations == null || evaluations.size() == 0) {
+					//no available evaluations, pop up an info dialog
+					view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
+				} 
+				else {
+					view.showModal1(submissionEntity == null, evaluations);
 				}
 			}
 			
@@ -316,25 +306,21 @@ public class EvaluationSubmitter implements Presenter {
 	
 	public void lookupEtagAndCreateSubmission(final String id, final Long ver) {
 		//look up entity for the current etag
-		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
-			public void onSuccess(EntityWrapper result) {
+		synapseClient.getEntity(id, new AsyncCallback<Entity>() {
+			public void onSuccess(Entity result) {
 				Entity entity;
-				try {
-					entity = nodeModelCreator.createEntity(result);
-					Long v = null;
-					if (ver != null)
-						v = ver;
-					else if (entity instanceof Versionable)
-						v = ((Versionable)entity).getVersionNumber();
-					 else {
-						 //entity is not versionable, the service will not accept null, but will accept a version of 1
-						v = 1L;
-					 }
-						 
-					submitToEvaluation(id, v, entity.getEtag());
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+				entity = result;
+				Long v = null;
+				if (ver != null)
+					v = ver;
+				else if (entity instanceof Versionable)
+					v = ((Versionable)entity).getVersionNumber();
+				 else {
+					 //entity is not versionable, the service will not accept null, but will accept a version of 1
+					v = 1L;
+				 }
+					 
+				submitToEvaluation(id, v, entity.getEtag());
 			}
 			
 			@Override

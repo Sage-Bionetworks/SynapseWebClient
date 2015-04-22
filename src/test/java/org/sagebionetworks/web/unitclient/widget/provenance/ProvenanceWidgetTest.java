@@ -24,8 +24,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -46,13 +44,11 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -76,7 +72,6 @@ public class ProvenanceWidgetTest {
 	ProvenanceWidget provenanceWidget;
 	ProvenanceWidgetView mockView;
 	AuthenticationController mockAuthController;
-	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
 	ClientCache mockClientCache;
@@ -85,10 +80,10 @@ public class ProvenanceWidgetTest {
 	
 	Data outputEntity;
 	String entity456Id = "syn456";
-	BatchResults<EntityHeader> referenceHeaders;
+	PaginatedResults<EntityHeader> referenceHeaders;
 	
-	String referenceListJSON;
-	String referenceHeadersJSON;
+	ReferenceList referenceList;
+//	String referenceHeadersJSON;
 	Exception someException = new Exception();
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	JsoProvider jsoProvider;
@@ -101,13 +96,12 @@ public class ProvenanceWidgetTest {
 	public void setup() throws Exception {		
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
 		mockClientCache = mock(ClientCache.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockAuthController, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new Data();
@@ -132,27 +126,18 @@ public class ProvenanceWidgetTest {
 		Set<Used> used = new HashSet<Used>();
 		used.add(ue);
 		act.setUsed(used);
-		ReferenceList referenceList = new ReferenceList();
+		referenceList = new ReferenceList();
 		referenceList.setReferences(new ArrayList<Reference>(Arrays.asList(new Reference[] { ref123, ref456 })));
-		referenceHeaders = new BatchResults<EntityHeader>();
+		referenceHeaders = new PaginatedResults<EntityHeader>();
 		referenceHeaders.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 })));
 		
-		String generatedResult = "generatedPaginatedResults";
 		PaginatedResults<Reference> generatedBy = new PaginatedResults<Reference>();
 		generatedBy.setResults(Arrays.asList(new Reference[] { ref123 }));		
-						
-		EntityWrapper ew = new EntityWrapper(outputEntity.writeToJSONObject(adapterFactory.createNew()).toJSONString(), Data.class.getName());		
-		referenceListJSON = referenceList.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		referenceHeadersJSON = referenceHeaders.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		
-		AsyncMockStubber.callSuccessWith(ew).when(mockSynapseClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(ew)).thenReturn(outputEntity);
+		AsyncMockStubber.callSuccessWith(outputEntity).when(mockSynapseClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(act).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(referenceHeadersJSON).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));		
-		Mockito.<BatchResults<?>>when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn((BatchResults<EntityHeader>)referenceHeaders);
-		AsyncMockStubber.callSuccessWith(generatedResult).when(mockSynapseClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));
-		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(generatedResult, Reference.class)).thenReturn(generatedBy);
-		
+		AsyncMockStubber.callSuccessWith(referenceHeaders).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(generatedBy).when(mockSynapseClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));
 		
 		descriptor = new HashMap<String, String>();
 		String depth = "1";
@@ -168,7 +153,7 @@ public class ProvenanceWidgetTest {
 		modifiedByUserProfile.setUserName("007");
 		modifiedByUserProfile.setFirstName("James");
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(modifiedByUserProfile);
+//		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(modifiedByUserProfile);
 
 	}
 	
@@ -243,7 +228,7 @@ public class ProvenanceWidgetTest {
 		
 		provenanceWidget.configure(null, descriptor, null, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		verify(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
 		
 		assertNotNull(graph);
@@ -267,11 +252,11 @@ public class ProvenanceWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildTreeFailHeaderBatch() throws Exception {
-		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 		
 		provenanceWidget.configure(null, descriptor, null, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));
+		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceList), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
 
 		verifySuccessGraphStructure(graph);
@@ -282,10 +267,10 @@ public class ProvenanceWidgetTest {
 	public void testFindOldVersionsNotFoundException() throws Exception {
 		SynapseJSNIUtils mockJsniUtils = mock(SynapseJSNIUtils.class);
 		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, adapterFactory, mockJsniUtils, jsoProvider, mockClientCache);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockAuthController, adapterFactory, mockJsniUtils, jsoProvider, mockClientCache);
 		
 		String message = "entity syn999 was not found";
-		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 		// create graph
 		provenanceWidget.configure(null, descriptor, null, null);	
 		
@@ -302,7 +287,7 @@ public class ProvenanceWidgetTest {
 		ProvGraph graph = verifyBuildGraphCalls();					
 		
 		reset(mockSynapseClient);
-		reset(mockNodeModelCreator);
+//		reset(mockNodeModelCreator);
 		
 		// current version of each reference
 		EntityHeader header123 = new EntityHeader();
@@ -311,13 +296,13 @@ public class ProvenanceWidgetTest {
 		EntityHeader header456 = new EntityHeader();
 		header456.setId(entity456Id);
 		header456.setVersionNumber(2L); // v2 is newer than in Before method
-		BatchResults<EntityHeader> currentVersionBatch = new BatchResults<EntityHeader>();
+		PaginatedResults<EntityHeader> currentVersionBatch = new PaginatedResults<EntityHeader>();
 		currentVersionBatch.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 })));		
-		String currentVersionsBatchJSON = referenceHeaders.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+//		String currentVersionsBatchJSON = referenceHeaders.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		
 		// new mocks for batch call
-		AsyncMockStubber.callSuccessWith(currentVersionsBatchJSON).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));		
-		Mockito.<BatchResults<?>>when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn((BatchResults<EntityHeader>)currentVersionBatch);
+		AsyncMockStubber.callSuccessWith(currentVersionBatch).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
+//		Mockito.<BatchResults<?>>when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn((BatchResults<EntityHeader>)currentVersionBatch);
 
 		provenanceWidget.findOldVersions();
 		
@@ -332,7 +317,7 @@ public class ProvenanceWidgetTest {
 
 	private ProvGraph verifyBuildGraphCalls() throws Exception {
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));		
+		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceList), any(AsyncCallback.class));		
 		return captureGraph();
 	}
 

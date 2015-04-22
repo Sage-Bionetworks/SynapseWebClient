@@ -1,8 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +30,7 @@ import org.sagebionetworks.evaluation.model.SubmissionEligibility;
 import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
@@ -31,12 +44,9 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -52,7 +62,6 @@ public class EvaluationSubmitterTest {
 	EvaluationSubmitter submitter;
 	EvaluationSubmitterView mockView;
 	AuthenticationController mockAuthenticationController;
-	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapseClient;
 	ChallengeClientAsync mockChallengeClient;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -74,12 +83,11 @@ public class EvaluationSubmitterTest {
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
 		mockView = mock(EvaluationSubmitterView.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockNodeModelCreator, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient);
+		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient);
 		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");
@@ -90,7 +98,7 @@ public class EvaluationSubmitterTest {
 		returnSubmission = new Submission();
 		returnSubmission.setId("363636");
 		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+
 		
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(2);
@@ -106,8 +114,7 @@ public class EvaluationSubmitterTest {
 		e2.setSubmissionReceiptMessage(EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE);
 		evaluationList.add(e2);
 		availableEvaluations.setResults(evaluationList);
-
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
+		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);
@@ -115,14 +122,12 @@ public class EvaluationSubmitterTest {
 		bundle = new EntityBundle();
 		bundle.setEntity(entity);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);
-		
+		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+
 		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
 		requirements.setTotalNumberOfResults(0);
 		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
 		requirements.setResults(ars);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
 		
 		//by default, this is a standard evaluation (no challenge)
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
@@ -185,7 +190,6 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluationsFailure() throws RestServiceException, JSONObjectAdapterException{
 		submitter.configure(entity, null);
 		reset(mockView);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
 		
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(ACCESS_TYPE.class), any(AsyncCallback.class));
@@ -205,7 +209,6 @@ public class EvaluationSubmitterTest {
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		evaluationList.add(new Evaluation());
 		availableEvaluations.setResults(evaluationList);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
 		
 		submitter.configure(entity, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
@@ -219,7 +222,7 @@ public class EvaluationSubmitterTest {
 		availableEvaluations.setTotalNumberOfResults(0);
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		availableEvaluations.setResults(evaluationList);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
+		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message

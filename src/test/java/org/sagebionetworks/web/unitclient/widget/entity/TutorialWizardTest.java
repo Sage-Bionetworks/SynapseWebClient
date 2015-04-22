@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,6 @@ import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -35,8 +32,7 @@ public class TutorialWizardTest {
 	TutorialWizard presenter;
 	TutorialWizardView mockView;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
-	List<JSONEntity> wikiHeadersList;
+	List<WikiHeader> wikiHeadersList;
 	WikiHeader testRootHeader, page1, page2;
 	
 	
@@ -51,14 +47,10 @@ public class TutorialWizardTest {
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockNodeModelCreator = Mockito.mock(NodeModelCreator.class);
 		mockView = Mockito.mock(TutorialWizardView.class);
-		
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		
-		
-		PaginatedResults<JSONEntity> wikiHeaders = new PaginatedResults<JSONEntity>();
-		wikiHeadersList = new ArrayList<JSONEntity>();
+			
+		PaginatedResults<WikiHeader> wikiHeaders = new PaginatedResults<WikiHeader>();
+		wikiHeadersList = new ArrayList<WikiHeader>();
 		testRootHeader = createWikiHeader("123",null,"my test root wiki header (page)");
 		page1 = createWikiHeader("99999", "123", "Step 1");
 		page2 = createWikiHeader("1", "123", "Step 2");
@@ -68,10 +60,10 @@ public class TutorialWizardTest {
 		wikiHeadersList.add(page1);
 		
 		wikiHeaders.setResults(wikiHeadersList);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(WikiHeader.class))).thenReturn(wikiHeaders);
+		AsyncMockStubber.callSuccessWith(wikiHeaders).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		
 		// setup the entity editor with 
-		presenter = new TutorialWizard(mockView, mockSynapseClient, mockNodeModelCreator);
+		presenter = new TutorialWizard(mockView, mockSynapseClient);
 	}
 
 	@Test

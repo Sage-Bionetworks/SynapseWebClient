@@ -1,17 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
@@ -25,10 +25,8 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinderView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -40,7 +38,6 @@ public class EntityFinderTest {
 
 	EntityFinderView mockView;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -52,13 +49,12 @@ public class EntityFinderTest {
 	public void before() throws JSONObjectAdapterException {
 		mockView = mock(EntityFinderView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();		
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		
-		entityFinder = new EntityFinder(mockView, mockNodeModelCreator, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
+		entityFinder = new EntityFinder(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
 		verify(mockView).setPresenter(entityFinder);
 		reset(mockView);
 	}
@@ -71,10 +67,8 @@ public class EntityFinderTest {
 		Entity entity = new Data();
 		entity.setId(id);
 		entity.setName(name);
-		EntityWrapper wrapper = new EntityWrapper();
-		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));		
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);
 		
 		entityFinder.lookupEntity(id, mockCallback);
 		
@@ -92,8 +86,7 @@ public class EntityFinderTest {
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);
 
 		// 404
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);		
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));			
 		entityFinder.lookupEntity(id, mockCallback);		
 		verify(mockCallback).onFailure(any(Throwable.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);		
@@ -101,8 +94,7 @@ public class EntityFinderTest {
 		reset(mockView);
 		
 		// 403
-		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);		
+		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));			
 		entityFinder.lookupEntity(id, mockCallback);
 		verify(mockCallback).onFailure(any(Throwable.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
@@ -111,7 +103,6 @@ public class EntityFinderTest {
 
 		// other
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));		
-		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);		
 		entityFinder.lookupEntity(id, mockCallback);
 		verify(mockCallback).onFailure(any(Throwable.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC);
@@ -127,9 +118,9 @@ public class EntityFinderTest {
 		PaginatedResults<VersionInfo> paginated = new PaginatedResults<VersionInfo>();		
 		List<VersionInfo> results = new ArrayList<VersionInfo>();
 		paginated.setResults(results);
-		AsyncMockStubber.callSuccessWith(versionsJson).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(paginated).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);	
-		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(VersionInfo.class))).thenReturn(paginated);
+//		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(VersionInfo.class))).thenReturn(paginated);
 		
 		entityFinder.loadVersions(id);
 		

@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -52,7 +51,6 @@ public class LoginPresenterTest {
 	LoginView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	NodeModelCreator mockNodeModelCreator;
 	CookieProvider mockCookieProvier;
 	GWTWrapper mockGwtWrapper;
 	SynapseJSNIUtils mockJSNIUtils;
@@ -70,7 +68,6 @@ public class LoginPresenterTest {
 		mockView = mock(LoginView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockCookieProvier = mock(CookieProvider.class);
 		mockGwtWrapper = mock(GWTWrapper.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
@@ -86,7 +83,7 @@ public class LoginPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
 		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);

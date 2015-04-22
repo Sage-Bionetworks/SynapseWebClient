@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -234,9 +233,9 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
 	
 	public void imposeRestriction(String entityId, final Callback entityUpdated) {
 		view.hideModal();
-		synapseClient.createLockAccessRequirement(entityId, new AsyncCallback<EntityWrapper>(){
+		synapseClient.createLockAccessRequirement(entityId, new AsyncCallback<ACTAccessRequirement>(){
 			@Override
-			public void onSuccess(EntityWrapper result) {
+			public void onSuccess(ACTAccessRequirement result) {
 				if (entityUpdated != null)
 					entityUpdated.invoke();
 			}

@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -31,25 +30,20 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -60,7 +54,6 @@ public class FileHistoryWidgetTest {
 	public static final Long CURRENT_FILE_VERSION = 8888L;
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	FileHistoryWidgetView mockView;
 	EntitySchemaCache mockSchemaCache;
@@ -79,7 +72,6 @@ public class FileHistoryWidgetTest {
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockPaginationWidget = mock(DetailedPaginationWidget.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(FileHistoryWidgetView.class);
@@ -97,7 +89,7 @@ public class FileHistoryWidgetTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 
-		fileHistoryWidget = new FileHistoryWidget(mockView, mockNodeModelCreator, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPaginationWidget, mockPreflightController);
+		fileHistoryWidget = new FileHistoryWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPaginationWidget, mockPreflightController);
 
 		vb = new FileEntity();
 		vb.setId(entityId);
@@ -116,7 +108,7 @@ public class FileHistoryWidgetTest {
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
 		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 				
-		AsyncMockStubber.callSuccessWith(new EntityWrapper()).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		
 		PaginatedResults<VersionInfo> mockPagedResults = mock(PaginatedResults.class);
 		when(mockPagedResults.getTotalNumberOfResults()).thenReturn(DEFAULT_MOCK_VERSION_COUNT);
@@ -128,17 +120,16 @@ public class FileHistoryWidgetTest {
 		v2.setVersionNumber(8889L);
 		versions.add(v2);
 		when(mockPagedResults.getResults()).thenReturn(versions);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(mockPagedResults);
+		AsyncMockStubber
+		.callSuccessWith(mockPagedResults)
+		.when(mockSynapseClient)
+		.getEntityVersions(anyString(), anyInt(), anyInt(),
+				any(AsyncCallback.class));
 		
 	}
 
 	@Test
 	public void testOnPageChange() throws Exception {
-		AsyncMockStubber
-				.callSuccessWith("")
-				.when(mockSynapseClient)
-				.getEntityVersions(anyString(), anyInt(), anyInt(),
-						any(AsyncCallback.class));
 		//with null version
 		fileHistoryWidget.setEntityBundle(bundle, null);
 				

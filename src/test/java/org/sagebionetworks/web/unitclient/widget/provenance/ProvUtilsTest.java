@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
@@ -34,13 +33,13 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
@@ -57,7 +56,6 @@ public class ProvUtilsTest {
 	ProvenanceWidget provenanceWidget;
 	ProvenanceWidgetView mockView;
 	AuthenticationController mockAuthController;
-	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
 	LayoutServiceAsync mockLayoutService;
@@ -67,7 +65,6 @@ public class ProvUtilsTest {
 	public void setup(){		
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockLayoutService = mock(LayoutServiceAsync.class);		
 		adapterFactory = new AdapterFactoryImpl();				
@@ -251,7 +248,7 @@ public class ProvUtilsTest {
 		header.setVersionNumber(ref.getTargetVersionNumber());
 		UsedEntity ue = new UsedEntity();
 		ue.setReference(ref);
-		BatchResults<EntityHeader> referenceHeaders = new BatchResults<EntityHeader>();
+		PaginatedResults<EntityHeader> referenceHeaders = new PaginatedResults<EntityHeader>();
 		referenceHeaders.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header })));
 				
 		Map<Reference, EntityHeader> refToHeader = ProvUtils.mapReferencesToHeaders(referenceHeaders);
@@ -441,18 +438,4 @@ public class ProvUtilsTest {
 			}
 		};
 	}
-
-	
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -271,8 +270,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			}
 		}
 	}
-	
-	public void imposeRestrictionClicked() {
+
+	@Override
+	public void imposeRestrictionOkClicked() {
 		Boolean isYesSelected = view.isYesHumanDataRadioSelected();
 		Boolean isNoSelected = view.isNoHumanDataRadioSelected();
 		
@@ -288,12 +288,17 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			accessRequirementDialog.imposeRestriction(bundle.getEntity().getId(), entityUpdated);
 		}
 	}
-	
+
+	@Override
+	public void imposeRestrictionCancelClicked() {
+		view.setImposeRestrictionModalVisible(false);
+	}
+
 	@Override
 	public void anonymousFlagModalOkClicked() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
-	
+
 	@Override
 	public void reportIssueClicked() {
 		view.showFlagModal();

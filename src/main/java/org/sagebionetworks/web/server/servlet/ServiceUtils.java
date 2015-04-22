@@ -58,51 +58,6 @@ public class ServiceUtils {
 	public static final String AUTHSVC_ACL_PRINCIPAL_ETAG = "etag";
 	public static final String AUTHSVC_ACL_PRINCIPAL_INDIVIDUAL = "individual";
 	
-	@Deprecated
-	public static StringBuilder getBaseUrlBuilder(ServiceUrlProvider urlProvider, NodeType type) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(urlProvider.getRepositoryServiceUrl() + "/");
-		builder.append(REPOSVC_PATH_ENTITY);
-		return builder;
-	}
-	
-	@Deprecated
-	public static String handleHttpClientErrorException(HttpClientErrorException ex) {
-	//		if(ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-	//		throw new UnauthorizedException();
-	//	} else if(ex.getStatusCode() == HttpStatus.FORBIDDEN) {
-	//		throw new ForbiddenException();
-	//	} else {
-	//		throw new UnknownError("Status code:" + ex.getStatusCode().value());
-	//	}
-		
-		// temporary solution to not being able to throw caught exceptions (due to Gin 1.0)
-		JSONObject obj = new JSONObject();
-		JSONObject errorObj = new JSONObject();
-		try {
-			Integer code = ex.getStatusCode().value(); 
-			if(code != null) errorObj.put("statusCode", code);
-			obj.put("error", errorObj);
-			
-		} catch (JSONException e) {
-			throw new UnknownError();
-		}
-		
-		String body = ex.getResponseBodyAsString();
-		JSONObject reasonObj;
-		try {
-			reasonObj = new JSONObject(body);
-			if(reasonObj.has(ERROR_REASON)) {
-				String message = reasonObj.getString(ERROR_REASON);
-				logger.info("Error Reason: " + message);
-				obj.put(ERROR_REASON, message);
-			}
-		} catch (JSONException e) {
-			logger.info(e.getMessage());			
-		}
-		return obj.toString();
-	}
-	
 	/**
 	 * The synapse client is stateful so we must create a new one for each request
 	 */

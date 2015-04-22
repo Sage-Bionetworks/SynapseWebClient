@@ -1,7 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +30,6 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
@@ -45,7 +51,6 @@ public class SubmitToEvaluationWidgetTest {
 	
 	SubmitToEvaluationWidgetView mockView;
 	ChallengeClientAsync mockChallengeClient;
-	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -62,7 +67,6 @@ public class SubmitToEvaluationWidgetTest {
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		mockView = mock(SubmitToEvaluationWidgetView.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
@@ -70,7 +74,7 @@ public class SubmitToEvaluationWidgetTest {
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockEvaluationSubmitter);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		widget = new SubmitToEvaluationWidget(mockView, mockChallengeClient, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, mockPortalGinInjector);
+		widget = new SubmitToEvaluationWidget(mockView, mockChallengeClient, mockAuthenticationController, mockGlobalApplicationState, mockPortalGinInjector);
 		verify(mockView).setPresenter(widget);
 		targetEvaluations = new HashSet<String>();
 		
@@ -83,7 +87,7 @@ public class SubmitToEvaluationWidgetTest {
 		targetEvaluations.add(EVAL_ID_1);
 		targetEvaluations.add(EVAL_ID_2);
 		
-		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockChallengeClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
+
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
 		availableEvaluations.setTotalNumberOfResults(2);
 		evaluationList = new ArrayList<Evaluation>();
@@ -98,8 +102,7 @@ public class SubmitToEvaluationWidgetTest {
 		e2.setSubmissionReceiptMessage(EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE);
 		evaluationList.add(e2);
 		availableEvaluations.setResults(evaluationList);
-
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
+		AsyncMockStubber.callSuccessWith(availableEvaluations).when(mockChallengeClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
 	}
 
 	@Test

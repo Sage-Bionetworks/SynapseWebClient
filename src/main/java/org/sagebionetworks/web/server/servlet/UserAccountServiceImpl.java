@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
+import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
@@ -96,15 +97,11 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public String initiateSession(String username, String password) throws RestServiceException {
+	public Session initiateSession(String username, String password) throws RestServiceException {
 		validateService();
-		
 		SynapseClient synapseClient = createAnonymousSynapseClient();
 		try {
-			Session session = synapseClient.login(username, password);
-			return EntityFactory.createJSONStringForEntity(session);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnauthorizedException(e.getMessage());
+			return synapseClient.login(username, password);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -233,15 +230,13 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public String getStorageUsage() {
+	public StorageUsageSummaryList getStorageUsage() {
 		validateService();
 
 		SynapseClient client = createSynapseClient();
 		try {
-			return EntityFactory.createJSONStringForEntity(client.getStorageUsageSummary(null));
+			return client.getStorageUsageSummary(null);
 		} catch (SynapseException e) {
-			throw new RestClientException("Unable to get storage usage", e);
-		} catch (JSONObjectAdapterException e) {
 			throw new RestClientException("Unable to get storage usage", e);
 		}
 	}
