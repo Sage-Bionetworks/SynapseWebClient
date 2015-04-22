@@ -69,7 +69,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 		this.footerWidget = footerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.teamListWidget = teamListWidget;
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		configureSearchBox();
@@ -100,7 +100,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

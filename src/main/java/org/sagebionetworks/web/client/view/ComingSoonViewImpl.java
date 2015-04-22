@@ -65,7 +65,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		this.jiraErrorHelper = jiraErrorHelper;
 		this.provenanceWidget = provenanceWidget;
 		this.authenticationController = authenticationController;
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());	
 		
@@ -78,7 +78,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 //		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
 		
 		header.clear();
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

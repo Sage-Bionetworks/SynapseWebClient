@@ -92,7 +92,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure();
+		headerWidget.configure(false);
 		headerWidget.refresh();
 	}
 
@@ -131,7 +131,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		
 		header.clear();
 		footer.clear();
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}

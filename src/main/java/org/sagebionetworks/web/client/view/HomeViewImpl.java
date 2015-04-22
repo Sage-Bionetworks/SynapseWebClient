@@ -139,7 +139,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		addUserPicturePanel();
 		
-		headerWidget.configure();
+		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
@@ -240,7 +240,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void refresh() {
 		header.clear();
-		headerWidget.configure();
+		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

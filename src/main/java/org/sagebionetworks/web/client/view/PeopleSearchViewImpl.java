@@ -72,7 +72,7 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 		this.footerWidget = footerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.userGroupListWidget = userGroupListWidget;
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		configureSearchBox();
@@ -103,7 +103,7 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

@@ -1376,6 +1376,11 @@ ol.lowerroman {
 	display: inline;
 }
 
+.displayInlineTable {
+	display: inline-table;
+}
+
+
 .displayInlineBlock {
 	display: inline-block;
 }
@@ -1631,15 +1636,6 @@ ol.lowerroman {
 
 .margin-top-10-imp {
 	margin-top: 10px !important;
-}
-
-.small-header {
-	height: 70px;
-	padding: 10px;
-}
-
-.largeHeader {
-	height: 90px;
 }
 
 .vertical-align-middle {

@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -20,7 +21,6 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -40,11 +40,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 
 	@UiField
-	Image logoSmall;
+	Image synapseLogo;
 	@UiField
-	DivElement headerDiv;
+	Div headerDiv;
 	@UiField
-	DivElement headerImageDiv;
+	Div headerImageDiv;
 
 	@UiField
 	Button dashboardButton;
@@ -121,6 +121,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		refreshTestSiteHeader();
 	}
 
+	@Override
+	public void setLargeLogo(boolean largeLogo) {
+		if (largeLogo) {
+			synapseLogo.setHeight("40px");
+			synapseLogo.setWidth("201px");
+			headerDiv.setHeight("70px");
+			headerDiv.setPaddingTop(16);
+		} else {
+			synapseLogo.setHeight("25px");
+			synapseLogo.setWidth("126px");
+			headerDiv.setHeight("50px");
+			headerDiv.setPaddingTop(12);
+		}
+	}
+	
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button
@@ -206,6 +221,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onFavoriteClick();
+			}
+		});
+		synapseLogo.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onLogoClick();
 			}
 		});
 	}

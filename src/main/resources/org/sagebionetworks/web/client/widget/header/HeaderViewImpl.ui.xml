@@ -6,34 +6,32 @@
 
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	<g:HTMLPanel>
-		<div ui:field="headerDiv" class="notopmargin small-header synapse-blue-bg">
-			<div class="margin-top-3">
-			    <div ui:field="headerImageDiv" class="left logo margin-top-4 smallHeader margin-left-35">
-			        <a href="#!Home:0"> 
-				    	<g:Image ui:field="logoSmall" resource="{sageImages.synapseLogo}" height="40px" width="201px" />
-					</a>
-			    </div>
+		<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg">
+			<bh:Div>
+			    <bh:Div ui:field="headerImageDiv" addStyleNames="left margin-left-35">
+			        <g:Image ui:field="synapseLogo" resource="{sageImages.synapseLogo}" addStyleNames="imageButton"/>
+			    </bh:Div>
 				<b:Tooltip placement="BOTTOM" title="Log out">
-					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-5" height="26px" />	
+					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5" height="26px" />	
 				</b:Tooltip>
 				<b:Tooltip placement="BOTTOM" title="Favorites">
-					<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-5">
+					<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5">
 						<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px"></b:Button>
 						<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
 						</b:DropDownMenu>
 					</b:ButtonGroup>
 				</b:Tooltip>
-			    <b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-5" height="26px" >@ Trash can</b:Button>
-			    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-5">
+			    <b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-left-5 margin-right-5" height="26px" >@ Trash can</b:Button>
+			    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5">
 					<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="26px">Log in</b:Button>
 				</g:SimplePanel>
-			    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-5">
+			    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5">
 					<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="26px">Register</b:Button>
 				</g:SimplePanel>
-				<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-5">
+				<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5">
 					<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="26px" addStyleNames="my-dashboard-header-button" />
 				</g:SimplePanel>
-				<b:ButtonGroup addStyleNames="right margin-5">
+				<b:ButtonGroup addStyleNames="right margin-left-5 margin-right-5">
 					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px">Help</b:Button>
 					<b:DropDownMenu>
 						<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Getting started</b:AnchorListItem>
@@ -44,12 +42,12 @@
 						<b:AnchorListItem ui:field="restAPILink">REST API docs</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:ButtonGroup>
-			    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-5"/>
-				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-5">
+			    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5"/>
+				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-left-5 margin-right-5">
 			    	<bh:Span addStyleNames="smallerText">Alpha features on&nbsp;</bh:Span>
 			    	<b:Anchor addStyleNames="smallerText displayInline" ui:field="goToStandardSite">off</b:Anchor>
 			    </g:FlowPanel>
-			</div>
-		</div>
+			</bh:Div>
+		</bh:Div>
 	</g:HTMLPanel>
 </ui:UiBinder>

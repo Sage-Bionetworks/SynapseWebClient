@@ -57,7 +57,7 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.certificateWidget = certificateWidget;
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		certificateContainer.setWidget(certificateWidget.asWidget());
@@ -74,7 +74,7 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
 		header.clear();
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

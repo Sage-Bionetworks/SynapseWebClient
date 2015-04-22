@@ -44,7 +44,7 @@ public class HelpViewImpl extends Composite implements HelpView {
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.wikiPage = wikiPage;
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -56,7 +56,7 @@ public class HelpViewImpl extends Composite implements HelpView {
 		this.presenter = presenter;
 		mainContainer.clear();
 		header.clear();
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());

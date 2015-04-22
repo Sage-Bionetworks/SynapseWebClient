@@ -53,7 +53,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
@@ -80,7 +80,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
-		headerWidget.configure();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
