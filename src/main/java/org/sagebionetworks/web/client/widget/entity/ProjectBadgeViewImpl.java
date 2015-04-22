@@ -54,8 +54,8 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 		anchor.addMouseOverHandler(new MouseOverHandler() {
 	        @Override
 	        public void onMouseOver(MouseOverEvent event) {
-	                showPopover();
 	                isPopover = true;
+	                showPopover();
 	        }
 		});
 		anchor.addMouseOutHandler(new MouseOutHandler() {
