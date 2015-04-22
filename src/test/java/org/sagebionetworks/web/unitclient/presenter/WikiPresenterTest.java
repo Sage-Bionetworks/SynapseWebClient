@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -28,7 +27,6 @@ public class WikiPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserAccountServiceAsync;
 	GlobalApplicationState mockGlobalApplicationState;
-	NodeModelCreator mockNodeModelCreator;
 	RssServiceAsync mockRssService;
 	
 	@Before
@@ -37,9 +35,8 @@ public class WikiPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserAccountServiceAsync = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockRssService = mock(RssServiceAsync.class);
-		loginPresenter = new WikiPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator, mockRssService);
+		loginPresenter = new WikiPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockRssService);
 		
 		verify(mockView).setPresenter(loginPresenter);
 	}	

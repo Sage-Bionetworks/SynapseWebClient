@@ -6,13 +6,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -23,18 +20,15 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 
 	private WikiAttachmentsView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
 	private List<String> toDeleteFileHandles;
 	private String selectedFilename;
 	
 	@Inject
-	public WikiAttachments(WikiAttachmentsView view, SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator) {
+	public WikiAttachments(WikiAttachmentsView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	
@@ -44,16 +38,11 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		selectedFilename = null;
 		toDeleteFileHandles = new ArrayList<String>();
 		this.wikiKey = wikiKey;
-		synapseClient.getV2WikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getV2WikiAttachmentHandles(wikiKey, new AsyncCallback<FileHandleResults>() {
 			@Override
-			public void onSuccess(String results) {
-				try {
-					FileHandleResults fileHandleResults = nodeModelCreator.createJSONEntity(results, FileHandleResults.class);
-					allFileHandles = fileHandleResults.getList();
-					updateFileList();
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(FileHandleResults fileHandleResults) {
+				allFileHandles = fileHandleResults.getList();
+				updateFileList();
 			}
 			
 			@Override

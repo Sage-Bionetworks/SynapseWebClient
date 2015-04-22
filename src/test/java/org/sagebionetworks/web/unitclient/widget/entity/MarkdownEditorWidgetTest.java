@@ -36,7 +36,6 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
@@ -52,7 +51,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class MarkdownEditorWidgetTest {
-	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapseClient; 
 	MarkdownEditorWidgetView mockView;
 	SynapseJSNIUtils mockSynapseJSNIUtils; 
@@ -75,7 +73,6 @@ public class MarkdownEditorWidgetTest {
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIcons = mock(IconsImageBundle.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
@@ -106,8 +103,6 @@ public class MarkdownEditorWidgetTest {
 		fileHandleIds.add(fileHandleId2);
 		testPage.setAttachmentFileHandleIds(fileHandleIds);
 		
-
-		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
 		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		WikiPage fakeWiki = new WikiPage();
 		fakeWiki.setMarkdown("Fake wiki");

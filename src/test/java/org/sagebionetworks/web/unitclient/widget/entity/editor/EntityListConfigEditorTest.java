@@ -17,17 +17,16 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -38,7 +37,6 @@ public class EntityListConfigEditorTest {
 	EntityListConfigEditor editor;
 	EntityListConfigView mockView;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AuthenticationController mockAuthenticationController;
 
@@ -51,7 +49,6 @@ public class EntityListConfigEditorTest {
 		mockView = mock(EntityListConfigView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);		
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -76,7 +73,7 @@ public class EntityListConfigEditorTest {
 		descriptor = new HashMap<String, String>();		
 		
 		editor = new EntityListConfigEditor(mockView, mockSynapseClient,
-				mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
+				mockSynapseJSNIUtils, mockAuthenticationController);
 		
 		editor.configure(null, descriptor, null);
 	}

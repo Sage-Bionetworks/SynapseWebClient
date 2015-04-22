@@ -73,10 +73,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	private PasswordTextBox externalPassword;
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
-	public static final String FILE_FIELD_STYLENAME = "dragAndDropUploadBox";
-	public static final String FILE_BORDER_STYLENAME = "dragAndDropBorder";
-	public static final String FILE_FIELD_DROP_STYLE_NAME = "dropable";
-	public static final String FILE_UPLOAD_LABEL_STYLENAME = "fileUploadLabel";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
 
@@ -107,19 +103,11 @@ public class UploaderViewImpl extends FlowPanel implements
 	private HTML spinningProgressContainer;
 	private Input fileUploadInput;
 	private Heading fileUploadLabel = new Heading(HeadingSize.H5);
-	public static final String DRAG_AND_DROP = "or Drag & Drop";
 	FlowPanel container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
 	
 	private HandlerRegistration messageHandler;
-	
-	// drag and drop handlers
-	private HandlerRegistration onDragOverDocHandler;
-	private HandlerRegistration onDragEnterDocHandler;
-	private HandlerRegistration onDropDocHandler;
-	private HandlerRegistration onDragLeaveHandler;
-	private HandlerRegistration onDragEndDocHandler;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
@@ -144,9 +132,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		
 		chooseFileBtn = new Button("Choose File");
 		chooseFileBtn.setType(ButtonType.INFO);
-		chooseFileBtn.setSize(ButtonSize.LARGE);
-		chooseFileBtn.addStyleName("col-xs-offset-4 moveup-70 displayInline");
-		
+		chooseFileBtn.setSize(ButtonSize.LARGE);		
 		uploadBtn = new Button();
 		uploadBtn.setType(ButtonType.PRIMARY);
 		uploadBtn.setPull(Pull.RIGHT);
@@ -230,7 +216,6 @@ public class UploaderViewImpl extends FlowPanel implements
 				}
 			});
 		}
-		addDragAndDropHandlers();
 		super.onAttach();
 	}
 	
@@ -240,7 +225,6 @@ public class UploaderViewImpl extends FlowPanel implements
 			messageHandler.removeHandler();
 			messageHandler = null;
 		}
-		removeDragAndDropHandlers();
 		super.onDetach();
 	}
 	
@@ -251,7 +235,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		// Clear previously selected files.
 		enableMultipleFileUploads(true);
 		fileUploadInput.setValue(null);
-		fileUploadLabel.setText(DRAG_AND_DROP);
+		fileUploadLabel.setText("");
 	}
 	
 	@Override
@@ -496,16 +480,16 @@ public class UploaderViewImpl extends FlowPanel implements
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		FlowPanel fileInputPanel = new FlowPanel();
-		fileInputPanel.addStyleName(FILE_BORDER_STYLENAME);
 		fileUploadInput = new Input(InputType.FILE);
 		fileUploadInput.setId(FILE_FIELD_ID);
 		fileUploadInput.setName("uploads[]");
-		fileUploadInput.setStyleName(FILE_FIELD_STYLENAME);
-		fileUploadLabel.addStyleName("moveup-70 margin-left-5 displayInline");
+		fileUploadInput.setVisible(false);
+		fileUploadLabel.addStyleName("displayInline margin-left-5");
 		fileUploadInput.addValueChangeHandler(new ValueChangeHandler<String>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
 				fileUploadLabel.setText(presenter.getSelectedFilesText());
+				uploadBtn.click();
 			}
 		});
 		chooseFileBtn.addClickHandler(new ClickHandler() {
@@ -611,139 +595,12 @@ public class UploaderViewImpl extends FlowPanel implements
 
 	private void configureUploadButton() {
 		isExternal = false;
-		uploadBtn.setText("Upload");
+		uploadBtn.setText("Save");
 	}
 
 	private void configureUploadButtonForExternal() {
 		isExternal = true;
 		uploadBtn.setText("Save");
 	}
-	
-	private void removeDragAndDropHandlers() {
-		if (onDragOverDocHandler != null) {
-			onDragOverDocHandler.removeHandler();
-			onDragOverDocHandler = null;
-		}
-		if (onDragEnterDocHandler != null) {
-			onDragEnterDocHandler.removeHandler();
-			onDragEnterDocHandler = null;
-		}
-		if (onDropDocHandler != null) {
-			onDropDocHandler.removeHandler();
-			onDropDocHandler = null;
-		}
-		if (onDropDocHandler != null) {
-			onDropDocHandler.removeHandler();
-			onDropDocHandler = null;
-		}
-		if (onDragEndDocHandler != null) {
-			onDragEndDocHandler.removeHandler();
-			onDragEndDocHandler = null;
-		}
-	}
-	
-	private void addDragAndDropHandlers() {
-		if (onDragOverDocHandler == null) {
-			onDragOverDocHandler = EventHandlerUtils.addEventListener("dragover", EventHandlerUtils.getDoc(), new JavaScriptCallback() {
-				@Override
-				public void invoke(JavaScriptObject event) {
-					_addDocDragOverDnD(event);
-				}
-			});
-		}
-		
-		if (onDragEnterDocHandler == null) {
-			onDragEnterDocHandler = EventHandlerUtils.addEventListener("dragenter", EventHandlerUtils.getDoc(), new JavaScriptCallback() {
-				@Override
-				public void invoke(JavaScriptObject event) {
-					_addDocDragEnterDnD(event);
-				}
-			});
-		}
-		
-		if (onDropDocHandler == null) {
-			onDropDocHandler = EventHandlerUtils.addEventListener("drop", EventHandlerUtils.getDoc(), new JavaScriptCallback() {
-				@Override
-				public void invoke(JavaScriptObject event) {
-					_addDocDropDnD(event, (Uploader) presenter);
-				}
-			});
-		}
-		
-		if (onDragLeaveHandler == null) {
-			onDragLeaveHandler = EventHandlerUtils.addEventListener("dragleave", EventHandlerUtils.getDoc(), new JavaScriptCallback() {
-				@Override
-				public void invoke(JavaScriptObject event) {
-					_addDocDragLeaveDnD(event);
-				}
-			});
-		}
-		
-		if (onDragEndDocHandler == null) {
-			onDragEndDocHandler = EventHandlerUtils.addEventListener("dragend", EventHandlerUtils.getDoc(), new JavaScriptCallback() {
-				@Override
-				public void invoke(JavaScriptObject event) {
-					_addDocDragEndDnD(event);
-				}
-			});
-		}
-	}
-	
-	private static native void _addDocDragOverDnD(JavaScriptObject event) /*-{
-		if (event !== undefined && event.target !== undefined && event.target.id !== undefined) {
-			// Prevent default to allow drop.
-			if (event.target.id != @org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_ID) {
-				event.preventDefault();
-			}
-		}
-	}-*/;
-	
-	private static native void _addDocDragEnterDnD(JavaScriptObject event) /*-{
-		if (event !== undefined && event.target !== undefined && event.target.id !== undefined && event.target.className !== undefined) {
-			// highlight potential drop target when the draggable element enters it
-			if (event.target.id == @org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_ID
-				&& event.target.className.indexOf(@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_DROP_STYLE_NAME) == -1) {
-				event.target.className += " " + @org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_DROP_STYLE_NAME;
-			}
-		}
-	}-*/;
-	
-	private static native void _addDocDropDnD(JavaScriptObject event, Uploader uploader) /*-{
-		if (event !== undefined && event.target !== undefined && event.target.id !== undefined && event.target.className !== undefined) {
-			if (event.target.id == @org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_ID) {
-				event.target.className = event.target.className.replace(@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_DROP_STYLE_NAME, '');
-				var files = event.dataTransfer.files;
-				$doc.getElementById(@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_ID).files = files;
-				
-				uploader.@org.sagebionetworks.web.client.widget.entity.download.Uploader::uploadFiles()();
-			}
-		}
-	}-*/;
-	
-	private static native void _addDocDragLeaveDnD(JavaScriptObject event) /*-{
-		if (event !== undefined && event.target !== undefined && event.target.id !== undefined && event.target.className !== undefined &&
-			event.target.offsetWidth !== undefined && event.target.offsetHeight !== undefined) {
-			if (event.target.id == @org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_ID) {
-				var epsilon_divisor = 30;	// For dragleave events called "inside" box due to border radius.
-				var epsilonX = event.target.offsetWidth / epsilon_divisor;
-				var epsilonY = event.target.offsetHeight / epsilon_divisor;
-				
-				var rect = event.target.getBoundingClientRect();
-				if (	event.clientX <= rect.left + epsilonX || event.clientX >= rect.right - epsilonX ||
-						event.clientY <= rect.top + epsilonY || event.clientY >= rect.bottom - epsilonY	) {
-					// Out of bounds of the box (not just hovering over contained "choose files" button).
-					event.target.className = event.target.className.replace(@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_DROP_STYLE_NAME, '');
-				}
-			}
-		}
-	}-*/;
-	
-	private static native void _addDocDragEndDnD(JavaScriptObject event) /*-{
-		if (event !== undefined && event.target !== undefined && event.target.id !== undefined) {
-			if (event.target.id == @org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_ID) {
-				event.target.className = event.target.className.replace(@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::FILE_FIELD_DROP_STYLE_NAME, '');
-			}
-		}
-	}-*/;
 
 }

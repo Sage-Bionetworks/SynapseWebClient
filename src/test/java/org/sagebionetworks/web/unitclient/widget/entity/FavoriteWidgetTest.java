@@ -58,7 +58,7 @@ public class FavoriteWidgetTest {
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
 		favorites.setResults(results);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new EntityHeader()).when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(true);
 		verify(mockView).showLoading();

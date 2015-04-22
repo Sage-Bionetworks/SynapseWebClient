@@ -23,6 +23,8 @@ import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.server.servlet.UserDataProvider;
 
 /**
  * This filter will attempt to find a matching project, and redirect to that project page
@@ -32,6 +34,13 @@ public class ProjectSearchRedirectFilter implements Filter {
 	public static final String PROJECT = "/project/"; 
 	
 	private SynapseClientImpl synapseClient;
+	private TokenProvider tokenProvider = new TokenProvider() {
+		@Override
+		public String getSessionToken() {
+			return UserDataProvider.getThreadLocalUserToken(perThreadRequest.get());
+		}
+	};
+	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	
 	@Override
 	public void destroy() {
@@ -43,6 +52,7 @@ public class ProjectSearchRedirectFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		try {
 			HttpServletRequest httpRqst = (HttpServletRequest)rqst;
+			perThreadRequest.set(httpRqst);
 			
 			URL requestURL = new URL(httpRqst.getRequestURL().toString());
 			//use path as the search string, but replace all '_' with spaces
@@ -79,5 +89,6 @@ public class ProjectSearchRedirectFilter implements Filter {
 	public void init(FilterConfig config) throws ServletException {
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setServiceUrlProvider(new ServiceUrlProvider());
+		synapseClient.setTokenProvider(tokenProvider);
 	}
 }

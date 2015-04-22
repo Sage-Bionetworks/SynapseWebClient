@@ -94,9 +94,9 @@ public class FavoriteWidget implements Presenter {
 	private void setIsFavorite(final String entityId,
 			final boolean isFavorite, final AsyncCallback<Void> callback) {
 		if(isFavorite) {
-			synapseClient.addFavorite(entityId, new AsyncCallback<String>() {
+			synapseClient.addFavorite(entityId, new AsyncCallback<EntityHeader>() {
 				@Override
-				public void onSuccess(String result) {
+				public void onSuccess(EntityHeader result) {
 					updateStoredFavorites(callback);
 				}
 				@Override

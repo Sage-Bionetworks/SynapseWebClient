@@ -97,10 +97,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 	public void configure(List<EntityHeader> headers) {
 		view.clear();
+		IsTreeItem loading = view.appendLoading(null);
 		for (EntityHeader header : headers) {
 			view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true,
 					false));
 		}
+		view.removeLoading(loading);
 	}
 
 	@Override

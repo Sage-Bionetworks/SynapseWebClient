@@ -15,7 +15,6 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -24,7 +23,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
@@ -50,7 +48,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private String teamId;
 	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
-	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
 	private String message, isMemberMessage, successMessage, buttonText, requestOpenInfoText;
@@ -71,7 +68,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
 			AuthenticationController authenticationController, 
-			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter,
 			GWTWrapper gwt,
 			WikiPageWidget wikiPageWidget
@@ -81,7 +77,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
 		this.wikiPageWidget = wikiPageWidget;
@@ -139,15 +134,12 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, isLoggedIn, new AsyncCallback<TeamBundle>() {
 				@Override
 				public void onSuccess(TeamBundle result) {
-					try {
-						Team team = nodeModelCreator.createJSONEntity(result.getTeamJson(), Team.class);
-						TeamMembershipStatus teamMembershipStatus = null;
-						if (result.getTeamMembershipStatusJson() != null)
-							teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
+					Team team = result.getTeam();
+					TeamMembershipStatus teamMembershipStatus = null;
+					if (result.getTeamMembershipStatus() != null)
+						teamMembershipStatus = result.getTeamMembershipStatus();
+					configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
+
 				}
 				@Override
 				public void onFailure(Throwable caught) {

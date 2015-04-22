@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -45,7 +44,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Footer footerWidget;
 	ProvenanceWidget provenanceWidget;
 	SynapseJSNIUtils synapseJSNIUtils;
-	NodeModelCreator nodeModelCreator;
 	JiraURLHelper jiraErrorHelper;
 	SynapseClientAsync synapseClient;
 	AuthenticationController authenticationController;
@@ -53,7 +51,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SynapseClientAsync synapseClient, final NodeModelCreator nodeModelCreator,
+			SynapseClientAsync synapseClient,
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
 			PortalGinInjector ginInjector,
 			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController ) {		
@@ -64,7 +62,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jiraErrorHelper = jiraErrorHelper;
 		this.provenanceWidget = provenanceWidget;
 		this.authenticationController = authenticationController;

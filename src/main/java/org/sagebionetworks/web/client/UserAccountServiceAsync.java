@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -11,7 +13,8 @@ public interface UserAccountServiceAsync {
 
 	void changePassword(String sessionToken, String newPassword, AsyncCallback<Void> callback);
 
-	void initiateSession(String username, String password, AsyncCallback<String> callback);
+	void initiateSession(String username, String password,
+			AsyncCallback<Session> callback);
 	
 	void getUserSessionData(String sessionToken, AsyncCallback<UserSessionData> callback);
 	
@@ -30,5 +33,5 @@ public interface UserAccountServiceAsync {
 	
 	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<PublicPrincipalIds> callback);
 	
-	void getStorageUsage(AsyncCallback<String> callback);
+	void getStorageUsage(AsyncCallback<StorageUsageSummaryList> callback);
 }

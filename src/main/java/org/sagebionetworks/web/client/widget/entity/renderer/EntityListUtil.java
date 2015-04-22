@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -50,7 +49,7 @@ public class EntityListUtil {
 
 	public static void loadIndividualRowDetails(
 			final SynapseClientAsync synapseClient, final SynapseJSNIUtils synapseJSNIUtils,
-			final NodeModelCreator nodeModelCreator, final boolean isLoggedIn,
+			final boolean isLoggedIn,
 			List<EntityGroupRecord> records, final int rowIndex,
 			final RowLoadedHandler handler) throws IllegalArgumentException {
 		if(records == null || rowIndex >= records.size()) {

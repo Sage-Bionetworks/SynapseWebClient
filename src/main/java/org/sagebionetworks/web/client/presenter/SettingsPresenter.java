@@ -5,7 +5,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -15,9 +14,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,7 +27,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private AuthenticationController authenticationController;
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
-	private NodeModelCreator nodeModelCreator;
 	private SynapseClientAsync synapseClient;
 	private GWTWrapper gwt;
 	private String apiKey = null;
@@ -40,14 +36,12 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			AuthenticationController authenticationController,
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
-			NodeModelCreator nodeModelCreator,
 			SynapseClientAsync synapseClient,
 			GWTWrapper gwt) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
 		view.setPresenter(this);
@@ -156,15 +150,11 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 	
 	public void updateUserStorage() {
-		userService.getStorageUsage(new AsyncCallback<String>(){
+		userService.getStorageUsage(new AsyncCallback<StorageUsageSummaryList>(){
 			@Override
-			public void onSuccess(String storageUsageSummaryListJson) {
-				try {
-					StorageUsageSummaryList storageUsageSummaryList = nodeModelCreator.createJSONEntity(storageUsageSummaryListJson, StorageUsageSummaryList.class);
-					view.updateStorageUsage(storageUsageSummaryList.getTotalSize());
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}    				
+			public void onSuccess(StorageUsageSummaryList results) {
+				StorageUsageSummaryList storageUsageSummaryList = results;
+				view.updateStorageUsage(storageUsageSummaryList.getTotalSize()); 				
 			}
 			
 			@Override
