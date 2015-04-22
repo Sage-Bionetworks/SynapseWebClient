@@ -725,8 +725,7 @@ public class ProfilePresenterTest {
 		profilePresenter.createTeam("");
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
-		Mockito.reset(mockView);
-		
+		Mockito.reset(mockView);	
 		profilePresenter.createTeam(null);
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());

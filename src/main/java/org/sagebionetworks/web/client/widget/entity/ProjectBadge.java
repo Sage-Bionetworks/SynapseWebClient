@@ -92,7 +92,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 
 		if (header.getModifiedOn() != null) {
 			order.add("Modified On");
-			map.put("Modified On", gwt.getDateTimeFormat(PredefinedFormat.RFC_2822).format(header.getModifiedOn()));		
+			map.put("Modified On", gwt.getDateTimeFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(header.getModifiedOn()));		
 		}
 		
 		return ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
