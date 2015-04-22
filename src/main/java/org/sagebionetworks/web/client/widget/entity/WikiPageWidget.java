@@ -130,7 +130,11 @@ SynapseWidgetPresenter {
 						if (caught instanceof NotFoundException) {
 							//show insert wiki button if user can edit and it's embedded in another entity page
 							if (isEmbeddedInOwnerPage) {
-								view.showWarningMessageInPage(DisplayConstants.NO_WIKI_FOUND);
+								if (canEdit) {
+									view.showWarningMessageInPage(DisplayConstants.LABEL_NO_MARKDOWN);
+								} else {
+									view.clear();
+								}
 							} else //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
 							

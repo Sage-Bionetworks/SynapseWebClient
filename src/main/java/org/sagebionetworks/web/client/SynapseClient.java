@@ -72,7 +72,7 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-@RemoteServiceRelativePath("synapse")	
+@RemoteServiceRelativePath("synapseclient")	
 public interface SynapseClient extends RemoteService {
 
 	public Entity getEntity(String entityId) throws RestServiceException;
