@@ -746,33 +746,6 @@ public class DisplayUtils {
 	}
 	
 
-	
-	/**
-	 * Returns the NodeType for this entity class. 
-	 * TODO : This should be removed when we move to using the Synapse Java Client
-	 * @param entity
-	 * @return
-	 */
-	public static NodeType getNodeTypeForEntity(Entity entity) {
-		// 	DATASET, LAYER, PROJECT, EULA, AGREEMENT, ENTITY, ANALYSIS, STEP
-		if(entity instanceof org.sagebionetworks.repo.model.Study) {
-			return NodeType.STUDY;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Data) {
-			return NodeType.DATA;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Project) {
-			return NodeType.PROJECT;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Analysis) {
-			return NodeType.ANALYSIS;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Step) {
-			return NodeType.STEP;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Code) {
-			return NodeType.CODE;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Link) {
-			return NodeType.LINK;
-		} 
-		return null;	
-	}
-	
 	public static String getEntityTypeDisplay(ObjectSchema schema) {
 		String title = schema.getTitle();
 		if(title == null){

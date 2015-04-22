@@ -37,6 +37,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
+@SuppressWarnings("serial")
 public class SearchServiceImpl extends RemoteServiceServlet implements
 		SearchService {
 
@@ -273,70 +274,4 @@ public class SearchServiceImpl extends RemoteServiceServlet implements
 	protected void checkPermutationStrongName() throws SecurityException {
 		// No-opp here allows us to make RPC calls for integration testing.
 	}
-
-	@Override
-	public List<String> searchEntities(String fromType,
-			List<WhereCondition> where, int offset, int limit, String sort,
-			boolean ascending) throws RestServiceException {
-		if(fromType == null) throw new IllegalArgumentException("fromType cannot be null");		
-		
-		final String COL_ID = "id";
-		final String COL_NAME = "name";
-		final String COL_NODETYPE = "nodeType";
-		SearchParameters params = new SearchParameters(
-				Arrays.asList(new String[] { COL_ID, COL_NAME, COL_NODETYPE }),
-				fromType, where, offset, limit, sort, ascending);		
-		
-		// Build the uri from the parameters
-		URI uri = QueryStringUtils.writeQueryUri(urlProvider.getRepositoryServiceUrl() + "/", params);
-
-		HttpHeaders headers = new HttpHeaders();
-		// If the user data is stored in a cookie, then fetch it and the session token to the header.
-		UserDataProvider.addUserDataToHeader(this.getThreadLocalRequest(), headers);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<String>("", headers);
-
-		// Make the actual call.
-		try {
-			ResponseEntity<Object> response = templateProvider.getTemplate().exchange(uri, HttpMethod.GET, entity, Object.class);
-			LinkedHashMap<String, Object> body = (LinkedHashMap<String, Object>) response.getBody();
-			List<Map<String, Object>> rows = (List<Map<String, Object>>) body.get(KEY_RESULTS);
-			long end = System.currentTimeMillis();
-			logger.info("Url GET: " + uri.toString());
-			
-			final String KEY_ID = fromType + "." + COL_ID;
-			final String KEY_NAME = fromType + "." + COL_NAME;
-			final String KEY_NODETYPE = fromType + "." + COL_NODETYPE;
-			List<String> eheaders = new ArrayList<String>();
-			for(Map<String,Object> row : rows) {
-				if(row.containsKey(KEY_ID) && row.containsKey(KEY_NAME) && row.containsKey(KEY_NODETYPE)) {
-					EntityHeader eh = new EntityHeader();
-					eh.setId((String)row.get(KEY_ID));
-					eh.setName((String)row.get(KEY_NAME));
-					short typeid = Short.parseShort(row.get(KEY_NODETYPE).toString());
-					EntityType type = EntityType.getTypeForId(typeid);
-					eh.setType(type.getMetadata().getName());
-					JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-					try {
-						eh.writeToJSONObject(adapter);
-					} catch (JSONObjectAdapterException e) {
-						e.printStackTrace();
-					}
-					eheaders.add(adapter.toJSONString());
-				}
-			}
-			return eheaders;
-		} catch (HttpClientErrorException ex) {
-			// temporary solution to not being able to throw caught exceptions (due to Gin 1.0)
-			Integer code = ex.getStatusCode().value();
-			if(code == 401) { // UNAUTHORIZED
-				throw new UnauthorizedException();
-			} else if(code == 403) { // FORBIDDEN
-				throw new ForbiddenException();
-			} else {
-				throw new UnknownErrorException(ex.getMessage());
-			}
-		}				
-	}
-
 }

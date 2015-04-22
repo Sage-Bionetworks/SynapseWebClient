@@ -855,6 +855,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
 		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
+		bind(ImageConfigViewImpl.class).in(Singleton.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
 		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
