@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -12,9 +13,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,7 +24,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private FilesBrowserView view;
 	private String configuredEntityId;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
@@ -37,14 +35,12 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	@Inject
 	public FilesBrowser(FilesBrowserView view,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator, 
 			AdapterFactory adapterFactory,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
@@ -122,25 +118,19 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		Folder folder = new Folder();
 		folder.setParentId(configuredEntityId);
 		folder.setEntityType(Folder.class.getName());
-		String entityJson;
-		try {
-			entityJson = folder.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String newId) {
-					currentFolderEntityId = newId;
-					view.showFolderEditDialog(newId);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
-				}			
-			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-		}
+		synapseClient.createOrUpdateEntity(folder, null, true, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String newId) {
+				currentFolderEntityId = newId;
+				view.showFolderEditDialog(newId);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
+			}			
+		});
 	}
 	
 	@Override
@@ -160,37 +150,27 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}
 	
 	public void updateFolderName(final Folder folder) {
-		try {
-			String entityJson = folder.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.updateEntity(entityJson, new AsyncCallback<EntityWrapper>() {
-				@Override
-				public void onSuccess(EntityWrapper result) {
-					view.showInfo("Folder '" + folder.getName() + "' Added", "");
-					view.refreshTreeView(configuredEntityId);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-		}
-
+		synapseClient.updateEntity(folder, new AsyncCallback<Entity>() {
+			@Override
+			public void onSuccess(Entity result) {
+				view.showInfo("Folder '" + folder.getName() + "' Added", "");
+				view.refreshTreeView(configuredEntityId);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
+			}
+		});
 	}
 	
 	@Override
 	public void updateFolderName(final String newFolderName) {
-		synapseClient.getEntity(currentFolderEntityId, new AsyncCallback<EntityWrapper>() {
+		synapseClient.getEntity(currentFolderEntityId, new AsyncCallback<Entity>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					Folder folder = nodeModelCreator.createJSONEntity(result.getEntityJson(), Folder.class);
-					folder.setName(newFolderName);
-					updateFolderName(folder);
-				} catch (JSONObjectAdapterException e) {			
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-				}
+			public void onSuccess(Entity result) {
+				Folder folder = (Folder) result;
+				folder.setName(newFolderName);
+				updateFolderName(folder);
 			}
 			
 			@Override

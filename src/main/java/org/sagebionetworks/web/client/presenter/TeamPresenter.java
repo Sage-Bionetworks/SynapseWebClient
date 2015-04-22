@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.shared.TeamBundle;
 
@@ -25,7 +24,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private org.sagebionetworks.web.client.place.Team place;
 	private TeamView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -37,14 +35,12 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		
 		view.setPresenter(this);
@@ -85,17 +81,13 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
-				try {
-					team = nodeModelCreator.createJSONEntity(result.getTeamJson(), Team.class);
-					if (result.getTeamMembershipStatusJson() != null)
-						teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-					else
-						teamMembershipStatus = null;
-					boolean isAdmin = result.isUserAdmin();
-					view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+				team = result.getTeam();
+				if (result.getTeamMembershipStatus() != null)
+					teamMembershipStatus = result.getTeamMembershipStatus();
+				else
+					teamMembershipStatus = null;
+				boolean isAdmin = result.isUserAdmin();
+				view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
 			}
 			@Override
 			public void onFailure(Throwable caught) {

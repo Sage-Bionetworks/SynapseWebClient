@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
@@ -42,7 +41,6 @@ public class EntityListWidgetTest {
 	EntityListWidget widget;
 	EntityListWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AuthenticationController mockAuthenticationController;
 
@@ -54,7 +52,6 @@ public class EntityListWidgetTest {
 	public void setup() throws Exception{		
 		mockView = mock(EntityListWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -78,7 +75,7 @@ public class EntityListWidgetTest {
 		// create empty descriptor
 		descriptor = new HashMap<String, String>();		
 				
-		widget = new EntityListWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
+		widget = new EntityListWidget(mockView, mockSynapseClient, mockSynapseJSNIUtils, mockAuthenticationController);
 	}
 	
 	@Test
@@ -106,8 +103,7 @@ public class EntityListWidgetTest {
 		records.add(record456);
 		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
 		
-		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
-					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
+		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils, mockAuthenticationController.isLoggedIn(),
 					records, 0, handler);
 		verify(handler).onLoaded(any(EntityGroupRecordDisplay.class));
 		
@@ -143,8 +139,7 @@ public class EntityListWidgetTest {
 		String resultDescription = "Description =)";
 		AsyncMockStubber.callSuccessWith(resultDescription).when(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 
-		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
-					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
+		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils, mockAuthenticationController.isLoggedIn(),
 					records, 0, handler);
 
 		// Since syn789 is non-deprecated, the call on

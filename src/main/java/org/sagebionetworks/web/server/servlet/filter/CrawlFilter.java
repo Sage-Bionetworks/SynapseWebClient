@@ -207,8 +207,7 @@ public class CrawlFilter implements Filter {
 		
 		//and ask for all descendents
 		try {
-			String childListJson = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
-			EntityIdList childList = EntityFactory.createEntityFromJSONString(childListJson, EntityIdList.class);
+			EntityIdList childList = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
 			for (EntityId childId : childList.getIdList()) {
 				html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getId()+"</a><br />");
 			}} catch(Exception e) {};

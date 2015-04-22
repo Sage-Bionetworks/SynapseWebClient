@@ -1,8 +1,13 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +24,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TeamSearchView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -34,7 +38,6 @@ public class TeamSearchPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserAccountServiceAsync;
 	GlobalApplicationState mockGlobalApplicationState;
-	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapse;
 	CookieProvider mockCookies;
 	PaginatedResults<Team> teamList = getTestTeams();
@@ -45,15 +48,13 @@ public class TeamSearchPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserAccountServiceAsync = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapse = mock(SynapseClientAsync.class);
 		mockCookies = mock(CookieProvider.class);
-		presenter = new TeamSearchPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapse, mockNodeModelCreator, mockCookies);
+		presenter = new TeamSearchPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapse, mockCookies);
 		
-		AsyncMockStubber.callSuccessWith("").when(mockSynapse).getTeamsBySearch(
+		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapse).getTeamsBySearch(
 				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(teamList);
+
 		verify(mockView).setPresenter(presenter);
 	}	
 	

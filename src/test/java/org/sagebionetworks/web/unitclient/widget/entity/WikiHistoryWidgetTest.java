@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +19,13 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import static org.mockito.Matchers.anyBoolean;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -39,7 +36,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class WikiHistoryWidgetTest {
 	WikiHistoryWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	WikiHistoryWidget presenter;
@@ -48,12 +44,10 @@ public class WikiHistoryWidgetTest {
 	public void before() throws Exception{
 		mockView = mock(WikiHistoryWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		
-		presenter = new WikiHistoryWidget(mockGlobalApplicationState, mockView, mockSynapseClient, 
-				mockNodeModelCreator, mockAuthenticationController);
+		presenter = new WikiHistoryWidget(mockGlobalApplicationState, mockView, mockSynapseClient, mockAuthenticationController);
 		
 		PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
 		paginatedHistory.setTotalNumberOfResults(1);
@@ -61,8 +55,8 @@ public class WikiHistoryWidgetTest {
 		V2WikiHistorySnapshot snapshot = new V2WikiHistorySnapshot();
 		results.add(snapshot);
 		paginatedHistory.setResults(results);
-		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(paginatedHistory);
-		AsyncMockStubber.callSuccessWith("fake json response")
+//		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(paginatedHistory);
+		AsyncMockStubber.callSuccessWith(paginatedHistory)
 			.when(mockSynapseClient).getV2WikiHistory(any(WikiPageKey.class), any(Long.class), any(Long.class), any(AsyncCallback.class));
 		
 		UserGroupHeaderResponsePage responsePage = new UserGroupHeaderResponsePage();

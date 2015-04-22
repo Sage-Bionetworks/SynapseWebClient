@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -48,14 +49,11 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class LicensedDownloaderTest {
 		
@@ -75,9 +73,6 @@ public class LicensedDownloaderTest {
 	Entity parentEntity;
 	List<LocationData> locations;	
 	EntityPath entityPath;
-	EntityWrapper StudyEntityWrapper;
-	EntityWrapper layerEntityWrapper;
-	EntityWrapper pathEntityWrapper;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AccessRequirementDialog mockAccessRequirementDialog;
@@ -152,9 +147,6 @@ public class LicensedDownloaderTest {
 		entityHeader.setType("/layer");
 		path.add(entityHeader);
 		entityPath.setPath(path);
-		
-
-		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
 		
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn(baseFileHandleUrl);
 	}

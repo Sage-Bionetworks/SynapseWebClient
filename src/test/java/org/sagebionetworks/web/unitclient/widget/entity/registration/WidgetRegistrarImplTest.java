@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
@@ -21,14 +20,12 @@ public class WidgetRegistrarImplTest {
 		
 	WidgetRegistrarImpl widgetRegistrar;
 	PortalGinInjector mockGinInjector;
-	NodeModelCreator mockNodeModelCreator;
 	Map<String, String> testImageWidgetDescriptor;
 	String testFileName = "testfile.png";
 	@Before
 	public void setup(){	
 		mockGinInjector = mock(PortalGinInjector.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
-		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector,mockNodeModelCreator, new JSONObjectAdapterImpl());
+		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector, new JSONObjectAdapterImpl());
 		testImageWidgetDescriptor = new HashMap<String, String>();
 	}
 	
