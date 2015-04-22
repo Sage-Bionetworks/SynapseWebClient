@@ -162,18 +162,18 @@ public class WikiSubpageNavigationTreeTest {
 
 		Mockito.verify(mockView, Mockito.times(1)).configure(aNode);
 
-		testReloadWikiForNode(aNode, aNode, 2);
-		testReloadWikiForNode(bNode, aNode, 3);
-		testReloadWikiForNode(cNode, aNode, 4);
-		testReloadWikiForNode(dNode, aNode, 5);
-		testReloadWikiForNode(eNode, aNode, 6);
+		testReloadWikiForNode(aNode, aNode, 1);
+		testReloadWikiForNode(bNode, aNode, 2);
+		testReloadWikiForNode(cNode, aNode, 3);
+		testReloadWikiForNode(dNode, aNode, 4);
+		testReloadWikiForNode(eNode, aNode, 5);
 	}
 
 	private void testReloadWikiForNode(SubpageNavTreeNode aNode, SubpageNavTreeNode root, int time) {
 		tree.reloadWiki(aNode);
 		Mockito.verify(mockReloadWikiPageCallback).invoke(aNode.getWikiPageKey());
-		Mockito.verify(mockGlobalApplicationState).replaceCurrentPlace(aNode.getTargetPlace());
-		Mockito.verify(mockView, Mockito.times(time)).configure(root);
+		Mockito.verify(mockGlobalApplicationState).pushCurrentPlace(aNode.getTargetPlace());
+		Mockito.verify(mockView, Mockito.times(time)).resetNavTree(root);
 	}
 
 	private void testInstanceOfSynapse(List<SubpageNavTreeNode> nodes) {
