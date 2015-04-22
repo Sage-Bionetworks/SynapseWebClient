@@ -29,6 +29,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 	private ClientCache clientCache;
 	private ProjectHeader header;
 	private FavoriteWidget favoritesWidget;
+	private UserProfile modifiedBy;
 	
 	@Inject
 	public ProjectBadge(ProjectBadgeView view, 
@@ -48,8 +49,9 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		view.setFavoritesWidget(favoritesWidget.asWidget());
 	}
 	
-	public void configure(ProjectHeader header) {
+	public void configure(ProjectHeader header, UserProfile modifiedBy) {
 		this.header = header;
+		this.modifiedBy = modifiedBy;
 		view.setLastActivityVisible(false);
 		if (header != null) {
 			if (header.getLastActivity() != null) {

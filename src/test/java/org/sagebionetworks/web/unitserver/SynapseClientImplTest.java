@@ -409,9 +409,10 @@ public class SynapseClientImplTest {
 						anyString())).thenReturn(sentMessage);
 
 		// getMyProjects getUserProjects
-		PaginatedResults<ProjectHeader> headers = new PaginatedResults<ProjectHeader>();
+		PaginatedResults headers = new PaginatedResults<ProjectHeader>();
 		headers.setTotalNumberOfResults(1100);
 		List<ProjectHeader> projectHeaders = new ArrayList();
+		List<UserProfile> userProfile = new ArrayList();
 		projectHeaders.add(new ProjectHeader());
 		headers.setResults(projectHeaders);
 		when(
@@ -1740,6 +1741,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test
@@ -1753,6 +1755,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getProjectsFromUser(eq(userId),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test
@@ -1766,6 +1769,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getProjectsForTeam(eq(teamId),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test

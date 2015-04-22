@@ -388,7 +388,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setAllProjectsFilterSelected();
 		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects));
+		verify(mockView).addProjects(eq(myProjects), anyList());
 		verify(mockView).setProjectSortVisible(true);
 
 		//should have refreshed teams too, since this is the owner
@@ -405,7 +405,7 @@ public class ProfilePresenterTest {
 		verify(mockView).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects));
+		verify(mockView).addProjects(eq(myProjects), anyList());
 		
 		//should have refreshed teams too, since this is the owner
 		verify(mockView, never()).clearTeamNotificationCount();
@@ -426,7 +426,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setMyProjectsFilterSelected();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(anyList());
+		verify(mockView).addProjects(anyList(), anyList());
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -441,7 +441,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
-		verify(mockView).addProjects(anyList());
+		verify(mockView).addProjects(anyList(), anyList());
 		verify(mockView).setProjectSortVisible(false);
 	}
 	
@@ -455,7 +455,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setSharedDirectlyWithMeFilterSelected();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(anyList());
+		verify(mockView).addProjects(anyList(), anyList());
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -469,7 +469,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockView).setFavoritesHelpPanelVisible(true);
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
-		verify(mockView, never()).addProjects(anyList());
+		verify(mockView, never()).addProjects(anyList(), anyList());
 		verify(mockView).setProjectSortVisible(false);
 	}
 
@@ -488,7 +488,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setTeamsFilterSelected();
 		verify(mockSynapseClient).getProjectsForTeam(eq(teamId), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects));
+		verify(mockView).addProjects(eq(myProjects), anyList());
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -576,7 +576,7 @@ public class ProfilePresenterTest {
 	public void testGetUserProjects() {
 		profilePresenter.getUserProjects(1);
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects));
+		verify(mockView).addProjects(eq(myProjects), anyList());
 	}
 	
 	@Test

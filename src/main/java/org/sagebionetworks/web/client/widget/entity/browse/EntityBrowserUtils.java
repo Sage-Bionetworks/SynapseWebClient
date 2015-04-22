@@ -73,6 +73,7 @@ public class EntityBrowserUtils {
 			public void onSuccess(List<EntityHeader> favorites) {
 				//show whatever projects that we found (maybe zero)
 				globalApplicationState.setFavorites(favorites);
+				
 				callback.onSuccess(favorites);
 			}
 			@Override
