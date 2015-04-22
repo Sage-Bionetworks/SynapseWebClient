@@ -27,8 +27,9 @@ public interface ProjectBadgeView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-//		void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback);
 
-		KeyValueDisplay<String> profileToKeyValueDisplay();
+		String getProjectTooltip();
 	}
+
+	void configure(String projectName, String href, String tooltip);
 }

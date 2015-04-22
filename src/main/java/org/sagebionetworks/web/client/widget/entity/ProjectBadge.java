@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
@@ -62,7 +63,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 				} catch(Exception e) {};
 			}
 			favoritesWidget.configure(header.getId());
-			view.setProject(header.getName(), DisplayUtils.getSynapseHistoryToken(header.getId()));
+			view.configure(header.getName(), DisplayUtils.getSynapseHistoryToken(header.getId()), getProjectTooltip());
 		}
 	}
 	
@@ -72,7 +73,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 	}	
 	
 	@Override
-	public KeyValueDisplay<String> profileToKeyValueDisplay() {
+	public String getProjectTooltip() {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		
@@ -81,8 +82,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 
 		if (modifiedBy != null) {
 			order.add("Modified By");
-			map.put("Modified By", modifiedBy.getFirstName() + " " + modifiedBy.getLastName() 
-					 + " (" + modifiedBy.getUserName() + ")");
+			map.put("Modified By", DisplayUtils.getDisplayName(modifiedBy));
 		}
 
 		if (header.getModifiedOn() != null) {
@@ -90,30 +90,8 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 			map.put("Modified On", DisplayUtils.converDataToPrettyString(header.getModifiedOn()));		
 		}
 		
-		return new KeyValueDisplay<String>(map, order);
+		return ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
 	}
-	
-//	@Override
-//	public void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback) {
-//		if (view.isAttached()) {
-//			view.showPopover();
-//		}
-//		UserBadge.getUserProfile("" + header.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-//			@Override
-//			public void onSuccess(UserProfile profile) {
-//				if (view.isAttached())
-//					callback.onSuccess(
-//							
-//							profileToKeyValueDisplay(profile, DisplayUtils.getDisplayName(profile)));		
-//			}
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				if (view.isAttached())
-//					callback.onFailure(caught);
-//			}
-//		});
-//	}
 	
 	public ProjectHeader getHeader() {
 		return header;

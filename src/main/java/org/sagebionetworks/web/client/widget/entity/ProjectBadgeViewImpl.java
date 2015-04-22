@@ -50,21 +50,6 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 			) {
 		widget = uiBinder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
-		isPopover = false;
-		anchor.addMouseOverHandler(new MouseOverHandler() {
-	        @Override
-	        public void onMouseOver(MouseOverEvent event) {
-	                isPopover = true;
-	                showPopover();
-	        }
-		});
-		anchor.addMouseOutHandler(new MouseOutHandler() {
-	        @Override
-	        public void onMouseOut(MouseOutEvent event) {
-	                isPopover = false;
-	                tooltip.hide();
-	        }
-		});
 	}
 	
 	@Override
@@ -75,6 +60,14 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	}
 	
 	@Override
+	public void configure(String projectName, String href, String tooltip) {
+		anchor.setText(projectName);
+		anchor.setHref(href);
+		this.tooltip.setTitle(tooltip);
+		this.tooltip.reconfigure();
+	}
+	
+	@Override
 	public String getSimpleDateString(Date date) {
 		return DisplayUtils.converDateaToSimpleString(date);
 	}
@@ -82,45 +75,6 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	@Override
 	public void setLastActivityText(String text) {
 		additionalText.setText(text);
-	}
-	
-	public void showPopover() {
-		if (!isPopoverInitialized) {
-			KeyValueDisplay<String> result = presenter.profileToKeyValueDisplay();
-			String content = ProvViewUtil.createEntityPopoverHtml(result).asString();
-			isPopoverInitialized = true;
-			if (widget.isAttached()) {
-				tooltip.setTitle(content);
-				tooltip.reconfigure();
-				if (isPopover)
-					tooltip.show();
-			}
-		
-//			presenter.getInfo(new AsyncCallback<KeyValueDisplay<String>>() {						
-//				@Override
-//				public void onSuccess(KeyValueDisplay<String> result) {
-//					renderPopover(ProvViewUtil.createEntityPopoverHtml(result).asString());
-//				}
-//				
-//				@Override
-//				public void onFailure(Throwable caught) {
-//					renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
-//				}
-//				
-//				private void renderPopover(final String content) {
-//					isPopoverInitialized = true;
-//					if (widget.isAttached()) {
-//						tooltip.setTitle(content);
-//						tooltip.reconfigure();
-//						if (isPopover)
-//							tooltip.show();
-//					}
-//				}
-//			});
-			
-		} else {
-			tooltip.show();
-		}
 	}
 	
 	@Override
@@ -148,8 +102,5 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	public boolean isAttached() {
 		return widget.isAttached();
 	}
-	/*
-	 * Private Methods
-	 */
 
 }
