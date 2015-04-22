@@ -12,7 +12,6 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -68,7 +67,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private boolean isEmbeddedInOwnerPage;
 	private HorizontalPanel modifiedPanel, createdPanel;
 	private SimplePanel historyPanel;
-	private SimplePanel noticeWidget;
 
 	public interface OwnerObjectNameCallback{
 		public void ownerObjectNameInitialized();
@@ -189,16 +187,14 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
 		}
 		resetWikiPagePanel();
-		// removeNotice();
 	}
 
 	private void resetWikiPagePanel() {
 		wikiPagePanel.clear();
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
-			FlowPanel noticePanel = createDifferentVersionNotice();
-			noticeWidget = wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice");
-			wikiPagePanel.add(noticeWidget);
+			Alert notice = createDifferentVersionNotice();
+			wikiPagePanel.add(notice);
 		}
 
 		wikiPagePanel.add(getBreadCrumbs());
@@ -297,8 +293,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return modifiedAndCreatedSection;
 	}
 
-	private FlowPanel createDifferentVersionNotice() {
-		FlowPanel noticePanel = new FlowPanel();
+	private Alert createDifferentVersionNotice() {
+		Alert noticePanel = new Alert();
 		HorizontalPanel noticeWithLink = new HorizontalPanel();
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 

@@ -89,7 +89,7 @@ SynapseWidgetPresenter {
 		this.isCurrentVersion = true;
 		this.versionInView = null;
 
-		/* set up callbacks */
+		// set up callback
 		if (callback != null)
 			this.callback = callback;
 		else 
@@ -103,12 +103,12 @@ SynapseWidgetPresenter {
 			};
 		// this callback is used to reload the wiki markdown without reloading the entire page
 		reloadWikiPageCallback = new CallbackP<WikiPageKey>() {
-            @Override
-            public void invoke(WikiPageKey param) {
-            	wikiKey = param;
-            	reloadWikiPage();
-            }
-        };
+			@Override
+			public void invoke(WikiPageKey param) {
+				wikiKey = param;
+				reloadWikiPage();
+			}
+		};
 
 		setOwnerObjectName(new CallbackP<String>() {
 			@Override
