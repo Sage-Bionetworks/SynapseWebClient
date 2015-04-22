@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -128,7 +129,12 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		entityField.setValue("");
 		urlField.setValue("");
 		nameField.setValue("");
-		uploadTabListItem.showTab();
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			@Override
+			public void execute() {
+				uploadTabListItem.showTab();
+			}
+		});
 	}
 	
 	@Override
