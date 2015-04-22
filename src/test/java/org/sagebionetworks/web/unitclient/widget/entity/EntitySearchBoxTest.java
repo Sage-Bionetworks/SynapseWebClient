@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.*;
+import static junit.framework.Assert.assertNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxOracle;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
@@ -38,7 +37,6 @@ public class EntitySearchBoxTest {
 	SageImageBundle mockSageImageBundle;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	NodeModelCreator mockNodeModelCreator;
 	EntitySearchBox suggestBox;
 	EntitySearchBoxOracle mockOracle;
 	
@@ -49,9 +47,8 @@ public class EntitySearchBoxTest {
 		mockSageImageBundle = mock(SageImageBundle.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockOracle = mock(EntitySearchBoxOracle.class);
-		suggestBox = new EntitySearchBox(mockView, mockSynapseClient, mockNodeModelCreator);
+		suggestBox = new EntitySearchBox(mockView, mockSynapseClient);
 		suggestBox.setOracle(mockOracle);
 	}
 	

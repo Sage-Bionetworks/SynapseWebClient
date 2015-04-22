@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -14,15 +13,13 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 	
 	private BigTeamBadgeView view;
 	SynapseClientAsync synapseClient;
-	NodeModelCreator nodeModelCreator;
 	
 	private String teamName;
 	
 	@Inject
-	public BigTeamBadge(BigTeamBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public BigTeamBadge(BigTeamBadgeView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	

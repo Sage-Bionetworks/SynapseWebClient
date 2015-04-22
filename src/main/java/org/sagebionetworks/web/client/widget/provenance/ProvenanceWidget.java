@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
@@ -18,7 +17,6 @@ import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -27,21 +25,18 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
@@ -55,7 +50,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	
 	private static final String FAKE_ID_PREFIX = "fakeId";
 	private ProvenanceWidgetView view;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;	
 	private SynapseClientAsync synapseClient;
@@ -87,7 +81,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController, 
 			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
@@ -95,7 +88,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			ClientCache clientCache) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
@@ -182,7 +174,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			
 	@Override
 	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, synapseClient, nodeModelCreator, adapterFactory, clientCache, idToNode, callback);
+		ProvUtils.getInfo(nodeId, synapseClient, adapterFactory, clientCache, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -222,21 +214,17 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			return;
 		}
 		String nextEntityId = lookupVersion.pop();
-		synapseClient.getEntity(nextEntityId, new AsyncCallback<EntityWrapper>() {
+		synapseClient.getEntity(nextEntityId, new AsyncCallback<Entity>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					Entity entity = nodeModelCreator.createEntity(result);
-					Reference ref = new Reference();
-					ref.setTargetId(entity.getId());
-					if(entity instanceof Versionable) {
-						ref.setTargetVersionNumber(((Versionable) entity).getVersionNumber());
-					}
-					startRefs.add(ref);
-					lookupVersion(doneCallback);
-				} catch (JSONObjectAdapterException e) {
-					doneCallback.onFailure(e);
-				}				
+			public void onSuccess(Entity result) {
+				Entity entity = result;
+				Reference ref = new Reference();
+				ref.setTargetId(entity.getId());
+				if(entity instanceof Versionable) {
+					ref.setTargetVersionNumber(((Versionable) entity).getVersionNumber());
+				}
+				startRefs.add(ref);
+				lookupVersion(doneCallback);			
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -325,21 +313,17 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 
 		// Lookup entities generated by this activity
-		synapseClient.getEntitiesGeneratedBy(item.getActivity().getId(), Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
+		synapseClient.getEntitiesGeneratedBy(item.getActivity().getId(), Integer.MAX_VALUE, 0, new AsyncCallback<PaginatedResults<Reference>>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					PaginatedResults<Reference> generated = nodeModelCreator.createPaginatedResults(result, Reference.class);
-					// add references to generatedByActivityId & references
-					if(generated != null && generated.getResults() != null) {
-						for(Reference ref : generated.getResults()) {
-							generatedByActivityId.put(ref, item.getActivity().getId());
-							references.add(ref);
-						}
-					} 
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}				
+			public void onSuccess(PaginatedResults<Reference> result) {
+				PaginatedResults<Reference> generated = result;
+				// add references to generatedByActivityId & references
+				if(generated != null && generated.getResults() != null) {
+					for(Reference ref : generated.getResults()) {
+						generatedByActivityId.put(ref, item.getActivity().getId());
+						references.add(ref);
+					}
+				} 		
 				addUsedToStack();
 			}
 			
@@ -370,28 +354,18 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private void lookupReferencesThenBuildGraph() {			
 		ReferenceList list = new ReferenceList();
 		list.setReferences(new ArrayList<Reference>(references));		
-		try {
-			synapseClient.getEntityHeaderBatch(list.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {					
-					BatchResults<EntityHeader> headers;
-					try {
-						headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
-						refToHeader = ProvUtils.mapReferencesToHeaders(headers);
-						buildGraphLayoutSendToView();
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {					
-					buildGraphLayoutSendToView();
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-		}
+		synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			@Override
+			public void onSuccess(PaginatedResults<EntityHeader> headers) {					
+				refToHeader = ProvUtils.mapReferencesToHeaders(headers);
+				buildGraphLayoutSendToView();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {					
+				buildGraphLayoutSendToView();
+			}
+		});
 	}
 
 	
@@ -513,43 +487,34 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		// batch request all entity ids to get current version. Notify view of non current versions
 		ReferenceList referenceList = new ReferenceList();
 		referenceList.setReferences(new ArrayList<Reference>(entityIds));		
-		try {
-			synapseClient.getEntityHeaderBatch(referenceList.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					try {
-						BatchResults<EntityHeader> currentVersions = nodeModelCreator.createBatchResults(result, EntityHeader.class);
-						Map<String,Long> entityToCurrentVersion = new HashMap<String, Long>();
-						for(EntityHeader header : currentVersions.getResults()) {
-							entityToCurrentVersion.put(header.getId(), header.getVersionNumber());
-						}
-						
-						// find graph nodes that should be marked as not current version
-						List<String> notCurrentNodeIds = new ArrayList<String>();
-						for(Reference ref : refToNodeId.keySet()) {
-							if(ref.getTargetVersionNumber() != null && !ref.getTargetVersionNumber().equals(entityToCurrentVersion.get(ref.getTargetId()))) {
-								notCurrentNodeIds.add(refToNodeId.get(ref));
-							}
-						}
-						view.markOldVersions(notCurrentNodeIds);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
+		synapseClient.getEntityHeaderBatch(referenceList, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			@Override
+			public void onSuccess(PaginatedResults<EntityHeader> currentVersions) {
+				Map<String,Long> entityToCurrentVersion = new HashMap<String, Long>();
+				for(EntityHeader header : currentVersions.getResults()) {
+					entityToCurrentVersion.put(header.getId(), header.getVersionNumber());
+				}
+				
+				// find graph nodes that should be marked as not current version
+				List<String> notCurrentNodeIds = new ArrayList<String>();
+				for(Reference ref : refToNodeId.keySet()) {
+					if(ref.getTargetVersionNumber() != null && !ref.getTargetVersionNumber().equals(entityToCurrentVersion.get(ref.getTargetId()))) {
+						notCurrentNodeIds.add(refToNodeId.get(ref));
 					}
 				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if (caught instanceof NotFoundException) {
-						//SWC-1843: do not redirect home.  log full exception to the console
-						synapseJSNIUtils.consoleError(caught.getMessage() + "\n" + DisplayUtils.getStackTrace(caught));
-					} else {
-						DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);	
-					}
-					
+				view.markOldVersions(notCurrentNodeIds);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					//SWC-1843: do not redirect home.  log full exception to the console
+					synapseJSNIUtils.consoleError(caught.getMessage() + "\n" + DisplayUtils.getStackTrace(caught));
+				} else {
+					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);	
 				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-		} 
+				
+			}
+		});
 	}
 	
 }

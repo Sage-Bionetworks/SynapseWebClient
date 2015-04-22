@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
@@ -45,7 +44,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
@@ -61,7 +59,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public SearchPresenter(SearchView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
+			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
 			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle) {
@@ -69,7 +67,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;

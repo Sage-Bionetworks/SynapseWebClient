@@ -40,7 +40,6 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -249,10 +248,6 @@ public class EvaluationAccessControlListEditorTest {
 			if (resourceAccess.getPrincipalId().equals(USER_ID))
 				toRemove = resourceAccess;
 		acl.getResourceAccess().remove(toRemove);
-		
-		EntityWrapper expectedEntityWrapper = new EntityWrapper(
-				acl.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName());
 		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));

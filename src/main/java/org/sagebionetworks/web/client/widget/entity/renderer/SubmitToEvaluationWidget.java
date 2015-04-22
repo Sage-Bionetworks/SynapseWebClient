@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -36,7 +35,6 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private AuthenticationController authenticationController;
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
-	private NodeModelCreator nodeModelCreator;
 	private Set<String> evaluationIds;
 	PortalGinInjector ginInjector;
 	private String evaluationUnavailableMessage;
@@ -44,14 +42,12 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	public SubmitToEvaluationWidget(SubmitToEvaluationWidgetView view, ChallengeClientAsync challengeClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			NodeModelCreator nodeModelCreator,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.challengeClient = challengeClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeModelCreator = nodeModelCreator;
 		this.ginInjector = ginInjector;
 	}
 	
@@ -74,18 +70,13 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 				//figure out if we should show anything
 				try {
-					challengeClient.getAvailableEvaluations(evaluationIds, new AsyncCallback<String>() {
+					challengeClient.getAvailableEvaluations(evaluationIds, new AsyncCallback<PaginatedResults<Evaluation>>() {
 						@Override
-						public void onSuccess(String jsonString) {
-							try {
-								PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-								if (results.getTotalNumberOfResults() == 0) {
-									view.showUnavailable(evaluationUnavailableMessage);
-								} else {
-									view.configure(wikiKey, buttonText);	
-								}
-							} catch (JSONObjectAdapterException e) {
-								onFailure(e);
+						public void onSuccess(PaginatedResults<Evaluation> results) {
+							if (results.getTotalNumberOfResults() == 0) {
+								view.showUnavailable(evaluationUnavailableMessage);
+							} else {
+								view.configure(wikiKey, buttonText);	
 							}
 						}
 						@Override

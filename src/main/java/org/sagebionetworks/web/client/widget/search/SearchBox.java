@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
@@ -21,7 +20,6 @@ import com.google.inject.Inject;
 public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresenter {
 	
 	private SearchBoxView view;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
@@ -32,13 +30,11 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 	
 	@Inject
 	public SearchBox(SearchBoxView view, 
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			AdapterFactory adapterFactory,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;

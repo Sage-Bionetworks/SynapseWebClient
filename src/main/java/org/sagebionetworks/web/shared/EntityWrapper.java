@@ -4,7 +4,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class EntityWrapper implements IsSerializable {
+class EntityWrapper implements IsSerializable {
 
 	private String entityJson;
 	private String entityClassName;

@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -36,7 +37,6 @@ import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -98,7 +98,7 @@ public class AccessRequirementDialogTest {
 		actAR.setActContactInfo(actContactInfo);
 		actAR.setId(actAccessRequirementId);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(EntityWrapper.class),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 	}
 	
@@ -473,18 +473,18 @@ public class AccessRequirementDialogTest {
 		standardConfigure();
 		widget.signTermsOfUseClicked();
 		
-		verify(mockSynapseClient).createAccessApproval(any(EntityWrapper.class),  any(AsyncCallback.class));
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class),  any(AsyncCallback.class));
 		verify(mockFinishedCallback).invoke();
 	}
 	
 	@Test
 	public void testSignTermsOfUseClickedFailure() throws JSONObjectAdapterException {
 		String errorMessage = "this should be passed to the view";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createAccessApproval(any(EntityWrapper.class),  any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class),  any(AsyncCallback.class));
 		standardConfigure();
 		widget.signTermsOfUseClicked();
 		
-		verify(mockSynapseClient).createAccessApproval(any(EntityWrapper.class),  any(AsyncCallback.class));
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class),  any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
 	}
 	

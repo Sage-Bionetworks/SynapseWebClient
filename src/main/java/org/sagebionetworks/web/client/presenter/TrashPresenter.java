@@ -4,20 +4,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -45,7 +43,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
-	private NodeModelCreator nodeModelCreator;
 	private PaginatedResults<TrashedEntity> trashList;
 	private int offset;
 
@@ -53,13 +50,11 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	public TrashPresenter(TrashView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
-			AuthenticationController authController,
-			NodeModelCreator nodeModelCreator){
+			AuthenticationController authController){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
-		this.nodeModelCreator = nodeModelCreator;
 		this.view.setPresenter(this);
 	}	
 	
@@ -104,21 +99,15 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		
 		
 		
-		synapseClient.viewTrashForUser(this.offset, TRASH_LIMIT, new AsyncCallback<String>() {
+		synapseClient.viewTrashForUser(this.offset, TRASH_LIMIT, new AsyncCallback<PaginatedResults<TrashedEntity>>() {
 			@Override
-			public void onSuccess(String result) {
-				
-				try {
-					trashList = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
-					if (trashList.getTotalNumberOfResults() > 0) {
-						view.configure(trashList.getResults());
-					} else {
-						view.displayEmptyTrash();
-					}
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			public void onSuccess(PaginatedResults<TrashedEntity> result) {
+				trashList = result;
+				if (trashList.getTotalNumberOfResults() > 0) {
+					view.configure(trashList.getResults());
+				} else {
+					view.displayEmptyTrash();
 				}
-				
 			}
 			
 			@Override
