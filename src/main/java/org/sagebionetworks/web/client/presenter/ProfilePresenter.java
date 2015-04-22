@@ -479,12 +479,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
 		view.showProjectsLoading(false);
 		view.clearProjects();
-		GWT.debugger();
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
 			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
 			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-bottom-10 col-xs-12");
 			view.addProjectWidget(widget);
 		}
 		if (projectHeaders.isEmpty())
@@ -498,7 +496,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-top-10");
 			view.addChallengeWidget(widget);
 		}
 	}

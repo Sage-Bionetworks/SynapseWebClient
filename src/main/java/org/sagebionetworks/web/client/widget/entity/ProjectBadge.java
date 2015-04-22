@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -31,6 +33,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 	private ProjectHeader header;
 	private FavoriteWidget favoritesWidget;
 	private UserProfile modifiedBy;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public ProjectBadge(ProjectBadgeView view, 
@@ -38,7 +41,8 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 			AdapterFactory adapterFactory,
 			GlobalApplicationState globalAppState,
 			ClientCache clientCache,
-			FavoriteWidget favoritesWidget
+			FavoriteWidget favoritesWidget,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -46,6 +50,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		this.globalAppState = globalAppState;
 		this.clientCache = clientCache;
 		this.favoritesWidget = favoritesWidget;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.setFavoritesWidget(favoritesWidget.asWidget());
 	}
@@ -87,7 +92,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 
 		if (header.getModifiedOn() != null) {
 			order.add("Modified On");
-			map.put("Modified On", DisplayUtils.converDataToPrettyString(header.getModifiedOn()));		
+			map.put("Modified On", gwt.getDateTimeFormat(PredefinedFormat.RFC_2822).format(header.getModifiedOn()));		
 		}
 		
 		return ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();

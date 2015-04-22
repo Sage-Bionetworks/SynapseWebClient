@@ -9,7 +9,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -21,6 +24,8 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -29,9 +34,12 @@ import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
+import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -43,12 +51,15 @@ public class ProjectBadgeTest {
 	EntityIconsCache mockEntityIconsCache;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	ClientCache mockClientCache;
-	AsyncCallback<KeyValueDisplay<String>> getInfoCallback;
 	ProjectBadgeView mockView;
 	String entityId = "syn123";
 	UserProfile userProfile;
 	ProjectBadge widget;
 	FavoriteWidget mockFavoriteWidget;
+	ProjectHeader mockProjectHeader;
+	Date mockDate;
+	DateTimeFormat mockDateTimeFormat;
+	GWTWrapper mockGWT;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -59,10 +70,18 @@ public class ProjectBadgeTest {
 		mockEntityIconsCache = mock(EntityIconsCache.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockFavoriteWidget = mock(FavoriteWidget.class);
+		mockProjectHeader = mock(ProjectHeader.class);
+		mockDate = mock(Date.class);
+		mockDateTimeFormat = mock(DateTimeFormat.class);
+		mockGWT = mock(GWTWrapper.class);
+		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
+		when(mockDateTimeFormat.format(any(Date.class))).thenReturn("today");
+		when(mockProjectHeader.getModifiedOn()).thenReturn(mockDate);
+		when(mockDate.toString()).thenReturn("today");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, the view is attached
 		when(mockView.isAttached()).thenReturn(true);
-		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget);
+		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget, mockGWT);
 		
 		//set up user profile
 		userProfile =  new UserProfile();
@@ -91,7 +110,7 @@ public class ProjectBadgeTest {
 		
 		
 		widget.configure(header, null);
-		verify(mockView).setProject(eq(name), anyString());
+		verify(mockView).configure(eq(name), anyString(), anyString());
 		verify(mockView).setLastActivityVisible(true);
 		verify(mockView).setLastActivityText(anyString());
 		verify(mockView).setFavoritesWidget(any(Widget.class));
@@ -106,13 +125,13 @@ public class ProjectBadgeTest {
 		header.setId(id);
 		header.setName(name);
 		widget.configure(header, null);
-		verify(mockView).setProject(eq(name), anyString());
+		verify(mockView).configure(eq(name), anyString(), anyString());
 		verify(mockView).setLastActivityVisible(false);
 		verify(mockView, never()).setLastActivityText(anyString());
 	}
 	
 	@Test
-	public void testprofileToKeyValueDisplay() {
+	public void testGetProjectTooltipNoUserProfile() {
 		ProjectHeader header = new ProjectHeader();
 		String id = "syn37373";
 		String name = "a name";
@@ -121,11 +140,37 @@ public class ProjectBadgeTest {
 		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
 		widget.configure(header, null);
 		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
-			
-		// getMap() is directly called when used, so it's tested directly 
-	/*	Map<String,String> tooltipMap = widget.profileToKeyValueDisplay().getMap();
-		assertTrue(tooltipMap.get("ID").equals(header.getId()));
-		assertTrue(!tooltipMap.containsKey("Modified By"));*/
+		Map<String,String> map = new HashMap<String, String>();
+		List<String> order = new ArrayList<String>();
+		order.add("ID");
+		map.put("ID", header.getId());
+		String intended = ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
+		String tooltip = widget.getProjectTooltip();
+		assertTrue(intended.equals(tooltip));
+	}
+	
+	@Test
+	public void testGetProjectTooltipComplete() {
+		ProjectHeader header = new ProjectHeader();
+		String id = "syn37373";
+		String name = "a name";
+		header.setId(id);
+		header.setName(name);
+		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
+		header.setModifiedOn(mockDate);
+		widget.configure(header, userProfile);
+		Map<String,String> map = new HashMap<String, String>();
+		List<String> order = new ArrayList<String>();
+		order.add("ID");
+		map.put("ID", header.getId());
+		order.add("Modified By");
+		map.put("Modified By", DisplayUtils.getDisplayName(userProfile));
+		order.add("Modified On");
+		map.put("Modified On", "today");
+		String intended = ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
+		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+		String tooltip = widget.getProjectTooltip();
+		assertTrue(intended.equals(tooltip));
 	}
 	
 	@Test
@@ -139,7 +184,7 @@ public class ProjectBadgeTest {
 		testProject.setName(projectName);
 		setupEntity(testProject, null);
 		ArgumentCaptor<String> hrefCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockView).setProject(eq(projectName), hrefCaptor.capture());
+		verify(mockView).configure(eq(projectName), hrefCaptor.capture(), anyString());
 		String href = hrefCaptor.getValue();
 		assertTrue(href.contains("#!Synapse:"));
 		assertTrue(href.contains(entityId));

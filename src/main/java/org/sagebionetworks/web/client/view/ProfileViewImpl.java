@@ -583,12 +583,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void addProjectWidget(Widget toAdd) {
+		toAdd.addStyleName("margin-bottom-10 col-xs-12");
 		projectsTabContent.add(toAdd);
 	}
 	
 	@Override
 	public void addChallengeWidget(Widget toAdd) {
 		DisplayUtils.show(challengesListItem);
+		toAdd.addStyleName("margin-top-10");
 		challengesTabContent.add(toAdd);
 	}
 	
