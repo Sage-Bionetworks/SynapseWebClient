@@ -499,8 +499,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			widget.addStyleName("margin-top-10");
 			view.addChallengeWidget(widget);
 		}
-//		if (challenges.isEmpty())
-//			view.addChallengeWidget(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
 	}
 	
 	public void projectPageAdded(int totalNumberOfResults) {

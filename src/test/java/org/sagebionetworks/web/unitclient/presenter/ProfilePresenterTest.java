@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -75,6 +76,7 @@ import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePresenterTest {
 	
@@ -86,6 +88,7 @@ public class ProfilePresenterTest {
 	ChallengeClientAsync mockChallengeClient;
 	LinkedInServiceAsync mockLinkedInServic;
 	GWTWrapper mockGwt;
+	PortalGinInjector mockInjector;
 	
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;	
@@ -116,9 +119,10 @@ public class ProfilePresenterTest {
 		mockCookies = mock(CookieProvider.class);
 		mockLinkedInServic = mock(LinkedInServiceAsync.class);
 		mockGwt = mock(GWTWrapper.class);
+		mockInjector = mock(PortalGinInjector.class);
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt);	
+				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, null);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
@@ -388,7 +392,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setAllProjectsFilterSelected();
 		verify(mockView).showProjectFiltersUI();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 
 		//should have refreshed teams too, since this is the owner
@@ -405,7 +409,7 @@ public class ProfilePresenterTest {
 		verify(mockView).clearProjects();
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 		
 		//should have refreshed teams too, since this is the owner
 		verify(mockView, never()).clearTeamNotificationCount();
@@ -426,7 +430,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setMyProjectsFilterSelected();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_CREATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(anyList(), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -441,7 +445,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
-		verify(mockView).addProjects(anyList(), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
 	
@@ -455,7 +459,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setSharedDirectlyWithMeFilterSelected();
 		verify(mockSynapseClient).getMyProjects(eq(ProjectListType.MY_PARTICIPATED_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(anyList(), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -469,7 +473,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockView).setFavoritesHelpPanelVisible(true);
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
-		verify(mockView, never()).addProjects(anyList(), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
 
@@ -488,7 +492,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setTeamsFilterSelected();
 		verify(mockSynapseClient).getProjectsForTeam(eq(teamId), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
 	
@@ -576,7 +580,7 @@ public class ProfilePresenterTest {
 	public void testGetUserProjects() {
 		profilePresenter.getUserProjects(1);
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		verify(mockView).addProjects(eq(myProjects), anyList());
+		verify(mockView).addProjectWidget(any(Widget.class));
 	}
 	
 	@Test
@@ -744,7 +748,7 @@ public class ProfilePresenterTest {
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
 		
 		verify(mockView, times(2)).showChallengesLoading(anyBoolean());
-		verify(mockView).addChallenges(testChallenges);
+		verify(mockView).addChallengeWidget(any(Widget.class));
 	}
 	
 	@Test
