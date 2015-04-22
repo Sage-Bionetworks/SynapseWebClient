@@ -143,7 +143,7 @@ SynapseWidgetPresenter {
 			}
 		});
 	}
-	
+
 	public void setOwnerObjectName(final CallbackP<String> callback) {
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -251,7 +251,7 @@ SynapseWidgetPresenter {
 							currentPage = result;
 							wikiKey.setWikiPageId(currentPage.getId());
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
+							view.resetWikiMarkdown(currentPage.getMarkdown(), wikiKey, isRootWiki, isCurrentVersion, versionInView);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -287,9 +287,7 @@ SynapseWidgetPresenter {
 		return this.reloadWikiPageCallback;
 	}
 
-	/* private methods */
-
-	private void reloadWikiPage() {
+	public void reloadWikiPage() {
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage result) {
@@ -309,20 +307,25 @@ SynapseWidgetPresenter {
 		});
 	}
 
+	/* private methods */
+
 	private void handleGetV2WikiPageAsV1Failure(Throwable caught) {
-		//if it is because of a missing root (and we have edit permission), then the pages browser should have a Create Wiki button
+		// if it is because of a missing root (and we have edit permission),
+		// then the pages browser should have a Create Wiki button
 		if (caught instanceof NotFoundException) {
 			//show insert wiki button if user can edit and it's embedded in another entity page
 			if (isEmbeddedInOwnerPage) {
 				view.showWarningMessageInPage(DisplayConstants.NO_WIKI_FOUND);
-			} else //otherwise, if it's not embedded in the owner page, show a 404
+			} else
+				//otherwise, if it's not embedded in the owner page, show a 404
 				view.show404();
 			
 			if (callback != null)
 				callback.noWikiFound();
 		}
 		else if (caught instanceof ForbiddenException) {
-			if (!isEmbeddedInOwnerPage) //if it's not embedded in the owner page, show a 403
+			//if it's not embedded in the owner page, show a 403
+			if (!isEmbeddedInOwnerPage)
 				view.show403();
 		}
 		else {

@@ -26,6 +26,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void restoreClicked(final Long wikiVersion);
 		public WikiPage getWikiPage();
 		public CallbackP<WikiPageKey> getReloadWikiPageCallback();
+		public void reloadWikiPage();
 	}
 	
 	public void configure(String markdown, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);
