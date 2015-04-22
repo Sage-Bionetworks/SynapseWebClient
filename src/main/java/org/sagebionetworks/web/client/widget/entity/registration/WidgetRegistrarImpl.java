@@ -8,7 +8,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -24,13 +23,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	private HashMap<String, String> contentType2FriendlyName = new HashMap<String, String>();
 	
 	PortalGinInjector ginInjector;
-	NodeModelCreator nodeModelCreator;
 	JSONObjectAdapter adapter;
 	
 	@Inject
-	public WidgetRegistrarImpl(PortalGinInjector ginInjector, NodeModelCreator nodeModelCreator, JSONObjectAdapter adapter) {
+	public WidgetRegistrarImpl(PortalGinInjector ginInjector, JSONObjectAdapter adapter) {
 		this.ginInjector = ginInjector;
-		this.nodeModelCreator = nodeModelCreator;
 		this.adapter = adapter;
 		initWithKnownWidgets();
 	}

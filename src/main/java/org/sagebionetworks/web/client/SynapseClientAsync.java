@@ -7,21 +7,28 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -29,9 +36,11 @@ import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -39,12 +48,16 @@ import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -52,23 +65,23 @@ import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
 
-	void getEntity(String entityId, AsyncCallback<EntityWrapper> callback);
+	void getEntity(String entityId, AsyncCallback<Entity> callback);
 	
 	void getProject(String projectId,AsyncCallback<Project> callback);
 	
-	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<EntityWrapper> callback);
+	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback);
 	
 	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundle> callback);
 	
 	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
 
-	void getEntityVersions(String entityId, int offset, int limit, AsyncCallback<String> callback);
-
-	void updateEntity(String entityJson, AsyncCallback<EntityWrapper> callback);
+	void getEntityVersions(String entityId, int offset, int limit,
+			AsyncCallback<PaginatedResults<VersionInfo>> callback);
 
 	void getEntityPath(String entityId, AsyncCallback<EntityPath> callback);
 
@@ -77,7 +90,8 @@ public interface SynapseClientAsync {
 	void junk(SerializableWhitelist l,
 			AsyncCallback<SerializableWhitelist> callback);
 
-	void getEntityReferencedBy(String entityId, AsyncCallback<String> callback);
+	void getEntityReferencedBy(String entityId,
+			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
 	void logDebug(String message, AsyncCallback<Void> callback);
 
@@ -95,13 +109,14 @@ public interface SynapseClientAsync {
 
 	void getRepositoryServiceUrl(AsyncCallback<String> callback);
 
-	void createOrUpdateEntity(String entityJson, String annoJson,
+	void createOrUpdateEntity(Entity entity, Annotations annos,
 			boolean isNew, AsyncCallback<String> callback);
 	
-	void getEntityTypeBatch(List<String> entityIds, AsyncCallback<String> callback);
+	void getEntityTypeBatch(List<String> entityIds,
+			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 	
-	void getEntityHeaderBatch(String referenceList,
-			AsyncCallback<String> callback);
+	void getEntityHeaderBatch(ReferenceList referenceList,
+			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
 	void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback);
 	
@@ -147,23 +162,25 @@ public interface SynapseClientAsync {
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
 	
 	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
-
-	public void getAllUsers(AsyncCallback<EntityWrapper> callback);
 	
-	public void createAccessRequirement(AccessRequirement arEW, AsyncCallback<AccessRequirement> callback);
+	void createAccessRequirement(AccessRequirement arEW,
+			AsyncCallback<AccessRequirement> callback);
 
-	public void createLockAccessRequirement(String entityId, AsyncCallback<EntityWrapper> callback);
+	void createLockAccessRequirement(String entityId,
+			AsyncCallback<ACTAccessRequirement> callback);
 	
 	public void getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType, AsyncCallback<AccessRequirementsTransport> callback);
 	
 	public void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
-	public void getAllEntityUploadAccessRequirements(String entityId, AsyncCallback<String> callback);
+	void getAllEntityUploadAccessRequirements(String entityId,
+			AsyncCallback<PaginatedResults<AccessRequirement>> callback);
 	
-	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
+	void createAccessApproval(AccessApproval aaEW,
+			AsyncCallback<AccessApproval> callback);
 	
-	public void updateExternalFile(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void updateExternalFile(String entityId, String externalUrl, String name, AsyncCallback<Entity> callback) throws RestServiceException;
 	
-	public void createExternalFile(String parentEntityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
+	public void createExternalFile(String parentEntityId, String externalUrl, String name, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
 	
@@ -176,28 +193,36 @@ public interface SynapseClientAsync {
 	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
 	
 	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
-	//wiki crud
-	public void getWikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+	void getWikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<PaginatedResults<WikiHeader>> callback);
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
-	 // V2 Wiki crud
-	public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-    public void getV2WikiPage(WikiPageKey key, AsyncCallback<String> callback);
-    public void getVersionOfV2WikiPage(WikiPageKey key, Long version, AsyncCallback<String> callback);
-    public void updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-    public void restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate, AsyncCallback<String> callback);
+	 void createV2WikiPage(String ownerId, String ownerType,
+			String wikiPageJson, AsyncCallback<V2WikiPage> callback);
+    void getV2WikiPage(WikiPageKey key, AsyncCallback<V2WikiPage> callback);
+    void getVersionOfV2WikiPage(WikiPageKey key, Long version,
+			AsyncCallback<V2WikiPage> callback);
+    void updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag,
+			AsyncCallback<V2WikiPage> callback);
+    void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
+			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
     public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
-    public void getV2WikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+    void getV2WikiHeaderTree(String ownerId, String ownerType,
+			AsyncCallback<PaginatedResults<V2WikiHeader>> callback);
     public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
     public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
-    public void getV2WikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
-    public void getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version, AsyncCallback<String> callback);
-    public void getV2WikiHistory(WikiPageKey key, Long limit, Long offset, AsyncCallback<String> callback);
+    void getV2WikiAttachmentHandles(WikiPageKey key,
+			AsyncCallback<FileHandleResults> callback);
+    void getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version,
+			AsyncCallback<FileHandleResults> callback);
+    void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
+			AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>> callback);
 
 	public void getMarkdown(WikiPageKey key, AsyncCallback<String> callback);
 	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
-	public void zipAndUploadFile(String content, String fileName, AsyncCallback<String> callback);
+	void zipAndUploadFile(String content, String fileName,
+			AsyncCallback<S3FileHandle> callback);
 	
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
@@ -206,9 +231,10 @@ public interface SynapseClientAsync {
 	
 	public void getPlainTextWikiPage(WikiPageKey key, AsyncCallback<String> callback);	
 	
-	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
+	void getEntitiesGeneratedBy(String activityId, Integer limit,
+			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
 
-	void addFavorite(String entityId, AsyncCallback<String> callback);
+	void addFavorite(String entityId, AsyncCallback<EntityHeader> callback);
 
 	void removeFavorite(String entityId, AsyncCallback<Void> callback);
 
@@ -220,21 +246,22 @@ public interface SynapseClientAsync {
 	/////////////////
 	void createTeam(String teamName,AsyncCallback<String> callback);
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
-	void getTeams(String userId, Integer limit, Integer offset, AsyncCallback<String> callback);
-	void getTeamsForUser(String userId, AsyncCallback<ArrayList<String>> callback);
-	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset, AsyncCallback<String> callback);
+	void getTeams(String userId, Integer limit, Integer offset,
+			AsyncCallback<PaginatedResults<Team>> callback);
+	void getTeamsForUser(String userId, AsyncCallback<List<Team>> callback);
+	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
+			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
 	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
 
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<MembershipInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<MembershipInvitationBundle>> callback);
-	void getOpenRequests(String teamId, AsyncCallback<ArrayList<MembershipRequestBundle>> callback);
+	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void deleteMembershipInvitation(String invitationId, AsyncCallback<Void> callback);
 	void updateTeam(String teamJson, AsyncCallback<String> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
-//	void getTeamMembershipState(String currentUserId, String teamId, AsyncCallback<String> callback);
 	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
 	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
@@ -250,7 +277,8 @@ public interface SynapseClientAsync {
 	void getCertificationQuiz(AsyncCallback<String> callback);
 	void submitCertificationQuizResponse(String quizResponseJson, AsyncCallback<String> callback);
 	
-	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
+	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl,
+			AsyncCallback<EntityIdList> callback);
 	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, Long storageLocationId, AsyncCallback<ChunkedFileToken> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(ChunkRequest request, AsyncCallback<String> callback) throws RestServiceException;
 	void combineChunkedFileUpload(List<ChunkRequest> requests, AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
@@ -259,7 +287,8 @@ public interface SynapseClientAsync {
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
 	
 	
-	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
+	void getEntityDoi(String entityId, Long versionNumber,
+			AsyncCallback<Doi> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 	
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
@@ -325,7 +354,7 @@ public interface SynapseClientAsync {
 	void restoreFromTrash(String entityId, String newParentId, AsyncCallback<Void> callback);
 	
 	void viewTrashForUser(long offset, long limit,
-			AsyncCallback<String> callback);
+			AsyncCallback<PaginatedResults<TrashedEntity>> callback);
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 

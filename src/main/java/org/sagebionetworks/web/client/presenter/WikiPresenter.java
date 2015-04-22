@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.WikiView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -24,7 +23,6 @@ public class WikiPresenter extends AbstractActivity implements WikiView.Presente
 	private WikiPlace place;
 	private WikiView view;
 	private AuthenticationController authenticationController;
-	private NodeModelCreator nodeModelCreator;
 	private RssServiceAsync rssService;
 	private GlobalApplicationState globalApplicationState;
 	
@@ -32,11 +30,9 @@ public class WikiPresenter extends AbstractActivity implements WikiView.Presente
 	public WikiPresenter(WikiView view, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
-			NodeModelCreator nodeModelCreator, 
 			RssServiceAsync rssService){
 		this.authenticationController = authenticationController;
 		this.view = view;
-		this.nodeModelCreator = nodeModelCreator;
 		this.rssService = rssService;
 		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);

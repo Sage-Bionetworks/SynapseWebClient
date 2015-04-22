@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.events;
 
 import java.util.List;
 
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.repo.model.Entity;
 
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -10,7 +10,7 @@ public class WidgetDescriptorUpdatedEvent extends GwtEvent<WidgetDescriptorUpdat
 
 	private static final Type<WidgetDescriptorUpdatedHandler> TYPE = new Type<WidgetDescriptorUpdatedHandler>();
 	private String name, oldName;
-	private EntityWrapper entityWrapper;
+	private Entity entityWrapper;
 	private boolean isDeleted;
 	private List<String> newFileHandleIds, deletedFileHandleIds;
 	
@@ -55,10 +55,10 @@ public class WidgetDescriptorUpdatedEvent extends GwtEvent<WidgetDescriptorUpdat
 	}
 	
 	
-	public EntityWrapper getEntityWrapper() {
+	public Entity getEntityWrapper() {
 		return entityWrapper;
 	}
-	public void setEntityWrapper(EntityWrapper entityWrapper) {
+	public void setEntityWrapper(Entity entityWrapper) {
 		this.entityWrapper = entityWrapper;
 	}
 	public String getInsertValue() {

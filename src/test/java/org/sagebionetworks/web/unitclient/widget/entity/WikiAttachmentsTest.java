@@ -1,7 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -19,10 +22,10 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -38,7 +41,6 @@ public class WikiAttachmentsTest {
 	WikiAttachments presenter;
 	WikiAttachmentsView mockView;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	String testFileName1 = "testfilename.jpg";
 	String testFileName2 ="a file";
 	String testFileId = "13";
@@ -47,11 +49,9 @@ public class WikiAttachmentsTest {
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockNodeModelCreator = Mockito.mock(NodeModelCreator.class);
 		mockView = Mockito.mock(WikiAttachmentsView.class);
 		
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).updateV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+
 		
 		FileHandleResults testResults = new FileHandleResults();
 		FileHandle testHandle = new S3FileHandle();
@@ -64,12 +64,13 @@ public class WikiAttachmentsTest {
 		testHandle2.setId(testFileId);
 		handles.add(testHandle2);
 		testResults.setList(handles);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(FileHandleResults.class))).thenReturn(testResults);
 		
 		WikiPage testPage = new WikiPage();
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(WikiPage.class))).thenReturn(testPage);
 		// setup the entity editor with 
-		presenter = new WikiAttachments(mockView, mockSynapseClient, mockNodeModelCreator);
+		presenter = new WikiAttachments(mockView, mockSynapseClient);
+		
+		AsyncMockStubber.callSuccessWith(testResults).when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).updateV2WikiPage(anyString(), anyString(), any(V2WikiPage.class), any(AsyncCallback.class));
 	}
 
 	@Test

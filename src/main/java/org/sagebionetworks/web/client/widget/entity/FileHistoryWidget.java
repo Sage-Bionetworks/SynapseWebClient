@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -12,13 +11,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -36,7 +33,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private EntityBundle bundle;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	public static final Integer VERSION_LIMIT = 100;
@@ -46,12 +42,11 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private boolean canEdit;
 	private Long versionNumber;
 	@Inject
-	public FileHistoryWidget(FileHistoryWidgetView view, NodeModelCreator nodeModelCreator,
+	public FileHistoryWidget(FileHistoryWidgetView view,
 			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
 			 DetailedPaginationWidget paginationWidget,
 			 PreflightController preflightController) {
 		super();
-		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
@@ -155,21 +150,17 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		// TODO: If we ever change the offset api to actually take 0 as a valid
 		// offset, then we need to remove "+1"
 		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue() + 1, VERSION_LIMIT,
-				new AsyncCallback<String>() {
+				new AsyncCallback<PaginatedResults<VersionInfo>>() {
 					@Override
-					public void onSuccess(String result) {
+					public void onSuccess(PaginatedResults<VersionInfo> result) {
 						PaginatedResults<VersionInfo> paginatedResults;
-						try {
-							paginatedResults = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
-							paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
-							if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
-								versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
-							}
-							for (VersionInfo versionInfo : paginatedResults.getResults()) {
-								view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
-							}
-						} catch (JSONObjectAdapterException e) {							
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+						paginatedResults = result;
+						paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
+						if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
+							versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
+						}
+						for (VersionInfo versionInfo : paginatedResults.getResults()) {
+							view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
 						}
 					}
 

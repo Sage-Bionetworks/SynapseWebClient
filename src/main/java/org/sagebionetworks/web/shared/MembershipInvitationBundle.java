@@ -1,10 +1,18 @@
 package org.sagebionetworks.web.shared;
 
+import org.sagebionetworks.repo.model.MembershipInvitation;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserProfile;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class MembershipInvitationBundle implements IsSerializable {
 
-	private String teamJson, membershipInvitationJson, userProfileJson;
+	private Team team;
+	private MembershipInvtnSubmission membershipInvtnSubmission;
+	private MembershipInvitation membershipInvitation;
+	private UserProfile userProfile;
 	
 	/**
 	 * Default constructor
@@ -13,34 +21,48 @@ public class MembershipInvitationBundle implements IsSerializable {
 		
 	}
 
-	public MembershipInvitationBundle(String teamJson, String userProfileJson, String membershipInvitationJson) {
+	public MembershipInvitationBundle(MembershipInvtnSubmission membershipInvtnSubmission,
+			UserProfile userProfile) {
 		super();
-		this.teamJson = teamJson;
-		this.membershipInvitationJson = membershipInvitationJson;
-		this.userProfileJson = userProfileJson;
+		this.membershipInvtnSubmission = membershipInvtnSubmission;
+		this.userProfile = userProfile;
 	}
 
-	public String getTeamJson() {
-		return teamJson;
+	public MembershipInvitationBundle(Team team, MembershipInvitation invite) {
+		this.team = team;
+		this.membershipInvitation = invite;
 	}
 
-	public void setTeamJson(String teamJson) {
-		this.teamJson = teamJson;
+	public MembershipInvitation getMembershipInvitation() {
+		return membershipInvitation;
 	}
-	
-	public String getUserProfileJson() {
-		return userProfileJson;
+
+	public void setMembershipInvitation(MembershipInvitation membershipInvitation) {
+		this.membershipInvitation = membershipInvitation;
 	}
-	
-	public void setUserProfileJson(String userProfileJson) {
-		this.userProfileJson = userProfileJson;
+
+	public Team getTeam() {
+		return team;
 	}
-	
-	public String getMembershipInvitationJson() {
-		return membershipInvitationJson;
+
+	public void setTeam(Team team) {
+		this.team = team;
 	}
-	public void setMembershipInvitationJson(String membershipInvitationJson) {
-		this.membershipInvitationJson = membershipInvitationJson;
+	public UserProfile getUserProfile() {
+		return userProfile;
+	}
+
+	public void setUserProfile(UserProfile userProfile) {
+		this.userProfile = userProfile;
+	}
+
+	public MembershipInvtnSubmission getMembershipInvtnSubmission() {
+		return membershipInvtnSubmission;
+	}
+
+	public void setMembershipInvtnSubmission(
+			MembershipInvtnSubmission membershipInvtnSubmission) {
+		this.membershipInvtnSubmission = membershipInvtnSubmission;
 	}
 
 	@Override
@@ -49,10 +71,11 @@ public class MembershipInvitationBundle implements IsSerializable {
 		int result = 1;
 		result = prime
 				* result
-				+ ((membershipInvitationJson == null) ? 0
-						: membershipInvitationJson.hashCode());
+				+ ((membershipInvtnSubmission == null) ? 0
+						: membershipInvtnSubmission.hashCode());
+		result = prime * result + ((team == null) ? 0 : team.hashCode());
 		result = prime * result
-				+ ((teamJson == null) ? 0 : teamJson.hashCode());
+				+ ((userProfile == null) ? 0 : userProfile.hashCode());
 		return result;
 	}
 
@@ -65,24 +88,30 @@ public class MembershipInvitationBundle implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		MembershipInvitationBundle other = (MembershipInvitationBundle) obj;
-		if (membershipInvitationJson == null) {
-			if (other.membershipInvitationJson != null)
+		if (membershipInvtnSubmission == null) {
+			if (other.membershipInvtnSubmission != null)
 				return false;
-		} else if (!membershipInvitationJson
-				.equals(other.membershipInvitationJson))
+		} else if (!membershipInvtnSubmission
+				.equals(other.membershipInvtnSubmission))
 			return false;
-		if (teamJson == null) {
-			if (other.teamJson != null)
+		if (team == null) {
+			if (other.team != null)
 				return false;
-		} else if (!teamJson.equals(other.teamJson))
+		} else if (!team.equals(other.team))
+			return false;
+		if (userProfile == null) {
+			if (other.userProfile != null)
+				return false;
+		} else if (!userProfile.equals(other.userProfile))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "MembershipInvitationBundle [teamJson=" + teamJson
-				+ ", membershipInvitationJson=" + membershipInvitationJson
-				+ "]";
+		return "MembershipInvitationBundle [team=" + team
+				+ ", membershipInvtnSubmission=" + membershipInvtnSubmission
+				+ ", userProfile=" + userProfile + "]";
 	}
+
 }
