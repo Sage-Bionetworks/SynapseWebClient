@@ -35,9 +35,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord);
 	void refreshHeader();
-	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
-	void addChallenges(List<ChallengeBundle> challenges);
+	void addProjectWidget(Widget widget);
+	void addChallengeWidget(Widget widget);
 	void setChallengesError(String error);
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
@@ -74,6 +74,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addSortOption(SortOptionEnum sort);
 	void clearSortOptions();
 	void setGetCertifiedVisible(boolean isVisible);
+	void setEmptyProjectUIVisible(boolean b);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();

@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -29,7 +30,10 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
@@ -41,11 +45,15 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
@@ -65,6 +73,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
 
+	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
 	private int teamNotificationCount;
 	private String currentUserId;
@@ -86,10 +95,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			CookieProvider cookies,
 			UserProfileModalWidget userProfileModalWidget,
 			LinkedInServiceAsync linkedInServic,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.challengeClient = challengeClient;
@@ -417,7 +428,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == filter) {
-					addProjectResults(projectHeaders.getResults());
+					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				}
 			}
@@ -435,7 +446,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(projectHeaders.getResults());
+					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				}
 			}
@@ -452,8 +463,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				List<ProjectHeader> headers = projectHeaders.getResults();
-				addProjectResults(headers);
+				addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
@@ -464,14 +474,28 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> headers) {
+	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
 		view.showProjectsLoading(false);
-		view.addProjects(headers);
+		view.clearProjects();
+		for (int i = 0; i < projectHeaders.size(); i++) {
+			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
+			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
+			Widget widget = badge.asWidget();
+			view.addProjectWidget(widget);
+		}
+		if (projectHeaders.isEmpty())
+			view.setEmptyProjectUIVisible(true);
 	}
 	
 	public void addChallengeResults(List<ChallengeBundle> challenges) {
 		view.showChallengesLoading(false);
-		view.addChallenges(challenges);
+		view.clearChallenges();
+		for (ChallengeBundle challenge : challenges) {
+			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
+			badge.configure(challenge);
+			Widget widget = badge.asWidget();
+			view.addChallengeWidget(widget);
+		}
 	}
 	
 	public void projectPageAdded(int totalNumberOfResults) {
@@ -497,13 +521,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						view.setFavoritesHelpPanelVisible(true);
 					} else {
 						List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
+						List<String> lastModifiedBy = new ArrayList<String>(result.size());
 						for (EntityHeader header : result) {
+							lastModifiedBy.add(header.getId());
 							ProjectHeader projectHeader = new ProjectHeader();
 							projectHeader.setId(header.getId());
 							projectHeader.setName(header.getName());
 							headers.add(projectHeader);
 						}
-						addProjectResults(headers);
+						addProjectResults(headers, null);
 						view.setIsMoreProjectsVisible(false);	
 					}
 				}

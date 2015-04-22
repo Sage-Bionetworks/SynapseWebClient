@@ -14,13 +14,11 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
-import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Search;
@@ -32,18 +30,13 @@ import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
-import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
-import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,7 +45,6 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -152,6 +144,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	FlowPanel projectsTabContent;
 	@UiField
+	SimplePanel emptyProjectUI;
+	@UiField
 	Button moreProjectsButton;
 	
 	//Headings
@@ -234,7 +228,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
 	private SettingsPresenter settingsPresenter;
-	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -244,8 +237,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
-			SettingsPresenter settingsPresenter,
-			PortalGinInjector ginInjector) {		
+			SettingsPresenter settingsPresenter) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -254,7 +246,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
 		this.settingsPresenter = settingsPresenter;
-		this.ginInjector = ginInjector;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -561,11 +552,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setTeamsError(String error) {
 		DisplayUtils.showErrorMessage(error);
 	}
-	
-	@Override
-	public void addProjects(List<ProjectHeader> projectHeaders) {
-		addProjectBadges(projectHeaders, projectsTabContent);
-	}
 
 	@Override
 	public void setProjectsError(String error) {
@@ -573,9 +559,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setEmptyProjectUIVisible(boolean b) {
+		emptyProjectUI.setVisible(b);
+	}
+	
+	@Override
 	public void clearProjects() {
 		projectsTabContent.clear();
 		setIsMoreProjectsVisible(false);
+		setEmptyProjectUIVisible(false);
 		favoritesHelpPanel.setVisible(false);
 	}
 	@Override
@@ -589,39 +581,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		moreProjectsButton.setVisible(isVisible);
 	}
 	
-	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
-		//uses ProjectBadge to show more information (additional info available from ProjectHeader)
-		for (ProjectHeader projectHeader : projectHeaders) {
-			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
-			badge.configure(projectHeader);
-			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-bottom-10 col-xs-12");
-			targetPanel.add(widget);
-		}
-		if (projectHeaders.isEmpty())
-			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
-	}
-	
-	private void addChallengeBadges(List<ChallengeBundle> challenges, FlowPanel targetPanel) {
-		targetPanel.clear();
-		for (ChallengeBundle challenge : challenges) {
-			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
-			badge.configure(challenge);
-			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-top-10");
-			targetPanel.add(widget);
-		}
-		if (challenges.isEmpty())
-			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
+	@Override
+	public void addProjectWidget(Widget toAdd) {
+		toAdd.addStyleName("margin-bottom-10 col-xs-12");
+		projectsTabContent.add(toAdd);
 	}
 	
 	@Override
-	public void addChallenges(List<ChallengeBundle> challenges) {
-		if (challenges.size() > 0) {
-			DisplayUtils.show(challengesListItem);
-			addChallengeBadges(challenges, challengesTabContent);
-		}
+	public void addChallengeWidget(Widget toAdd) {
+		DisplayUtils.show(challengesListItem);
+		toAdd.addStyleName("margin-top-10");
+		challengesTabContent.add(toAdd);
 	}
+	
 	@Override
 	public void showChallengesLoading(boolean isVisible) {
 		UIObject.setVisible(challengesLoadingUI, isVisible);
