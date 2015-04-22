@@ -1741,6 +1741,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test
@@ -1754,6 +1755,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getProjectsFromUser(eq(userId),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test
@@ -1767,6 +1769,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getProjectsForTeam(eq(teamId),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test
