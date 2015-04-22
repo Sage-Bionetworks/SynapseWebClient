@@ -71,15 +71,20 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		return view.asWidget();
 	}	
 	
-	public KeyValueDisplay<String> profileToKeyValueDisplay(UserProfile profile, String modifiedBy) {
+	@Override
+	public KeyValueDisplay<String> profileToKeyValueDisplay() {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		
 		order.add("ID");
 		map.put("ID", header.getId());
 
-		order.add("Modified By");
-		map.put("Modified By", modifiedBy);
+		if (modifiedBy != null) {
+			order.add("Modified By");
+			map.put("Modified By", modifiedBy.getFirstName() + " " + modifiedBy.getLastName() 
+					 + " (" + modifiedBy.getUserName() + ")");
+		}
+
 		
 		order.add("Modified On");
 
@@ -89,22 +94,27 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		return new KeyValueDisplay<String>(map, order);
 	}
 	
-	@Override
-	public void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback) {
-		UserBadge.getUserProfile("" + header.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-			@Override
-			public void onSuccess(UserProfile profile) {
-				if (view.isAttached())
-					callback.onSuccess(profileToKeyValueDisplay(profile, DisplayUtils.getDisplayName(profile)));		
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				if (view.isAttached())
-					callback.onFailure(caught);
-			}
-		});
-	}
+//	@Override
+//	public void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback) {
+//		if (view.isAttached()) {
+//			view.showPopover();
+//		}
+//		UserBadge.getUserProfile("" + header.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+//			@Override
+//			public void onSuccess(UserProfile profile) {
+//				if (view.isAttached())
+//					callback.onSuccess(
+//							
+//							profileToKeyValueDisplay(profile, DisplayUtils.getDisplayName(profile)));		
+//			}
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				if (view.isAttached())
+//					callback.onFailure(caught);
+//			}
+//		});
+//	}
 	
 	public ProjectHeader getHeader() {
 		return header;

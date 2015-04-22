@@ -86,27 +86,38 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	
 	public void showPopover() {
 		if (!isPopoverInitialized) {
-			presenter.getInfo(new AsyncCallback<KeyValueDisplay<String>>() {						
-				@Override
-				public void onSuccess(KeyValueDisplay<String> result) {
-					renderPopover(ProvViewUtil.createEntityPopoverHtml(result).asString());
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
-				}
-				
-				private void renderPopover(final String content) {
-					isPopoverInitialized = true;
-					if (widget.isAttached()) {
-						tooltip.setTitle(content);
-						tooltip.reconfigure();
-						if (isPopover)
-							tooltip.show();
-					}
-				}
-			});
+			KeyValueDisplay<String> result = presenter.profileToKeyValueDisplay();
+			String content = ProvViewUtil.createEntityPopoverHtml(result).asString();
+			isPopoverInitialized = true;
+			if (widget.isAttached()) {
+				tooltip.setTitle(content);
+				tooltip.reconfigure();
+				if (isPopover)
+					tooltip.show();
+			}
+		
+//			presenter.getInfo(new AsyncCallback<KeyValueDisplay<String>>() {						
+//				@Override
+//				public void onSuccess(KeyValueDisplay<String> result) {
+//					renderPopover(ProvViewUtil.createEntityPopoverHtml(result).asString());
+//				}
+//				
+//				@Override
+//				public void onFailure(Throwable caught) {
+//					renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
+//				}
+//				
+//				private void renderPopover(final String content) {
+//					isPopoverInitialized = true;
+//					if (widget.isAttached()) {
+//						tooltip.setTitle(content);
+//						tooltip.reconfigure();
+//						if (isPopover)
+//							tooltip.show();
+//					}
+//				}
+//			});
+			
 		} else {
 			tooltip.show();
 		}

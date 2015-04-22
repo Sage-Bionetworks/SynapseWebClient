@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Date;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,6 +27,8 @@ public interface ProjectBadgeView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback);
+//		void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback);
+
+		KeyValueDisplay<String> profileToKeyValueDisplay();
 	}
 }
