@@ -60,7 +60,7 @@
 	        	</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="imposeRestrictionCancelButton" type="DEFAULT">Cancel</b:Button>
 				<b:Button ui:field="imposeRestrictionOkButton" type="PRIMARY">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
