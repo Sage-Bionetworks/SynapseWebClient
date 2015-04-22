@@ -409,9 +409,10 @@ public class SynapseClientImplTest {
 						anyString())).thenReturn(sentMessage);
 
 		// getMyProjects getUserProjects
-		PaginatedResults<ProjectHeader> headers = new PaginatedResults<ProjectHeader>();
+		PaginatedResults headers = new PaginatedResults<ProjectHeader>();
 		headers.setTotalNumberOfResults(1100);
 		List<ProjectHeader> projectHeaders = new ArrayList();
+		List<UserProfile> userProfile = new ArrayList();
 		projectHeaders.add(new ProjectHeader());
 		headers.setResults(projectHeaders);
 		when(
