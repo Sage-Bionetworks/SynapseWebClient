@@ -85,11 +85,10 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 					 + " (" + modifiedBy.getUserName() + ")");
 		}
 
-		
-		order.add("Modified On");
-
-		if (header.getModifiedOn() != null)
+		if (header.getModifiedOn() != null) {
+			order.add("Modified On");
 			map.put("Modified On", DisplayUtils.converDataToPrettyString(header.getModifiedOn()));		
+		}
 		
 		return new KeyValueDisplay<String>(map, order);
 	}
