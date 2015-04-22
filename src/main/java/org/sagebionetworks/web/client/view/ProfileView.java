@@ -74,6 +74,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addSortOption(SortOptionEnum sort);
 	void clearSortOptions();
 	void setGetCertifiedVisible(boolean isVisible);
+	void setEmptyProjectUIVisible(boolean b);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
@@ -96,7 +97,4 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 	}
-
-
-
 }

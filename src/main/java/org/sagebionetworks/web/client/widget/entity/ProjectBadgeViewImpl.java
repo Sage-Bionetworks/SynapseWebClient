@@ -64,7 +64,6 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 		anchor.setText(projectName);
 		anchor.setHref(href);
 		this.tooltip.setTitle(tooltip);
-		this.tooltip.reconfigure();
 	}
 	
 	@Override

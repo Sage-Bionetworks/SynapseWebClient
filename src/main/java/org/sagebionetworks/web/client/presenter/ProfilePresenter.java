@@ -47,6 +47,7 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -478,6 +479,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
 		view.showProjectsLoading(false);
 		view.clearProjects();
+		GWT.debugger();
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
 			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
@@ -486,7 +488,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			view.addProjectWidget(widget);
 		}
 		if (projectHeaders.isEmpty())
-			view.addProjectWidget(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
+			view.setEmptyProjectUIVisible(true);
 	}
 	
 	public void addChallengeResults(List<ChallengeBundle> challenges) {
