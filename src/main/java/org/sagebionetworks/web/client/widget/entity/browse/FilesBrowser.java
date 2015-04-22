@@ -73,7 +73,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public Widget asWidget() {
-		view.setPresenter(this);		
+		view.setPresenter(this);
 		return view.asWidget();
 	}
 
@@ -118,6 +118,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		Folder folder = new Folder();
 		folder.setParentId(configuredEntityId);
 		folder.setEntityType(Folder.class.getName());
+
 		synapseClient.createOrUpdateEntity(folder, null, true, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newId) {
@@ -129,7 +130,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
-			}			
+			}
 		});
 	}
 	
@@ -140,12 +141,12 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			public void onSuccess(Void na) {
 				//folder is deleted when folder creation is canceled.  refresh the tree for updated information 
 				view.refreshTreeView(configuredEntityId);
+				view.setNewFolderDialogVisible(false);
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
-			}			
+			}
 		});
 	}
 	
@@ -155,6 +156,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			public void onSuccess(Entity result) {
 				view.showInfo("Folder '" + folder.getName() + "' Added", "");
 				view.refreshTreeView(configuredEntityId);
+				view.setNewFolderDialogVisible(false);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -172,12 +174,11 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				folder.setName(newFolderName);
 				updateFolderName(folder);
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
-			}			
+			}
 		});
 	}
 	

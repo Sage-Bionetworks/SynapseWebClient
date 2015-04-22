@@ -20,7 +20,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-@RemoteServiceRelativePath("challenge")	
+@RemoteServiceRelativePath("challengeclient")	
 public interface ChallengeClient extends RemoteService {
 
 	/**

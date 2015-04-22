@@ -72,8 +72,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		this.quizInfoDialog = quizInfoDialog;
 		uploaderContainer.setWidget(uploader.asWidget());
 		quizInfoDialogContainer.setWidget(quizInfoDialog.asWidget());
-		sharingAndDataUseContainer
-				.setWidget(sharingAndDataUseWidget.asWidget());
+		sharingAndDataUseContainer.setWidget(sharingAndDataUseWidget.asWidget());
 		addFolderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -94,16 +93,17 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		okNewFolderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				newFolderDialog.hide();
 				presenter.updateFolderName(folderNameField.getText());
 			}
 		});
+
 		cancelNewFolderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.deleteFolder(true);
 			}
 		});
+
 		folderNameField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -112,6 +112,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 				}
 			}
 		});
+
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
@@ -131,7 +132,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	}
 
 	@Override
-	public void showUploadDialog(String entityId) {
+	public void showUploadDialog(String entityId){
 		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
@@ -191,5 +192,14 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@Override
 	public void refreshTreeView(String entityId) {
 		entityTreeBrowser.configure(entityId);
+	}
+
+	@Override
+	public void setNewFolderDialogVisible(boolean visible) {
+		if (visible) {
+			newFolderDialog.show();
+		} else {
+			newFolderDialog.hide();
+		}
 	}
 }

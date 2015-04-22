@@ -20,7 +20,6 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
-import org.sagebionetworks.web.server.servlet.ProjectServiceImpl;
 import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
@@ -79,18 +78,15 @@ public class PortalServletModule extends ServletModule {
 
 		// Setup the Synapse service
 		bind(SynapseClientImpl.class).in(Singleton.class);
-		serve("/Portal/synapse").with(SynapseClientImpl.class);
+		serve("/Portal/synapseclient").with(SynapseClientImpl.class);
 		
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
-		serve("/Portal/challenge").with(ChallengeClientImpl.class);
+		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
 		
 		// Setup the Search service
 		bind(SearchServiceImpl.class).in(Singleton.class);
-		serve("/Portal/search").with(SearchServiceImpl.class);
-		// setup the project service
-		bind(ProjectServiceImpl.class).in(Singleton.class);
-		serve("/Portal/project").with(ProjectServiceImpl.class);
+		serve("/Portal/searchclient").with(SearchServiceImpl.class);
 	
 		// setup the layout service
 		bind(LayoutServiceImpl.class).in(Singleton.class);

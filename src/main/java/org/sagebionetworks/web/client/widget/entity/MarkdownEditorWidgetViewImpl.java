@@ -411,7 +411,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void showPreviewHTML(String result, WikiPageKey wikiKey, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
 		HTMLPanel panel;
 		if(result == null || "".equals(result)) {
-	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>"));
+	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
 		}
 		else{
 			panel = new HTMLPanel(result);

@@ -228,4 +228,16 @@ public class EntityTreeBrowserTest {
 				(int) endIndex));
 		searchResults.setTotalEntityCount(totalEntries);
 	}
+	
+	@Test
+	public void testConfigure() {
+		List<EntityHeader> headers = new ArrayList<EntityHeader>();
+		headers.add(new EntityHeader());
+		
+		entityTreeBrowser.configure(headers);
+		verify(mockView).clear();
+		verify(mockView).appendLoading(null);
+		verify(mockView).appendRootEntityTreeItem(any(EntityTreeItem.class));
+		verify(mockView).removeLoading(any(IsTreeItem.class));
+	}
 }

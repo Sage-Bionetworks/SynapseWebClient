@@ -32,8 +32,8 @@
 				<g:SimplePanel ui:field="sharingAndDataUseContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="cancelNewFolderButton" type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-				<b:Button ui:field="okNewFolderButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
+				<b:Button ui:field="cancelNewFolderButton" type="DEFAULT">Cancel</b:Button>
+				<b:Button ui:field="okNewFolderButton" type="PRIMARY">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>
