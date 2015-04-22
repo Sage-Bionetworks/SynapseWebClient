@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Search;
@@ -234,7 +233,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
 	private SettingsPresenter settingsPresenter;
-	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -244,8 +242,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
-			SettingsPresenter settingsPresenter,
-			PortalGinInjector ginInjector) {		
+			SettingsPresenter settingsPresenter) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -254,7 +251,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
 		this.settingsPresenter = settingsPresenter;
-		this.ginInjector = ginInjector;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -561,11 +557,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setTeamsError(String error) {
 		DisplayUtils.showErrorMessage(error);
 	}
-	
-	@Override
-	public void addProjects(List<ProjectHeader> projectHeaders, List<UserProfile> modifiedBy) {
-		addProjectBadges(projectHeaders, modifiedBy, projectsTabContent);
-	}
 
 	@Override
 	public void setProjectsError(String error) {
@@ -589,40 +580,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		moreProjectsButton.setVisible(isVisible);
 	}
 	
-	private void addProjectBadges(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedBy, FlowPanel targetPanel) {
-		//uses ProjectBadge to show more information (additional info available from ProjectHeader)
-		GWT.debugger();
-		for (int i = 0; i < projectHeaders.size(); i++) {
-			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
-			badge.configure(projectHeaders.get(i), lastModifiedBy == null ? null :lastModifiedBy.get(i));
-			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-bottom-10 col-xs-12");
-			targetPanel.add(widget);
-		}
-		if (projectHeaders.isEmpty())
-			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
-	}
-	
-	private void addChallengeBadges(List<ChallengeBundle> challenges, FlowPanel targetPanel) {
-		targetPanel.clear();
-		for (ChallengeBundle challenge : challenges) {
-			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
-			badge.configure(challenge);
-			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-top-10");
-			targetPanel.add(widget);
-		}
-		if (challenges.isEmpty())
-			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
+	@Override
+	public void addProjectWidget(Widget toAdd) {
+		projectsTabContent.add(toAdd);
 	}
 	
 	@Override
-	public void addChallenges(List<ChallengeBundle> challenges) {
-		if (challenges.size() > 0) {
-			DisplayUtils.show(challengesListItem);
-			addChallengeBadges(challenges, challengesTabContent);
-		}
+	public void addChallengeWidget(Widget toAdd) {
+		DisplayUtils.show(challengesListItem);
+		challengesTabContent.add(toAdd);
 	}
+	
 	@Override
 	public void showChallengesLoading(boolean isVisible) {
 		UIObject.setVisible(challengesLoadingUI, isVisible);

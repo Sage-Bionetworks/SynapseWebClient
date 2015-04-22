@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -31,7 +32,10 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
@@ -45,9 +49,12 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
@@ -67,6 +74,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
 
+	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
 	private int teamNotificationCount;
 	private String currentUserId;
@@ -88,10 +96,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			CookieProvider cookies,
 			UserProfileModalWidget userProfileModalWidget,
 			LinkedInServiceAsync linkedInServic,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.challengeClient = challengeClient;
@@ -465,14 +475,32 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> headers, List<UserProfile> lastModifiedBy) {
+	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
 		view.showProjectsLoading(false);
-		view.addProjects(headers, lastModifiedBy);
+		view.clearProjects();
+		for (int i = 0; i < projectHeaders.size(); i++) {
+			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
+			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
+			Widget widget = badge.asWidget();
+			widget.addStyleName("margin-bottom-10 col-xs-12");
+			view.addProjectWidget(widget);
+		}
+		if (projectHeaders.isEmpty())
+			view.addProjectWidget(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
 	public void addChallengeResults(List<ChallengeBundle> challenges) {
 		view.showChallengesLoading(false);
-		view.addChallenges(challenges);
+		view.clearChallenges();
+		for (ChallengeBundle challenge : challenges) {
+			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
+			badge.configure(challenge);
+			Widget widget = badge.asWidget();
+			widget.addStyleName("margin-top-10");
+			view.addChallengeWidget(widget);
+		}
+//		if (challenges.isEmpty())
+//			view.addChallengeWidget(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
 	}
 	
 	public void projectPageAdded(int totalNumberOfResults) {
