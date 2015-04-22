@@ -78,7 +78,7 @@ public class ProjectBadgeTest {
 		header.setId(entity.getId());
 		header.setName(entity.getName());
 		header.setLastActivity(lastActivityDate);
-		widget.configure(header);
+		widget.configure(header, null);
 	}
 	
 	@Test
@@ -92,7 +92,7 @@ public class ProjectBadgeTest {
 		header.setLastActivity(lastActivity);
 		
 		
-		widget.configure(header);
+		widget.configure(header, null);
 		verify(mockView).setProject(eq(name), anyString());
 		verify(mockView).setLastActivityVisible(true);
 		verify(mockView).setLastActivityText(anyString());
@@ -107,7 +107,7 @@ public class ProjectBadgeTest {
 		String name = "a name";
 		header.setId(id);
 		header.setName(name);
-		widget.configure(header);
+		widget.configure(header, null);
 		verify(mockView).setProject(eq(name), anyString());
 		verify(mockView).setLastActivityVisible(false);
 		verify(mockView, never()).setLastActivityText(anyString());
@@ -146,13 +146,13 @@ public class ProjectBadgeTest {
 		header.setId(id);
 		header.setName(name);
 		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
-		widget.configure(header);
+		widget.configure(header, null);
 		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
 			
 		// getMap() is directly called when used, so it's tested directly 
 		Map<String,String> tooltipMap = widget.profileToKeyValueDisplay(userProfile, "Bilbo").getMap();
 		assertTrue(tooltipMap.get("ID").equals(header.getId()));
-		assertTrue(tooltipMap.get("Modified By").equals(userProfile.getOwnerId()));
+		assertTrue(tooltipMap.get("Modified By").equals(userProfile.getUserName()));
 	}
 
 	@Test

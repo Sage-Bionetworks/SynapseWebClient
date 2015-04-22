@@ -3088,7 +3088,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			List<ProjectHeader> headers = (List<ProjectHeader>)synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset).getResults();
 			List<String> lastModifiedBy = new LinkedList<String>();
 			for (ProjectHeader header: headers) {
-				lastModifiedBy.add(header.getModifiedBy().toString());
+				lastModifiedBy.add(header == null ? "" : header.getModifiedBy().toString());
 			}
 			return new ProjectPagedResults(headers, headers.size(), listUserProfiles(lastModifiedBy));
 		} catch (SynapseException e) {
