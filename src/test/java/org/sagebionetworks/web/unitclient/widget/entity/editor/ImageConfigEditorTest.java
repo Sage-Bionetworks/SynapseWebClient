@@ -61,7 +61,6 @@ public class ImageConfigEditorTest {
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(editor);
-		verify(mockView).initView();
 		verify(mockView).setFileInputWidget(any(Widget.class));
 		verify(mockView).setWikiAttachmentsWidget(any(Widget.class));
 	}
@@ -83,7 +82,7 @@ public class ImageConfigEditorTest {
 	public void testUploadFileClickedSuccess() {
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, mockCallback);
-		
+		verify(mockView).initView();
 		editor.uploadFileClicked();
 		verify(mockView).setUploadButtonEnabled(false);
 		

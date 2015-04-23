@@ -284,7 +284,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
-			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {
+			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader, String wikiPageId) {
 		this.versionNumber = versionNumber;
 		this.currentArea = area;
 		DisplayUtils.hide(adminListItem);
@@ -298,9 +298,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
 		isProject = bundle.getEntity() instanceof Project;		
-		String wikiPageId = null;
-		if (Synapse.EntityArea.WIKI == area)
-			wikiPageId = areaToken;
+		
 		if (isProject) {
 			renderProjectEntity(bundle, entityTypeDisplay, area, wikiPageId);
 		} else if (isFolderLike) {
