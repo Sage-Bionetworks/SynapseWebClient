@@ -294,15 +294,32 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	private Alert createDifferentVersionNotice() {
-		Alert noticePanel = new Alert();
+		Alert notice = new Alert();
 		HorizontalPanel noticeWithLink = new HorizontalPanel();
-		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		HTML startMessage = createStartMessage();
+		Anchor linkToCurrent = createLinkToCurrentVerion();
 
+		noticeWithLink.add(wrapWidget(startMessage, "margin-left-5"));
+		noticeWithLink.add(linkToCurrent);
+		notice.add(noticeWithLink);
+
+		if(canEdit) {
+			Button restoreButton = createRestoreButton();
+			notice.add(restoreButton);
+		}
+		return notice;
+	}
+
+	private HTML createStartMessage() {
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		String noticeStart = "You are viewing an old version of this page. View the ";
 		builder = new SafeHtmlBuilder();
 		builder.appendHtmlConstant(noticeStart);
 		HTML startMessage = new HTML(builder.toSafeHtml());
-		
+		return startMessage;
+	}
+
+	private Anchor createLinkToCurrentVerion() {
 		Anchor linkToCurrent = new Anchor();
 		linkToCurrent.setHTML("current version.");
 		linkToCurrent.setStyleName("link", true);
@@ -313,16 +330,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				presenter.reloadWikiPage();
 			}
 		});
-
-		noticeWithLink.add(wrapWidget(startMessage, "margin-left-5"));
-		noticeWithLink.add(linkToCurrent);
-		noticePanel.add(noticeWithLink);
-
-		if(canEdit) {
-			Button restoreButton = createRestoreButton();
-			noticePanel.add(restoreButton);
-		}
-		return noticePanel;
+		return linkToCurrent;
 	}
 
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {
