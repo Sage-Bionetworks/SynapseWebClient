@@ -24,7 +24,8 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, 
 			Long versionNumber, Synapse.EntityArea area, String areaToken,
-			EntityHeader projectHeader);
+			EntityHeader projectHeader,
+			String wikiPageId);
 
 	/**
 	 * Presenter interface
