@@ -124,6 +124,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	@Override
 	public void initView() {
+		uploadButton.setEnabled(true);
 		uploadSuccessUI.setVisible(false);
 		uploadFailureUI.setVisible(false);
 		entityField.setValue("");

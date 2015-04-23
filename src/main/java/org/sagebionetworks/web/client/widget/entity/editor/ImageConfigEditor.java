@@ -43,6 +43,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
 		fileHandleIds = new ArrayList<String>();
+		fileInputWidget.reset();
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		//and try to prepopulate with values from the map.  if it fails, ignore
