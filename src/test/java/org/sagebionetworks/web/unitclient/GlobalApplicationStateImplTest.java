@@ -223,4 +223,13 @@ public class GlobalApplicationStateImplTest {
 		verify(mockSynapseJSNIUtils).replaceHistoryState(newToken);
 	}
 	
+	@Test
+	public void testPushCurrentPlace(){
+		String newToken = "/some/new/token";
+		Place mockPlace = mock(Place.class);
+		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
+		globalApplicationState.pushCurrentPlace(mockPlace);
+		verify(mockCookieProvider).setCookie(anyString(), anyString(), any(Date.class));
+		verify(mockSynapseJSNIUtils).pushHistoryState(newToken);
+	}
 }
