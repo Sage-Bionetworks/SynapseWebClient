@@ -233,6 +233,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.registration.QuestionContainerWidgetView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
@@ -689,6 +690,9 @@ public class PortalGinModule extends AbstractGinModule {
 		/*
 		 * Widgets
 		 */
+		
+		// QuestionContainerWidget
+		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetView.class);
 		
 		// LoginWidget
 		bind(LoginWidgetViewImpl.class).in(Singleton.class);

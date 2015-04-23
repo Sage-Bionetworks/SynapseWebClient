@@ -592,7 +592,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), 
+)) {					
 						view.showErrorMessage(caught.getMessage());
 					}
 				}
