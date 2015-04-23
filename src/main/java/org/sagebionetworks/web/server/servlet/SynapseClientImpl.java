@@ -125,7 +125,6 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.table.query.ParseException;
@@ -138,8 +137,9 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -161,6 +161,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -899,18 +900,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-//	@Override
-//	public PaginatedResults<UserProfile> getAllUsers() throws RestServiceException {
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			return convertPaginated(synapseClient
-//					.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT));
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		} 
-//	}
-
 	
 	@Override
 	public AccessRequirement createAccessRequirement(AccessRequirement ar)
@@ -2061,7 +2050,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ArrayList<MembershipInvitationBundle> getOpenInvitations(String userId)
+	public ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -2071,13 +2060,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// and ask for the team info for each invite, and fill that in the
 			// bundle
 
-			ArrayList<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
+			ArrayList<OpenUserInvitationBundle> returnList = new ArrayList<OpenUserInvitationBundle>();
 			// now go through and create a MembershipInvitationBundle for each
 			// pair
 
 			for (MembershipInvitation invite : invitations.getResults()) {
 				Team team = synapseClient.getTeam(invite.getTeamId());
-				MembershipInvitationBundle b = new MembershipInvitationBundle(team, invite);
+				OpenUserInvitationBundle b = new OpenUserInvitationBundle(team, invite);
 				returnList.add(b);
 			}
 
@@ -2088,7 +2077,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ArrayList<MembershipInvitationBundle> getOpenTeamInvitations(
+	public ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(
 			String teamId, Integer limit, Integer offset)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2099,14 +2088,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// and ask for the team info for each invite, and fill that in the
 			// bundle
 
-			ArrayList<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
+			ArrayList<OpenTeamInvitationBundle> returnList = new ArrayList<OpenTeamInvitationBundle>();
 			// now go through and create a MembershipInvitationBundle for each
 			// pair
 
 			for (MembershipInvtnSubmission invite : invitations.getResults()) {
 				UserProfile profile = synapseClient.getUserProfile(invite
 						.getInviteeId());
-				MembershipInvitationBundle b = new MembershipInvitationBundle(invite,
+				OpenTeamInvitationBundle b = new OpenTeamInvitationBundle(invite,
 						profile);
 				returnList.add(b);
 			}
@@ -2836,8 +2825,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			org.sagebionetworks.repo.model.PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset);
-			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+			List<ProjectHeader> headers = (List<ProjectHeader>)synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset).getResults();
+			List<String> lastModifiedByList = new LinkedList<String>();
+			for (ProjectHeader header: headers) {
+				if (header.getModifiedBy() != null)
+					lastModifiedByList.add(header.getModifiedBy().toString());
+			}			
+			return new ProjectPagedResults(headers, headers.size(), listUserProfiles(lastModifiedByList));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -2848,21 +2842,29 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long teamIdLong = Long.parseLong(teamId);
-			org.sagebionetworks.repo.model.PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset);
-			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+			List<ProjectHeader> headers = (List<ProjectHeader>)synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset).getResults();
+			List<String> lastModifiedByList = new LinkedList<String>();
+			for (ProjectHeader header: headers) {
+				if (header.getModifiedBy() != null)
+					lastModifiedByList.add(header.getModifiedBy().toString());
+			}
+			return new ProjectPagedResults(headers, headers.size(), listUserProfiles(lastModifiedByList));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-
-	
+	}	
 	
 	public ProjectPagedResults getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long userIdLong = Long.parseLong(userId);
-			org.sagebionetworks.repo.model.PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset);
-			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+			List<ProjectHeader> headers = (List<ProjectHeader>)synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset).getResults();
+			List<String> lastModifiedByList = new LinkedList<String>();
+			for (ProjectHeader header: headers) {
+				if (header.getModifiedBy() != null)
+					lastModifiedByList.add(header.getModifiedBy().toString());
+			}
+			return new ProjectPagedResults(headers, headers.size(), listUserProfiles(lastModifiedByList));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

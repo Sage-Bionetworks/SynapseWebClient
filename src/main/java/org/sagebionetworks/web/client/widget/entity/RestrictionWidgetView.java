@@ -41,7 +41,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	Boolean isYesHumanDataRadioSelected();
 	Boolean isNoHumanDataRadioSelected();
 	
-	
+	public void setImposeRestrictionModalVisible(boolean visible);
+
 	/**
 	 * Presenter interface
 	 */
@@ -50,10 +51,10 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 		void anonymousFlagModalOkClicked();
 		void reportIssueClicked();
 		void anonymousReportIssueClicked();
-		void imposeRestrictionClicked();
-		
+		void imposeRestrictionOkClicked();
+		void imposeRestrictionCancelClicked();
+
 		void yesHumanDataClicked();
 		void notHumanDataClicked();
 	}
-
 }

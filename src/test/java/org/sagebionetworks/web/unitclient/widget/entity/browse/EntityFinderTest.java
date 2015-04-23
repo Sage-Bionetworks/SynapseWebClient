@@ -120,7 +120,6 @@ public class EntityFinderTest {
 		paginated.setResults(results);
 		AsyncMockStubber.callSuccessWith(paginated).when(mockSynapseClient).getEntityVersions(eq(id), anyInt(), anyInt(), any(AsyncCallback.class));		
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);	
-//		Mockito.<PaginatedResults<?>>when(mockNodeModelCreator.createPaginatedResults(anyString(), eq(VersionInfo.class))).thenReturn(paginated);
 		
 		entityFinder.loadVersions(id);
 		

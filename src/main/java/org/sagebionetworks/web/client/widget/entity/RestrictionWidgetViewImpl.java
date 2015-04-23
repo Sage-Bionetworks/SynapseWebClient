@@ -65,6 +65,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@UiField
 	Button imposeRestrictionOkButton;
+	@UiField
+	Button imposeRestrictionCancelButton;
 	
 	@UiField
 	Modal flagModal;
@@ -106,10 +108,17 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		imposeRestrictionOkButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.imposeRestrictionClicked();
+				presenter.imposeRestrictionOkClicked();
 			}
 		});
-		
+
+		imposeRestrictionCancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.imposeRestrictionCancelClicked();
+			}
+		});
+
 		changeLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -288,8 +297,17 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public Boolean isYesHumanDataRadioSelected() {
 		return yesHumanDataRadio.getValue();
 	}
+
+	@Override
+	public void setImposeRestrictionModalVisible(boolean visible) {
+		if (visible) {
+			imposeRestrictionModal.show();
+		} else {
+			imposeRestrictionModal.hide();
+		}
+	}
+
 	/*
 	 * Private Methods
 	 */
-
 }

@@ -54,6 +54,7 @@ public class AttachmentConfigViewImpl implements AttachmentConfigView {
 	
 	@Override
 	public void initView() {
+		uploadButton.setEnabled(true);
 		uploadSuccessUI.setVisible(false);
 		uploadFailureUI.setVisible(false);
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {

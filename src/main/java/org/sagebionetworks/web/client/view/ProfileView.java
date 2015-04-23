@@ -2,11 +2,8 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
@@ -14,9 +11,7 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -35,9 +30,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord);
 	void refreshHeader();
-	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
-	void addChallenges(List<ChallengeBundle> challenges);
+	void addProjectWidget(Widget widget);
+	void addChallengeWidget(Widget widget);
 	void setChallengesError(String error);
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
@@ -74,6 +69,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addSortOption(SortOptionEnum sort);
 	void clearSortOptions();
 	void setGetCertifiedVisible(boolean isVisible);
+	void setEmptyProjectUIVisible(boolean b);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
@@ -84,7 +80,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void refreshTeams();
 		void updateArea(ProfileArea area);
-		void updateTeamInvites(List<MembershipInvitationBundle> invites);
+		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();

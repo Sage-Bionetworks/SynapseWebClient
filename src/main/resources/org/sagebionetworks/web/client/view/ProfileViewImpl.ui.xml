@@ -102,6 +102,9 @@
 											</b:ButtonGroup>
 										</b:ButtonGroup>
 										<g:FlowPanel ui:field="projectsTabContent" addStyleNames="margin-top-10"/>
+										<g:SimplePanel ui:field="emptyProjectUI" addStyleNames="smallGreyText padding-15">
+										    	<bh:Text>- Empty</bh:Text>
+										</g:SimplePanel>
 									</b:Column>
 
 
