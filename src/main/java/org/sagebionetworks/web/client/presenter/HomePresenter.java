@@ -119,14 +119,14 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			RSSEntry entry = feed.getEntries().get(i);
 			//every max, set as the last
 			String lastString = (i+1)%MAX_NEWS_ITEMS==0 ? "last" : "";
-			htmlResponse.append("<div class=\"col-md-4 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
+			htmlResponse.append("<div class=\"col-sm-4 margin-top-20 "+lastString+"\"><div class=\"panel padding-10\"><h6 class=\"margin-bottom-4\"><a href=\"");
             htmlResponse.append(entry.getLink());
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());
-            htmlResponse.append("</a></h5><p class=\"clear small-italic\">");
-            htmlResponse.append(entry.getDate() + " - " + entry.getAuthor() + "<br>");
+            htmlResponse.append("</a></h6><p class=\"clear\"> by ");
+            htmlResponse.append(entry.getAuthor() + " | " + entry.getDate() + "<br>");
             htmlResponse.append(entry.getContent());
-            htmlResponse.append("</p></div>");
+            htmlResponse.append("</p></div></div>");
 		}
 		return htmlResponse.toString();
 	}
