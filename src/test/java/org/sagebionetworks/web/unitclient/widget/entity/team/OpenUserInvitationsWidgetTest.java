@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.MembershipInvitation;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetView;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -42,7 +42,7 @@ public class OpenUserInvitationsWidgetTest {
 	Callback mockTeamUpdatedCallback;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	UserProfile testProfile;
-	MembershipInvitation testInvite;
+	MembershipInvtnSubmission testInvite;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -57,15 +57,15 @@ public class OpenUserInvitationsWidgetTest {
 		testProfile = new UserProfile();
 		testProfile.setOwnerId("42");
 		testProfile.setFirstName("Bob");
-		testInvite = new MembershipInvitation();
+		testInvite = new MembershipInvtnSubmission();
 		testInvite.setTeamId(teamId);
-		testInvite.setUserId(testProfile.getOwnerId());
+//		testInvite.setUserId(testProfile.getOwnerId());
 		testInvite.setMessage("This is a test invite");
 		
-		List<MembershipInvitationBundle> testReturn = new ArrayList<MembershipInvitationBundle>();
-		MembershipInvitationBundle mib = new MembershipInvitationBundle();
+		List<OpenTeamInvitationBundle> testReturn = new ArrayList<OpenTeamInvitationBundle>();
+		OpenTeamInvitationBundle mib = new OpenTeamInvitationBundle();
 		mib.setUserProfile(testProfile);
-		mib.setMembershipInvitation(testInvite);
+		mib.setMembershipInvtnSubmission(testInvite);
 		testReturn.add(mib);
 		
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
@@ -73,9 +73,9 @@ public class OpenUserInvitationsWidgetTest {
 	}
 	
 	private void setupGetOpenTeamInvitations(int mockInvitationReturnCount) {
-		List<MembershipInvitationBundle> testReturn = new ArrayList<MembershipInvitationBundle>();
+		List<OpenTeamInvitationBundle> testReturn = new ArrayList<OpenTeamInvitationBundle>();
 		for (int i = 0; i < mockInvitationReturnCount; i++) {
-			testReturn.add(new MembershipInvitationBundle());	
+			testReturn.add(new OpenTeamInvitationBundle());	
 		}
 		
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));

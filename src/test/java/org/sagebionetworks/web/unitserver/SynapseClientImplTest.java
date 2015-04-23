@@ -123,7 +123,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
@@ -1372,19 +1372,14 @@ public class SynapseClientImplTest {
 		int limit = 55;
 		int offset = 2;
 		String teamId = "132";
-		List<MembershipInvitationBundle> invitationBundles = synapseClient
+		List<OpenTeamInvitationBundle> invitationBundles = synapseClient
 				.getOpenTeamInvitations(teamId, limit, offset);
 		verify(mockSynapse).getOpenMembershipInvitationSubmissions(eq(teamId),
 				anyString(), eq((long) limit), eq((long) offset));
 		// we set this up so that a single invite would be returned. Verify that
 		// it is the one we're looking for
 		assertEquals(1, invitationBundles.size());
-		MembershipInvitationBundle invitationBundle = invitationBundles.get(0);
-
-		// String invitationJson =
-		// testInvitation.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		// String userProfileJson =
-		// inviteeUserProfile.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		OpenTeamInvitationBundle invitationBundle = invitationBundles.get(0);
 		assertEquals(inviteeUserProfile, invitationBundle.getUserProfile());
 		assertEquals(testInvitation, invitationBundle.getMembershipInvtnSubmission());
 	}

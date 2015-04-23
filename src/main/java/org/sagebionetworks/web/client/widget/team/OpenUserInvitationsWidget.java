@@ -5,13 +5,12 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.place.shared.Place;
@@ -73,13 +72,13 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	@Override
 	public void getNextBatch() {
 		//using the given team, try to show all pending membership requests (or nothing if empty)
-		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<MembershipInvitationBundle>>() {
+		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<OpenTeamInvitationBundle>>() {
 			@Override
-			public void onSuccess(ArrayList<MembershipInvitationBundle> result) {
+			public void onSuccess(ArrayList<OpenTeamInvitationBundle> result) {
 				currentOffset += result.size();
 				
 				//create the associated object list, and pass to the view to render
-				for (MembershipInvitationBundle b : result) {
+				for (OpenTeamInvitationBundle b : result) {
 					invitations.add(b.getMembershipInvtnSubmission());
 					profiles.add(b.getUserProfile());
 				}
