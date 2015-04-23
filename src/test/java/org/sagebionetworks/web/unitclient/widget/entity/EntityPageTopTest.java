@@ -455,6 +455,17 @@ public class EntityPageTopTest {
 		
 	}
 
+	@Test
+	public void testGetWikiPageId() {
+		String rootWikiId = "IAmGroot";
+		String areaToken = "notRoot";
+		
+		assertEquals(rootWikiId, pageTop.getWikiPageId(EntityArea.FILES, areaToken, rootWikiId));
+		assertEquals(areaToken, pageTop.getWikiPageId(EntityArea.WIKI, areaToken, rootWikiId));
+		assertEquals(rootWikiId, pageTop.getWikiPageId(EntityArea.WIKI, rootWikiId, rootWikiId));
+		assertEquals(rootWikiId, pageTop.getWikiPageId(EntityArea.WIKI, "", rootWikiId));
+		assertEquals(rootWikiId, pageTop.getWikiPageId(EntityArea.WIKI, null, rootWikiId));
+	}
 	
 	/*
 	 * Private Methods
