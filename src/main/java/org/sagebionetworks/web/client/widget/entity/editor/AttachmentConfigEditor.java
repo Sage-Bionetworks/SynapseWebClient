@@ -32,13 +32,13 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		this.fileInputWidget = fileInputWidget;
 		this.wikiAttachments = wikiAttachments;
 		view.setPresenter(this);
-		view.initView();
 		view.setFileInputWidget(fileInputWidget.asWidget());
 		view.setWikiAttachmentsWidget(wikiAttachments.asWidget());
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
+		view.initView();
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
 		fileHandleIds = new ArrayList<String>();
