@@ -3,10 +3,8 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
@@ -14,13 +12,11 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface ProfileView extends IsWidget, SynapseView {
 	
@@ -84,7 +80,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void refreshTeams();
 		void updateArea(ProfileArea area);
-		void updateTeamInvites(List<MembershipInvitationBundle> invites);
+		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();

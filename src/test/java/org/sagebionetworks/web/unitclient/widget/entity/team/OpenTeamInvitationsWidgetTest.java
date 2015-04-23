@@ -27,7 +27,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -43,9 +43,9 @@ public class OpenTeamInvitationsWidgetTest {
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	Team testTeam;
 	MembershipInvitation testInvite;
-	List<MembershipInvitationBundle> testReturn;
+	List<OpenUserInvitationBundle> testReturn;
 	Callback mockTeamUpdatedCallback;
-	CallbackP<List<MembershipInvitationBundle>> mockOpenTeamInvitationsCallback;
+	CallbackP<List<OpenUserInvitationBundle>> mockOpenTeamInvitationsCallback;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -63,8 +63,8 @@ public class OpenTeamInvitationsWidgetTest {
 		testInvite.setUserId("42");
 		testInvite.setMessage("This is a test invite");
 		
-		testReturn = new ArrayList<MembershipInvitationBundle>();
-		MembershipInvitationBundle mib = new MembershipInvitationBundle();
+		testReturn = new ArrayList<OpenUserInvitationBundle>();
+		OpenUserInvitationBundle mib = new OpenUserInvitationBundle();
 		mib.setTeam(testTeam);
 		mib.setMembershipInvitation(testInvite);
 		testReturn.add(mib);

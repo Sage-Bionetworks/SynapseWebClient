@@ -64,7 +64,7 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -842,9 +842,9 @@ public class ProfilePresenterTest {
 		//reset team notification count
 		profilePresenter.setTeamNotificationCount(0);
 		int inviteCount = 3;
-		List<MembershipInvitationBundle> invites = new ArrayList<MembershipInvitationBundle>();
+		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
-			invites.add(new MembershipInvitationBundle());	
+			invites.add(new OpenUserInvitationBundle());	
 		}
 		profilePresenter.updateTeamInvites(invites);
 		
@@ -867,7 +867,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testUpdateTeamInvitesZero() {
 		profilePresenter.setTeamNotificationCount(0);
-		profilePresenter.updateTeamInvites(new ArrayList<MembershipInvitationBundle>());
+		profilePresenter.updateTeamInvites(new ArrayList<OpenUserInvitationBundle>());
 		
 		assertEquals(0, profilePresenter.getTeamNotificationCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());

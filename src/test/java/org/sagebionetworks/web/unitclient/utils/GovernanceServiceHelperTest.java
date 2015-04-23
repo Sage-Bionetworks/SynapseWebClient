@@ -75,12 +75,6 @@ public class GovernanceServiceHelperTest {
 							throws Throwable {
 						if (method.equals(SynapseClientAsync.class.getMethod("createAccessApproval", AccessApproval.class, AsyncCallback.class))) {
 							AccessApproval aa = (AccessApproval)args[0];
-//							AdapterFactory adapterFactory = new AdapterFactoryImpl();
-//							JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-//							
-//			    			@SuppressWarnings("unchecked")
-//							AccessApproval aa = jsonEntityFactory.createEntity(ew.getEntityJson(), 
-//										(Class<AccessApproval>)Class.forName(ew.getEntityClassName()));
 			    			assertEquals(accessRequirementId, aa.getRequirementId());
 			    			AsyncCallback callback = (AsyncCallback)args[1];
 							callback.onSuccess(null);

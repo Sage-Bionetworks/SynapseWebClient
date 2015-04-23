@@ -83,7 +83,6 @@ public class ProvenanceWidgetTest {
 	PaginatedResults<EntityHeader> referenceHeaders;
 	
 	ReferenceList referenceList;
-//	String referenceHeadersJSON;
 	Exception someException = new Exception();
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	JsoProvider jsoProvider;
@@ -153,7 +152,6 @@ public class ProvenanceWidgetTest {
 		modifiedByUserProfile.setUserName("007");
 		modifiedByUserProfile.setFirstName("James");
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-//		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(modifiedByUserProfile);
 
 	}
 	
@@ -287,7 +285,6 @@ public class ProvenanceWidgetTest {
 		ProvGraph graph = verifyBuildGraphCalls();					
 		
 		reset(mockSynapseClient);
-//		reset(mockNodeModelCreator);
 		
 		// current version of each reference
 		EntityHeader header123 = new EntityHeader();
@@ -298,11 +295,8 @@ public class ProvenanceWidgetTest {
 		header456.setVersionNumber(2L); // v2 is newer than in Before method
 		PaginatedResults<EntityHeader> currentVersionBatch = new PaginatedResults<EntityHeader>();
 		currentVersionBatch.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 })));		
-//		String currentVersionsBatchJSON = referenceHeaders.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		
 		// new mocks for batch call
-		AsyncMockStubber.callSuccessWith(currentVersionBatch).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
-//		Mockito.<BatchResults<?>>when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn((BatchResults<EntityHeader>)currentVersionBatch);
+		AsyncMockStubber.callSuccessWith(currentVersionBatch).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 
 		provenanceWidget.findOldVersions();
 		
