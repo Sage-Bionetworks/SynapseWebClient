@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -159,10 +159,10 @@ public class EntityViewImpl extends Composite implements EntityView {
 				presenter.refresh();
 			}
 		};
-		CallbackP<List<MembershipInvitationBundle>> teamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
+		CallbackP<List<OpenUserInvitationBundle>> teamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
 			
 			@Override
-			public void invoke(List<MembershipInvitationBundle> invites) {
+			public void invoke(List<OpenUserInvitationBundle> invites) {
 				//if there are any, then also add the title text to the panel
 				if (invites != null && invites.size() > 0) {
 					HTML message = new HTML("<h4>"+DisplayConstants.ACCESS_DEPENDENT_ON_TEAM+"</h4>");

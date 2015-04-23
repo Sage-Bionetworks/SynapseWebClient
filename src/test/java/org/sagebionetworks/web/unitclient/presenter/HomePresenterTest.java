@@ -41,7 +41,7 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
@@ -67,7 +67,7 @@ public class HomePresenterTest {
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	
 	List<EntityHeader> testEvaluationResults;
-	List<MembershipInvitationBundle> openInvitations;
+	List<OpenUserInvitationBundle> openInvitations;
 	
 	RSSFeed testFeed = null;
 	String testTeamId = "42";
@@ -104,7 +104,7 @@ public class HomePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		
-		openInvitations = new ArrayList<MembershipInvitationBundle>();
+		openInvitations = new ArrayList<OpenUserInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		
 		testFeed = new RSSFeed();
