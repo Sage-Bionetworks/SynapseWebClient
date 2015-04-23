@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -12,11 +11,11 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface ProfileView extends IsWidget, SynapseView {
 	
@@ -31,9 +30,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord);
 	void refreshHeader();
-	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
-	void addChallenges(List<ChallengeBundle> challenges);
+	void addProjectWidget(Widget widget);
+	void addChallengeWidget(Widget widget);
 	void setChallengesError(String error);
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
@@ -70,6 +69,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addSortOption(SortOptionEnum sort);
 	void clearSortOptions();
 	void setGetCertifiedVisible(boolean isVisible);
+	void setEmptyProjectUIVisible(boolean b);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();

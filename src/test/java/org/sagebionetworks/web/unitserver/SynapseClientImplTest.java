@@ -124,6 +124,7 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -409,9 +410,10 @@ public class SynapseClientImplTest {
 						anyString())).thenReturn(sentMessage);
 
 		// getMyProjects getUserProjects
-		PaginatedResults<ProjectHeader> headers = new PaginatedResults<ProjectHeader>();
+		PaginatedResults headers = new PaginatedResults<ProjectHeader>();
 		headers.setTotalNumberOfResults(1100);
 		List<ProjectHeader> projectHeaders = new ArrayList();
+		List<UserProfile> userProfile = new ArrayList();
 		projectHeaders.add(new ProjectHeader());
 		headers.setResults(projectHeaders);
 		when(
@@ -1730,11 +1732,12 @@ public class SynapseClientImplTest {
 	public void testGetMyProjects() throws Exception {
 		int limit = 11;
 		int offset = 20;
-		synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset,
+		ProjectPagedResults results = synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset,
 				ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC);
 		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test
@@ -1748,6 +1751,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getProjectsFromUser(eq(userId),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test
@@ -1761,6 +1765,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getProjectsForTeam(eq(teamId),
 				eq(ProjectListSortColumn.LAST_ACTIVITY),
 				eq(SortDirection.DESC), eq(limit), eq(offset));
+		verify(mockSynapse).listUserProfiles(anyList());
 	}
 
 	@Test

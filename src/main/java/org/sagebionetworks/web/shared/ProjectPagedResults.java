@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 
 public class ProjectPagedResults implements Serializable {
 	private int totalNumberOfResults;
 	private List<ProjectHeader> results;
-
+	private List<UserProfile> lastModifiedBy;
+	
 	/**
 	 * Default constructor is required
 	 */
@@ -20,6 +22,21 @@ public class ProjectPagedResults implements Serializable {
 		super();
 		this.totalNumberOfResults = totalNumberOfResults;
 		this.results = results;
+	}
+	
+	public ProjectPagedResults(List<ProjectHeader> results, int totalNumberOfResults, List<UserProfile> lastModifiedBy) {
+		super();
+		this.totalNumberOfResults = totalNumberOfResults;
+		this.results = results;
+		this.lastModifiedBy = lastModifiedBy;
+	}
+	
+	public void setLastModifiedBy(List<UserProfile> lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
+
+	public List<UserProfile> getLastModifiedBy() {
+		return lastModifiedBy;
 	}
 
 	public int getTotalNumberOfResults() {
@@ -38,13 +55,21 @@ public class ProjectPagedResults implements Serializable {
 		this.results = results;
 	}
 
-	
+
+	@Override
+	public String toString() {
+		return "ProjectPagedResults [totalNumberOfResults="
+				+ totalNumberOfResults + ", results=" + results
+				+ ", lastModifiedBy=" + lastModifiedBy + "]";
+	}
 
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((lastModifiedBy == null) ? 0 : lastModifiedBy.hashCode());
 		result = prime * result + ((results == null) ? 0 : results.hashCode());
 		result = prime * result + totalNumberOfResults;
 		return result;
@@ -60,6 +85,11 @@ public class ProjectPagedResults implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ProjectPagedResults other = (ProjectPagedResults) obj;
+		if (lastModifiedBy == null) {
+			if (other.lastModifiedBy != null)
+				return false;
+		} else if (!lastModifiedBy.equals(other.lastModifiedBy))
+			return false;
 		if (results == null) {
 			if (other.results != null)
 				return false;
@@ -69,11 +99,6 @@ public class ProjectPagedResults implements Serializable {
 			return false;
 		return true;
 	}
-
-
-	@Override
-	public String toString() {
-		return "ProjectPagedResults [totalNumberOfResults=" + totalNumberOfResults + ", results=" + results + "]";
-	}
+	
 	
 }

@@ -61,7 +61,7 @@ public class PortalLoggingIntegrationTest {
 		log.debug("This is a debug message");
 		log.info("This is an info message containing a UUID: "+uuid);
 		log.error("An Error!!!", new RuntimeException(new IllegalArgumentException("Bad mojo!")));
-		// Wait for the UUID to apear in S3.
+		// Wait for the UUID to appear in S3.
 		long start = System.currentTimeMillis();
 		String key = null;
 		do{
