@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.search;
+package org.sagebionetworks.web.client.view.users;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,38 +14,38 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SearchBoxViewImpl implements SearchBoxView {
-	public interface Binder extends UiBinder<Widget, SearchBoxViewImpl> {}
+public class RegisterWidgetViewImpl implements RegisterWidgetView {
+	public interface Binder extends UiBinder<Widget, RegisterWidgetViewImpl> {}
 	private Presenter presenter;
 	Widget widget;
 	@UiField
-	Button searchButton;
+	Button registerBtn;
 	@UiField
-	TextBox searchField;
-	
+	TextBox emailAddressField;
+
 	@Inject
-	public SearchBoxViewImpl(Binder binder) {
+	public RegisterWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		searchField.getElement().setAttribute("placeholder", " Search");
+		emailAddressField.getElement().setAttribute("placeholder", " Enter email address");
 		initClickHandlers();
 	}
-		
-	private void initClickHandlers() {
-		searchButton.addClickHandler(new ClickHandler() {
+
+	public void initClickHandlers() {
+		registerBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.search(searchField.getValue());
-				searchField.setValue("");
+				presenter.registerUser(emailAddressField.getValue());
 			}
 		});
-	    searchField.addKeyDownHandler(new KeyDownHandler() {				
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					searchButton.click();
-	            }					
-			}
-		});				
+		
+		emailAddressField.addKeyDownHandler(new KeyDownHandler() {
+		    @Override
+		    public void onKeyDown(KeyDownEvent event) {
+		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+		        	registerBtn.click();
+		        }
+		    }
+		});
 	}
 	
 	@Override
@@ -76,10 +76,14 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	public void setVisible(boolean isVisible) {
 		widget.setVisible(isVisible);
 	}
+	@Override
+	public void enableRegisterButton(boolean enable) {
+		registerBtn.setEnabled(enable);
+	}
 	
 	@Override
 	public void clear() {
-		//searchField.setText("");		
+		emailAddressField.setText("");
 	}
 
 	/*

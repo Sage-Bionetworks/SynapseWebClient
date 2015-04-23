@@ -646,8 +646,16 @@ a.shortBtn {
 	margin-top: 15px;
 }
 
+.margin-top-20 {
+	margin-top: 20px;
+}
+
 .margin-top-30 {
 	margin-top: 30px;
+}
+
+.margin-top-40 {
+	margin-top: 40px;
 }
 
 .margin-top-60 {
@@ -876,7 +884,9 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
-
+.color-white {
+	color: white;
+}
 .apitable label {
 	margin-left:5px;
 	display:inline;
@@ -910,11 +920,18 @@ a.shortBtn {
 	display:inline-block;
 }
 
+.font-weight-bolder {
+	font-weight: bolder;
+}
+
 .font-size-32 {
 	font-size: 32px !important;
 	font-family: Yanone Kaffeesatz;
 }
 
+.font-size-5em {
+	font-size: 5em;
+}
 .font-size-150,
 i.font-size-150 {
 	font-size: 150px;
@@ -1328,10 +1345,13 @@ ol.lowerroman {
 	padding: 5px;
 }
 
+.padding-10 {
+	padding: 10px;
+}
+
 .padding-15 {
 	padding: 15px;
 }
-
 
 .padding-2 {
 	padding: 2px;
@@ -1850,7 +1870,6 @@ a.projectTitle:hover {
   position: relative;
   font-size: 16px;
   height: auto;
-  padding: 10px;
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;

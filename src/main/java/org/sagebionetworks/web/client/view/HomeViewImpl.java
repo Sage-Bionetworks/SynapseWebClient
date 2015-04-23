@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
@@ -13,11 +14,9 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Challenges;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -56,19 +55,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel newsFeed;
 	@UiField
-	org.gwtbootstrap3.client.ui.Button loginBtn;
-	@UiField
-	org.gwtbootstrap3.client.ui.Button registerBtn;
-	@UiField
-	org.gwtbootstrap3.client.ui.Button dreamBtn;
-	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
+	@UiField
+	Div registerUI;
+	
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
 	HTMLPanel howToUseSynapseContainer;
-	@UiField
-	HTMLPanel getStartedContainer;
 	@UiField
 	SimplePanel rClientInstallPanel;
 	@UiField
@@ -101,10 +95,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
-	private GlobalApplicationState globalApplicationState;
-	private HomeSearchBox homeSearchBox;	
 	IconsImageBundle iconsImageBundle;
-	private CookieProvider cookies;
 	SynapseJSNIUtils synapseJSNIUtils;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
@@ -120,14 +111,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 			CookieProvider cookies,
 			final AuthenticationController authController,
 			SynapseJSNIUtils synapseJSNIUtils,
-			UserBadge userBadge) {
+			UserBadge userBadge,
+			RegisterWidget registerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.globalApplicationState = globalApplicationState;
-		this.homeSearchBox = homeSearchBox;
 		this.iconsImageBundle = icons;
-		this.cookies = cookies;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.userBadge = userBadge;
 		userBadge.setSize(BadgeSize.DEFAULT_PICTURE_ONLY);
@@ -146,25 +135,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		bigSearchBox.clear();
 		bigSearchBox.add(homeSearchBox.asWidget());
 		
-		loginBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
-			}
-		});
-		registerBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
-			}
-		});
-		dreamBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
-			}
-		});
-		
 		dashboardBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -174,6 +144,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		// Programmatic Clients
 		fillProgrammaticClientInstallCode();
+		
+		registerUI.add(registerWidget.asWidget());
 		
 		// Other links
 		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
@@ -198,16 +170,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void showLoggedInUI(UserSessionData userData) {
 		clearUserProfilePicture();
 		setUserProfilePicture(userData);
-		
-		loginBtn.setVisible(false);
-		registerBtn.setVisible(false);
+		registerUI.setVisible(false);
 		dashboardBtn.setVisible(true);
 	}
 	@Override
 	public void showAnonymousUI() {
 		clearUserProfilePicture();
-		loginBtn.setVisible(true);
-		registerBtn.setVisible(true);
+		registerUI.setVisible(true);
 		dashboardBtn.setVisible(false);
 	}
 	

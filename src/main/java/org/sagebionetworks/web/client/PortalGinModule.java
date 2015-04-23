@@ -79,6 +79,8 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
+import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -605,6 +607,8 @@ public class PortalGinModule extends AbstractGinModule {
 		// RegisterAccountView
 		bind(RegisterAccountViewImpl.class).in(Singleton.class);
 		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class);
+		
+		bind(RegisterWidgetView.class).to(RegisterWidgetViewImpl.class);
 
 		// ProfileView
 		bind(ProfileViewImpl.class).in(Singleton.class);
