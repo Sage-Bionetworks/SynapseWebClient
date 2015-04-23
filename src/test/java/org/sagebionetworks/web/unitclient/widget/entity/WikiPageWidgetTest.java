@@ -186,5 +186,23 @@ public class WikiPageWidgetTest {
 		verify(mockView).showWikiHistory(false);
 	}
 
-	
+	@Test
+	public void testReloadWikiPageSuccess() {
+		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null);
+		WikiPage wikiPage = new WikiPage();
+		wikiPage.setId(wikiPageKey.getWikiPageId());
+		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		presenter.reloadWikiPage();
+		verify(mockView).resetWikiMarkdown(anyString(), eq(wikiPageKey), anyBoolean(), anyBoolean(), any(Long.class));
+	}
+
+	@Test
+	public void testReloadWikiPageFailure() {
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
+		// fail to reload wiki page
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.reloadWikiPage();
+		verify(mockView).clear();
+	}
 }
