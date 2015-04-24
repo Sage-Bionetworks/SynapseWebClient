@@ -340,7 +340,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private void sendDetailsToView(Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
+	}
+	
+	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
+		String wikiPageId = rootWikiId;
+		if (Synapse.EntityArea.WIKI == area && DisplayUtils.isDefined(areaToken))
+			wikiPageId = areaToken;
+		return wikiPageId;
 	}
 	
 	private UserProfile getUserProfile() {
