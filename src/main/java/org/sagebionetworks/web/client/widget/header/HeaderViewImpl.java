@@ -132,7 +132,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			synapseLogo.setHeight("25px");
 			synapseLogo.setWidth("126px");
 			headerDiv.setHeight("50px");
-			headerDiv.setPaddingTop(12);
+			headerDiv.setPaddingTop(9);
 		}
 	}
 	

@@ -420,7 +420,6 @@ button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a
 /* Clear out GWT's link color */
 a, a:visited, a:hover {
   color: inherit;
-  font-size: 1.1em;
 }
 
 a.shortBtn {		
@@ -904,6 +903,7 @@ a.shortBtn {
 }
 
 .font-italic { font-style: italic; }
+.font-size-1.1em { font-size: 1.1em; }
 
 .public-acl-image {
 	background-image: url(images/icons/globe-green-16.png);
@@ -1357,7 +1357,6 @@ ol.lowerroman {
 .padding-2 {
 	padding: 2px;
 }
-
 
 .howToUseLink {
 	font-size: 16px;

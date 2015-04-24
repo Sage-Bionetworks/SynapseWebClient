@@ -31,13 +31,13 @@
 		</b:Row>
 		<b:Row>
 			<b:Column size="SM_1" />
-			<b:Column  size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="center-in-div" />
-				<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp" 
-					text="Collaborate"
+			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
+				<g:Image resource='{sageImageBundle.directory}' addStyleNames="center-in-div" />
+				<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+					text="Organize your digital research assets"
 				></b:Heading>
 				<b:Heading size="H5" addStyleNames="margin-top-3"
-					text="Share your Project with your collaborators, or make it Public!"
+					text="Create a free Synapse Project to store your research data, code, and results."
 				></b:Heading>
 			</b:Column>
 			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
@@ -49,13 +49,13 @@
 					text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance."
 				></b:Heading>
 			</b:Column>
-			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<g:Image resource='{sageImageBundle.directory}' addStyleNames="center-in-div" />
-				<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
-					text="Organize your digital research assets"
+			<b:Column  size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
+				<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="center-in-div" />
+				<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp" 
+					text="Collaborate"
 				></b:Heading>
 				<b:Heading size="H5" addStyleNames="margin-top-3"
-					text="Create a free Synapse Project to store your research data, code, and results."
+					text="Share your Project with your collaborators, or make it Public!"
 				></b:Heading>
 			</b:Column>
 			<b:Column size="SM_1" />
@@ -70,43 +70,49 @@
 		</b:Row>
 		<b:Row>
 			<b:Column size="SM_1" />
-			<b:Column  size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<bh:Div addStyleNames="synapse-purple-bg padding-10">
-					<bh:Div addStyleNames="margin-10">
-						<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
+			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
+				<g:FocusPanel ui:field="researchCommunitiesBox">
+					<bh:Div addStyleNames="synapse-yellow-bg padding-10 imageButton" height="255px">
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="2">
+									<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-10" />
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
+						<b:Heading size="H5" addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >"></b:Heading>
 					</bh:Div>
-					<b:Heading size="H5" addStyleNames="color-white" text="See all the current DREAM challenges avail- able on Synapse. >"></b:Heading>
-				</bh:Div>
+				</g:FocusPanel>
 			</b:Column>
-			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<bh:Div addStyleNames="synapse-green-bg padding-10">
-					<t:Table>
-						<t:TableRow>
-							<t:TableData paddingRight="2">
-								<g:Image resource='{sageImageBundle.unlock}' addStyleNames="margin-10" />
-							</t:TableData>
-							<t:TableData paddingRight="2">
-								<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="OPEN RESEARCH PROJECTS"></b:Heading>
-							</t:TableData>
-						</t:TableRow>
-					</t:Table>
-					<b:Heading size="H5" addStyleNames="color-white" text="See the open research projects hosted on Synapse. >"></b:Heading>
-				</bh:Div>
+			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10" >
+				<g:FocusPanel ui:field="openResearchProjectsBox">
+					<bh:Div addStyleNames="synapse-green-bg padding-10 imageButton" height="255px">
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="2">
+									<g:Image resource='{sageImageBundle.unlock}' addStyleNames="margin-10" />
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="OPEN RESEARCH PROJECTS"></b:Heading>
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
+						<b:Heading size="H5" addStyleNames="color-white" text="See the open research projects hosted on Synapse. >"></b:Heading>
+					</bh:Div>
+				</g:FocusPanel>
 			</b:Column>
-			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<bh:Div addStyleNames="synapse-yellow-bg padding-10">
-					<t:Table>
-						<t:TableRow>
-							<t:TableData paddingRight="2">
-								<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-10" />
-							</t:TableData>
-							<t:TableData paddingRight="2">
-								<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
-							</t:TableData>
-						</t:TableRow>
-					</t:Table>
-					<b:Heading size="H5" addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >"></b:Heading>
-				</bh:Div>
+			<b:Column  size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
+				<g:FocusPanel ui:field="dreamChallengesBox">
+					<bh:Div addStyleNames="synapse-purple-bg padding-10 imageButton" height="255px">
+						<bh:Div addStyleNames="margin-10">
+							<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
+						</bh:Div>
+						<b:Heading size="H5" addStyleNames="color-white" text="See all the current DREAM challenges available on Synapse. >"></b:Heading>
+					</bh:Div>
+				</g:FocusPanel>
 			</b:Column>
 			<b:Column size="SM_1" />
 		</b:Row>
@@ -134,7 +140,37 @@
 				></b:Heading>
 			</b:Column>
 		</b:Row>
-		
+		<b:Row>
+		<b:Column size="SM_1" />
+		<b:Column size="SM_5" addStyleNames="margin-top-5 margin-left-10 margin-right-10">
+				<g:FocusPanel ui:field="termsOfUseBox">
+					<b:Panel addStyleNames="padding-15 imageButton">
+						<b:Heading size="H5" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
+						<b:Heading size="H6" text="Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, guide- lines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews." />
+						<b:Button text="Learn about Synapse Use and Oversight" />
+					</b:Panel>
+				</g:FocusPanel>
+			</b:Column>
+		<b:Column size="SM_5" addStyleNames="margin-top-5 margin-left-10 margin-right-10">
+				<g:FocusPanel ui:field="becomeCertifiedBox">
+					<b:Panel addStyleNames="padding-15 imageButton">
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="10">
+									<g:Image resource='{sageImageBundle.certificate}' addStyleNames="margin-10" />
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H5" addStyleNames="font-weight-bolder" text="Become a Certified User!"></b:Heading>
+									<b:Heading size="H6" text="In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data." />
+									<b:Button text="Learn more about certification" />
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
+					</b:Panel>
+				</g:FocusPanel>
+			</b:Column>
+			<b:Column size="SM_1" />
+		</b:Row>
 		
 		<b:Row addStyleNames="synapse-blue-bg margin-top-10">
 			<b:Column size="SM_1" />
@@ -201,31 +237,6 @@
 		<!-- TOP 3 COLUMNS -->		
 		<div class="container margin-top-30">
 		    <div class="row">
-				<!-- What is Synapse -->
-				<g:HTMLPanel ui:field="whatIsSynapseContainer">
-					<div class="col-md-4 ">
-						<h3>What is Synapse?</h3>
-						<ul class="list check-list">
-	
-							<li class="whatIsSynapseText">
-								A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' />
-								workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span>
-								your research.
-							</li>
-							<li class="whatIsSynapseText">
-								A tool to improve reproducibility of data intensive science, <span style="font-weight: bold;">recording progress as you work</span>
-								with tools such as <span style="font-weight: bold;">R</span> and <span style="font-weight: bold;">Python</span>.
-							</li>
-							<li class="whatIsSynapseText">
-								A set of <span style="font-weight: bold;">living research projects</span> enabling contribution to
-								<span style="font-weight: bold;">large-scale collaborative solutions</span> to scientific problems.
-							</li>
-							<li class="whatIsSynapseText">
-								<g:Anchor ui:field="aboutSynapseLink" />
-							</li>
-						</ul>
-					</div>
-				</g:HTMLPanel>
 	
 				<!-- How to Use Synapse -->
 				<g:HTMLPanel ui:field="howToUseSynapseContainer">
@@ -253,43 +264,11 @@
 				</g:HTMLPanel>
 			</div> <!-- end row -->				
 			
-			<!-- SEARCH BOX -->
-			<div class="row margin-top-15">
-				<h3>Search Synapse</h3>
-				<div class="well" style="margin-bottom: 0px !important;">
-					<g:SimplePanel ui:field="bigSearchBox" />
-				</div>
-			</div> <!-- end row -->				
-
-			<div class="row">			
-				<div class="separator separator-margin"></div>						
-			</div> <!-- end row -->				
-
-			<div class="row">			
-				<!-- NEWS -->						
-				<div class="main-service">
-					<!-- DATA USE -->
-					<div class="col-md-3">
-						<h3>Terms of Use</h3>
-						<div class="well">
-							<p>Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, 
-							    guidelines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews.</p>
-							<div style="margin-top: 10px;">
-								<h4>
-									<a href="#!Help:Governance" class="service-tipsy north link">Learn about Synapse Use and Oversight</a>
-								</h4>
-							</div>
-						</div>				
-					</div>
-					<!-- END DATA USE -->				
-				</div>
-			</div> <!-- end row -->				
 		</div> <!-- close class="container" -->			
 									
 
 		<div class="clear"></div>
 
 		<g:SimplePanel ui:field="footer" />
-
 	</g:HTMLPanel>
 </ui:UiBinder> 

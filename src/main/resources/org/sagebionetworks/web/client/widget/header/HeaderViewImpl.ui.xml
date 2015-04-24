@@ -11,7 +11,7 @@
 		        <g:Image ui:field="synapseLogo" resource="{sageImages.synapseLogo}" addStyleNames="imageButton"/>
 		    </bh:Div>
 			<b:Tooltip placement="BOTTOM" title="Log out">
-				<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5" height="26px" />	
+				<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="26px" />	
 			</b:Tooltip>
 			<b:Tooltip placement="BOTTOM" title="Favorites">
 				<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
@@ -21,7 +21,7 @@
 				</b:ButtonGroup>
 			</b:Tooltip>
 		    <b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" height="26px" >@ Trash can</b:Button>
-		    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+		    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-15 margin-top-5">
 				<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="26px">Log in</b:Button>
 			</g:SimplePanel>
 		    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">

@@ -14,15 +14,17 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Challenges;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -33,6 +35,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -51,8 +54,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel bigSearchBox;
-	@UiField
 	SimplePanel newsFeed;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
@@ -61,9 +62,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	Div registerUI;
 	
-	
-	@UiField
-	HTMLPanel whatIsSynapseContainer;
 	@UiField
 	HTMLPanel howToUseSynapseContainer;
 	@UiField
@@ -91,9 +89,20 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	Anchor javaExampleCodeLink;	
 	@UiField
-	Anchor aboutSynapseLink;
-	@UiField
 	Anchor restApiLink;
+	
+	@UiField
+	FocusPanel dreamChallengesBox;
+	@UiField
+	FocusPanel openResearchProjectsBox;
+	@UiField
+	FocusPanel researchCommunitiesBox;
+	
+	@UiField
+	FocusPanel termsOfUseBox;
+	@UiField
+	FocusPanel becomeCertifiedBox;
+	
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -110,7 +119,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			IconsImageBundle icons, 
 			SageImageBundle imageBundle,
 			final GlobalApplicationState globalApplicationState,
-			HomeSearchBox homeSearchBox, 
 			CookieProvider cookies,
 			final AuthenticationController authController,
 			SynapseJSNIUtils synapseJSNIUtils,
@@ -135,9 +143,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
-		bigSearchBox.clear();
-		bigSearchBox.add(homeSearchBox.asWidget());
-		
 		dashboardBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -151,8 +156,42 @@ public class HomeViewImpl extends Composite implements HomeView {
 		registerUI.add(registerWidget.asWidget());
 		
 		// Other links
-		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
+		
+		dreamChallengesBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
+			}
+		});
+		openResearchProjectsBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//TODO: go to new open researchs project page
+//				globalApplicationState.getPlaceChanger().goTo(new T(""));
+			}
+		});
+		
+		researchCommunitiesBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//TODO: go to new research communities page
+//				globalApplicationState.getPlaceChanger().goTo(new T(""));
+			}
+		});
+		
+		termsOfUseBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GOVERNANCE));
+			}
+		});
+		becomeCertifiedBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));
+			}
+		});
 	}
 		
 	/**
