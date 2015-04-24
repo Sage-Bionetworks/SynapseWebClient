@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.registration;
+package org.sagebionetworks.web.client.view;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +13,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface QuestionContainerWidgetView extends IsWidget {
 
-	void setPresenter(Presenter presenter);
 	public Widget asWidget();
 	public void addStyleName(String style);
 	
@@ -32,4 +31,6 @@ public interface QuestionContainerWidgetView extends IsWidget {
 	}
 
 	void addAnswer(Widget answerContainer);
+	void setQuestionHeader(Widget questionHeader);
+	void configureMoreInfo(String href);
 }

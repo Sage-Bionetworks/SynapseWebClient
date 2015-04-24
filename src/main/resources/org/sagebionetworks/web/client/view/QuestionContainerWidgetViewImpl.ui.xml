@@ -9,13 +9,13 @@
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
  
     <g:FlowPanel ui:field="questionContainer" styleName="margin-bottom-40 margin-left-15">
-        <b:Heading size="H5" class="inline-block control-label">
-            <b:Small ui:field="questionNumber" class="margin-right-10"></b:Small>
+        <b:Heading ui:field="questionHeader" size="H5" styleName="inline-block control-label margin-right-10">
+            <!--  <bh:Span ui:field="questionNumber" styleName="greyText-imp"></bh:Span>-->
         </b:Heading>
-        <b:Anchor ui:field="moreInfoLink" styleName="margin-left-9">
+        <b:Anchor ui:field="moreInfoLink" styleName="margin-left-9" target="_blank">
             <span class="glyphicon glyphicon-question-sign font-size-15"></span>
-            <span class="margin-left-5">Need help answering this question?</span>
-        	<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}'/>            
+            <span>Need help answering this question?</span>
+        	<!--<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}'/>-->       
         </b:Anchor>
 	</g:FlowPanel>
 </ui:UiBinder> 

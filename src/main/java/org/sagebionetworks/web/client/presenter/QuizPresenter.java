@@ -23,11 +23,12 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.QuestionContainerWidget;
 import org.sagebionetworks.web.client.view.QuizView;
-import org.sagebionetworks.web.client.widget.entity.registration.QuestionContainerWidget;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -70,8 +71,10 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.adapterFactory = adapterFactory;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.isSubmitInitialized = false;
+		getIsCertified();
 	}
 	
 	@Override
@@ -115,7 +118,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				@Override
 				public void onClick(ClickEvent event) {
 					//gather answers and pass them back to the presenter
-					if (questionIndex2AnswerIndices.keySet().size() < currentQuestionCount) {
+					if (questionIndexToQuestionWidget.keySet().size() < currentQuestionCount) {
 						view.showErrorMessage(DisplayConstants.ERROR_ALL_QUESTIONS_REQUIRED);
 					} else {
 						view.setSubmitEnabled(false);
@@ -126,9 +129,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			});
 		}
 		view.reset();
-//		quizContainer.setVisible(true);
-//		submitButton.setVisible(true);
-//		submitButton.setEnabled(true);
 	}
 	
 	@Override
@@ -155,10 +155,12 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			submission.setQuestionResponses(questionResponses);
 			JSONObjectAdapter adapter = submission.writeToJSONObject(jsonObjectAdapter.createNew());
 			String questionnaireResponse = adapter.toJSONString();
+			GWT.debugger();
 			synapseClient.submitCertificationQuizResponse(questionnaireResponse, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String passingRecordJson) {
 					try {
+						GWT.debugger();
 						PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 						if (passingRecord.getPassed())
 							view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);

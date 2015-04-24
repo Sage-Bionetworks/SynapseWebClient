@@ -59,6 +59,8 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.client.view.ProjectsHomeViewImpl;
+import org.sagebionetworks.web.client.view.QuestionContainerWidgetView;
+import org.sagebionetworks.web.client.view.QuestionContainerWidgetViewImpl;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.view.QuizViewImpl;
 import org.sagebionetworks.web.client.view.SearchView;
@@ -233,7 +235,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.registration.QuestionContainerWidgetView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
@@ -692,7 +693,7 @@ public class PortalGinModule extends AbstractGinModule {
 		 */
 		
 		// QuestionContainerWidget
-		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetView.class);
+		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetViewImpl.class);
 		
 		// LoginWidget
 		bind(LoginWidgetViewImpl.class).in(Singleton.class);

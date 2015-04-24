@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
-import org.sagebionetworks.web.client.widget.entity.registration.QuestionContainerWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
@@ -268,38 +267,38 @@ public class QuizViewImpl extends Composite implements QuizView {
 		scoreContainer.setInnerHTML(scoreContainerText);
 	}
 	
-	private void scoreQuiz(PassingRecord passingRecord) {
-		//go through and highlight correct/incorrect answers
-		testContainer.clear();
-		if (passingRecord.getCorrections() == null)
-			return;
-		int questionNumber = 1;
-		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
-			//indicate success/failure
-			if (correctness.getQuestion() != null) {
-				FlowPanel questionUI = addQuestion(questionNumber++, correctness.getQuestion(), (MultichoiceResponse)correctness.getResponse());
-				testContainer.add(questionUI);
-
-				HTML html = new InlineHTML();
-				html.addStyleName("margin-right-5");
-				if (correctness.getIsCorrect()) {
-					//green checkmark
-					html.setHTML(DisplayUtils.getIcon("glyphicon-ok font-size-15 text-success"));
-				} else {
-					//red X
-					html.setHTML(DisplayUtils.getIcon("glyphicon-remove font-size-15 text-danger"));
-					questionUI.addStyleName("has-error");
-				}
-				questionUI.insert(html, 0);
-			}
-		}
-		//scored quiz cannot be resubmitted
-		submitButton.setVisible(false);
-		if (passingRecord.getCorrections() != null) {
-			DisplayUtils.show(scoreContainer);
-			scoreContainer.setInnerHTML("Score: " + passingRecord.getScore() + "/" + passingRecord.getCorrections().size() );
-		}
-	}
+//	private void scoreQuiz(PassingRecord passingRecord) {
+//		//go through and highlight correct/incorrect answers
+//		testContainer.clear();
+//		if (passingRecord.getCorrections() == null)
+//			return;
+//		int questionNumber = 1;
+//		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
+//			//indicate success/failure
+//			if (correctness.getQuestion() != null) {
+//				FlowPanel questionUI = addQuestion(questionNumber++, correctness.getQuestion(), (MultichoiceResponse)correctness.getResponse());
+//				testContainer.add(questionUI);
+//
+//				HTML html = new InlineHTML();
+//				html.addStyleName("margin-right-5");
+//				if (correctness.getIsCorrect()) {
+//					//green checkmark
+//					html.setHTML(DisplayUtils.getIcon("glyphicon-ok font-size-15 text-success"));
+//				} else {
+//					//red X
+//					html.setHTML(DisplayUtils.getIcon("glyphicon-remove font-size-15 text-danger"));
+//					questionUI.addStyleName("has-error");
+//				}
+//				questionUI.insert(html, 0);
+//			}
+//		}
+//		//scored quiz cannot be resubmitted
+//		submitButton.setVisible(false);
+//		if (passingRecord.getCorrections() != null) {
+//			DisplayUtils.show(scoreContainer);
+//			scoreContainer.setInnerHTML("Score: " + passingRecord.getScore() + "/" + passingRecord.getCorrections().size() );
+//		}
+//	}
 	
 //	private FlowPanel (int questionNumber, Question question, MultichoiceResponse response) {
 //		FlowPanel parentQuestionContainer = new FlowPanel();

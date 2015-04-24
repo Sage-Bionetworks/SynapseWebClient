@@ -1,17 +1,19 @@
-package org.sagebionetworks.web.client.widget.entity.registration;
+package org.sagebionetworks.web.client.view;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.Question;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.place.Wiki;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -28,18 +30,18 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 	private QuestionContainerWidgetView view;
 	private PortalGinInjector ginInjector;
 	private Set<Long> answers;
-	private long questionNumber;
 	
 	@Inject
 	public QuestionContainerWidget(QuestionContainerWidgetView view,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.ginInjector = ginInjector;
+		answers = new HashSet<Long>();
 	}
 	
 	@Override
 	public void configure(Long questionNumber, Question question, MultichoiceResponse response) {
-		this.questionNumber = questionNumber;
+		view.setQuestionHeader(new InlineHTML("<small class=\"margin-right-10\">"+questionNumber+".</small>"+SimpleHtmlSanitizer.sanitizeHtml(question.getPrompt()).asString()+"</small>"));
 		final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion) question;
 		if (question instanceof MultichoiceQuestion) {
 			if (multichoiceQuestion.getExclusive()) {
@@ -51,12 +53,13 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					answerButton.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
+							GWT.debugger();
 							answers.clear();
 							answers.add(answer.getAnswerIndex());
 						}
 					});
-					answerContainer.add(answerButton);
-					view.addAnswer(answerContainer);
+					answerContainer.add(answerButton.asWidget());
+					view.addAnswer(answerContainer.asWidget());
 					//handleIfPreviouslyAnswered(answerButton, response, answer.getAnswerIndex());
 				}
 			} else {
@@ -69,6 +72,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					checkbox.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
+							GWT.debugger();
 							//not exclusive, include all possible answer indexes
 							if (checkbox.getValue()) {
 								answers.add(answer.getAnswerIndex());	
@@ -81,6 +85,11 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					view.addAnswer(answerContainer);
 					//handleIfPreviouslyAnswered(checkbox, response, answer.getAnswerIndex());
 				}
+			}
+			final WikiPageKey moreInfoKey = question.getReference();
+			if (moreInfoKey != null && moreInfoKey.getOwnerObjectId() != null) {
+				Wiki place = new Wiki(moreInfoKey.getOwnerObjectId(), moreInfoKey.getOwnerObjectType().name(), moreInfoKey.getWikiPageId());
+				view.configureMoreInfo("#!Wiki:" + place.toToken());
 			}
 		}
 
