@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.web.client.ClientProperties;
 
 /**
@@ -23,24 +23,24 @@ public class ListUtilsTest {
 	public void testStudySort(){
 		
 		// Create a few datset
-		Study one = new Study();
+		Folder one = new Folder();
 		one.setId(ClientProperties.DEFAULT_PLACE_TOKEN);
 		one.setName("beta");
 		one.setCreatedOn(new Date(99));
-		Study two = new Study();
+		Folder two = new Folder();
 		two.setId("1");
 		two.setName("alpha");
 		two.setCreatedOn(new Date(98));
-		Study allNull = new Study();
+		Folder allNull = new Folder();
 		// Add them to the list
 		
-		List<Study> list = new ArrayList<Study>();
+		List<Folder> list = new ArrayList<Folder>();
 		list.add(allNull);
 		list.add(one);
 		list.add(two);
 		
 		// Now sort the list on name
-		List<Study> sorted = ListUtils.getSortedCopy("name", false, list, Study.class);
+		List<Folder> sorted = ListUtils.getSortedCopy("name", false, list, Folder.class);
 		assertNotNull(sorted);
 		System.out.println(sorted);
 		

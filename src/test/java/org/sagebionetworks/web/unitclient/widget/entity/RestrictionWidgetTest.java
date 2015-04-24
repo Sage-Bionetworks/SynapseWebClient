@@ -19,8 +19,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -32,7 +32,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -54,7 +53,6 @@ public class RestrictionWidgetTest {
 	RestrictionWidgetView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter jsonObjectAdapter;
-	EntityTypeProvider mockEntityTypeProvider;
 	JiraURLHelper mockJiraURLHelper;
 	AccessRequirementDialog mockAccessRequirementDialog;
 	RestrictionWidget widget;
@@ -79,7 +77,6 @@ public class RestrictionWidgetTest {
 		mockView = mock(RestrictionWidgetView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 		mockEntityUpdatedCallback = mock(Callback.class);
 		UserSessionData usd = new UserSessionData();
@@ -97,7 +94,7 @@ public class RestrictionWidgetTest {
 
 		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockAccessRequirementDialog);
 
-		vb = new Data();
+		vb = new FileEntity();
 		vb.setId(entityId);
 		vb.setVersionNumber(new Long(1));
 		vb.setVersionLabel("");

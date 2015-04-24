@@ -31,7 +31,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -63,7 +62,6 @@ public class EntityPageTopTest {
 	EntityPageTopView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter jsonObjectAdapter;
-	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
 	JiraURLHelper mockJiraURLHelper;
@@ -97,7 +95,6 @@ public class EntityPageTopTest {
 		mockView = mock(EntityPageTopView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
@@ -106,7 +103,6 @@ public class EntityPageTopTest {
 		
 		pageTop = new EntityPageTop(mockView, mockAuthenticationController,
 				mockSchemaCache,
-				mockEntityTypeProvider,
 				mockIconsImageBundle, 
 				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
 		pageTop.setAreaChangeHandler(areaChangeHandler);

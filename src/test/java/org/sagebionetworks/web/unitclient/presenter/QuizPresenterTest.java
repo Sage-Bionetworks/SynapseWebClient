@@ -151,8 +151,7 @@ public class QuizPresenterTest {
 	}
 	
 	private void setPassingRecordResponse(PassingRecord pr) throws JSONObjectAdapterException {
-		String json = pr.writeToJSONObject(adapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(json).when(mockSynapseClient).submitCertificationQuizResponse(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).submitCertificationQuizResponse(any(QuizResponse.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -202,10 +201,10 @@ public class QuizPresenterTest {
 		verify(mockView).showSuccess(any(UserProfile.class), any(PassingRecord.class));
 		
 		//let's also check the response object
-		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<QuizResponse> arg = ArgumentCaptor.forClass(QuizResponse.class);
 		verify(mockSynapseClient).submitCertificationQuizResponse(arg.capture(), any(AsyncCallback.class));
 		//reconstruct the QuestionnaireResponse, and sanity check that it should have 2 question responses
-		QuizResponse questionnaireResponse = new QuizResponse(adapterFactory.createNew(arg.getValue()));
+		QuizResponse questionnaireResponse = arg.getValue();
 		assertEquals(2, questionnaireResponse.getQuestionResponses().size());
 	}
 
@@ -223,7 +222,7 @@ public class QuizPresenterTest {
 	
 	@Test
 	public void testSubmitAnswersError() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).submitCertificationQuizResponse(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).submitCertificationQuizResponse(any(QuizResponse.class), any(AsyncCallback.class));
 		presenter.submitAnswers(new HashMap<Long, Set<Long>>());
 		verify(mockView).showErrorMessage(anyString());
 	}

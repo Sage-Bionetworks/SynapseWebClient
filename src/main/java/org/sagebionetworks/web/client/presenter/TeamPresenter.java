@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -148,25 +147,19 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			team.setDescription(description);
 			team.setCanPublicJoin(canPublicJoin);
 			team.setIcon(fileHandleId);
-			try {
-				JSONObjectAdapter adapter = team.writeToJSONObject(jsonObjectAdapter.createNew());
-				String teamJson = adapter.toJSONString();
-				synapseClient.updateTeam(teamJson, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
-						refresh();
+			synapseClient.updateTeam(team, new AsyncCallback<Team>() {
+				@Override
+				public void onSuccess(Team result) {
+					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
+					refresh();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+						view.showErrorMessage(caught.getMessage());
 					}
-					@Override
-					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-							view.showErrorMessage(caught.getMessage());
-						}
-					}
-				});
-			} catch (JSONObjectAdapterException e) {
-				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-			}
+				}
+			});
 		}
 	}
 }

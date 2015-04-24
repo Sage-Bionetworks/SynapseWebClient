@@ -9,8 +9,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
@@ -190,14 +188,9 @@ public class EntityListUtil {
 		// download
 		String downloadUrl = null;
 		if(!isLoggedIn) {				
-			if(bundle.getEntity() instanceof FileEntity || bundle.getEntity() instanceof Locationable)
+			if(bundle.getEntity() instanceof FileEntity)
 				downloadUrl = "#" + nameLinkUrl;
-		} else if(referencedEntity instanceof Locationable) {
-			List<LocationData> locations = ((Locationable) referencedEntity).getLocations();
-			if(locations != null && locations.size() > 0) {
-				downloadUrl = locations.get(0).getPath();
-			} 
-		} else if(referencedEntity instanceof FileEntity) {					
+		}  else if(referencedEntity instanceof FileEntity) {					
 			downloadUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), referencedEntity.getId(), ((FileEntity) referencedEntity).getVersionNumber(), false);
 		}
 		

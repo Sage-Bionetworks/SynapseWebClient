@@ -7,7 +7,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
@@ -18,15 +17,13 @@ public class FileTitleBarTest {
 	FileTitleBar fileTitleBar;
 	FileTitleBarView mockView;
 	AuthenticationController mockAuthController;
-	EntityTypeProvider mockEntityTypeProvider;
 	SynapseClientAsync mockSynapseClient;
 	@Before
 	public void setup(){	
 		mockView = mock(FileTitleBarView.class);
 		mockAuthController = mock(AuthenticationController.class);
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		fileTitleBar = new FileTitleBar(mockView, mockAuthController, mockEntityTypeProvider, mockSynapseClient);
+		fileTitleBar = new FileTitleBar(mockView, mockAuthController, mockSynapseClient);
 		
 		verify(mockView).setPresenter(fileTitleBar);
 	}

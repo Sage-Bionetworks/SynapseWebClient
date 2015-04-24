@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityPageTopView extends IsWidget, SynapseView {
@@ -58,8 +57,6 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		boolean isLoggedIn();
 
 		String createEntityLink(String id, String version, String display);
-
-		ImageResource getIconForType(String typeString);
 
 		boolean isPlaceChangeForArea(EntityArea targetTab);
 

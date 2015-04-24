@@ -1,41 +1,15 @@
 package org.sagebionetworks.web.shared;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
 
 public class EntityType {
 
 	private String name;
 	private String className;
-	private String defaultParentPath;
-	private EntityTypeMetadata metadata;
-    private List<EntityType> validParentTypes;
-    private List<EntityType> validChildTypes;   
         
-	public EntityType(String name, String className,
-			String defaultParentPath, EntityTypeMetadata metadata) {
+	public EntityType(String name, String className) {
 		super();
 		this.name = name;
-		this.className = className;
-		this.defaultParentPath = defaultParentPath;
-		this.metadata = metadata;		
-	}
-
-	public List<EntityType> getValidParentTypes() {
-		return validParentTypes;
-	}
-
-	public void setValidParentTypes(List<EntityType> validParentTypes) {
-		this.validParentTypes = validParentTypes;
-	}
-
-	public List<EntityType> getValidChildTypes() {
-		return validChildTypes;
-	}
-
-	public void setValidChildTypes(List<EntityType> validChildTypes) {
-		this.validChildTypes = validChildTypes;
+		this.className = className;	
 	}
 
 	public String getName() {
@@ -44,25 +18,6 @@ public class EntityType {
 
 	public String getClassName() {
 		return className;
-	}
-
-	public String getDefaultParentPath() {
-		return defaultParentPath;
-	}
-
-	public EntityTypeMetadata getMetadata() {
-		return metadata;
-	}
-
-	public List<String> getAliases() {
-		return metadata.getAliases();
-	}
-
-	@Override
-	public String toString() {
-		return "EntityType [name=" + name + ", className=" + className
-				+ ", defaultParentPath=" + defaultParentPath + ", metadata="
-				+ metadata + "]";
 	}
 
 	@Override
@@ -90,8 +45,5 @@ public class EntityType {
 			return false;
 		return true;
 	}
-
-
-
     
 }

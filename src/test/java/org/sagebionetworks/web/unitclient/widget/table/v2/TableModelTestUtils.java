@@ -23,7 +23,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.csv.CsvNullReader;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 
 import au.com.bytecode.opencsv.CSVWriter;
 

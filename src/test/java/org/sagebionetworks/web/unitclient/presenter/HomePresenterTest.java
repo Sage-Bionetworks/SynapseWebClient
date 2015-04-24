@@ -15,8 +15,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
@@ -61,7 +59,6 @@ public class HomePresenterTest {
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookies;
-	AutoGenFactory autoGenFactory;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	GWTWrapper mockGwtWrapper;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
@@ -87,8 +84,7 @@ public class HomePresenterTest {
 		mockCookies = mock(CookieProvider.class);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://synapse.org/filehandle/");
 		
-		autoGenFactory = new AutoGenFactory();
-		BatchResults<EntityHeader> testBatchResults = new BatchResults<EntityHeader>();
+		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		testEvaluationResults = new ArrayList<EntityHeader>();
 		EntityHeader testEvaluation = new EntityHeader();
 		testEvaluation.setId("eval project id 1");
