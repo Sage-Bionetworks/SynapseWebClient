@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +35,6 @@ import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -60,8 +58,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -95,8 +91,8 @@ public class ChallengeClientImplTest {
 	
 	String testFileName = "testFileEntity.R";
 	EntityPath path;
-	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
-	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
+	org.sagebionetworks.reflection.model.PaginatedResults<UserGroup> pgugs;
+	org.sagebionetworks.reflection.model.PaginatedResults<UserProfile> pgups;
 	AccessControlList acl;
 	WikiPage page;
 	V2WikiPage v2Page;
@@ -117,7 +113,6 @@ public class ChallengeClientImplTest {
 	private static final String EVAL_ID_2 = "eval ID 2";
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
 	ChallengeTeam testChallengeTeam1, testChallengeTeam2;
 	Challenge testChallenge;
 	
@@ -144,7 +139,7 @@ public class ChallengeClientImplTest {
 		when(mockSynapse.getUserEvaluationPermissions(EVAL_ID_2)).thenReturn(userEvaluationPermissions);
 		
 		
-		BatchResults<EntityHeader> batchHeaders = new BatchResults<EntityHeader>();
+		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> batchHeaders = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		batchHeaderResults = new ArrayList<EntityHeader>();
 		for (int i = 0; i < 10; i++) {
 			EntityHeader h = new EntityHeader();
@@ -317,7 +312,7 @@ public class ChallengeClientImplTest {
 	
 	@Test
 	public void testGetAvailableEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		org.sagebionetworks.repo.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.repo.model.PaginatedResults<Evaluation>();
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
 		Evaluation e = new Evaluation();
 		e.setId("A test ID");
 		testResults.setResults(Arrays.asList(e));
@@ -408,7 +403,7 @@ public class ChallengeClientImplTest {
 		String sharedEntityId = "syn123455";
 		setupGetAvailableEvaluations(sharedEntityId);
 		
-		org.sagebionetworks.repo.model.PaginatedResults<Submission> submissions = new org.sagebionetworks.repo.model.PaginatedResults<Submission>();
+		org.sagebionetworks.reflection.model.PaginatedResults<Submission> submissions = new org.sagebionetworks.reflection.model.PaginatedResults<Submission>();
 		//verify when all empty, hasSubmitted returns false
 		when(mockSynapse.getMySubmissions(anyString(), anyLong(), anyLong())).thenReturn(submissions);
 		assertFalse(synapseClient.hasSubmitted());
@@ -422,21 +417,21 @@ public class ChallengeClientImplTest {
 	}
 	
 	public void setupGetEvaluationsForEntity(String sharedEntityId) throws SynapseException {
-		org.sagebionetworks.repo.model.PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
 		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(getEmptyPaginatedResults());
 		when(mockSynapse.getEvaluationByContentSource(eq(sharedEntityId),anyInt(),anyInt())).thenReturn(testResults);
 	}
 	
-	private org.sagebionetworks.repo.model.PaginatedResults<Evaluation> getEmptyPaginatedResults() {
-		org.sagebionetworks.repo.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.repo.model.PaginatedResults<Evaluation>();
+	private org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> getEmptyPaginatedResults() {
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		testResults.setTotalNumberOfResults(0);
 		testResults.setResults(evaluationList);
 		return testResults;
 	}
 	
-	private org.sagebionetworks.repo.model.PaginatedResults<Evaluation> getTestEvaluations(String sharedEntityId) {
-		org.sagebionetworks.repo.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.repo.model.PaginatedResults<Evaluation>();
+	private org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> getTestEvaluations(String sharedEntityId) {
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
 		List<Evaluation> evaluationList = new ArrayList<Evaluation>();
 		Evaluation e = new Evaluation();
 		e.setId(EVAL_ID_1);
@@ -452,7 +447,7 @@ public class ChallengeClientImplTest {
 	}
 	
 	public void setupGetAvailableEvaluations(String sharedEntityId) throws SynapseException {
-		org.sagebionetworks.repo.model.PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
+		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
 		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 	}
 	
@@ -551,7 +546,7 @@ public class ChallengeClientImplTest {
 	
 	public void setupListChallengesForParticipant() throws SynapseException {
 		when(mockSynapse.listChallengesForParticipant(anyString(), anyLong(), anyLong())).thenReturn(getTestChallengePagedResults());
-		BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>();
+		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		EntityHeader header = new EntityHeader();
 		header.setId(testChallengeProject);
 		header.setName(TEST_CHALLENGE_PROJECT_NAME);

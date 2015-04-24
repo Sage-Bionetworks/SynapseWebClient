@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -18,7 +19,6 @@ import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
-import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
@@ -50,7 +49,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
 	AdapterFactory adapterFactory;
-	EntityTypeProvider entityTypeProvider;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
@@ -60,12 +58,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
-			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
 			IconsImageBundle iconsImageBundle, AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.entityTypeProvider = entityTypeProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
@@ -372,19 +368,18 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	}
 
 	public static ImageResource getIconForType(String type,
-			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle) {
 		if (type == null)
 			return null;
 		EntityType entityType;
 		if (type.startsWith("org."))
-			entityType = entityTypeProvider.getEntityTypeForClassName(type);
+			entityType = EntityType.getEntityTypeForClassName(type);
 		else
-			entityType = entityTypeProvider.getEntityTypeForString(type);
+			entityType = EntityType.valueOf(type.toLowerCase());
 		if (entityType == null)
 			return null;
 		return DisplayUtils.getSynapseIconForEntityClassName(
-				entityType.getClassName(), DisplayUtils.IconSize.PX16,
+				entityType.getClassForType().getName(), DisplayUtils.IconSize.PX16,
 				iconsImageBundle);
 	}
 }

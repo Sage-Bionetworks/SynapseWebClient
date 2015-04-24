@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -26,7 +26,6 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	
 	PromptModalView view;
 	SynapseClientAsync synapseClient;
-	EntityTypeProvider typeProvider;
 	String parentId;
 	Entity toRename;
 	String startingName;
@@ -34,12 +33,11 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	
 	@Inject
 	public RenameEntityModalWidgetImpl(PromptModalView view,
-			SynapseClientAsync synapseClient, EntityTypeProvider typeProvider) {
+			SynapseClientAsync synapseClient) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.view.setPresenter(this);
-		this.typeProvider = typeProvider;
 	}
 	
 	
@@ -92,7 +90,7 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	@Override
 	public void onRename(Entity toRename, Callback handler) {
 		this.handler = handler;
-		String typeName = typeProvider.getEntityDispalyName(toRename);
+		String typeName = EntityType.getEntityTypeForClass(toRename.getClass()).getDisplayName();
 		this.toRename = toRename;
 		this.startingName = toRename.getName();
 		this.view.clear();

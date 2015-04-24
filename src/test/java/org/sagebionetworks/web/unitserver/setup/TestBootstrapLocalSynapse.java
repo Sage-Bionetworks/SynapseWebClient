@@ -12,14 +12,12 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.NewIntegrationTestUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.Condition;
@@ -139,7 +137,7 @@ public class TestBootstrapLocalSynapse {
 		RestrictableObjectDescriptor rod = new RestrictableObjectDescriptor();
 		rod.setId(entityId);
 		rod.setType(RestrictableObjectType.ENTITY);
-		VariableContentPaginatedResults<AccessRequirement> vcpr = synapseClient.getAccessRequirements(rod);
+		org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> vcpr = synapseClient.getAccessRequirements(rod);
 		if(vcpr != null && vcpr.getTotalNumberOfResults() > 0){
 			for(AccessRequirement ar: vcpr.getResults()){
 				if(ar.getAccessType().equals(type)){
@@ -292,7 +290,7 @@ public class TestBootstrapLocalSynapse {
 	 * @throws SynapseException
 	 */
 	private Long findUser(String username) throws SynapseException{
-		PaginatedResults<UserProfile> pr = adminClient.getUsers(0, Integer.MAX_VALUE);
+		org.sagebionetworks.reflection.model.PaginatedResults<UserProfile> pr = adminClient.getUsers(0, Integer.MAX_VALUE);
 		if(pr != null && pr.getResults() != null){
 			for(UserProfile up: pr.getResults()){
 				if(up.getUserName().equals(username)){

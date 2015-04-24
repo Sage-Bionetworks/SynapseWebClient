@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.Study;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -58,7 +58,7 @@ public class BreadcrumbTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testAsWidgetEntity() throws Exception {
-		Entity entity = new Study();
+		Entity entity = new Folder();
 		entity.setId("3");
 		entity.setUri("path/dataset/3");
 		List<EntityHeader> pathHeaders = new ArrayList<EntityHeader>();

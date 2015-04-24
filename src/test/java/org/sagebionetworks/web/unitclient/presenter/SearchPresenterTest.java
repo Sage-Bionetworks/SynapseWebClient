@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -44,7 +43,6 @@ public class SearchPresenterTest {
 	SynapseClientAsync mockSynapseClient;
 	JSONObjectAdapter jsonObjectAdapter;
 	PlaceChanger mockPlaceChanger;
-	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 
 	String exampleTerm;
@@ -58,7 +56,6 @@ public class SearchPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		EntityTypeProvider mockEntityTypeProvider = null; 
 		IconsImageBundle mockIconsImageBundle = mock(IconsImageBundle.class);
 
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
@@ -66,7 +63,7 @@ public class SearchPresenterTest {
 		searchPresenter = new SearchPresenter(mockView,
 				mockGlobalApplicationState, mockAuthenticationController,
 				mockSynapseClient,
-				new JSONObjectAdapterImpl(), mockEntityTypeProvider,
+				new JSONObjectAdapterImpl(),
 				mockIconsImageBundle);
 		
 		exampleTerm = "searchQueryTerm";

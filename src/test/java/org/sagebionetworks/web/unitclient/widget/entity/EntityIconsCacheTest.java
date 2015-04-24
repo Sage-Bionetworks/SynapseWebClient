@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -10,27 +9,20 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
-import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.resources.client.ImageResource;
 
 public class EntityIconsCacheTest {
-	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	EntityIconsCache entityIconsCache;
 	ImageResource mockProjectIcon;
 
 	@Before
 	public void before() {
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
-		entityIconsCache = new EntityIconsCache(mockEntityTypeProvider, mockIconsImageBundle);
-		EntityType type = new EntityType("Project", Project.class.getName(), "", null);
-		when(mockEntityTypeProvider.getEntityTypeForString(anyString())).thenReturn(type);
+		entityIconsCache = new EntityIconsCache(mockIconsImageBundle);
 		mockProjectIcon = mock(ImageResource.class);
 		when(mockIconsImageBundle.synapseProject16()).thenReturn(mockProjectIcon);
 	}

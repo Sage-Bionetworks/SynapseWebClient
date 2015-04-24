@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -15,7 +16,6 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -67,7 +67,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	EntityActionControllerView view;
 	PreflightController preflightController;
-	EntityTypeProvider entityTypeProvider;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
@@ -90,7 +89,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
-			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
@@ -105,7 +103,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.accessControlListModalWidget = accessControlListModalWidget;
 		this.view.addAccessControlListModalWidget(accessControlListModalWidget);
 		this.preflightController = preflightController;
-		this.entityTypeProvider = entityTypeProvider;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
@@ -127,7 +124,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.actionMenu = actionMenu;
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
-		this.enityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityBundle.getEntity());
+		this.enityTypeDisplay = EntityType.getEntityTypeForClass(entityBundle.getEntity().getClass()).getDisplayName();
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
 		actionMenu.addControllerWidget(uploader.asWidget());

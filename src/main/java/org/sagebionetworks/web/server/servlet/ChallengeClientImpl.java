@@ -19,8 +19,6 @@ import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -83,7 +81,6 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	AutoGenFactory entityFactory = new AutoGenFactory();
 	
 	/**
 	 * Injected with Gin
@@ -149,7 +146,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	 * @param in
 	 * @return
 	 */
-	public <T extends JSONEntity> PaginatedResults<T> convertPaginated(org.sagebionetworks.repo.model.PaginatedResults<T> in){
+	public <T extends JSONEntity> PaginatedResults<T> convertPaginated(org.sagebionetworks.reflection.model.PaginatedResults<T> in){
 		return  new PaginatedResults<T>(in.getResults(), in.getTotalNumberOfResults());
 	}
 	
@@ -255,7 +252,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			// look up the available evaluations
-			org.sagebionetworks.repo.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
+			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
 					.getEvaluationByContentSource(entityId,
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);
@@ -337,13 +334,13 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		try {
 			// get all evaluations for which the user has joined as a
 			// participant
-			org.sagebionetworks.repo.model.PaginatedResults<Evaluation> evaluations = synapseClient
+			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> evaluations = synapseClient
 					.getAvailableEvaluationsPaginated(
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);
 			for (Evaluation evaluation : evaluations.getResults()) {
 				// return true if any of these have a submission
-				org.sagebionetworks.repo.model.PaginatedResults<Submission> res = synapseClient
+				org.sagebionetworks.reflection.model.PaginatedResults<Submission> res = synapseClient
 						.getMySubmissions(evaluation.getId(), 0, 0);
 				if (res.getTotalNumberOfResults() > 0) {
 					return true;
@@ -496,7 +493,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 				ref.setTargetId(challenge.getProjectId());
 				references.add(ref);
 			}
-			BatchResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
+			org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
 			List<EntityHeader> projectHeaders = headers.getResults();
 			
 			Map<String, String> projectNameLookup = new HashMap<String, String>();
@@ -538,7 +535,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		try {
 			Challenge challenge = synapseClient.getChallenge(challengeId);
 			//get the challenge, to resolve the project id
-			org.sagebionetworks.repo.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
+			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
 					.getEvaluationByContentSource(challenge.getProjectId(),
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);

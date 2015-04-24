@@ -40,6 +40,8 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -199,8 +201,8 @@ public interface SynapseClientAsync {
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
-	 void createV2WikiPage(String ownerId, String ownerType,
-			String wikiPageJson, AsyncCallback<V2WikiPage> callback);
+	 void createV2WikiPage(String ownerId, String ownerType, V2WikiPage page,
+			AsyncCallback<V2WikiPage> callback);
     void getV2WikiPage(WikiPageKey key, AsyncCallback<V2WikiPage> callback);
     void getVersionOfV2WikiPage(WikiPageKey key, Long version,
 			AsyncCallback<V2WikiPage> callback);
@@ -259,7 +261,7 @@ public interface SynapseClientAsync {
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void deleteMembershipInvitation(String invitationId, AsyncCallback<Void> callback);
-	void updateTeam(String teamJson, AsyncCallback<String> callback);
+	void updateTeam(Team team, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
@@ -276,7 +278,8 @@ public interface SynapseClientAsync {
 	 */
 	void getCertifiedUserPassingRecord(String userId, AsyncCallback<String> callback);
 	void getCertificationQuiz(AsyncCallback<String> callback);
-	void submitCertificationQuizResponse(String quizResponseJson, AsyncCallback<String> callback);
+	void submitCertificationQuizResponse(QuizResponse response,
+			AsyncCallback<PassingRecord> callback);
 	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl,
 			AsyncCallback<EntityIdList> callback);
