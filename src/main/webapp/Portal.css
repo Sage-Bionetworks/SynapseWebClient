@@ -420,6 +420,7 @@ button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a
 /* Clear out GWT's link color */
 a, a:visited, a:hover {
   color: inherit;
+  font-size: 1.1em;
 }
 
 a.shortBtn {		
@@ -2044,11 +2045,11 @@ ul, ol {
   padding-top:    3px;
   padding-bottom: 3px;
   padding-left: 30px;
-  font-size: 90%;
+  font-size: 1.1em;
 }
 .bs-sidenav .nav .nav > li > a {
   padding-left: 40px;
-  font-size: 80%;
+  font-size: 1em;
 }
 .bs-sidenav .nav .nav .nav > li > a {
   padding-left: 50px;

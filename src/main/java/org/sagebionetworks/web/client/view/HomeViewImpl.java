@@ -57,7 +57,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
 	@UiField
+	Div dashboardUI;
+	@UiField
 	Div registerUI;
+	
 	
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
@@ -171,13 +174,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 		clearUserProfilePicture();
 		setUserProfilePicture(userData);
 		registerUI.setVisible(false);
-		dashboardBtn.setVisible(true);
+		dashboardUI.setVisible(true);
 	}
 	@Override
 	public void showAnonymousUI() {
 		clearUserProfilePicture();
 		registerUI.setVisible(true);
-		dashboardBtn.setVisible(false);
+		dashboardUI.setVisible(false);
 	}
 	
 	private void clearUserProfilePicture() {

@@ -13,7 +13,7 @@
 		<b:Row addStyleNames="synapse-blue-bg margin-top-10">
 			<b:Column size="SM_1" />
 			<b:Column size="SM_11">
-				<b:Heading size="H4" addStyleNames="margin-top-5 margin-bottom-5 color-white"
+				<b:Heading size="H4" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 						text="PARTNERS"
 				></b:Heading>
 			</b:Column>

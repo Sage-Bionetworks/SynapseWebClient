@@ -124,9 +124,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void setLargeLogo(boolean largeLogo) {
 		if (largeLogo) {
-			synapseLogo.setHeight("40px");
-			synapseLogo.setWidth("201px");
-			headerDiv.setHeight("70px");
+			synapseLogo.setHeight("66px");
+			synapseLogo.setWidth("332px");
+			headerDiv.setHeight("100px");
 			headerDiv.setPaddingTop(16);
 		} else {
 			synapseLogo.setHeight("25px");
