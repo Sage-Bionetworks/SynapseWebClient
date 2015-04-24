@@ -142,7 +142,7 @@
 		</b:Row>
 		<b:Row>
 		<b:Column size="SM_1" />
-		<b:Column size="SM_5" addStyleNames="margin-top-5 margin-left-10 margin-right-10">
+		<b:Column size="SM_5" addStyleNames="margin-top-30 margin-left-10 margin-right-10">
 				<g:FocusPanel ui:field="termsOfUseBox">
 					<b:Panel addStyleNames="padding-15 imageButton">
 						<b:Heading size="H5" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
@@ -151,7 +151,7 @@
 					</b:Panel>
 				</g:FocusPanel>
 			</b:Column>
-		<b:Column size="SM_5" addStyleNames="margin-top-5 margin-left-10 margin-right-10">
+		<b:Column size="SM_5" addStyleNames="margin-top-30 margin-left-10 margin-right-10">
 				<g:FocusPanel ui:field="becomeCertifiedBox">
 					<b:Panel addStyleNames="padding-15 imageButton">
 						<t:Table>
@@ -234,11 +234,9 @@
 			</b:Column>
 		</b:Row>
 		
-		<!-- TOP 3 COLUMNS -->		
+		<!-- 
 		<div class="container margin-top-30">
 		    <div class="row">
-	
-				<!-- How to Use Synapse -->
 				<g:HTMLPanel ui:field="howToUseSynapseContainer">
 					<div class="col-md-4 ">
 						<h3>How to Use Synapse</h3>
@@ -262,13 +260,13 @@
 						</ul>
 					</div>
 				</g:HTMLPanel>
-			</div> <!-- end row -->				
+			</div> 				
 			
-		</div> <!-- close class="container" -->			
+		</div> 			
 									
 
 		<div class="clear"></div>
-
+ -->
 		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 

@@ -884,9 +884,10 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
-.color-white {
+.color-white, .color-white:hover, .color-white:visited {
 	color: white;
 }
+
 .apitable label {
 	margin-left:5px;
 	display:inline;

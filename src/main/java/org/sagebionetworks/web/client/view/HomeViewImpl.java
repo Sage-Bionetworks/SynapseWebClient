@@ -63,8 +63,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Div registerUI;
 	
 	@UiField
-	HTMLPanel howToUseSynapseContainer;
-	@UiField
 	SimplePanel rClientInstallPanel;
 	@UiField
 	SimplePanel pythonClientInstallPanel;

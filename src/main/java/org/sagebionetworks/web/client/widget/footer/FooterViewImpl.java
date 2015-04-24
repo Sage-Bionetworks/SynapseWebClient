@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.footer;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -19,6 +20,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -32,11 +34,16 @@ public class FooterViewImpl extends Composite implements FooterView {
 	@UiField
 	FlowPanel debugModePanel;	
 	@UiField
-	SpanElement copyrightYear;
+	Span copyrightYear;
 	@UiField
 	SpanElement portalVersionSpan;
 	@UiField
 	SpanElement repoVersionSpan;
+	
+	@UiField
+	FocusPanel twitterBox;
+	@UiField
+	FocusPanel facebookBox;
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
@@ -49,7 +56,19 @@ public class FooterViewImpl extends Composite implements FooterView {
 		this.cookies = cookies;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		addDebugModeLink();		
-		copyrightYear.setInnerHTML(DateTimeFormat.getFormat("yyyy").format(new Date()));
+		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()));
+		twitterBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("https://twitter.com/sagebio", "", "");
+			}
+		});
+		facebookBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("http://www.facebook.com/pages/Sage-Bionetworks/246302308981", "", "");
+			}
+		});
 	}
 	
 	private void addDebugModeLink() {
