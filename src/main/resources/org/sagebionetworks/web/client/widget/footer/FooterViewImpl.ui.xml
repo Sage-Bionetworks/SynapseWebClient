@@ -1,36 +1,42 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<g:HTMLPanel>
 
-		<!-- FOOTER -->		
-		<div class="margin-top-10 footer-line-top-wrapper">
-            <div class="footer-container">
-                <div class="footer-top-line">
-            	</div>
-        	</div>
-            <div class="clear"></div>
-    	</div>
+		<!-- FOOTER -->	
+		
+		<b:Row addStyleNames="synapse-blue-bg margin-top-10">
+			<b:Column size="SM_1" />
+			<b:Column size="SM_11">
+				<b:Heading size="H4" addStyleNames="margin-top-5 margin-bottom-5 color-white"
+						text="PARTNERS"
+				></b:Heading>
+			</b:Column>
+		</b:Row>
+
+		<div class="margin-top-10 margin-left-15 margin-right-15">
+			<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.lsdfa.org/" target="_new"><g:Image resource='{sageImageBundle.lsdfLogo}' styleName='padding-5' /></a></div>                            
+			<!-- image needs to be updated <div class="img-thumbnail margin-bottom-5"><a href="http://www.cancer.gov/" target="_new"><g:Image resource='{sageImageBundle.nciLogo}' styleName='padding-5' /></a></div> -->                                                       
+			<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nhlbiLogo}' styleName='padding-5' /></a></div>                                                       
+			<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.sloan.org/" target="_new"><g:Image resource='{sageImageBundle.sloanLogo}' styleName='padding-5' /></a></div>                                                       
+			<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nia.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.niaLogo}' styleName='padding-5' /></a></div>
+			<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nimhLogo}' styleName='padding-5' /></a></div>
+			<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.ctf.org/" target="_new"><g:Image resource='{sageImageBundle.ctfLogo}' styleName='padding-5' /></a></div>
+		</div>
+		
         <div class="clear"></div>
         <div class="footer-wrapper">
             <div class="margin-left-15 margin-right-15">
 	            <div class="footer">
 					<div class="row">
 						<div class="col-md-8">
-							<h6>Synapse is supported by</h6>
-							<div>                          				                          				                    
-								<div class="img-thumbnail margin-bottom-5"><a href="http://www.lsdfa.org/" target="_new"><g:Image resource='{sageImageBundle.lsdfLogo}' styleName='padding-5' /></a></div>                            
-								<!-- image needs to be updated <div class="img-thumbnail margin-bottom-5"><a href="http://www.cancer.gov/" target="_new"><g:Image resource='{sageImageBundle.nciLogo}' styleName='padding-5' /></a></div> -->                                                       
-								<div class="img-thumbnail margin-bottom-5"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nhlbiLogo}' styleName='padding-5' /></a></div>                                                       
-								<div class="img-thumbnail margin-bottom-5"><a href="http://www.sloan.org/" target="_new"><g:Image resource='{sageImageBundle.sloanLogo}' styleName='padding-5' /></a></div>                                                       
-								<div class="img-thumbnail margin-bottom-5"><a href="http://www.nia.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.niaLogo}' styleName='padding-5' /></a></div>
-								<div class="img-thumbnail margin-bottom-5"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nimhLogo}' styleName='padding-5' /></a></div>
-								<div class="img-thumbnail margin-bottom-5"><a href="http://www.ctf.org/" target="_new"><g:Image resource='{sageImageBundle.ctfLogo}' styleName='padding-5' /></a></div>
-							</div>
+							
+							
 		                </div>
 		                <div class="col-md-2 col-sm-12">
 		                	<h6>Follow us on</h6>                            
