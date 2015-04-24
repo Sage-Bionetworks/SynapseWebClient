@@ -317,9 +317,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if(newQuery != null){
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null){
-				replaceArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+				/*
+				 * The first time we set a query in the URL we want to replace 
+				 * the current history.  All subsequent changes to the query
+				 * should be added to the browser's history.
+				 */
+				if(areaHasTableQuery()){
+					// Adds the new query to the browser's history.
+					setArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+				}else{
+					// Replace the current entry in the browser's history with the new query.
+					replaceArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+				}
 			}
 		}
+	}
+	
+	private boolean areaHasTableQuery(){
+		Query currentQuery = getTableQuery();
+		return currentQuery != null;
 	}
 	
 	@Override
