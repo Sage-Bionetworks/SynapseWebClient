@@ -12,9 +12,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -39,7 +38,6 @@ public class EntityFinderTest {
 	EntityFinderView mockView;
 	SynapseClientAsync mockSynapseClient;
 	AdapterFactory adapterFactory;
-	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 
@@ -50,7 +48,6 @@ public class EntityFinderTest {
 		mockView = mock(EntityFinderView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
-		autoGenFactory = new AutoGenFactory();		
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		
@@ -64,7 +61,7 @@ public class EntityFinderTest {
 	public void testLoadEntity() throws Exception {
 		String name = "name";
 		String id = "syn456";
-		Entity entity = new Data();
+		Entity entity = new Folder();
 		entity.setId(id);
 		entity.setName(name);
 		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(eq(id), any(AsyncCallback.class));		
@@ -80,7 +77,7 @@ public class EntityFinderTest {
 	public void testLoadEntityFail() throws Exception {
 		String name = "name";
 		String id = "syn456";
-		Entity entity = new Data();
+		Entity entity = new Folder();
 		entity.setId(id);
 		entity.setName(name);
 		AsyncCallback<Entity> mockCallback = mock(AsyncCallback.class);

@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -95,7 +94,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 
 	public boolean includeRestrictionWidget() {
-		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof TableEntity) || (bundle.getEntity() instanceof Locationable) || (bundle.getEntity() instanceof Folder) || (showIfProject && bundle.getEntity() instanceof Project);
+		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof TableEntity) || (bundle.getEntity() instanceof Folder) || (showIfProject && bundle.getEntity() instanceof Project);
 	}
 
 	public String accessRequirementText() {

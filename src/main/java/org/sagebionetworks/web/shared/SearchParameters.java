@@ -30,13 +30,6 @@ public class SearchParameters implements IsSerializable{
 	public SearchParameters(){
 	}
 
-	public SearchParameters(List<String> selectColumns, EntityType entityType, List<WhereCondition>  where, int offset, int limit,
-			String sort, boolean ascending) {
-		super();
-		this.fromType = entityType.getName();
-		setMembers(selectColumns, where, offset, limit, sort, ascending);
-	}
-
 	public SearchParameters(List<String> selectColumns, String fromType, List<WhereCondition>  where, int offset, int limit,
 			String sort, boolean ascending) {
 		super();

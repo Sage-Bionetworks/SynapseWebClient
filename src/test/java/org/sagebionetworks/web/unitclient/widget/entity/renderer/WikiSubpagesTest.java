@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -50,7 +49,6 @@ public class WikiSubpagesTest {
 	WikiSubpagesView mockView;
 	SynapseClientAsync mockSynapseClient;
 	AdapterFactory adapterFactory;
-	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	V2WikiOrderHint mockV2WikiOrderHint;
@@ -66,7 +64,6 @@ public class WikiSubpagesTest {
 		mockView = mock(WikiSubpagesView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
-		autoGenFactory = new AutoGenFactory();		
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockAuthenticationController);
