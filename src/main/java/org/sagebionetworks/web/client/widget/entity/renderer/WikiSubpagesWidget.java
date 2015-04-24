@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -27,7 +26,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRendererPresenter {
+public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 	
 	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
@@ -51,10 +50,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		this.authenticationController = authenticationController;
 		
 		view.setPresenter(this);
-	}	
-	@Override
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null, true, null);
 	}
 
 	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
@@ -102,10 +97,9 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	public void clearState() {
 		view.clear();
 	}
-	
-	@Override
+
 	public Widget asWidget() {
-		view.setPresenter(this);		
+		view.setPresenter(this);
 		return view.asWidget();
 	}
 	
