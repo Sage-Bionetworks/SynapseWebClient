@@ -88,7 +88,6 @@
 					<t:TableRow>
 						<t:TableData paddingRight="2" addStyleNames="text-align-center">
 							<b:Anchor ui:field="copyrightYear" href="http://sagebase.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
-							<b:Anchor href="http://sagebase.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-2 displayInline" text="Sage Bionetworks" />
 						</t:TableData>
 						<t:TableData paddingRight="2" addStyleNames="text-align-center">
 							<b:Anchor href="mailto:synapseInfo@sagebase.org" text="Contact us" addStyleNames="color-white margin-left-10"/>	

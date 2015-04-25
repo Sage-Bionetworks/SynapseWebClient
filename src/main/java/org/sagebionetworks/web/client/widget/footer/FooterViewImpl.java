@@ -47,7 +47,7 @@ public class FooterViewImpl extends Composite implements FooterView {
 		this.initWidget(binder.createAndBindUi(this));
 		this.cookies = cookies;
 		initDebugModeLink();		
-		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()));
+		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
 		twitterBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

@@ -76,7 +76,7 @@
 						<t:Table>
 							<t:TableRow>
 								<t:TableData paddingRight="2">
-									<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-10" />
+									<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-top-left-10" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
