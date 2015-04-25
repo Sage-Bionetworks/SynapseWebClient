@@ -3,7 +3,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:d="urn:import:com.google.gwt.dom.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
@@ -13,8 +14,8 @@
 		<!-- FOOTER -->	
 		
 		<b:Row addStyleNames="synapse-blue-bg margin-top-10">
-			<b:Column size="SM_1" />
-			<b:Column size="SM_11">
+			<b:Column size="MD_1" />
+			<b:Column size="MD_11">
 				<b:Heading size="H4" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 						text="PARTNERS"
 				></b:Heading>
@@ -32,8 +33,8 @@
 		</div>
 		
         <b:Row addStyleNames="synapse-blue-bg margin-top-30 padding-15">
-			<b:Column size="SM_1" />
-			<b:Column size="SM_3">
+			<b:Column size="MD_1" />
+			<b:Column size="MD_4">
 				<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
 						text="Governance"
 				></b:Heading>
@@ -41,7 +42,7 @@
 				<b:Anchor href="static/governance/SynapseCommonsDataUseProcedure.pdf" text="Date Use Procedure" addStyleNames="color-white margin-left-10 displayBlock"/>
 				<b:Anchor href="static/governance/SynapsePrivacyPolicy.pdf" text="Privacy Policy" addStyleNames="color-white margin-left-10 displayBlock"/>
 			</b:Column>
-			<b:Column size="SM_4">
+			<b:Column size="MD_4">
 				<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
 						text="Support"
 				></b:Heading>
@@ -51,53 +52,64 @@
 				<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" text="Command Line Client Documentation" addStyleNames="color-white margin-left-10 displayBlock"/>
 				<b:Anchor href="https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java" text="Java Client" addStyleNames="color-white margin-left-10 displayBlock"/>
 			</b:Column>
-			<b:Column size="SM_3">
+			<b:Column size="MD_3">
 				<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
 						text="Connect with us"
 				></b:Heading>
 				<!-- Twitter -->
-				<g:FocusPanel ui:field="twitterBox" addStyleNames="imageButton margin-left-10">
-					<bh:Div>
+				<bh:Div>
+					<g:FocusPanel ui:field="twitterBox" addStyleNames="imageButton margin-left-10 displayInline">
 						<b:IconStack>
 							<b:Icon type="CIRCLE" stackBase="true" addStyleNames="color-white"/>
 							<b:Icon type="TWITTER" stackTop="true" addStyleNames="synapse-blue"/>
 						</b:IconStack>
-						<b:Anchor text="Twitter" addStyleNames="color-white margin-left-10" />
-					</bh:Div>
-				</g:FocusPanel>
+					</g:FocusPanel>
+					<b:Anchor text="Twitter" href="https://twitter.com/sagebio" addStyleNames="color-white margin-left-10" />
+				</bh:Div>
+				
 				<!-- Facebook -->
-				<g:FocusPanel ui:field="facebookBox" addStyleNames="imageButton margin-left-10">
-					<bh:Div>
+				<bh:Div>
+					<g:FocusPanel ui:field="facebookBox" addStyleNames="imageButton margin-left-10 displayInline">
 						<b:IconStack>
 							<b:Icon type="CIRCLE" stackBase="true" addStyleNames="color-white"/>
 							<b:Icon type="FACEBOOK" stackTop="true" addStyleNames="synapse-blue"/>
 						</b:IconStack>
-						<b:Anchor text="Facebook" addStyleNames="color-white margin-left-10" />
-					</bh:Div>
-				</g:FocusPanel>
+					</g:FocusPanel>
+					<b:Anchor text="Facebook" href="http://www.facebook.com/pages/Sage-Bionetworks/246302308981" addStyleNames="color-white margin-left-10" />
+				</bh:Div>
+				
 			</b:Column>
-			<b:Column size="SM_1" />
+			<b:Column size="MD_1" />
 		</b:Row>
 		
         <b:Row addStyleNames="synapse-blue-bg margin-top-10 padding-15">
-			<b:Column size="SM_1" />
-			<b:Column size="SM_11">
-				<g:FocusPanel>
-					<bh:Div>
-						<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 displayInline" text="@" />
-						<bh:Span ui:field="copyrightYear" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
-						<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-2 displayInline" text="Sage Bionetworks" />
-					</bh:Div>
-				</g:FocusPanel>
-			</b:Column>
+        	<b:Column size="XS_12">
+				<t:Table width="100%">
+					<t:TableRow>
+						<t:TableData paddingRight="2" addStyleNames="text-align-center">
+							<b:Anchor ui:field="copyrightYear" href="http://sagebase.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
+							<b:Anchor href="http://sagebase.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-2 displayInline" text="Sage Bionetworks" />
+						</t:TableData>
+						<t:TableData paddingRight="2" addStyleNames="text-align-center">
+							<b:Anchor href="mailto:synapseInfo@sagebase.org" text="Contact us" addStyleNames="color-white margin-left-10"/>	
+						</t:TableData>
+						<t:TableData paddingRight="2" addStyleNames="text-align-center">
+							<b:Anchor href="http://creativecommons.org/licenses/by/3.0/legalcode" text="Creative Commons License" addStyleNames="color-white margin-left-10"/>
+						</t:TableData>
+						<t:TableData paddingRight="2" addStyleNames="text-align-center">
+							<bh:Div addStyleNames="displayInline margin-left-10">
+								<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-2 displayInline" text="portal: " />
+								<bh:Span ui:field="portalVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
+								<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 displayInline" text="repo: " />
+								<bh:Span ui:field="repoVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
+								<b:Tooltip title="Website alpha test mode">
+									<b:Anchor ui:field="debugLink" text="@" addStyleNames="color-white margin-left-15"/>
+								</b:Tooltip>
+							</bh:Div>
+						</t:TableData>
+					</t:TableRow>
+				</t:Table>
+	    	</b:Column>
 		</b:Row>
-        
-        <a href="http://www.sagebase.org">Sage Bionetworks</a><br/>
-		<a href="mailto:synapseInfo@sagebase.org">synapseInfo@sagebase.org</a>
-		<span class="small">portal: <span ui:field="portalVersionSpan" />, repo: <span ui:field="repoVersionSpan" /></span>
-		<a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> /
-		<g:FlowPanel ui:field="debugModePanel" />
-        <script ui:field="searchScript"/>
-		
 	</g:HTMLPanel>
 </ui:UiBinder>

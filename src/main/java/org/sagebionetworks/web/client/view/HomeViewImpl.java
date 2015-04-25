@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -100,7 +102,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	FocusPanel termsOfUseBox;
 	@UiField
 	FocusPanel becomeCertifiedBox;
-	
 	
 	private Presenter presenter;
 	private Header headerWidget;

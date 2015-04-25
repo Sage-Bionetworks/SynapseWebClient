@@ -69,8 +69,8 @@
 			</b:Column>
 		</b:Row>
 		<b:Row>
-			<b:Column size="SM_1" />
-			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
+			<b:Column size="MD_1" />
+			<b:Column size="MD_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
 				<g:FocusPanel ui:field="researchCommunitiesBox">
 					<bh:Div addStyleNames="synapse-yellow-bg padding-10 imageButton" height="255px">
 						<t:Table>
@@ -87,7 +87,7 @@
 					</bh:Div>
 				</g:FocusPanel>
 			</b:Column>
-			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10" >
+			<b:Column size="MD_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10" >
 				<g:FocusPanel ui:field="openResearchProjectsBox">
 					<bh:Div addStyleNames="synapse-green-bg padding-10 imageButton" height="255px">
 						<t:Table>
@@ -104,7 +104,7 @@
 					</bh:Div>
 				</g:FocusPanel>
 			</b:Column>
-			<b:Column  size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
+			<b:Column  size="MD_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
 				<g:FocusPanel ui:field="dreamChallengesBox">
 					<bh:Div addStyleNames="synapse-purple-bg padding-10 imageButton" height="255px">
 						<bh:Div addStyleNames="margin-10">
@@ -114,7 +114,7 @@
 					</bh:Div>
 				</g:FocusPanel>
 			</b:Column>
-			<b:Column size="SM_1" />
+			<b:Column size="MD_1" />
 		</b:Row>
 		
 		<b:Row addStyleNames="synapse-green-bg margin-top-40">
@@ -141,8 +141,8 @@
 			</b:Column>
 		</b:Row>
 		<b:Row>
-		<b:Column size="SM_1" />
-		<b:Column size="SM_5" addStyleNames="margin-top-30 margin-left-10 margin-right-10">
+		<b:Column size="MD_1" />
+		<b:Column size="MD_5" addStyleNames="margin-top-30 margin-left-10 margin-right-10">
 				<g:FocusPanel ui:field="termsOfUseBox">
 					<b:Panel addStyleNames="padding-15 imageButton">
 						<b:Heading size="H5" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
@@ -151,7 +151,7 @@
 					</b:Panel>
 				</g:FocusPanel>
 			</b:Column>
-		<b:Column size="SM_5" addStyleNames="margin-top-30 margin-left-10 margin-right-10">
+		<b:Column size="MD_5" addStyleNames="margin-top-30 margin-left-10 margin-right-10">
 				<g:FocusPanel ui:field="becomeCertifiedBox">
 					<b:Panel addStyleNames="padding-15 imageButton">
 						<t:Table>
@@ -169,7 +169,7 @@
 					</b:Panel>
 				</g:FocusPanel>
 			</b:Column>
-			<b:Column size="SM_1" />
+			<b:Column size="MD_1" />
 		</b:Row>
 		
 		<b:Row addStyleNames="synapse-blue-bg margin-top-10">
