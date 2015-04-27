@@ -83,10 +83,10 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				headers.add(sth);
 				if(sort != null){
 					if(headerName.equals(sort.getColumn())){
-						if(SortDirection.ASC.equals(sort.getDirection())){
-							sth.setIcon(IconType.SORT_ASC);
-						}else{
+						if(SortDirection.DESC.equals(sort.getDirection())){
 							sth.setIcon(IconType.SORT_DESC);
+						}else{
+							sth.setIcon(IconType.SORT_ASC);
 						}
 					}
 				}

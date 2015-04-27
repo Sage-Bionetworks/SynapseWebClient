@@ -23,8 +23,6 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
 import org.sagebionetworks.web.client.view.AccountView;
@@ -517,17 +515,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(HeaderView.class).to(HeaderViewImpl.class);
 		bind(FooterViewImpl.class).in(Singleton.class);
 		bind(FooterView.class).to(FooterViewImpl.class);
-
-		// EntityType
-		bind(EntityTypeProvider.class).in(Singleton.class);
 		
 		// JSONAdapters
 		bind(JSONObjectAdapter.class).to(JSONObjectGwt.class);
 		bind(JSONArrayAdapter.class).to(JSONArrayGwt.class);
-		
-		// JSONEntityFactory
-		bind(JSONEntityFactoryImpl.class).in(Singleton.class);
-		bind(JSONEntityFactory.class).to(JSONEntityFactoryImpl.class);
 		
 		// EntitySchemaCacheImpl
 		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
@@ -852,6 +843,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
 		bind(ImageConfigViewImpl.class).in(Singleton.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
+		bind(AttachmentConfigViewImpl.class).in(Singleton.class);
 		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
 		bind(LinkConfigView.class).to(LinkConfigViewImpl.class);

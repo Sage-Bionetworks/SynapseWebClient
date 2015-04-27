@@ -16,9 +16,9 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -41,7 +41,7 @@ public class EntityListConfigEditorTest {
 	AuthenticationController mockAuthenticationController;
 
 	Map<String, String> descriptor;
-	Data syn456;
+	Folder syn456;
 	EntityGroupRecord record456; 
 	
 	@Before
@@ -54,7 +54,7 @@ public class EntityListConfigEditorTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
-		syn456 = new Data();
+		syn456 = new Folder();
 		syn456.setId("syn456");
 		syn456.setName(syn456.getId());
 		EntityBundle bundle = new EntityBundle();

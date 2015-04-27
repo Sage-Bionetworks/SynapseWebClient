@@ -16,11 +16,8 @@ import static org.sagebionetworks.web.client.ClientProperties.TB;
 import static org.sagebionetworks.web.client.ClientProperties.WHITE_SPACE;
 import static org.sagebionetworks.web.client.ClientProperties.WIKI_URL;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,25 +40,17 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
-import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Code;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.ExpressionData;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Step;
-import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -92,8 +81,6 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
-import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -109,13 +96,11 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
@@ -152,12 +137,6 @@ public class DisplayUtils {
         WARNING,
         QUESTION
 	}
-	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
-			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
-			Code.class.getName(), Link.class.getName(), 
-			Analysis.class.getName(), Step.class.getName(), 
-			RObject.class.getName(), PhenotypeData.class.getName(), 
-			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	/**
 	 * Returns a properly aligned icon from an ImageResource
@@ -996,7 +975,7 @@ public class DisplayUtils {
 	public static enum IconSize { PX16, PX24 };
 	
 	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		String className = type == null ? null : type.getClassName();		
+		String className = type == null ? null : type.getEntityTypeClassName();		
 		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
@@ -1118,35 +1097,6 @@ public class DisplayUtils {
 		Boolean hasChildern = bundle.getHasChildren();
 		if(hasChildern == null) return true;
 		return hasChildern;
-	}
-
-	public static ArrayList<EntityType> orderForDisplay(List<EntityType> children) {
-		ArrayList<EntityType> ordered = new ArrayList<EntityType>();
-		
-		if(children != null) {
-			// fill map
-			Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
-			for(EntityType child : children) {
-				classToTypeMap.put(child.getClassName(), child);
-			}
-			 
-			// add child tabs in order
-			for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
-				if(classToTypeMap.containsKey(className)) {
-					EntityType child = classToTypeMap.get(className);
-					classToTypeMap.remove(className);
-					ordered.add(child);
-				}
-			}
-
-			// add any remaining tabs that weren't covered by the display order
-			for(String className : classToTypeMap.keySet()) {
-				EntityType child = classToTypeMap.get(className);
-				ordered.add(child);
-			}							
-		}
-		
-		return ordered;
 	}
 	
 	public static Popover addPopover(Widget widget, String message) {

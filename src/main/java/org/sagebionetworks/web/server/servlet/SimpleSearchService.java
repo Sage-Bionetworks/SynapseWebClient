@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -38,7 +37,6 @@ public class SimpleSearchService extends HttpServlet {
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	@SuppressWarnings("unused")
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	AutoGenFactory entityFactory = new AutoGenFactory();
 	
 	/**
 	 * Injected with Gin

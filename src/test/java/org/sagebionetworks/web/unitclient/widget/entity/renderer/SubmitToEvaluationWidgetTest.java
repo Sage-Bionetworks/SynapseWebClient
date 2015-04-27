@@ -20,7 +20,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -52,7 +51,6 @@ public class SubmitToEvaluationWidgetTest {
 	SubmitToEvaluationWidgetView mockView;
 	ChallengeClientAsync mockChallengeClient;
 	AdapterFactory adapterFactory;
-	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	EvaluationSubmitter mockEvaluationSubmitter;
@@ -68,7 +66,6 @@ public class SubmitToEvaluationWidgetTest {
 		mockView = mock(SubmitToEvaluationWidgetView.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
-		autoGenFactory = new AutoGenFactory();
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
 		mockPortalGinInjector = mock(PortalGinInjector.class);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockEvaluationSubmitter);

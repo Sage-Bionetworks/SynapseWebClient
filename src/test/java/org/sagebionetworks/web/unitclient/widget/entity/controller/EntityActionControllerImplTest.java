@@ -29,6 +29,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -39,7 +40,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -75,7 +75,6 @@ public class EntityActionControllerImplTest {
 
 	EntityActionControllerView mockView;
 	PreflightController mockPreflightController;
-	EntityTypeProvider mockEntityTypeProvider;
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
@@ -95,7 +94,7 @@ public class EntityActionControllerImplTest {
 	EntityActionControllerImpl controller;
 	String parentId;
 	String entityId;
-	String entityDispalyType;
+//	String entityDispalyType;
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
 	MarkdownEditorWidget mockMarkdownEditorWidget;
@@ -105,7 +104,6 @@ public class EntityActionControllerImplTest {
 	public void before() {
 		mockView = Mockito.mock(EntityActionControllerView.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
-		mockEntityTypeProvider = Mockito.mock(EntityTypeProvider.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
@@ -124,13 +122,11 @@ public class EntityActionControllerImplTest {
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
-		entityDispalyType = "Sometype";
-		when(mockEntityTypeProvider.getEntityDispalyName(any(Entity.class))).thenReturn(entityDispalyType);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
-				mockPreflightController, mockEntityTypeProvider,
+				mockPreflightController,
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
 				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockUploader,
@@ -172,7 +168,7 @@ public class EntityActionControllerImplTest {
 		//delete
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+entityDispalyType);
+		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+EntityType.table.getDisplayName());
 		verify(mockActionMenu).addActionListener(Action.DELETE_ENTITY, controller);
 		// share
 		verify(mockActionMenu).setActionEnabled(Action.SHARE, true);
@@ -181,7 +177,7 @@ public class EntityActionControllerImplTest {
 		// Rename
 		verify(mockActionMenu).setActionEnabled(Action.CHANGE_ENTITY_NAME, true);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+entityDispalyType);
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+EntityType.table.getDisplayName());
 		verify(mockActionMenu).addActionListener(Action.CHANGE_ENTITY_NAME, controller);
 		// upload
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
@@ -246,7 +242,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
-		verify(mockActionMenu).setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+entityDispalyType);
+		verify(mockActionMenu).setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+EntityType.folder.getDisplayName());
 		verify(mockActionMenu).addActionListener(Action.MOVE_ENTITY, controller);
 	}
 	
@@ -334,7 +330,7 @@ public class EntityActionControllerImplTest {
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(DELETED, THE + entityDispalyType + WAS_SUCCESSFULLY_DELETED);
+		verify(mockView).showInfo(DELETED, THE + EntityType.table.getDisplayName() + WAS_SUCCESSFULLY_DELETED);
 		verify(mockGlobalApplicationState).gotoLastPlace(new Synapse(parentId, null, EntityArea.TABLES, null) );
 	}
 	

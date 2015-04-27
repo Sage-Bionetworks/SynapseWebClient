@@ -6,7 +6,6 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -14,7 +13,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.table.Query;
@@ -284,7 +282,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
-			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {
+			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader, String wikiPageId) {
 		this.versionNumber = versionNumber;
 		this.currentArea = area;
 		DisplayUtils.hide(adminListItem);
@@ -296,11 +294,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		showProjectLink(projectHeader);
 	
 		// Custom layouts for certain entities
-		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
+		boolean isFolderLike = bundle.getEntity() instanceof Folder;
 		isProject = bundle.getEntity() instanceof Project;		
-		String wikiPageId = null;
-		if (Synapse.EntityArea.WIKI == area)
-			wikiPageId = areaToken;
+		
 		if (isProject) {
 			renderProjectEntity(bundle, entityTypeDisplay, area, wikiPageId);
 		} else if (isFolderLike) {

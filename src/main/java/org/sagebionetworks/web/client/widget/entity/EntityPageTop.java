@@ -8,9 +8,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
@@ -23,11 +21,9 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.ProjectAreaState;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -36,7 +32,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
 	private EntitySchemaCache schemaCache;
-	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private GlobalApplicationState globalApplicationState;
@@ -59,7 +54,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public EntityPageTop(EntityPageTopView view, 
 			AuthenticationController authenticationController,
 			EntitySchemaCache schemaCache,
-			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle,
 			GlobalApplicationState globalApplicationState,
 			EventBus bus,
@@ -67,7 +61,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.schemaCache = schemaCache;
-		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
 		this.bus = bus;
 		this.globalApplicationState = globalApplicationState;	
@@ -176,18 +169,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override
 	public String createEntityLink(String id, String version, String display) {
 		return DisplayUtils.createEntityLink(id, version, display);
-	}
-
-	@Override
-	public ImageResource getIconForType(String typeString) {
-		EntityType type = entityTypeProvider.getEntityTypeForString(typeString);
-		// try class name as some references are short names, some class names
-		if(type == null)
-			type = entityTypeProvider.getEntityTypeForClassName(typeString);
-		if(type == null) {
-			return DisplayUtils.getSynapseIconForEntity(null, IconSize.PX16, iconsImageBundle);
-		}
-		return DisplayUtils.getSynapseIconForEntityType(type, IconSize.PX16, iconsImageBundle);
 	}
 
 	public void setAreaChangeHandler(AreaChangeHandler handler) {
@@ -317,9 +298,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if(newQuery != null){
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null){
-				replaceArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+				/*
+				 * The first time we set a query in the URL we want to replace 
+				 * the current history.  All subsequent changes to the query
+				 * should be added to the browser's history.
+				 */
+				if(areaHasTableQuery()){
+					// Adds the new query to the browser's history.
+					setArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+				}else{
+					// Replace the current entry in the browser's history with the new query.
+					replaceArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+				}
 			}
 		}
+	}
+	
+	private boolean areaHasTableQuery(){
+		Query currentQuery = getTableQuery();
+		return currentQuery != null;
 	}
 	
 	@Override
@@ -340,7 +337,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private void sendDetailsToView(Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
+	}
+	
+	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
+		String wikiPageId = rootWikiId;
+		if (Synapse.EntityArea.WIKI == area && DisplayUtils.isDefined(areaToken))
+			wikiPageId = areaToken;
+		return wikiPageId;
 	}
 	
 	private UserProfile getUserProfile() {
