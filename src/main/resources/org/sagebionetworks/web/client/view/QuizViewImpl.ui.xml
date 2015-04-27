@@ -13,14 +13,24 @@
     	<div class="container margin-top-15">
     	    <span ui:field="loadingUI" class="center-block center margin-150"><g:Image resource='{sageImageBundle.loading31}' />&nbsp;Loading...</span>
     	    <g:SimplePanel ui:field="successContainer" visible="false">	</g:SimplePanel>
-    	    <div ui:field="quizFailure" style="display:none" class="row">
-				<div class="col-sm-offset-1 col-sm-10">
+    	    <div ui:field="quizSuccessUI" style="display:none" class="row">
+				<div class="col-sm-offset-1 col-sm-10 margin-top-15">
+				    <div class="panel panel-success">
+					      <div class="panel-heading">
+							<b:Heading size="H3" addStyleNames="panel-title" text="Quiz passed"></b:Heading>
+					      </div>
+					      <b:Heading size="H4" ui:field="successScoreContainer" addStyleNames="margin-10"></b:Heading>
+					</div>
+    			</div>
+			</div>
+			<div ui:field="quizFailureUI" style="display:none" class="row">
+				<div class="col-sm-offset-1 col-sm-10 margin-top-15">
 				    <div class="panel panel-danger">
 					      <div class="panel-heading">
-							<h3 class="panel-title">Quiz failed</h3>
+							<b:Heading size="H3" addStyleNames="panel-title" text="Quiz failed"></b:Heading>
 					      </div>
-					      <b:Heading size="H4" ui:field="scoreContainer" addStyleNames="margin-left-15 margin-top-15 margin-bottom-0-imp"></b:Heading>
-					      <div class="panel-body">
+					      <b:Heading size="H4" ui:field="failureScoreContainer" addStyleNames="margin-10"></b:Heading>
+					      <div class="margin-10">
 								<p>Please review the items shown in red below, and <g:Anchor ui:field="tryAgainLink" styleName="link" text="try again"/>.</p>
 					      </div>
 					</div>

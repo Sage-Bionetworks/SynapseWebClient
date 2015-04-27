@@ -46,6 +46,18 @@ public class QuizViewImpl extends Composite implements QuizView {
 	DivElement quizHeader;
 	
 	@UiField
+	DivElement quizSuccessUI;
+	
+	@UiField
+	DivElement quizFailureUI;
+	
+	@UiField
+	Heading failureScoreContainer;
+	
+	@UiField
+	Heading successScoreContainer; 
+	
+	@UiField
 	FlowPanel testContainer;
 	@UiField
 	Button submitButton;
@@ -54,16 +66,11 @@ public class QuizViewImpl extends Composite implements QuizView {
 	SimplePanel successContainer;
 	
 	@UiField
-	DivElement quizFailure;
-	
-	@UiField
-	Heading scoreContainer;
-	
-	@UiField
 	Button tutorialButton1;
 	
 	@UiField
 	Anchor tryAgainLink;
+	
 	@UiField
 	SpanElement loadingUI;
 	
@@ -188,14 +195,18 @@ public class QuizViewImpl extends Composite implements QuizView {
 	
 	@Override
 	public void showScore(String scoreContainerText) {
-		scoreContainer.setText(scoreContainerText);
+		successScoreContainer.setText(scoreContainerText);
+		failureScoreContainer.setText(scoreContainerText);
 	}
 	
 	@Override
 	public void showSuccess(UserProfile profile, PassingRecord passingRecord) {
 		hideAll();
+		DisplayUtils.show(quizSuccessUI);
+		DisplayUtils.hide(quizFailureUI);
 		certificateWidget.configure(profile, passingRecord);
 		successContainer.setVisible(true);
+		quizContainer.setVisible(true);
 		DisplayUtils.scrollToTop();
 	}
 	
@@ -203,8 +214,9 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public void showFailure(PassingRecord passingRecord) {
 		hideAll();
 		//show failure message and quiz
-		DisplayUtils.show(quizFailure);
-		quizFailure.scrollIntoView();
+		DisplayUtils.hide(quizSuccessUI);
+		DisplayUtils.show(quizFailureUI);
+		quizFailureUI.scrollIntoView();
 		quizContainer.setVisible(true);
 	}
 	
@@ -212,7 +224,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public void hideAll() {
 		quizContainer.setVisible(false);
 		successContainer.setVisible(false);
-		DisplayUtils.hide(quizFailure);
+		DisplayUtils.hide(quizFailureUI);
+		DisplayUtils.hide(quizSuccessUI);
 	}
 
 	@Override
