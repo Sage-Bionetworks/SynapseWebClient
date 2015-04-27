@@ -33,7 +33,6 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -57,7 +56,6 @@ public class FileHistoryWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	FileHistoryWidgetView mockView;
 	EntitySchemaCache mockSchemaCache;
-	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	JiraURLHelper mockJiraURLHelper;
 	PreflightController mockPreflightController;
@@ -76,7 +74,6 @@ public class FileHistoryWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(FileHistoryWidgetView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 		mockPreflightController = mock(PreflightController.class);

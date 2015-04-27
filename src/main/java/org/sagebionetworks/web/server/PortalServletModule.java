@@ -55,11 +55,7 @@ public class PortalServletModule extends ServletModule {
 	private static Logger logger = Logger.getLogger(PortalServletModule.class.getName());
 	
 	@Override
-	protected void configureServlets() {
-//		// This is not working yet
-//		filter("/Portal/*").through(SimpleAuthFilter.class);
-//		bind(SimpleAuthFilter.class).in(Singleton.class);
-		
+	protected void configureServlets() {		
 		// filter all call through this filter
 		filter("/Portal/*").through(TimingFilter.class);
 		bind(TimingFilter.class).in(Singleton.class);

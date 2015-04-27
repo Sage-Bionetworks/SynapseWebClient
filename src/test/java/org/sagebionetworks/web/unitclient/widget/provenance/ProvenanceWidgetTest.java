@@ -24,8 +24,8 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -78,7 +78,7 @@ public class ProvenanceWidgetTest {
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
 	GlobalApplicationState mockGlobalAppState;
 	
-	Data outputEntity;
+	FileEntity outputEntity;
 	String entity456Id = "syn456";
 	PaginatedResults<EntityHeader> referenceHeaders;
 	
@@ -103,7 +103,7 @@ public class ProvenanceWidgetTest {
 		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockAuthController, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
 		verify(mockView).setPresenter(provenanceWidget);
 		
-		outputEntity = new Data();
+		outputEntity = new FileEntity();
 		outputEntity.setId("syn123");
 		outputEntity.setVersionNumber(1L);
 		act = new Activity();
