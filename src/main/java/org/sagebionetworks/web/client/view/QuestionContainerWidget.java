@@ -63,7 +63,6 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					answerUI.add(answerButton);
 					answerContainer.add(answerButton.asWidget());
 					view.addAnswer(answerContainer.asWidget());
-					//handleIfPreviouslyAnswered(answerButton, response, answer.getAnswerIndex());
 				}
 			} else {
 				//checkbox
@@ -86,7 +85,6 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					answerUI.add(checkbox);
 					answerContainer.add(checkbox);
 					view.addAnswer(answerContainer);
-					//handleIfPreviouslyAnswered(checkbox, response, answer.getAnswerIndex());
 				}
 			}
 			final WikiPageKey moreInfoKey = question.getReference();
@@ -104,16 +102,10 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 		html.addStyleName("margin-right-5");
 		if (isCorrect) {
 			view.showSuccess(true);
-//			html.setHTML(DisplayUtils.getIcon("glyphicon-ok font-size-15 text-success"));
 		} else {
 			view.showFailure(true);
-//			html.setHTML(DisplayUtils.getIcon("glyphicon-remove font-size-15 text-danger"));
 			view.addStyleName("has-error");
 		}
-		
-		
-		
-		// CONSIDER RENAMING THE METHOD FOR THIS USE CASE!!!!!!!!
 		view.addAnswer(html);
 	}
 	
@@ -122,23 +114,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 	public Set<Long> getAnswers() {
 		return answers;
 	}
-	
-//	private void handleIfPreviouslyAnswered(CheckBox checkbox, MultichoiceResponse response, Long answerIndex) {
-//		if (response != null) {
-//			if (response.getAnswerIndex().contains(answerIndex))
-//				checkbox.setValue(true);
-//			checkbox.setEnabled(false);
-//		}
-//	}
-	
-//	private Set<Long> getAnswerIndexes(Long questionIndex) {
-//		Set<Long> answers = questionIndex2AnswerIndices.get(questionIndex);
-//		if (answers == null) {
-//			answers = new HashSet<Long>();
-//			questionIndex2AnswerIndices.put(questionIndex, answers);
-//		}
-//		return answers;
-//	}
+
 
 	public Widget asWidget() {
 		return view.asWidget();

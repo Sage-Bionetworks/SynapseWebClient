@@ -1,25 +1,15 @@
 package org.sagebionetworks.web.client.view;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
-import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
-import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
-import org.sagebionetworks.repo.model.quiz.Question;
-import org.sagebionetworks.repo.model.quiz.Quiz;
-import org.sagebionetworks.repo.model.quiz.ResponseCorrectness;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -35,13 +25,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -71,7 +57,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	DivElement quizFailure;
 	
 	@UiField
-	DivElement scoreContainer;
+	Heading scoreContainer;
 	
 	@UiField
 	Button tutorialButton1;
@@ -202,8 +188,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	
 	@Override
 	public void showScore(String scoreContainerText) {
-		DisplayUtils.show(scoreContainer);
-		scoreContainer.setInnerHTML(scoreContainerText);
+		scoreContainer.setText(scoreContainerText);
 	}
 	
 	@Override
@@ -211,7 +196,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 		hideAll();
 		certificateWidget.configure(profile, passingRecord);
 		successContainer.setVisible(true);
-		quizContainer.setVisible(true);
 		DisplayUtils.scrollToTop();
 	}
 	
@@ -229,7 +213,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 		quizContainer.setVisible(false);
 		successContainer.setVisible(false);
 		DisplayUtils.hide(quizFailure);
-		DisplayUtils.hide(scoreContainer);
 	}
 
 	@Override
