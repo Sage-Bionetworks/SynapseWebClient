@@ -10,7 +10,7 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -31,7 +31,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -63,7 +62,6 @@ public class EntityPageTopTest {
 	EntityPageTopView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter jsonObjectAdapter;
-	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	EventBus mockEventBus;
 	JiraURLHelper mockJiraURLHelper;
@@ -97,7 +95,6 @@ public class EntityPageTopTest {
 		mockView = mock(EntityPageTopView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
@@ -106,7 +103,6 @@ public class EntityPageTopTest {
 		
 		pageTop = new EntityPageTop(mockView, mockAuthenticationController,
 				mockSchemaCache,
-				mockEntityTypeProvider,
 				mockIconsImageBundle, 
 				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
 		pageTop.setAreaChangeHandler(areaChangeHandler);
@@ -375,10 +371,24 @@ public class EntityPageTopTest {
 	}
 	
 	@Test
-	public void testSetTableQuery() {
+	public void testSetTableQueryWithNoToken() {
 		String queryToken = queryTokenProvider.queryToToken(query);
 		pageTop.setTableQuery(query);
-		verify(areaChangeHandler).replaceArea(eq(EntityArea.TABLES), contains(queryToken));		
+		verify(areaChangeHandler).replaceArea(eq(EntityArea.TABLES), contains(queryToken));
+		verify(areaChangeHandler, never()).areaChanged(eq(EntityArea.TABLES), contains(queryToken));	
+	}
+	
+	@Test
+	public void testSetTableQueryWithToken() {
+		query.setOffset(1L);
+		String startToken = queryTokenProvider.queryToToken(query);
+		// Start with a token.
+		pageTop.setArea(EntityArea.TABLES, EntityPageTop.TABLE_QUERY_PREFIX + startToken);
+		reset(areaChangeHandler);
+		String queryToken = queryTokenProvider.queryToToken(query);
+		pageTop.setTableQuery(query);
+		verify(areaChangeHandler, never()).replaceArea(eq(EntityArea.TABLES), contains(queryToken));		
+		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(queryToken));		
 	}
 	
 	@Test

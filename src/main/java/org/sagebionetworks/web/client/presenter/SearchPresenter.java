@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -15,7 +16,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -24,7 +24,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
-import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -45,7 +44,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private EntityTypeProvider entityTypeProvider;
 	private IconsImageBundle iconsImageBundle;
 	
 	private SearchQuery currentSearch;
@@ -61,14 +59,12 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
-			EntityTypeProvider entityTypeProvider,
 			IconsImageBundle iconsImageBundle) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.entityTypeProvider = entityTypeProvider;
 		this.iconsImageBundle = iconsImageBundle;
 		
 		currentSearch = getBaseSearchQuery();
@@ -229,7 +225,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public ImageResource getIconForHit(Hit hit) {
 		if(hit == null) return null;
-		EntityType type = entityTypeProvider.getEntityTypeForString(hit.getNode_type());
+		EntityType type = EntityType.valueOf(hit.getNode_type());
 		return DisplayUtils.getSynapseIconForEntityType(type, DisplayUtils.IconSize.PX24, iconsImageBundle);
 	}
 	

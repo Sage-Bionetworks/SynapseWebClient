@@ -49,11 +49,11 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
+import org.sagebionetworks.reflection.model.PaginatedResults;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
@@ -67,7 +67,6 @@ import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
@@ -83,7 +82,6 @@ import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
@@ -115,8 +113,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -163,9 +159,9 @@ public class SynapseClientImplTest {
 
 	String testFileName = "testFileEntity.R";
 	EntityPath path;
-	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
-	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
-	org.sagebionetworks.repo.model.PaginatedResults<Team> pguts;
+	org.sagebionetworks.reflection.model.PaginatedResults<UserGroup> pgugs;
+	org.sagebionetworks.reflection.model.PaginatedResults<UserProfile> pgups;
+	org.sagebionetworks.reflection.model.PaginatedResults<Team> pguts;
 	Team teamA, teamZ;
 	AccessControlList acl;
 	WikiPage page;
@@ -183,8 +179,8 @@ public class SynapseClientImplTest {
 	private static final String EVAL_ID_2 = "eval ID 2";
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-			adapterFactory);
+//	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+//			adapterFactory);
 	private TeamMembershipStatus membershipStatus;
 
 	@Before
@@ -241,19 +237,19 @@ public class SynapseClientImplTest {
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityPath(entityId)).thenReturn(path);
 
-		pgugs = new org.sagebionetworks.repo.model.PaginatedResults<UserGroup>();
+		pgugs = new org.sagebionetworks.reflection.model.PaginatedResults<UserGroup>();
 		List<UserGroup> ugs = new ArrayList<UserGroup>();
 		ugs.add(new UserGroup());
 		pgugs.setResults(ugs);
 		when(mockSynapse.getGroups(anyInt(), anyInt())).thenReturn(pgugs);
 
-		pgups = new org.sagebionetworks.repo.model.PaginatedResults<UserProfile>();
+		pgups = new org.sagebionetworks.reflection.model.PaginatedResults<UserProfile>();
 		List<UserProfile> ups = new ArrayList<UserProfile>();
 		ups.add(new UserProfile());
 		pgups.setResults(ups);
 		when(mockSynapse.getUsers(anyInt(), anyInt())).thenReturn(pgups);
 
-		pguts = new org.sagebionetworks.repo.model.PaginatedResults<Team>();
+		pguts = new org.sagebionetworks.reflection.model.PaginatedResults<Team>();
 		List<Team> uts = new ArrayList<Team>();
 		teamZ = new Team();
 		teamZ.setId("1");
@@ -287,7 +283,7 @@ public class SynapseClientImplTest {
 		bene.setId("syn999");
 		when(mockSynapse.getEntityBenefactor(anyString())).thenReturn(bene);
 
-		BatchResults<EntityHeader> batchHeaders = new BatchResults<EntityHeader>();
+		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> batchHeaders = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		batchHeaderResults = new ArrayList<EntityHeader>();
 		for (int i = 0; i < 10; i++) {
 			EntityHeader h = new EntityHeader();
@@ -341,7 +337,7 @@ public class SynapseClientImplTest {
 				mockSynapse
 						.completeChunkFileUpload(any(CompleteChunkedFileRequest.class)))
 				.thenReturn(handle);
-		VariableContentPaginatedResults<AccessRequirement> ars = new VariableContentPaginatedResults<AccessRequirement>();
+		org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> ars = new org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement>();
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(
@@ -707,19 +703,6 @@ public class SynapseClientImplTest {
 				ObjectType.ENTITY.toString(), "20"));
 		verify(mockSynapse).getWikiAttachmenthHandles(
 				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-
-	@Test
-	public void testCreateV2WikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
-		Mockito.when(
-				mockSynapse.createV2WikiPage(anyString(),
-						any(ObjectType.class), any(V2WikiPage.class)))
-				.thenReturn(v2Page);
-		synapseClient.createV2WikiPage("testId", ObjectType.ENTITY.toString(),
-				wikiPageJson);
-		verify(mockSynapse).createV2WikiPage(anyString(),
-				any(ObjectType.class), any(V2WikiPage.class));
 	}
 
 	@Test
@@ -1565,9 +1548,7 @@ public class SynapseClientImplTest {
 				.thenReturn(mockPassingRecord);
 		QuizResponse myResponse = new QuizResponse();
 		myResponse.setId(837L);
-		String quizResponseJson = myResponse.writeToJSONObject(
-				adapterFactory.createNew()).toJSONString();
-		synapseClient.submitCertificationQuizResponse(quizResponseJson);
+		synapseClient.submitCertificationQuizResponse(myResponse);
 		verify(mockSynapse).submitCertifiedUserTestResponse(eq(myResponse));
 	}
 

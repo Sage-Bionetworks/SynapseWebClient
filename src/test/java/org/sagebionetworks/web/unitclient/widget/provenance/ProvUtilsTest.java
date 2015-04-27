@@ -19,8 +19,8 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
@@ -85,13 +85,13 @@ public class ProvUtilsTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildProvGraph() throws Exception {
-		Data entity1 = new Data();
+		FileEntity entity1 = new FileEntity();
 		entity1.setId("syn123");
 		entity1.setVersionNumber(1L);
-		Data entity2 = new Data();
+		FileEntity entity2 = new FileEntity();
 		entity2.setId("syn456");
 		entity2.setVersionNumber(1L);
-		Data entity3 = new Data();
+		FileEntity entity3 = new FileEntity();
 		entity3.setId("syn456654");
 		entity3.setVersionNumber(1L);
 		Activity act = new Activity();
@@ -117,7 +117,7 @@ public class ProvUtilsTest {
 		EntityHeader header3 = new EntityHeader();
 		header3.setId(ref3.getTargetId());
 		header3.setName("Some Name");
-		header3.setType(Data.class.getName());
+		header3.setType(FileEntity.class.getName());
 		header3.setVersionNumber(ref3.getTargetVersionNumber());
 		
 		Set<Used> used = new HashSet<Used>();

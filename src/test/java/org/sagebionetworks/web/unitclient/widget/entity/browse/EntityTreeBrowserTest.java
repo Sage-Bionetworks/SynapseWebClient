@@ -28,7 +28,6 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -42,13 +41,11 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
-import com.google.gwt.user.client.ui.TreeItem;
 
 public class EntityTreeBrowserTest {
 	EntityTreeBrowserView mockView;
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
-	EntityTypeProvider mockEntityTypeProvider;
 	GlobalApplicationState mockGlobalApplicationState;
 	IconsImageBundle mockIconsImageBundle;
 	PortalGinInjector mockInjector;
@@ -65,7 +62,6 @@ public class EntityTreeBrowserTest {
 		mockView = mock(EntityTreeBrowserView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockInjector = mock(PortalGinInjector.class);
@@ -74,8 +70,7 @@ public class EntityTreeBrowserTest {
 		mockLoadingItem = mock(IsTreeItem.class);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseClient, mockAuthenticationController,
-				mockEntityTypeProvider, mockGlobalApplicationState,
+				mockSynapseClient, mockAuthenticationController,  mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
@@ -133,8 +128,7 @@ public class EntityTreeBrowserTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseClient, mockAuthenticationController,
-				mockEntityTypeProvider, mockGlobalApplicationState,
+				mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
 		entityTreeBrowser.getFolderChildren("123", null, 0,
 				mockView.appendLoading(null));

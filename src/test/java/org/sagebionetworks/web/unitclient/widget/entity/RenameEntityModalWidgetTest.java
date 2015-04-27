@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
@@ -28,7 +27,6 @@ public class RenameEntityModalWidgetTest {
 	PromptModalView mockView;
 	SynapseClientAsync mockSynapseClient;
 	Callback mockCallback;
-	EntityTypeProvider mockTypeProvider;
 	String startName;
 	String entityDispalyType;
 	String parentId;
@@ -40,13 +38,11 @@ public class RenameEntityModalWidgetTest {
 		mockView = Mockito.mock(PromptModalView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockCallback = Mockito.mock(Callback.class);
-		mockTypeProvider = Mockito.mock(EntityTypeProvider.class);
 		entity = new TableEntity();
 		startName = "Start Name";
 		entity.setName(startName);
 		entityDispalyType = "Table";
-		when(mockTypeProvider.getEntityDispalyName(entity)).thenReturn(entityDispalyType);
-		widget = new RenameEntityModalWidgetImpl(mockView, mockSynapseClient, mockTypeProvider);
+		widget = new RenameEntityModalWidgetImpl(mockView, mockSynapseClient);
 	}
 	
 	@Test

@@ -42,6 +42,8 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -294,7 +296,7 @@ public interface SynapseClient extends RemoteService {
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
-    public V2WikiPage createV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
+    public V2WikiPage createV2WikiPage(String ownerId, String ownerType, V2WikiPage page) throws RestServiceException;
     public V2WikiPage getV2WikiPage(WikiPageKey key) throws RestServiceException;
     public V2WikiPage getVersionOfV2WikiPage(WikiPageKey key, Long version) throws RestServiceException;
     public V2WikiPage updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag) throws RestServiceException;
@@ -339,7 +341,7 @@ public interface SynapseClient extends RemoteService {
 	public void deleteMembershipInvitation(String invitationId) throws RestServiceException;
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
-	public String updateTeam(String teamJson) throws RestServiceException;
+	public Team updateTeam(Team team) throws RestServiceException;
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
@@ -347,7 +349,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
 	public String getCertificationQuiz() throws RestServiceException;
-	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException; 
+	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
 	
 	public EntityIdList getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	

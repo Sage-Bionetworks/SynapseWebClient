@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -75,45 +74,34 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	@Override
 	public void submitAnswers(Map<Long, Set<Long>> questionIndex2AnswerIndices) {
-		try {
-			//submit question/answer combinations for approval
-			//create response object from answers
-			QuizResponse submission = new QuizResponse();
-			List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
-			for (Long questionIndex : questionIndex2AnswerIndices.keySet()) {
-				Set<Long> answerIndices = questionIndex2AnswerIndices.get(questionIndex);
-				MultichoiceResponse response = new MultichoiceResponse();
-				response.setQuestionIndex(questionIndex);
-				response.setAnswerIndex(answerIndices);
-				questionResponses.add(response);
-			}
-			submission.setQuestionResponses(questionResponses);
-			JSONObjectAdapter adapter = submission.writeToJSONObject(jsonObjectAdapter.createNew());
-			String questionnaireResponse = adapter.toJSONString();
-			synapseClient.submitCertificationQuizResponse(questionnaireResponse, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String passingRecordJson) {
-					try {
-						PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-						if (passingRecord.getPassed())
-							view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
-						else
-							view.showFailure(passingRecord);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					} 
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		//submit question/answer combinations for approval
+		//create response object from answers
+		QuizResponse submission = new QuizResponse();
+		List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
+		for (Long questionIndex : questionIndex2AnswerIndices.keySet()) {
+			Set<Long> answerIndices = questionIndex2AnswerIndices.get(questionIndex);
+			MultichoiceResponse response = new MultichoiceResponse();
+			response.setQuestionIndex(questionIndex);
+			response.setAnswerIndex(answerIndices);
+			questionResponses.add(response);
 		}
+		submission.setQuestionResponses(questionResponses);
+		synapseClient.submitCertificationQuizResponse(submission, new AsyncCallback<PassingRecord>() {
+			@Override
+			public void onSuccess(PassingRecord passingRecord) {
+				if (passingRecord.getPassed())
+					view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+				else
+					view.showFailure(passingRecord);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+					view.showErrorMessage(caught.getMessage());
+				} 
+			}
+		});
 	}
 
 	@Override
