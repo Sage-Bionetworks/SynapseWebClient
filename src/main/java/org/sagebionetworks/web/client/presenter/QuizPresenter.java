@@ -138,54 +138,37 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	@Override
 	public void submitAnswers() {
-		try {
-			//submit question/answer combinations for approval
-			//create response object from answers
-			QuizResponse submission = new QuizResponse();
-			List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
-//			for (Long questionIndex : questionIndex2AnswerIndices.keySet()) {
-//				Set<Long> answerIndices = questionIndex2AnswerIndices.get(questionIndex);
-//				MultichoiceResponse response = new MultichoiceResponse();
-//				response.setQuestionIndex(questionIndex);
-//				response.setAnswerIndex(answerIndices);
-//				questionResponses.add(response);
-//			}
-			for (Long questionNumber : questionIndexToQuestionWidget.keySet()) {
-				QuestionContainerWidget questionWidget = questionIndexToQuestionWidget.get(questionNumber);
-				Set<Long> answers = questionWidget.getAnswers();
-				Long questionIndex = questionWidget.getQuestionIndex();
-				MultichoiceResponse response = new MultichoiceResponse();
-				response.setQuestionIndex(questionIndex);
-				response.setAnswerIndex(answers);
-				questionResponses.add(response);
-			}
-			submission.setQuestionResponses(questionResponses);
-			JSONObjectAdapter adapter = submission.writeToJSONObject(jsonObjectAdapter.createNew());
-			String questionnaireResponse = adapter.toJSONString();
-			synapseClient.submitCertificationQuizResponse(questionnaireResponse, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String passingRecordJson) {
-					try {
-						PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-						if (passingRecord.getPassed())
-							showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
-						else
-							showFailure(passingRecord);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					} 
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		//submit question/answer combinations for approval
+		//create response object from answers
+		QuizResponse submission = new QuizResponse();
+		List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
+
+		for (Long questionNumber : questionIndexToQuestionWidget.keySet()) {
+			QuestionContainerWidget questionWidget = questionIndexToQuestionWidget.get(questionNumber);
+			Set<Long> answers = questionWidget.getAnswers();
+			Long questionIndex = questionWidget.getQuestionIndex();
+			MultichoiceResponse response = new MultichoiceResponse();
+			response.setQuestionIndex(questionIndex);
+			response.setAnswerIndex(answers);
+			questionResponses.add(response);
 		}
+		submission.setQuestionResponses(questionResponses);
+		synapseClient.submitCertificationQuizResponse(submission, new AsyncCallback<PassingRecord>() {
+			@Override
+			public void onSuccess(PassingRecord passingRecord) {
+				if (passingRecord.getPassed())
+					showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+				else
+					showFailure(passingRecord);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+					view.showErrorMessage(caught.getMessage());
+				} 
+			}
+		});
 	}
 	
 	@Override
@@ -203,21 +186,17 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	private void scoreQuiz(PassingRecord passingRecord) {
-		//go through and highlight correct/incorrect answers
-		GWT.debugger();
-		view.clearTestContainer();
 		if (passingRecord.getCorrections() == null)
 			return;
 		Long questionNumber = Long.valueOf(1);
-		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
+		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {			
 			//indicate success/failure
 			if (correctness.getQuestion() != null) {
-				QuestionContainerWidget question = ginInjector.getQuestionContainerWidget();
-				question.configure(questionNumber++, correctness.getQuestion(), (MultichoiceResponse)correctness.getResponse());
-				view.addQuestionContainerWidget(question.asWidget());
+				QuestionContainerWidget question = questionIndexToQuestionWidget.get(questionNumber++);
 				HTML html = new InlineHTML();
 				html.addStyleName("margin-right-5");
 				question.addCorrectnessStyle(correctness.getIsCorrect());
+				question.setEnabled(false);
 			}
 		}
 		//scored quiz cannot be resubmitted

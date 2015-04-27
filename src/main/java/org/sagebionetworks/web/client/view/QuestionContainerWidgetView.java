@@ -30,11 +30,12 @@ public interface QuestionContainerWidgetView extends IsWidget {
 
 		Long getQuestionIndex();
 
+		void setEnabled(boolean enabled);
+
 	}
 
 	void addAnswer(Widget answerContainer);
 	void setQuestionHeader(Widget questionHeader);
 	void configureMoreInfo(String href);
 	void showSuccess(boolean isShown);
-	void showFailure(boolean isShown);
-}
+	void showFailure(boolean isShown);}

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
@@ -9,11 +8,8 @@ import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.Question;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Wiki;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -28,16 +24,16 @@ import com.google.inject.Inject;
 public class QuestionContainerWidget implements QuestionContainerWidgetView.Presenter{
 
 	private QuestionContainerWidgetView view;
-	private PortalGinInjector ginInjector;
 	private Set<Long> answers;
+	// Used to disable the buttons after scoring is performed
+	private Set<Widget> answerUI;
 	private Long questionIndex;
 	
 	@Inject
-	public QuestionContainerWidget(QuestionContainerWidgetView view,
-			PortalGinInjector ginInjector) {
+	public QuestionContainerWidget(QuestionContainerWidgetView view) {
 		this.view = view;
-		this.ginInjector = ginInjector;
 		answers = new HashSet<Long>();
+		answerUI = new HashSet<Widget>();
 	}
 	
 	@Override 
@@ -60,11 +56,11 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					answerButton.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							GWT.debugger();
 							answers.clear();
 							answers.add(answer.getAnswerIndex());
 						}
 					});
+					answerUI.add(answerButton);
 					answerContainer.add(answerButton.asWidget());
 					view.addAnswer(answerContainer.asWidget());
 					//handleIfPreviouslyAnswered(answerButton, response, answer.getAnswerIndex());
@@ -79,7 +75,6 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 					checkbox.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							GWT.debugger();
 							//not exclusive, include all possible answer indexes
 							if (checkbox.getValue()) {
 								answers.add(answer.getAnswerIndex());	
@@ -88,6 +83,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 							}
 						}
 					});
+					answerUI.add(checkbox);
 					answerContainer.add(checkbox);
 					view.addAnswer(answerContainer);
 					//handleIfPreviouslyAnswered(checkbox, response, answer.getAnswerIndex());
@@ -146,5 +142,16 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		for (Widget answerWidget: answerUI) {
+			if (answerWidget instanceof CheckBox) {
+				((CheckBox)answerWidget).setEnabled(enabled);
+			} else if (answerWidget instanceof RadioButton) {
+				((RadioButton)answerWidget).setEnabled(enabled);
+			}
+		}
 	}
 }

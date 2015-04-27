@@ -18,16 +18,6 @@ public interface QuizView extends IsWidget, SynapseView {
 	
 	void setPresenter(Presenter loginPresenter);	
 	void hideLoading();
-	
-	public interface Presenter extends SynapsePresenter {
-		void goTo(Place place);
-		void goToLastPlace();	
-		void showQuiz(Quiz quiz);
-		void submitAnswers();
-		void showSuccess(UserProfile profile, PassingRecord passingRecord);
-		void showFailure(PassingRecord passingRecord);
-    }
-
 	void setQuizHeader(String quizHeader);
 	void addQuestionContainerWidget(Widget widget);
 	void addSubmitHandler(ClickHandler handler);
@@ -38,6 +28,13 @@ public interface QuizView extends IsWidget, SynapseView {
 	void hideAll();
 	void showSuccess(UserProfile profile, PassingRecord passingRecord);
 	void showFailure(PassingRecord passingRecord);
-	void clearTestContainer();
 	
+	public interface Presenter extends SynapsePresenter {
+		void goTo(Place place);
+		void goToLastPlace();	
+		void showQuiz(Quiz quiz);
+		void submitAnswers();
+		void showSuccess(UserProfile profile, PassingRecord passingRecord);
+		void showFailure(PassingRecord passingRecord);
+    }
 }

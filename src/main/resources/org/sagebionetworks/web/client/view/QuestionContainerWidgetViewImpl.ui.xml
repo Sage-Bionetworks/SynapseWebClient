@@ -10,8 +10,8 @@
 	<t:Table>
     	<t:TableRow>
         	<t:TableData paddingRight="2">
-				<b:Icon ui:field="successIcon" addStyleNames="display-inline movedown-2" size="TIMES2" type="CHECK" color="GREEN" visible="false"></b:Icon>     
-            	<b:Icon ui:field="failureIcon" addStyleNames="display-inline movedown-2" size="TIMES2" type="TIMES" color="RED" visible="false"></b:Icon>   
+				<b:Icon ui:field="successIcon" addStyleNames="display-inline moveup-10" size="TIMES2" type="CHECK" color="GREEN" visible="false"></b:Icon>     
+            	<b:Icon ui:field="failureIcon" addStyleNames="display-inline moveup-10" size="TIMES2" type="TIMES" color="RED" visible="false"></b:Icon>   
             </t:TableData>
             <t:TableData paddingRight="2">
             	<g:FlowPanel ui:field="questionContainer" addStyleNames="margin-bottom-40 margin-left-15">
