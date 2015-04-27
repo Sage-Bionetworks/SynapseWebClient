@@ -28,9 +28,13 @@ public interface QuestionContainerWidgetView extends IsWidget {
 		
 		void addCorrectnessStyle(boolean isCorrect);
 
+		Long getQuestionIndex();
+
 	}
 
 	void addAnswer(Widget answerContainer);
 	void setQuestionHeader(Widget questionHeader);
 	void configureMoreInfo(String href);
+	void showSuccess(boolean isShown);
+	void showFailure(boolean isShown);
 }

@@ -30,6 +30,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 	private QuestionContainerWidgetView view;
 	private PortalGinInjector ginInjector;
 	private Set<Long> answers;
+	private Long questionIndex;
 	
 	@Inject
 	public QuestionContainerWidget(QuestionContainerWidgetView view,
@@ -39,10 +40,16 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 		answers = new HashSet<Long>();
 	}
 	
+	@Override 
+	public Long getQuestionIndex() {
+		return questionIndex;
+	}
+	
 	@Override
 	public void configure(Long questionNumber, Question question, MultichoiceResponse response) {
 		view.setQuestionHeader(new InlineHTML("<small class=\"margin-right-10\">"+questionNumber+".</small>"+SimpleHtmlSanitizer.sanitizeHtml(question.getPrompt()).asString()+"</small>"));
 		final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion) question;
+		this.questionIndex = question.getQuestionIndex();
 		if (question instanceof MultichoiceQuestion) {
 			if (multichoiceQuestion.getExclusive()) {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
@@ -100,9 +107,11 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 		HTML html = new InlineHTML();
 		html.addStyleName("margin-right-5");
 		if (isCorrect) {
-			html.setHTML(DisplayUtils.getIcon("glyphicon-ok font-size-15 text-success"));
+			view.showSuccess(true);
+//			html.setHTML(DisplayUtils.getIcon("glyphicon-ok font-size-15 text-success"));
 		} else {
-			html.setHTML(DisplayUtils.getIcon("glyphicon-remove font-size-15 text-danger"));
+			view.showFailure(true);
+//			html.setHTML(DisplayUtils.getIcon("glyphicon-remove font-size-15 text-danger"));
 			view.addStyleName("has-error");
 		}
 		

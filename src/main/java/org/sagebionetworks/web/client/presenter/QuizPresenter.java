@@ -74,6 +74,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.isSubmitInitialized = false;
+		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 		getIsCertified();
 	}
 	
@@ -101,7 +102,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			view.setQuizHeader(quiz.getHeader());
 		//clear old questions
 		List<Question> questions = quiz.getQuestions();
-		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 		final int currentQuestionCount = questions.size();
 		Long questionNumber = Long.valueOf(1);
 		for (Question question : questions) {
@@ -131,6 +131,11 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		view.reset();
 	}
 	
+	// For testing only
+	public void setQuestionIndexToQuestionWidgetMap(Map<Long, QuestionContainerWidget> ans) {
+		this.questionIndexToQuestionWidget = ans;
+	}
+	
 	@Override
 	public void submitAnswers() {
 		try {
@@ -145,8 +150,10 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 //				response.setAnswerIndex(answerIndices);
 //				questionResponses.add(response);
 //			}
-			for (Long questionIndex : questionIndexToQuestionWidget.keySet()) {
-				Set<Long> answers = questionIndexToQuestionWidget.get(questionIndex).getAnswers();
+			for (Long questionNumber : questionIndexToQuestionWidget.keySet()) {
+				QuestionContainerWidget questionWidget = questionIndexToQuestionWidget.get(questionNumber);
+				Set<Long> answers = questionWidget.getAnswers();
+				Long questionIndex = questionWidget.getQuestionIndex();
 				MultichoiceResponse response = new MultichoiceResponse();
 				response.setQuestionIndex(questionIndex);
 				response.setAnswerIndex(answers);
@@ -155,17 +162,15 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			submission.setQuestionResponses(questionResponses);
 			JSONObjectAdapter adapter = submission.writeToJSONObject(jsonObjectAdapter.createNew());
 			String questionnaireResponse = adapter.toJSONString();
-			GWT.debugger();
 			synapseClient.submitCertificationQuizResponse(questionnaireResponse, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String passingRecordJson) {
 					try {
-						GWT.debugger();
 						PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 						if (passingRecord.getPassed())
-							view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+							showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
 						else
-							view.showFailure(passingRecord);
+							showFailure(passingRecord);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -199,6 +204,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	private void scoreQuiz(PassingRecord passingRecord) {
 		//go through and highlight correct/incorrect answers
+		GWT.debugger();
 		view.clearTestContainer();
 		if (passingRecord.getCorrections() == null)
 			return;

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.html.Small;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -29,6 +30,12 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	@UiField
 	Anchor moreInfoLink;
 		
+	@UiField
+	Icon successIcon;
+	
+	@UiField
+	Icon failureIcon;
+	
 	Widget widget;
 	
 	public interface Binder extends UiBinder<Widget, QuestionContainerWidgetViewImpl> {}
@@ -46,6 +53,16 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	@Override
 	public void configureMoreInfo(String href) {
 		moreInfoLink.setHref(href);
+	}
+	
+	@Override
+	public void showSuccess(boolean isShown) {
+		successIcon.setVisible(isShown);
+	}
+	
+	@Override
+	public void showFailure(boolean isShown) {
+		failureIcon.setVisible(isShown);
 	}
 	
 	@Override
