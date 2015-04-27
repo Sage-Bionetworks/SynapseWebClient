@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.SynWiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
@@ -166,16 +167,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 		openResearchProjectsBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//TODO: go to new open researchs project page
-//				globalApplicationState.getPlaceChanger().goTo(new T(""));
+				//go to new open research project page
+				globalApplicationState.getPlaceChanger().goTo(new SynWiki("OpenResearchProjects"));
 			}
 		});
 		
 		researchCommunitiesBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//TODO: go to new research communities page
-//				globalApplicationState.getPlaceChanger().goTo(new T(""));
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new SynWiki("ResearchCommunities"));
 			}
 		});
 		
