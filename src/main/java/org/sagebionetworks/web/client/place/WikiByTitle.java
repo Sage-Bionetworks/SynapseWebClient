@@ -6,12 +6,13 @@ import com.google.gwt.place.shared.Prefix;
 
 /**
  * Standalone wiki place.  A single wiki page is shown here. It will show the associated wiki page based on page title.
+ * The place prefix is simply "W"
  */
-public class SynWiki extends Place{
+public class WikiByTitle extends Place{
 	
 	private String token;
 
-	public SynWiki(String token) {
+	public WikiByTitle(String token) {
 		this.token = token;
 	}
 
@@ -20,15 +21,15 @@ public class SynWiki extends Place{
 	}
 	
 	@Prefix("!W")
-	public static class Tokenizer implements PlaceTokenizer<SynWiki> {
+	public static class Tokenizer implements PlaceTokenizer<WikiByTitle> {
         @Override
-        public String getToken(SynWiki place) {
+        public String getToken(WikiByTitle place) {
             return place.toToken();
         }
 
         @Override
-        public SynWiki getPlace(String token) {
-            return new SynWiki(token);
+        public WikiByTitle getPlace(String token) {
+            return new WikiByTitle(token);
         }
     }
 }

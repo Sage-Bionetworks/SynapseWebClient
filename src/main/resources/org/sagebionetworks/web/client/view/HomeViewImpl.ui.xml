@@ -32,35 +32,47 @@
 		<b:Row>
 			<b:Column size="SM_1" />
 			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<g:Image resource='{sageImageBundle.directory}' addStyleNames="center-in-div" />
-				<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
-					text="Organize your digital research assets"
-				></b:Heading>
-				<b:Heading size="H5" addStyleNames="margin-top-3"
-					text="Create a free Synapse Project to store your research data, code, and results."
-				></b:Heading>
+				<g:FocusPanel ui:field="organizeResearchAssetsBox">
+					<bh:Div addStyleNames="imageButton">
+						<g:Image resource='{sageImageBundle.directory}' addStyleNames="center-in-div" />
+						<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+							text="Organize your digital research assets"
+						></b:Heading>
+						<b:Heading size="H5" addStyleNames="margin-top-3"
+							text="Create a free Synapse Project to store your research data, code, and results."
+						></b:Heading>
+					</bh:Div>
+				</g:FocusPanel>
 			</b:Column>
 			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<g:Image resource='{sageImageBundle.prov}' addStyleNames="center-in-div" />
-				<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
-					text="Get credit for your research"
-				></b:Heading>
-				<b:Heading size="H5" addStyleNames="margin-top-3"
-					text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance."
-				></b:Heading>
+				<g:FocusPanel ui:field="creditForResearchBox">
+					<bh:Div addStyleNames="imageButton">
+						<g:Image resource='{sageImageBundle.prov}' addStyleNames="center-in-div" />
+						<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+							text="Get credit for your research"
+						></b:Heading>
+						<b:Heading size="H5" addStyleNames="margin-top-3"
+							text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance."
+						></b:Heading>
+					</bh:Div>
+				</g:FocusPanel>
 			</b:Column>
 			<b:Column  size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
-				<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="center-in-div" />
-				<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp" 
-					text="Collaborate"
-				></b:Heading>
-				<b:Heading size="H5" addStyleNames="margin-top-3"
-					text="Share your Project with your collaborators, or make it Public!"
-				></b:Heading>
+				<g:FocusPanel ui:field="collaborateBox">
+					<bh:Div addStyleNames="imageButton">
+						<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="center-in-div" />
+						<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp" 
+							text="Collaborate"
+						></b:Heading>
+						<b:Heading size="H5" addStyleNames="margin-top-3"
+							text="Share your Project with your collaborators, or make it Public!"
+						></b:Heading>
+					</bh:Div>
+				</g:FocusPanel>
 			</b:Column>
 			<b:Column size="SM_1" />
 		</b:Row>
-		<b:Row addStyleNames="synapse-blue-bg margin-top-10">
+		<b:Row addStyleNames="synapse-blue-bg margin-top-40">
 			<b:Column size="SM_1" />
 			<b:Column size="SM_11">
 				<b:Heading size="H4" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"

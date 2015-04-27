@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -19,7 +17,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.SynWiki;
+import org.sagebionetworks.web.client.place.WikiByTitle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
@@ -103,6 +101,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 	FocusPanel termsOfUseBox;
 	@UiField
 	FocusPanel becomeCertifiedBox;
+	@UiField
+	FocusPanel creditForResearchBox;
+	@UiField
+	FocusPanel organizeResearchAssetsBox;
+	@UiField
+	FocusPanel collaborateBox;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -168,7 +172,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				//go to new open research project page
-				globalApplicationState.getPlaceChanger().goTo(new SynWiki("OpenResearchProjects"));
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("OpenResearchProjects"));
 			}
 		});
 		
@@ -176,7 +180,29 @@ public class HomeViewImpl extends Composite implements HomeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new SynWiki("ResearchCommunities"));
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("ResearchCommunities"));
+			}
+		});
+		
+		creditForResearchBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("GetCreditForYourResearch"));
+			}
+		});
+		organizeResearchAssetsBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("OrganizeYourDigitalResearchAssets"));
+			}
+		});
+		collaborateBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("Collaborate"));
 			}
 		});
 		

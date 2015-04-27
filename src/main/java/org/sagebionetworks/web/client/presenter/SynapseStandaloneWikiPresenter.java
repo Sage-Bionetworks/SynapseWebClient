@@ -5,7 +5,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.SynWiki;
+import org.sagebionetworks.web.client.place.WikiByTitle;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -18,7 +18,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class SynapseStandaloneWikiPresenter extends AbstractActivity implements SynapseStandaloneWikiView.Presenter, Presenter<SynWiki> {
+public class SynapseStandaloneWikiPresenter extends AbstractActivity implements SynapseStandaloneWikiView.Presenter, Presenter<WikiByTitle> {
 		
 	private Wiki place;
 	private SynapseStandaloneWikiView view;
@@ -38,7 +38,7 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 	}
 	
 	@Override
-	public void setPlace(SynWiki place) {
+	public void setPlace(WikiByTitle place) {
 		view.showLoading();
 		final String title = place.toToken();
 		if (!DisplayUtils.isDefined(title)) {
