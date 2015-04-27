@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
+import org.sagebionetworks.web.client.presenter.SynapseStandaloneWikiPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
@@ -313,4 +314,6 @@ public interface PortalGinInjector extends Ginjector {
 	public RegisterTeamDialog getRegisterTeamDialog();
 	public AnnotationEditor getAnnotationEditor();
 	public FileHistoryRowView getFileHistoryRow();
+	
+	public SynapseStandaloneWikiPresenter getSynapseStandaloneWikiPresenter();
 }

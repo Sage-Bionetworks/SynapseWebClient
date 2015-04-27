@@ -68,6 +68,7 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.WikiPaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
@@ -513,4 +514,5 @@ public interface SynapseClient extends RemoteService {
 	Entity createExternalFile(String parentEntityId, String externalUrl,
 			String name) throws RestServiceException;
 	
+	WikiPaginatedResults getStandaloneWikis() throws RestServiceException;
 }
