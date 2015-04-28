@@ -33,6 +33,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -165,7 +166,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		dreamChallengesBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
+				Location.assign("http://dreamchallenges.org/");
 			}
 		});
 		openResearchProjectsBox.addClickHandler(new ClickHandler() {
@@ -212,10 +213,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GOVERNANCE));
 			}
 		});
+		
 		becomeCertifiedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("Certification"));
 			}
 		});
 	}

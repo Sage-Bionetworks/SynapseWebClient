@@ -1206,9 +1206,6 @@ public class DisplayUtils {
 		}
 	}-*/;
 
-	public static native void setWindowTarget(JavaScriptObject window, String target)/*-{
-    	window.location = target;
-		}-*/;
 	/**
 	 * links in the wiki pages that reference other wiki pages don't include the domain.  this method adds the domain.
 	 * @param html
