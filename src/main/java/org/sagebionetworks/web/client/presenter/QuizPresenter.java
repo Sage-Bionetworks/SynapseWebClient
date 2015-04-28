@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.view.QuestionContainerWidget;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -34,8 +33,6 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.inject.Inject;
 
 public class QuizPresenter extends AbstractActivity implements QuizView.Presenter, Presenter<org.sagebionetworks.web.client.place.Quiz> {
@@ -93,12 +90,11 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			view.setQuizHeader(quiz.getHeader());
 		//clear old questions
 		List<Question> questions = quiz.getQuestions();
-		final int currentQuestionCount = questions.size();
 		Long questionNumber = Long.valueOf(1);
 		for (Question question : questions) {
 			QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
 			questionIndexToQuestionWidget.put(questionNumber, newQuestion);
-			newQuestion.configure(questionNumber, question, null);
+			newQuestion.configure(questionNumber, question);
 			view.addQuestionContainerWidget(newQuestion.asWidget());
 			questionNumber++;
 		}

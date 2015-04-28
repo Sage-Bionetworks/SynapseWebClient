@@ -1,17 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
-import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.Question;
-import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface QuestionContainerWidgetView extends IsWidget {
@@ -26,14 +20,13 @@ public interface QuestionContainerWidgetView extends IsWidget {
 
 		Set<Long> getAnswers();
 		
-		void configure(Long questionNumber, Question question,
-				MultichoiceResponse response);
-		
 		void addCorrectnessStyle(boolean isCorrect);
 
 		Long getQuestionIndex();
 
 		void setEnabled(boolean enabled);
+
+		void configure(Long questionNumber, Question question);
 
 	}
 

@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.view;
+package org.sagebionetworks.web.client.presenter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,17 +6,12 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
-import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.Question;
-import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.view.QuestionContainerWidgetView;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -38,7 +33,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 	}
 	
 	@Override
-	public void configure(Long questionNumber, Question question, MultichoiceResponse response) {
+	public void configure(Long questionNumber, Question question) {
 		answers = new HashSet<Long>();
 		view.configure(questionNumber, question.getPrompt());
 		final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion) question;
@@ -46,7 +41,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 		if (question instanceof MultichoiceQuestion) {
 			if (multichoiceQuestion.getExclusive()) {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
-					view.addRadioButton(question.getQuestionIndex(), answer.getPrompt(), new ClickHandler() {
+					view.addRadioButton(questionIndex, answer.getPrompt(), new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
 							answers.clear();
@@ -88,7 +83,6 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 			view.addStyleName("has-error");
 		}
 	}
-	
 	
 	@Override
 	public Set<Long> getAnswers() {

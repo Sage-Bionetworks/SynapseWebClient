@@ -35,9 +35,9 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.view.QuestionContainerWidget;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -169,10 +169,7 @@ public class QuizPresenterTest {
 		presenter.getQuiz();
 		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		ArgumentCaptor<Quiz> arg = ArgumentCaptor.forClass(Quiz.class);
-		// Called by getIsCertified, loads while determining certification status,
-		// then again loads when getting the quiz.
-		verify(mockView, Mockito.times(2)).showLoading();
-		// Because getIsCertified doesn't call with success or failure, does not call hideLoading()
+		verify(mockView).showLoading();
 		verify(mockView).hideLoading();
 		//mock quiz has 5 questions
 		verify(mockView, Mockito.times(5)).addQuestionContainerWidget(any(Widget.class));
@@ -184,7 +181,7 @@ public class QuizPresenterTest {
 		presenter.getQuiz();
 		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		// Called through constructing the presenter as well as getQuiz
-		verify(mockView, Mockito.times(2)).showLoading();
+		verify(mockView).showLoading();
 		// Because the constructor's getIsCertified call doesn't call success or failure,
 		// either of which contain the matching hideLoading(), it's only called by hideLoading().
 		verify(mockView).hideLoading();
@@ -203,14 +200,12 @@ public class QuizPresenterTest {
 		answerIndices.add(3L);
 		when(mockQuestionOne.getAnswers()).thenReturn(answerIndices);
 		when(mockQuestionOne.getQuestionIndex()).thenReturn(0L);
-		//questionIndex2AnswerIndices.put(0L, answerIndices);
 		//and question index 4 has answer indices 0 and 3
 		answerIndices = new HashSet<Long>();
 		answerIndices.add(0L);
 		answerIndices.add(3L);
 		when(mockQuestionOne.getAnswers()).thenReturn(answerIndices);
 		when(mockQuestionOne.getQuestionIndex()).thenReturn(4L);
-//		questionIndex2AnswerIndices.put(4L, answerIndices);
 		questionWidgetMap.put(0L, mockQuestionOne);
 		questionWidgetMap.put(4L, mockQuestionTwo);
 		presenter.setQuestionIndexToQuestionWidgetMap(questionWidgetMap);
@@ -228,7 +223,6 @@ public class QuizPresenterTest {
 		ArgumentCaptor<QuizResponse> arg = ArgumentCaptor.forClass(QuizResponse.class);
 		verify(mockSynapseClient).submitCertificationQuizResponse(arg.capture(), any(AsyncCallback.class));
 		//reconstruct the QuestionnaireResponse, and sanity check that it should have 2 question responses
-//		QuizResponse questionnaireResponse = new QuizResponse(adapterFactory.createNew(arg.getValue()));
 		assertEquals(2, arg.getValue().getQuestionResponses().size());
 	}
 
