@@ -28,31 +28,26 @@ import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.inject.Inject;
 
 public class QuizPresenter extends AbstractActivity implements QuizView.Presenter, Presenter<org.sagebionetworks.web.client.place.Quiz> {
 
-	private org.sagebionetworks.web.client.place.Quiz testPlace;
 	private QuizView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private Quiz quiz;
 	private PortalGinInjector ginInjector;
 	private boolean isSubmitInitialized;
-	private Map<Long, Set<Long>> questionIndex2AnswerIndices;
 	private Map<Long, QuestionContainerWidget> questionIndexToQuestionWidget;
 	
 	@Inject
@@ -69,13 +64,9 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
-		this.isSubmitInitialized = false;
 		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
-		getIsCertified();
 	}
 	
 	@Override
@@ -107,8 +98,9 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		for (Question question : questions) {
 			QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
 			questionIndexToQuestionWidget.put(questionNumber, newQuestion);
-			newQuestion.configure(questionNumber++, question, null);
+			newQuestion.configure(questionNumber, question, null);
 			view.addQuestionContainerWidget(newQuestion.asWidget());
+			questionNumber++;
 		}
 		
 		//initialize if necessary
@@ -117,8 +109,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			view.addSubmitHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					//gather answers and pass them back to the presenter
-					if (questionIndexToQuestionWidget.keySet().size() < currentQuestionCount) {
+					if (!checkAllAnswered()) {
 						view.showErrorMessage(DisplayConstants.ERROR_ALL_QUESTIONS_REQUIRED);
 					} else {
 						view.setSubmitEnabled(false);
@@ -129,6 +120,14 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			});
 		}
 		view.reset();
+	}
+	
+	private boolean checkAllAnswered() {
+		for (Long questionNumber : questionIndexToQuestionWidget.keySet()) {
+			if (questionIndexToQuestionWidget.get(questionNumber).getAnswers().isEmpty()) 
+				return false;
+		}
+		return true;
 	}
 	
 	// For testing only
@@ -193,8 +192,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			//indicate success/failure
 			if (correctness.getQuestion() != null) {
 				QuestionContainerWidget question = questionIndexToQuestionWidget.get(questionNumber++);
-				HTML html = new InlineHTML();
-				html.addStyleName("margin-right-5");
 				question.addCorrectnessStyle(correctness.getIsCorrect());
 				question.setEnabled(false);
 			}
@@ -215,9 +212,10 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 
 	@Override
 	public void setPlace(org.sagebionetworks.web.client.place.Quiz place) {
-		this.testPlace = place;
 		view.setPresenter(this);
 		view.clear();
+		this.isSubmitInitialized = false;
+		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 		getIsCertified();
 	}
 	

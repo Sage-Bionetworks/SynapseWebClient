@@ -75,16 +75,12 @@ public class QuizViewImpl extends Composite implements QuizView {
 	SpanElement loadingUI;
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private CertificateWidget certificateWidget;
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 	boolean isSubmitInitialized;
 	Map<Long, Set<Long>> questionIndex2AnswerIndices; 
-	// Used for debugging when there are less question indices than the currentQuestionCount
-	private int currentQuestionCount;
-	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public QuizViewImpl(Binder uiBinder,
@@ -95,11 +91,9 @@ public class QuizViewImpl extends Composite implements QuizView {
 			CertificateWidget certificateWidget,
 			PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.certificateWidget = certificateWidget;
-		this.ginInjector = ginInjector;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
