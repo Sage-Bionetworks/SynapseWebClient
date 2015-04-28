@@ -67,8 +67,26 @@ public class DoiWidget implements Presenter {
 			@Override
 			public void onSuccess(Doi result) {
 				doi = result;
-				view.showDoi(doi.getDoiStatus());
-				if ((doi.getDoiStatus() == DoiStatus.IN_PROCESS) && timer == null) {
+				final DoiStatus doiStatus = doi.getDoiStatus();
+				if (doiStatus == DoiStatus.ERROR) {
+					view.showDoiError();
+				} else if (doiStatus == DoiStatus.IN_PROCESS) {
+					view.showDoiInProgress();
+				} else if (doiStatus == DoiStatus.CREATED || doiStatus == DoiStatus.READY) {
+					getDoiPrefix(new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String prefix) {
+							view.showDoiCreated(getDoiHtml(prefix, doiStatus == DoiStatus.READY));
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(caught.getMessage());
+						}
+					});
+				}				
+				if ((doiStatus == DoiStatus.IN_PROCESS) && timer == null) {
 					timer = new Timer() {
 						public void run() {
 							configureDoi();

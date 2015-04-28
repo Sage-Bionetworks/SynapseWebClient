@@ -2,17 +2,15 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.sagebionetworks.repo.model.doi.DoiStatus;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -25,9 +23,6 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	private Presenter presenter;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
-	
-	@UiField
-	FlowPanel container;
 	
 	@UiField	
 	Anchor createDoiLink;
@@ -52,6 +47,12 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		widget = uiBinder.createAndBindUi(this);
+		createDoiLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createDoi();
+			}
+		});
 	}
 	
 	private void hideAllChildren() {
@@ -68,44 +69,32 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	} 
 
 	@Override
-	public void showDoi(final DoiStatus doi) {
+	public void showDoiError() {
 		hideAllChildren();
-		if (doi == DoiStatus.ERROR) {
-			//show error UI
-			createDoiLink.setVisible(true);
-			errorCreatingDoi.setVisible(true);
-		} else if (doi == DoiStatus.IN_PROCESS) {
-			//show in process UI
-			doiProcessing.setVisible(true);
-		} else if (doi == DoiStatus.CREATED || doi == DoiStatus.READY) {
-			//ask for the doi prefix from the presenter, and show a link to that!
-			//first clear old handler, if there is one
-			doiHTML.setVisible(true);
-			final SynapseView view = this;
-			presenter.getDoiPrefix(new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String prefix) {
-					doiHTML.getElement().setInnerHTML(presenter.getDoiHtml(prefix, doi == DoiStatus.READY));
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						showErrorMessage(caught.getMessage());
-				}
-			});
-		}
+		//show error UI
+		createDoiLink.setVisible(true);
+		errorCreatingDoi.setVisible(true);
+	}
+	
+	@Override
+	public void showDoiInProgress() {
+		hideAllChildren();
+		//show in process UI
+		doiProcessing.setVisible(true);
+	}
+	
+	@Override
+	public void showDoiCreated(String doiText) {
+		hideAllChildren();
+		//ask for the doi prefix from the presenter, and show a link to that!
+		//first clear old handler, if there is one
+		doiHTML.setVisible(true);
+		doiHTML.getElement().setInnerHTML(doiText);
 	}
 	
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
-		createDoiLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.createDoi();
-			}
-		});
 	}
 
 	@Override
