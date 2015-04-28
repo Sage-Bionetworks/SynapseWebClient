@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
+import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
@@ -257,6 +258,7 @@ public interface PortalGinInjector extends Ginjector {
 	public UserBadge getUserBadgeWidget();
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
+	public QuestionContainerWidget getQuestionContainerWidget();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
