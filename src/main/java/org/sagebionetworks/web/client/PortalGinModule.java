@@ -686,6 +686,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// QuestionContainerWidget
 		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetViewImpl.class);
 		
+		// DoiWidget
+		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
+		
 		// LoginWidget
 		bind(LoginWidgetViewImpl.class).in(Singleton.class);
 		bind(LoginWidgetView.class).to(LoginWidgetViewImpl.class);
@@ -887,9 +890,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EvaluationSubmitterView.class).to(EvaluationSubmitterViewImpl.class);
 		
 		bind(FavoriteWidgetView.class).to(FavoriteWidgetViewImpl.class);
-		
-		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
-		
+				
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
 		

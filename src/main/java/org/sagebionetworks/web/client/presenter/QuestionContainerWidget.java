@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class QuestionContainerWidget implements QuestionContainerWidgetView.Presenter{
+public class QuestionContainerWidget implements QuestionContainerWidgetView.Presenter {
 
 	private QuestionContainerWidgetView view;
 	private Set<Long> answers;

@@ -30,6 +30,7 @@ public class DoiWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	DoiWidgetView mockView;
 	String entityId = "syn123";
+	String testDoiPrefix = "testDoiPrefix";
 	DoiWidget doiWidget;
 	Doi testDoi;
 	StackConfigServiceAsync mockStackConfigService;
@@ -41,13 +42,12 @@ public class DoiWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(DoiWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
+		mockStackConfigService = mock(StackConfigServiceAsync.class);
 		testDoi = new Doi();
 		testDoi.setDoiStatus(DoiStatus.CREATED);
 		AsyncMockStubber.callSuccessWith(testDoi).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-
-//		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testDoi);
-		mockStackConfigService = mock(StackConfigServiceAsync.class);
+		AsyncMockStubber.callSuccessWith(testDoiPrefix).when(mockStackConfigService).getDoiPrefix(any(AsyncCallback.class));
 		doiWidget = new DoiWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockStackConfigService, mockAuthenticationController);
 	}
 	
@@ -56,7 +56,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatus() throws Exception {
 		doiWidget.configure(entityId, true, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.CREATED);
+		verify(mockView).showDoiCreated(doiWidget.getDoiHtml(testDoiPrefix, false));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -64,7 +64,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatusNotEditable() throws Exception {
 		doiWidget.configure(entityId, false, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.CREATED);
+		verify(mockView).showDoiCreated(doiWidget.getDoiHtml(testDoiPrefix, false));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -73,7 +73,7 @@ public class DoiWidgetTest {
 		testDoi.setDoiStatus(DoiStatus.ERROR);
 		doiWidget.configure(entityId, true, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.ERROR);
+		verify(mockView).showDoiError();
 	}
 	
 	@SuppressWarnings("unchecked")
