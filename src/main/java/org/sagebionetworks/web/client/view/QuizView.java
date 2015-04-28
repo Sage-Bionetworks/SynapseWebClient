@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;

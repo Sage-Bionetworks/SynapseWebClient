@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -80,7 +76,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 	boolean isSubmitInitialized;
-	Map<Long, Set<Long>> questionIndex2AnswerIndices; 
 	
 	@Inject
 	public QuizViewImpl(Binder uiBinder,
@@ -100,7 +95,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 		successContainer.setWidget(certificateWidget.asWidget());
 		
 		isSubmitInitialized = false;
-		questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
 		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -157,7 +151,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public void clear() {
 		hideAll();
 		testContainer.clear();
-		questionIndex2AnswerIndices.clear();
 		hideLoading();
 	}
 	
@@ -171,7 +164,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 		testContainer.add(widget);
 	}
 	
-	// Not sure about this? How should I be adding the click handler? Done it before but can't quite recall.
 	@Override
 	public void addSubmitHandler(ClickHandler handler) { 
 		submitButton.addClickHandler(handler);

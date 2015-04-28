@@ -160,7 +160,6 @@ public class QuizPresenterTest {
 	}
 	
 	private void setPassingRecordResponse(PassingRecord pr) throws JSONObjectAdapterException {
-//		String json = pr.writeToJSONObject(adapter.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(pr).when(mockSynapseClient).submitCertificationQuizResponse(any(QuizResponse.class), any(AsyncCallback.class));
 	}
 	
@@ -180,17 +179,13 @@ public class QuizPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		presenter.getQuiz();
 		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
-		// Called through constructing the presenter as well as getQuiz
 		verify(mockView).showLoading();
-		// Because the constructor's getIsCertified call doesn't call success or failure,
-		// either of which contain the matching hideLoading(), it's only called by hideLoading().
 		verify(mockView).hideLoading();
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testSubmitAnswersPass() throws JSONObjectAdapterException {
-		//Map<Long, Set<Long>> questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
 		Map<Long, QuestionContainerWidget> questionWidgetMap = new HashMap<Long, QuestionContainerWidget>();
 		//let's say I have 2 answers
 		QuestionContainerWidget mockQuestionOne = mock(QuestionContainerWidget.class);
