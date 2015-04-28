@@ -6,7 +6,7 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:FlowPanel ui:field="container"> 
+	<g:FlowPanel> 
 	    <bh:Span text="DOI:" addStyleNames="boldText margin-right-5"/>
 	    <b:Alert ui:field="errorCreatingDoi" addStyleNames="boldText" visible="false">
 	        <bh:Strong text="Error creating DOI"/>
