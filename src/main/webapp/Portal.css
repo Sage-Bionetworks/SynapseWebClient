@@ -661,8 +661,8 @@ a.shortBtn {
 .margin-top-60 {
 	margin-top: 60px;
 }
-.margin-top-60-imp {
-	margin-top: 60px !important;
+.margin-top-100-imp {
+	margin-top: 100px !important;
 }
 .margin-top-100 {
 	margin-top: 100px;
@@ -2034,7 +2034,6 @@ ul, ol {
 .nav > .active > a,
 .nav > .active:hover > a,
 .nav > .active:focus > a {
-  font-weight: bold;
   color: black !important;
   text-decoration:none;
   background-color: transparent;

@@ -17,7 +17,7 @@
 		<b:Row addStyleNames="margin-top-15">
 			<b:Column size="SM_1" />
 			<b:Column size="SM_5">
-				<b:Heading size="H1" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue font-size-5em" />
+				<b:Heading size="H2" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue" />
 			</b:Column>
 			<b:Column size="SM_1" />
 			<b:Column size="SM_4">
@@ -184,7 +184,7 @@
 			<b:Column size="MD_1" />
 		</b:Row>
 		
-		<b:Row addStyleNames="synapse-blue-bg margin-top-10">
+		<b:Row addStyleNames="synapse-yellow-bg margin-top-10">
 			<b:Column size="SM_1" />
 			<b:Column size="SM_11">
 				<b:Heading size="H4" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
