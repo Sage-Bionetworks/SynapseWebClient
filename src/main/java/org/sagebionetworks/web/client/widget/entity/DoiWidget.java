@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView.Presenter;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -60,6 +61,7 @@ public class DoiWidget implements Presenter {
 
 	public void configureDoi() {
 		view.clear();
+		GWT.debugger();
 		//get this entity's Doi (if it has one)
 		doi = null;
 		timer = null;
@@ -80,6 +82,7 @@ public class DoiWidget implements Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				GWT.debugger();
 				if (caught instanceof NotFoundException) {
 					if (canEdit)
 						view.showCreateDoi();

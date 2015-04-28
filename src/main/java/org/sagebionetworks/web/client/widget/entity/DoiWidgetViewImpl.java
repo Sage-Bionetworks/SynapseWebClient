@@ -1,21 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,53 +27,70 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	
+	@UiField
 	FlowPanel container;
+	
+	@UiField	
 	Anchor createDoiLink;
+	
+	@UiField
+	Alert errorCreatingDoi;
+			
+	@UiField
+	SimplePanel doiProcessing;
+	
+	@UiField
+	HTMLPanel doiHTML;
+	
+	Widget widget;
+	
+	public interface Binder extends UiBinder<Widget, DoiWidgetViewImpl> {}
 	
 	@Inject
 	public DoiWidgetViewImpl(GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			Binder uiBinder) {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-
-		container = new FlowPanel();
-		initWidget(container);
-		createDoiLink = new Anchor("create DOI");
-		createDoiLink.addStyleName("link");
-		createDoiLink.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.createDoi();
-			}
-		});
+		widget = uiBinder.createAndBindUi(this);
+	}
+	
+	private void hideAllChildren() {
+		GWT.debugger();
+		errorCreatingDoi.setVisible(false);
+		createDoiLink.setVisible(false);
+		doiProcessing.setVisible(false);
+		doiHTML.getElement().setInnerHTML("");
 	}
 	
 	@Override
 	public void showCreateDoi() {
-	  container.clear();
-	  addWidgetToContainer(createDoiLink);
+		GWT.debugger();
+		hideAllChildren();
+	    createDoiLink.setVisible(true);
 	} 
 
 	@Override
 	public void showDoi(final DoiStatus doi) {
-		container.clear();
-		
+		GWT.debugger();
+		hideAllChildren();
 		if (doi == DoiStatus.ERROR) {
 			//show error UI
-			addWidgetToContainer(createDoiLink);
-			container.add(new HTMLPanel(DisplayUtils.getWarningHtml("Error creating DOI", "")));
+			createDoiLink.setVisible(true);
+			errorCreatingDoi.setVisible(true);
 		} else if (doi == DoiStatus.IN_PROCESS) {
 			//show in process UI
-			addWidgetToContainer(new Label("DOI processing"));
+			GWT.debugger();
+			doiProcessing.setVisible(true);
 		} else if (doi == DoiStatus.CREATED || doi == DoiStatus.READY) {
 			//ask for the doi prefix from the presenter, and show a link to that!
 			//first clear old handler, if there is one
+			doiHTML.setVisible(true);
 			final SynapseView view = this;
 			presenter.getDoiPrefix(new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String prefix) {
-					addWidgetToContainer(new HTMLPanel(presenter.getDoiHtml(prefix, doi == DoiStatus.READY)));
+					doiHTML.getElement().setInnerHTML(presenter.getDoiHtml(prefix, doi == DoiStatus.READY));
 				}
 				
 				@Override
@@ -83,20 +102,28 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		}
 	}
 	
-	private void addWidgetToContainer(Widget widget) {
-		//we are showing something in the DOI area
-		Label title = new Label(DisplayConstants.DOI + ":");
-		title.addStyleName("inline-block boldText");
-		container.add(title);
-		
-		DisplayUtils.surroundWidgetWithParens(container, widget);
-		
-		container.add(new HTML());
-	}
+//	private void addWidgetToContainer(Widget widget) {
+//		//we are showing something in the DOI area
+//		Label title = new Label(DisplayConstants.DOI + ":");
+//		title.addStyleName("inline-block boldText");
+//		container.add(title);
+//		
+//		DisplayUtils.surroundWidgetWithParens(container, widget);
+//		
+//		// Why add an empty HTML?
+//		container.add(new HTML());
+//	}
 	
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
+		// Shouldn't go here, but where?
+		createDoiLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createDoi();
+			}
+		});
 	}
 
 	@Override
@@ -104,8 +131,13 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	}
 
 	@Override
+	public Widget asWidget() {
+		return widget;
+	}
+	
+	@Override
 	public void clear() {
-		container.clear();
+		hideAllChildren();
 	}
 
 	@Override
