@@ -56,7 +56,6 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	}
 	
 	private void hideAllChildren() {
-		GWT.debugger();
 		errorCreatingDoi.setVisible(false);
 		createDoiLink.setVisible(false);
 		doiProcessing.setVisible(false);
@@ -65,14 +64,12 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	
 	@Override
 	public void showCreateDoi() {
-		GWT.debugger();
 		hideAllChildren();
 	    createDoiLink.setVisible(true);
 	} 
 
 	@Override
 	public void showDoi(final DoiStatus doi) {
-		GWT.debugger();
 		hideAllChildren();
 		if (doi == DoiStatus.ERROR) {
 			//show error UI
@@ -80,7 +77,6 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 			errorCreatingDoi.setVisible(true);
 		} else if (doi == DoiStatus.IN_PROCESS) {
 			//show in process UI
-			GWT.debugger();
 			doiProcessing.setVisible(true);
 		} else if (doi == DoiStatus.CREATED || doi == DoiStatus.READY) {
 			//ask for the doi prefix from the presenter, and show a link to that!

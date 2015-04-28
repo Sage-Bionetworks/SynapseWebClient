@@ -61,7 +61,6 @@ public class DoiWidget implements Presenter {
 
 	public void configureDoi() {
 		view.clear();
-		GWT.debugger();
 		//get this entity's Doi (if it has one)
 		doi = null;
 		timer = null;
@@ -82,7 +81,6 @@ public class DoiWidget implements Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.debugger();
 				if (caught instanceof NotFoundException) {
 					if (canEdit)
 						view.showCreateDoi();
