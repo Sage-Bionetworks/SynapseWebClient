@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -98,22 +97,9 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		}
 	}
 	
-//	private void addWidgetToContainer(Widget widget) {
-//		//we are showing something in the DOI area
-//		Label title = new Label(DisplayConstants.DOI + ":");
-//		title.addStyleName("inline-block boldText");
-//		container.add(title);
-//		
-//		DisplayUtils.surroundWidgetWithParens(container, widget);
-//		
-//		// Why add an empty HTML?
-//		container.add(new HTML());
-//	}
-	
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
-		// Shouldn't go here, but where?
 		createDoiLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
