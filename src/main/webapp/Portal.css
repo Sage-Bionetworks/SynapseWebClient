@@ -931,9 +931,6 @@ a.shortBtn {
 	font-family: Yanone Kaffeesatz;
 }
 
-.font-size-5em {
-	font-size: 5em;
-}
 .font-size-150,
 i.font-size-150 {
 	font-size: 150px;
@@ -998,6 +995,11 @@ i.font-size-lg {
 i.font-size-2x {
 	font-size:2em;
 }
+
+.font-size-3.2x {
+	font-size:3.2em;
+}
+
 .font-size-5x,
 i.font-size-5x {
 	font-size:5em;

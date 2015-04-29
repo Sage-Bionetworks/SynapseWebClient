@@ -74,27 +74,6 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("resource/images/NIMH_logo.jpg")
 	ImageResource nimhLogo();
 
-	@Source("resource/images/spotlight/Dream85_Banner.jpg")
-	ImageResource dream85Banner();
-	
-	@Source("resource/images/spotlight/Olfaction_Prediction_banner.jpg")
-	ImageResource dreamOP();
-	
-	@Source("resource/images/spotlight/AMP-AD-banner.jpg")
-	ImageResource ampAd();
-	
-	@Source("resource/images/spotlight/Project_datasphere_banner.jpg")
-	ImageResource dreamPDS();
-	
-	@Source("resource/images/spotlight/SMC-Het_banner.jpg")
-	ImageResource dreamSMCHet();
-	
-	@Source("resource/images/spotlight/SMC-RNA_banner.jpg")
-	ImageResource dreamSMCRNA();
-	
-	@Source("resource/images/spotlight/TcgaPancancer.jpg")
-	ImageResource tcgaPancancer();
-	
 	@Source("resource/images/certificate.png")
 	ImageResource certificate();
 
