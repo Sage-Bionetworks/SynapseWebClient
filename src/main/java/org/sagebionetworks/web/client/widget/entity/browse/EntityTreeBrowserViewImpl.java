@@ -72,7 +72,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 		});
 		// Make sure to show this and hide the tree on empty.
-		this.add(emptyUI);
 		hideEmptyUI();
 	}
 
