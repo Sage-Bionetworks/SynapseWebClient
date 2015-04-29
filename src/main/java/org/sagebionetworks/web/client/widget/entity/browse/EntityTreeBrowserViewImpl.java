@@ -3,10 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
@@ -20,10 +20,9 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,20 +38,29 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	private IconsImageBundle iconsImageBundle;
 
 	private boolean isSelectable = false;
-	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private EntityTreeItem selectedItem;
-	private SageImageBundle sageImageBundle;
-	private HTML emptyUI = new HTML(EMPTY_DISPLAY);
+	public interface Binder extends UiBinder<Widget, EntityTreeBrowserViewImpl> {}
+
+	
+	@UiField
+	Span emptyUI;
+	
+	@UiField
+	Span loadingUI;
+	
+	@UiField(provided=true)
+	Tree entityTree;
+	
+	private Widget widget;
 
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
-			SageImageBundle sageImageBundle) {
+			Binder uiBinder) {
 		this.iconsImageBundle = iconsImageBundle;
-		this.sageImageBundle = sageImageBundle;
 		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
 		entityTree = new Tree(new EntityTreeResources());
-		this.add(entityTree);
+		this.widget = uiBinder.createAndBindUi(this);
 		// On open, it will call expandTreeItemOnOpen, which starts a loading message.
 		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
 			@Override
@@ -64,7 +72,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 		});
 		// Make sure to show this and hide the tree on empty.
-		this.add(emptyUI);
 		hideEmptyUI();
 	}
 
@@ -80,7 +87,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 
 	@Override
@@ -130,7 +137,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		configureEntityTreeItem(childToAdd);
 		// Place the created child in the tree as the child of the given parent
 		// entity.
-		entityTree.insertItem(entityTree.getItemCount() - 1, childToAdd.asTreeItem());
+		entityTree.addItem(childToAdd.asTreeItem());
 	}
 
 	@Override
@@ -197,13 +204,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				// Asyc or offset issues?
-				presenter.getFolderChildren(parentId, null, offset,
-						insertLoading(null, (int) offset));
+				setLoadingVisible(true);
+				presenter.getFolderChildren(parentId, null, offset);
 				childToCreate.setVisible(false);
 			}
 		});
-		entityTree.insertItem(entityTree.getItemCount() - 1, childToCreate.asTreeItem());
+		entityTree.insertItem((int) offset, childToCreate.asTreeItem());
 	}
 
 	/**
@@ -220,12 +226,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.getChildrenFiles(parentId, null, offset,
-						appendLoading(null));
+				setLoadingVisible(true);
+				presenter.getChildrenFiles(parentId, null, offset);
 				childToCreate.setVisible(false);
 			}
 		});
-		entityTree.insertItem(entityTree.getItemCount() - 1, childToCreate.asTreeItem());
+		entityTree.addItem(childToCreate.asTreeItem());
 	}
 
 	/**
@@ -242,12 +248,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.getFolderChildren(parent.getHeader().getId(), parent,
-						offset, insertLoading(parent, (int) offset));
+				parent.showLoadingIcon();
+				presenter.getFolderChildren(parent.getHeader().getId(), parent, offset);
 				childToCreate.setVisible(false);
 			}
 		});
-		parent.asTreeItem().insertItem(parent.asTreeItem().getChildCount() - 1, childToCreate.asTreeItem());
+		parent.asTreeItem().insertItem((int) offset, childToCreate.asTreeItem());
 	}
 
 	/**
@@ -264,12 +270,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.getChildrenFiles(parent.getHeader().getId(), parent,
-						offset, appendLoading(parent));
+				parent.showLoadingIcon();
+				presenter.getChildrenFiles(parent.getHeader().getId(), parent, offset);
 				childToCreate.setVisible(false);
 			}
 		});
-		parent.asTreeItem().insertItem(parent.asTreeItem().getChildCount() - 1, childToCreate.asTreeItem());
+		parent.asTreeItem().addItem(childToCreate.asTreeItem());
 	}
 
 	/*
@@ -323,35 +329,13 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	}
 
 	@Override
+	public void setLoadingVisible(boolean isShown) {
+		loadingUI.setVisible(isShown);
+	}
+
+	@Override
 	public void showLoading() {
-	}
-	
-	@Override
-	public void removeLoading(IsTreeItem toHide) {
-		toHide.asTreeItem().remove();
+		setLoadingVisible(true);
 	}
 
-	@Override
-	public IsTreeItem insertLoading(EntityTreeItem parent, int offset) {
-		TreeItem loadingTreeItem = new TreeItem(new HTMLPanel(
-				DisplayUtils.getLoadingHtml(sageImageBundle)));
-		loadingTreeItem.addStyleName("entityTreeItem-font");
-		if (parent == null)
-			entityTree.insertItem(offset, loadingTreeItem);
-		else
-			parent.asTreeItem().insertItem(offset, loadingTreeItem);
-		return loadingTreeItem;
-	}
-
-	@Override
-	public IsTreeItem appendLoading(EntityTreeItem parent) {
-		TreeItem loadingTreeItem = new TreeItem(new HTMLPanel(
-				DisplayUtils.getLoadingHtml(sageImageBundle)));
-		loadingTreeItem.addStyleName("entityTreeItem-font");
-		if (parent == null)
-			entityTree.addItem(loadingTreeItem);
-		else
-			parent.asTreeItem().addItem(loadingTreeItem);
-		return loadingTreeItem;
-	}
 }
