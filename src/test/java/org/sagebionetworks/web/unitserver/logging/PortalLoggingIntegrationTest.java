@@ -35,7 +35,7 @@ public class PortalLoggingIntegrationTest {
 	/**
 	 * This test has a long wait time as log rolling only occurs once a minute.
 	 */
-	public static final int MAX_WAIT_MS = 1000*60*6*5;
+	public static final long MAX_WAIT_MS = 1000*60*60;
 	
 	
 	@Autowired
