@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.WikiByTitle;
-import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -20,7 +19,6 @@ import com.google.inject.Inject;
 
 public class SynapseStandaloneWikiPresenter extends AbstractActivity implements SynapseStandaloneWikiView.Presenter, Presenter<WikiByTitle> {
 		
-	private Wiki place;
 	private SynapseStandaloneWikiView view;
 	private SynapseClientAsync synapseClient;
 	
@@ -88,7 +86,7 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+				view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 			}
 		});
 	}
