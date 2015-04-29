@@ -22,6 +22,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
@@ -108,6 +109,15 @@ public class HeaderTest {
 		Place place = captor.getValue();
 		assertTrue(place instanceof LoginPlace);
 		assertEquals(LoginPlace.LOGIN_TOKEN, ((LoginPlace)place).toToken());
+	}
+	
+	@Test
+	public void testOnLogoClick() {
+		header.onLogoClick();
+		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Place place = captor.getValue();
+		assertTrue(place instanceof Home);
 	}
 
 	@Test
