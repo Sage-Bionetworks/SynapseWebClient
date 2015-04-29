@@ -51,7 +51,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
-	private final int MAX_FOLDER_LIMIT = 100;
+	private final int MAX_FOLDER_LIMIT = 3;
 
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,

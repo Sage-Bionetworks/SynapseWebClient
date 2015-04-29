@@ -209,7 +209,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		entityTree.insertItem(entityTree.getItemCount(), childToCreate.asTreeItem());
+		entityTree.insertItem((int) offset, childToCreate.asTreeItem());
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		entityTree.insertItem(entityTree.getItemCount(), childToCreate.asTreeItem());
+		entityTree.addItem(childToCreate.asTreeItem());
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		parent.asTreeItem().insertItem(parent.asTreeItem().getChildCount(), childToCreate.asTreeItem());
+		parent.asTreeItem().insertItem((int) offset, childToCreate.asTreeItem());
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		parent.asTreeItem().insertItem(parent.asTreeItem().getChildCount(), childToCreate.asTreeItem());
+		parent.asTreeItem().addItem(childToCreate.asTreeItem());
 	}
 
 	/*
