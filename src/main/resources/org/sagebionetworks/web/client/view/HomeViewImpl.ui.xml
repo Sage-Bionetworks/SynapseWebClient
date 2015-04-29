@@ -15,7 +15,7 @@
 		<b:Row addStyleNames="margin-top-15">
 			<b:Column size="SM_1" />
 			<b:Column size="SM_5">
-				<b:Heading size="H2" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue font-size-3.2x" />
+				<b:Heading size="H2" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue font-size-3-2x" />
 			</b:Column>
 			<b:Column size="SM_1" />
 			<b:Column size="SM_4">
@@ -42,9 +42,9 @@
 					</bh:Div>
 				</g:FocusPanel>
 			</b:Column>
-			<b:Column size="SM_3" addStyleNames="margin-top-40 ">
+			<b:Column size="SM_3" addStyleNames="margin-top-40 margin-left-10 margin-right-10">
 				<g:FocusPanel ui:field="creditForResearchBox">
-					<bh:Div addStyleNames="imageButton margin-left-10 margin-right-10">
+					<bh:Div addStyleNames="imageButton">
 						<g:Image resource='{sageImageBundle.prov}' addStyleNames="center-in-div" />
 						<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
 							text="Get credit for your research"
@@ -155,7 +155,7 @@
 		<b:Column size="MD_5" addStyleNames="margin-top-30">
 				<g:FocusPanel ui:field="termsOfUseBox">
 					<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
-						<b:Heading size="H5" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
 						<b:Heading size="H6" text="Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, guide- lines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews." />
 						<b:Button text="Learn about Synapse Use and Oversight" />
 					</b:Panel>
@@ -170,7 +170,7 @@
 									<g:Image resource='{sageImageBundle.certificate}' addStyleNames="margin-10" />
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H5" addStyleNames="font-weight-bolder" text="Become a Certified User!"></b:Heading>
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Become a Certified User!"></b:Heading>
 									<b:Heading size="H6" text="In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data." />
 									<b:Button text="Learn more about certification" />
 								</t:TableData>
