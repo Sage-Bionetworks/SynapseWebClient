@@ -83,7 +83,7 @@
 			<b:Row>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="researchCommunitiesBox">
-						<bh:Div addStyleNames="synapse-yellow-bg padding-10 imageButton margin-left-10 margin-right-10" height="255px">
+						<bh:Div addStyleNames="synapse-yellow-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
 							<t:Table>
 								<t:TableRow>
 									<t:TableData paddingRight="2">
@@ -100,7 +100,7 @@
 				</b:Column>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="openResearchProjectsBox">
-						<bh:Div addStyleNames="synapse-green-bg padding-10 imageButton margin-left-10 margin-right-10" height="255px">
+						<bh:Div addStyleNames="synapse-green-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
 							<t:Table>
 								<t:TableRow>
 									<t:TableData paddingRight="2">
@@ -117,7 +117,7 @@
 				</b:Column>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
 					<g:FocusPanel ui:field="dreamChallengesBox">
-						<bh:Div addStyleNames="synapse-purple-bg padding-10 imageButton margin-left-10 margin-right-10" height="255px">
+						<bh:Div addStyleNames="synapse-purple-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
 							<bh:Div addStyleNames="margin-10">
 								<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
 							</bh:Div>

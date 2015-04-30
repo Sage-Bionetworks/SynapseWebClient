@@ -91,7 +91,7 @@
 	        	<b:Column size="SM_12">
 					<t:Table width="100%">
 						<t:TableRow>
-							<t:TableData paddingRight="2" addStyleNames="text-align-center">
+							<t:TableData paddingRight="2" >
 								<b:Anchor ui:field="copyrightYear" href="http://sagebase.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
 							</t:TableData>
 							<t:TableData paddingRight="2" addStyleNames="text-align-center">
@@ -100,7 +100,7 @@
 							<t:TableData paddingRight="2" addStyleNames="text-align-center">
 								<b:Anchor href="http://creativecommons.org/licenses/by/3.0/legalcode" text="Creative Commons License" addStyleNames="color-white margin-left-10"/>
 							</t:TableData>
-							<t:TableData paddingRight="2" addStyleNames="text-align-center">
+							<t:TableData paddingRight="2" addStyleNames="text-align-right">
 								<bh:Div addStyleNames="displayInline margin-left-10">
 									<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-2 displayInline" text="portal: " />
 									<bh:Span ui:field="portalVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
