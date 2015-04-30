@@ -601,8 +601,8 @@ public class DisplayConstants {
 	public static final String REGISTER_BUTTON = "Register for a Synapse Account";
 	public static final String CREATE_PROJECT = "Create Project";
 	public static final String CREATE_TEAM = "Create Team";
-	public static final String NEW_PROJECT_NAME = " New Project Name";
-	public static final String NEW_TEAM_NAME = " New Team Name";
+	public static final String NEW_PROJECT_NAME = "New Project Name";
+	public static final String NEW_TEAM_NAME = "New Team Name";
 	public static final String SHORT_TEAM_DESCRIPTION = "Short Team Description";
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
 	public static final String SYNAPSE_TUTORIAL = "Synapse Tutorial";
