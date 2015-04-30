@@ -14,12 +14,11 @@
 		<g:SimplePanel ui:field="header"/>
 		<b:Container fluid="true">
 			<b:Row addStyleNames="margin-top-15">
-				<b:Column size="SM_6">
-					<b:Heading size="H2" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue font-size-3-2x" />
+				<b:Column size="SM_7">
+					<b:Heading size="H2" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue font-size-3-2x margin-left-15" />
 				</b:Column>
-				<b:Column size="SM_1" />
 				<b:Column size="SM_5">
-					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-10" visible="false">
+					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-10 margin-left-15" visible="false">
 						<b:Heading size="H5" addStyleNames="color-white margin-top-5" text="WELCOME BACK"></b:Heading>
 						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" />
 					</bh:Div>
