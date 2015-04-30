@@ -117,9 +117,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		int maxIdx = feed.getEntries().size() > MAX_NEWS_ITEMS ? MAX_NEWS_ITEMS : feed.getEntries().size();
 		for (int i = 0; i < maxIdx; i++) {
 			RSSEntry entry = feed.getEntries().get(i);
-			//every max, set as the last
-			String lastString = (i+1)%MAX_NEWS_ITEMS==0 ? "last" : "";
-			htmlResponse.append("<div class=\"col-sm-4 margin-top-20 "+lastString+"\"><div class=\"panel padding-10\"><h6 class=\"margin-bottom-4\"><a href=\"");
+			htmlResponse.append("<div class=\"col-sm-4 margin-top-20\"><div class=\"panel padding-10\"><h6 class=\"margin-bottom-4\"><a href=\"");
             htmlResponse.append(entry.getLink());
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());
