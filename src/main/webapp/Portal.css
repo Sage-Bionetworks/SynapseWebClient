@@ -1244,10 +1244,6 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration:underline;
 }
 
-.entityTreeItem, .entityTreeItem-font {
-	font: normal 11px arial, tahoma, helvetica, sans-serif;
-}
-
 .entityTreeItem-selected a,
 .entityTreeItem-selected a:hover, 
 .entityTreeItem-selected img,
