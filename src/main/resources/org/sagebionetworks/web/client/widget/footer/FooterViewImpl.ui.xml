@@ -40,7 +40,7 @@
 		</b:Container>
 		<b:Container fluid="true">
 	        <b:Row addStyleNames="synapse-blue-bg margin-top-30 padding-15">
-				<b:Column size="MD_4" addStyleNames="margin-top-15 margin-bottom-15">
+				<b:Column size="SM_4" addStyleNames="margin-top-15 margin-bottom-15">
 					<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
 							text="Governance"
 					></b:Heading>
@@ -48,7 +48,7 @@
 					<b:Anchor href="static/governance/SynapseCommonsDataUseProcedure.pdf" text="Date Use Procedure" addStyleNames="color-white margin-left-10 displayBlock"/>
 					<b:Anchor href="static/governance/SynapsePrivacyPolicy.pdf" text="Privacy Policy" addStyleNames="color-white margin-left-10 displayBlock"/>
 				</b:Column>
-				<b:Column size="MD_4" addStyleNames="margin-top-15 margin-bottom-15">
+				<b:Column size="SM_5" addStyleNames="margin-top-15 margin-bottom-15">
 					<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
 							text="Support"
 					></b:Heading>
@@ -58,7 +58,7 @@
 					<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" text="Command Line Client Documentation" addStyleNames="color-white margin-left-10 displayBlock"/>
 					<b:Anchor href="https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java" text="Java Client" addStyleNames="color-white margin-left-10 displayBlock"/>
 				</b:Column>
-				<b:Column size="MD_4" addStyleNames="margin-top-15 margin-bottom-15">
+				<b:Column size="SM_3" addStyleNames="margin-top-15 margin-bottom-15">
 					<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
 							text="Connect with us"
 					></b:Heading>
