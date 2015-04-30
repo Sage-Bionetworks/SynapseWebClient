@@ -103,6 +103,7 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(Quiz.class);
 		excludeFromLastPlace.add(ChangeUsername.class);
 		excludeFromLastPlace.add(Trash.class);
+		excludeFromLastPlace.add(Certificate.class);
 	}
 
 	@Override

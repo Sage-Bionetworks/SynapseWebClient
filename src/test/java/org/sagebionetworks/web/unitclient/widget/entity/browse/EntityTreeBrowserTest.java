@@ -84,8 +84,8 @@ public class EntityTreeBrowserTest {
 		EntityHeader header = new EntityHeader();
 		header.setId(parentId);
 		when(mockEntityTreeItem.getHeader()).thenReturn(header);
-		when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
-		when(mockView.insertLoading(any(EntityTreeItem.class), Mockito.anyInt())).thenReturn(mockLoadingItem);
+//		when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
+//		when(mockView.insertLoading(any(EntityTreeItem.class), Mockito.anyInt())).thenReturn(mockLoadingItem);
 		Mockito.when(mockInjector.getMoreTreeWidget()).thenReturn(mockMoreTreeItem);
 		AsyncMockStubber
 				.callSuccessWith(searchResults)
@@ -97,8 +97,7 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testGetFolderChildren() {
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-		entityTreeBrowser.getFolderChildren("123", null, 0,
-				mockView.appendLoading(null));
+		entityTreeBrowser.getFolderChildren("123", null, 0);
 		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor
 				.forClass(EntityQuery.class);
 		verify(mockSynapseClient, times(2)).executeEntityQuery(
@@ -130,8 +129,7 @@ public class EntityTreeBrowserTest {
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
 				mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
-		entityTreeBrowser.getFolderChildren("123", null, 0,
-				mockView.appendLoading(null));
+		entityTreeBrowser.getFolderChildren("123", null, 0);
 		// capture the servlet call
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor
 				.forClass(AsyncCallback.class);
@@ -148,8 +146,7 @@ public class EntityTreeBrowserTest {
 	public void testMoreButtonRootLevel() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
 		setQueryResults(2 * maxLim, 0, maxLim);
-		entityTreeBrowser.getFolderChildren(parentId, null, 0,
-				mockView.appendLoading(null));
+		entityTreeBrowser.getFolderChildren(parentId, null, 0);
 		// Creates the limited number of entity items
 		verify(mockView, times((int) entityTreeBrowser.getMaxLimit()))
 				.insertRootEntityTreeItem(any(EntityTreeItem.class),
@@ -165,8 +162,7 @@ public class EntityTreeBrowserTest {
 	public void testMoreButtonChildLevel() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
 		setQueryResults(2 * maxLim, 0, maxLim);
-		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem, 0,
-				mockView.appendLoading(mockEntityTreeItem));
+		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem, 0);
 		// Creates the limited number of entity items
 		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
 				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),
@@ -181,8 +177,7 @@ public class EntityTreeBrowserTest {
 	public void testGetMoreButtonRequery() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
 		setQueryResults(2 * maxLim, 0, maxLim);
-		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem,
-				0, mockView.appendLoading(mockEntityTreeItem));
+		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem, 0);
 		// Adds the limited number of entity items
 		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
 				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),
@@ -196,7 +191,7 @@ public class EntityTreeBrowserTest {
 		// directly the moreButton should call getFolderChildren with that
 		// offset
 		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem,
-				maxLim, mockView.appendLoading(mockEntityTreeItem));
+				maxLim);
 		// Adds the rest of the entity items
 		verify(mockView, times((int) (2 * maxLim))).insertChildEntityTreeItem(
 				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),
@@ -230,8 +225,8 @@ public class EntityTreeBrowserTest {
 		
 		entityTreeBrowser.configure(headers);
 		verify(mockView).clear();
-		verify(mockView).appendLoading(null);
+		verify(mockView).setLoadingVisible(true);
 		verify(mockView).appendRootEntityTreeItem(any(EntityTreeItem.class));
-		verify(mockView).removeLoading(any(IsTreeItem.class));
+		verify(mockView).setLoadingVisible(false);
 	}
 }

@@ -1,30 +1,37 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface QuizView extends IsWidget, SynapseView {
 	
 	void setPresenter(Presenter loginPresenter);	
-	void showQuiz(Quiz questions);
+	void hideLoading();
+	void setQuizHeader(String quizHeader);
+	void addQuestionContainerWidget(Widget widget);
+	void addSubmitHandler(ClickHandler handler);
+	void setSubmitEnabled(boolean isEnabled);
+	void reset();
+	void setSubmitVisible(boolean isVisible);
+	void showScore(String scoreContainerText);
+	void hideAll();
 	void showSuccess(UserProfile profile, PassingRecord passingRecord);
 	void showFailure(PassingRecord passingRecord);
-	void hideLoading();
 	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
-		void goToLastPlace();
-		
-		void submitAnswers(Map<Long, Set<Long>> questionIndex2AnswerIndices);
+		void goToLastPlace();	
+		void showQuiz(Quiz quiz);
+		void submitAnswers();
+		void showSuccess(UserProfile profile, PassingRecord passingRecord);
+		void showFailure(PassingRecord passingRecord);
     }
-	
 }

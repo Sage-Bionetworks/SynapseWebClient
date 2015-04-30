@@ -24,7 +24,7 @@
 					</t:TableData>
 				</t:TableRow>
 			</t:Table>
-		</b:Alert>
+	</b:Alert>
 		<div class="margin-10">
 			<div class="row margin-top-5">
 			    <div ui:field="profileUI" class="col-md-5 col-xs-12">
