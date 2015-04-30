@@ -119,9 +119,9 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 	public void reloadWiki(SubpageNavTreeNode node) {
 		if (reloadWikiPageCallback != null) {
 			reloadWikiPageCallback.invoke(node.getWikiPageKey());
-			globalApplicationState.pushCurrentPlace(node.getTargetPlace());
 			this.currentWikiKey = node.getWikiPageKey();
 			view.resetNavTree(this.overallRoot);
+			globalApplicationState.pushCurrentPlace(node.getTargetPlace());
 		}
 	}
 

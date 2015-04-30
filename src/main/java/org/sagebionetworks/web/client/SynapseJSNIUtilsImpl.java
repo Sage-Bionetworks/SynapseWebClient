@@ -452,5 +452,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private static native void _pushHistoryState(String token)/*-{
 		$wnd.history.pushState( {} , '', '#'+token );
+		// reload the page on pop state
+		$wnd.onpopstate = function(event) {
+			$wnd.location.reload(false);
+		};
 	}-*/;
 }
