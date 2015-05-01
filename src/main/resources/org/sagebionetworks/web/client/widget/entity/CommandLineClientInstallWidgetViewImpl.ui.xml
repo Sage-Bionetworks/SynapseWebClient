@@ -8,17 +8,13 @@
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:HTMLPanel>
 		<b:Heading size="H5" text="Install the Command Line Client"/>
-  		<g:HTMLPanel addStyleNames="codeContent">
-  		    <bh:Text text="# From Terminal Prompt:"/>
-  		    <br/>
-  	        <bh:Text text="pip install synapseclient"/>
-  	        <br/>
-  	        <br/>
-  	        <bh:Text text="# or"/>
-  	        <br/>
-  	        <bh:Text text="easy_install synapseclient"/>
- 	        </g:HTMLPanel>
- 	        <b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" addStyleNames="link" target="_blank" text="API Documentation"/>
+  		<pre class="codeContent">
+# From Terminal Prompt:
+pip install synapseclient
+
+# or
+easy_install synapseclient</pre>
+ 	    <b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" addStyleNames="link" target="_blank" text="API Documentation"/>
 		<bh:Text text="and"/>
 		<b:Anchor href="https://www.synapse.org/#!Help:CommandLineClient" addStyleNames="link" target="_blank" text="Example Code"/>
 	</g:HTMLPanel>

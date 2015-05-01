@@ -18,14 +18,14 @@ public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.cl
 	Widget widget;
 	
 	@UiField(provided=true)
-	CommandLineClientGetEntityWidgetViewImpl getEntity;
+	CommandLineClientEntityGetterUIWidgetViewImpl getEntity;
 	
 	@UiField(provided=true)
 	CommandLineClientInstallWidgetViewImpl install;
 	
 	@Inject
 	public CommandLineClientModalWidgetViewImpl(Binder uiBinder,
-			CommandLineClientGetEntityWidgetViewImpl getEntity,
+			CommandLineClientEntityGetterUIWidgetViewImpl getEntity,
 			CommandLineClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;

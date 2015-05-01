@@ -13,7 +13,7 @@
 	  	<b:ImageAnchor dataToggle="MODAL" dataTarget="#javaClient" url='{sageImageBundle.logoJava45.getSafeUri.asString}'/>
 	  	<b:Modal title="Synapse Java Client" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="javaClient">
 			<b:ModalBody>
-				<e:JavaClientGetEntityWidgetViewImpl ui:field="getEntity"/>
+				<e:JavaClientEntityGetterUIWidgetViewImpl ui:field="getEntity"/>
 		  		<e:JavaClientInstallWidgetViewImpl ui:field="install"/> 
 			</b:ModalBody>
 			<b:ModalFooter>

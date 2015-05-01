@@ -14,7 +14,7 @@ public class JavaClientModalWidgetViewImpl  extends com.google.gwt.user.client.u
 	Widget widget;
 	
 	@UiField(provided=true)
-	JavaClientGetEntityWidgetViewImpl getEntity;
+	JavaClientEntityGetterUIWidgetViewImpl getEntity;
 	
 	@UiField(provided=true)
 	JavaClientInstallWidgetViewImpl install;
@@ -22,7 +22,7 @@ public class JavaClientModalWidgetViewImpl  extends com.google.gwt.user.client.u
 	@Inject
 	public JavaClientModalWidgetViewImpl(Binder uiBinder,
 			JavaClientInstallWidgetViewImpl install,
-			JavaClientGetEntityWidgetViewImpl getEntity) {
+			JavaClientEntityGetterUIWidgetViewImpl getEntity) {
 		this.install = install;
 		this.getEntity = getEntity;
 		widget = uiBinder.createAndBindUi(this);

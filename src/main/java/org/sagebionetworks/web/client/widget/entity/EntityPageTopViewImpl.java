@@ -696,6 +696,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private void createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {
+		fileProgrammaticClientsContainer.clear();
 		String id = bundle.getEntity().getId();
 		rLoadWidget.configure(id, versionNumber);
 		pythonLoadWidget.configure(id);

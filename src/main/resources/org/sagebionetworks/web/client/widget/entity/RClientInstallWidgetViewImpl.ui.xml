@@ -10,11 +10,9 @@
   
   	<g:HTMLPanel>
 	  	<b:Heading size="H5" text="Install the R Client"/>
-		<g:HTMLPanel addStyleNames="codeContent">
-	       <bh:Text text="source('http://depot.sagebase.org/CRAN.R')"/>
-	       <br/>
-	       <bh:Text text="pkgInstall(c(&quot;synapseClient&quot;))"/>
-      	</g:HTMLPanel>
+		<pre class="codeContent">
+source('http://depot.sagebase.org/CRAN.R')
+pkgInstall(c(&quot;synapseClient&quot;))</pre>
       	<b:Anchor href="http://r-docs.synapse.org/" addStyleNames="link" target="_blank" text="API Documentation"/>
 		<bh:Text text="and"/>
 		<b:Anchor href="https://www.synapse.org/#!Help:RClient" addStyleNames="link" target="_blank" text="Example Code"/>

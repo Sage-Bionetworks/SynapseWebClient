@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
-import org.sagebionetworks.web.client.widget.entity.CommandLineClientGetEntityWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.CommandLineClientEntityGetterUIWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.CommandLineClientInstallWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -198,10 +198,6 @@ public interface PortalGinInjector extends Ginjector {
 	public JiraURLHelper getJiraURLHelper();
 		
 	public MarkdownWidget getMarkdownWidget();
-	
-	public CommandLineClientInstallWidgetViewImpl getCommandLineClientInstallWidgetViewImpl();
-	
-	public CommandLineClientGetEntityWidgetViewImpl getCommandLineClientGetEntityWidgetViewImpl();
 	
 	public ActionMenuWidget createActionMenuWidget();
 	

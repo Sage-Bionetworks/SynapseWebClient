@@ -14,14 +14,14 @@ public class PythonClientModalWidgetViewImpl extends com.google.gwt.user.client.
 	Widget widget;
 	
 	@UiField(provided=true)
-	PythonClientGetEntityWidgetViewImpl getEntity;
+	PythonClientEntityGetterUIWidgetViewImpl getEntity;
 	
 	@UiField(provided=true)
 	PythonClientInstallWidgetViewImpl install;
 	
 	@Inject
 	public PythonClientModalWidgetViewImpl(Binder uiBinder,
-			PythonClientGetEntityWidgetViewImpl getEntity,
+			PythonClientEntityGetterUIWidgetViewImpl getEntity,
 			PythonClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;

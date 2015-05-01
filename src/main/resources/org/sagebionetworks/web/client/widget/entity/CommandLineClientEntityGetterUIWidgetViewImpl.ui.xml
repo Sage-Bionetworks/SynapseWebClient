@@ -8,15 +8,11 @@
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:HTMLPanel>
 		<b:Heading size="H5" text="Download this Entity"/>
-		<g:HTMLPanel addStyleNames="codeContent">
-		    <bh:Text text="# Login"/>
-		    <br/>
-		    <bh:Text text="synapse -u synapse_username -p pw"/>
-		    <br/>
-		    <br/>
-		    <bh:Text text="# Download file"/>
-		    <br/>
-			<bh:Text ui:field="download"/>
-		</g:HTMLPanel>
+		<pre class="codeContent">
+# Login
+synapse -u synapse_username -p synapse_password
+
+# Download file
+synapse get <span ui:field="synid1"/></pre>
 	</g:HTMLPanel>
 </ui:UiBinder>

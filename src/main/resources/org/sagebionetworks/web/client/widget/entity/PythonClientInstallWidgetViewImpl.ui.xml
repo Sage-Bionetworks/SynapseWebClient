@@ -7,16 +7,12 @@
   	<g:HTMLPanel>
 	  	<g:HTMLPanel>
 			<b:Heading size="H5" text="Install the Python Client"/>
-	  		<g:HTMLPanel addStyleNames="codeContent">
-	  		    <bh:Text text="# From Terminal Prompt:"/>
-	  		    <br/>
-	  	        <bh:Text text="pip install synapseclient"/>
-	  	        <br/>
-	  	        <br/>
-	  	        <bh:Text text="# or"/>
-	  	        <br/>
-	  	        <bh:Text text="easy_install synapseclient"/>
-	        </g:HTMLPanel>
+	  		<pre class="codeContent">
+# From Terminal Prompt:
+pip install synapseclient
+
+# or
+easy_install synapseclient</pre>
 		</g:HTMLPanel>
 		<b:Anchor href="http://python-docs.synapse.org/" addStyleNames="link" target="_blank" text="API Documentation"/>
 		<bh:Text text="and"/>

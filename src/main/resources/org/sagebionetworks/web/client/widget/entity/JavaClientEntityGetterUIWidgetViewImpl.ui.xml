@@ -9,17 +9,13 @@
   
   	<g:HTMLPanel>
  		<b:Heading size="H5" text="Download this Entity"/>
-  		<g:HTMLPanel addStyleNames="codeContent">
-	  	    <bh:Text text="import org.sagebionetworks.client.Synapse;"/>
-	  	    <br/>
-	  	    <br/>
-	  	    <bh:Text text="Synapse synapseClient = new Synapse();"/>
-	  	    <br/>
-	  	    <bh:Text text="synapseClient.login('synapse_username', 'password');"/>
-	  	    <br/>
-	  	    <br/>
-		  	<bh:Text ui:field="download"/>
-	  	</g:HTMLPanel>
+ 		<pre class="codeContent">
+import org.sagebionetworks.client.Synapse;
+ 	
+Synapse synapseClient = new Synapse();	  
+synapseClient.login('synapse_username', 'password');
+
+Entity <span ui:field="synid1"/> = synapseClient.getEntityById("<span ui:field="synid2"/>");</pre>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

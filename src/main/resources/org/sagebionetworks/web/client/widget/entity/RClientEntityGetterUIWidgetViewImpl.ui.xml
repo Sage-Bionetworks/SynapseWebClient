@@ -10,21 +10,14 @@
   
 	<g:HTMLPanel>
 	    <b:Heading size="H5" text="Download this Entity"/>
-		<g:HTMLPanel addStyleNames="codeContent">
-	 	    <bh:Text text="library(synapseClient)"/>
-	 	    <br/>				  	    
-	 	    <bh:Text text="synapseLogin('username','password')"/>
-	 	    <br/>
-	 	    <br/>
-	 	    <bh:Text text="# Obtain a pointer and download the data"/>
-	 	    <br/>
-		  	<bh:Text ui:field="getEntity"/>
-		  	<br/>
-		  	<br/>
-		  	<bh:Text text="# Load the data"/>
-		  	<br/>
-		  	<bh:Text ui:field="loadEntity"/>
-		  	<br/>
- 		</g:HTMLPanel>
+		<pre class="codeContent">library(synapseClient)
+synapseLogin('username','password')
+
+# Obtain a pointer and download the data
+
+<span ui:field="synid1"/> &#60;- synGet(id='<span ui:field="synid2"/>')
+
+# Load the data
+<span ui:field="synid3"/> &#60;- synGet(id='<span ui:field="synid4"/>', load=T)</pre>
 	</g:HTMLPanel>
 </ui:UiBinder>

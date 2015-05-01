@@ -14,14 +14,14 @@ public class RClientModalWidgetViewImpl extends com.google.gwt.user.client.ui.Fl
 	Widget widget;
 	
 	@UiField(provided=true)
-	RClientGetEntityWidgetViewImpl getEntity;
+	RClientEntityGetterUIWidgetViewImpl getEntity;
 	
 	@UiField(provided=true)
 	RClientInstallWidgetViewImpl install;
 	
 	@Inject
 	public RClientModalWidgetViewImpl(Binder uiBinder,
-			RClientGetEntityWidgetViewImpl getEntity,
+			RClientEntityGetterUIWidgetViewImpl getEntity,
 			RClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;
