@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -56,6 +55,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
@@ -101,7 +101,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	Anchor projectHeaderAnchor;
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
@@ -144,7 +143,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel fileProvenanceContainer;
 	@UiField
-	SimplePanel fileProgrammaticClientsContainer;
+	HTMLPanel fileProgrammaticClientsContainer;
 	@UiField
 	SimplePanel fileModifiedAndCreatedContainer;
 	@UiField
@@ -188,10 +187,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private static int WIDGET_HEIGHT_PX = 270;
 	private String currentProjectAnchorTargetId;
 	private boolean annotationsShown;
+	private RClientModalWidgetViewImpl rLoadWidget;
+	private PythonClientModalWidgetViewImpl pythonLoadWidget;
+	private JavaClientModalWidgetViewImpl javaLoadWidget;
+	private CommandLineClientModalWidgetViewImpl commandLineLoadWidget;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
-			SageImageBundle sageImageBundle,
 			FileTitleBar fileTitleBar,
 			Breadcrumb breadcrumb,
 			EntityMetadata entityMetadata, 
@@ -203,9 +205,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			FilesBrowser folderFilesBrowser,
 			WikiPageWidget wikiPageWidget,
 			TableListWidget tableListWidget,
+			RClientModalWidgetViewImpl rLoadWidget,
+			PythonClientModalWidgetViewImpl pythonLoadWidget,
+			JavaClientModalWidgetViewImpl javaLoadWidget,
+			CommandLineClientModalWidgetViewImpl commandLineLoadWidget,
 			PreviewWidget previewWidget, CookieProvider cookies,
 			GlobalApplicationState globalApplicationState) {
-		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -218,6 +223,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.wikiPageWidget = wikiPageWidget;
 		this.tableListWidget = tableListWidget;
+		this.rLoadWidget = rLoadWidget;
+		this.javaLoadWidget = javaLoadWidget;
+		this.commandLineLoadWidget = commandLineLoadWidget;
+		this.pythonLoadWidget = pythonLoadWidget;
 		this.globalApplicationState = globalApplicationState;
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.add(fileHistoryWidget.asWidget());
@@ -436,7 +445,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			fileProvenanceContainer.add(createProvenanceWidget(bundle, provFullWidth));
 		}	
 		// Programmatic Clients
-		fileProgrammaticClientsContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
+		createProgrammaticClientsWidget(bundle, versionNumber);
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
 	}
@@ -686,8 +695,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return wrapper;
 	}
 	
-	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {
-		return ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), versionNumber, synapseJSNIUtils, sageImageBundle);
+	private void createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {
+		fileProgrammaticClientsContainer.clear();
+		String id = bundle.getEntity().getId();
+		rLoadWidget.configure(id, versionNumber);
+		pythonLoadWidget.configure(id);
+		javaLoadWidget.configure(id);
+		commandLineLoadWidget.configure(id);
+		fileProgrammaticClientsContainer.add(rLoadWidget.asWidget());
+		fileProgrammaticClientsContainer.add(pythonLoadWidget.asWidget());
+		fileProgrammaticClientsContainer.add(javaLoadWidget.asWidget());
+		fileProgrammaticClientsContainer.add(commandLineLoadWidget.asWidget());		
 	}
 
 	private Widget configureFilesBrowser(FilesBrowser filesBrowser, Entity entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {

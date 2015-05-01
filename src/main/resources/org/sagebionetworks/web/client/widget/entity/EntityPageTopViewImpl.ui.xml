@@ -59,7 +59,7 @@
 						</b:Row>
 						<b:Row>
 							<b:Column size="XS_12">
-								<g:SimplePanel ui:field="fileProgrammaticClientsContainer"/>		
+								<g:HTMLPanel ui:field="fileProgrammaticClientsContainer"/>		
 							</b:Column>
 						</b:Row>
 						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
