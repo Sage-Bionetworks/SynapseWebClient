@@ -74,4 +74,9 @@ public interface SynapseJSNIUtils {
 	 * @param token
 	 */
 	public void pushHistoryState(String token);
+
+	/**
+	 * initialize the behavior for on pop state
+	 */
+	public void initOnPopStateHandler();
 }

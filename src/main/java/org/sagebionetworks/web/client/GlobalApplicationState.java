@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
-import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -115,9 +114,14 @@ public interface GlobalApplicationState {
 	public boolean isWikiBasedEntity(String entityId);
 
 	/**
-	 * This can be used to change the URL in the browser without reloading the page.
+	 * This method can be used to change the URL in the browser without reloading the page.
 	 * 
 	 * @param currentPlace
 	 */
 	public void pushCurrentPlace(Place targetPlace);
+
+	/**
+	 * This method initializes the handler for on pop state event.
+	 */
+	public void initOnPopStateHandler();
 }
