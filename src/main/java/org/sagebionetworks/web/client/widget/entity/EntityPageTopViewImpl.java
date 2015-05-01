@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -102,7 +101,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	Anchor projectHeaderAnchor;
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
@@ -196,7 +194,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
-			SageImageBundle sageImageBundle,
 			FileTitleBar fileTitleBar,
 			Breadcrumb breadcrumb,
 			EntityMetadata entityMetadata, 
@@ -214,7 +211,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			CommandLineClientModalWidgetViewImpl commandLineLoadWidget,
 			PreviewWidget previewWidget, CookieProvider cookies,
 			GlobalApplicationState globalApplicationState) {
-		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;

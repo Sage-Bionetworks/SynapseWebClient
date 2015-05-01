@@ -10,7 +10,6 @@ import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -32,7 +31,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
 	private EntitySchemaCache schemaCache;
-	private IconsImageBundle iconsImageBundle;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private GlobalApplicationState globalApplicationState;
 	private EntityBundle bundle;
@@ -54,14 +52,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public EntityPageTop(EntityPageTopView view, 
 			AuthenticationController authenticationController,
 			EntitySchemaCache schemaCache,
-			IconsImageBundle iconsImageBundle,
 			GlobalApplicationState globalApplicationState,
 			EventBus bus,
 			QueryTokenProvider queryTokenProvider) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.schemaCache = schemaCache;
-		this.iconsImageBundle = iconsImageBundle;
 		this.bus = bus;
 		this.globalApplicationState = globalApplicationState;	
 		this.queryTokenProvider = queryTokenProvider;
