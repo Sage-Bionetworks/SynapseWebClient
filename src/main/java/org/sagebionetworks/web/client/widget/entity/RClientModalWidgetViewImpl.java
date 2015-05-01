@@ -10,8 +10,6 @@ import com.google.inject.Inject;
 public class RClientModalWidgetViewImpl extends com.google.gwt.user.client.ui.FlowPanel implements HasWidgets {
 
 	public interface Binder extends UiBinder<Widget, RClientModalWidgetViewImpl> {}
-
-	Widget widget;
 	
 	@UiField(provided=true)
 	RClientEntityGetterUIWidgetViewImpl getEntity;
@@ -25,7 +23,7 @@ public class RClientModalWidgetViewImpl extends com.google.gwt.user.client.ui.Fl
 			RClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;
-		widget = uiBinder.createAndBindUi(this);
+		uiBinder.createAndBindUi(this);
 	}
 	
 	public void configure(String id, Long versionNumber) {
@@ -33,6 +31,6 @@ public class RClientModalWidgetViewImpl extends com.google.gwt.user.client.ui.Fl
 	}
 	
 	public Widget asWidget() {
-		return widget;
+		return this;
 	}
 }

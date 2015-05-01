@@ -14,8 +14,6 @@ import com.google.inject.Inject;
 public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.client.ui.FlowPanel implements HasWidgets {
 
 	public interface Binder extends UiBinder<Widget, CommandLineClientModalWidgetViewImpl> {}
-
-	Widget widget;
 	
 	@UiField(provided=true)
 	CommandLineClientEntityGetterUIWidgetViewImpl getEntity;
@@ -29,7 +27,7 @@ public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.cl
 			CommandLineClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;
-		widget = uiBinder.createAndBindUi(this);
+		uiBinder.createAndBindUi(this);
 	}
 	
 	public void configure(String id) {
@@ -37,7 +35,7 @@ public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.cl
 	}
 	
 	public Widget asWidget() {
-		return widget;
+		return this;
 	}
 
 }

@@ -8,16 +8,13 @@ import com.google.inject.Inject;
 public class PythonClientInstallWidgetViewImpl extends com.google.gwt.user.client.ui.Composite {
 
 	public interface Binder extends UiBinder<Widget, PythonClientInstallWidgetViewImpl> {}
-
-	Widget widget;
 	
 	@Inject
 	public PythonClientInstallWidgetViewImpl(Binder uiBinder) {
-		widget = uiBinder.createAndBindUi(this);
-		initWidget(widget);
+		initWidget(uiBinder.createAndBindUi(this));
 	}
 	
 	public Widget asWidget() {
-		return widget;
+		return this;
 	}
 }
