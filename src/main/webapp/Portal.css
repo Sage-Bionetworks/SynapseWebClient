@@ -1407,6 +1407,7 @@ ol.lowerroman {
 	display: inline-block;
 	position: relative;
 	top: 4px;
+	overflow-y: hidden;
 }
 
 .myEvaluationListContainer {
