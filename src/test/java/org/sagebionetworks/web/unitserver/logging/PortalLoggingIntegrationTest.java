@@ -53,6 +53,7 @@ public class PortalLoggingIntegrationTest {
 		Thread.sleep(30000);
 	}
 	
+	@Ignore
 	@Test
 	public void testRoundTrip() throws InterruptedException, IOException{
 		// This test writes data to the log and then attempts to find that data S3 after the logs have been swept.
