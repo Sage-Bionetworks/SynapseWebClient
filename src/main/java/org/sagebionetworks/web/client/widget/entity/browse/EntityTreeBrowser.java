@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -88,17 +87,18 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 */
 	public void configure(String searchId) {
 		view.clear();
-		getFolderChildren(searchId, null, 0, view.appendLoading(null));
+		view.setLoadingVisible(true);
+		getFolderChildren(searchId, null, 0);
 	}
 
 	public void configure(List<EntityHeader> headers) {
 		view.clear();
-		IsTreeItem loading = view.appendLoading(null);
+		view.setLoadingVisible(true);
 		for (EntityHeader header : headers) {
 			view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true,
 					false));
 		}
-		view.removeLoading(loading);
+		view.setLoadingVisible(false);
 	}
 
 	@Override
@@ -107,11 +107,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		return view.asWidget();
 	}
 
-	// Have each have a hideLoading...
 	@Override
 	public void getFolderChildren(final String parentId,
-			final EntityTreeItem parent, final long offset,
-			final IsTreeItem loading) {
+			final EntityTreeItem parent, final long offset) {
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
 				org.sagebionetworks.repo.model.entity.query.EntityType.folder);
 		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
@@ -138,9 +136,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 							}
 						}
 						if (offset == 0) {
-							getChildrenFiles(parentId, parent, 0, loading);
-						} else
-							view.removeLoading(loading);
+							getChildrenFiles(parentId, parent, 0);
+						} else {
+							if (parent == null)
+								view.setLoadingVisible(false);
+							else
+								parent.showTypeIcon();
+						}
 					}
 
 					@Override
@@ -178,8 +180,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 	@Override
 	public void getChildrenFiles(final String parentId,
-			final EntityTreeItem parent, final long offset,
-			final IsTreeItem loading) {
+			final EntityTreeItem parent, final long offset) {
 		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
 				org.sagebionetworks.repo.model.entity.query.EntityType.file);
 		synapseClient.executeEntityQuery(childrenQuery,
@@ -203,7 +204,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 										offset);
 							}
 						}
-						view.removeLoading(loading);
+						if (parent == null) {
+							view.setLoadingVisible(false);
+						} else {
+							parent.showTypeIcon();
+
+						}
 						// Root should only have the now hidden loading UI,
 						// which amounts to a single child.
 						if (parent == null && view.getRootCount() == 0) {
@@ -278,8 +284,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			// We have not already fetched children for this entity.
 			alreadyFetchedEntityChildren.add(target);
 			target.asTreeItem().removeItems();
-			getFolderChildren(target.getHeader().getId(), target, 0,
-					view.appendLoading(target));
+			target.showLoadingIcon();
+			getFolderChildren(target.getHeader().getId(), target, 0);
 		}
 	}
 
