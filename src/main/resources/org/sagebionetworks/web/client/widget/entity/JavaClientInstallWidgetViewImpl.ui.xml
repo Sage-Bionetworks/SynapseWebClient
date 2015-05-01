@@ -14,13 +14,28 @@
 		    <br/>
 	        <bh:Text text="&#60;distributionManagement&#62;"/>
 		    <br/>
-	        <bh:Text text="&#60;repository&#62;"/>
+	        &nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;repository&#62;"/>
 	        <br/>
-		    <bh:Text text="# Using Maven, add to pom.xml:"/>
-		    <br/>
-	        <bh:Text text="# or"/>
+	        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;id&#62;sagebionetworks&#60;/id&#62;"/>
 	        <br/>
-	        <bh:Text text="easy_install synapseclient"/>
+	        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;name&#62;sagebionetworks-releases&#60;/name&#62;"/>
+	        <br/>
+	        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;url&#62;http://sagebionetworks.artifactoryonline.com/sagebionetworks/libs-releases-local&#60;/url&#62;"/>
+	        <br/>
+	        &nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;/repository&#62;"/>
+	        <br/>
+	        <bh:Text text="&#60;/distributionManagement&#62;"/>
+	        <br/>
+	        <br/>
+	        <bh:Text text="&#60;dependency&#62;"/>
+	        <br/>	        
+	        &nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;groupId&#62;org.sagebionetworks&#60;/groupId&#62;"/>
+	        <br/>
+	        &nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;artifactId&#62;synapseJavaClient&#60;/artifactId&#62;"/>
+	        <br/>
+	        &nbsp;&nbsp;&nbsp;&nbsp;<bh:Text text="&#60;version&#62;See Repository for newest Version&#60;/version&#62;"/>
+	        <br/>
+	        <bh:Text text="&#60;/dependency&#62;"/>
         </g:HTMLPanel>
         <b:Anchor href="https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java" addStyleNames="link" target="_blank" text="API Documentation"/>
 		<bh:Text text="and"/>

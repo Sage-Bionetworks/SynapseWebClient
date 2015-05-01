@@ -1,57 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.inject.Inject;
 
 public class ProgrammaticClientCode extends Composite implements SynapseWidgetPresenter {
 
-	private static int numSeq = 0;
-	
-	// Likely want to move all of this off this widget, but for now...
-	
-	static PortalGinInjector ginInjector;
-	
-	@Inject
-	public ProgrammaticClientCode(PortalGinInjector ginInjector) {
-		this.ginInjector = ginInjector;
-	}
-	
-	public static FlowPanel createLoadWidget(String entityId, Long versionNumber, SynapseJSNIUtils synapseJSNIUtils, SageImageBundle sageImageBundle) {
-		Anchor rLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoR45())));
-		GWT.debugger();
-//		rClientEntityLoadWidgetViewImpl rLoadWidget = ginInjector.createRClientEntityLoadWidgetViewImpl();
-//		rLoadWidget.configure(entityId, versionNumber);
-		//DisplayUtils.addClickPopover(rLoadWidget.asWidget(), "Synapse R Client", Placement.BOTTOM);
-
-		Anchor pythonLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoPython45())));
-		DisplayUtils.addClickPopover(pythonLink, "Synapse Python Client", getPythonClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
-
-		Anchor shellLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoCommandLine45())));
-		DisplayUtils.addClickPopover(shellLink, "Synapse Command Line Client", getCommandLineClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
-
-		Anchor javaLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoJava45())));
-		DisplayUtils.addClickPopover(javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
-		
-		FlowPanel lc = new FlowPanel();
-		lc.add(pythonLink);
-		lc.add(shellLink);
-		lc.add(javaLink);
-		return lc;
-	}
+	private static int numSeq = 0;	
 	
 	public static SafeHtml getRClientEntityLoad(String id, Long versionNumber) {
 		String safeId = SafeHtmlUtils.fromString(id).asString();
