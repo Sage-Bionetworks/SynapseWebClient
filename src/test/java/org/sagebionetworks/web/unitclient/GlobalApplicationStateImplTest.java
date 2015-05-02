@@ -232,4 +232,10 @@ public class GlobalApplicationStateImplTest {
 		verify(mockCookieProvider).setCookie(anyString(), anyString(), any(Date.class));
 		verify(mockSynapseJSNIUtils).pushHistoryState(newToken);
 	}
+
+	@Test
+	public void testInitOnPopStateHandler() {
+		globalApplicationState.initOnPopStateHandler();
+		verify(mockSynapseJSNIUtils).initOnPopStateHandler();
+	}
 }
