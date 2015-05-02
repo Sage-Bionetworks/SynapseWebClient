@@ -436,6 +436,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				
 			}
+
+			@Override
+			public void initOnPopStateHandler() {
+				// TODO Auto-generated method stub
+			}
 		};
 	}
 }

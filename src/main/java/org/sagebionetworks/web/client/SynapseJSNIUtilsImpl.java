@@ -456,7 +456,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		_initOnPopStateHandler();
 	}
 
-	private static native void _initOnPopStateHandler()/*- {
+	private static native void _initOnPopStateHandler()/*-{
 		// reload the page on pop state
 		$wnd.on("onpopstate", function(event) {
 			$wnd.location.reload(false);
