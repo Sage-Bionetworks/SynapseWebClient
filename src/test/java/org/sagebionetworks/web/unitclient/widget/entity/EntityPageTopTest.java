@@ -9,8 +9,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -95,7 +97,6 @@ public class EntityPageTopTest {
 		mockView = mock(EntityPageTopView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
-		mockIconsImageBundle = mock(IconsImageBundle.class);
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
@@ -103,7 +104,6 @@ public class EntityPageTopTest {
 		
 		pageTop = new EntityPageTop(mockView, mockAuthenticationController,
 				mockSchemaCache,
-				mockIconsImageBundle, 
 				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
 		pageTop.setAreaChangeHandler(areaChangeHandler);
 		
