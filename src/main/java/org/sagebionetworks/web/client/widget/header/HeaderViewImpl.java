@@ -120,20 +120,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		initClickHandlers();
 		refreshTestSiteHeader();
 	}
-
+	
 	@Override
-	public void setLargeLogo(boolean largeLogo) {
-		if (largeLogo) {
-			synapseLogo.setHeight("66px");
-			synapseLogo.setWidth("332px");
-			headerDiv.setHeight("100px");
-			headerDiv.setPaddingTop(16);
-		} else {
-			synapseLogo.setHeight("25px");
-			synapseLogo.setWidth("126px");
-			headerDiv.setHeight("50px");
-			headerDiv.setPaddingTop(9);
-		}
+	public void showLargeLogo() {
+		synapseLogo.setHeight("66px");
+		synapseLogo.setWidth("332px");
+		headerDiv.setHeight("100px");
+		headerDiv.setPaddingTop(16);
+	}
+	
+	@Override
+	public void showSmallLogo() {
+		synapseLogo.setHeight("25px");
+		synapseLogo.setWidth("126px");
+		headerDiv.setHeight("50px");
+		headerDiv.setPaddingTop(9);
 	}
 	
 	/**

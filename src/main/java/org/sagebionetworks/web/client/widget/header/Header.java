@@ -47,7 +47,11 @@ public class Header implements HeaderView.Presenter {
 	}
 	
 	public void configure(boolean largeLogo) {
-		view.setLargeLogo(largeLogo);
+		if (largeLogo) {
+			view.showLargeLogo();
+		} else {
+			view.showSmallLogo();
+		}
 	}
 
 	public Widget asWidget() {

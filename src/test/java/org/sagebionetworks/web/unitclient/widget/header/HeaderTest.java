@@ -4,6 +4,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -169,5 +170,18 @@ public class HeaderTest {
 		verify(mockView, times(2)).clearFavorite();
 		verify(mockSynapseClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
+	}
+	
+	@Test
+	public void testShowLargeLogo() {
+		header.configure(true);
+		verify(mockView).showLargeLogo();
+		verify(mockView, never()).showSmallLogo();
+	}
+	@Test
+	public void testShowSmallLogo() {
+		header.configure(false);
+		verify(mockView, never()).showLargeLogo();
+		verify(mockView).showSmallLogo();
 	}
 }
