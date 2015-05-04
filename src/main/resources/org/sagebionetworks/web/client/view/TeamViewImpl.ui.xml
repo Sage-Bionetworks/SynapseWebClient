@@ -4,10 +4,8 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 
 	<g:HTMLPanel>
-	    <div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
-	    <div class="margin-top-left-10 margin-right-15">
+	    <g:SimplePanel ui:field="header" />
+		<div class="margin-top-left-10 margin-right-15">
 	        <div class="row">
 	            <g:SimplePanel ui:field="mediaObjectContainer" styleName="col-md-9"/>
 	    		<g:FlowPanel ui:field="commandsContainer" styleName="col-md-3"/>

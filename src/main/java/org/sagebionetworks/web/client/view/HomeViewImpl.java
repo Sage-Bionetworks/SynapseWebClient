@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
@@ -14,16 +15,17 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
-import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.place.WikiByTitle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -31,9 +33,11 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -52,23 +56,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel bigSearchBox;
-	@UiField
 	SimplePanel newsFeed;
-	@UiField
-	org.gwtbootstrap3.client.ui.Button loginBtn;
-	@UiField
-	org.gwtbootstrap3.client.ui.Button registerBtn;
-	@UiField
-	org.gwtbootstrap3.client.ui.Button dreamBtn;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
 	@UiField
-	HTMLPanel whatIsSynapseContainer;
+	Div dashboardUI;
 	@UiField
-	HTMLPanel howToUseSynapseContainer;
-	@UiField
-	HTMLPanel getStartedContainer;
+	Div registerUI;
+	
 	@UiField
 	SimplePanel rClientInstallPanel;
 	@UiField
@@ -94,17 +89,30 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	Anchor javaExampleCodeLink;	
 	@UiField
-	Anchor aboutSynapseLink;
-	@UiField
 	Anchor restApiLink;
+	
+	@UiField
+	FocusPanel dreamChallengesBox;
+	@UiField
+	FocusPanel openResearchProjectsBox;
+	@UiField
+	FocusPanel researchCommunitiesBox;
+	
+	@UiField
+	FocusPanel termsOfUseBox;
+	@UiField
+	FocusPanel becomeCertifiedBox;
+	@UiField
+	FocusPanel creditForResearchBox;
+	@UiField
+	FocusPanel organizeResearchAssetsBox;
+	@UiField
+	FocusPanel collaborateBox;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
-	private GlobalApplicationState globalApplicationState;
-	private HomeSearchBox homeSearchBox;	
 	IconsImageBundle iconsImageBundle;
-	private CookieProvider cookies;
 	SynapseJSNIUtils synapseJSNIUtils;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
@@ -116,18 +124,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 			IconsImageBundle icons, 
 			SageImageBundle imageBundle,
 			final GlobalApplicationState globalApplicationState,
-			HomeSearchBox homeSearchBox, 
 			CookieProvider cookies,
 			final AuthenticationController authController,
 			SynapseJSNIUtils synapseJSNIUtils,
-			UserBadge userBadge) {
+			UserBadge userBadge,
+			RegisterWidget registerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.globalApplicationState = globalApplicationState;
-		this.homeSearchBox = homeSearchBox;
 		this.iconsImageBundle = icons;
-		this.cookies = cookies;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.userBadge = userBadge;
 		userBadge.setSize(BadgeSize.DEFAULT_PICTURE_ONLY);
@@ -143,28 +148,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
-		bigSearchBox.clear();
-		bigSearchBox.add(homeSearchBox.asWidget());
-		
-		loginBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
-			}
-		});
-		registerBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
-			}
-		});
-		dreamBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
-			}
-		});
-		
 		dashboardBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -175,9 +158,68 @@ public class HomeViewImpl extends Composite implements HomeView {
 		// Programmatic Clients
 		fillProgrammaticClientInstallCode();
 		
+		registerUI.add(registerWidget.asWidget());
+		
 		// Other links
-		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
+		
+		dreamChallengesBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Location.assign("http://dreamchallenges.org/");
+			}
+		});
+		openResearchProjectsBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new open research project page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("OpenResearchProjects"));
+			}
+		});
+		
+		researchCommunitiesBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("ResearchCommunities"));
+			}
+		});
+		
+		creditForResearchBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("GetCreditForYourResearch"));
+			}
+		});
+		organizeResearchAssetsBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("OrganizeYourDigitalResearchAssets"));
+			}
+		});
+		collaborateBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//go to new research communities page
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("Collaborate"));
+			}
+		});
+		
+		termsOfUseBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GOVERNANCE));
+			}
+		});
+		
+		becomeCertifiedBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("Certification"));
+			}
+		});
 	}
 		
 	/**
@@ -198,17 +240,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void showLoggedInUI(UserSessionData userData) {
 		clearUserProfilePicture();
 		setUserProfilePicture(userData);
-		
-		loginBtn.setVisible(false);
-		registerBtn.setVisible(false);
-		dashboardBtn.setVisible(true);
+		registerUI.setVisible(false);
+		dashboardUI.setVisible(true);
 	}
 	@Override
 	public void showAnonymousUI() {
 		clearUserProfilePicture();
-		loginBtn.setVisible(true);
-		registerBtn.setVisible(true);
-		dashboardBtn.setVisible(false);
+		registerUI.setVisible(true);
+		dashboardUI.setVisible(false);
 	}
 	
 	private void clearUserProfilePicture() {
@@ -221,13 +260,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			UserProfile profile = userData.getProfile();
 			userBadge.configure(profile);
 		}
-	}
-
-	
-	@Override
-	public void onAttach() {
-		super.onAttach();
-		startCarousel();
 	}
 	
 	@Override
@@ -310,10 +342,4 @@ public class HomeViewImpl extends Composite implements HomeView {
 		a.setHref(href);
 		a.setText(text);
 	}
-
-	private static native void startCarousel() /*-{
-		$wnd.jQuery('#myCarousel').carousel('cycle');
-	}-*/;
-
-	
 }

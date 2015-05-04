@@ -689,9 +689,19 @@ public class SynapseClientImplTest {
 				.thenReturn(headerTreeResults);
 		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
 		verify(mockSynapse).getWikiHeaderTree(anyString(),
-				any(ObjectType.class));
+				eq(ObjectType.ENTITY));
 	}
 
+	@Test
+	public void testGetStandaloneWikis() throws Exception {
+		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
+		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class)))
+				.thenReturn(headerTreeResults);
+		synapseClient.getStandaloneWikis();
+		verify(mockSynapse).getWikiHeaderTree(anyString(),
+				any(ObjectType.class));
+	}
+	
 	@Test
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();

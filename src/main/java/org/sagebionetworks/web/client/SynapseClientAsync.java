@@ -66,6 +66,7 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.WikiPaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -413,4 +414,5 @@ public interface SynapseClientAsync {
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
 
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
+	void getStandaloneWikis(AsyncCallback<WikiPaginatedResults> callback);
 }

@@ -384,7 +384,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	private void resizeMarkdownTextArea(int extra) {
-		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight()+ 2 + extra) + "px");
+		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight() + extra) + "px");
 	}
 	
 	@Override

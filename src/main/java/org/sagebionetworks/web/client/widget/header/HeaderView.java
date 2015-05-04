@@ -38,10 +38,11 @@ public interface HeaderView extends IsWidget {
 		void onLoginClick();
 		void onRegisterClick();
 		void onFavoriteClick();
+		void onLogoClick();
 	}
-
-	public void setLargeLogo(boolean isHome);
-
+	public void showLargeLogo();
+	public void showSmallLogo();
+	
 	public void clearFavorite();
 
 	public void setEmptyFavorite();

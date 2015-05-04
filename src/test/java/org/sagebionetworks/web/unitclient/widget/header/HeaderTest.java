@@ -2,8 +2,12 @@ package org.sagebionetworks.web.unitclient.widget.header;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +17,13 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Help;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
@@ -108,6 +111,15 @@ public class HeaderTest {
 		assertTrue(place instanceof LoginPlace);
 		assertEquals(LoginPlace.LOGIN_TOKEN, ((LoginPlace)place).toToken());
 	}
+	
+	@Test
+	public void testOnLogoClick() {
+		header.onLogoClick();
+		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Place place = captor.getValue();
+		assertTrue(place instanceof Home);
+	}
 
 	@Test
 	public void testOnRegisterClick() {
@@ -158,5 +170,18 @@ public class HeaderTest {
 		verify(mockView, times(2)).clearFavorite();
 		verify(mockSynapseClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
+	}
+	
+	@Test
+	public void testShowLargeLogo() {
+		header.configure(true);
+		verify(mockView).showLargeLogo();
+		verify(mockView, never()).showSmallLogo();
+	}
+	@Test
+	public void testShowSmallLogo() {
+		header.configure(false);
+		verify(mockView, never()).showLargeLogo();
+		verify(mockView).showSmallLogo();
 	}
 }

@@ -14,7 +14,7 @@
 			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab4" text="From Attachments"/>
 		</b:NavTabs>
 		<b:TabContent>
-			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
+			<b:TabPane active="true" b:id="tab1" addStyleNames="margin-top-15">
 				<g:SimplePanel ui:field="fileInputWidgetContainer" />
 				<b:Button ui:field="uploadButton" text="Upload" type="INFO" />
 				<g:FlowPanel ui:field="uploadSuccessUI">
@@ -27,7 +27,7 @@
 				</g:FlowPanel>
 				<g:SimplePanel ui:field="uploadParamsPanelContainer" />
 			</b:TabPane>
-			<b:TabPane b:id="tab2" addStyleNames="panel margin-top-15">
+			<b:TabPane b:id="tab2" addStyleNames="margin-top-15">
 				<bh:Div addStyleNames="form-horizontal">
 					<b:FieldSet>
 						<b:FormGroup>
@@ -45,7 +45,7 @@
 					</b:FieldSet>
 				</bh:Div>
 			</b:TabPane>
-			<b:TabPane b:id="tab3" addStyleNames="panel margin-top-15">
+			<b:TabPane b:id="tab3" addStyleNames="margin-top-15">
 				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup>
@@ -61,7 +61,7 @@
 				</bh:Div>
 				<g:SimplePanel ui:field="synapseParamsPanelContainer" />
 			</b:TabPane>
-			<b:TabPane b:id="tab4" addStyleNames="panel margin-top-15">
+			<b:TabPane b:id="tab4" addStyleNames="margin-top-15">
 				<g:SimplePanel ui:field="wikiAttachmentsContainer" />
 			</b:TabPane>
 			

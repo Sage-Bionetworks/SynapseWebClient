@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.footer;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
