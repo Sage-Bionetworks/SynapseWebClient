@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -20,7 +21,6 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -39,17 +39,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
 	}
 
-	private static final String HEADER_LARGE_STYLE = "largeHeader";
-	private static final String HEADER_SMALL_STYLE = "smallHeader";
-
 	@UiField
-	Image logoSmall;
+	Image synapseLogo;
 	@UiField
-	Image logoLarge;
+	Div headerDiv;
 	@UiField
-	DivElement headerDiv;
-	@UiField
-	DivElement headerImageDiv;
+	Div headerImageDiv;
 
 	@UiField
 	Button dashboardButton;
@@ -97,7 +92,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private SearchBox searchBox;
 	private CookieProvider cookies;
 	SageImageBundle sageImageBundle;
-	boolean showLargeLogo;
 	UserBadge userBadge;
 	Span userBadgeText;
 	HorizontalPanel myDashboardButtonContents;
@@ -123,11 +117,26 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		userBadgeText = new Span();
 		myDashboardButtonContents.add(userBadgeText);
 		addUserPicturePanel();
-		showLargeLogo = false; // default
 		initClickHandlers();
 		refreshTestSiteHeader();
 	}
-
+	
+	@Override
+	public void showLargeLogo() {
+		synapseLogo.setHeight("66px");
+		synapseLogo.setWidth("332px");
+		headerDiv.setHeight("100px");
+		headerDiv.setPaddingTop(16);
+	}
+	
+	@Override
+	public void showSmallLogo() {
+		synapseLogo.setHeight("25px");
+		synapseLogo.setWidth("126px");
+		headerDiv.setHeight("50px");
+		headerDiv.setPaddingTop(9);
+	}
+	
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button
@@ -215,6 +224,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				presenter.onFavoriteClick();
 			}
 		});
+		synapseLogo.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onLogoClick();
+			}
+		});
 	}
 
 	@Override
@@ -233,7 +248,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void refresh() {
-		setLogo();
 		refreshTestSiteHeader();
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 		trashLink.setVisible(isInTestWebsite);
@@ -287,28 +301,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 	}
 
-	@Override
-	public void setLargeLogo(boolean isLarge) {
-		this.showLargeLogo = isLarge;
-	}
-
 	/*
 	 * Private Methods
 	 */
-
-	private void setLogo() {
-		if(showLargeLogo) {
-			logoLarge.setVisible(true);
-			logoSmall.setVisible(false);
-			headerDiv.removeClassName(HEADER_SMALL_STYLE);
-			headerDiv.addClassName(HEADER_LARGE_STYLE);
-		} else {
-			logoLarge.setVisible(false);
-			logoSmall.setVisible(true);
-			headerDiv.removeClassName(HEADER_LARGE_STYLE);
-			headerDiv.addClassName(HEADER_SMALL_STYLE);
-		}
-	}
 
 	private void refreshTestSiteHeader() {
 		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));

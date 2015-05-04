@@ -4,9 +4,7 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
-	    <div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
+	    <g:SimplePanel ui:field="header" />
 		<div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search People</h3></div>
 		<b:Container addStyleNames="margin-top-15">
 		    <b:Row>

@@ -9,9 +9,7 @@
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
     
 	<g:HTMLPanel>
-		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator margin-top-10-imp"></div>
 		<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true" visible="false">
 			<t:Table>
 				<t:TableRow>
@@ -71,12 +69,12 @@
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
 							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-8 col-sm-6">
-									<div class="input-group">
-										<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
-										<span class="input-group-btn">
-											<b:Button ui:field="createProjectButton" type="DEFAULT">Create Project</b:Button>
-										</span>
-									</div>
+						    		<b:InputGroup>
+										<g:TextBox ui:field="createProjectTextBox" width="100%" height="34px" />
+										<b:InputGroupButton>
+											<b:Button ui:field="createProjectButton" text="Create Project"/>
+										</b:InputGroupButton>
+									</b:InputGroup>
 								</div>
 								<div class="col-xs-4 col-sm-6">
 								    <b:Button ui:field="projectSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Projects" />
@@ -108,9 +106,6 @@
 										    	<bh:Text>- Empty</bh:Text>
 										</g:SimplePanel>
 									</b:Column>
-
-
-
 								</b:Row>
 								<div ui:field="projectsLoadingUI" >
 									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
@@ -147,12 +142,12 @@
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="teamsTabContainer">
 					    	<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-8 col-sm-6">
-									<div class="input-group">
-										<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
-										<span class="input-group-btn">
-											<b:Button ui:field="createTeamButton" type="DEFAULT">Create Team</b:Button>
-										</span>
-									</div>
+						    		<b:InputGroup>
+										<g:TextBox ui:field="createTeamTextBox" width="100%" height="34px" />
+										<b:InputGroupButton>
+											<b:Button ui:field="createTeamButton" text="Create Team"/>
+										</b:InputGroupButton>
+									</b:InputGroup>
 								</div>
 								 <div class="col-xs-4 col-sm-6">
 								    <b:Button ui:field="teamSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Teams" />

@@ -12,7 +12,7 @@
 			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab2" text="From Attachments"/>
 		</b:NavTabs>
 		<b:TabContent>
-			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
+			<b:TabPane active="true" b:id="tab1" addStyleNames="margin-top-15">
 				<g:SimplePanel ui:field="fileInputWidgetContainer" />
 				<b:Button ui:field="uploadButton" text="Upload" type="INFO" />
 				<g:FlowPanel ui:field="uploadSuccessUI">
@@ -24,7 +24,7 @@
 					<bh:Text ui:field="uploadErrorText"></bh:Text>
 				</g:FlowPanel>
 			</b:TabPane>
-			<b:TabPane b:id="tab2" addStyleNames="panel margin-top-15">
+			<b:TabPane b:id="tab2" addStyleNames="margin-top-15">
 				<g:SimplePanel ui:field="wikiAttachmentsContainer" />
 			</b:TabPane>
 		</b:TabContent>

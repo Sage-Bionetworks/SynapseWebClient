@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
@@ -46,7 +47,11 @@ public class Header implements HeaderView.Presenter {
 	}
 	
 	public void configure(boolean largeLogo) {
-		view.setLargeLogo(largeLogo);
+		if (largeLogo) {
+			view.showLargeLogo();
+		} else {
+			view.showSmallLogo();
+		}
 	}
 
 	public Widget asWidget() {
@@ -73,6 +78,11 @@ public class Header implements HeaderView.Presenter {
 	@Override
 	public void onLogoutClick() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));	
+	}
+	
+	@Override
+	public void onLogoClick() {
+		globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN));	
 	}
 
 	@Override

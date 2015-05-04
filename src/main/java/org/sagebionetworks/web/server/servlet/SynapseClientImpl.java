@@ -142,6 +142,7 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -415,11 +416,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private static final Integer MAX_LIMIT = Integer.MAX_VALUE;
 	private static final Integer ZERO_OFFSET = 0;
 
-
-	private static final int USER_PAGINATION_OFFSET = 0;
-	// before we hit this limit we will use another mechanism to find users
-	private static final int USER_PAGINATION_LIMIT = 1000;
-	
 	/**
 	 * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
 	 * @param in
@@ -2895,4 +2891,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		
 	}
 
+	@Override
+	public WikiPaginatedResults getStandaloneWikis() throws RestServiceException {
+		String synId = getSynapseProperty("org.sagebionetworks.portal.standalone_wikis_synapse_id");
+		PaginatedResults<WikiHeader> headers = getWikiHeaderTree(synId, ObjectType.ENTITY);
+		return new WikiPaginatedResults(headers, synId, ObjectType.ENTITY);
+	}
 }

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.search;
 
 import java.util.Arrays;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -13,17 +12,13 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresenter {
 	
 	private SearchBoxView view;
-	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private HandlerManager handlerManager = new HandlerManager(this);
-	private Entity entity;
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
 	private boolean searchAll = false;
@@ -35,7 +30,6 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 			AdapterFactory adapterFactory,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
-		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
@@ -48,7 +42,6 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 		return view.asWidget();		
 	}
 
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}

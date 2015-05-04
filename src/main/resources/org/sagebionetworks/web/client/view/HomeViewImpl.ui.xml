@@ -2,249 +2,252 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
  	
  	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
- 	
-	<ui:style>		
-	</ui:style>
+	
 	<g:HTMLPanel>
 		<!-- HEADER -->
-		<div class="color-line"></div>
-		<g:SimplePanel ui:field="header" styleName="container"/>
-		<div class="separator separator-header-home"></div>
-		
-		<!-- TOP 3 COLUMNS -->		
-		<div class="container margin-top-30">
-		    <div class="row">
-				<!-- What is Synapse -->
-				<g:HTMLPanel ui:field="whatIsSynapseContainer">
-					<div class="col-md-4 ">
-						<h3>What is Synapse?</h3>
-						<ul class="list check-list">
-	
-							<li class="whatIsSynapseText">
-								A <span style="font-weight: bold;">private</span> <g:Image resource='{icons.lockGrey16}' /> or <span style="font-weight: bold;">public</span> <g:Image resource='{icons.globe16}' />
-								workspace that allows you to <span style="font-weight: bold;">aggregate</span>, <span style="font-weight: bold;">describe</span>, and <span style="font-weight: bold;">share</span>
-								your research.
-							</li>
-							<li class="whatIsSynapseText">
-								A tool to improve reproducibility of data intensive science, <span style="font-weight: bold;">recording progress as you work</span>
-								with tools such as <span style="font-weight: bold;">R</span> and <span style="font-weight: bold;">Python</span>.
-							</li>
-							<li class="whatIsSynapseText">
-								A set of <span style="font-weight: bold;">living research projects</span> enabling contribution to
-								<span style="font-weight: bold;">large-scale collaborative solutions</span> to scientific problems.
-							</li>
-							<li class="whatIsSynapseText">
-								<g:Anchor ui:field="aboutSynapseLink" />
-							</li>
-						</ul>
-					</div>
-				</g:HTMLPanel>
-	
-				<!-- How to Use Synapse -->
-				<g:HTMLPanel ui:field="howToUseSynapseContainer">
-					<div class="col-md-4 ">
-						<h3>How to Use Synapse</h3>
-						<ul class="list arrow-list">
-							<li>
-								<a class="link howToUseLink" href="#!Help:GettingStarted" target="_blank">Synapse Tutorial</a><br/>
-								A guide to using Synapse
-							</li>
-							<li>
-								<a class="link howToUseLink" href="http://support.sagebase.org/sagebase" target="_blank">Support Forums</a><br/>
-								Help, frequently asked questions and support topics								
-							</li>
-							<li>
-								<a class="link howToUseLink" href="mailto:synapseInfo@sagebase.org" target="_blank">Contact Us</a><br/>
-								Other questions about Synapse?
-							</li>
-							<li>
-								<a class="link howToUseLink" href="#!Help:Collaboratorium" target="_blank">Interactive Workshop</a><br/>
-								A hands-on guide for using Synapse
-							</li>
-						</ul>
-					</div>
-				</g:HTMLPanel>
-		
-				<!-- Get Started -->
-				<g:HTMLPanel ui:field="getStartedContainer">
-					<div class="col-md-4 ">
-						<h3>Get Started</h3>
-						Synapse is free to use as a service.
-						<b:Button ui:field="dashboardBtn" size="LARGE" visible="false" block="true" marginTop="20" />
-						<b:Button ui:field="loginBtn" size="LARGE" text="Log in" block="true" marginTop="20" />
-						<b:Button ui:field="registerBtn" size="LARGE" text="Register for a Synapse Account" marginTop="20" block="true" />
-						<b:Button ui:field="dreamBtn" size="LARGE" text="DREAM Challenges" block="true" marginTop="20" /> 
-					</div>
-				</g:HTMLPanel>
-			</div> <!-- end row -->				
-			
-			<!-- SEARCH BOX -->
-			<div class="row margin-top-15">
-				<h3>Search Synapse</h3>
-				<div class="well" style="margin-bottom: 0px !important;">
-					<g:SimplePanel ui:field="bigSearchBox" />
-				</div>
-			</div> <!-- end row -->				
-
-            <!-- SLIDER -->
-			<div class="row margin-top-15">
-			    <!-- Carousel
-			    ================================================== -->
-			    <div id="myCarousel" class="carousel slide">
-			      <!-- Indicators -->
-			      <ol class="carousel-indicators">
-			        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-			        <li data-target="#myCarousel" data-slide-to="1"></li>
-			        <li data-target="#myCarousel" data-slide-to="2"></li>
-			        <li data-target="#myCarousel" data-slide-to="3"></li>
-   			        <li data-target="#myCarousel" data-slide-to="4"></li>
-					<li data-target="#myCarousel" data-slide-to="5"></li>
-				  </ol>
-			      <div class="carousel-inner">
-			        <div class="item active">
-			          <a href="#!Challenges:DREAM"><g:Image resource='{sageImageBundle.dream85Banner}' /></a>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2580853"><g:Image resource='{sageImageBundle.ampAd}' /></a>
-			        </div>
-					<div class="item">
-			          <a href="#!Synapse:syn2813589"><g:Image resource='{sageImageBundle.dreamSMCRNA}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">			              
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 20px;" href="#!Synapse:syn2813589">Challenge Details &amp; Pre-registration</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2813581"><g:Image resource='{sageImageBundle.dreamSMCHet}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 20px; " href="#!Synapse:syn2813581">Challenge Details &amp; Pre-registration</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2811262"><g:Image resource='{sageImageBundle.dreamOP}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 10px; left: 50px;" href="#!Synapse:syn2811262">Challenge Details &amp; Sign Up</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn2813558"><g:Image resource='{sageImageBundle.dreamPDS}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			                <p><a class="btn btn-large btn-primary" style="position: relative; top: 5px;" href="#!Synapse:syn2813558">Challenge Details &amp; Sign Up</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        
-			        <div class="item">
-			          <a href="#!Synapse:syn300013"><g:Image resource='{sageImageBundle.tcgaPancancer}' /></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn300013">TCGA Pancancer Project</a></p>
-			            </div>
-			          </div>
-			        </div>			        			       
-			      </div>
-			      <a class="left carousel-control-clean" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
-			      <a class="right carousel-control-clean" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-			    </div><!-- /.carousel -->
-			</div> <!-- end row -->		
-
-			<div class="row">
-				<div class="separator separator-margin"></div>						
-			</div> <!-- end row -->				
-
-			<!-- PROGRAMMATIC CLIENTS -->
-			<div class="row">				
-			    <div class="row">
-			        <div class="col-md-12">
-						<h3>Programmatic Clients</h3>
-						<p>Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
+		<g:SimplePanel ui:field="header"/>
+		<b:Container fluid="true">
+			<b:Row addStyleNames="margin-top-15">
+				<b:Column size="SM_7">
+					<b:Heading size="H2" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue font-size-3-2x margin-left-15" />
+				</b:Column>
+				<b:Column size="SM_5">
+					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-10 margin-left-15" visible="false">
+						<b:Heading size="H5" addStyleNames="color-white margin-top-5" text="WELCOME BACK"></b:Heading>
+						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" />
+					</bh:Div>
+					<bh:Div ui:field="registerUI"></bh:Div>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
+					<g:FocusPanel ui:field="organizeResearchAssetsBox">
+						<bh:Div addStyleNames="imageButton margin-left-10 margin-right-10">
+							<g:Image resource='{sageImageBundle.directory}' addStyleNames="center-in-div" />
+							<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+								text="Organize your digital research assets"
+							></b:Heading>
+							<b:Heading size="H5" addStyleNames="margin-top-3"
+								text="Create a free Synapse Project to store your research data, code, and results."
+							></b:Heading>
+						</bh:Div>
+					</g:FocusPanel>
+				</b:Column>
+				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
+					<g:FocusPanel ui:field="creditForResearchBox">
+						<bh:Div addStyleNames="imageButton">
+							<g:Image resource='{sageImageBundle.prov}' addStyleNames="center-in-div" />
+							<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
+								text="Get credit for your research"
+							></b:Heading>
+							<b:Heading size="H5" addStyleNames="margin-top-3"
+								text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance."
+							></b:Heading>
+						</bh:Div>
+					</g:FocusPanel>
+				</b:Column>
+				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
+					<g:FocusPanel ui:field="collaborateBox">
+						<bh:Div addStyleNames="imageButton margin-left-10 margin-right-10">
+							<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="center-in-div" />
+							<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp" 
+								text="Collaborate"
+							></b:Heading>
+							<b:Heading size="H5" addStyleNames="margin-top-3"
+								text="Share your Project with your collaborators, or make it Public!"
+							></b:Heading>
+						</bh:Div>
+					</g:FocusPanel>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-blue-bg margin-top-40">
+				<b:Column size="SM_12">
+					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="WAYS TO USE SYNAPSE"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
+					<g:FocusPanel ui:field="researchCommunitiesBox">
+						<bh:Div addStyleNames="synapse-yellow-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
+							<t:Table>
+								<t:TableRow>
+									<t:TableData paddingRight="2">
+										<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-top-left-10" />
+									</t:TableData>
+									<t:TableData paddingRight="2">
+										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
+									</t:TableData>
+								</t:TableRow>
+							</t:Table>
+							<b:Heading size="H5" addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >"></b:Heading>
+						</bh:Div>
+					</g:FocusPanel>
+				</b:Column>
+				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
+					<g:FocusPanel ui:field="openResearchProjectsBox">
+						<bh:Div addStyleNames="synapse-green-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
+							<t:Table>
+								<t:TableRow>
+									<t:TableData paddingRight="2">
+										<g:Image resource='{sageImageBundle.unlock}' addStyleNames="margin-10" />
+									</t:TableData>
+									<t:TableData paddingRight="2">
+										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="OPEN RESEARCH PROJECTS"></b:Heading>
+									</t:TableData>
+								</t:TableRow>
+							</t:Table>
+							<b:Heading size="H5" addStyleNames="color-white" text="See the open research projects hosted on Synapse. >"></b:Heading>
+						</bh:Div>
+					</g:FocusPanel>
+				</b:Column>
+				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
+					<g:FocusPanel ui:field="dreamChallengesBox">
+						<bh:Div addStyleNames="synapse-purple-bg padding-10 imageButton margin-left-10 margin-right-10" height="200px">
+							<bh:Div addStyleNames="margin-10">
+								<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
+							</bh:Div>
+							<b:Heading size="H5" addStyleNames="color-white" text="See all the current DREAM challenges available on Synapse. >"></b:Heading>
+						</bh:Div>
+					</g:FocusPanel>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-green-bg margin-top-40">
+				<b:Column size="SM_12">
+					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="NEWS"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_12">
+					<g:SimplePanel ui:field="newsFeed"/>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-purple-bg margin-top-10">
+				<b:Column size="SM_12">
+					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="GOVERNANCE"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+						<g:FocusPanel ui:field="termsOfUseBox">
+							<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
+								<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
+								<b:Heading size="H6" text="Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, guide- lines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews." />
+								<b:Button text="Learn about Synapse Use and Oversight" />
+							</b:Panel>
+						</g:FocusPanel>
+					</b:Column>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+						<g:FocusPanel ui:field="becomeCertifiedBox">
+							<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
+								<t:Table>
+									<t:TableRow>
+										<t:TableData paddingRight="10">
+											<g:Image resource='{sageImageBundle.certificate}' addStyleNames="margin-10" />
+										</t:TableData>
+										<t:TableData paddingRight="2">
+											<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Become a Certified User!"></b:Heading>
+											<b:Heading size="H6" text="In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data." />
+											<b:Button text="Learn more about certification" />
+										</t:TableData>
+									</t:TableRow>
+								</t:Table>
+							</b:Panel>
+						</g:FocusPanel>
+					</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-yellow-bg margin-top-10">
+				<b:Column size="SM_12">
+					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="PROGRAMATIC CLIENTS"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_12">
+					<g:FlowPanel addStyleNames="padding-10">
+						<bh:Paragraph text="Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
 						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
 						   all from the comfort of your own code. Don't see your language of choice here? Check out our 
-						   full <g:Anchor ui:field="restApiLink"/>.</p>
-					 </div>
-			   </div>
-				<div class="row">
-				    <div class="col-md-3">
-				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+						   full&nbsp;"  addStyleNames="displayInline"/>
+						<g:Anchor ui:field="restApiLink" addStyleNames="displayInline"/>
+					 </g:FlowPanel>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+			    <b:Column size="SM_3">
+			    	<bh:Div addStyleNames="padding-10">
+				    	<bh:Span>
 				    	    <g:Image resource='{sageImageBundle.logoR45}' />
-				    	</span>
-				    	<h4 style="display:inline; ">R Client</h4>
+				    	</bh:Span>
+				    	<b:Heading size="H4" text="R Client" addStyleNames="displayInline"/>
 				    	<g:SimplePanel ui:field="rClientInstallPanel" />
-				    	<h5 style="display:inline"><g:Anchor ui:field="rAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="rExampleCodeLink"/></h5>
-					</div>
-					<div class="col-md-3">
-				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+				    	<g:Anchor ui:field="rAPILink"/> <bh:Text text="&nbsp;&amp;&nbsp;" /> <g:Anchor ui:field="rExampleCodeLink"/>
+				    </bh:Div>
+				</b:Column>
+				<b:Column size="SM_3">
+					<bh:Div addStyleNames="padding-10">
+						<bh:Span>
 				    	    <g:Image resource='{sageImageBundle.logoPython45}' />
-				    	</span>
-				    	<h4 style="display:inline; ">Python Client</h4>
+				    	</bh:Span>
+				    	<b:Heading size="H4" text="Python Client" addStyleNames="displayInline"/>
 				    	<g:SimplePanel ui:field="pythonClientInstallPanel" />
-						<h5 style="display:inline"><g:Anchor ui:field="pythonAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="pythonExampleCodeLink"/></h5>
-					</div>
-					<div class="col-md-3">
-				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+						<g:Anchor ui:field="pythonAPILink"/> <bh:Text text="&nbsp;&amp;&nbsp;" /><g:Anchor ui:field="pythonExampleCodeLink"/>
+					</bh:Div>
+				</b:Column>
+				<b:Column size="SM_3">
+					<bh:Div addStyleNames="padding-10">
+						<bh:Span>
 				    	    <g:Image resource='{sageImageBundle.logoCommandLine45}' />
-				    	</span>
-				    	<h4 style="display:inline; ">Command Line Client</h4>
+				    	</bh:Span>
+				    	<b:Heading size="H4" text="Command Line Client" addStyleNames="displayInline"/>
 				    	<g:SimplePanel ui:field="clClientInstallPanel" />
-						<h5 style="display:inline"><g:Anchor ui:field="clAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="clExampleCodeLink"/></h5>
-					</div>												
-					<div class="col-md-3">
-				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+						<g:Anchor ui:field="clAPILink"/><bh:Text text="&nbsp;&amp;&nbsp;" /><g:Anchor ui:field="clExampleCodeLink"/>
+					</bh:Div>
+				</b:Column>							
+				<b:Column size="SM_3">
+					<bh:Div addStyleNames="padding-10">
+						<bh:Span>
 				    	    <g:Image resource='{sageImageBundle.logoJava45}' />
-				    	</span>
-				    	<h4 style="display:inline; ">Java Client</h4>
+				    	</bh:Span>
+				    	<b:Heading size="H4" text="Java Client" addStyleNames="displayInline"/>
 				    	<g:SimplePanel ui:field="javaClientInstallPanel" />
-				    	<span class="padding-top-5">
-							<h5 style="display:inline"><g:Anchor ui:field="javaAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="javaExampleCodeLink"/></h5>								
-				    	</span>
-					</div>
-				</div>
-			</div> <!-- end row -->				
-
-			<div class="row">			
-				<div class="separator separator-margin"></div>						
-			</div> <!-- end row -->				
-
-			<div class="row">			
-				<!-- NEWS -->						
-				<div class="main-service">
-					<div class="col-md-9">
-						<h3>News</h3>						
-						<g:SimplePanel ui:field="newsFeed" styleName="row"/>
-					</div>
-					
-					<!-- DATA USE -->
-					<div class="col-md-3">
-						<h3>Terms of Use</h3>
-						<div class="well">
-							<p>Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, 
-							    guidelines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews.</p>
-							<div style="margin-top: 10px;">
-								<h4>
-									<a href="#!Help:Governance" class="service-tipsy north link">Learn about Synapse Use and Oversight</a>
-								</h4>
-							</div>
-						</div>				
-					</div>
-					<!-- END DATA USE -->				
-				</div>
-			</div> <!-- end row -->				
-		</div> <!-- close class="container" -->			
-									
-
-		<div class="clear"></div>
-
+				    	<g:Anchor ui:field="javaAPILink"/><bh:Text text="&nbsp;&amp;&nbsp;" /><g:Anchor ui:field="javaExampleCodeLink"/>
+				    </bh:Div>
+				</b:Column>
+			</b:Row>
+		</b:Container>
 		<g:SimplePanel ui:field="footer" />
-
 	</g:HTMLPanel>
 </ui:UiBinder> 

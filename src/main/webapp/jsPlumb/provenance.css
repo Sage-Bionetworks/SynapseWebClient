@@ -1,5 +1,5 @@
 .provEntityNode {
-	opacity:0.8; 
+	opacity:0.9; 
 	filter:alpha(opacity=80); 
 	width:96px; 
 	height:46.8px;
@@ -17,7 +17,7 @@
 
 .provActivityNode { 
 	border:0.1em dotted #ccc; 
-	opacity:0.8; 
+	opacity:0.9; 
 	filter:alpha(opacity=80); 
 	width: 132px;
 	z-index:20; 

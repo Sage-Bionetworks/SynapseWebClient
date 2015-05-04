@@ -39,7 +39,6 @@ public class SynapseWikiPresenter extends AbstractActivity implements SynapseWik
 		configure(new WikiPageKey(place.getOwnerId(), place.getOwnerType(), place.getWikiId()));
 	}
 	
-	
 	@Override
 	public void configure(final WikiPageKey wikiKey) {
 		synapseClient.hasAccess(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), ACCESS_TYPE.UPDATE.toString(), new AsyncCallback<Boolean>() {
