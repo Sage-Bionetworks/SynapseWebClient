@@ -290,4 +290,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		String token = appPlaceHistoryMapper.getToken(currentPlace);
 		this.synapseJSNIUtils.replaceHistoryState(token);
 	}
+
+	@Override
+	public void pushCurrentPlace(Place targetPlace) {
+		setCurrentPlace(targetPlace);
+		String token = appPlaceHistoryMapper.getToken(targetPlace);
+		this.synapseJSNIUtils.pushHistoryState(token);
+	}
+
+	@Override
+	public void initOnPopStateHandler() {
+		this.synapseJSNIUtils.initOnPopStateHandler();
+	}
 }

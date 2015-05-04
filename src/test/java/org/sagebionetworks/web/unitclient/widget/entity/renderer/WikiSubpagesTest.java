@@ -52,13 +52,13 @@ public class WikiSubpagesTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	V2WikiOrderHint mockV2WikiOrderHint;
-	
+
 	WikiSubpagesWidget widget;
 	List<V2WikiHeader> wikiHeadersList;
 	V2WikiHeader testRootHeader;
 	String entityId = "syn123";
 	Map<String, String> descriptor = new HashMap<String, String>();
-	
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockView = mock(WikiSubpagesView.class);
@@ -70,14 +70,14 @@ public class WikiSubpagesTest {
 		verify(mockView).setPresenter(widget);
 		ArrayList<EntityHeader> results = new ArrayList<EntityHeader>();
 		results.add(new EntityHeader());
-		
+
 		AsyncMockStubber.callSuccessWith("entity id 1").when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 
 		PaginatedResults<EntityHeader> batchResults = new PaginatedResults<EntityHeader>();
 		batchResults.setTotalNumberOfResults(1);
 		batchResults.setResults(results);
 		AsyncMockStubber.callSuccessWith(batchResults).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-		
+
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		PaginatedResults<V2WikiHeader> wikiHeaders = new PaginatedResults<V2WikiHeader>();
 		wikiHeadersList = new ArrayList<V2WikiHeader>();
@@ -86,7 +86,7 @@ public class WikiSubpagesTest {
 		testRootHeader.setParentId(null);
 		testRootHeader.setTitle("my test root wiki header (page)");
 		wikiHeadersList.add(testRootHeader);
-		
+
 		wikiHeaders.setResults(wikiHeadersList);
 		mockV2WikiOrderHint = mock(V2WikiOrderHint.class);
 		when(mockV2WikiOrderHint.getIdList()).thenReturn(null);
@@ -98,32 +98,31 @@ public class WikiSubpagesTest {
 	@Test
 	public void testConfigureEntityHeaderBatchFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true, null);
 		verify(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
-	
+
 	@Test
 	public void testConfigureFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true, null);
 		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
+
 	@Test
 	public void testConfigureProjectRootNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true, null);
 		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView, times(3)).clear();
 	}
-	
+
 	@Test
 	public void testGetLinkPlaceSynapse() throws Exception {
 		boolean embeddedInOwnerPage = true;
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage, null);
 		String targetEntityId = "syn938";
 		Long targetEntityVersion = 4L;
 		String targetWikiId = "888";
@@ -135,11 +134,11 @@ public class WikiSubpagesTest {
 		assertEquals(Synapse.EntityArea.WIKI, targetSynapsePlace.getArea());
 		assertEquals(targetWikiId, targetSynapsePlace.getAreaToken());
 	}
-	
+
 	@Test
 	public void testGetLinkPlaceWiki() throws Exception {
 		boolean embeddedInOwnerPage = false;
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage, null);
 		String targetEntityId = "syn938";
 		Long targetEntityVersion = 4L;
 		String targetWikiId = "888";
@@ -160,35 +159,24 @@ public class WikiSubpagesTest {
 	@Test
 	public void testEditOrderButtonVisibilityForAnonymous(){
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, false);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, false, null);
 		verify(mockView).setEditOrderButtonVisible(false);
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true, null);
 		verify(mockView, Mockito.times(2)).setEditOrderButtonVisible(false);
 		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true, null);
 		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(false);
 	}
 
 	@Test
 	public void testEditOrderButtonVisibilityForLogin(){
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, false);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, false, null);
 		verify(mockView).setEditOrderButtonVisible(true);
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, true, null);
 		verify(mockView, Mockito.times(2)).setEditOrderButtonVisible(true);
 		AsyncMockStubber.callFailureWith(new Throwable()).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, false);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, false, null);
 		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(true);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
