@@ -6,8 +6,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,11 +16,9 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -249,7 +245,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
-		deleteButton.addClickHandler(getDeleteClickHandler());
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
@@ -272,26 +267,18 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				formattingGuideModal.show();
 			}
 		});
-		
-		markdownTextArea.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.markdownEditorClicked();
-			}
-		});
-		
-		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				presenter.markdownEditorClicked();
-			}
-		});
-		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea();
-			}
-		});
+	}
+	
+	public void setDeleteClickHandler(ClickHandler handler) {
+		deleteButton.addClickHandler(handler);
+	}
+	
+	public void addTextAreaKeyUpHandler(KeyUpHandler handler) {
+		markdownTextArea.addKeyUpHandler(handler);
+	}
+	
+	public void addTextAreaClickHandler(ClickHandler handler) {
+		markdownTextArea.addClickHandler(handler);
 	}
 	
 	private ClickHandler getClickHandler(final MarkdownEditorAction action) {
@@ -299,21 +286,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.handleCommand(action);		
-			}
-		};
-	}
-	
-	private ClickHandler getDeleteClickHandler() {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
-					@Override
-					public void callback(boolean isConfirmed) {
-						if (isConfirmed)
-							presenter.handleCommand(MarkdownEditorAction.DELETE);
-					}
-				});
 			}
 		};
 	}
@@ -353,7 +325,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				Window.scrollTo(0, mdCommands.getAbsoluteTop());
 			}
 		});
-		resizeMarkdownTextArea();
 	}
 	
 	
@@ -369,19 +340,16 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		formattingGuideContainer.add(markdownWidget);
 	}
 
-	private void resizeMarkdownTextArea() {
-		int index = 0;
-		int numLines = 0;
-		String editorText = markdownTextArea.getText();
-		do {
-			GWT.debugger();
-			index = 1 + editorText.indexOf("\n",index);
-			numLines++;
-		} while (index > 0 && index < editorText.length());
-		if (markdownTextArea.getVisibleLines() != numLines + 1) {
-			// Keeps a minimum size of 5 lines
-			markdownTextArea.setVisibleLines(numLines + 1 > 5 ? numLines + 1 : 5);
-		}
+	public String getMarkdownText() {
+		return  markdownTextArea.getText();
+	}
+	
+	public int getMarkdownTextAreaVisibleLines() {
+		return markdownTextArea.getVisibleLines();
+	}
+		
+	public void resizeMarkdownTextArea(int visibleLines) {
+		markdownTextArea.setVisibleLines(visibleLines);
 	}
 	
 	@Override

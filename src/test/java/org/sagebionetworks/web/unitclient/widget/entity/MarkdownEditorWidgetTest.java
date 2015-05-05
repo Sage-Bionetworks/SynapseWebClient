@@ -92,10 +92,11 @@ public class MarkdownEditorWidgetTest {
 		initialMarkdown = "Hello Markdown";
 		presenter.configure(wikiPageKey, mockDescriptorUpdatedHandler);
 		
-		
+		String testPageMarkdownText = "my test markdown";
 		testPage = new WikiPage();
 		testPage.setId("wikiPageId");
-		testPage.setMarkdown("my test markdown");
+		testPage.setMarkdown(testPageMarkdownText);
+		when(mockView.getMarkdownText()).thenReturn(testPageMarkdownText);
 		testPage.setTitle("My Test Wiki Title");
 		List<String> fileHandleIds = new ArrayList<String>();
 		//our page has two file handles already
