@@ -468,14 +468,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	@Override
-	public void setExternalFilePath(String path, String name) {
+	public void setExternalFilePath(String path, String name, Long storageLocationId) {
 		boolean isUpdating = entityId != null || entity != null;
 		if (isUpdating) {
 			//existing entity
-			updateExternalFileEntity(entityId, path, name);
+			updateExternalFileEntity(entityId, path, name, storageLocationId);
 		} else {
 			//new data, use the appropriate synapse call
-			createNewExternalFileEntity(path, name);
+			createNewExternalFileEntity(path, name, storageLocationId);
 		}
 	}
 	
@@ -485,9 +485,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		entityUpdated();	
 	}
 	
-	public void updateExternalFileEntity(String entityId, String path, String name) {
+	public void updateExternalFileEntity(String entityId, String path, String name, Long storageLocationId) {
 		try {
-			synapseClient.updateExternalFile(entityId, path, name, new AsyncCallback<Entity>() {
+			synapseClient.updateExternalFile(entityId, path, name, storageLocationId, new AsyncCallback<Entity>() {
 				@Override
 				public void onSuccess(Entity result) {
 					externalLinkUpdated(result, FileEntity.class);
@@ -501,9 +501,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 		}
 	}
-	public void createNewExternalFileEntity(final String path, final String name) {
+	public void createNewExternalFileEntity(final String path, final String name, final Long storageLocationId) {
 		try {
-			synapseClient.createExternalFile(parentEntityId, path, name, new AsyncCallback<Entity>() {
+			synapseClient.createExternalFile(parentEntityId, path, name, storageLocationId, new AsyncCallback<Entity>() {
 				@Override
 				public void onSuccess(Entity result) {
 					externalLinkUpdated(result, FileEntity.class);
@@ -583,7 +583,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				//should respond with the new path
 				String path = uploadResult.getMessage();
 				String fileName = fileNames[currIndex];
-				setExternalFilePath(path, fileName);
+				setExternalFilePath(path, fileName, storageLocationId);
 			}
 		}else {
 			if (isJschAuthorizationError(uploadResult.getMessage())) {
@@ -698,7 +698,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return percentOfAllFiles;
 	}
 
-	// for JUnit tests
+	@Override
 	public Long getStorageLocationId(){
 		return this.storageLocationId;
 	}

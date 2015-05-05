@@ -508,9 +508,8 @@ public interface SynapseClient extends RemoteService {
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
-	Entity updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
+	Entity updateExternalFile(String entityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
 
-	Entity createExternalFile(String parentEntityId, String externalUrl,
-			String name) throws RestServiceException;
+	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
 	
 }

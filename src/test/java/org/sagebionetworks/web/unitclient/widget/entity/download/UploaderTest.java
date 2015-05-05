@@ -132,9 +132,9 @@ public class UploaderTest {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
-		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		//by default, there is no name conflict
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view,
@@ -157,23 +157,23 @@ public class UploaderTest {
 	public void testSetNewExternalPath() throws Exception {
 		//this is the full success test
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
-		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
+		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 	
 	@Test
 	public void testSetExternalPathFailedCreate() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
+		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		
 		verify(view).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testSetExternalPathFailedUpdateFile() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
+		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		
 		verify(view).showErrorMessage(anyString());
 	}
@@ -181,8 +181,8 @@ public class UploaderTest {
 	@Test
 	public void testSetExternalFileEntityPathWithFileEntity() throws Exception {
 		uploader.asWidget(testEntity);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
-		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
+		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 
@@ -458,7 +458,7 @@ public class UploaderTest {
 		r.setMessage(newUrl);
 		uploader.handleSubmitResult(r);
 		//should try to create a new external file
-		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 	}
 	
 	@Test
