@@ -58,6 +58,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -331,6 +332,8 @@ public interface SynapseClient extends RemoteService {
 	public String createTeam(String teamName) throws RestServiceException;
 	public void deleteTeam(String teamId) throws RestServiceException;
 	public PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
+	List<TeamRequestBundle> getTeamsRequestsBundleForUser(String userId)
+			throws RestServiceException;
 	public List<Team> getTeamsForUser(String userId) throws RestServiceException;
 	public PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
@@ -512,5 +515,7 @@ public interface SynapseClient extends RemoteService {
 
 	Entity createExternalFile(String parentEntityId, String externalUrl,
 			String name) throws RestServiceException;
+
+
 	
 }

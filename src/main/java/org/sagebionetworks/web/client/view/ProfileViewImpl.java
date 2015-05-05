@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.shared.event.AlertClosedEvent;
@@ -35,11 +36,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-
-
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -510,13 +507,28 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams, boolean isOwner) {
-		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
-			@Override
-			public void invoke(String teamId, Long requestCount) {
-				presenter.addMembershipRequests(requestCount.intValue());
-			}
-		});
+	public void setTeams(List<Team> teams) {
+		myTeamsWidget.configure(teams, false, false);
+	}
+	
+	@Override
+	public void setTeamsFromBundle(List<TeamRequestBundle> teamsRequestBundles) {
+		int requestCount = 0;
+		List<Team> teams = new ArrayList<Team>(teamsRequestBundles.size());
+		for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
+			requestCount += teamAndRequest.getRequestCount();
+			teams.add(teamAndRequest.getTeam());
+		}
+		presenter.addMembershipRequests(requestCount);
+		myTeamsWidget.configure(teams, false, true);
+		
+		
+//		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
+//			@Override
+//			public void invoke(String teamId, Long requestCount) {
+//				presenter.addMembershipRequests(requestCount.intValue());
+//			}
+//		});
 	}
 	
 	private void addMyTeamProjectsFilter() {

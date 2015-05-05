@@ -30,10 +30,10 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
@@ -45,14 +45,11 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
@@ -390,20 +387,34 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.showTeamsLoading();
 		teamNotificationCount = 0;
 		view.clearTeamNotificationCount();
-		if (isOwner)
+		if (isOwner) {
 			view.refreshTeamInvites();
-		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setTeamsError(caught.getMessage());
-			}
-			@Override
-			public void onSuccess(List<Team> teams) {
-				view.setTeams(teams,isOwner);
-			}
-		};
-		
-		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
+			AsyncCallback<List<TeamRequestBundle>> teamCallback = new AsyncCallback<List<TeamRequestBundle>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setTeamsError(caught.getMessage());
+				}
+				@Override
+				public void onSuccess(List<TeamRequestBundle> teams) {
+					view.setTeamsFromBundle(teams);
+				}
+			};
+			TeamListWidget.getTeamBundles(currentUserId, synapseClient, adapterFactory, teamCallback);
+		} else {
+			AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setTeamsError(caught.getMessage());
+				}
+				@Override
+				public void onSuccess(List<Team> teams) {
+					view.setTeams(teams);
+				}
+			};
+			
+			TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
+		}
+
 	}
 	
 	public void getMoreChallenges() {

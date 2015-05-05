@@ -126,12 +126,11 @@ public class TeamListWidgetTest {
 		boolean isBig = true;
 		boolean isRequestCountVisible = true;
 		//also test the request count callback
-		TeamListWidget.RequestCountCallback mockCallback = mock(TeamListWidget.RequestCountCallback.class);
-		widget.configure(teamList, isBig, isRequestCountVisible, mockCallback);
+//		TeamListWidget.RequestCountCallback mockCallback = mock(TeamListWidget.RequestCountCallback.class);
+		widget.configure(teamList, isBig, isRequestCountVisible);
 		verify(mockView).configure(eq(teamList), eq(isBig));
-		verify(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
-		//verify callback was invoked
-		verify(mockCallback).invoke(anyString(), anyLong());
+		//no longer callback -> must verify the count has already been found
+//		verify(mockCallback).invoke(anyString(), anyLong());
 	}
 	
 	@Test
@@ -140,9 +139,8 @@ public class TeamListWidgetTest {
 		boolean isBig = false;
 		boolean isRequestCountVisible = true;
 		//null request count callback
-		widget.configure(teamList, isBig, isRequestCountVisible, null);
+		widget.configure(teamList, isBig, isRequestCountVisible);
 		verify(mockView).configure(eq(teamList), eq(isBig));
-		verify(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 }

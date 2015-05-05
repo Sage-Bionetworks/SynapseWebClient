@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -48,19 +47,7 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	}
 	
 	public void configure(List<Team> teams, boolean isBig, boolean isRequestCountVisible) {
-		configure(teams, isBig, isRequestCountVisible, null);
-	}
-	
-	public void configure(List<Team> teams, boolean isBig, boolean isRequestCountVisible, RequestCountCallback requestCountCallback) {
-		this.requestCountCallback = requestCountCallback;
-		
 		view.configure(teams, isBig);
-		//then asynchronously load the request counts
-		if (isRequestCountVisible) {
-			for (Team team : teams) {
-				queryForRequestCount(team.getId());
-			}
-		}
 	}
 	
 	public static void getTeams(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<List<Team>> callback) {
@@ -75,6 +62,22 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 			}
 		});
 	}
+	
+	public static void getTeamBundles(String userId,
+			SynapseClientAsync synapseClient, AdapterFactory adapterFactory,
+			final AsyncCallback<List<TeamRequestBundle>> callback) {
+		synapseClient.getTeamsRequestsBundleForUser(userId, new AsyncCallback<List<TeamRequestBundle>>() {
+			@Override
+			public void onSuccess(List<TeamRequestBundle> teams) {
+				callback.onSuccess(teams);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
+	}
+	
 	
 	public void queryForRequestCount(final String teamId) {
 		synapseClient.getOpenRequestCount(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Long>() {
