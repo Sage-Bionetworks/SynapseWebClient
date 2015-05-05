@@ -14,10 +14,9 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.WikiByTitle;
+import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
@@ -173,7 +172,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				//go to new open research project page
-				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("OpenResearchProjects"));
+				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("OpenResearchProjects"));
 			}
 		});
 		
@@ -181,7 +180,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("ResearchCommunities"));
+				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("ResearchCommunities"));
 			}
 		});
 		
@@ -189,21 +188,21 @@ public class HomeViewImpl extends Composite implements HomeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("GetCreditForYourResearch"));
+				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("GetCreditForYourResearch"));
 			}
 		});
 		organizeResearchAssetsBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("OrganizeYourDigitalResearchAssets"));
+				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("OrganizeYourDigitalResearchAssets"));
 			}
 		});
 		collaborateBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("Collaborate"));
+				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("Collaborate"));
 			}
 		});
 		
@@ -217,7 +216,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		becomeCertifiedBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new WikiByTitle("Certification"));
+				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("Certification"));
 			}
 		});
 	}

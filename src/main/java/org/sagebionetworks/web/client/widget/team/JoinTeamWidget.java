@@ -202,7 +202,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	}
 	
 	public void getChallengeParticipationInfoWikiKey(final CallbackP<WikiPageKey> callback) {
-		synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
+		synapseClient.getPageNameToWikiKeyMap(new AsyncCallback<HashMap<String,WikiPageKey>>() {
 			@Override
 			public void onSuccess(HashMap<String,WikiPageKey> result) {
 				callback.invoke(result.get(WebConstants.CHALLENGE_PARTICIPATION_INFO));
