@@ -18,17 +18,15 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -291,7 +289,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea(0);
+				resizeMarkdownTextArea();
 			}
 		});
 	}
@@ -355,19 +353,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				Window.scrollTo(0, mdCommands.getAbsoluteTop());
 			}
 		});
-		
-		//init markdown text area height
-		Timer t = new Timer() {
-	      @Override
-	      public void run() {
-	    	  if (markdownTextArea.getElement().getScrollHeight() > 0) {
-	    		  resizeMarkdownTextArea(120);
-	    	  } else {
-	    		  this.schedule(100);
-	    	  }
-	      }
-	    };
-	    t.schedule(100);
+		resizeMarkdownTextArea();
 	}
 	
 	
@@ -383,8 +369,19 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		formattingGuideContainer.add(markdownWidget);
 	}
 
-	private void resizeMarkdownTextArea(int extra) {
-		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight()+ 2 + extra) + "px");
+	private void resizeMarkdownTextArea() {
+		int index = 0;
+		int numLines = 0;
+		String editorText = markdownTextArea.getText();
+		do {
+			GWT.debugger();
+			index = 1 + editorText.indexOf("\n",index);
+			numLines++;
+		} while (index > 0 && index < editorText.length());
+		if (markdownTextArea.getVisibleLines() != numLines + 1) {
+			// Keeps a minimum size of 5 lines
+			markdownTextArea.setVisibleLines(numLines + 1 > 5 ? numLines + 1 : 5);
+		}
 	}
 	
 	@Override
