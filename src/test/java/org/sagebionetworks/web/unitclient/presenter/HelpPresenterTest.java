@@ -47,28 +47,28 @@ public class HelpPresenterTest {
 		userGuideKey = new WikiPageKey(userGuideEntity, ObjectType.ENTITY.toString(), userGuideWiki);
 		pageName2WikiKeyMap.put(WebConstants.GETTING_STARTED, userGuideKey);
 		
-		AsyncMockStubber.callSuccessWith(pageName2WikiKeyMap).when(mockSynapseClient).getHelpPages(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(pageName2WikiKeyMap).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 	}	
 	
 	@Test
 	public void testSetPlaceMapInit() {
 		presenter.setPlace(place);
-		verify(mockSynapseClient).getHelpPages(any(AsyncCallback.class));
+		verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		verify(mockView).showHelpPage(eq(userGuideKey));
 		
 		//if we go there again, it should not call the synapse client again (map has been initialized)
 		presenter.setPlace(place);
 		//verify this was only called once (above)
-		verify(mockSynapseClient, times(1)).getHelpPages(any(AsyncCallback.class));
+		verify(mockSynapseClient, times(1)).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		//but we are showing the page from the pre-initialized map now
 		verify(mockView, times(2)).showHelpPage(eq(userGuideKey));
 	}	
 	
 	@Test
 	public void testSetPlaceInitFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getHelpPages(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		presenter.setPlace(place);
-		verify(mockSynapseClient).getHelpPages(any(AsyncCallback.class));
+		verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}	
 }

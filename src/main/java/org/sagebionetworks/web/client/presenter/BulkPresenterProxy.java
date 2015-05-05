@@ -24,7 +24,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.WikiByTitle;
+import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -175,9 +175,9 @@ public class BulkPresenterProxy extends AbstractActivity {
 					NewAccountPresenter presenter = ginjector.getNewAccountPresenter();
 					presenter.setPlace((NewAccount) place);
 					presenter.start(panel, eventBus);
-				} else if (place instanceof WikiByTitle) {
+				} else if (place instanceof StandaloneWiki) {
 					SynapseStandaloneWikiPresenter presenter = ginjector.getSynapseStandaloneWikiPresenter();
-					presenter.setPlace((WikiByTitle) place);
+					presenter.setPlace((StandaloneWiki) place);
 					presenter.start(panel, eventBus);
 				} else {
 					// Log that we have an unknown place but send the user to the default

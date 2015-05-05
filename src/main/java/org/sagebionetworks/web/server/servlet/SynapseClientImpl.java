@@ -142,7 +142,6 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -2511,7 +2510,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
+	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getPageNameToWikiKeyMap()
 			throws RestServiceException {
 		initHelpPagesMap();
 		return pageName2WikiKeyMap;
@@ -2520,54 +2519,23 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private void initHelpPagesMap() {
 		if (pageName2WikiKeyMap == null) {
 			HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> tempMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
-			tempMap.put(
-					WebConstants.GETTING_STARTED,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY)));
-			tempMap.put(
-					WebConstants.CREATE_PROJECT,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.CREATE_PROJECT_WIKI_ID_PROPERTY)));
-			tempMap.put(
-					WebConstants.R_CLIENT,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
-			tempMap.put(
-					WebConstants.PYTHON_CLIENT,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-			tempMap.put(
-					WebConstants.COMMAND_LINE_CLIENT,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-			tempMap.put(
-					WebConstants.FORMATTING_GUIDE,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.FORMATTING_GUIDE_WIKI_ID_PROPERTY)));
-			tempMap.put(
-					WebConstants.CHALLENGE_PARTICIPATION_INFO,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY)));
-			tempMap.put(
-					WebConstants.GOVERNANCE,
-					new org.sagebionetworks.web.shared.WikiPageKey(
-							getSynapseProperty(WebConstants.GOVERNANCE_ENTITY_ID_PROPERTY),
-							ObjectType.ENTITY.toString(),
-							getSynapseProperty(WebConstants.GOVERNANCE_WIKI_ID_PROPERTY)));
+			HashMap<String, String> properties = getSynapseProperties();
+			for (String key : properties.keySet()) {
+				if (key.startsWith(WebConstants.WIKI_PROPERTIES_PACKAGE)) {
+					String value = properties.get(key);
+					String[] tokens = value.split("/");
+					String synId = null;
+					String wikiId = null;
+					if (tokens.length == 2) {
+						synId = tokens[0];
+						wikiId = tokens[1];
+					} else if (tokens.length == 1) {
+						synId = value;
+					} 
+					tempMap.put(key.substring(WebConstants.WIKI_PROPERTIES_PACKAGE.length()), 
+							new org.sagebionetworks.web.shared.WikiPageKey(synId, ObjectType.ENTITY.toString(), wikiId));
+				}
+			}
 			
 			//Workshop
 			addHelpPageMapping(tempMap, WebConstants.COLLABORATORIUM, WebConstants.COLLABORATORIUM_ENTITY_ID_PROPERTY, null);
@@ -2889,12 +2857,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		// This method does nothing?
 		
-	}
-
-	@Override
-	public WikiPaginatedResults getStandaloneWikis() throws RestServiceException {
-		String synId = getSynapseProperty("org.sagebionetworks.portal.standalone_wikis_synapse_id");
-		PaginatedResults<WikiHeader> headers = getWikiHeaderTree(synId, ObjectType.ENTITY);
-		return new WikiPaginatedResults(headers, synId, ObjectType.ENTITY);
 	}
 }

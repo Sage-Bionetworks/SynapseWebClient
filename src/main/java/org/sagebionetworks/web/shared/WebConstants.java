@@ -195,6 +195,7 @@ public class WebConstants {
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
 	public static final String GOVERNANCE = "Governance";
+	public static final String WIKI_PROPERTIES_PACKAGE="org.sagebionetworks.portal.wikis.";
 	
 	public static final String COLLABORATORIUM = "Collaboratorium";
 	public static final String STAGE_I = "StageI";

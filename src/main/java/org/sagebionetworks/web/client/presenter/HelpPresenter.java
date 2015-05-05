@@ -41,7 +41,7 @@ public class HelpPresenter extends AbstractActivity implements HelpView.Presente
 		final String pageName = place.toToken();
 		if (pageName2WikiKeyMap == null) {
 			//initialize pageName2WikiKeyMap
-			synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
+			synapseClient.getPageNameToWikiKeyMap(new AsyncCallback<HashMap<String,WikiPageKey>>() {
 				
 				@Override
 				public void onSuccess(HashMap<String, WikiPageKey> result) {
