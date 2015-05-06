@@ -88,8 +88,9 @@ public class WikiSubpageNavigationTreeTest {
 
 	@Test
 	public void testConfigure() {
-		tree.configure(wikiHeaders, ownerObjectName, new Synapse(""), currentWikiKey, true, mockReloadWikiPageCallback);
-
+		Synapse rootPlace = new Synapse("");
+		tree.configure(wikiHeaders, ownerObjectName, rootPlace, currentWikiKey, true, mockReloadWikiPageCallback);
+		Mockito.verify(mockGlobalApplicationState).pushCurrentPlace(rootPlace);
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
 		SubpageNavTreeNode cNode = bNode.getChildren().get(0);
@@ -154,6 +155,7 @@ public class WikiSubpageNavigationTreeTest {
 	@Test
 	public void testReloadWiki() {
 		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+		Mockito.reset(mockGlobalApplicationState);
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
 		SubpageNavTreeNode cNode = bNode.getChildren().get(0);
@@ -172,6 +174,7 @@ public class WikiSubpageNavigationTreeTest {
 	private void testReloadWikiForNode(SubpageNavTreeNode aNode, SubpageNavTreeNode root, int time) {
 		tree.reloadWiki(aNode);
 		Mockito.verify(mockReloadWikiPageCallback).invoke(aNode.getWikiPageKey());
+		//pushCurrentPlace called once from configure, and once from reload
 		Mockito.verify(mockGlobalApplicationState).pushCurrentPlace(aNode.getTargetPlace());
 		Mockito.verify(mockView, Mockito.times(time)).resetNavTree(root);
 	}
