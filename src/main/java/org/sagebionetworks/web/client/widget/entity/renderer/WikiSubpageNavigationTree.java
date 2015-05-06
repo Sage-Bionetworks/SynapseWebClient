@@ -73,7 +73,8 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 				parent.getChildren().add(child);
 			}
 		}
-
+		//also push the root to the history (with the state object so that we can reload if user should go back).
+		globalApplicationState.pushCurrentPlace(overallRoot.getTargetPlace());
 		view.configure(overallRoot);
 	}
 
