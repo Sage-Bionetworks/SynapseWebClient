@@ -8,26 +8,27 @@
 	
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
-		<b:Row>
-			<b:Column size="XS_12">
-				<bh:Div ui:field="markdownContainer" addStyleNames="min-height-400"></bh:Div>
-			</b:Column>
-		</b:Row>
-		<b:Row ui:field="errorUI" visible="false" addStyleNames="min-height-400">
-			<b:Column size="XS_12">
-				<b:Alert type="WARNING" addStyleNames="margin-top-100">
-					<bh:Strong ui:field="errorText" />
-				</b:Alert>
-			</b:Column>
-		</b:Row>
-		
-		<b:Row ui:field="loadingUI" visible="false" addStyleNames="margin-150">
-			<b:Column size="XS_12" offset="XS_5">
-				<g:Image styleName="displayInline moveup-2" resource='{sageImageBundle.loading31}' />
-				<b:Heading size="H4" text="Loading..." addStyleNames="displayInline margin-left-5"/>
-			</b:Column>
-		</b:Row>
-
+		<b:Container>
+			<b:Row>
+				<b:Column size="XS_12">
+					<bh:Div ui:field="markdownContainer" addStyleNames="min-height-400"></bh:Div>
+				</b:Column>
+			</b:Row>
+			<b:Row ui:field="errorUI" visible="false" addStyleNames="min-height-400">
+				<b:Column size="XS_12">
+					<b:Alert type="WARNING" addStyleNames="margin-top-100">
+						<bh:Strong ui:field="errorText" />
+					</b:Alert>
+				</b:Column>
+			</b:Row>
+			
+			<b:Row ui:field="loadingUI" visible="false" addStyleNames="margin-150">
+				<b:Column size="XS_12" offset="XS_5">
+					<g:Image styleName="displayInline moveup-2" resource='{sageImageBundle.loading31}' />
+					<b:Heading size="H4" text="Loading..." addStyleNames="displayInline margin-left-5"/>
+				</b:Column>
+			</b:Row>
+		</b:Container>
 		<g:SimplePanel ui:field="footer" />
 	</bh:Div>
 
