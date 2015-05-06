@@ -299,7 +299,6 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public ChallengeBadge getChallengeBadgeWidget();
 	
-	public EntityBadge getEntityBadgeWidget();
 	public ProjectBadge getProjectBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
 	public MoreTreeItem getMoreTreeWidget();

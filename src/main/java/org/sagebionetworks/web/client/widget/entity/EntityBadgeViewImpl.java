@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -25,6 +26,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,6 +45,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel iconContainer;
 	@UiField
 	FlowPanel entityContainer;
+	@UiField
+	Label idField;
+	
 	Image iconPicture;
 	ClickHandler nonDefaultClickHandler;
 	
@@ -109,6 +114,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			iconPicture.addClickHandler(clickHandler);
 			iconContainer.setWidget(iconPicture);
 			entityContainer.add(anchor);
+			idField.setText(entityHeader.getId());
 		} 		
 	}
 	

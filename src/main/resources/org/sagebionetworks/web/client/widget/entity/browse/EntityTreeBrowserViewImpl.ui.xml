@@ -10,7 +10,13 @@
 	
 	<bh:Div>
 	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
-		<g:Tree ui:field="entityTree">
+	    
+	    <!-- File browser tree "table" header -->
+	    <bh:Div addStyleNames="margin-bottom-10 light-border-bottom" width="100%">
+			<bh:Span text="Name" addStyleNames="margin-left-35" />
+			<bh:Span text="ID" addStyleNames="right margin-right-65" />
+		</bh:Div>
+	    <g:Tree ui:field="entityTree">
 		</g:Tree>  
 		<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
 	        <g:Image resource='{sageImageBundle.loading31}' />&nbsp;Loading...
