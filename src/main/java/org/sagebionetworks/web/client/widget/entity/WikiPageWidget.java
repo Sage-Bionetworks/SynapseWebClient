@@ -46,6 +46,7 @@ SynapseWidgetPresenter {
 	private boolean isCurrentVersion;
 	private Long versionInView;
 	private CallbackP<WikiPageKey> reloadWikiPageCallback;
+	private CallbackP<String> wikiReloadHandler;
 
 	public interface Callback{
 		public void pageUpdated();
@@ -277,6 +278,7 @@ SynapseWidgetPresenter {
 					boolean isRootWiki = currentPage.getParentWikiId() == null;
 					wikiKey.setWikiPageId(currentPage.getId());
 					view.resetWikiMarkdown(currentPage.getMarkdown(), wikiKey, isRootWiki, true, null);
+					wikiReloadHandler.invoke(currentPage.getId());
 				} catch (Exception e) {
 					onFailure(e);
 				}
@@ -317,5 +319,9 @@ SynapseWidgetPresenter {
 			if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 				view.showWarningMessageInPage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 		}
+	}
+
+	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
+		this.wikiReloadHandler = wikiReloadHandler;
 	}
 }

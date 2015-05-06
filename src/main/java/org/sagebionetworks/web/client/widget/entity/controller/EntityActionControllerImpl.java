@@ -589,4 +589,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+
+	@Override
+	public void setWikiPageId(String wikiPageId) {
+		this.wikiPageId = wikiPageId;
+	}
 }
