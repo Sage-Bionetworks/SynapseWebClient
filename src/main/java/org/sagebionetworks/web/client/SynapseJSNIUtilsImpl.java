@@ -439,7 +439,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private static native void _replaceHistoryState(String token)/*-{
-		$wnd.history.replaceState( {} , '', '#'+token );
+		var stateObj = { source: 'replaceState' };
+		$wnd.history.replaceState( stateObj , '', '#'+token );
 	}-*/;
 
 	@Override
@@ -448,7 +449,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _pushHistoryState(String token)/*-{
-		$wnd.history.pushState( {} , '', '#'+token );
+		var stateObj = { source: 'pushState' };
+		$wnd.history.pushState( stateObj , '', '#'+token );
 	}-*/;
 
 	@Override
@@ -458,8 +460,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private static native void _initOnPopStateHandler()/*-{
 		// reload the page on pop state
+		//we set the source property of the state if we used pushState or replaceState
 		$wnd.addEventListener("popstate", function(event) {
-			$wnd.location.reload(false);
+			var stateObj = event.state;
+			if (typeof stateObj !== "undefined" && stateObj !== null && typeof stateObj.source !== "undefined"){
+				$wnd.location.reload(false);
+			}
 		});
 	}-*/;
 }
