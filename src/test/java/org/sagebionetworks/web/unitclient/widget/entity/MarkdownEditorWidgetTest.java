@@ -347,7 +347,7 @@ public class MarkdownEditorWidgetTest {
 		when(mockView.getMarkdownText()).thenReturn(markdown);
 		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		//now should be 11 lines (10 lines + 1 below)
+		//now should be 8 lines (7 lines + 1 below)
 		verify(mockView).resizeMarkdownTextArea(8);
 		
 		markdown = "1\n2\n3\n";
@@ -355,7 +355,7 @@ public class MarkdownEditorWidgetTest {
 		when(mockView.getMarkdownText()).thenReturn(markdown);
 		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		//now should be 11 lines (10 lines + 1 below)
+		//now should be 5 lines (minimum)
 		verify(mockView).resizeMarkdownTextArea(5);
 	}
 	
