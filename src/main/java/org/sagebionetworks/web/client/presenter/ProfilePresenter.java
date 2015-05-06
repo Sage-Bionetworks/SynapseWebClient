@@ -35,7 +35,6 @@ import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
-import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
@@ -298,26 +297,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void refreshProjects() {
 		currentProjectOffset = 0;
 		view.clearProjects();
-		getMoreProjects();
-		
-		//initialize team filters
-		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				//could not load teams for team filters
-				view.setTeamsFilterVisible(false);
-			}
-			@Override
-			public void onSuccess(List<Team> teams) {
-				view.setTeamsFilterVisible(!teams.isEmpty());
-				view.setTeamsFilterTeams(teams);
-			}
-		};
-		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
-		
-		//also refresh the teams tab if you are the owner (to show notifications)
-		if (isOwner)
-			refreshTeams();
+		getMoreProjects();		
+		//also refresh the teams tab
+		refreshTeams();
 	}
 	
 	public void refreshChallenges() {
@@ -387,35 +369,55 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.showTeamsLoading();
 		teamNotificationCount = 0;
 		view.clearTeamNotificationCount();
-		if (isOwner) {	
+		if (isOwner)
 			view.refreshTeamInvites();
-			AsyncCallback<List<TeamRequestBundle>> teamCallback = new AsyncCallback<List<TeamRequestBundle>>() {
+		getTeamBundles(currentUserId, synapseClient, adapterFactory, isOwner);
+	}
+	
+	public void getTeamBundles(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory,
+			boolean includeRequestCount) {
+		if (includeRequestCount) {
+			synapseClient.getTeamsRequestsBundleForUser(userId, new AsyncCallback<List<TeamRequestBundle>>() {
+				@Override
+				public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
+					if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
+						int requestCount = 0;
+						List<Team> teams = new ArrayList<Team>(teamsRequestBundles.size());
+						for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
+							requestCount += teamAndRequest.getRequestCount();
+							teams.add(teamAndRequest.getTeam());
+						}
+						addMembershipRequests(requestCount);
+						view.setTeamsFilterVisible(!teams.isEmpty());
+						view.setTeamsFilterTeams(teams);
+						view.setTeams(teams);
+					}
+				}
 				@Override
 				public void onFailure(Throwable caught) {
+					view.setTeamsFilterVisible(false);
 					view.setTeamsError(caught.getMessage());
 				}
-				@Override
-				public void onSuccess(List<TeamRequestBundle> teams) {
-					view.setTeamsFromBundle(teams);
-				}
-			};
-			TeamListWidget.getTeamBundles(currentUserId, synapseClient, adapterFactory, teamCallback);
+			});
 		} else {
-			AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					view.setTeamsError(caught.getMessage());
-				}
+			synapseClient.getTeamsForUser(userId, new AsyncCallback<List<Team>>() {
 				@Override
 				public void onSuccess(List<Team> teams) {
-					view.setTeams(teams);
+					view.setTeamsFilterVisible(!teams.isEmpty());
+					view.setTeamsFilterTeams(teams);
+					if (teams != null && teams.size() > 0) {
+						view.setTeams(teams);
+					}
 				}
-			};
-			
-			TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setTeamsFilterVisible(false);
+					view.setTeamsError(caught.getMessage());
+				}
+			});
 		}
-
 	}
+	
 	
 	public void getMoreChallenges() {
 		view.showChallengesLoading(true);

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.shared.event.AlertClosedEvent;
@@ -508,18 +507,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeams(List<Team> teams) {
-		myTeamsWidget.configure(teams, false);
-	}
-	
-	@Override
-	public void setTeamsFromBundle(List<TeamRequestBundle> teamsRequestBundles) {
-		int requestCount = 0;
-		List<Team> teams = new ArrayList<Team>(teamsRequestBundles.size());
-		for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
-			requestCount += teamAndRequest.getRequestCount();
-			teams.add(teamAndRequest.getTeam());
-		}
-		presenter.addMembershipRequests(requestCount);
 		myTeamsWidget.configure(teams, false);
 	}
 	

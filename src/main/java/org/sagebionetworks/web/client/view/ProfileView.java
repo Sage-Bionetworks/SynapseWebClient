@@ -92,9 +92,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void resort(SortOptionEnum sortOption);
 	}
 
-
-	void setTeamsFromBundle(List<TeamRequestBundle> teamsRequestBundles);
-
 	void setTeams(List<Team> teams);
 
 }

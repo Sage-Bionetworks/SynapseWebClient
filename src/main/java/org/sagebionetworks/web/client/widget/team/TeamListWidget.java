@@ -48,57 +48,7 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	
 	public void configure(List<Team> teams, boolean isBig) {
 		view.configure(teams, isBig);
-	}
-	
-	public static void getTeams(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<List<Team>> callback) {
-		synapseClient.getTeamsForUser(userId, new AsyncCallback<List<Team>>() {
-			@Override
-			public void onSuccess(List<Team> teams) {
-				callback.onSuccess(teams);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
-	
-	public static void getTeamBundles(String userId,
-			SynapseClientAsync synapseClient, AdapterFactory adapterFactory,
-			final AsyncCallback<List<TeamRequestBundle>> callback) {
-		synapseClient.getTeamsRequestsBundleForUser(userId, new AsyncCallback<List<TeamRequestBundle>>() {
-			@Override
-			public void onSuccess(List<TeamRequestBundle> teams) {
-				callback.onSuccess(teams);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
-	
-	
-	public void queryForRequestCount(final String teamId) {
-		synapseClient.getOpenRequestCount(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Long>() {
-			@Override
-			public void onSuccess(Long result) {
-				if (result != null) {
-					//only inform the view if the resulting count is positive
-					if (result > 0)
-						view.setRequestCount(teamId, result);
-					if (requestCountCallback != null)
-						requestCountCallback.invoke(teamId, result);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
-			}
-		});
-	}
+	}	
 	
 	public Widget asWidget() {
 		view.setPresenter(this);
