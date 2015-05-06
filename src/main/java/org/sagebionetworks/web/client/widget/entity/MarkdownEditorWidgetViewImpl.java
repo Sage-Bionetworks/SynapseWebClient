@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -45,6 +46,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	private ResourceLoader resourceLoader;
 	private MarkdownWidget markdownWidget;
 	private Presenter presenter;
+	private boolean isShown;
 	
 	@UiField
 	public Modal editorDialog;
@@ -202,6 +204,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.iconsImageBundle = iconsImageBundle;
 		this.resourceLoader = resourceLoader;
 		this.markdownWidget = markdownWidget;
+		this.isShown = false;
 		markdownWidget.addStyleName("margin-10");
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
@@ -358,13 +361,20 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
+	public boolean isEditorModalVisible() {
+		return isShown;
+	}
+	
+	@Override
 	public void showEditorModal() {
 		editorDialog.show();
+		isShown = true;
 	}
 	
 	@Override
 	public void hideEditorModal() {
 		editorDialog.hide();
+		isShown = false;
 	}
 	
 	@Override
@@ -452,6 +462,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setTitleEditorVisible(boolean visible) {
 		titleField.setVisible(visible);
 	}
+
 	
 	@Override
 	public String getTitle() {

@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -47,7 +48,7 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 		void handleCommand(MarkdownEditorAction action);
 		void markdownEditorClicked();
 	}
-
+	
 	void addTextAreaKeyUpHandler(KeyUpHandler keyUpHandler);
 
 	void resizeMarkdownTextArea(int i);
@@ -59,4 +60,6 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	int getMarkdownTextAreaVisibleLines();
 
 	void setDeleteClickHandler(ClickHandler deleteClickHandler);
+
+	boolean isEditorModalVisible();
 }

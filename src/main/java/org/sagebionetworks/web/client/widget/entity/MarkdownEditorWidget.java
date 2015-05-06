@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -27,10 +28,16 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -155,18 +162,20 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.setTitle(currentPage.getTitle());
 		globalApplicationState.setIsEditing(true);
 		setMarkdownTextAreaHandlers();
-		resizeMarkdownTextArea();
+  	  	resizeMarkdownTextArea();
 		view.setDeleteClickHandler(getDeleteClickHandler());
 		view.showEditorModal();
+		gwt.scheduleExecution(new Callback() {
+			@Override
+			public void invoke() {
+		    	  resizeMarkdownTextArea();
+		    	  if (view.isEditorModalVisible()) 
+			    	  gwt.scheduleExecution(this, 500);
+			}
+		}, 500);	
 	}
 	
-	private void setMarkdownTextAreaHandlers() {
-		view.addTextAreaKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea();
-			}
-		});
+	private void setMarkdownTextAreaHandlers() {		
 		view.addTextAreaKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
@@ -198,9 +207,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void resizeMarkdownTextArea() {
 		int visLines = view.getMarkdownTextAreaVisibleLines();
-		if (visLines < 5) {
-			view.resizeMarkdownTextArea(5);
-		}
 		int index = 0;
 		int numLines = 0;
 		String editorText = view.getMarkdownText();
@@ -208,7 +214,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			index = 1 + editorText.indexOf("\n",index);
 			numLines++;
 		} while (index > 0 && index < editorText.length());
-		if (visLines != numLines + 1 && numLines > 5) {
+		if (visLines < 5 || visLines != numLines + 1) {
 			// Keeps a minimum size of 5 lines
 			view.resizeMarkdownTextArea(numLines + 1 > 5 ? numLines + 1 : 5);
 		}
