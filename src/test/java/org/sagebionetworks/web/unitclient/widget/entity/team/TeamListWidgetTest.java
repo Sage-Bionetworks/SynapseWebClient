@@ -113,8 +113,7 @@ public class TeamListWidgetTest {
 	public void testConfigureIsBigNoRequestCount() {
 		//this is the configuration used by the Team Search page
 		boolean isBig = true;
-		boolean isRequestCountVisible = false;
-		widget.configure(teamList, isBig, isRequestCountVisible);
+		widget.configure(teamList, isBig);
 		verify(mockView).configure(eq(teamList), eq(isBig));
 		//should not call since request count is not visible
 		verify(mockSynapseClient, never()).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
@@ -124,22 +123,16 @@ public class TeamListWidgetTest {
 	public void testConfigureIsBigWithRequestCount() {
 		//this is the configuration used by the Teams tab in the dashboard
 		boolean isBig = true;
-		boolean isRequestCountVisible = true;
-		//also test the request count callback
-//		TeamListWidget.RequestCountCallback mockCallback = mock(TeamListWidget.RequestCountCallback.class);
-		widget.configure(teamList, isBig, isRequestCountVisible);
+		widget.configure(teamList, isBig);
 		verify(mockView).configure(eq(teamList), eq(isBig));
-		//no longer callback -> must verify the count has already been found
-//		verify(mockCallback).invoke(anyString(), anyLong());
 	}
 	
 	@Test
 	public void testConfigureSmallWithRequestCount() {
 		//this is the configuration used by the old home page
 		boolean isBig = false;
-		boolean isRequestCountVisible = true;
 		//null request count callback
-		widget.configure(teamList, isBig, isRequestCountVisible);
+		widget.configure(teamList, isBig);
 		verify(mockView).configure(eq(teamList), eq(isBig));
 	}
 	

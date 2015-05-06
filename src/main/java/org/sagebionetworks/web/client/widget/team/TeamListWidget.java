@@ -46,7 +46,7 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	public void configure(List<Team> teams, boolean isBig, boolean isRequestCountVisible) {
+	public void configure(List<Team> teams, boolean isBig) {
 		view.configure(teams, isBig);
 	}
 	

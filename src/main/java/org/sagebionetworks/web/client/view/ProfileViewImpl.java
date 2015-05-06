@@ -508,7 +508,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeams(List<Team> teams) {
-		myTeamsWidget.configure(teams, false, false);
+		myTeamsWidget.configure(teams, false);
 	}
 	
 	@Override
@@ -520,7 +520,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			teams.add(teamAndRequest.getTeam());
 		}
 		presenter.addMembershipRequests(requestCount);
-		myTeamsWidget.configure(teams, false, true);
+		myTeamsWidget.configure(teams, false);
 		
 		
 //		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
