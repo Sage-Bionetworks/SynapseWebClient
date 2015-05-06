@@ -159,6 +159,8 @@ public class ProfilePresenterTest {
 		PassingRecord myPassingRecord = new PassingRecord();
 		String passingRecordJson = myPassingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(passingRecordJson).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(myTeamBundles).when(mockSynapseClient).getTeamsRequestsBundleForUser(anyString(), any(AsyncCallback.class));
+
 		
 		//set up get user projects test
 		EntityHeader project1 = new EntityHeader();
@@ -412,8 +414,8 @@ public class ProfilePresenterTest {
 		//should have refreshed teams too, since this is the owner
 		verify(mockView).clearTeamNotificationCount();
 		verify(mockView).refreshTeamInvites();
-		// Need to verify this some other way
-//		verify(mockView).setTeamsFromBundle(anyList());		
+		verify(mockView).setTeamsFromBundle(anyList());		
+		
 	}
 	
 	@Test
@@ -429,7 +431,6 @@ public class ProfilePresenterTest {
 		verify(mockView, never()).clearTeamNotificationCount();
 		verify(mockView, never()).refreshTeamInvites();
 		verify(mockView, never()).setTeams(anyList());
-		
 	}
 
 	
