@@ -12,7 +12,7 @@
 	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
 	    
 	    <!-- File browser tree "table" header -->
-	    <bh:Div addStyleNames="margin-bottom-10 light-border-bottom" width="100%">
+	    <bh:Div ui:field="entityTreeHeader" addStyleNames="margin-bottom-10 light-border-bottom" width="100%">
 			<bh:Span text="Name" addStyleNames="margin-left-35" />
 			<bh:Span text="ID" addStyleNames="right margin-right-65" />
 		</bh:Div>
