@@ -765,11 +765,21 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
-	public void testGetTeams() {
+	public void testGetTeamsNotOwner() {
+		profilePresenter.setIsOwner(false);
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		verify(mockView).showTeamsLoading();
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeams(eq(myTeams));
+	}
+	
+	@Test
+	public void testGetTeamsOwner() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.tabClicked(ProfileArea.TEAMS);	
+		verify(mockView).showTeamsLoading();
+		verify(mockSynapseClient).getTeamsRequestsBundleForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsFromBundle(myTeamBundles);
 	}
 	
 	@Test

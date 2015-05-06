@@ -387,7 +387,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.showTeamsLoading();
 		teamNotificationCount = 0;
 		view.clearTeamNotificationCount();
-		if (isOwner) {
+		if (isOwner) {	
 			view.refreshTeamInvites();
 			AsyncCallback<List<TeamRequestBundle>> teamCallback = new AsyncCallback<List<TeamRequestBundle>>() {
 				@Override
