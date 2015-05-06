@@ -5,7 +5,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<g:ScrollPanel>
-			<b:Form>
+			<bh:Div>
 				<t:Table styleName="table table-striped table-condensed">
 					<t:THead>
 						<t:TableRow ui:field="header">
@@ -16,7 +16,7 @@
 				<g:SimplePanel ui:field="editorPopupBuffer">
 					<bh:Div styleName="margin-top-300" />
 				</g:SimplePanel>
-			</b:Form>
+			</bh:Div>
 		</g:ScrollPanel>
 		<g:SimplePanel ui:field="paginationPanel" />
 	</bh:Div>

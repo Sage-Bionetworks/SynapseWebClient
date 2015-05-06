@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
+import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
@@ -31,14 +32,20 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
+import org.sagebionetworks.web.client.widget.entity.CommandLineClientEntityGetterUIWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.CommandLineClientInstallWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.client.widget.entity.RClientModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -123,6 +130,7 @@ import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
+import com.google.gwt.uibinder.client.UiField;
 
 /**
  * The root portal dependency injection root.
@@ -194,6 +202,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ActionMenuWidget createActionMenuWidget();
 	
 	public EntityActionController createEntityActionController();
+	
 	/*
 	 *  Markdown Widgets
 	 */
@@ -254,6 +263,7 @@ public interface PortalGinInjector extends Ginjector {
 	public UserBadge getUserBadgeWidget();
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
+	public QuestionContainerWidget getQuestionContainerWidget();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
@@ -279,7 +289,6 @@ public interface PortalGinInjector extends Ginjector {
 	public LinkCellRenderer createLinkCellRenderer();
 	public FileCellEditor createFileCellEditor();
 	public FileCellRenderer createFileCellRenderer();
-
 		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();
@@ -293,7 +302,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityBadge getEntityBadgeWidget();
 	public ProjectBadge getProjectBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
-
+	public MoreTreeItem getMoreTreeWidget();
 	public UserGroupListWidget getUserGroupListWidget();
 	
 	public TableListWidget getTableListWidget();
@@ -309,4 +318,6 @@ public interface PortalGinInjector extends Ginjector {
 	public StaticTableHeader createStaticTableHeader();
 	public EvaluationSubmitter getEvaluationSubmitter();
 	public RegisterTeamDialog getRegisterTeamDialog();
+	public AnnotationEditor getAnnotationEditor();
+	public FileHistoryRowView getFileHistoryRow();
 }

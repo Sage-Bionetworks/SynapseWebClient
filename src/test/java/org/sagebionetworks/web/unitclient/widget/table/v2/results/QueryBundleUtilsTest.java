@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
@@ -56,8 +57,23 @@ public class QueryBundleUtilsTest {
 		assertEquals(null, QueryBundleUtils.getTableId(bundle));
 		bundle.setQueryResult(null);
 		assertEquals(null, QueryBundleUtils.getTableId(bundle));
-		assertEquals(null, QueryBundleUtils.getTableId(null));
+		assertEquals(null, QueryBundleUtils.getTableId((QueryResultBundle)null));
 	}
+	
+	@Test
+	public void testGetTableIdFromQuerySql(){
+		assertEquals("syn456", QueryBundleUtils.getTableIdFromSql("SELECT syn123, BAR FROM SYN456 where id='syn789'"));
+		assertEquals(null, QueryBundleUtils.getTableIdFromSql("SELECT syn123, foo FROM 456 where id='syn789'"));
+	}
+	
+	@Test
+	public void testGetTableIdQuery(){
+		Query query = new Query();
+		query.setSql("select * from syn999");
+		assertEquals("syn999", QueryBundleUtils.getTableId(query));
+		assertEquals(null, QueryBundleUtils.getTableId((Query)null));
+	}
+
 
 	@Test
 	public void testGetSelect(){

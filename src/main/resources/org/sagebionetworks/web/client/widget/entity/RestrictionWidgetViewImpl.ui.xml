@@ -16,13 +16,13 @@
 	        <g:Image ui:field="unmetRequirementsIcon" styleName="displayInline" resource='{icons.shieldRed16}' />
 	        <g:Image ui:field="metRequirementsIcon" styleName="displayInline" resource='{icons.shieldRed16WithGreenCheckmark}' />
 			<!-- Note, tooltip does not work if wrapping Text -->
-			<b:Tooltip placement="BOTTOM" text="Conditions for use are set by human privacy regulations or contractual obligations">
+			<b:Tooltip placement="BOTTOM" title="Conditions for use are set by human privacy regulations or contractual obligations">
 			    <g:InlineLabel text="Controlled Use" />
 			</b:Tooltip>
 		</bh:Span>
 		<bh:Span ui:field="noneUI">
 		    <!-- Note, tooltip does not work if wrapping Text -->
-			<b:Tooltip placement="BOTTOM" text="Conditions for use are set by human privacy regulations or contractual obligations">
+			<b:Tooltip placement="BOTTOM" title="Conditions for use are set by human privacy regulations or contractual obligations">
 				<g:InlineLabel text="None" />
 			</b:Tooltip>
 		</bh:Span>
@@ -33,13 +33,13 @@
 		
 		<bh:Span ui:field="flagUI">
 		    <g:Image styleName="displayInline moveup-2 moveright-5" resource='{icons.flagSmall16}' />
-			<b:Tooltip placement="BOTTOM" text="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
+			<b:Tooltip placement="BOTTOM" title="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
 				<b:Anchor ui:field="reportIssueLink">report issue</b:Anchor>
 			</b:Tooltip>
 		</bh:Span>
 		<bh:Span ui:field="anonymousFlagUI">
 		    <g:Image styleName="displayInline moveup-2 moveright-5" resource='{icons.flagSmall16}' />
-			<b:Tooltip placement="BOTTOM" text="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
+			<b:Tooltip placement="BOTTOM" title="Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team">
 				<b:Anchor ui:field="anonymousReportIssueLink">report issue</b:Anchor>
 			</b:Tooltip>
 		</bh:Span>
@@ -60,7 +60,7 @@
 	        	</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="imposeRestrictionCancelButton" type="DEFAULT">Cancel</b:Button>
 				<b:Button ui:field="imposeRestrictionOkButton" type="PRIMARY">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>

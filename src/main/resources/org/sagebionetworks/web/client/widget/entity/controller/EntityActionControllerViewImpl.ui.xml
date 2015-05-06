@@ -4,5 +4,6 @@
 
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="aclPanel" />
+		<g:SimplePanel ui:field="markdownEditorPanel" />
 	</g:HTMLPanel>
 </ui:UiBinder>

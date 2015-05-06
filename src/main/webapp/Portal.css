@@ -183,10 +183,6 @@
 	top: -2px;		
 }
 
-.gxtGreyBackground {
-	background-color: #e8e8e8;
-}	
-
 .smallGreyText {
     color: #717171;
 	font-size: 10px;
@@ -601,6 +597,16 @@ a.shortBtn {
 .margin-left-1 {
 	margin-left: 1px;
 }
+.margin-left-2 {
+	margin-left: 2px;
+}
+.margin-left-3 {
+	margin-left: 3px;
+}
+
+.margin-left-5 {
+	margin-left: 5px;
+}
 .margin-left-9 {
 	margin-left: 9px;
 }
@@ -614,16 +620,7 @@ a.shortBtn {
 .margin-right-15 {
 	margin-right: 15px;
 }
-.margin-left-2 {
-	margin-left: 2px;
-}
-.margin-left-3 {
-	margin-left: 3px;
-}
 
-.margin-left-5 {
-	margin-left: 5px;
-}
 .margin-top-3 {
 	margin-top: 3px;
 }
@@ -714,6 +711,9 @@ a.shortBtn {
 	margin-bottom: 0px !important;
 }
 
+.margin-bottom-300 {
+	margin-bottom: 300px;
+}
 
 .margin-left-725 {
 	margin-left: 725px;
@@ -780,18 +780,6 @@ a.shortBtn {
 	position: relative;
 	top: -160px;
 }
-
-.dragAndDropUploadBox {
-	width: 100%;
-	padding: 3em 0 6em 38%;
-	opacity: 0;
-	filter: alpha(opacity=0);
-}
-.dragAndDropBorder {
-	border: 2px dashed;
-	border-radius: 3em;
-}
-
 
 .userGroupSuggestBoxPopup {
 	z-index: 2000;
@@ -927,7 +915,8 @@ a.shortBtn {
 	font-family: Yanone Kaffeesatz;
 }
 
-.font-size-150 {
+.font-size-150,
+i.font-size-150 {
 	font-size: 150px;
 }
 
@@ -978,19 +967,24 @@ a.shortBtn {
 	font-size: 12px;
 }
 
-.font-size-1x {
+.font-size-1x,
+i.font-size-1x {
 	font-size:1em;
 }
-.font-size-lg {
+.font-size-lg,
+i.font-size-lg {
 	font-size:1.33em;
 }
-.font-size-2x {
+.font-size-2x,
+i.font-size-2x {
 	font-size:2em;
 }
-.font-size-5x {
+.font-size-5x,
+i.font-size-5x {
 	font-size:5em;
 }
-.font-size-12x {
+.font-size-12x,
+i.font-size-12x {
 	font-size:12em;
 }
 
@@ -1017,6 +1011,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .scroll-y {
 	overflow-y: auto;
+}
+
+.hide-resize {
+	resize: none;
 }
 
 .scroll-auto {
@@ -1409,6 +1407,7 @@ ol.lowerroman {
 	display: inline-block;
 	position: relative;
 	top: 4px;
+	overflow-y: hidden;
 }
 
 .myEvaluationListContainer {
@@ -1492,7 +1491,10 @@ ol.lowerroman {
 	top: -70px;
 }
 
-
+.moveup-10 {
+	position: relative;
+	top: -10px;
+}
 .moveup-8 {
 	position: relative;
 	top: -8px;
@@ -1531,6 +1533,11 @@ ol.lowerroman {
 	position: relative;
 	top: 4px;
 }
+.movedown-5 {
+	position: relative;
+	top: 5px;
+}
+
 .movedown-6 {
 	position: relative;
 	top: 6px;
@@ -1563,7 +1570,7 @@ ol.lowerroman {
     left: 6px;
 	color: #333333;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 21px;
+    font-size: 24px;
     font-weight: 200;
     line-height: 1.4;
     padding: 3px 7px;
@@ -1798,6 +1805,11 @@ a.projectTitle:hover {
 .padding-left-10 {
 	padding-left: 10px;
 }
+
+.padding-left-15 {
+	padding-left: 15px;
+}
+
 .padding-left-30 {
 	padding-left: 30px;
 }

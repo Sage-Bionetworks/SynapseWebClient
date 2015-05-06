@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.constants.ValidationState;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -17,6 +18,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+// Want to add enter handler... What is the best way to go about this?
 public class UserProfileEditorWidgetViewImpl implements
 		UserProfileEditorWidgetView {
 	
@@ -26,10 +28,6 @@ public class UserProfileEditorWidgetViewImpl implements
 	SimplePanel imagePanel;
 	@UiField
 	SimplePanel fileInputWidgetPanel;
-	@UiField
-	Alert uploadAlert;
-	@UiField
-	Button uploadFileButton;
 	@UiField
 	FormGroup usernameFormGroup;
 	@UiField
@@ -133,32 +131,7 @@ public class UserProfileEditorWidgetViewImpl implements
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		uploadFileButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onUploadFile();
-			}
-		});
-	}
 
-	@Override
-	public void showUploadError(String string) {
-		uploadAlert.setText(string);
-		uploadAlert.setVisible(true);
-	}
-
-	@Override
-	public void hideUploadError() {
-		uploadAlert.setVisible(false);
-	}
-
-	@Override
-	public void setUploading(boolean uploading) {
-		if(uploading){
-			uploadFileButton.state().loading(); 
-		}else{
-			uploadFileButton.state().reset(); 
-		}
 	}
 
 	@Override
@@ -221,6 +194,19 @@ public class UserProfileEditorWidgetViewImpl implements
 	@Override
 	public void setLink(String url) {
 		this.link.setText(url);
+	}
+
+	@Override
+	public void addKeyDownHandlerToFields(KeyDownHandler keyDownHandler) {
+		username.addKeyDownHandler(keyDownHandler);
+		firstName.addKeyDownHandler(keyDownHandler);
+		lastName.addKeyDownHandler(keyDownHandler);
+		currentPosition.addKeyDownHandler(keyDownHandler);
+		currentAffiliation.addKeyDownHandler(keyDownHandler);
+		industry.addKeyDownHandler(keyDownHandler);
+		location.addKeyDownHandler(keyDownHandler);
+		link.addKeyDownHandler(keyDownHandler);
+		bio.addKeyDownHandler(keyDownHandler);
 	}
 
 }

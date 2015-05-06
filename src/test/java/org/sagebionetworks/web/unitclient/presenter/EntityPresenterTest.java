@@ -1,50 +1,44 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -59,16 +53,13 @@ public class EntityPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	CookieProvider mockCookies;
 	PlaceChanger mockPlaceChanger;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
 	Entity EntityModel1;
 	EntityBundle eb;
-	EntityBundleTransport ebt;
 	String entityId = "syn43344";
 	Synapse.EntityArea area = Synapse.EntityArea.FILES;
 	String areaToken = null;
@@ -84,20 +75,17 @@ public class EntityPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapterFactory, mockCookies, mockSynapseJSNIUtils);
-		ebt = new EntityBundleTransport();
-		ebt.setIsWikiBasedEntity(false);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockCookies, mockSynapseJSNIUtils);
 		Entity testEntity = new Project();
-		eb = new EntityBundle(testEntity, null, null, null, null, null, null, null);
+		eb = new EntityBundle();
+		eb.setEntity(testEntity);
 		EntityPath path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
 		eb.setPath(path);
-		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntityBundle(eq(ebt))).thenReturn(eb);
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setPresenter(entityPresenter);
 		id=0L;
 		
@@ -146,7 +134,7 @@ public class EntityPresenterTest {
 	
 	@Test
 	public void testWikiBasedEntity() {
-		ebt.setIsWikiBasedEntity(true);
+		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
 		entityPresenter.setPlace(place);
@@ -161,7 +149,7 @@ public class EntityPresenterTest {
 	@Test
 	public void testWikiBasedEntityInTestWebsite() {
 		//will show full project page for wiki based entities when in alpha mode
-		ebt.setIsWikiBasedEntity(true);
+		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
@@ -201,11 +189,11 @@ public class EntityPresenterTest {
 		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
 		
 		eb.setAccessRequirements(unfilteredARs);
-		eb.setUnmetDownloadAccessRequirements(unfilteredUnmetARs);
+		eb.setUnmetAccessRequirements(unfilteredUnmetARs);
 		EntityPresenter.filterToDownloadARs(eb);
 		
 		assertEquals(expectedFilteredARs, eb.getAccessRequirements());
-		assertEquals(expectedFilteredUnmetARs, eb.getUnmetDownloadAccessRequirements());
+		assertEquals(expectedFilteredUnmetARs, eb.getUnmetAccessRequirements());
 	}
 	
 	@Test

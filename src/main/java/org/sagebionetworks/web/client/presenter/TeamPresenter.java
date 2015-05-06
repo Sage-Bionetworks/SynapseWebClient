@@ -3,13 +3,11 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.shared.TeamBundle;
 
@@ -25,7 +23,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private org.sagebionetworks.web.client.place.Team place;
 	private TeamView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -37,14 +34,12 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		
 		view.setPresenter(this);
@@ -85,17 +80,13 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
-				try {
-					team = nodeModelCreator.createJSONEntity(result.getTeamJson(), Team.class);
-					if (result.getTeamMembershipStatusJson() != null)
-						teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-					else
-						teamMembershipStatus = null;
-					boolean isAdmin = result.isUserAdmin();
-					view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+				team = result.getTeam();
+				if (result.getTeamMembershipStatus() != null)
+					teamMembershipStatus = result.getTeamMembershipStatus();
+				else
+					teamMembershipStatus = null;
+				boolean isAdmin = result.isUserAdmin();
+				view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -156,25 +147,19 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			team.setDescription(description);
 			team.setCanPublicJoin(canPublicJoin);
 			team.setIcon(fileHandleId);
-			try {
-				JSONObjectAdapter adapter = team.writeToJSONObject(jsonObjectAdapter.createNew());
-				String teamJson = adapter.toJSONString();
-				synapseClient.updateTeam(teamJson, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
-						refresh();
+			synapseClient.updateTeam(team, new AsyncCallback<Team>() {
+				@Override
+				public void onSuccess(Team result) {
+					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
+					refresh();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+						view.showErrorMessage(caught.getMessage());
 					}
-					@Override
-					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-							view.showErrorMessage(caught.getMessage());
-						}
-					}
-				});
-			} catch (JSONObjectAdapterException e) {
-				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-			}
+				}
+			});
 		}
 	}
 }

@@ -19,18 +19,16 @@ import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedIds;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.ChallengeClient;
@@ -38,6 +36,7 @@ import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -82,7 +81,6 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	}
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	AutoGenFactory entityFactory = new AutoGenFactory();
 	
 	/**
 	 * Injected with Gin
@@ -143,6 +141,15 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 				.getThreadLocalRequest());
 	}
 
+	/**
+	 * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
+	 * @param in
+	 * @return
+	 */
+	public <T extends JSONEntity> PaginatedResults<T> convertPaginated(org.sagebionetworks.reflection.model.PaginatedResults<T> in){
+		return  new PaginatedResults<T>(in.getResults(), in.getTotalNumberOfResults());
+	}
+	
 	/*
 	 * ChallengeClient Service Methods
 	 */
@@ -185,7 +192,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	 * @see org.sagebionetworks.web.client.ChallengeClient#getEvaluations(java.util.List)
 	 */
 	@Override
-	public String getEvaluations(List<String> evaluationIds)
+	public PaginatedResults<Evaluation> getEvaluations(List<String> evaluationIds)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -196,45 +203,37 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 			PaginatedResults<Evaluation> results = new PaginatedResults<Evaluation>();
 			results.setResults(evalList);
 			results.setTotalNumberOfResults(evalList.size());
-			JSONObjectAdapter evaluationsJson = results
-					.writeToJSONObject(adapterFactory.createNew());
-			return evaluationsJson.toJSONString();
+			return results;
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
 	@Override
-	public String getAvailableEvaluations() throws RestServiceException {
+	public PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Evaluation> results = synapseClient
+			return convertPaginated(synapseClient
 					.getAvailableEvaluationsPaginated(
 							EVALUATION_PAGINATION_OFFSET,
-							EVALUATION_PAGINATION_LIMIT);
-			JSONObjectAdapter evaluationsJson = results
-					.writeToJSONObject(adapterFactory.createNew());
-			return evaluationsJson.toJSONString();
+							EVALUATION_PAGINATION_LIMIT));
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
 	@Override
-	public String getAvailableEvaluations(Set<String> targetEvaluationIds)
+	public PaginatedResults<Evaluation> getAvailableEvaluations(Set<String> targetEvaluationIds)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			List<String> targetEvaluationIdsList = new ArrayList<String>();
 			targetEvaluationIdsList.addAll(targetEvaluationIds);
-			PaginatedResults<Evaluation> results = synapseClient
+			return convertPaginated(synapseClient
 					.getAvailableEvaluationsPaginated(
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT,
-							targetEvaluationIdsList);
-			JSONObjectAdapter evaluationsJson = results
-					.writeToJSONObject(adapterFactory.createNew());
-			return evaluationsJson.toJSONString();
+							targetEvaluationIdsList));
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -245,7 +244,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	 * caller can change permissions
 	 */
 	@Override
-	public ArrayList<String> getSharableEvaluations(String entityId)
+	public List<Evaluation> getSharableEvaluations(String entityId)
 			throws RestServiceException {
 		if (entityId == null || entityId.trim().length() == 0) {
 			throw new BadRequestException("Entity ID must be given");
@@ -253,20 +252,19 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			// look up the available evaluations
-			PaginatedResults<Evaluation> allEvaluations = synapseClient
+			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
 					.getEvaluationByContentSource(entityId,
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);
 
-			ArrayList<String> mySharableEvalauations = new ArrayList<String>();
+			List<Evaluation> mySharableEvalauations = new ArrayList<Evaluation>();
 			for (Evaluation eval : allEvaluations.getResults()) {
 				// evaluation is associated to entity id. can I change
 				// permissions?
 				UserEvaluationPermissions uep = synapseClient
 						.getUserEvaluationPermissions(eval.getId());
 				if (uep.getCanChangePermissions()) {
-					mySharableEvalauations.add(eval.writeToJSONObject(
-							adapterFactory.createNew()).toJSONString());
+					mySharableEvalauations.add(eval);
 				}
 			}
 			return mySharableEvalauations;
@@ -336,13 +334,13 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		try {
 			// get all evaluations for which the user has joined as a
 			// participant
-			PaginatedResults<Evaluation> evaluations = synapseClient
+			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> evaluations = synapseClient
 					.getAvailableEvaluationsPaginated(
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);
 			for (Evaluation evaluation : evaluations.getResults()) {
 				// return true if any of these have a submission
-				PaginatedResults<Submission> res = synapseClient
+				org.sagebionetworks.reflection.model.PaginatedResults<Submission> res = synapseClient
 						.getMySubmissions(evaluation.getId(), 0, 0);
 				if (res.getTotalNumberOfResults() > 0) {
 					return true;
@@ -433,10 +431,13 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 				challengeTeamList.add(teamBundle);
 			}
 			if (currentUserId != null) {
-				List<TeamMember> teamMemberList = synapseClient.listTeamMembers(teamIds, currentUserId);
-				for (int i = 0; i < teamMemberList.size(); i++) {
-					Boolean isTeamAdmin = teamMemberList.get(i).getIsAdmin();
-					challengeTeamList.get(i).setIsAdmin(isTeamAdmin);
+				for (int i = 0; i < teamIds.size(); i++) {
+					try {
+						TeamMember member = synapseClient.getTeamMember(teamIds.get(i).toString(), currentUserId);
+						challengeTeamList.get(i).setIsAdmin(member.getIsAdmin());
+					} catch (Exception e) {
+						//do nothing on failure
+					}	
 				}
 			}
 			
@@ -492,7 +493,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 				ref.setTargetId(challenge.getProjectId());
 				references.add(ref);
 			}
-			BatchResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
+			org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
 			List<EntityHeader> projectHeaders = headers.getResults();
 			
 			Map<String, String> projectNameLookup = new HashMap<String, String>();
@@ -534,7 +535,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		try {
 			Challenge challenge = synapseClient.getChallenge(challengeId);
 			//get the challenge, to resolve the project id
-			PaginatedResults<Evaluation> allEvaluations = synapseClient
+			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> allEvaluations = synapseClient
 					.getEvaluationByContentSource(challenge.getProjectId(),
 							EVALUATION_PAGINATION_OFFSET,
 							EVALUATION_PAGINATION_LIMIT);

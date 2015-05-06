@@ -19,7 +19,7 @@ public class CSVOptionsWidgetImpl implements CSVOptionsWidget, CSVOptionsView.Pr
 	public CSVOptionsWidgetImpl(CSVOptionsView view) {
 		super();
 		this.view = view;
-		this.view.setPresetner(this);
+		this.view.setPresenter(this);
 	}
 
 	@Override

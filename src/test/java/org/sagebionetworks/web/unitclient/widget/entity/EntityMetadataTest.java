@@ -6,10 +6,10 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
@@ -35,7 +35,9 @@ public class EntityMetadataTest {
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
 		Project project = new Project();
-		EntityBundle bundle = new EntityBundle(project, null, permissions, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(project);
+		bundle.setPermissions(permissions);
 		Long versionNumber = -122L;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setEntityBundle(bundle, canChangePermissions, canCertifiedUserEdit, true);
@@ -50,7 +52,9 @@ public class EntityMetadataTest {
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
 		FileEntity fileEntity = new FileEntity();
-		EntityBundle bundle = new EntityBundle(fileEntity, null, permissions, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(fileEntity);
+		bundle.setPermissions(permissions);
 		Long versionNumber = null;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setEntityBundle(bundle, canChangePermissions, canCertifiedUserEdit, false);

@@ -35,7 +35,7 @@ public class PortalLoggingIntegrationTest {
 	/**
 	 * This test has a long wait time as log rolling only occurs once a minute.
 	 */
-	public static final int MAX_WAIT_MS = 1000*60*6;
+	public static final long MAX_WAIT_MS = 1000*60*60;
 	
 	
 	@Autowired
@@ -53,6 +53,7 @@ public class PortalLoggingIntegrationTest {
 		Thread.sleep(30000);
 	}
 	
+	@Ignore
 	@Test
 	public void testRoundTrip() throws InterruptedException, IOException{
 		// This test writes data to the log and then attempts to find that data S3 after the logs have been swept.
@@ -61,7 +62,7 @@ public class PortalLoggingIntegrationTest {
 		log.debug("This is a debug message");
 		log.info("This is an info message containing a UUID: "+uuid);
 		log.error("An Error!!!", new RuntimeException(new IllegalArgumentException("Bad mojo!")));
-		// Wait for the UUID to apear in S3.
+		// Wait for the UUID to appear in S3.
 		long start = System.currentTimeMillis();
 		String key = null;
 		do{

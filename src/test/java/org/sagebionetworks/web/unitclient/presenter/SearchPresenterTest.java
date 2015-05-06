@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -30,7 +29,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
@@ -43,10 +41,8 @@ public class SearchPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	JSONObjectAdapter jsonObjectAdapter;
 	PlaceChanger mockPlaceChanger;
-	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 
 	String exampleTerm;
@@ -56,20 +52,18 @@ public class SearchPresenterTest {
 	public void setup() throws Exception{
 		mockView = mock(SearchView.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		EntityTypeProvider mockEntityTypeProvider = null; 
 		IconsImageBundle mockIconsImageBundle = mock(IconsImageBundle.class);
 
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		searchPresenter = new SearchPresenter(mockView,
 				mockGlobalApplicationState, mockAuthenticationController,
-				mockSynapseClient, mockNodeModelCreator,
-				new JSONObjectAdapterImpl(), mockEntityTypeProvider,
+				mockSynapseClient,
+				new JSONObjectAdapterImpl(),
 				mockIconsImageBundle);
 		
 		exampleTerm = "searchQueryTerm";

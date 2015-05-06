@@ -16,11 +16,14 @@ public interface AttachmentConfigView extends IsWidget, WidgetEditorView {
 	public void setPresenter(Presenter presenter);
 	
 	public void configure(WikiPageKey wikiKey, DialogCallback window);
-	void showNote(String html);
 	void setFileInputWidget(Widget fileInputWidget);
+	void setWikiAttachmentsWidget(Widget widget);
 	void showUploadFailureUI(String error);
 	void showUploadSuccessUI();
 	void setUploadButtonEnabled(boolean enabled);
+	boolean isNewAttachment();
+	boolean isFromAttachments();
+	
 	/**
 	 * Presenter interface
 	 */

@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.header;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
@@ -18,7 +21,7 @@ public interface HeaderView extends IsWidget {
 	public void removeMenuItemActive(MenuItems menuItem);
 
 	public void refresh();
-	
+
 	/**
 	 * Sets the search box to visible or not
 	 * @param searchVisible
@@ -29,18 +32,24 @@ public interface HeaderView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		
-		UserSessionData getUser();
-		void onGettingStartedClick();
 		void onTrashClick();
 		void onLogoutClick();
 		void onDashboardClick();
 		void onLoginClick();
 		void onRegisterClick();
-		
+		void onFavoriteClick();
 	}
 
 	public void setLargeLogo(boolean isHome);
+
+	public void clearFavorite();
+
+	public void setEmptyFavorite();
+
+	public void addFavorite(List<EntityHeader> headers);
+	public void showFavoritesLoading();
+
+	void setUser(UserSessionData userData);
 
 
 }

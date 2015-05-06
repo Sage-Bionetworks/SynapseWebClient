@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.client.widget.asynch.BatchTableFileHandleRequests;
@@ -55,8 +56,10 @@ public class BatchTableFileHandleRequestsTest {
 					allCallbacks.add(callback);
 					Long rowId = row;
 					Long rowVersion = row+1;
-					String columnId = ""+col;
-					TableFileHandleRequest request = new TableFileHandleRequest(fileHandleId, new CellAddress(tableId, columnId, rowId, rowVersion), callback);
+					ColumnModel column  = new ColumnModel();
+					column.setId(""+col);
+					column.setName("name"+col);
+					TableFileHandleRequest request = new TableFileHandleRequest(fileHandleId, new CellAddress(tableId, column, rowId, rowVersion), callback);
 					batch.addRequest(request);
 				}
 			}
@@ -73,6 +76,8 @@ public class BatchTableFileHandleRequestsTest {
 		assertEquals(3, set.getHeaders().size());
 		for(int col=0; col<3; col++){
 			assertEquals(""+col, set.getHeaders().get(col).getId());
+			// Both the name and the ID are required to get all file handles SWC-2218
+			assertEquals("name"+col, set.getHeaders().get(col).getName());
 		}
 		assertEquals(4, set.getRows().size());
 		for(int row=0; row< 4; row++){

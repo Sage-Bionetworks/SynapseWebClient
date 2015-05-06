@@ -13,7 +13,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -64,7 +64,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			
 		toolTipAndDeleteAclButton = new Tooltip();
 		toolTipAndDeleteAclButton.setWidget(deleteAclButton);
-		toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
+		toolTipAndDeleteAclButton.setTitle(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
 		toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
 	}
 	
@@ -167,22 +167,15 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				
 				Tooltip toolTipAndCreateAclButton = new Tooltip();
 				toolTipAndCreateAclButton.setWidget(createAclButton);
-				toolTipAndCreateAclButton.setText(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
+				toolTipAndCreateAclButton.setTitle(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
 				toolTipAndCreateAclButton.setPlacement(Placement.BOTTOM);
 				add(toolTipAndCreateAclButton);
 			} else {
 				// Configure AddPeopleToAclPanel.
-				CallbackP<Void> selectPermissionCallback = new CallbackP<Void>() {
+				CallbackP<UserGroupSuggestion> addPersonCallback = new CallbackP<UserGroupSuggestion>() {
 					@Override
-					public void invoke(Void param) {
-						presenter.setUnsavedViewChanges(true);
-					}
-				};
-				
-				CallbackP<Void> addPersonCallback = new CallbackP<Void>() {
-					@Override
-					public void invoke(Void param) {
-						addPersonToAcl();
+					public void invoke(UserGroupSuggestion param) {
+						addPersonToAcl(param);
 					}
 				};
 				
@@ -200,7 +193,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					}
 				};
 				
-				addPeoplePanel.configure(permList, permissionDisplay, selectPermissionCallback, addPersonCallback, makePublicCallback, isPubliclyVisible);
+				addPeoplePanel.configure(permList, permissionDisplay, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
 				deleteAclButton.setEnabled(canEnableInheritance);
 				add(toolTipAndDeleteAclButton);
@@ -258,19 +251,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		DisplayUtils.showErrorMessage(message);
 	}
 	
-
-	@Override
-	public void alertUnsavedViewChanges(final Callback saveCallback) {
-		DisplayUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, 
-				new Callback() {
-					@Override
-					public void invoke() {
-						addPersonToAcl();
-						saveCallback.invoke();
-					}
-				});
-	}
-	
 	/*
 	 * Private Methods
 	 */	
@@ -279,22 +259,14 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		showErrorMessage(message);
 	}
 	
-	private void addPersonToAcl() {
-		UserGroupSuggestBox peopleSuggestBox = addPeoplePanel.getSuggestBox();
-		if(peopleSuggestBox.getSelectedSuggestion() != null) {
-			String principalIdStr = peopleSuggestBox.getSelectedSuggestion().getHeader().getOwnerId();
+	private void addPersonToAcl(UserGroupSuggestion selectedUser) {
+		if(selectedUser != null) {
+			String principalIdStr = selectedUser.getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
-			if (addPeoplePanel.getSelectedPermissionLevel() != null) {
-				PermissionLevel level = addPeoplePanel.getSelectedPermissionLevel();
-				presenter.setAccess(principalId, level);
-				
-				// clear selections
-				peopleSuggestBox.clear();
-				presenter.setUnsavedViewChanges(false);
-			} else {
-				showAddMessage("Please select a permission level to grant.");
-			}
+			presenter.setAccess(principalId, PermissionLevel.CAN_VIEW);
+			// clear selections
+			addPeoplePanel.getSuggestBox().clear();
 		} else {
 			showAddMessage("Please select a user or team to grant permission to.");
 		}

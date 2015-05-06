@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -130,12 +131,12 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		table.setParentId(this.parentId);
 		table.setName(this.view.getTableName());
 		// Create the table
-		synapseClient.createTableEntity(table,
-				new AsyncCallback<TableEntity>() {
+		synapseClient.createEntity(table,
+				new AsyncCallback<Entity>() {
 
 					@Override
-					public void onSuccess(TableEntity result) {
-						applyCSVToTable(result);
+					public void onSuccess(Entity result) {
+						applyCSVToTable((TableEntity) result);
 					}
 
 					@Override
@@ -155,7 +156,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		this.uploadtoTableRequest.setTableId(table.getId());
 		this.view.setTrackerVisible(true);
 		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
-				AsynchType.TableCSVUpload, this.uploadtoTableRequest, table.getId(),
+				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
 				new AsynchronousProgressHandler() {
 
 					@Override

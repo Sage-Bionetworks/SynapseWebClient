@@ -7,9 +7,9 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
-import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface GlobalApplicationState {
 
@@ -75,6 +75,14 @@ public interface GlobalApplicationState {
 	public void setCurrentPlace(Place currentPlace);
 	
 	/**
+	 * This can be used to change the URL in the browser without adding new history or reloading the page.
+	 * Instead of adding history it will rewrite the current history.
+	 * 
+	 * @param currentPlace
+	 */
+	public void replaceCurrentPlace(Place currentPlace);
+	
+	/**
 	 * Sets the App Place History Mapper
 	 * @param appPlaceHistoryMapper
 	 */
@@ -90,7 +98,7 @@ public interface GlobalApplicationState {
 	
 	public void setFavorites(List<EntityHeader> favorites);
 	
-	public void checkVersionCompatibility(SynapseView view);
+	public void checkVersionCompatibility(AsyncCallback<String> callback);
 	public boolean isEditing();
 	public void setIsEditing(boolean isEditing);
 	
@@ -102,4 +110,18 @@ public interface GlobalApplicationState {
 	String getSynapseProperty(String key);
 	
 	void clearLastPlace();
+	
+	public boolean isWikiBasedEntity(String entityId);
+
+	/**
+	 * This method can be used to change the URL in the browser without reloading the page.
+	 * 
+	 * @param currentPlace
+	 */
+	public void pushCurrentPlace(Place targetPlace);
+
+	/**
+	 * This method initializes the handler for on pop state event.
+	 */
+	public void initOnPopStateHandler();
 }

@@ -64,18 +64,10 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	}
 	
 	public static void getTeams(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<List<Team>> callback) {
-		synapseClient.getTeamsForUser(userId, new AsyncCallback<ArrayList<String>>() {
+		synapseClient.getTeamsForUser(userId, new AsyncCallback<List<Team>>() {
 			@Override
-			public void onSuccess(ArrayList<String> results) {
-				try {
-					List<Team> teams = new ArrayList<Team>();
-					for (String teamString : results) {
-						teams.add(new Team(adapterFactory.createNew(teamString)));
-					}
-					callback.onSuccess(teams);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void onSuccess(List<Team> teams) {
+				callback.onSuccess(teams);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

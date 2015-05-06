@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -29,30 +30,37 @@ import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
+import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class ProfilePresenter extends AbstractActivity implements ProfileView.Presenter, Presenter<Profile> {
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
-	public static final String USER_PROFILE_WELCOME_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.welcome.message.visible.state";
+	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
 	
 	private Profile place;
 	private ProfileView view;
@@ -65,6 +73,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
 
+	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
 	private int teamNotificationCount;
 	private String currentUserId;
@@ -74,6 +83,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public final static int CHALLENGE_PAGE_SIZE=100;
 	public ProjectFilterEnum filterType;
 	public Team filterTeam;
+	public SortOptionEnum currentProjectSort;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -85,10 +95,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			CookieProvider cookies,
 			UserProfileModalWidget userProfileModalWidget,
 			LinkedInServiceAsync linkedInServic,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.challengeClient = challengeClient;
@@ -96,6 +108,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.linkedInService = linkedInServic;
 		this.gwt = gwt;
+		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		view.clearSortOptions();
+		for (SortOptionEnum sort: SortOptionEnum.values()) {
+			view.addSortOption(sort);
+		}
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
 	}
@@ -145,13 +162,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 
-	private void updateProfileView(String userId, final ProfileArea initialTab) {
+	// Configuration
+	public void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
 		view.showLoading();
+		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		view.setSortText(currentProjectSort.sortText);
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
-		view.setProfileEditButtonVisible(isOwner);	currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
+		view.setProfileEditButtonVisible(isOwner);	
+		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
 			initUserFavorites(new Callback() {
@@ -161,7 +182,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			});
 		} else {
-			getUserProfile(initialTab);
+			if (initialTab == ProfileArea.SETTINGS) 
+				getUserProfile(ProfileArea.PROJECTS);
+			else
+				getUserProfile(initialTab);
 		}
 	}
 	
@@ -170,7 +194,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(UserProfile profile) {
 					initializeShowHideProfile(isOwner);
-					initializeShowHideWelcome(isOwner);
 					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 				}
 			@Override
@@ -200,6 +223,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if (caught instanceof NotFoundException) {
 					view.updateView(profile, isOwner, null);
 					tabClicked(area);
+					initializeShowHideCertification(isOwner);
 				}
 				else
 					view.showErrorMessage(caught.getMessage());
@@ -227,22 +251,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void initializeShowHideWelcome(boolean isOwner) {
+	public void initializeShowHideCertification(boolean isOwner) {
 		if (isOwner) {
-			boolean isWelcomeMessageVisible = true;
+			boolean isCertificationMessageVisible = false;
 			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY);
-				if (cookieValue != null && !cookieValue.isEmpty()) {
-					isWelcomeMessageVisible = Boolean.valueOf(cookieValue);	
+				String cookieValue = cookies.getCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
+					isCertificationMessageVisible = true;	
 				}
 			} catch (Exception e) {
-				//if there are any problems getting the welcome message visibility state, ignore and use default (show)
+				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
 			}
-			view.setWelcomeToDashboardVisible(isWelcomeMessageVisible);
+			view.setGetCertifiedVisible(isCertificationMessageVisible);
 		} else {
 			//not the owner
-			//hide welcome message
-			view.setWelcomeToDashboardVisible(false);
+			//hide certification message
+			view.setGetCertifiedVisible(false);
 		}
 	}
 	
@@ -311,13 +335,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 * @param team
 	 */
 	public void setProjectFilterAndRefresh(ProjectFilterEnum filterType, Team team) {
-		this.filterType =filterType;
+		this.filterType = filterType;
 		filterTeam = team;
 		refreshProjects();
 	}
 
 	public void getMoreProjects() {
 		if (isOwner) {
+			view.setProjectSortVisible(true);
 			view.showProjectFiltersUI();
 			//this depends on the active filter
 			switch (filterType) {
@@ -339,6 +364,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					break;
 				case FAVORITES:
 					view.setFavoritesFilterSelected();
+					view.setProjectSortVisible(false);
 					getFavorites();
 					break;
 				case TEAM:
@@ -351,6 +377,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		} else
 			getUserProjects(currentProjectOffset);
 	}
+	
+	@Override
+	public void resort(SortOptionEnum sort) {
+		currentProjectSort = sort;
+		view.setSortText(sort.sortText);
+		refreshProjects();
+	}	
 	
 	@Override
 	public void refreshTeams() {
@@ -391,11 +424,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == filter) {
-					addProjectResults(projectHeaders.getResults());
+					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				}
 			}
@@ -409,11 +442,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getProjectsForTeam(filterTeam.getId(), PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(projectHeaders.getResults());
+					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				}
 			}
@@ -427,11 +460,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		view.showProjectsLoading(true);
-		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				List<ProjectHeader> headers = projectHeaders.getResults();
-				addProjectResults(headers);
+				addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
 				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
@@ -442,14 +474,28 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> headers) {
+	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
 		view.showProjectsLoading(false);
-		view.addProjects(headers);
+		view.clearProjects();
+		for (int i = 0; i < projectHeaders.size(); i++) {
+			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
+			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
+			Widget widget = badge.asWidget();
+			view.addProjectWidget(widget);
+		}
+		if (projectHeaders.isEmpty())
+			view.setEmptyProjectUIVisible(true);
 	}
 	
 	public void addChallengeResults(List<ChallengeBundle> challenges) {
 		view.showChallengesLoading(false);
-		view.addChallenges(challenges);
+		view.clearChallenges();
+		for (ChallengeBundle challenge : challenges) {
+			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
+			badge.configure(challenge);
+			Widget widget = badge.asWidget();
+			view.addChallengeWidget(widget);
+		}
 	}
 	
 	public void projectPageAdded(int totalNumberOfResults) {
@@ -475,13 +521,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						view.setFavoritesHelpPanelVisible(true);
 					} else {
 						List<ProjectHeader> headers = new ArrayList<ProjectHeader>(result.size());
+						List<String> lastModifiedBy = new ArrayList<String>(result.size());
 						for (EntityHeader header : result) {
+							lastModifiedBy.add(header.getId());
 							ProjectHeader projectHeader = new ProjectHeader();
 							projectHeader.setId(header.getId());
 							projectHeader.setName(header.getName());
 							headers.add(projectHeader);
 						}
-						addProjectResults(headers);
+						addProjectResults(headers, null);
 						view.setIsMoreProjectsVisible(false);	
 					}
 				}
@@ -620,7 +668,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void updateTeamInvites(List<MembershipInvitationBundle> invites) {
+	public void updateTeamInvites(List<OpenUserInvitationBundle> invites) {
 		if (invites != null && invites.size() > 0) {
 			teamNotificationCount += invites.size();
 			// update team notification count
@@ -754,11 +802,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void welcomeToDashboardDismissed() {
-		//set welcome message visible=false for a year
+	public void setGetCertifiedDismissed() {
+		//set certification message visible=false for a year
 		Date yearFromNow = new Date();
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		cookies.setCookie(USER_PROFILE_WELCOME_VISIBLE_STATE_KEY, Boolean.toString(false), yearFromNow);
+		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
 	}
 	
 	/**

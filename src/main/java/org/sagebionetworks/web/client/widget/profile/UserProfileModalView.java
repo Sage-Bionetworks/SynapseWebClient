@@ -22,7 +22,7 @@ public interface UserProfileModalView extends IsWidget {
 	 * Bind the view to its presenter.
 	 * @param presenter
 	 */
-	public void setPreseneter(Presenter presenter);
+	public void setPresenter(Presenter presenter);
 
 	/**
 	 * Show/hide the loading state of the view.

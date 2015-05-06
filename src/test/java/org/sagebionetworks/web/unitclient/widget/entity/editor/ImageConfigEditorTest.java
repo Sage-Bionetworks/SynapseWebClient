@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -16,12 +16,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -32,15 +34,22 @@ public class ImageConfigEditorTest {
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	FileInputWidget mockFileInputWidget;
 	String testFileName = "testing.png";
+	String testAttachmentName = "attachment1.png";
 	DialogCallback mockCallback;
+	WikiAttachments mockAttachments;
 	
 	@Before
 	public void setup(){
 		mockFileInputWidget = mock(FileInputWidget.class);
 		mockView = mock(ImageConfigView.class);
 		mockCallback = mock(DialogCallback.class);
-		editor = new ImageConfigEditor(mockView, mockFileInputWidget);
+		mockAttachments = mock(WikiAttachments.class);
+		editor = new ImageConfigEditor(mockView, mockFileInputWidget, mockAttachments);
+		when(mockAttachments.isValid()).thenReturn(true);
+		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, "image/png")});
+		when(mockView.isSynapseEntity()).thenReturn(false);
+		when(mockView.isFromAttachments()).thenReturn(false);
 	}
 	
 	@Test
@@ -52,8 +61,8 @@ public class ImageConfigEditorTest {
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(editor);
-		verify(mockView).initView();
 		verify(mockView).setFileInputWidget(any(Widget.class));
+		verify(mockView).setWikiAttachmentsWidget(any(Widget.class));
 	}
 
 
@@ -73,7 +82,7 @@ public class ImageConfigEditorTest {
 	public void testUploadFileClickedSuccess() {
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, mockCallback);
-		
+		verify(mockView).initView();
 		editor.uploadFileClicked();
 		verify(mockView).setUploadButtonEnabled(false);
 		
@@ -138,4 +147,29 @@ public class ImageConfigEditorTest {
 		assertNull(editor.getTextToInsert());
 	}
 
+	@Test
+	public void testIsFromAttachments() {
+	        when(mockView.isSynapseEntity()).thenReturn(false);
+	        when(mockView.isFromAttachments()).thenReturn(true);
+	        Map<String,String> descriptor = new HashMap<String, String>();
+	        editor.configure(wikiKey, descriptor, mockCallback);
+	        
+	        editor.addFileHandleId("123");
+	        editor.updateDescriptorFromView();
+	        verify(mockView).checkParams();
+	        verify(mockAttachments).isValid();
+	        assertEquals(testAttachmentName, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+	}
+
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testIsFromAttachmentsFailure() {
+	        when(mockView.isSynapseEntity()).thenReturn(false);
+	        when(mockView.isFromAttachments()).thenReturn(true);
+	        Map<String,String> descriptor = new HashMap<String, String>();
+	        editor.configure(wikiKey, descriptor, mockCallback);
+	        editor.addFileHandleId("123");
+	        when(mockAttachments.isValid()).thenReturn(false);
+	        editor.updateDescriptorFromView();
+	}
 }

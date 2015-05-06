@@ -1,8 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,9 +16,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -24,12 +32,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -49,7 +53,6 @@ public class RestrictionWidgetTest {
 	RestrictionWidgetView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter jsonObjectAdapter;
-	EntityTypeProvider mockEntityTypeProvider;
 	JiraURLHelper mockJiraURLHelper;
 	AccessRequirementDialog mockAccessRequirementDialog;
 	RestrictionWidget widget;
@@ -74,7 +77,6 @@ public class RestrictionWidgetTest {
 		mockView = mock(RestrictionWidgetView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
-		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 		mockEntityUpdatedCallback = mock(Callback.class);
 		UserSessionData usd = new UserSessionData();
@@ -92,7 +94,7 @@ public class RestrictionWidgetTest {
 
 		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockAccessRequirementDialog);
 
-		vb = new Data();
+		vb = new FileEntity();
 		vb.setId(entityId);
 		vb.setVersionNumber(new Long(1));
 		vb.setVersionLabel("");
@@ -112,7 +114,7 @@ public class RestrictionWidgetTest {
 		allAccessRequirements.add(accessRequirement1);
 		allAccessRequirements.add(accessRequirement2);
 		when(bundle.getAccessRequirements()).thenReturn(allAccessRequirements);
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(Collections.singletonList(accessRequirement1));
+		when(bundle.getUnmetAccessRequirements()).thenReturn(Collections.singletonList(accessRequirement1));
 				
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
@@ -133,7 +135,7 @@ public class RestrictionWidgetTest {
 	private void setupEmptyAccessRequirements() {
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 		widget.setEntityBundle(bundle);
 		widget.resetAccessRequirementCount();
 	}
@@ -197,7 +199,7 @@ public class RestrictionWidgetTest {
 	
 	@Test
 	public void testConfigureLoggedInControlledMet() {
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(new ArrayList<AccessRequirement>());
+		when(bundle.getUnmetAccessRequirements()).thenReturn(new ArrayList<AccessRequirement>());
 		
 		//is logged in, with our tou restriction set up in before(), has admin access (can change)
 		widget.configure(bundle, 
@@ -270,33 +272,49 @@ public class RestrictionWidgetTest {
 	public void testImposeRestrictionClickedNoSelectionNulls() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(null);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(null);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showErrorMessage(anyString());
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 
 	@Test
 	public void testImposeRestrictionClickedNoSelection2() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(false);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showErrorMessage(anyString());
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 	
 	@Test
 	public void testImposeRestrictionClickedNoIsSelected() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(true);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(false);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showErrorMessage(anyString());
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 	
 	@Test
 	public void testImposeRestrictionClickedYesIsSelected() {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(true);
-		widget.imposeRestrictionClicked();
+		widget.imposeRestrictionOkClicked();
 		verify(mockView).showLoading();
 		verify(mockAccessRequirementDialog).imposeRestriction(anyString(), any(Callback.class));
+	}
+
+	@Test
+	public void testImposeRestrictionCancelButtonClicked() {
+		when(mockView.isNoHumanDataRadioSelected()).thenReturn(false);
+		when(mockView.isYesHumanDataRadioSelected()).thenReturn(true);
+		widget.imposeRestrictionCancelClicked();
+		verify(mockView, Mockito.never()).showLoading();
+		verify(mockAccessRequirementDialog, Mockito.never()).imposeRestriction(anyString(), any(Callback.class));
+		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 
 	@Test
@@ -348,7 +366,7 @@ public class RestrictionWidgetTest {
 	public void testSelectNextAccessRequirementAllMet() {
 		//in this case, all access requirements have been met. verify all are shown.
 		List<AccessRequirement> emptyList = Collections.emptyList();
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(emptyList);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(emptyList);
 		widget.resetAccessRequirementCount();
 		assertEquals(accessRequirement1, widget.selectNextAccessRequirement());
 		assertEquals(accessRequirement2, widget.selectNextAccessRequirement());
@@ -361,7 +379,7 @@ public class RestrictionWidgetTest {
 		//verify that only the first unmet requirement is selected
 		
 		List<AccessRequirement> list = new ArrayList<AccessRequirement>();
-		when(bundle.getUnmetDownloadAccessRequirements()).thenReturn(list);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(list);
 		ACTAccessRequirement actAccessRequirement = new ACTAccessRequirement();
 		actAccessRequirement.setId(9883L);
 		list.add(accessRequirement1);

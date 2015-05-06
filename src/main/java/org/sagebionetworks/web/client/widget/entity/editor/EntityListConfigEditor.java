@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -27,20 +26,17 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 	private EntityListConfigView view;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private NodeModelCreator nodeModelCreator;
 	private Map<String, String> descriptor;
 	List<EntityGroupRecord> records;
 	AuthenticationController authenticationController;
 
 	@Inject
 	public EntityListConfigEditor(EntityListConfigView view,
-			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator, SynapseJSNIUtils synapseJSNIUtils,
+			SynapseClientAsync synapseClient, SynapseJSNIUtils synapseJSNIUtils,
 			AuthenticationController authenticationController) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 		view.initView();
@@ -58,7 +54,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		if(records != null && !records.equals("")) {
 			for(int i=0; i<records.size(); i++) {
 				final int rowIndex = i;
-				EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, nodeModelCreator, isLoggedIn, records, rowIndex, new RowLoadedHandler() {					
+				EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, isLoggedIn, records, rowIndex, new RowLoadedHandler() {					
 					@Override
 					public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 						view.setEntityGroupRecordDisplay(rowIndex, entityGroupRecordDisplay, isLoggedIn);
@@ -79,7 +75,7 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		records.add(record);
 		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, EntityListUtil.recordsToString(records));
 		try {
-			EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, nodeModelCreator, isLoggedIn, records, addedIndex, new RowLoadedHandler() {					
+			EntityListUtil.loadIndividualRowDetails(synapseClient, synapseJSNIUtils, isLoggedIn, records, addedIndex, new RowLoadedHandler() {					
 				@Override
 				public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay) {
 					view.setEntityGroupRecordDisplay(addedIndex, entityGroupRecordDisplay, isLoggedIn);
@@ -147,6 +143,10 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 
 	@Override
 	public List<String> getNewFileHandleIds() {
+		return null;
+	}
+	@Override
+	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
 }

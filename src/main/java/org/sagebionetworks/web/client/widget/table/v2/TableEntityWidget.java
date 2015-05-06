@@ -3,10 +3,10 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -36,8 +36,6 @@ public class TableEntityWidget implements IsWidget,
 		TableEntityWidgetView.Presenter, QueryResultsListener,
 		QueryInputListener{
 
-	public static final String HIDE_SCHEMA = "Hide Schema";
-	public static final String SHOW_SCHEMA = "Show Schema";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Show Schema' to add columns to the this table.";
@@ -117,6 +115,7 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEdit);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		this.actionMenu.setBasicDivderVisible(canEdit);
 		// Listen to action events.
 		this.actionMenu.addActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
@@ -318,10 +317,8 @@ public class TableEntityWidget implements IsWidget,
 	@Override
 	public void onSchemaToggle(boolean shown) {
 		if(shown){
-			actionMenu.setActionText(Action.TOGGLE_TABLE_SCHEMA, HIDE_SCHEMA);
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
 		}else{
-			actionMenu.setActionText(Action.TOGGLE_TABLE_SCHEMA, SHOW_SCHEMA);
 			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 		}
 	}

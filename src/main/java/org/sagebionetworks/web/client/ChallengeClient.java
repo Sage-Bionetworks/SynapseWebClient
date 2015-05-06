@@ -1,10 +1,10 @@
 
 package org.sagebionetworks.web.client;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -13,13 +13,14 @@ import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-@RemoteServiceRelativePath("challenge")	
+@RemoteServiceRelativePath("challengeclient")	
 public interface ChallengeClient extends RemoteService {
 
 	/**
@@ -28,12 +29,13 @@ public interface ChallengeClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
+	public PaginatedResults<Evaluation> getEvaluations(List<String> evaluationIds) throws RestServiceException;
 	
-	public String getAvailableEvaluations() throws RestServiceException;
-	public String getAvailableEvaluations(Set<String> targetEvaluationIds) throws RestServiceException;
+	PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException;
+	PaginatedResults<Evaluation> getAvailableEvaluations(
+			Set<String> targetEvaluationIds) throws RestServiceException;
 	
-	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
+	List<Evaluation> getSharableEvaluations(String entityId) throws RestServiceException;
 	
 	public Submission createIndividualSubmission(Submission submission, String etag) throws RestServiceException;
 	public Submission createTeamSubmission(Submission submission, String etag, String memberStateHash) throws RestServiceException;

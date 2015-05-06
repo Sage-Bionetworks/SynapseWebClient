@@ -4,28 +4,41 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<b:ButtonToolBar addStyleNames="pull-right">
-		<b:ButtonGroup>
-			<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_TABLE_SCHEMA" >Show Schema</a:ActionButton>
-		</b:ButtonGroup>
-		<b:ButtonGroup>
-			<a:ActionButton icon="LOCK" action="SHARE" >Share</a:ActionButton>
-		</b:ButtonGroup>
-		<b:ButtonGroup>
-			<b:DropDown>
-				<b:Button icon="GEAR" dataToggle="DROPDOWN">Tools</b:Button>
-				<b:DropDownMenu ui:field="toolsDropDown" addStyleNames="dropdown-menu-right">
-					<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_TABLE_DATA"	>Upload Data To Table</a:ActionMenuItem>
-					<a:ActionMenuItem action="EDIT_TABLE_DATA" >Edit Query Results</a:ActionMenuItem>
-					<a:ActionMenuItem icon="DOWNLOAD" action="DOWNLOAD_TABLE_QUERY_RESULTS"	>Download Query Results</a:ActionMenuItem>
-					<b:Divider/>
-					<a:ActionMenuItem action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
-					<a:ActionMenuItem icon="PLUS" action="ADD_WIKI_PAGE">Add Wiki</a:ActionMenuItem>
-					<a:ActionMenuItem action="SUBMIT_TO_CHALLENGE">Submit To Challenge</a:ActionMenuItem>
-					<a:ActionMenuItem action="MOVE_ENTITY">Move</a:ActionMenuItem>
-					<a:ActionMenuItem icon="TRASH_O" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
-				</b:DropDownMenu>
-			</b:DropDown>
-		</b:ButtonGroup>
-	</b:ButtonToolBar>
+	<g:HTMLPanel>
+		<b:ButtonToolBar ui:field="buttonToolBar" addStyleNames="pull-right">
+			<b:ButtonGroup>
+				<a:ActionButton icon="LOCK" action="SHARE">Share</a:ActionButton>
+			</b:ButtonGroup>
+			<b:ButtonGroup>
+				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_TABLE_SCHEMA">Schema</a:ActionButton>
+			</b:ButtonGroup>
+			<b:ButtonGroup>
+				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_ANNOTATIONS">Annotations</a:ActionButton>
+			</b:ButtonGroup>
+			
+			<b:ButtonGroup>
+				<b:DropDown>
+					<b:Button icon="GEAR" dataToggle="DROPDOWN">Tools</b:Button>
+					<b:DropDownMenu ui:field="toolsDropDown"
+						addStyleNames="dropdown-menu-right">
+						<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_TABLE_DATA">Upload
+							Data To Table</a:ActionMenuItem>
+						<a:ActionMenuItem action="EDIT_TABLE_DATA">Edit
+							Query Results</a:ActionMenuItem>
+						<a:ActionMenuItem icon="DOWNLOAD"
+							action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Query Results</a:ActionMenuItem>
+						<b:Divider ui:field="basicDivider" visible="false" />
+						<a:ActionMenuItem icon="EDIT" action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
+						<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_NEW_FILE">Upload a New Version of the File</a:ActionMenuItem>
+						<a:ActionMenuItem icon="NEWSPAPER_O" action="EDIT_WIKI_PAGE">Edit Wiki</a:ActionMenuItem>
+						<a:ActionMenuItem icon="TROPHY" action="SUBMIT_TO_CHALLENGE">Submit To Challenge</a:ActionMenuItem>
+						<a:ActionMenuItem icon="ARROWS" action="MOVE_ENTITY">Move</a:ActionMenuItem>
+						<a:ActionMenuItem icon="LINK" action="CREATE_LINK">Save Link to This Page</a:ActionMenuItem>
+						<a:ActionMenuItem icon="TRASH_O" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
+					</b:DropDownMenu>
+				</b:DropDown>
+			</b:ButtonGroup>
+		</b:ButtonToolBar>
+		<bh:Div ui:field="controllerContainer"/>
+	</g:HTMLPanel>
 </ui:UiBinder>

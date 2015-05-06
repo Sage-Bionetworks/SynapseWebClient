@@ -1,13 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
@@ -15,11 +17,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -52,27 +52,23 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel doiPanel;
 	@UiField
-	HTMLPanel annotationsPanel;
+	Collapse annotationsContent;
 	@UiField
-	FlowPanel annotationsContent;
-	@UiField
-	InlineLabel showAnnotations;
-
+	SimplePanel annotationsContainer;
 	
 	private Presenter presenter;
-	private boolean annotationsFilled = false;
-
+	
 	@UiField(provided = true)
 	final IconsImageBundle icons;
 
-	AnnotationsWidget annotationsWidget;
+	AnnotationsRendererWidget annotationsWidget;
 	RestrictionWidget restrictionWidget;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
 			FavoriteWidget favoriteWidget,
 			DoiWidget doiWidget,
-			AnnotationsWidget annotationsWidget,
+			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget
 			) {
 		this.icons = iconsImageBundle;
@@ -81,15 +77,24 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.annotationsWidget = annotationsWidget;
 		this.restrictionWidget = restrictionWidget;
 		initWidget(uiBinder.createAndBindUi(this));
-
 				
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 		
 		doiPanel.addStyleName("inline-block");
 		doiPanel.setWidget(doiWidget.asWidget());
+		annotationsContainer.setWidget(annotationsWidget.asWidget());
+		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 	}
 
+	@Override
+	public void setAnnotationsVisible(boolean visible) {
+		if (visible) {
+			annotationsContent.show();
+		} else {
+			annotationsContent.hide();
+		}
+	}
 	@Override
 	public void setEntityBundle(EntityBundle bundle, boolean canAdmin, boolean canEdit, boolean isShowingOlderVersion) {
 		clearmeta();
@@ -135,27 +140,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {
 		// configure widget
 		annotationsWidget.configure(bundle, canEdit);
-		// show widget?
-		if(canEdit || !annotationsWidget.isEmpty()) {
-			annotationsPanel.setVisible(true);
-		} else {
-			annotationsPanel.setVisible(false);
-		}
 		
-		// reset view
-		showAnnotations.setText(DisplayConstants.SHOW_LC);
-		annotationsContent.setVisible(false);
-		if(!annotationsFilled) {
-			DisplayUtils.configureShowHide(showAnnotations, annotationsContent);
-			FlowPanel wrap = new FlowPanel();
-			wrap.addStyleName("highlight-box margin-bottom-15");
-			wrap.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
-			wrap.add(annotationsWidget.asWidget());
-			annotationsContent.add(wrap);
-			
-			annotationsFilled = true;
-		}
-		DisplayUtils.clearElementWidth(annotationsContent.getElement());
+		if (annotationsContent.isShown())
+			annotationsContent.toggle();
 	}
 	
 	private void clearmeta() {

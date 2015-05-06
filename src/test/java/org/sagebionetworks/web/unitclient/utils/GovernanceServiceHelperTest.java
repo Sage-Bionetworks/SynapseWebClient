@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -18,29 +21,19 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.PostMessageContentAccessApproval;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -48,7 +41,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GovernanceServiceHelperTest {
 	SynapseClientAsync mockSynapseClient;
-	@Captor ArgumentCaptor<EntityWrapper> captor;
+	@Captor ArgumentCaptor<AccessApproval> captor;
 	
 	@Before
 	public void setup() {
@@ -80,14 +73,8 @@ public class GovernanceServiceHelperTest {
 					@Override
 					public Object invoke(Object synapseClient, Method method, Object[] args)
 							throws Throwable {
-						if (method.equals(SynapseClientAsync.class.getMethod("createAccessApproval", EntityWrapper.class, AsyncCallback.class))) {
-							EntityWrapper ew = (EntityWrapper)args[0];
-							AdapterFactory adapterFactory = new AdapterFactoryImpl();
-							JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-							
-			    			@SuppressWarnings("unchecked")
-							AccessApproval aa = jsonEntityFactory.createEntity(ew.getEntityJson(), 
-										(Class<AccessApproval>)Class.forName(ew.getEntityClassName()));
+						if (method.equals(SynapseClientAsync.class.getMethod("createAccessApproval", AccessApproval.class, AsyncCallback.class))) {
+							AccessApproval aa = (AccessApproval)args[0];
 			    			assertEquals(accessRequirementId, aa.getRequirementId());
 			    			AsyncCallback callback = (AsyncCallback)args[1];
 							callback.onSuccess(null);
@@ -131,12 +118,8 @@ public class GovernanceServiceHelperTest {
 				);
 		verify(onSuccess).invoke();
 		//also check the captured entity wrapper to verify the approval object
-		EntityWrapper capturedWrapper = captor.getValue();
-		//verify that this is the right type of approval
-		assertEquals(PostMessageContentAccessApproval.class.getName(), capturedWrapper.getEntityClassName());
-		//reconstruct the access approval
-		PostMessageContentAccessApproval approval = new PostMessageContentAccessApproval(adapter.createNew(capturedWrapper.getEntityJson()));
-		assertEquals(accessRequirementId, approval.getRequirementId());
+		AccessApproval capturedWrapper = captor.getValue();
+		assertEquals(accessRequirementId, capturedWrapper.getRequirementId());
 	}
 	
 	@Test

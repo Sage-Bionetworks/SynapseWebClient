@@ -6,7 +6,6 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +17,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -29,10 +27,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class DoiWidgetTest {
 
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	DoiWidgetView mockView;
 	String entityId = "syn123";
+	String testDoiPrefix = "testDoiPrefix";
 	DoiWidget doiWidget;
 	Doi testDoi;
 	StackConfigServiceAsync mockStackConfigService;
@@ -41,17 +39,16 @@ public class DoiWidgetTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);		
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(DoiWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		AsyncMockStubber.callSuccessWith("fake doi json").when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		mockStackConfigService = mock(StackConfigServiceAsync.class);
 		testDoi = new Doi();
 		testDoi.setDoiStatus(DoiStatus.CREATED);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testDoi);
-		mockStackConfigService = mock(StackConfigServiceAsync.class);
-		doiWidget = new DoiWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockGlobalApplicationState, mockStackConfigService, mockAuthenticationController);
+		AsyncMockStubber.callSuccessWith(testDoi).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testDoiPrefix).when(mockStackConfigService).getDoiPrefix(any(AsyncCallback.class));
+		doiWidget = new DoiWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockStackConfigService, mockAuthenticationController);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -59,7 +56,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatus() throws Exception {
 		doiWidget.configure(entityId, true, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.CREATED);
+		verify(mockView).showDoiCreated(doiWidget.getDoiHtml(testDoiPrefix, false));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -67,7 +64,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatusNotEditable() throws Exception {
 		doiWidget.configure(entityId, false, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.CREATED);
+		verify(mockView).showDoiCreated(doiWidget.getDoiHtml(testDoiPrefix, false));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -76,7 +73,7 @@ public class DoiWidgetTest {
 		testDoi.setDoiStatus(DoiStatus.ERROR);
 		doiWidget.configure(entityId, true, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoi(DoiStatus.ERROR);
+		verify(mockView).showDoiError();
 	}
 	
 	@SuppressWarnings("unchecked")

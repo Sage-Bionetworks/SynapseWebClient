@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,6 +26,7 @@ import org.jsoup.Jsoup;
 import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -41,7 +42,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -150,10 +150,9 @@ public class CrawlFilter implements Filter {
 	
 	private String getEntityHtml(String entityId) throws RestServiceException, JSONObjectAdapterException{
 		int mask = ENTITY | ANNOTATIONS;
-		EntityBundleTransport entityTransport = synapseClient.getEntityBundle(entityId, mask);
-		Entity entity = EntityFactory.createEntityFromJSONString(entityTransport.getEntityJson(), Entity.class);
-		Annotations annotations = EntityFactory.createEntityFromJSONString(entityTransport.getAnnotationsJson(), Annotations.class);
-		
+		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
+		Entity entity = bundle.getEntity();
+		Annotations annotations = bundle.getAnnotations();
 		String name = escapeHtml(entity.getName());
 		String description = escapeHtml(entity.getDescription());
 		String markdown = null;
@@ -208,8 +207,7 @@ public class CrawlFilter implements Filter {
 		
 		//and ask for all descendents
 		try {
-			String childListJson = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
-			EntityIdList childList = EntityFactory.createEntityFromJSONString(childListJson, EntityIdList.class);
+			EntityIdList childList = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
 			for (EntityId childId : childList.getIdList()) {
 				html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getId()+"</a><br />");
 			}} catch(Exception e) {};

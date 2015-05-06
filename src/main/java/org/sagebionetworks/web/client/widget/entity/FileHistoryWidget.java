@@ -1,22 +1,21 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -28,93 +27,54 @@ import com.google.inject.Inject;
  *
  * @author jayhodgson
  */
-public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget {
+public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget, PageChangeListener {
 	
 	private FileHistoryWidgetView view;
 	private EntityBundle bundle;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	//the version that we're currently looking at
-	private Long currentVersion;
-		
+	public static final Integer VERSION_LIMIT = 100;
+	public PreflightController preflightController;
+	
+	private DetailedPaginationWidget paginationWidget;
+	private boolean canEdit;
+	private Long versionNumber;
 	@Inject
-	public FileHistoryWidget(FileHistoryWidgetView view, NodeModelCreator nodeModelCreator,
-			 SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
+	public FileHistoryWidget(FileHistoryWidgetView view,
+			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
+			 DetailedPaginationWidget paginationWidget,
+			 PreflightController preflightController) {
 		super();
-		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.paginationWidget = paginationWidget;
+		this.preflightController = preflightController;
+		view.setPaginationWidget(paginationWidget.asWidget());
 		this.view.setPresenter(this);
-	}
-	
-
-	@Override
-	public void loadVersions(String id, final int offset, int limit,
-			final AsyncCallback<PaginatedResults<VersionInfo>> asyncCallback) {
-		// TODO: If we ever change the offset api to actually take 0 as a valid
-		// offset, then we need to remove "+1"
-		synapseClient.getEntityVersions(id, offset + 1, limit,
-				new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						PaginatedResults<VersionInfo> paginatedResults;
-						try {
-							paginatedResults = nodeModelCreator.createPaginatedResults(result, VersionInfo.class);
-							asyncCallback.onSuccess(paginatedResults);
-						} catch (JSONObjectAdapterException e) {							
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-						}
-					}
-
-					@Override
-					public void onFailure(Throwable caught) {
-						asyncCallback.onFailure(caught);
-					}
-				});
 	}
 	
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
-		this.currentVersion = versionNumber;
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber != null);
+		this.versionNumber = versionNumber;
+		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+		boolean isShowingCurrentVersion = versionNumber == null;
+		view.setEntityBundle(bundle.getEntity(), !isShowingCurrentVersion);
+		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
+		
+		//initialize versions
+		onPageChange(0L);
 	}
-	
 
 	@Override
-	public void editCurrentVersionInfo(String entityId, final String version, final String comment) {
-		//SWC-771. The current bundle may be pointing to an old version (not the current version).  
-		//First ask for the current version of the entity
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					Entity entity = nodeModelCreator.createEntity(result);
-					editCurrentVersionInfo(entity, version, comment);
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
-
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught,
-						globalApplicationState,
-						authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED + "\n" + caught.getMessage());
-				}
-
-			}
-		});
+	public void updateVersionInfo(String newLabel, String newComment) {
+		editCurrentVersionInfo(bundle.getEntity(), newLabel, newComment);
 	}
 
-	private void editCurrentVersionInfo(Entity entity, String version, String comment) throws JSONObjectAdapterException {
+	private void editCurrentVersionInfo(Entity entity, String version, String comment) {
 		if (entity instanceof Versionable) {
 			final Versionable vb = (Versionable)entity;
 			if (version != null && version.equals(vb.getVersionLabel()) &&
@@ -122,16 +82,14 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 				view.showInfo("Version Info Unchanged", "You didn't change anything about the version info.");
 				return;
 			}
-			String versionLabel = version;
-			if (version == null || version.equals(""))
-				versionLabel = null; // Null out the version field if empty so it defaults to number
+			String versionLabel = null;
+			if (version!=null)
+				versionLabel = version.toString();
 			vb.setVersionLabel(versionLabel);
 			vb.setVersionComment(comment);
-			JSONObjectAdapter joa = jsonObjectAdapter.createNew();
 			
-			vb.writeToJSONObject(joa);
-			synapseClient.updateEntity(joa.toJSONString(),
-					new AsyncCallback<EntityWrapper>() {
+			synapseClient.updateEntity(vb,
+					new AsyncCallback<Entity>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							if (!DisplayUtils.handleServiceException(
@@ -142,7 +100,8 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 							}
 						}
 						@Override
-						public void onSuccess(EntityWrapper result) {
+						public void onSuccess(Entity result) {
+							view.hideEditVersionInfo();
 							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
 							fireEntityUpdatedEvent();
 						}
@@ -151,8 +110,8 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 	
 	@Override
-	public void deleteVersion(final String entityId, final Long versionNumber) {
-		synapseClient.deleteEntityVersionById(entityId, versionNumber, new AsyncCallback<Void>() {
+	public void deleteVersion(final Long versionNumber) {
+		synapseClient.deleteEntityVersionById(bundle.getEntity().getId(), versionNumber, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (!DisplayUtils.handleServiceException(caught,
@@ -163,7 +122,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			}
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + entityId + " " + DisplayConstants.LABEL_DELETED);
+				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
 				fireEntityUpdatedEvent();
 			}
 		});
@@ -184,5 +143,51 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
 	}
+	
+	@Override
+	public void onPageChange(final Long newOffset) {
+		view.clearVersions();
+		// TODO: If we ever change the offset api to actually take 0 as a valid
+		// offset, then we need to remove "+1"
+		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue() + 1, VERSION_LIMIT,
+				new AsyncCallback<PaginatedResults<VersionInfo>>() {
+					@Override
+					public void onSuccess(PaginatedResults<VersionInfo> result) {
+						PaginatedResults<VersionInfo> paginatedResults;
+						paginatedResults = result;
+						paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
+						if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
+							versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
+						}
+						for (VersionInfo versionInfo : paginatedResults.getResults()) {
+							view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
+						}
+					}
 
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(caught.getMessage());
+					}
+				});
+	}
+
+	
+	/**
+	 * For testing purposes only
+	 * @return
+	 */
+	public Long getVersionNumber() {
+		return versionNumber;
+	}
+	
+	@Override
+	public void onEditVersionInfoClicked() {
+		preflightController.checkUploadToEntity(bundle, new Callback() {
+			@Override
+			public void invoke() {
+				final Versionable vb = (Versionable)bundle.getEntity();
+				view.showEditVersionInfo(vb.getVersionLabel(), vb.getVersionComment());
+			}
+		});
+	}
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.UploadView;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -17,12 +18,14 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 	 * Configure the view with the parent id
 	 * @param entityId
 	 */
-	public void configure(String entityId, boolean canCertifiedUserAddChild);
+	void configure(String entityId, boolean canCertifiedUserAddChild);
 
 	public void refreshTreeView(String entityId);
-	
+
 	public void showFolderEditDialog(final String folderEntityId);
-	
+
+	public void setNewFolderDialogVisible(boolean visible);
+
 	/**
 	 * Presenter interface
 	 */
@@ -33,5 +36,4 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 		void deleteFolder(boolean skipTrashCan);
 		void fireEntityUpdatedEvent();
 	}
-
 }

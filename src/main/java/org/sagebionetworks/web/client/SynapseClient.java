@@ -9,27 +9,42 @@ import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -37,13 +52,17 @@ import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
+import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -56,16 +75,16 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
-@RemoteServiceRelativePath("synapse")	
+@RemoteServiceRelativePath("synapseclient")	
 public interface SynapseClient extends RemoteService {
 
-	public EntityWrapper getEntity(String entityId) throws RestServiceException;
+	public Entity getEntity(String entityId) throws RestServiceException;
 	
 	public Project getProject(String projectId) throws RestServiceException;
 	
-	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
+	public Entity getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
 		
-	public String getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
+	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 
 	public void deleteEntityById(String entityId) throws RestServiceException;
 	
@@ -77,7 +96,7 @@ public interface SynapseClient extends RemoteService {
 
 	public void restoreFromTrash(String entityId, String newParentId) throws RestServiceException;
 
-	public String viewTrashForUser(long offset, long limit) throws RestServiceException;
+	public PaginatedResults<TrashedEntity> viewTrashForUser(long offset, long limit) throws RestServiceException;
 	
 	public void purgeTrashForUser() throws RestServiceException;
 
@@ -89,21 +108,13 @@ public interface SynapseClient extends RemoteService {
 	
 	public SearchResults search(SearchQuery searchQuery) throws RestServiceException; 
 	
-	public String getEntityTypeBatch(List<String> entityIds) throws RestServiceException;
+	public PaginatedResults<EntityHeader> getEntityTypeBatch(List<String> entityIds) throws RestServiceException;
 	
-	public String getEntityHeaderBatch(String referenceList) throws RestServiceException;
+	public PaginatedResults<EntityHeader> getEntityHeaderBatch(ReferenceList referenceList) throws RestServiceException;
 	
 	public ArrayList<EntityHeader> getEntityHeaderBatch(List<String> entityIds) throws RestServiceException;
 	
 	public SerializableWhitelist junk(SerializableWhitelist l);
-	
-	/**
-	 * Updates the entity in the repo  
-	 * @param entityJson - the JSON string representing the entity
-	 * @return the updated version of the entity
-	 * @throws RestServiceException
-	 */
-	public EntityWrapper updateEntity(String entityJson) throws RestServiceException;
 	
 	/**
 	 * Update an entity.
@@ -120,7 +131,7 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 * @throws SynapseException 
 	 */
-	public EntityBundleTransport getEntityBundle(String entityId, int partsMask) throws RestServiceException;
+	public EntityBundle getEntityBundle(String entityId, int partsMask) throws RestServiceException;
 
 	/**
 	 * Get a bundle of information about an entity in a single call
@@ -129,9 +140,9 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 * @throws SynapseException 
 	 */
-	public EntityBundleTransport getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
+	public EntityBundle getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
 
-	public String getEntityReferencedBy(String entityId) throws RestServiceException;
+	public PaginatedResults<EntityHeader> getEntityReferencedBy(String entityId) throws RestServiceException;
 	
 	/**
 	 * Log a debug message in the server-side log.
@@ -174,7 +185,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException 
 	 */
-	public String createOrUpdateEntity(String entityJson, String annoJson, boolean isNew) throws RestServiceException;
+	public String createOrUpdateEntity(Entity entity, Annotations annos, boolean isNew) throws RestServiceException;
 
 	/**
 	 * Returns the user's profile object
@@ -232,7 +243,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public void setNotificationEmail(String email) throws RestServiceException;
 	
-	public AccessControlList getNodeAcl(String id) throws RestServiceException;
+	public AccessControlList getEntityBenefactorAcl(String id) throws RestServiceException;
 	
 	public AccessControlList createAcl(AccessControlList acl) throws RestServiceException;
 	
@@ -253,26 +264,13 @@ public interface SynapseClient extends RemoteService {
 	
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
-	public EntityWrapper getAllUsers() throws RestServiceException;
-
-	AccessRequirement createAccessRequirement(AccessRequirement arEW)
-			throws RestServiceException;
-	
-	EntityWrapper createLockAccessRequirement(String entityId) throws RestServiceException;
+	AccessRequirement createAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 
 	AccessRequirementsTransport getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType)
 			throws RestServiceException;
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
-	String getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
-	
-	EntityWrapper createAccessApproval(EntityWrapper aaEW)
-			throws RestServiceException;
-
-	
-	public EntityWrapper updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
-	
-	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl, String name) throws RestServiceException;
+	PaginatedResults<AccessRequirement> getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
 	
 	/**
 	 * convenience method for converting markdown to html
@@ -287,36 +285,36 @@ public interface SynapseClient extends RemoteService {
 	
 	public Activity getActivity(String activityId) throws RestServiceException;
 	
-	public String getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
+	public PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
 
 	public String getJSONEntity(String repoUri) throws RestServiceException;
 	
 	public String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
 	//wiki crud
-	public String getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+	public PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
-    public String createV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
-    public String getV2WikiPage(WikiPageKey key) throws RestServiceException;
-    public String getVersionOfV2WikiPage(WikiPageKey key, Long version) throws RestServiceException;
-    public String updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
-    public String restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
+    public V2WikiPage createV2WikiPage(String ownerId, String ownerType, V2WikiPage page) throws RestServiceException;
+    public V2WikiPage getV2WikiPage(WikiPageKey key) throws RestServiceException;
+    public V2WikiPage getVersionOfV2WikiPage(WikiPageKey key, Long version) throws RestServiceException;
+    public V2WikiPage updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag) throws RestServiceException;
+    public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
-    public String getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+    public PaginatedResults<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	public V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
 	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
-    public String getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
-    public String getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version) throws RestServiceException;
-    public String getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
+    public FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
+    public FileHandleResults getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version) throws RestServiceException;
+    public PaginatedResults<V2WikiHistorySnapshot> getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
     
 	public String getMarkdown(WikiPageKey key)throws IOException, RestServiceException;
 	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
-	public String zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
+	public S3FileHandle zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
 	
-	public String createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
-	public String updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
+	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
+	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
@@ -324,7 +322,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getFileEndpoint() throws RestServiceException;
 	
-	public String addFavorite(String entityId) throws RestServiceException;
+	public EntityHeader addFavorite(String entityId) throws RestServiceException;
 	
 	public void removeFavorite(String entityId) throws RestServiceException;
 	
@@ -332,18 +330,18 @@ public interface SynapseClient extends RemoteService {
 	
 	public String createTeam(String teamName) throws RestServiceException;
 	public void deleteTeam(String teamId) throws RestServiceException;
-	public String getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
-	public ArrayList<String> getTeamsForUser(String userId) throws RestServiceException;
-	public String getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
+	public PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
+	public List<Team> getTeamsForUser(String userId) throws RestServiceException;
+	public PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
 	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
-	public ArrayList<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
-	public ArrayList<MembershipInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
-	public ArrayList<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
+	public ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
+	public ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
+	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
 	public void deleteMembershipInvitation(String invitationId) throws RestServiceException;
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
-	public String updateTeam(String teamJson) throws RestServiceException;
+	public Team updateTeam(Team team) throws RestServiceException;
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
@@ -351,18 +349,18 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
 	public String getCertificationQuiz() throws RestServiceException;
-	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException; 
+	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
 	
-	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
+	public EntityIdList getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
-	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType, String contentMD5) throws RestServiceException;
+	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType, String contentMD5, Long storageLocationId) throws RestServiceException;
 	public String getChunkedPresignedUrl(ChunkRequest chunkRequest) throws RestServiceException;
 	public UploadDaemonStatus combineChunkedFileUpload(List<ChunkRequest> requests) throws RestServiceException;
 	public UploadDaemonStatus getUploadDaemonStatus(String daemonId) throws RestServiceException;
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
 	
-	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
+	public Doi getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
@@ -429,18 +427,19 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body, String tableId) throws RestServiceException;
+	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body) throws RestServiceException;
 	
 	/**
 	 * Get the results of an Asynchronous job identified by the provided jobId.
 	 * @param type
 	 * @param jobId
+	 * @param body The request body
 	 * @return
 	 * @throws RestServiceException
 	 * @throws ResultNotReadyException Thrown when the job is not ready.  The status JOSN of this exception
 	 * is of type AsynchronousJobStatus.
 	 */
-	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, String tableId) throws RestServiceException, ResultNotReadyException;
+	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
 	/**
 	 * Execute a generic entity entity query.
@@ -458,7 +457,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException 
 	 */
-	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException;
+	public Entity createEntity(Entity entity) throws RestServiceException;
 
 	/**
 	 * Get the file Handle given its ID.
@@ -489,9 +488,9 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset) throws RestServiceException;
-	ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset) throws RestServiceException;
-	ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
+	ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
+	ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
+	ProjectPagedResults getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
 	
 	String getHost(String urlString) throws RestServiceException;
 
@@ -502,4 +501,16 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
+
+	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
+
+	ACTAccessRequirement createLockAccessRequirement(String entityId) throws RestServiceException;
+
+	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
+
+	Entity updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
+
+	Entity createExternalFile(String parentEntityId, String externalUrl,
+			String name) throws RestServiceException;
+	
 }

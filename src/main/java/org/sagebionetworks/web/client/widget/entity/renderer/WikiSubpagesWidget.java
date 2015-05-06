@@ -4,27 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,38 +26,34 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRendererPresenter {
+public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 	
 	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
-	private AdapterFactory adapterFactory;
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName;
 	private Place ownerObjectLink;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
 	private V2WikiOrderHint subpageOrderHint;
+	private AuthenticationController authenticationController;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
+	private CallbackP<WikiPageKey> reloadWikiPageCallback;
 	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
-							NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
+							AuthenticationController authenticationController) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
-		this.adapterFactory = adapterFactory;
+		this.authenticationController = authenticationController;
 		
 		view.setPresenter(this);
-	}	
-	@Override
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null, true);
 	}
 
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
+		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiKey = wikiKey;
@@ -78,32 +68,22 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			allRefs.add(ref);
 			ReferenceList list = new ReferenceList();
 			list.setReferences(allRefs);	
-			try {
-				synapseClient.getEntityHeaderBatch(list.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {					
-						BatchResults<EntityHeader> headers;
-						try {
-							headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
-							if (headers.getTotalNumberOfResults() == 1) {
-								EntityHeader theHeader = headers.getResults().get(0);
-								ownerObjectName = theHeader.getName();
-								ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
-								refreshTableOfContents();
-							}	
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-						}
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {					
-						view.showErrorMessage(caught.getMessage());
-					}
-				});
-			} catch (JSONObjectAdapterException e) {
-				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-			}
+			synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+				@Override
+				public void onSuccess(PaginatedResults<EntityHeader> headers) {
+					if (headers.getTotalNumberOfResults() == 1) {
+						EntityHeader theHeader = headers.getResults().get(0);
+						ownerObjectName = theHeader.getName();
+						ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
+						refreshTableOfContents();
+					}	
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
 		}
 	}
 	
@@ -117,42 +97,38 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	public void clearState() {
 		view.clear();
 	}
-	
-	@Override
+
 	public Widget asWidget() {
-		view.setPresenter(this);		
+		view.setPresenter(this);
 		return view.asWidget();
 	}
 	
 	public void refreshTableOfContents() {
 		view.clear();
-		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<String>() {
+		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<PaginatedResults<V2WikiHeader>>() {
 			@Override
-			public void onSuccess(String results) {
-				try {
-					final PaginatedResults<V2WikiHeader> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
-					
-					synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
-						@Override
-						public void onSuccess(V2WikiOrderHint result) {
-							// "Sort" stuff'
-							subpageOrderHint = result;
-							WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders.getResults(), subpageOrderHint);
-							
-							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-											ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							// Failed to get order hint. Just ignore it.
-							view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
-						}
-					});
-					
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(PaginatedResults<V2WikiHeader> results) {
+				final PaginatedResults<V2WikiHeader> wikiHeaders = results;
+				
+				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
+					@Override
+					public void onSuccess(V2WikiOrderHint result) {
+						// "Sort" stuff'
+						subpageOrderHint = result;
+						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders.getResults(), subpageOrderHint);
+						
+						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
+						view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						// Failed to get order hint. Just ignore it.
+						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
+						view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
+					}
+				});
 			}
 			
 			@Override
@@ -167,8 +143,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			}
 		});
 	}
-	
-	
+
 	private UpdateOrderHintCallback getUpdateOrderHintCallback() {
 		return new UpdateOrderHintCallback() {
 			@Override
@@ -187,9 +162,13 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				}
 		};
 	}
-	
+
 	public interface UpdateOrderHintCallback {
 		void updateOrderHint(List<String> newOrderHintIdList);
 	}
-	
+
+	@Override
+	public CallbackP<WikiPageKey> getReloadWikiPageCallback() {
+		return this.reloadWikiPageCallback;
+	}
 }

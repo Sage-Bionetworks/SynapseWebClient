@@ -1,35 +1,35 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
-import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
-import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetView;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class OpenTeamInvitationsWidgetTest {
@@ -40,35 +40,34 @@ public class OpenTeamInvitationsWidgetTest {
 	String teamId = "123";
 	OpenTeamInvitationsWidget widget;
 	AuthenticationController mockAuthenticationController;
-	NodeModelCreator mockNodeModelCreator;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	Team testTeam;
 	MembershipInvitation testInvite;
-	List<MembershipInvitationBundle> testReturn;
+	List<OpenUserInvitationBundle> testReturn;
 	Callback mockTeamUpdatedCallback;
-	CallbackP<List<MembershipInvitationBundle>> mockOpenTeamInvitationsCallback;
+	CallbackP<List<OpenUserInvitationBundle>> mockOpenTeamInvitationsCallback;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(OpenTeamInvitationsWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator);
+		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
 		
 		testTeam = new Team();
 		testTeam.setId(teamId);
 		testTeam.setName("Bob's Team");
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(Team.class))).thenReturn(testTeam);
 		testInvite = new MembershipInvitation();
 		testInvite.setTeamId(teamId);
 		testInvite.setUserId("42");
 		testInvite.setMessage("This is a test invite");
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(MembershipInvitation.class))).thenReturn(testInvite);
 		
-		testReturn = new ArrayList<MembershipInvitationBundle>();
-		testReturn.add(new MembershipInvitationBundle());
+		testReturn = new ArrayList<OpenUserInvitationBundle>();
+		OpenUserInvitationBundle mib = new OpenUserInvitationBundle();
+		mib.setTeam(testTeam);
+		mib.setMembershipInvitation(testInvite);
+		testReturn.add(mib);
 		
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		

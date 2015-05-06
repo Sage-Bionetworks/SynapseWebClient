@@ -2,10 +2,13 @@ package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,20 +22,21 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	
 	UserProfileEditorWidgetView view;
 	ProfileImageWidget imageWidget;
-	FileInputWidget fileInputWidget;
+	FileHandleUploadWidget fileHandleUploadWidget;
 	String fileHandleId;
 	
 	@Inject
-	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view, ProfileImageWidget imageWidget, FileInputWidget fileInputWidget) {
+	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view, ProfileImageWidget imageWidget, FileHandleUploadWidget fileHandleUploadWidget) {
 		super();
 		this.view = view;
 		this.imageWidget = imageWidget;
-		this.fileInputWidget = fileInputWidget;
-		this.view.addFileInputWidget(fileInputWidget);
+		this.fileHandleUploadWidget = fileHandleUploadWidget;
+		this.view.addFileInputWidget(fileHandleUploadWidget);
 		this.view.addImageWidget(imageWidget);
 		this.view.setPresenter(this);
 	}
 
+	
 	@Override
 	public Widget asWidget() {
 		return this.view.asWidget();
@@ -42,7 +46,6 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	public void configure(UserProfile profile) {
 		view.hideUsernameError();
 		view.hideLinkError();
-		view.hideUploadError();
 		view.setUsername(profile.getUserName());
 		view.setFirstName(profile.getFirstName());
 		view.setLastName(profile.getLastName());
@@ -54,11 +57,16 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setLink(profile.getUrl());
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
 		imageWidget.configure(this.fileHandleId);
+		fileHandleUploadWidget.configure("Upload Image",new CallbackP<String>() {
+			@Override
+			public void invoke(String fileHandleId) {
+				setNewFileHandle(fileHandleId);
+			}
+		});
 	}
 
 	@Override
 	public boolean isValid() {
-		view.hideUploadError();
 		view.hideUsernameError();
 		view.hideLinkError();
 		boolean valid = true;
@@ -71,11 +79,6 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 			}else{
 				view.showUsernameError(CAN_ONLY_INCLUDE);
 			}
-		}
-		// file
-		if(isFileSelected()){
-			valid = false;
-			view.showUploadError(FILE_WAS_SELECTED_BUT_NOT_UPLOADED);
 		}
 		// link
 		String link = view.getLink();
@@ -137,41 +140,16 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	public String getSummary() {
 		return view.getBio();
 	}
-
-	@Override
-	public void onUploadFile() {
-		view.hideUploadError();
-		if(!isFileSelected()){
-			view.showUploadError(PLEASE_SELECT_A_FILE);
-			return;
-		}
-		this.view.setUploading(true);
-		// upload the file
-		this.fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
-			
-			@Override
-			public void uploadSuccess(String fileHandleId) {
-				view.setUploading(false);
-				fileInputWidget.reset();
-				setNewFileHandle(fileHandleId);
-			}
-			
-			@Override
-			public void uploadFailed(String error) {
-				view.setUploading(false);
-				view.showUploadError(error);
-			}
-		});
-	}
 	
 	private void setNewFileHandle(String fileHandleId) {
 		this.fileHandleId = fileHandleId;
 		this.imageWidget.configure(this.fileHandleId);
 	}
-	
-	private boolean isFileSelected(){
-		FileMetadata[] selectedFiles = this.fileInputWidget.getSelectedFileMetadata();
-		return !(selectedFiles == null || selectedFiles.length < 1);
+
+	@Override
+	public void addKeyDownHandler(KeyDownHandler keyDownHandler) {
+		view.addKeyDownHandlerToFields(keyDownHandler);
 	}
+	
 
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.search;
 
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
 
@@ -44,5 +45,7 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 		
 		void getPrevSuggestions();
 		void getNextSuggestions();
+		
+		void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
 	}
 }

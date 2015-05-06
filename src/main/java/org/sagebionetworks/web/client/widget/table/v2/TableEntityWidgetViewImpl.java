@@ -9,8 +9,8 @@ import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;

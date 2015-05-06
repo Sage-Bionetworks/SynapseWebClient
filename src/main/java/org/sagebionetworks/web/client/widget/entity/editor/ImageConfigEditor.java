@@ -7,6 +7,7 @@ import java.util.Map;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
@@ -24,14 +25,16 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	private List<String> fileHandleIds;
 	private FileInputWidget fileInputWidget;
 	private DialogCallback dialogCallback;
+	private WikiAttachments wikiAttachments;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view, FileInputWidget fileInputWidget) {
+	public ImageConfigEditor(ImageConfigView view, FileInputWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
 		view.setPresenter(this);
-		view.initView();
 		this.fileInputWidget = fileInputWidget;
+		this.wikiAttachments = wikiAttachments;
 		view.setFileInputWidget(fileInputWidget.asWidget());
+		view.setWikiAttachmentsWidget(wikiAttachments.asWidget());
 	}
 	
 	@Override
@@ -39,7 +42,10 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
 		fileHandleIds = new ArrayList<String>();
+		view.initView();
+		fileInputWidget.reset();
 		view.configure(wikiKey, dialogCallback);
+		wikiAttachments.configure(wikiKey);
 		//and try to prepopulate with values from the map.  if it fails, ignore
 		try {
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY) || descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
@@ -65,9 +71,14 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	public void updateDescriptorFromView() {
 		view.checkParams();
 		if (!view.isExternal()) {
-			if (view.isSynapseEntity())
+			if (view.isSynapseEntity()) {
 				descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, view.getSynapseId());
-			else {
+			} else if (view.isFromAttachments()) {
+				if (!wikiAttachments.isValid()) {
+					throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_ATTACHMENT_MESSAGE);
+				}
+				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
+			} else {
 				if (fileHandleIds.isEmpty()) {
 					throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
 				}
@@ -137,6 +148,14 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	@Override
 	public List<String> getNewFileHandleIds() {
 		return fileHandleIds;
+	}
+	@Override
+	public List<String> getDeletedFileHandleIds() {
+		if (view.isFromAttachments()) {
+			return wikiAttachments.getFilesHandlesToDelete();
+		} else {
+			return null;
+		}
 	}
 	/*
 	 * Private Methods

@@ -16,19 +16,17 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -39,12 +37,11 @@ public class EntityListConfigEditorTest {
 	EntityListConfigEditor editor;
 	EntityListConfigView mockView;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AuthenticationController mockAuthenticationController;
 
 	Map<String, String> descriptor;
-	Data syn456;
+	Folder syn456;
 	EntityGroupRecord record456; 
 	
 	@Before
@@ -52,20 +49,18 @@ public class EntityListConfigEditorTest {
 		mockView = mock(EntityListConfigView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockAuthenticationController = mock(AuthenticationController.class);		
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 		// create gettable entity
-		syn456 = new Data();
+		syn456 = new Folder();
 		syn456.setId("syn456");
 		syn456.setName(syn456.getId());
-		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null, null);
-		EntityBundleTransport transport = new EntityBundleTransport();
-		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createEntityBundle(transport)).thenReturn(bundle);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(syn456);
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
 
 		// create an entity group record for syn456
 		record456 = new EntityGroupRecord();
@@ -78,7 +73,7 @@ public class EntityListConfigEditorTest {
 		descriptor = new HashMap<String, String>();		
 		
 		editor = new EntityListConfigEditor(mockView, mockSynapseClient,
-				mockNodeModelCreator, mockSynapseJSNIUtils, mockAuthenticationController);
+				mockSynapseJSNIUtils, mockAuthenticationController);
 		
 		editor.configure(null, descriptor, null);
 	}

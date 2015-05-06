@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<b:Form>
+		<bh:Div>
 			<b:FieldSet>
 				<b:FormGroup>
 					<b:FormLabel for="url" addStyleNames="displayInline">Query</b:FormLabel>
@@ -14,7 +14,7 @@
 					</g:FlowPanel>
 				</b:FormGroup>
 			</b:FieldSet>
-		</b:Form>
+		</bh:Div>
 		<g:FlowPanel addStyleNames="help-panel">
 			<b:BlockQuote styleName="panel">
 				<bh:Text text="Provide a Query for any Synapse Table. Only users who have access to the Table being queried will be able to see the Table in the Wiki page."></bh:Text>

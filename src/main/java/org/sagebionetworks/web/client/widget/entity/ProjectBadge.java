@@ -1,18 +1,24 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.Project;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
+import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,6 +32,8 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 	private ClientCache clientCache;
 	private ProjectHeader header;
 	private FavoriteWidget favoritesWidget;
+	private UserProfile modifiedBy;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public ProjectBadge(ProjectBadgeView view, 
@@ -33,7 +41,8 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 			AdapterFactory adapterFactory,
 			GlobalApplicationState globalAppState,
 			ClientCache clientCache,
-			FavoriteWidget favoritesWidget
+			FavoriteWidget favoritesWidget,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -41,12 +50,14 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		this.globalAppState = globalAppState;
 		this.clientCache = clientCache;
 		this.favoritesWidget = favoritesWidget;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.setFavoritesWidget(favoritesWidget.asWidget());
 	}
 	
-	public void configure(ProjectHeader header) {
+	public void configure(ProjectHeader header, UserProfile modifiedBy) {
 		this.header = header;
+		this.modifiedBy = modifiedBy;
 		view.setLastActivityVisible(false);
 		if (header != null) {
 			if (header.getLastActivity() != null) {
@@ -57,39 +68,34 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 				} catch(Exception e) {};
 			}
 			favoritesWidget.configure(header.getId());
-			view.setProject(header.getName(), DisplayUtils.getSynapseHistoryToken(header.getId()));
+			view.configure(header.getName(), DisplayUtils.getSynapseHistoryToken(header.getId()), getProjectTooltip());
 		}
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
-	}
+	}	
 	
 	@Override
-	public void getInfo(final AsyncCallback<KeyValueDisplay<String>> callback) {
-		synapseClient.getProject(header.getId(), new AsyncCallback<Project>() {
-			@Override
-			public void onSuccess(final Project result) {
-				UserBadge.getUserProfile(result.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-					@Override
-					public void onSuccess(UserProfile profile) {
-						if (view.isAttached())
-							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(result, DisplayUtils.getDisplayName(profile), false));		
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						if (view.isAttached())
-							callback.onFailure(caught);
-					}
-				});
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (view.isAttached())
-					callback.onFailure(caught);
-			}
-		});
+	public String getProjectTooltip() {
+		Map<String,String> map = new HashMap<String, String>();
+		List<String> order = new ArrayList<String>();
+		
+		order.add("ID");
+		map.put("ID", header.getId());
+
+		if (modifiedBy != null) {
+			order.add("Modified By");
+			map.put("Modified By", DisplayUtils.getDisplayName(modifiedBy));
+		}
+
+		if (header.getModifiedOn() != null) {
+			order.add("Modified On");
+			map.put("Modified On", gwt.getDateTimeFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(header.getModifiedOn()));		
+		}
+		
+		return ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
 	}
 	
 	public ProjectHeader getHeader() {

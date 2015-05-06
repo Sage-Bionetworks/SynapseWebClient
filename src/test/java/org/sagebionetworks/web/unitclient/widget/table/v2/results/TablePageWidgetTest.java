@@ -214,7 +214,7 @@ public class TablePageWidgetTest {
 		SortItem sort = new SortItem();
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		sort.setDirection(SortDirection.DESC);
-		boolean isEditable = true;
+		boolean isEditable = false;
 		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
@@ -244,7 +244,34 @@ public class TablePageWidgetTest {
 		SortItem sort = new SortItem();
 		sort.setColumn(schema.get(sortColumnIndex).getName());
 		sort.setDirection(SortDirection.ASC);
-		boolean isEditable = true;
+		boolean isEditable = false;
+		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
+		// Pagination should be setup since a page change listener was provided.
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		verify(mockView).setPaginationWidgetVisible(true);
+		
+		// Check each header
+		for(int i=0; i<sortHeaders.size(); i++){
+			SortableTableHeader sth = sortHeaders.get(i);
+			if(i == sortColumnIndex){
+				verify(sth).setIcon(IconType.SORT_ASC);
+			}else{
+				verify(sth, never()).setIcon(any(IconType.class));
+			}
+		}
+	}
+	
+	/**
+	 * Test for SWC-2312
+	 */
+	@Test
+	public void testConfigureWithSortDirectionNull(){
+		int sortColumnIndex = 1;
+		SortItem sort = new SortItem();
+		sort.setColumn(schema.get(sortColumnIndex).getName());
+		// When the direction is null
+		sort.setDirection(null);
+		boolean isEditable = false;
 		widget.configure(bundle, query, sort, isEditable, null, mockPageChangeListner);
 		// Pagination should be setup since a page change listener was provided.
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);

@@ -13,7 +13,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 
 import com.google.gwt.dev.util.collect.HashSet;
 

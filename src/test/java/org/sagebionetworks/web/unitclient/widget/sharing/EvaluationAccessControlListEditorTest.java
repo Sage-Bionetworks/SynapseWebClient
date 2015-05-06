@@ -35,12 +35,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -56,7 +53,6 @@ public class EvaluationAccessControlListEditorTest {
 	// JSON utility components
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
-	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
 	
 
 	// Mock components
@@ -250,10 +246,6 @@ public class EvaluationAccessControlListEditorTest {
 				toRemove = resourceAccess;
 		acl.getResourceAccess().remove(toRemove);
 		
-		EntityWrapper expectedEntityWrapper = new EntityWrapper(
-				acl.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				AccessControlList.class.getName());
-		
 		// configure mocks
 		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
@@ -311,13 +303,4 @@ public class EvaluationAccessControlListEditorTest {
 
 		verify(mockACLEView).showErrorMessage(anyString());
 	}
-
-	@Test
-	public void testUnsavedViewChanges() {
-		acle.setUnsavedViewChanges(true);
-		acle.pushChangesToSynapse(null);
-		
-		verify(mockACLEView).alertUnsavedViewChanges(any(Callback.class));
-	}
-	
 }

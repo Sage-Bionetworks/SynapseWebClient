@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -67,11 +66,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		
 		if(entityHeader != null) {
 			isPopoverInitialized = false;
-			tooltip.setIsHtml(true);
-			tooltip.setTitle(entityHeader.getName());
-						
-			tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
-			
 			
 			final Anchor anchor = new Anchor();
 			anchor.setText(entityHeader.getName());
@@ -133,21 +127,17 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				
 				private void renderPopover(final String content) {
 					isPopoverInitialized = true;
-					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-						@Override
-						public void execute() {
-							if (entityContainer.isAttached()) {
-								tooltip.setText(content);
-								tooltip.reconfigure();
-								if (isPopover)
-									tooltip.show();
-							}
-						}
-					});
+					if (entityContainer.isAttached()) {
+						tooltip.setTitle(content);
+						tooltip.reconfigure();
+						if (isPopover)
+							tooltip.show();
+					}
 				}
 			});
+		} else {
+			tooltip.show();	
 		}
-		tooltip.show();
 	}
 
 	@Override

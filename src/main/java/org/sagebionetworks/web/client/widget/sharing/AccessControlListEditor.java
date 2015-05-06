@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -49,7 +49,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private AccessControlListEditorView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
-	private boolean unsavedViewChanges;
 	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
@@ -108,10 +107,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		return entity == null ? null : entity.getId();
 	}
 	
-	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
-		this.unsavedViewChanges = unsavedViewChanges;
-	}
-	
 	/**
 	 * Generate the ACLEditor Widget
 	 */
@@ -144,13 +139,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		hasChangesHandler.hasChanges(false);
 		
-		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
-		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
+		int partsMask = EntityBundle.BENEFACTOR_ACL | EntityBundle.PERMISSIONS;
+		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundleTransport bundle) {
+			public void onSuccess(EntityBundle bundle) {
 				try {
 					// retrieve ACL and user entity permissions from bundle
-					acl = bundle.getAcl();
+					acl = bundle.getBenefactorAcl();
 					uep = bundle.getPermissions();
 					//initialize original principal id set
 					originalPrincipalIdSet = new HashSet<String>();
@@ -354,7 +349,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			return;
 		}		
 		// Fetch parent's benefactor's ACL (candidate benefactor for this entity)
-		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
+		synapseClient.getEntityBenefactorAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
 				try {
@@ -374,17 +369,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	public void pushChangesToSynapse(final boolean recursive, final Callback changesPushedCallback) {
-		if(unsavedViewChanges) {
-			view.alertUnsavedViewChanges(new Callback() {
-				
-				@Override
-				public void invoke() {
-					pushChangesToSynapse(recursive, changesPushedCallback);
-				}
-			});
-			return;
-		}
-		
 		validateEditorState();
 		
 		// Create an async callback to receive the updated ACL from Synapse
@@ -510,7 +494,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED + ": " + caught.getMessage());
 			}
 		});
 	}

@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -18,7 +17,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -96,7 +94,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 
 	public boolean includeRestrictionWidget() {
-		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof TableEntity) || (bundle.getEntity() instanceof Locationable) || (bundle.getEntity() instanceof Folder) || (showIfProject && bundle.getEntity() instanceof Project);
+		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof TableEntity) || (bundle.getEntity() instanceof Folder) || (showIfProject && bundle.getEntity() instanceof Project);
 	}
 
 	public String accessRequirementText() {
@@ -126,7 +124,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		allArsIterator = bundle.getAccessRequirements().iterator();
 		if (hasUnmetDownloadAccessRequirements()) {
 			List<AccessRequirement> unmetRequirements = new ArrayList<AccessRequirement>();
-			for (AccessRequirement unmetRequirement : bundle.getUnmetDownloadAccessRequirements()) {
+			for (AccessRequirement unmetRequirement : bundle.getUnmetAccessRequirements()) {
 				unmetRequirements.add(unmetRequirement);
 				if (!(unmetRequirement instanceof SelfSignAccessRequirement)) {
 					break;
@@ -138,12 +136,12 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	public boolean hasUnmetDownloadAccessRequirements() {
-		List<AccessRequirement> unmetArs = bundle.getUnmetDownloadAccessRequirements();
+		List<AccessRequirement> unmetArs = bundle.getUnmetAccessRequirements();
 		return (unmetArs != null && !unmetArs.isEmpty());
 	}
 	
 	public boolean isCurrentAccessRequirementUnmet() {
-		return bundle.getUnmetDownloadAccessRequirements().contains(currentAR);
+		return bundle.getUnmetAccessRequirements().contains(currentAR);
 	}
 
 	private UserProfile getUserProfile() {
@@ -271,8 +269,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			}
 		}
 	}
-	
-	public void imposeRestrictionClicked() {
+
+	@Override
+	public void imposeRestrictionOkClicked() {
 		Boolean isYesSelected = view.isYesHumanDataRadioSelected();
 		Boolean isNoSelected = view.isNoHumanDataRadioSelected();
 		
@@ -288,12 +287,17 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			accessRequirementDialog.imposeRestriction(bundle.getEntity().getId(), entityUpdated);
 		}
 	}
-	
+
+	@Override
+	public void imposeRestrictionCancelClicked() {
+		view.setImposeRestrictionModalVisible(false);
+	}
+
 	@Override
 	public void anonymousFlagModalOkClicked() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
-	
+
 	@Override
 	public void reportIssueClicked() {
 		view.showFlagModal();

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -7,24 +8,21 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.footer.Footer;
-import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -144,6 +142,14 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changeSynapsePasswordHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		
+		newEmailField.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					addEmailButton.click();
+				}
+			}
+		});
 		addEmailButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -152,7 +158,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 					presenter.addEmail(newEmailField.getValue());
 				}
 			}
-		});
+		});		
 	}
 
 

@@ -1,12 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -17,8 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -33,9 +41,7 @@ import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -45,17 +51,11 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.JSONEntityFactory;
-import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
-import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -75,18 +75,14 @@ public class UploaderTest {
 	SynapseJSNIUtils synapseJsniUtils;
 	ClientLogger mockLogger;
 	GlobalApplicationState mockGlobalApplicationState;
-	// JSON utility components
-	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
-	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-	private static NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(jsonEntityFactory, jsonObjectAdapter);
 	
-	AutoGenFactory autogenFactory;
 	Uploader uploader;
 	GWTWrapper gwt;
 	FileEntity testEntity;
 	CancelHandler cancelHandler;
 	String parentEntityId;
+	private Long storageLocationId;
 	
 	@Before
 	public void before() throws Exception {
@@ -96,28 +92,23 @@ public class UploaderTest {
 		synapseClient=mock(SynapseClientAsync.class);
 		jiraURLHelper=mock(JiraURLHelper.class);
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
-		autogenFactory=mock(AutoGenFactory.class);
 		gwt = mock(GWTWrapper.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockLogger = mock(ClientLogger.class);
-		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
 		testEntity.setId("syn99");
-		EntityWrapper expectedEntityWrapper = new EntityWrapper(
-				testEntity.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
-				FileEntity.class.getName());
 		ChunkedFileToken token = new ChunkedFileToken();
 		token.setFileName("testFile.txt");
 		String tokenJson = token.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		when(autogenFactory.newInstance(anyString())).thenReturn(testEntity);
 		UserSessionData sessionData = new UserSessionData();
 		sessionData.setProfile(new UserProfile());
 		when(authenticationController.isLoggedIn()).thenReturn(true);
 		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		
 		S3UploadDestination d = new S3UploadDestination();
@@ -141,12 +132,12 @@ public class UploaderTest {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
-		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		//by default, there is no name conflict
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
-		uploader = new Uploader(view, nodeModelCreator,
+		uploader = new Uploader(view,
 				synapseClient,
 				synapseJsniUtils,
 				gwt, authenticationController, multipartUploader, mockGlobalApplicationState, mockLogger);
@@ -159,6 +150,7 @@ public class UploaderTest {
 		
 		when(synapseJsniUtils.getFileSize(anyString(), anyInt())).thenReturn(1.0);
 		when(synapseJsniUtils.isFileAPISupported()).thenReturn(true);
+		storageLocationId = 9090L;
 	}
 	
 	@Test
@@ -331,7 +323,7 @@ public class UploaderTest {
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
-		
+		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
 	}
 	
@@ -342,6 +334,7 @@ public class UploaderTest {
 		destinations.add(mock(UploadDestination.class));
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
+		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
 	}
 	
@@ -355,12 +348,14 @@ public class UploaderTest {
 		ExternalUploadDestination d = new ExternalUploadDestination();
 		d.setUploadType(UploadType.SFTP);
 		d.setUrl(url);
+		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("ok.net").when(synapseClient).getHost(anyString(), any(AsyncCallback.class));
 		
 		uploader.queryForUploadDestination();
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 		assertEquals(UploadType.SFTP, uploader.getCurrentUploadType());
 		verify(view).showUploadingToExternalStorage(anyString(), anyString());
 		verify(view).enableMultipleFileUploads(false);
@@ -376,8 +371,18 @@ public class UploaderTest {
 		assertTrue(target.startsWith(sftpProxy));
 		assertTrue(target.contains("?url=" + url));
 	}
-	
-	
+
+	@Test
+	public void testQueryForUploadDestinationsWithUploadToS3() {
+		S3UploadDestination d = new S3UploadDestination();
+		d.setUploadType(UploadType.S3);
+		d.setStorageLocationId(storageLocationId);
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(d);
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
+	}
 
 	@Test
 	public void testQueryForUploadDestinationsWithoutParentEntityId() {
@@ -389,12 +394,18 @@ public class UploaderTest {
 		
 		Mockito.reset(synapseClient);
 		uploader.asWidget(fileEntity);
-		
+		assertNull(uploader.getStorageLocationId());
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
 		verify(synapseClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
 		assertEquals(entityId, stringCaptor.getValue());
 	}
-	
+
+	@Test
+	public void testQueryForUploadDestinationsWithNullEntity() {
+		Mockito.reset(synapseClient);
+		uploader.asWidget((FileEntity)null);
+		assertNull(uploader.getStorageLocationId());
+	}
 
 	@Test
 	public void testUploadNoCredentials() {
@@ -522,7 +533,7 @@ public class UploaderTest {
 	@Test
 	public void testGetSelectedFilesTextNoFiles() {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
-		assertEquals(UploaderViewImpl.DRAG_AND_DROP, uploader.getSelectedFilesText());
+		assert(uploader.getSelectedFilesText().isEmpty());
 	}
 	
 	@Test

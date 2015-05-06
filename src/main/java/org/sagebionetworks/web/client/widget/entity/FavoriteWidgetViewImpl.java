@@ -9,7 +9,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,6 +45,7 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 		favoriteIcon.setIcon(IconType.STAR);
 		favoriteIcon.removeStyleName("greyText-imp");
 		favoriteIcon.addStyleName("favoriteIcon");
+		favoriteIcon.setVisible(true);
 	}
 	
 	@Override
@@ -53,6 +53,13 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 		favoriteIcon.setIcon(IconType.STAR_O);
 		favoriteIcon.removeStyleName("favoriteIcon");
 		favoriteIcon.addStyleName("greyText-imp");
+		favoriteIcon.setVisible(true);
+	}
+
+	@Override
+	public void hideFavoriteAndLoading() {
+		favoriteIcon.setVisible(false);
+		loadingUI.setVisible(false);
 	}
 
 	@Override
@@ -62,14 +69,7 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 
 	@Override
 	public void showLoading() {
-		favoriteIcon.setVisible(false);
 		loadingUI.setVisible(true);
-	}
-	
-	@Override
-	public void hideLoading() {
-		loadingUI.setVisible(false);
-		favoriteIcon.setVisible(true);
 	}
 
 	@Override

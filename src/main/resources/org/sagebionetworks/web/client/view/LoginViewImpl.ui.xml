@@ -41,23 +41,23 @@
 						<div ui:field="termsOfServiceHighlightBox" class="highlight-box col-sm-offset-1 col-sm-10">
 								<div>
 								    <h5>I commit myself to:</h5>
-									<div class="checkbox margin-top-15 margin-bottom-20-imp">
-					   					<g:CheckBox ui:field="actEthicallyCb" text="Act ethically and responsibly."/>
+									<div class="margin-top-15 margin-bottom-20-imp">
+					   					<b:CheckBox ui:field="actEthicallyCb" text="Act ethically and responsibly."/>
 					   				</div>
-					   				<div class="checkbox margin-bottom-20-imp">
-					   					<g:CheckBox ui:field="protectPrivacyCb" text="Protect and respect data participant's privacy and confidentiality."/>
+					   				<div class="margin-bottom-20-imp">
+					   					<b:CheckBox ui:field="protectPrivacyCb" text="Protect and respect data participant's privacy and confidentiality."/>
 					   				</div>
-					   				<div class="checkbox margin-bottom-20-imp">
-					   					<g:CheckBox ui:field="noHackCb" text="Not hack Synapse."/>
+					   				<div class="margin-bottom-20-imp">
+					   					<b:CheckBox ui:field="noHackCb" text="Not hack Synapse."/>
 					   				</div>
-					   				<div class="checkbox margin-bottom-20-imp">
-					   					<g:CheckBox ui:field="shareCb" text="Share content only when I have authority to do so and sharing does not violate any applicable laws or contracts."/>
+					   				<div class="margin-bottom-20-imp">
+					   					<b:CheckBox ui:field="shareCb" text="Share content only when I have authority to do so and sharing does not violate any applicable laws or contracts."/>
 					   				</div>
-					   				<div class="checkbox margin-bottom-20-imp">
-					   					<g:CheckBox ui:field="responsibilityCb" text="Take full responsibility for my use of data, software and other Synapse content."/>
+					   				<div class="margin-bottom-20-imp">
+					   					<b:CheckBox ui:field="responsibilityCb" text="Take full responsibility for my use of data, software and other Synapse content."/>
 					   				</div>
-					   				<div class="checkbox margin-bottom-20-imp">
-					   					<g:CheckBox ui:field="lawsCb" text="Abide by all applicable laws and regulations as laid out in the complete ethical and legal documents governing Synapse."/>
+					   				<div class="margin-bottom-20-imp">
+					   					<b:CheckBox ui:field="lawsCb" text="Abide by all applicable laws and regulations as laid out in the complete ethical and legal documents governing Synapse."/>
 					   				</div>
 				   				</div>
 						</div>

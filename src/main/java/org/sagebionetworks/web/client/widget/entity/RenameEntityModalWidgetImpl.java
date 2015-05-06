@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -16,7 +16,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presenter, RenameEntityModalWidget {
+public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, RenameEntityModalWidget {
 
 	public static final String BUTTON_TEXT = "Rename";
 	public static final String LABLE_SUFFIX = " name";
@@ -24,22 +24,20 @@ public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presente
 
 	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
 	
-	EntityNameModalView view;
+	PromptModalView view;
 	SynapseClientAsync synapseClient;
-	EntityTypeProvider typeProvider;
 	String parentId;
 	Entity toRename;
 	String startingName;
 	Callback handler;
 	
 	@Inject
-	public RenameEntityModalWidgetImpl(EntityNameModalView view,
-			SynapseClientAsync synapseClient, EntityTypeProvider typeProvider) {
+	public RenameEntityModalWidgetImpl(PromptModalView view,
+			SynapseClientAsync synapseClient) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.view.setPresenter(this);
-		this.typeProvider = typeProvider;
 	}
 	
 	
@@ -92,7 +90,7 @@ public class RenameEntityModalWidgetImpl implements EntityNameModalView.Presente
 	@Override
 	public void onRename(Entity toRename, Callback handler) {
 		this.handler = handler;
-		String typeName = typeProvider.getEntityDispalyName(toRename);
+		String typeName = EntityType.getEntityTypeForClass(toRename.getClass()).getDisplayName();
 		this.toRename = toRename;
 		this.startingName = toRename.getName();
 		this.view.clear();

@@ -20,28 +20,23 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.JiraGovernanceConstants;
@@ -49,13 +44,10 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class LicensedDownloaderTest {
 		
@@ -69,15 +61,10 @@ public class LicensedDownloaderTest {
 	AsyncCallback<String> mockStringCallback;
 
 	JSONObjectAdapter jsonObjectAdapterProvider;
-	EntityTypeProvider entityTypeProvider;
 	FileEntity entity;
 	EntityBundle entityBundle;
 	Entity parentEntity;
-	List<LocationData> locations;	
 	EntityPath entityPath;
-	EntityWrapper StudyEntityWrapper;
-	EntityWrapper layerEntityWrapper;
-	EntityWrapper pathEntityWrapper;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AccessRequirementDialog mockAccessRequirementDialog;
@@ -96,10 +83,7 @@ public class LicensedDownloaderTest {
 		mockStringCallback = mock(AsyncCallback.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-
-		// create entity type provider
-		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);	
 
 		JiraGovernanceConstants gc = mock(JiraGovernanceConstants.class);
 		JiraClientAsync mockJiraClient = mock(JiraClientAsync.class);
@@ -115,7 +99,7 @@ public class LicensedDownloaderTest {
 		
 		
 		// Parent Entity
-		parentEntity = new Study();
+		parentEntity = new FileEntity();
 		parentEntity.setId("StudyId");
 		parentEntity.setUri("blahblah/Study/StudyId");
 
@@ -129,7 +113,9 @@ public class LicensedDownloaderTest {
 		FileHandle mockFileHandle = mock(FileHandle.class);
 		when(mockFileHandle.getId()).thenReturn("123");
 		
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, Collections.singletonList(mockFileHandle), null);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(entity);
+		entityBundle.setFileHandles(Collections.singletonList(mockFileHandle));
 		
 		// path for entity
 		entityPath = new EntityPath();
@@ -151,9 +137,6 @@ public class LicensedDownloaderTest {
 		path.add(entityHeader);
 		entityPath.setPath(path);
 		
-
-		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
-		
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn(baseFileHandleUrl);
 	}
 	
@@ -164,8 +147,8 @@ public class LicensedDownloaderTest {
 		entity.setId("myFileEntityId");
 		entity.setVersionNumber(4l);
 		resetMocks();
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
-		
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(entity);
 		// Null locations
 		resetMocks();			
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);

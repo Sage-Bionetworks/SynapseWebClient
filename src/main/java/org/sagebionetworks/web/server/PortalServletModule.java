@@ -1,20 +1,15 @@
 package org.sagebionetworks.web.server;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
@@ -25,7 +20,6 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
-import org.sagebionetworks.web.server.servlet.ProjectServiceImpl;
 import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
@@ -35,15 +29,16 @@ import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.filter.CRCSCFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
+import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
+import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
-import org.sagebionetworks.web.server.servlet.openid.OpenIDServlet;
-import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
+import org.sagebionetworks.web.server.servlet.filter.UpForAChallengeFilter;
+import org.sagebionetworks.web.server.servlet.oauth2.OAuth2Servlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.google.gwt.place.shared.PlaceTokenizer;
+import com.google.gwt.place.shared.WithTokenizers;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
@@ -58,14 +53,9 @@ import com.google.inject.servlet.ServletModule;
 public class PortalServletModule extends ServletModule {
 	
 	private static Logger logger = Logger.getLogger(PortalServletModule.class.getName());
-	private boolean debugRpcInitialized = false;
+	
 	@Override
-	protected void configureServlets() {
-		debugCopyCodeServerRPCPolicies();
-//		// This is not working yet
-//		filter("/Portal/*").through(SimpleAuthFilter.class);
-//		bind(SimpleAuthFilter.class).in(Singleton.class);
-		
+	protected void configureServlets() {		
 		// filter all call through this filter
 		filter("/Portal/*").through(TimingFilter.class);
 		bind(TimingFilter.class).in(Singleton.class);
@@ -73,6 +63,9 @@ public class PortalServletModule extends ServletModule {
 		filter("/Portal/*").through(RPCValidationFilter.class);
 		bind(RPCValidationFilter.class).in(Singleton.class);
 
+		bind(UpForAChallengeFilter.class).in(Singleton.class);
+		filter("/upforachallenge").through(UpForAChallengeFilter.class);
+		
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
 		
@@ -81,18 +74,15 @@ public class PortalServletModule extends ServletModule {
 
 		// Setup the Synapse service
 		bind(SynapseClientImpl.class).in(Singleton.class);
-		serve("/Portal/synapse").with(SynapseClientImpl.class);
+		serve("/Portal/synapseclient").with(SynapseClientImpl.class);
 		
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
-		serve("/Portal/challenge").with(ChallengeClientImpl.class);
+		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
 		
 		// Setup the Search service
 		bind(SearchServiceImpl.class).in(Singleton.class);
-		serve("/Portal/search").with(SearchServiceImpl.class);
-		// setup the project service
-		bind(ProjectServiceImpl.class).in(Singleton.class);
-		serve("/Portal/project").with(ProjectServiceImpl.class);
+		serve("/Portal/searchclient").with(SearchServiceImpl.class);
 	
 		// setup the layout service
 		bind(LayoutServiceImpl.class).in(Singleton.class);
@@ -142,11 +132,10 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Rss service mapping
 		bind(RssServiceImpl.class).in(Singleton.class);
 		serve("/Portal/rss").with(RssServiceImpl.class);
-				
-		// Setup the OpenID service mapping
-		bind(OpenIDServlet.class).in(Singleton.class);
-		serve(WebConstants.OPEN_ID_URI).with(OpenIDServlet.class);
-		serve(OpenIDUtils.OPENID_CALLBACK_URI).with(OpenIDServlet.class);
+		
+		// OAuth2 
+		bind(OAuth2Servlet.class).in(Singleton.class);
+		serve("/Portal/oauth2callback").with(OAuth2Servlet.class);
 		
 		// The Rest template provider should be a singleton.
 		bind(RestTemplateProviderImpl.class).in(Singleton.class);
@@ -159,39 +148,24 @@ public class PortalServletModule extends ServletModule {
 		
 		// JSONObjectAdapter
 		bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
+		
+		//search by public project name
+		bind(ProjectSearchRedirectFilter.class).in(Singleton.class);
+		filter(ProjectSearchRedirectFilter.PROJECT+"*").through(ProjectSearchRedirectFilter.class);
+		
+		
+		
+		handleGWTPlaces();
 	}
 	
-	private void debugCopyCodeServerRPCPolicies() {
-		try {
-			String gwtCodeServerPort = System.getProperty("gwt.codeserver.port");
-			if (!debugRpcInitialized && gwtCodeServerPort != null && gwtCodeServerPort.trim().length() > 0) { 
-				//until we upgrade to gwt 2.6 or later, we need to manually copy the gwt.rpc files to the Portal directory.
-				String targetDir = System.getProperty("user.dir") + "/Portal/";
-				new File(targetDir).mkdirs();
-				WebClient webClient = new WebClient();
-				String rootPage = "http://127.0.0.1:"+gwtCodeServerPort+"/Portal/";
-				HtmlPage page = webClient.getPage(rootPage);
-				final List<?> anchors = page.getByXPath("//a");
-				for (Object object : anchors) {
-					HtmlAnchor anchor = (HtmlAnchor)object;
-					String href = anchor.getHrefAttribute();
-					if (href.endsWith("gwt.rpc")) {
-						//now copy gwt.rpc file to the target directory!
-						URL website = new URL(rootPage + href);
-						ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-						FileOutputStream fos = new FileOutputStream(targetDir + href);
-						fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-						fos.close();
-					}
-				}
-				
-				debugRpcInitialized = true;
-				webClient.closeAllWindows();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	
+	public void handleGWTPlaces() {
+		bind(PlacesRedirectFilter.class).in(Singleton.class);
+		Class<? extends PlaceTokenizer<?>>[] placeClasses = AppPlaceHistoryMapper.class.getAnnotation(WithTokenizers.class).value();
+		for (Class<? extends PlaceTokenizer<?>> c : placeClasses) {
+			String simpleName = c.getEnclosingClass().getSimpleName();
+			String filterRegEx = "/" + simpleName + ":*";
+			filter(filterRegEx).through(PlacesRedirectFilter.class);
+		} 
 	}
 	
 	/**

@@ -15,13 +15,13 @@
 				
 				<!--Project level information -->
 				<b:Row addStyleNames="margin-top-5">
-					<b:Column size="MD_8">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
+						<g:SimplePanel ui:field="projectActionMenuContainer"/>
+					</bh:Div>
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 						<g:SimplePanel ui:field="projectDescriptionContainer"/>
-					</b:Column>
-					<b:Column size="MD_4">
-						<g:SimplePanel ui:field="projectActionMenuContainer"/>
-					</b:Column>
+					</bh:Div>
 				</b:Row>
 				
    				<div class="row margin-top-15" ui:field="navtabContainer">
@@ -39,19 +39,18 @@
 					</b:Column>
 				</b:Row>
 				<b:Row ui:field="filesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
-					<b:Column size="MD_8">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
+						<g:SimplePanel ui:field="fileActionMenuContainer"/>
+					</bh:Div>
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
 						<g:SimplePanel ui:field="fileTitlebarContainer"/>
 						<g:SimplePanel ui:field="locationableTitlebarContainer"/>
 						<g:SimplePanel ui:field="fileMetadataContainer"/>
-					</b:Column>
-					<b:Column size="MD_4">
-						<g:SimplePanel ui:field="fileActionMenuContainer"/>
-					</b:Column>
+					</bh:Div>
 					<b:Column size="XS_12">
 						<g:SimplePanel ui:field="fileHistoryContainer"/>
 						<g:SimplePanel ui:field="fileDescriptionContainer"/>
-						<g:SimplePanel addStyleNames="panel panel-body margin-top-15" ui:field="fileSnapshotsContainer"/>
 						<g:SimplePanel ui:field="filesWikiPageContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
 						<b:Row>
@@ -60,23 +59,22 @@
 						</b:Row>
 						<b:Row>
 							<b:Column size="XS_12">
-								<g:SimplePanel ui:field="fileProgrammaticClientsContainer"/>		
+								<g:HTMLPanel ui:field="fileProgrammaticClientsContainer"/>		
 							</b:Column>
 						</b:Row>
 						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
 					</b:Column>
 				</b:Row>
 				<b:Row ui:field="tablesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15 padding-bottom-15">
-					<b:Column size="MD_8">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
+						<g:SimplePanel ui:field="tableActionMenuContainer"/>
+					</bh:Div>
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="tableBreadcrumbContainer"/>
 						<g:SimplePanel ui:field="tableMetadataContainer"/>
-					</b:Column>
-					<b:Column size="MD_4">
-						<g:SimplePanel ui:field="tableActionMenuContainer"/>
-					</b:Column>
+					</bh:Div>
 					<b:Column size="XS_12">
 						<g:SimplePanel ui:field="tableListWidgetContainer"/>
-						<g:SimplePanel ui:field="tableActionControllerContainer"/>
 						<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
 						<g:FlowPanel addStyleNames="help-panel">

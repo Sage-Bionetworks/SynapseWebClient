@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -44,13 +45,15 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@UiField
 	Button findEntitiesButton;
 	
-	
 	@UiField
 	Button uploadButton;
 	@UiField
 	SimplePanel fileInputWidgetContainer;
 	@UiField
 	SimplePanel uploadParamsPanelContainer;
+	@UiField
+	SimplePanel wikiAttachmentsContainer;
+
 	
 	@UiField
 	SimplePanel synapseParamsPanelContainer;
@@ -61,6 +64,8 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	TabListItem externalTabListItem;
 	@UiField
 	TabListItem synapseTabListItem;
+	@UiField
+	TabListItem existingAttachmentListItem;
 	@UiField
 	FlowPanel uploadSuccessUI;
 	@UiField
@@ -98,7 +103,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 				presenter.uploadFileClicked();				
 			}
 		});
-		
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -120,8 +124,18 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	@Override
 	public void initView() {
+		uploadButton.setEnabled(true);
 		uploadSuccessUI.setVisible(false);
 		uploadFailureUI.setVisible(false);
+		entityField.setValue("");
+		urlField.setValue("");
+		nameField.setValue("");
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			@Override
+			public void execute() {
+				uploadTabListItem.showTab();
+			}
+		});
 	}
 	
 	@Override
@@ -168,7 +182,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		fileInputWidgetContainer.clear();
 		fileInputWidgetContainer.setWidget(fileInputWidget);
 	}
-	
+	@Override
+	public void setWikiAttachmentsWidget(Widget widget) {
+		wikiAttachmentsContainer.clear();
+		wikiAttachmentsContainer.add(widget);
+	}
 	@Override
 	public void setUploadButtonEnabled(boolean enabled) {
 		uploadButton.setEnabled(enabled);
@@ -249,6 +267,11 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public boolean isSynapseEntity() {
 		return synapseTabListItem.isActive();
+	}
+	
+	@Override
+	public boolean isFromAttachments() {
+		return existingAttachmentListItem.isActive();
 	}
 	
 	@Override

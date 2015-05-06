@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -50,10 +49,10 @@ public class SearchUtil {
 			globalApplicationState.getPlaceChanger().goTo(searchPlace);	
 		} else {
 			//looks like a redirect.  let's validate before going there.
-			synapseClient.getEntity(queryTerm, new AsyncCallback<EntityWrapper>() {
+			synapseClient.getEntity(queryTerm, new AsyncCallback<Entity>() {
 				
 				@Override
-				public void onSuccess(EntityWrapper result) {
+				public void onSuccess(Entity result) {
 					//any success then go to entity page
 					globalApplicationState.getPlaceChanger().goTo(synapsePlace);
 				}

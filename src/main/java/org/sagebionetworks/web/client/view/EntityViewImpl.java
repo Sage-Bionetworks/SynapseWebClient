@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -90,6 +90,11 @@ public class EntityViewImpl extends Composite implements EntityView {
 			public void areaChanged(EntityArea area, String areaToken) {
 				presenter.updateArea(area, areaToken);
 			}
+
+			@Override
+			public void replaceArea(EntityArea area, String areaToken) {
+				presenter.replaceArea(area, areaToken);
+			}
 		});
 		
 		header.clear();
@@ -154,10 +159,10 @@ public class EntityViewImpl extends Composite implements EntityView {
 				presenter.refresh();
 			}
 		};
-		CallbackP<List<MembershipInvitationBundle>> teamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
+		CallbackP<List<OpenUserInvitationBundle>> teamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
 			
 			@Override
-			public void invoke(List<MembershipInvitationBundle> invites) {
+			public void invoke(List<OpenUserInvitationBundle> invites) {
 				//if there are any, then also add the title text to the panel
 				if (invites != null && invites.size() > 0) {
 					HTML message = new HTML("<h4>"+DisplayConstants.ACCESS_DEPENDENT_ON_TEAM+"</h4>");

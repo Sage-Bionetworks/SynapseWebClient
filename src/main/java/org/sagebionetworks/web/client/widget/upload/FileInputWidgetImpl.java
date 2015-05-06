@@ -8,7 +8,9 @@ import com.google.inject.Inject;
  * 
  * @author jhill
  *
+ *
  */
+@Deprecated // Use org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget
 public class FileInputWidgetImpl implements FileInputWidget,
 		FileInputView.Presenter {
 
@@ -61,7 +63,7 @@ public class FileInputWidgetImpl implements FileInputWidget,
 							String progressText) {
 						view.updateProgress(currentProgress*100, progressText);
 					}
-				});
+				}, null);
 	}
 
 	@Override

@@ -1,13 +1,19 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Date;
-
-import static junit.framework.Assert.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,18 +24,22 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
+import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -41,11 +51,15 @@ public class ProjectBadgeTest {
 	EntityIconsCache mockEntityIconsCache;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	ClientCache mockClientCache;
-	AsyncCallback<KeyValueDisplay<String>> getInfoCallback;
 	ProjectBadgeView mockView;
 	String entityId = "syn123";
+	UserProfile userProfile;
 	ProjectBadge widget;
 	FavoriteWidget mockFavoriteWidget;
+	ProjectHeader mockProjectHeader;
+	Date mockDate;
+	DateTimeFormat mockDateTimeFormat;
+	GWTWrapper mockGWT;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -54,19 +68,25 @@ public class ProjectBadgeTest {
 		mockView = mock(ProjectBadgeView.class);
 		mockClientCache = mock(ClientCache.class);
 		mockEntityIconsCache = mock(EntityIconsCache.class);
-		getInfoCallback = mock(AsyncCallback.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockFavoriteWidget = mock(FavoriteWidget.class);
+		mockProjectHeader = mock(ProjectHeader.class);
+		mockDate = mock(Date.class);
+		mockDateTimeFormat = mock(DateTimeFormat.class);
+		mockGWT = mock(GWTWrapper.class);
+		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
+		when(mockDateTimeFormat.format(any(Date.class))).thenReturn("today");
+		when(mockProjectHeader.getModifiedOn()).thenReturn(mockDate);
+		when(mockDate.toString()).thenReturn("today");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, the view is attached
 		when(mockView.isAttached()).thenReturn(true);
-		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget);
+		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget, mockGWT);
 		
 		//set up user profile
-		UserProfile userProfile =  new UserProfile();
+		userProfile =  new UserProfile();
 		userProfile.setOwnerId("4444");
 		userProfile.setUserName("Bilbo");
-		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 	
 	private void setupEntity(Project entity, Date lastActivityDate) throws JSONObjectAdapterException {
@@ -75,7 +95,7 @@ public class ProjectBadgeTest {
 		header.setId(entity.getId());
 		header.setName(entity.getName());
 		header.setLastActivity(lastActivityDate);
-		widget.configure(header);
+		widget.configure(header, null);
 	}
 	
 	@Test
@@ -88,8 +108,9 @@ public class ProjectBadgeTest {
 		header.setName(name);
 		header.setLastActivity(lastActivity);
 		
-		widget.configure(header);
-		verify(mockView).setProject(eq(name), anyString());
+		
+		widget.configure(header, null);
+		verify(mockView).configure(eq(name), anyString(), anyString());
 		verify(mockView).setLastActivityVisible(true);
 		verify(mockView).setLastActivityText(anyString());
 		verify(mockView).setFavoritesWidget(any(Widget.class));
@@ -103,60 +124,53 @@ public class ProjectBadgeTest {
 		String name = "a name";
 		header.setId(id);
 		header.setName(name);
-		widget.configure(header);
-		verify(mockView).setProject(eq(name), anyString());
+		widget.configure(header, null);
+		verify(mockView).configure(eq(name), anyString(), anyString());
 		verify(mockView).setLastActivityVisible(false);
 		verify(mockView, never()).setLastActivityText(anyString());
 	}
-
+	
 	@Test
-	public void testGetInfoHappyCase() throws Exception {
-		String entityId = "syn12345";
-		Project testProject = new Project();
-		testProject.setModifiedBy("4444");
+	public void testGetProjectTooltipNoUserProfile() {
+		ProjectHeader header = new ProjectHeader();
+		String id = "syn37373";
+		String name = "a name";
+		header.setId(id);
+		header.setName(name);
+		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
+		widget.configure(header, null);
 		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
-		testProject.setId(entityId);
-		setupEntity(testProject, null);
-		widget.getInfo(getInfoCallback);
-		verify(getInfoCallback).onSuccess(any(KeyValueDisplay.class));
+		Map<String,String> map = new HashMap<String, String>();
+		List<String> order = new ArrayList<String>();
+		order.add("ID");
+		map.put("ID", header.getId());
+		String intended = ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
+		String tooltip = widget.getProjectTooltip();
+		assertTrue(intended.equals(tooltip));
 	}
 	
 	@Test
-	public void testGetInfoNotAttached() throws Exception {
-		//same as happy case, but now the view reports that it is not attached
-		when(mockView.isAttached()).thenReturn(false);
-		String entityId = "syn12345";
-		Project testProject = new Project();
-		testProject.setModifiedBy("4444");
-		testProject.setId(entityId);
-		setupEntity(testProject, null);
-		widget.getInfo(getInfoCallback);
-		verify(getInfoCallback, never()).onSuccess(any(KeyValueDisplay.class));
-	}
-	
-	@Test
-	public void testGetInfoFailure() throws Exception {
-		setupEntity(new Project(), null);
-		//failure to get entity
-		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getProject(anyString(), any(AsyncCallback.class));
-		widget.getInfo(getInfoCallback);
-		//exception should be passed back to callback
-		verify(getInfoCallback).onFailure(eq(ex));
-	}
-
-	@Test
-	public void testGetInfoProfileFailure() throws Exception {
-		String entityId = "syn12345";
-		Project testProject = new Project();
-		testProject.setModifiedBy("4444");
-		testProject.setId(entityId);
-		setupEntity(testProject, null);
-		Exception ex = new Exception("unhandled get profile error");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		
-		widget.getInfo(getInfoCallback);
-		verify(getInfoCallback).onFailure(eq(ex));
+	public void testGetProjectTooltipComplete() {
+		ProjectHeader header = new ProjectHeader();
+		String id = "syn37373";
+		String name = "a name";
+		header.setId(id);
+		header.setName(name);
+		header.setModifiedBy(Long.valueOf(userProfile.getOwnerId()));
+		header.setModifiedOn(mockDate);
+		widget.configure(header, userProfile);
+		Map<String,String> map = new HashMap<String, String>();
+		List<String> order = new ArrayList<String>();
+		order.add("ID");
+		map.put("ID", header.getId());
+		order.add("Modified By");
+		map.put("Modified By", DisplayUtils.getDisplayName(userProfile));
+		order.add("Modified On");
+		map.put("Modified On", "today");
+		String intended = ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
+		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
+		String tooltip = widget.getProjectTooltip();
+		assertTrue(intended.equals(tooltip));
 	}
 	
 	@Test
@@ -170,7 +184,7 @@ public class ProjectBadgeTest {
 		testProject.setName(projectName);
 		setupEntity(testProject, null);
 		ArgumentCaptor<String> hrefCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockView).setProject(eq(projectName), hrefCaptor.capture());
+		verify(mockView).configure(eq(projectName), hrefCaptor.capture(), anyString());
 		String href = hrefCaptor.getValue();
 		assertTrue(href.contains("#!Synapse:"));
 		assertTrue(href.contains(entityId));

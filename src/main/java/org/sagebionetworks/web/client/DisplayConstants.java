@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.HasDirection.Direction;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -303,8 +305,7 @@ public class DisplayConstants {
 	public static final String STATUS_CREATED_BY = "Owner";
 	public static final String EMPTY = "Empty";
 	public static final String NONE_FOUND = "None Found";
-	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
-	public static final String LABEL_NO_MARKDOWN = "There is no content. Please edit to add information.";
+	public static final String LABEL_NO_MARKDOWN = "There is no content. Please click \""+EntityActionControllerImpl.EDIT_WIKI+"\" from the Tools menu.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";
@@ -403,6 +404,7 @@ public class DisplayConstants {
 	 * Widget editors
 	 */
 	public static final String IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE = "A file must be uploaded to continue.";
+	public static final String ERROR_SELECT_ATTACHMENT_MESSAGE = "Unable to insert attachment.";
 	public static final String IMAGE_CONFIG_FILE_TYPE_MESSAGE = "The uploaded image file type is not recognized on most browsers. Please convert to PNG or JPEG and try again.";
 	public static final String IMAGE_CONFIG_INVALID_URL_MESSAGE = "Please enter a valid URL";
 	public static final String IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE = "Please enter valid alternate text for the URL";
@@ -417,19 +419,6 @@ public class DisplayConstants {
 	public static final String LINK_TEXT_LABEL = "Link Text:";
 	public static final String UPLOAD_SUCCESSFUL_STATUS_TEXT = "Uploaded successfully";
 	public static final String YOUTUBE_VIDEO_URL_LABEL = "Video URL:";
-	public static final String SYNAPSE_API_CALL_URL_LABEL = "Synapse API URI:";
-	public static final String SYNAPSE_API_CALL_QUERY_LABEL = "Query:";
-	public static final String SYNAPSE_API_CALL_COLUMNS_LABEL = "Columns To Display:";
-	public static final String SYNAPSE_API_CALL_COLUMN_HEADERS_LABEL = "Column Headers:";
-	public static final String SYNAPSE_API_CALL_RENDERERS_LABEL = "Renderer Names:";
-	public static final String SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL = "Show Row Numbers?";
-	public static final String SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME = "Row Numbers Col Name:";
-	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Pagination?";
-	public static final String SYNAPSE_API_CALL_IS_QUERY_TABLE_RESULTS = "Returns QueryTableResults?";
-	public static final String SYNAPSE_API_CALL_IS_SHOW_IF_LOGGED_IN_ONLY = "Only Show Table If User Is Logged In?";
-	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
-	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
-	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
 	public static final String SHINYSITE_SITE_LABEL = "Site URL";
 	public static final String WIDTH = "Width";
 	public static final String HEIGHT = "Height";

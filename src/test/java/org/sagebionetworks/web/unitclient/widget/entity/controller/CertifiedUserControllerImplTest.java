@@ -9,10 +9,10 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 public class CertifiedUserControllerImplTest {
 
@@ -30,7 +30,9 @@ public class CertifiedUserControllerImplTest {
 		Project entity = new Project();
 		permissions = new UserEntityPermissions();
 		permissions.setIsCertifiedUser(true);
-		bundle = new EntityBundle(entity, null, permissions, null, null, null, null, null);
+		bundle = new EntityBundle();
+		bundle.setEntity(entity);
+		bundle.setPermissions(permissions);
 	}
 	
 	@Test

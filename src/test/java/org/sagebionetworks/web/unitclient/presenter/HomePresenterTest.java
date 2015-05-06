@@ -15,8 +15,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
@@ -41,7 +39,7 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
@@ -61,13 +59,12 @@ public class HomePresenterTest {
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookies;
-	AutoGenFactory autoGenFactory;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	GWTWrapper mockGwtWrapper;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	
 	List<EntityHeader> testEvaluationResults;
-	List<MembershipInvitationBundle> openInvitations;
+	List<OpenUserInvitationBundle> openInvitations;
 	
 	RSSFeed testFeed = null;
 	String testTeamId = "42";
@@ -87,8 +84,7 @@ public class HomePresenterTest {
 		mockCookies = mock(CookieProvider.class);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://synapse.org/filehandle/");
 		
-		autoGenFactory = new AutoGenFactory();
-		BatchResults<EntityHeader> testBatchResults = new BatchResults<EntityHeader>();
+		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		testEvaluationResults = new ArrayList<EntityHeader>();
 		EntityHeader testEvaluation = new EntityHeader();
 		testEvaluation.setId("eval project id 1");
@@ -104,7 +100,7 @@ public class HomePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		
-		openInvitations = new ArrayList<MembershipInvitationBundle>();
+		openInvitations = new ArrayList<OpenUserInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		
 		testFeed = new RSSFeed();

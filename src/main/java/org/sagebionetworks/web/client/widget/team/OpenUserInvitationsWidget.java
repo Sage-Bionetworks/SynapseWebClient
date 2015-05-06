@@ -5,14 +5,12 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.place.shared.Place;
@@ -25,7 +23,6 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public static final Integer INVITATION_BATCH_LIMIT = 10;
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private String teamId;
@@ -38,14 +35,12 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController, 
-			NodeModelCreator nodeModelCreator) {
+			AuthenticationController authenticationController) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeModelCreator = nodeModelCreator;
 	}
 
 	@Override
@@ -77,24 +72,20 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	@Override
 	public void getNextBatch() {
 		//using the given team, try to show all pending membership requests (or nothing if empty)
-		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<MembershipInvitationBundle>>() {
+		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<OpenTeamInvitationBundle>>() {
 			@Override
-			public void onSuccess(ArrayList<MembershipInvitationBundle> result) {
-				try {
-					currentOffset += result.size();
-					
-					//create the associated object list, and pass to the view to render
-					for (MembershipInvitationBundle b : result) {
-						invitations.add(nodeModelCreator.createJSONEntity(b.getMembershipInvitationJson(), MembershipInvtnSubmission.class));
-						profiles.add(nodeModelCreator.createJSONEntity(b.getUserProfileJson(), UserProfile.class));
-					}
-					view.configure(profiles, invitations);
-					
-					//show the more button if we maxed out the return results
-					view.setMoreResultsVisible(result.size() == INVITATION_BATCH_LIMIT);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
+			public void onSuccess(ArrayList<OpenTeamInvitationBundle> result) {
+				currentOffset += result.size();
+				
+				//create the associated object list, and pass to the view to render
+				for (OpenTeamInvitationBundle b : result) {
+					invitations.add(b.getMembershipInvtnSubmission());
+					profiles.add(b.getUserProfile());
 				}
+				view.configure(profiles, invitations);
+				
+				//show the more button if we maxed out the return results
+				view.setMoreResultsVisible(result.size() == INVITATION_BATCH_LIMIT);
 			}
 			
 			@Override

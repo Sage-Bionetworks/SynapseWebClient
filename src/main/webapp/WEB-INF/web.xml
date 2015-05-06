@@ -49,7 +49,10 @@
 		<filter-name>cacheFilter</filter-name>
 		<filter-class>org.sagebionetworks.web.server.servlet.filter.GWTCacheControlFilter</filter-class>
 	</filter>
-	
+	<filter>
+		<filter-name>xFilter</filter-name>
+		<filter-class>org.sagebionetworks.web.server.servlet.filter.XFilter</filter-class>
+	</filter>
 	<filter>
 		<filter-name>guiceFilter</filter-name>
 		<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
@@ -67,6 +70,11 @@
 	
 	<filter-mapping>
 		<filter-name>cacheFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>xFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
@@ -94,4 +102,16 @@
 		<welcome-file>Portal.html</welcome-file>
 	</welcome-file-list>
 
+	<servlet>
+		<servlet-name>jUnitHostImpl</servlet-name>
+		<servlet-class>com.google.gwt.junit.server.JUnitHostImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jUnitHostImpl</servlet-name>
+		<url-pattern>/Portal/junithost/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	  <servlet-name>jUnitHostImpl</servlet-name>
+	  <url-pattern>/Portal/remote_logging</url-pattern>
+	</servlet-mapping>
 </web-app>

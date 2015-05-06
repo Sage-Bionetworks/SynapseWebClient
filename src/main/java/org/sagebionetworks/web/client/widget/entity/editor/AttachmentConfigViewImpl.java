@@ -1,61 +1,74 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentConfigView {
-
+public class AttachmentConfigViewImpl implements AttachmentConfigView {
+	public interface AttachmentConfigViewImplUiBinder extends UiBinder<Widget, AttachmentConfigViewImpl> {}
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
-	private FlowPanel errorPanel = new FlowPanel();
-	private FlowPanel uploadNotePanel = new FlowPanel();
-	private Widget fileInputWidget;
-	Button uploadButton = new Button(DisplayConstants.IMAGE_CONFIG_UPLOAD);
-	private HTMLPanel successPanel;
+	
+	@UiField
+	Button uploadButton;
+	@UiField
+	SimplePanel fileInputWidgetContainer;
+	@UiField
+	SimplePanel wikiAttachmentsContainer;
+	@UiField
+	TabListItem uploadTabListItem;
+	@UiField
+	TabListItem existingAttachmentListItem;
+	@UiField
+	FlowPanel uploadSuccessUI;
+	@UiField
+	FlowPanel uploadFailureUI;
+	@UiField
+	Text uploadErrorText;
+	
+	private Widget widget;
 	
 	@Inject
-	public AttachmentConfigViewImpl(IconsImageBundle iconsImageBundle) {
-		this.iconsImageBundle = iconsImageBundle;
-		uploadButton.setType(ButtonType.INFO);
+	public AttachmentConfigViewImpl(AttachmentConfigViewImplUiBinder binder) {
+		widget = binder.createAndBindUi(this);
+		
 		uploadButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.uploadFileClicked();
 			}
 		});
-		successPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
 	}
 	
 	@Override
 	public void initView() {
+		uploadButton.setEnabled(true);
+		uploadSuccessUI.setVisible(false);
+		uploadFailureUI.setVisible(false);
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			@Override
+			public void execute() {
+				uploadTabListItem.showTab();
+			}
+		});
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
-		add(successPanel);
-		add(uploadNotePanel);
-		add(fileInputWidget);
-		add(uploadButton);
-		add(errorPanel);
-		successPanel.setVisible(false);
-		uploadNotePanel.setVisible(true);
-		fileInputWidget.setVisible(true);
+		fileInputWidgetContainer.setVisible(true);
 		uploadButton.setVisible(true);
-		errorPanel.setVisible(true);
 	}
 	
 	@Override
@@ -63,29 +76,31 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 		uploadButton.setEnabled(enabled);
 	}
 	@Override
-	public void showUploadSuccessUI() {
-		successPanel.setVisible(true);
-		uploadNotePanel.setVisible(false);
-		fileInputWidget.setVisible(false);
-		uploadButton.setVisible(false);
-		errorPanel.setVisible(false);
+	public void showUploadFailureUI(String error) {
+		uploadErrorText.setText(error);
+		uploadFailureUI.setVisible(true);
+		uploadSuccessUI.setVisible(false);
 	}
 	
 	@Override
-	public void showUploadFailureUI(String error) {
-		errorPanel.clear();
-		errorPanel.add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ error)));
+	public void showUploadSuccessUI() {
+		fileInputWidgetContainer.setVisible(false);
+		uploadButton.setVisible(false);
+
+		uploadFailureUI.setVisible(false);
+		uploadSuccessUI.setVisible(true);
 	}
-	
 	
 	@Override
 	public void setFileInputWidget(Widget fileInputWidget) {
-		this.fileInputWidget = fileInputWidget;
+		fileInputWidgetContainer.clear();
+		fileInputWidgetContainer.setWidget(fileInputWidget);
 	}
 	
 	@Override
-	public void showNote(String note) {
-		uploadNotePanel.add(new HTML(note));
+	public void setWikiAttachmentsWidget(Widget wikiAttachmentWidget) {
+		wikiAttachmentsContainer.clear();
+		wikiAttachmentsContainer.setWidget(wikiAttachmentWidget);
 	}
 	
 	@Override
@@ -94,7 +109,7 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}	
 
 	@Override 
@@ -118,10 +133,18 @@ public class AttachmentConfigViewImpl extends FlowPanel implements AttachmentCon
 	
 	@Override
 	public void clear() {
-		super.clear();
-		uploadNotePanel.clear();
-		errorPanel.clear();
 	}
+	
+	@Override
+	public boolean isNewAttachment() {
+		return uploadTabListItem.isActive();
+	}
+	
+	@Override
+	public boolean isFromAttachments() {
+		return existingAttachmentListItem.isActive();
+	}
+	
 	/*
 	 * Private Methods
 	 */

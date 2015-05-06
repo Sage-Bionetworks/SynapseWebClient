@@ -15,6 +15,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
@@ -22,7 +23,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -84,7 +84,9 @@ public class TableEntityWidgetTest {
 		tableBundle.setColumnModels(columns);
 		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController);
 		// The test bundle
-		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(tableEntity);
+		entityBundle.setTableBundle(tableBundle);
 		
 		String sql = "SELECT * FROM "+tableEntity.getId()+" LIMIT 3 OFFSET 0";
 		Query query = new Query();
@@ -156,6 +158,8 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		
+		verify(mockActionMenu).setBasicDivderVisible(true);
 	}
 	
 	@Test
@@ -167,6 +171,8 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		
+		verify(mockActionMenu).setBasicDivderVisible(false);
 	}
 	
 	@Test
@@ -286,7 +292,6 @@ public class TableEntityWidgetTest {
 		boolean schemaShown = true;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.onSchemaToggle(schemaShown);
-		verify(mockActionMenu).setActionText(Action.TOGGLE_TABLE_SCHEMA, TableEntityWidget.HIDE_SCHEMA);
 		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
 	}
 	
@@ -296,7 +301,6 @@ public class TableEntityWidgetTest {
 		boolean schemaShown = false;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.onSchemaToggle(schemaShown);
-		verify(mockActionMenu).setActionText(Action.TOGGLE_TABLE_SCHEMA, TableEntityWidget.SHOW_SCHEMA);
 		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 	}
 	

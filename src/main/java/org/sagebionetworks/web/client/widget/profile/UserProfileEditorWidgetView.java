@@ -1,14 +1,11 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UserProfileEditorWidgetView extends IsWidget {
 	
 	public interface Presenter{
-		/**
-		 * Called when the user selects upload.
-		 */
-		public void onUploadFile();
 	}
 
 	void setUsername(String userName);
@@ -37,12 +34,6 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	
 	public void setPresenter(Presenter presenter);
 
-	void showUploadError(String string);
-
-	void hideUploadError();
-
-	void setUploading(boolean uplaoding);
-
 	String getLink();
 
 	void showLinkError(String string);
@@ -66,5 +57,7 @@ public interface UserProfileEditorWidgetView extends IsWidget {
 	String getLocation();
 
 	void setLink(String url);
+
+	void addKeyDownHandlerToFields(KeyDownHandler keyDownHandler);
 
 }

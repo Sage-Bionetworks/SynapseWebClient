@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -11,8 +13,11 @@ import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
@@ -20,8 +25,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
-
-
+	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
@@ -33,16 +37,58 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private String synapseVersion;
 	private boolean isEditing;
 	private HashMap<String, String> synapseProperties;
-	
+	Set<String> wikiBasedEntites;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	private ClientLogger logger;
+	private GlobalApplicationStateView view;
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient) {
+	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
+			CookieProvider cookieProvider,
+			JiraURLHelper jiraUrlHelper, 
+			EventBus eventBus, 
+			SynapseClientAsync synapseClient, 
+			SynapseJSNIUtils synapseJSNIUtils, 
+			ClientLogger logger) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.logger = logger;
+		this.view = view;
 		isEditing = false;
+		initUncaughtExceptionHandler();
 	}
 	
+	public void initUncaughtExceptionHandler() {
+		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
+			public void onUncaughtException(Throwable e) {
+				handleUncaughtException(e);
+			}
+		});
+	}
+	
+	public void handleUncaughtException(Throwable e) {
+		try {
+			Throwable unwrapped = unwrap(e);
+			logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
+		} catch (Throwable t) {
+			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
+		} finally {
+			synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage());
+		}
+	}
+	
+	public Throwable unwrap(Throwable e) {
+		if (e instanceof UmbrellaException) {
+			UmbrellaException ue = (UmbrellaException) e;
+			if (ue.getCauses().size() == 1) {
+				return unwrap(ue.getCauses().iterator().next());
+			}
+		}
+		return e;
+	}
+
 	@Override
 	public PlaceChanger getPlaceChanger() {
 		if(placeChanger == null) {
@@ -152,7 +198,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Override
-	public void checkVersionCompatibility(final SynapseView view) {
+	public void checkVersionCompatibility(final AsyncCallback<String> callback) {
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
@@ -160,13 +206,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 					synapseVersion = versions;
 				} else {
 					if(!synapseVersion.equals(versions)) {
-						view.showErrorMessage(DisplayConstants.NEW_VERSION_INSTRUCTIONS);
+						view.showVersionOutOfDateGlobalMessage();
 					}
+				}
+				if (callback != null) {
+					callback.onSuccess(versions);
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				if (callback != null) {
+					callback.onFailure(caught);	
+				}
 			}
 		});
 	}
@@ -187,6 +239,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				synapseProperties = properties;
+				initWikiEntities(properties);
 				c.invoke();
 			}
 			
@@ -204,5 +257,49 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		else 
 			return null;
 	}
+
+	@Override
+	public boolean isWikiBasedEntity(String entityId) {
+		if(wikiBasedEntites == null){
+			return false;
+		}else{
+			return wikiBasedEntites.contains(entityId);
+	}
+	}
 	
+	/**
+	 * Setup the wiki based entities.
+	 * @param properties
+	 */
+	private void initWikiEntities(HashMap<String, String> properties) {
+		wikiBasedEntites = new HashSet<String>();
+		wikiBasedEntites.add(properties.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
+		wikiBasedEntites.add(properties.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.sagebionetworks.web.client.GlobalApplicationState#replaceCurrentPlace(com.google.gwt.place.shared.Place)
+	 */
+	@Override
+	public void replaceCurrentPlace(Place currentPlace) {
+		setCurrentPlace(currentPlace);
+		String token = appPlaceHistoryMapper.getToken(currentPlace);
+		this.synapseJSNIUtils.replaceHistoryState(token);
+	}
+
+	@Override
+	public void pushCurrentPlace(Place targetPlace) {
+		setCurrentPlace(targetPlace);
+		String token = appPlaceHistoryMapper.getToken(targetPlace);
+		this.synapseJSNIUtils.pushHistoryState(token);
+	}
+
+	@Override
+	public void initOnPopStateHandler() {
+		this.synapseJSNIUtils.initOnPopStateHandler();
+	}
 }

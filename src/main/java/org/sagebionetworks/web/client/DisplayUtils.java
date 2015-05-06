@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
-import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_TOP_MARGIN_PX;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
 import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.KB;
@@ -17,15 +16,13 @@ import static org.sagebionetworks.web.client.ClientProperties.TB;
 import static org.sagebionetworks.web.client.ClientProperties.WHITE_SPACE;
 import static org.sagebionetworks.web.client.ClientProperties.WIKI_URL;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
@@ -33,6 +30,7 @@ import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
@@ -42,26 +40,17 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
-import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Code;
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.ExpressionData;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Page;
-import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.RObject;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Step;
-import org.sagebionetworks.repo.model.Study;
-import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -73,7 +62,6 @@ import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
@@ -93,8 +81,6 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
-import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -108,23 +94,13 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.Text;
-import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
@@ -161,12 +137,6 @@ public class DisplayUtils {
         WARNING,
         QUESTION
 	}
-	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
-			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
-			Code.class.getName(), Link.class.getName(), 
-			Analysis.class.getName(), Step.class.getName(), 
-			RObject.class.getName(), PhenotypeData.class.getName(), 
-			ExpressionData.class.getName(),	GenotypeData.class.getName() };
 	
 	/**
 	 * Returns a properly aligned icon from an ImageResource
@@ -186,15 +156,6 @@ public class DisplayUtils {
 	public static String getIconThumbnailHtml(ImageResource icon) {
 		if(icon == null) return null;		
 		return "<span class=\"thumbnail-image-container\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
-	}
-	
-	/**
-	 * Returns a properly aligned name and description for a special user or group
-	 * @param name of user or group
-	 * @return
-	 */
-	public static String getUserNameDescriptionHtml(String name, String description) {
-		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
 	}
 	
 	/**
@@ -228,19 +189,6 @@ public class DisplayUtils {
 		result.append("</div>");
 		return result.toString();
 	}
-	
-	
-	/**
-	 * Returns html for a thumbnail image.
-	 * 
-	 * @param url
-	 * @return
-	 */
-	public static String getThumbnailPicHtml(String url) {
-		if(url == null) return null;
-		return DisplayUtilsGWT.TEMPLATES.profilePicture(url).asString();
-	}
-
 	
 	/**
 	 * Converts all hrefs to gwt anchors, and handles the anchors by sending them to a new window.
@@ -720,12 +668,6 @@ public class DisplayUtils {
 		return builder.toSafeHtml();
 	}
 	
-	public static void center(Window window) {
-		int left = (com.google.gwt.user.client.Window.getClientWidth() - window.getOffsetWidth()) / 2;
-		window.setPosition(left, 150);
-		scrollToTop();
-	}
-	
 	public static void scrollToTop(){
 		com.google.gwt.user.client.Window.scrollTo(0, 0);
 	}
@@ -780,34 +722,6 @@ public class DisplayUtils {
 		}
 		
 		return sb.toString();
-	}
-	
-
-	
-	/**
-	 * Returns the NodeType for this entity class. 
-	 * TODO : This should be removed when we move to using the Synapse Java Client
-	 * @param entity
-	 * @return
-	 */
-	public static NodeType getNodeTypeForEntity(Entity entity) {
-		// 	DATASET, LAYER, PROJECT, EULA, AGREEMENT, ENTITY, ANALYSIS, STEP
-		if(entity instanceof org.sagebionetworks.repo.model.Study) {
-			return NodeType.STUDY;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Data) {
-			return NodeType.DATA;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Project) {
-			return NodeType.PROJECT;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Analysis) {
-			return NodeType.ANALYSIS;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Step) {
-			return NodeType.STEP;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Code) {
-			return NodeType.CODE;
-		} else if(entity instanceof org.sagebionetworks.repo.model.Link) {
-			return NodeType.LINK;
-		} 
-		return null;	
 	}
 	
 	public static String getEntityTypeDisplay(ObjectSchema schema) {
@@ -995,9 +909,8 @@ public class DisplayUtils {
 		return getPlaceString(place.getName());		
 	}
 	
-	public static LayoutContainer wrap(Widget widget) {
-		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("col-md-12");
+	public static Column wrap(Widget widget) {
+		Column lc = new Column(ColumnSize.MD_12);
 		lc.add(widget);
 		return lc;
 	}
@@ -1062,34 +975,13 @@ public class DisplayUtils {
 	public static enum IconSize { PX16, PX24 };
 	
 	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		String className = type == null ? null : type.getClassName();		
+		String className = type == null ? null : type.getEntityTypeClassName();		
 		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 
 	public static ImageResource getSynapseIconForEntity(Entity entity, IconSize iconSize, IconsImageBundle iconsImageBundle) {
 		String className = entity == null ? null : entity.getClass().getName();
 		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
-	}
-
-	/**
-	 * Create a loading window.
-	 * 
-	 * @param sageImageBundle
-	 * @param message
-	 * @return
-	 */
-	public static Window createLoadingWindow(SageImageBundle sageImageBundle, String message) {
-		Window window = new Window();
-		window.setModal(true);		
-		window.setHeight(114);
-		window.setWidth(221);		
-		window.setBorders(false);
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()));
-		shb.appendEscaped(message);
-		window.add(new Html(shb.toSafeHtml().asString()), new MarginData(20, 0, 0, 45));		
-		window.setBodyStyleName("whiteBackground");
-		return window;
 	}
 	
 	/**
@@ -1115,9 +1007,9 @@ public class DisplayUtils {
 	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
 		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
 				DisplayUtils.getIconHtml(sageImageBundle.loading31()) +" "+ message));	
-		LayoutContainer panel = new LayoutContainer();
-		panel.add(w, new MarginData(FULL_ENTITY_TOP_MARGIN_PX, 0, FULL_ENTITY_TOP_MARGIN_PX, 0));
-		panel.addStyleName("center");				
+		SimplePanel panel = new SimplePanel();
+		panel.setWidget(w);
+		panel.addStyleName("margin-top-300 margin-bottom-300 center");
 		return panel;
 	}
 	
@@ -1125,21 +1017,6 @@ public class DisplayUtils {
 		ImageResource icon = null;
 		if(Link.class.getName().equals(className)) {
 			icon = iconsImageBundle.synapseLink16();
-		} else if(Analysis.class.getName().equals(className)) {
-			// Analysis
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseAnalysis16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseAnalysis24();			
-		} else if(Code.class.getName().equals(className)) {
-			// Code
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
-		} else if(Data.class.getName().equals(className) ||
-				ExpressionData.class.getName().equals(className) ||
-				GenotypeData.class.getName().equals(className) ||
-				PhenotypeData.class.getName().equals(className)) {
-			// Data
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
@@ -1152,26 +1029,6 @@ public class DisplayUtils {
 			// Project
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseProject24();			
-		} else if(RObject.class.getName().equals(className)) {
-			// RObject
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseRObject16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseRObject24();			
-		} else if(Summary.class.getName().equals(className)) {
-			// Summary
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseSummary16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseSummary24();			
-		} else if(Step.class.getName().equals(className)) {
-			// Step
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseStep16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseStep24();			
-		} else if(Study.class.getName().equals(className)) {
-			// Study
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();
-		} else if(Page.class.getName().equals(className)) {
-			// Page
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
@@ -1181,46 +1038,6 @@ public class DisplayUtils {
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseModel24();			
 		}
-		return icon;
-	}
-
-	/**
-	 * Maps mime types to icons.
-	 */
-	private static Map<String, String> attachmentMap = new HashMap<String, String>();
-	public static String UNKNOWN_ICON 				= "220";
-	public static String DEFAULT_PDF_ICON 			= "222";
-	public static String DEFAULT_IMAGE_ICON			= "242";
-	public static String DEFAULT_TEXT_ICON 			= "224";
-	public static String DEFAULT_COMPRESSED_ICON	= "226";
-	static{
-		attachmentMap.put("pdf", DEFAULT_PDF_ICON);
-		attachmentMap.put("txt", DEFAULT_TEXT_ICON);
-		attachmentMap.put("doc", DEFAULT_TEXT_ICON);
-		attachmentMap.put("doc", DEFAULT_TEXT_ICON);
-		attachmentMap.put("docx", DEFAULT_TEXT_ICON);
-		attachmentMap.put("docx", DEFAULT_TEXT_ICON);
-		attachmentMap.put("zip", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("tar", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("gz", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("rar", DEFAULT_COMPRESSED_ICON);
-		attachmentMap.put("png", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("gif", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("jpg", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("jpeg", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("bmp", DEFAULT_IMAGE_ICON);
-		attachmentMap.put("wbmp", DEFAULT_IMAGE_ICON);
-	}
-	
-	/**
-	 * Get the icon to be used with a given file type.
-	 */
-	public static String getAttachmentIcon(String fileName){
-		if(fileName == null) return UNKNOWN_ICON;
-		String mimeType = getMimeType(fileName);
-		if(mimeType == null) return UNKNOWN_ICON;
-		String icon = attachmentMap.get(mimeType.toLowerCase());
-		if(icon == null) return UNKNOWN_ICON;
 		return icon;
 	}
 	
@@ -1281,35 +1098,6 @@ public class DisplayUtils {
 		if(hasChildern == null) return true;
 		return hasChildern;
 	}
-
-	public static ArrayList<EntityType> orderForDisplay(List<EntityType> children) {
-		ArrayList<EntityType> ordered = new ArrayList<EntityType>();
-		
-		if(children != null) {
-			// fill map
-			Map<String,EntityType> classToTypeMap = new HashMap<String, EntityType>();
-			for(EntityType child : children) {
-				classToTypeMap.put(child.getClassName(), child);
-			}
-			 
-			// add child tabs in order
-			for(String className : DisplayUtils.ENTITY_TYPE_DISPLAY_ORDER) {
-				if(classToTypeMap.containsKey(className)) {
-					EntityType child = classToTypeMap.get(className);
-					classToTypeMap.remove(className);
-					ordered.add(child);
-				}
-			}
-
-			// add any remaining tabs that weren't covered by the display order
-			for(String className : classToTypeMap.keySet()) {
-				EntityType child = classToTypeMap.get(className);
-				ordered.add(child);
-			}							
-		}
-		
-		return ordered;
-	}
 	
 	public static Popover addPopover(Widget widget, String message) {
 		Popover popover = new Popover(widget);
@@ -1317,10 +1105,6 @@ public class DisplayUtils {
 		popover.setIsHtml(true);
 		popover.setContent(message);
 		return popover;
-	}
-	
-	public static Tooltip addToolTip(final Component widget, String message) {
-		return addTooltip(widget, message, Placement.AUTO);
 	}
 	
 	/**
@@ -1351,7 +1135,7 @@ public class DisplayUtils {
 	public static Tooltip addTooltip(Widget widget, String tooltipText, Placement pos){
 		Tooltip t = new Tooltip();
 		t.setPlacement(pos);
-		t.setText(tooltipText);
+		t.setTitle(tooltipText);
 		t.setIsHtml(true);
 		t.setIsAnimated(false);
 		t.setTrigger(Trigger.HOVER);
@@ -1539,11 +1323,6 @@ public class DisplayUtils {
 	    return output.toString();
 	  }
 	
-	public static void updateTextArea(org.gwtbootstrap3.client.ui.TextArea textArea, String newValue) {
-		textArea.setValue(newValue);
-		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
-	}
-
 	public static boolean isInTestWebsite(CookieProvider cookies) {
 		return isInCookies(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
@@ -1899,23 +1678,16 @@ public class DisplayUtils {
 	}
 	
 	public static void surroundWidgetWithParens(Panel container, Widget widget) {
-		Text paren = new Text("(");
+		InlineHTML paren = new InlineHTML("(");
 		paren.addStyleName("inline-block margin-left-5");
 		container.add(paren);
 
 		widget.addStyleName("inline-block");
 		container.add(widget);
 
-		paren = new Text(")");
+		paren = new InlineHTML(")");
 		paren.addStyleName("inline-block margin-right-10");
 		container.add(paren);
-	}
-
-	public static LayoutContainer createRowContainer() {
-		LayoutContainer row;
-		row = new LayoutContainer();
-		row.setStyleName("row");
-		return row;
 	}
 	
 	public static FlowPanel createRowContainerFlowPanel() {
@@ -2000,17 +1772,6 @@ public class DisplayUtils {
  			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
  		panel.add(mediaBodyPanel);
  		return panel;
-	}
-	
-	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){
-		final SimpleComboBox<String> cb = new SimpleComboBox<String>();
-		cb.add(values);
-		cb.setSimpleValue(defaultValue);
-		cb.setTypeAhead(false);
-		cb.setEditable(false);
-		cb.setForceSelection(true);
-		cb.setTriggerAction(TriggerAction.ALL);
-		return cb;
 	}
 	
 	public static HTML getNewLabel(boolean superScript) {		
@@ -2141,8 +1902,6 @@ public class DisplayUtils {
 					content.setVisible(true);
 					label.setText(DisplayConstants.HIDE_LC);
 				}
-				if (content instanceof LayoutContainer)
-					((LayoutContainer)content).layout(true);
 			}
 		});
 	}
@@ -2156,8 +1915,4 @@ public class DisplayUtils {
 		else return s;
 	 }
 
-	public static void setHighlightBoxUser(DivElement highlightBox, String displayName, String title) {
-		String prefix = displayName != null ? displayName+"'s " : "";
-		highlightBox.setAttribute("highlight-box-title", prefix + title);
-	}
 }

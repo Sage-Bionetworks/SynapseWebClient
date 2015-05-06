@@ -11,7 +11,7 @@
 	  	<b:Modal title="Submit to Challenge"
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
 			<b:ModalBody>
-				<b:Form>
+				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup ui:field="entityFinderUI">
 							<b:FormGroup>
@@ -33,7 +33,7 @@
 							<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
 						</b:FormGroup>
 					</b:FieldSet>
-				</b:Form>
+				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
@@ -46,8 +46,8 @@
 				<b:FieldSet>
 					<bh:Div>
 						<b:ButtonGroup>
-							<b:Radio ui:field="isIndividualRadioButton" active="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
-							<b:Radio ui:field="isTeamRadioButton" name="submitAsTeamGroup" text="I am submitting as part of a team"/>
+							<b:Radio ui:field="isIndividualRadioButton" value="true" name="submitAsTeamGroup" text="I am submitting as an individual"/>
+							<b:Radio ui:field="isTeamRadioButton" value="false" name="submitAsTeamGroup" text="I am submitting as part of a team"/>
 						</b:ButtonGroup>
 						<bh:Div ui:field="teamsUI">
 							<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" />

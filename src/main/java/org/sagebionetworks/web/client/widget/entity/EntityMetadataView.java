@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -19,7 +19,7 @@ public interface EntityMetadataView extends IsWidget, SynapseView {
 
 	public void showErrorMessage(String message);
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler);
-	
+	void setAnnotationsVisible(boolean visible);
 	public interface Presenter {
 		void fireEntityUpdatedEvent();
 	}

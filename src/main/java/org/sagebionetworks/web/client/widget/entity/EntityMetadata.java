@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 
@@ -63,4 +63,7 @@ public class EntityMetadata implements Presenter {
 		view.setEntityUpdatedHandler(handler);
 	}
 
+	public void setAnnotationsVisible(boolean visible) {
+		view.setAnnotationsVisible(visible);
+	}
 }

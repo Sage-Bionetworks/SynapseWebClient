@@ -2,12 +2,11 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Panel;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -37,7 +36,6 @@ public class EvaluationLinksListViewImpl extends FlowPanel implements Evaluation
 			FlowPanel linkContainer = new FlowPanel();
 			linkContainer.addStyleName("margin-10");
 		    
-			String iconHtml = DisplayUtils.getIconHtml(imageBundle.synapseStep16());
 			for (Evaluation evaluation : evaluations) {
 				SimplePanel wrapper = new SimplePanel();
 				Anchor a = new Anchor();
@@ -59,9 +57,8 @@ public class EvaluationLinksListViewImpl extends FlowPanel implements Evaluation
 				add(html);
 			}
 			
-			LayoutContainer border = new LayoutContainer();
+			Panel border = new Panel();
 		    border.addStyleName("notopmargin");
-		    border.setBorders(true);
 		    border.add(linkContainer);
 			
 			add(border);

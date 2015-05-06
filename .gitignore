@@ -4,4 +4,6 @@ target
 /.project
 /.settings
 /.gwt
+gwt-unitCache/
+war/
 .DS_Store

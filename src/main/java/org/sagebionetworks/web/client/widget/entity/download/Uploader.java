@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -24,15 +23,13 @@ import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
-import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
-import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -56,7 +53,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB	
 	private UploaderView view;
-	private NodeModelCreator nodeModelCreator;
 	private HandlerManager handlerManager;
 	private Entity entity;
 	private String parentEntityId;
@@ -77,11 +73,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private UploadType currentUploadType;
 	private String currentExternalUploadUrl;
 	private ClientLogger logger;
-	
+	private Long storageLocationId;
+
 	@Inject
 	public Uploader(
 			UploaderView view, 			
-			NodeModelCreator nodeModelCreator, 
 			SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJsniUtils,
 			GWTWrapper gwt,
@@ -92,7 +88,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			) {
 	
 		this.view = view;		
-		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
@@ -157,7 +152,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public String getSelectedFilesText() {
 		String[] selectedFiles = getSelectedFileNames();
 		if (selectedFiles == null)
-			return UploaderViewImpl.DRAG_AND_DROP;
+			return "";
 		else if (selectedFiles.length == 1) {
 			return selectedFiles[0];
 		} else {
@@ -205,6 +200,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void queryForUploadDestination() {
 		enableMultipleFileUploads();
+		storageLocationId = null;
 		if (parentEntityId == null && entity == null) {
 			currentUploadType = UploadType.S3;
 			view.showUploadingToSynapseStorage();
@@ -218,9 +214,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						view.showUploadingToSynapseStorage();
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
+						storageLocationId = uploadDestinations.get(0).getStorageLocationId();
 						updateS3UploadBannerView(uploadDestinations.get(0).getBanner());
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
+						storageLocationId = d.getStorageLocationId();
 						if (UploadType.SFTP == d.getUploadType()){
 							currentUploadType = UploadType.SFTP;
 							currentExternalUploadUrl = d.getUrl();
@@ -415,7 +413,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void directUploadStep2(String fileName) {
-		this.multiPartUploader.uploadFile(fileName, UploaderViewImpl.FILE_FIELD_ID, this.currIndex, this);
+		this.multiPartUploader.uploadFile(fileName, UploaderViewImpl.FILE_FIELD_ID, this.currIndex, this, storageLocationId);
 	}
 
 	private void handleCancelledFileUpload() {
@@ -481,21 +479,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public void externalLinkUpdated(EntityWrapper result, Class<? extends Entity> entityClass) {
-		try {
-			entity = nodeModelCreator.createJSONEntity(result.getEntityJson(), entityClass);
-			view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
-			entityUpdated();						
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
-		}
+	public void externalLinkUpdated(Entity result, Class<? extends Entity> entityClass) {
+		entity = result;
+		view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+		entityUpdated();	
 	}
 	
 	public void updateExternalFileEntity(String entityId, String path, String name) {
 		try {
-			synapseClient.updateExternalFile(entityId, path, name, new AsyncCallback<EntityWrapper>() {
+			synapseClient.updateExternalFile(entityId, path, name, new AsyncCallback<Entity>() {
 				@Override
-				public void onSuccess(EntityWrapper result) {
+				public void onSuccess(Entity result) {
 					externalLinkUpdated(result, FileEntity.class);
 				}
 				@Override
@@ -509,9 +503,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	public void createNewExternalFileEntity(final String path, final String name) {
 		try {
-			synapseClient.createExternalFile(parentEntityId, path, name, new AsyncCallback<EntityWrapper>() {
+			synapseClient.createExternalFile(parentEntityId, path, name, new AsyncCallback<Entity>() {
 				@Override
-				public void onSuccess(EntityWrapper result) {
+				public void onSuccess(Entity result) {
 					externalLinkUpdated(result, FileEntity.class);
 				}
 				
@@ -623,15 +617,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Private Methods
 	 */
 	private void refreshAfterSuccessfulUpload(String entityId) {
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					entity = nodeModelCreator.createEntity(result);
-					uploadSuccess();
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
+			public void onSuccess(Entity result) {
+				entity = result;
+				uploadSuccess();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -706,5 +696,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		double percentPerFile = 1.0/(double)numberFiles;
 		double percentOfAllFiles = percentPerFile*percentOfCurrentFile + (percentPerFile*currentFileIndex);
 		return percentOfAllFiles;
+	}
+
+	// for JUnit tests
+	public Long getStorageLocationId(){
+		return this.storageLocationId;
 	}
 }

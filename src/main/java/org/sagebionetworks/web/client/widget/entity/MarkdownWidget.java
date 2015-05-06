@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -48,7 +47,6 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	private CookieProvider cookies;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
-	NodeModelCreator nodeModelCreator;
 	GWTWrapper gwt;
 	PortalGinInjector ginInjector;
 	private ResourceLoader resourceLoader;
@@ -64,7 +62,6 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 			CookieProvider cookies,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			NodeModelCreator nodeModelCreator,
 			ResourceLoader resourceLoader, 
 			GWTWrapper gwt,
 			PortalGinInjector ginInjector) {
@@ -76,7 +73,6 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 		this.cookies = cookies;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.nodeModelCreator = nodeModelCreator;
 		this.resourceLoader = resourceLoader;
 		this.gwt = gwt;
 		this.ginInjector = ginInjector;

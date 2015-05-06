@@ -74,7 +74,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 		builder.append("&");
 		builder.append(WebConstants.TABLE_COLUMN_ID);
 		builder.append("=");
-		builder.append(address.getColumnId());
+		builder.append(address.getColumn().getId());
 		builder.append("&");
 		builder.append(WebConstants.TABLE_ROW_ID);
 		builder.append("=");

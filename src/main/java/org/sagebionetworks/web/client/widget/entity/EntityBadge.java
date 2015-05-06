@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -80,31 +79,25 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback) {
-		synapseClient.getEntity(entityId, new AsyncCallback<EntityWrapper>() {
+		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					final Entity entity = AdapterUtils.getEntityForBadgeInfo(adapterFactory, result.getEntityClassName(), result.getEntityJson());
-					if (entity == null) {
-						callback.onFailure(new IllegalArgumentException("The class " + result.getEntityClassName() + " is not supported for entity badge detailed information."));
-						return;
-					}
-					
-					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-						@Override
-						public void onSuccess(UserProfile profile) {
-							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile), false));		
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-					});
-						
-					
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+			public void onSuccess(Entity result) {
+				final Entity entity = result;
+				if (entity == null) {
+					callback.onFailure(new IllegalArgumentException("Null is not supported for entity badge detailed information."));
+					return;
 				}
+				
+				UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+					@Override
+					public void onSuccess(UserProfile profile) {
+						callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile), false));		
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);
+					}
+				});
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -2,24 +2,23 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
-import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
@@ -80,8 +79,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
 			MyEntitiesBrowser myEntitiesBrowser, 
-			LicensedDownloader licensedDownloaderHandler, 
-			EntityTypeProvider typeProvider,
+			LicensedDownloader licensedDownloaderHandler,
 			FavoriteWidget favoriteWidget,
 			GlobalApplicationState globalAppState,
 			Md5Link md5Link,

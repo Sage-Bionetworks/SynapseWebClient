@@ -1,14 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.*;
-import static org.mockito.Matchers.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -16,18 +22,20 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
@@ -37,16 +45,17 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class MarkdownEditorWidgetTest {
-	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapseClient; 
 	MarkdownEditorWidgetView mockView;
 	SynapseJSNIUtils mockSynapseJSNIUtils; 
 	WidgetRegistrar mockWidgetRegistrar;
+	PlaceChanger mockPlaceChanger;
 	MarkdownEditorWidget presenter;
 	IconsImageBundle mockIcons;
 	CookieProvider mockCookies;
@@ -56,11 +65,14 @@ public class MarkdownEditorWidgetTest {
 	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
-	WidgetDescriptorUpdatedHandler mockDescriptorUpdatedHandler;
-	
+	CallbackP<WikiPage> mockDescriptorUpdatedHandler;
+	GlobalApplicationState mockGlobalApplicationState;
+	WikiPage testPage;
+	String fileHandleId1 = "44";
+	String fileHandleId2 = "45";
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIcons = mock(IconsImageBundle.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
@@ -70,25 +82,44 @@ public class MarkdownEditorWidgetTest {
 		mockGwt = mock(GWTWrapper.class);
 		mockView = mock(MarkdownEditorWidgetView.class);
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockPlaceChanger = mock(PlaceChanger.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState);
 		
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
-		mockDescriptorUpdatedHandler = mock(WidgetDescriptorUpdatedHandler.class);
+		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
-		presenter.configure(wikiPageKey, initialMarkdown, mockDescriptorUpdatedHandler);
+		presenter.configure(wikiPageKey, mockDescriptorUpdatedHandler);
+		
+		
+		testPage = new WikiPage();
+		testPage.setId("wikiPageId");
+		testPage.setMarkdown("my test markdown");
+		testPage.setTitle("My Test Wiki Title");
+		List<String> fileHandleIds = new ArrayList<String>();
+		//our page has two file handles already
+		fileHandleIds.add(fileHandleId1);
+		fileHandleIds.add(fileHandleId2);
+		testPage.setAttachmentFileHandleIds(fileHandleIds);
+		
+		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		WikiPage fakeWiki = new WikiPage();
+		fakeWiki.setMarkdown("Fake wiki");
+		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	
 	@Test
 	public void testConfigure() {
 		//configured in before, verify that view is reset
-		verify(mockView).setSaveVisible(false);
-		verify(mockView).setDeleteVisible(false);
-		verify(mockView).setAttachmentsButtonVisible(false);
 		verify(mockView).clear();
-		verify(mockView).setCancelVisible(false);
 		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
+		
 	}
 	
 	@Test
@@ -162,54 +193,30 @@ public class MarkdownEditorWidgetTest {
 	
 	@Test
 	public void testSave() {
-		//tests setActionHandler as well
+		presenter.configure(testPage);
 		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.SAVE, callback);
-		verify(mockView).setSaveVisible(true);
 		presenter.handleCommand(MarkdownEditorAction.SAVE);
 		verify(mockView).setSaving(true);
-		verify(callback).invoke();
+		verify(mockSynapseClient).updateV2WikiPageWithV1(eq(wikiPageKey.getOwnerObjectId()), eq(wikiPageKey.getOwnerObjectType()), eq(testPage), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testCancel() {
 		//tests setActionHandler as well
 		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.CANCEL, callback);
-		verify(mockView).setCancelVisible(true);
 		presenter.handleCommand(MarkdownEditorAction.CANCEL);
-		verify(callback).invoke();
-	}
-	
-	@Test
-	public void testAttachments() {
-		//tests setActionHandler as well
-		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.ATTACHMENTS, callback);
-		verify(mockView).setAttachmentsButtonVisible(true);
-		presenter.handleCommand(MarkdownEditorAction.ATTACHMENTS);
-		verify(callback).invoke();
+		verify(mockView).hideEditorModal();
 	}
 	
 	@Test
 	public void testDelete() {
+		presenter.configure(testPage);
 		//tests setActionHandler as well
 		reset(mockView);
-		Callback callback = mock(Callback.class);
-		presenter.setActionHandler(MarkdownEditorAction.DELETE, callback);
-		verify(mockView).setDeleteVisible(true);
 		presenter.handleCommand(MarkdownEditorAction.DELETE);
-		verify(callback).invoke();
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testInvalidActionHandler() {
-		Callback callback = mock(Callback.class);
-		//we do not provide callback functionality to BOLD
-		presenter.setActionHandler(MarkdownEditorAction.BOLD, callback);
+		verify(mockSynapseClient).deleteV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
+		verify(mockView).hideEditorModal();
+		verify(mockPlaceChanger).goTo(any(Synapse.class));
 	}
 	
 	@Test
@@ -300,7 +307,6 @@ public class MarkdownEditorWidgetTest {
 		verify(mockEditDescriptor).addWidgetDescriptorUpdatedHandler(captor.capture());
 		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
 		captor.getValue().onUpdate(event);
-		verify(mockDescriptorUpdatedHandler).onUpdate(event);
 	}
 	
 	@Test
@@ -344,7 +350,6 @@ public class MarkdownEditorWidgetTest {
 		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
 		captor.getValue().onUpdate(event);
 		//it also passes the update up
-		verify(mockDescriptorUpdatedHandler).onUpdate(event);
 		verify(mockView).setMarkdown(before + after);
 		verify(mockView).setCursorPos(startWidgetIndex);
 	}
@@ -581,4 +586,36 @@ public class MarkdownEditorWidgetTest {
 		presenter.handleCommand(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD);
 		assertTrue(getNewMarkdown().contains(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE));
 	}
+	
+
+	@Test
+	public void testAddAttachments() throws IOException, RestServiceException, JSONObjectAdapterException{		
+		presenter.configure(testPage);
+		String fileHandleId3 = "46";
+		
+		List<String> newFileHandles = new ArrayList<String>();
+		newFileHandles.add(fileHandleId2);
+		newFileHandles.add(fileHandleId3);
+		presenter.addFileHandles(newFileHandles);
+		
+		List<String> currentFileHandleIds = presenter.getWikiPage().getAttachmentFileHandleIds();
+		//should be unique values only, so there should be 3
+		assertTrue(currentFileHandleIds.size() == 3);
+		assertTrue(currentFileHandleIds.contains(fileHandleId1));
+		assertTrue(currentFileHandleIds.contains(fileHandleId2));
+		assertTrue(currentFileHandleIds.contains(fileHandleId3));
+	}
+	
+	@Test
+	public void testDeleteAttachments() throws IOException, RestServiceException, JSONObjectAdapterException{
+		presenter.configure(testPage);
+		List<String> deleteHandleIds = new ArrayList<String>();
+		deleteHandleIds.add(fileHandleId2);
+		
+		presenter.removeFileHandles(deleteHandleIds);
+		List<String> currentFileHandleIds = presenter.getWikiPage().getAttachmentFileHandleIds();
+		assertTrue(currentFileHandleIds.size() == 1);
+		assertTrue(currentFileHandleIds.contains(fileHandleId1));
+	}
+	
 }

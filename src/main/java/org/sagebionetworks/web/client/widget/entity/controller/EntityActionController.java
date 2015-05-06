@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -21,7 +21,7 @@ public interface EntityActionController extends IsWidget {
 	 * @param actionMenu
 	 * @param entityBundle
 	 */
-	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, EntityUpdatedHandler handler);
+	public void configure(ActionMenuWidget actionMenu, EntityBundle entityBundle, String wikiPageKey, EntityUpdatedHandler handler);
 
 	/**
 	 * Delete action selected
@@ -32,5 +32,11 @@ public interface EntityActionController extends IsWidget {
 	 * Share dialog selected.
 	 */
 	public void onShare();
+	
+	/**
+	 * Annotations toggled
+	 * @param shown
+	 */
+	void onAnnotationsToggled(boolean shown);
 
 }

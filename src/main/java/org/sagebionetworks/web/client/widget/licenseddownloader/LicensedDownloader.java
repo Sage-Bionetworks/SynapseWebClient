@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
@@ -22,6 +21,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialog;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -90,7 +90,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 	private void extractBundle(EntityBundle entityBundle) {
 		loadDownloadUrl(entityBundle);		
 		List<AccessRequirement> ars = entityBundle.getAccessRequirements();
-		List<AccessRequirement> unmetARs = entityBundle.getUnmetDownloadAccessRequirements();
+		List<AccessRequirement> unmetARs = entityBundle.getUnmetAccessRequirements();
 		// first, clear license agreement.  then, if there is an agreement required, set it below
 		setLicenseAgreement(ars, unmetARs);
 	}
