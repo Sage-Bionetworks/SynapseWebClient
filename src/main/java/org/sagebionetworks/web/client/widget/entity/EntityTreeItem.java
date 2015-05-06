@@ -22,7 +22,7 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	
 	public void configure(EntityHeader header,  boolean isRootItem, boolean isExpandable) {
 		entityBadge.configure(header);
-		entityBadge.asWidget().addStyleName("padding-bottom-4-imp");
+		entityBadge.asWidget().addStyleName("padding-2 light-border-bottom");
 		treeItem = new TreeItem(asWidget());
 		this.isExpandable = isExpandable;
 		if (isRootItem)
