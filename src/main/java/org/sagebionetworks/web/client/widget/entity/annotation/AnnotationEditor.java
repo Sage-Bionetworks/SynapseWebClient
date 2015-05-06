@@ -55,6 +55,13 @@ public class AnnotationEditor implements Presenter {
 			editor.setValue(value);
 			view.addNewEditor(editor);
 		}
+		
+		//if no values, then add a single editor (allows edit or delete of annotation)
+		if (annotation.getValues().size() == 0) {
+			CellEditor editor = createNewEditor();
+			view.addNewEditor(editor);
+		}
+		
 		view.configure(annotation.getKey(), annotationTypes.indexOf(annotation.getType()));
 	}
 	
