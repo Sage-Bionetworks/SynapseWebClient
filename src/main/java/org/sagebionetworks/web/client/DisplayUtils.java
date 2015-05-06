@@ -1083,6 +1083,7 @@ public class DisplayUtils {
 		builder.append(fileHandleId);
 		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
 		builder.append(preview);
+		builder.append(getParamForNoCaching());
 		return builder.toString();
 	}
 	
