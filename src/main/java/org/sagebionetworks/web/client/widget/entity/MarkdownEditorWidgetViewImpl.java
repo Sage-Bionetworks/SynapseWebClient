@@ -19,16 +19,13 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -251,7 +248,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
-		deleteButton.addClickHandler(getDeleteClickHandler());
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
@@ -274,26 +270,26 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				formattingGuideModal.show();
 			}
 		});
-		
-		markdownTextArea.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.markdownEditorClicked();
-			}
-		});
-		
-		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				presenter.markdownEditorClicked();
-			}
-		});
-		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea(0);
-			}
-		});
+	}
+	
+	@Override 
+	public void confirm(String text, ConfirmCallback callback) {
+		Bootbox.confirm(text, callback);
+	}
+	
+	@Override
+	public void setDeleteClickHandler(ClickHandler handler) {
+		deleteButton.addClickHandler(handler);
+	}
+	
+	@Override
+	public void addTextAreaKeyUpHandler(KeyUpHandler handler) {
+		markdownTextArea.addKeyUpHandler(handler);
+	}
+	
+	@Override
+	public void addTextAreaClickHandler(ClickHandler handler) {
+		markdownTextArea.addClickHandler(handler);
 	}
 	
 	private ClickHandler getClickHandler(final MarkdownEditorAction action) {
@@ -301,21 +297,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.handleCommand(action);		
-			}
-		};
-	}
-	
-	private ClickHandler getDeleteClickHandler() {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
-					@Override
-					public void callback(boolean isConfirmed) {
-						if (isConfirmed)
-							presenter.handleCommand(MarkdownEditorAction.DELETE);
-					}
-				});
 			}
 		};
 	}
@@ -355,19 +336,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				Window.scrollTo(0, mdCommands.getAbsoluteTop());
 			}
 		});
-		
-		//init markdown text area height
-		Timer t = new Timer() {
-	      @Override
-	      public void run() {
-	    	  if (markdownTextArea.getElement().getScrollHeight() > 0) {
-	    		  resizeMarkdownTextArea(120);
-	    	  } else {
-	    		  this.schedule(100);
-	    	  }
-	      }
-	    };
-	    t.schedule(100);
 	}
 	
 	
@@ -383,13 +351,26 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		formattingGuideContainer.add(markdownWidget);
 	}
 
-	private void resizeMarkdownTextArea(int extra) {
-		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight() + extra) + "px");
+	public String getMarkdownText() {
+		return  markdownTextArea.getText();
+	}
+	
+	public int getMarkdownTextAreaVisibleLines() {
+		return markdownTextArea.getVisibleLines();
+	}
+		
+	public void resizeMarkdownTextArea(int visibleLines) {
+		markdownTextArea.setVisibleLines(visibleLines);
 	}
 	
 	@Override
 	public void setAlphaCommandsVisible(boolean visible) {
 		alphaInsertButton.setVisible(visible);
+	}
+	
+	@Override
+	public boolean isEditorModalAttachedAndVisible() {
+		return editorDialog.isAttached() && editorDialog.isVisible();
 	}
 	
 	@Override
@@ -487,6 +468,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setTitleEditorVisible(boolean visible) {
 		titleField.setVisible(visible);
 	}
+
 	
 	@Override
 	public String getTitle() {

@@ -33,8 +33,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
-import org.sagebionetworks.web.client.widget.entity.CommandLineClientEntityGetterUIWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.CommandLineClientInstallWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
@@ -45,7 +43,6 @@ import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
-import org.sagebionetworks.web.client.widget.entity.RClientModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -131,7 +128,6 @@ import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
-import com.google.gwt.uibinder.client.UiField;
 
 /**
  * The root portal dependency injection root.
@@ -203,7 +199,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ActionMenuWidget createActionMenuWidget();
 	
 	public EntityActionController createEntityActionController();
-	
+		
 	/*
 	 *  Markdown Widgets
 	 */
@@ -300,7 +296,6 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public ChallengeBadge getChallengeBadgeWidget();
 	
-	public EntityBadge getEntityBadgeWidget();
 	public ProjectBadge getProjectBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
 	public MoreTreeItem getMoreTreeWidget();
