@@ -196,8 +196,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		};
 	}
 	
-	private void resizeMarkdownTextArea() {
-		if (view.getMarkdownTextAreaVisibleLines() < 5) {
+	public void resizeMarkdownTextArea() {
+		int visLines = view.getMarkdownTextAreaVisibleLines();
+		if (visLines < 5) {
 			view.resizeMarkdownTextArea(5);
 		}
 		int index = 0;
@@ -207,7 +208,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			index = 1 + editorText.indexOf("\n",index);
 			numLines++;
 		} while (index > 0 && index < editorText.length());
-		if (view.getMarkdownTextAreaVisibleLines() != numLines + 1) {
+		if (visLines != numLines + 1 && numLines > 5) {
 			// Keeps a minimum size of 5 lines
 			view.resizeMarkdownTextArea(numLines + 1 > 5 ? numLines + 1 : 5);
 		}

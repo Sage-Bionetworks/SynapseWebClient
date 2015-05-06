@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -248,6 +249,59 @@ public class MarkdownEditorWidgetTest {
 		when(mockView.getCursorPos()).thenReturn(-1);
 		presenter.insertMarkdown(newText);
 		verify(mockView).setMarkdown(eq(markdown + newText));
+	}
+	
+	@Test
+	public void testResizeMarkdownEmpty() {
+		String markdown = "";
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
+		when(mockView.getMarkdownText()).thenReturn(markdown);
+		when(mockView.getCursorPos()).thenReturn(4);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView).resizeMarkdownTextArea(5);
+		String newText = "1\n2\n3\n4";
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(5);
+		when(mockView.getMarkdownText()).thenReturn(newText);
+		presenter.resizeMarkdownTextArea();
+		//shouldn't resize at this size, therefore remaining at one invocation
+		verify(mockView).resizeMarkdownTextArea(5);
+		//should resize after 5 line threshold
+		newText += "\n5\n6\n7";
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(5);
+		when(mockView.getMarkdownText()).thenReturn(newText);
+		presenter.resizeMarkdownTextArea();
+		//7 lines, so should show an 8th line below
+		verify(mockView).resizeMarkdownTextArea(8);
+	}
+	
+	@Test
+	public void testResizeMarkdownLongText() {
+		String markdown = "1\n2\n3\n4\n5\n6\n7\n8\n9\n";
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
+		when(mockView.getMarkdownText()).thenReturn(markdown);
+		when(mockView.getCursorPos()).thenReturn(4);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView).resizeMarkdownTextArea(10);
+	}	
+	
+	@Test
+	public void testResizeMarkdownOnInsert() {
+		String markdown = "1\n2\n3\n4\n5\n6\n7\n8";
+		String newText = "\n9\n10";
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
+		when(mockView.getMarkdownText()).thenReturn(markdown);
+		when(mockView.getCursorPos()).thenReturn(4);
+		presenter.resizeMarkdownTextArea();
+		//originally 9 lines (8 lines + 1 below)
+		verify(mockView).resizeMarkdownTextArea(9);
+		
+		markdown += newText;
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(9);
+		when(mockView.getMarkdownText()).thenReturn(markdown);
+		when(mockView.getCursorPos()).thenReturn(4);
+		presenter.resizeMarkdownTextArea();
+		//now should be 11 lines (10 lines + 1 below)
+		verify(mockView).resizeMarkdownTextArea(11);
 	}
 	
 	@Test
