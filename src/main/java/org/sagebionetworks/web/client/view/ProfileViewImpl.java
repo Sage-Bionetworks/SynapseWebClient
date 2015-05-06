@@ -521,14 +521,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		}
 		presenter.addMembershipRequests(requestCount);
 		myTeamsWidget.configure(teams, false);
-		
-		
-//		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
-//			@Override
-//			public void invoke(String teamId, Long requestCount) {
-//				presenter.addMembershipRequests(requestCount.intValue());
-//			}
-//		});
 	}
 	
 	private void addMyTeamProjectsFilter() {

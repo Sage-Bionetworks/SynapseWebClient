@@ -157,11 +157,8 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
-
-@SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	
@@ -1796,7 +1793,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			List<TeamRequestBundle> withRequests = new ArrayList<TeamRequestBundle>(teamList.size());
 			for (Team team: teamList) {
 				Long openRequestCount = getOpenRequestCount(userId, team.getId());
-				withRequests.add(new TeamRequestBundle(team, openRequestCount));
+				withRequests.add(new TeamRequestBundle(team, openRequestCount == null ? 0 : openRequestCount));
 			}
 			return withRequests;
 		} catch (SynapseException e) {
