@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -62,4 +63,6 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setDeleteClickHandler(ClickHandler deleteClickHandler);
 
 	boolean isEditorModalVisible();
+
+	void confirmDeletion(String string, ConfirmCallback confirmCallback);
 }

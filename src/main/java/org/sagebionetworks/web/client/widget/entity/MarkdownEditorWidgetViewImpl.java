@@ -6,6 +6,8 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -272,14 +274,22 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		});
 	}
 	
+	@Override 
+	public void confirmDeletion(String text, ConfirmCallback callback) {
+		Bootbox.confirm(text, callback);
+	}
+	
+	@Override
 	public void setDeleteClickHandler(ClickHandler handler) {
 		deleteButton.addClickHandler(handler);
 	}
 	
+	@Override
 	public void addTextAreaKeyUpHandler(KeyUpHandler handler) {
 		markdownTextArea.addKeyUpHandler(handler);
 	}
 	
+	@Override
 	public void addTextAreaClickHandler(ClickHandler handler) {
 		markdownTextArea.addClickHandler(handler);
 	}

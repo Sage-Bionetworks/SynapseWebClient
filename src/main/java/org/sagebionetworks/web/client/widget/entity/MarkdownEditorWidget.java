@@ -190,11 +190,11 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		});
 	}
 	
-	private ClickHandler getDeleteClickHandler() {
+	public ClickHandler getDeleteClickHandler() {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
+				view.confirmDeletion(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
 					@Override
 					public void callback(boolean isConfirmed) {
 						if (isConfirmed)

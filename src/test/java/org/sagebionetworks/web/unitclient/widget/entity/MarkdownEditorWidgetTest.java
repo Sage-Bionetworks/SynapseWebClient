@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -49,6 +52,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class MarkdownEditorWidgetTest {
@@ -191,6 +195,30 @@ public class MarkdownEditorWidgetTest {
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
 		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testDeleteConfirmedCallback() {
+		ClickHandler deleteClickHandler = presenter.getDeleteClickHandler();
+		mockView.setDeleteClickHandler(deleteClickHandler);
+		deleteClickHandler.onClick(null);
+		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		verify(mockView).confirmDeletion(anyString(), captor.capture());
+		//confirm deletion
+		captor.getValue().callback(true);
+		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testDeleteCancelCallback() {
+		ClickHandler deleteClickHandler = presenter.getDeleteClickHandler();
+		mockView.setDeleteClickHandler(deleteClickHandler);
+		deleteClickHandler.onClick(null);
+		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		verify(mockView).confirmDeletion(anyString(), captor.capture());
+		//confirm deletion
+		captor.getValue().callback(false);
+		verify(mockSynapseClient, Mockito.never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	@Test
