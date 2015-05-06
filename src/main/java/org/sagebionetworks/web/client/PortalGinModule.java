@@ -545,7 +545,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//GWT utility methods
 		bind(GWTWrapperImpl.class).in(Singleton.class);
-		bind(GWTWrapper.class).to(GWTWrapperImpl.class);
+		bind(GWTWrapper.class).to(GWTWrapperImpl.class);		
 		
 		//RequestBuilder
 		bind(RequestBuilderWrapperImpl.class).in(Singleton.class);

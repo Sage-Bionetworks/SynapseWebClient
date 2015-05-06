@@ -4,19 +4,19 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:HTMLPanel>
-		<table cellspacing='0' cellpadding='0'>
-			<tr>
-				<td align="left" width="20px" style="vertical-align: top;">					
-					<g:SimplePanel ui:field="iconContainer" />
-				</td>
-				<td>
-				    <b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
-			    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
-					</b:Tooltip>
-				</td>
-			</tr>
-		</table>
-	</g:HTMLPanel>    
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	<bh:Div width="100%">
+		<bh:Span>
+			<g:SimplePanel ui:field="iconContainer" addStyleNames="displayInline margin-right-5"/>
+		</bh:Span>
+		<bh:Span>
+			<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
+	    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
+			</b:Tooltip>
+		</bh:Span>
+		<bh:Span addStyleNames="right margin-right-40">
+			<g:Label ui:field="idField"/>
+		</bh:Span>
+	</bh:Div>    
 </ui:UiBinder>
