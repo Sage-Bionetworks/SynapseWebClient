@@ -48,7 +48,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	private ResourceLoader resourceLoader;
 	private MarkdownWidget markdownWidget;
 	private Presenter presenter;
-	private boolean isShown;
 	
 	@UiField
 	public Modal editorDialog;
@@ -206,7 +205,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.iconsImageBundle = iconsImageBundle;
 		this.resourceLoader = resourceLoader;
 		this.markdownWidget = markdownWidget;
-		this.isShown = false;
 		markdownWidget.addStyleName("margin-10");
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
@@ -275,7 +273,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override 
-	public void confirmDeletion(String text, ConfirmCallback callback) {
+	public void confirm(String text, ConfirmCallback callback) {
 		Bootbox.confirm(text, callback);
 	}
 	
@@ -371,20 +369,18 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public boolean isEditorModalVisible() {
-		return isShown;
+	public boolean isEditorModalAttachedAndVisible() {
+		return editorDialog.isAttached() && editorDialog.isVisible();
 	}
 	
 	@Override
 	public void showEditorModal() {
 		editorDialog.show();
-		isShown = true;
 	}
 	
 	@Override
 	public void hideEditorModal() {
 		editorDialog.hide();
-		isShown = false;
 	}
 	
 	@Override

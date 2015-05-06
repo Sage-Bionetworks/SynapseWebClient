@@ -62,7 +62,7 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 
 	void setDeleteClickHandler(ClickHandler deleteClickHandler);
 
-	boolean isEditorModalVisible();
+	boolean isEditorModalAttachedAndVisible();
 
-	void confirmDeletion(String string, ConfirmCallback confirmCallback);
+	void confirm(String string, ConfirmCallback confirmCallback);
 }

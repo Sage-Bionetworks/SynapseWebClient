@@ -50,6 +50,8 @@ import com.google.inject.Inject;
  */
 public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter, SynapseWidgetPresenter {
 	
+	public final int MIN_VISIBLE_EDITOR_LINES = 5;
+	
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
 	private GWTWrapper gwt;
@@ -169,7 +171,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			@Override
 			public void invoke() {
 		    	  resizeMarkdownTextArea();
-		    	  if (view.isEditorModalVisible()) 
+		    	  if (view.isEditorModalAttachedAndVisible()) 
 			    	  gwt.scheduleExecution(this, 500);
 			}
 		}, 500);	
@@ -194,7 +196,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				view.confirmDeletion(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
+				view.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
 					@Override
 					public void callback(boolean isConfirmed) {
 						if (isConfirmed)
@@ -214,9 +216,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			index = 1 + editorText.indexOf("\n",index);
 			numLines++;
 		} while (index > 0 && index < editorText.length());
-		if (visLines < 5 || visLines != numLines + 1) {
-			// Keeps a minimum size of 5 lines
-			view.resizeMarkdownTextArea(numLines + 1 > 5 ? numLines + 1 : 5);
+		if (visLines < MIN_VISIBLE_EDITOR_LINES || visLines != numLines + 1) {
+			// Keeps a minimum size of MIN_VISIBLE_EDITOR_LINES lines
+			view.resizeMarkdownTextArea(numLines + 1 > MIN_VISIBLE_EDITOR_LINES 
+					? numLines + 1 : MIN_VISIBLE_EDITOR_LINES);
 		}
 	}
 	

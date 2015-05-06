@@ -10,7 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +72,8 @@ public class MarkdownEditorWidgetTest {
 	WikiPage testPage;
 	String fileHandleId1 = "44";
 	String fileHandleId2 = "45";
-
+	int minEditorLines;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -91,7 +89,7 @@ public class MarkdownEditorWidgetTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState);
-		
+		minEditorLines = presenter.MIN_VISIBLE_EDITOR_LINES;
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
@@ -125,7 +123,6 @@ public class MarkdownEditorWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
-		
 	}
 	
 	@Test
@@ -199,31 +196,34 @@ public class MarkdownEditorWidgetTest {
 	
 	@Test
 	public void testDeleteConfirmedCallback() {
+		boolean isConfirmed = true;
+
 		ClickHandler deleteClickHandler = presenter.getDeleteClickHandler();
-		mockView.setDeleteClickHandler(deleteClickHandler);
 		deleteClickHandler.onClick(null);
 		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
-		verify(mockView).confirmDeletion(anyString(), captor.capture());
+		verify(mockView).confirm(anyString(), captor.capture());
 		//confirm deletion
-		captor.getValue().callback(true);
+		captor.getValue().callback(isConfirmed);
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testDeleteCancelCallback() {
+		boolean isConfirmed = false;
+		
 		ClickHandler deleteClickHandler = presenter.getDeleteClickHandler();
-		mockView.setDeleteClickHandler(deleteClickHandler);
 		deleteClickHandler.onClick(null);
 		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
-		verify(mockView).confirmDeletion(anyString(), captor.capture());
-		//confirm deletion
-		captor.getValue().callback(false);
+		verify(mockView).confirm(anyString(), captor.capture());
+		//confirm deletion cancelled
+		captor.getValue().callback(isConfirmed);
 		verify(mockSynapseClient, Mockito.never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testSave() {
 		presenter.configure(testPage);
+		verify(mockView).setDeleteClickHandler(any(ClickHandler.class));
 		reset(mockView);
 		presenter.handleCommand(MarkdownEditorAction.SAVE);
 		verify(mockView).setSaving(true);
@@ -241,6 +241,7 @@ public class MarkdownEditorWidgetTest {
 	@Test
 	public void testDelete() {
 		presenter.configure(testPage);
+		verify(mockView).setDeleteClickHandler(any(ClickHandler.class));
 		//tests setActionHandler as well
 		reset(mockView);
 		presenter.handleCommand(MarkdownEditorAction.DELETE);
@@ -284,79 +285,80 @@ public class MarkdownEditorWidgetTest {
 		String markdown = "";
 		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
 		when(mockView.getMarkdownText()).thenReturn(markdown);
-		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		verify(mockView).resizeMarkdownTextArea(5);
-		String newText = "1\n2\n3\n4";
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(5);
+		verify(mockView).resizeMarkdownTextArea(minEditorLines);
+		String newText = getMultilineText(minEditorLines-1);
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(minEditorLines);
 		when(mockView.getMarkdownText()).thenReturn(newText);
 		presenter.resizeMarkdownTextArea();
 		//shouldn't resize at this size, therefore remaining at one invocation
-		verify(mockView).resizeMarkdownTextArea(5);
-		//should resize after 5 line threshold
-		newText += "\n5\n6\n7";
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(5);
+		verify(mockView).resizeMarkdownTextArea(minEditorLines);
+		//should resize after minEditorLines line threshold
+		newText += getMultilineText(minEditorLines);
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(minEditorLines);
 		when(mockView.getMarkdownText()).thenReturn(newText);
 		presenter.resizeMarkdownTextArea();
 		//7 lines, so should show an 8th line below
-		verify(mockView).resizeMarkdownTextArea(8);
+		verify(mockView).resizeMarkdownTextArea(2*minEditorLines);
 	}
 	
 	@Test
 	public void testResizeMarkdownLongText() {
-		String markdown = "1\n2\n3\n4\n5\n6\n7\n8\n9\n";
+		String markdown = getMultilineText(2*minEditorLines);
 		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
 		when(mockView.getMarkdownText()).thenReturn(markdown);
-		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		verify(mockView).resizeMarkdownTextArea(10);
+		verify(mockView).resizeMarkdownTextArea(2*minEditorLines + 1);
 	}	
 	
 	@Test
 	public void testResizeMarkdownOnInsert() {
-		String markdown = "1\n2\n3\n4\n5\n6\n7\n8";
-		String newText = "\n9\n10";
+		String markdown = getMultilineText(2*minEditorLines);
+		String newText = getMultilineText(minEditorLines);
 		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
 		when(mockView.getMarkdownText()).thenReturn(markdown);
-		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		//originally 9 lines (8 lines + 1 below)
-		verify(mockView).resizeMarkdownTextArea(9);
+		//originally 2*minEditorLines + 1 lines
+		verify(mockView).resizeMarkdownTextArea(2*minEditorLines + 1);
 		
 		markdown += newText;
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(9);
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(2*minEditorLines + 1);
 		when(mockView.getMarkdownText()).thenReturn(markdown);
-		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		//now should be 11 lines (10 lines + 1 below)
-		verify(mockView).resizeMarkdownTextArea(11);
+		//now should be 3*minEditorLines + 1 lines
+		verify(mockView).resizeMarkdownTextArea(3*minEditorLines + 1);
 	}
-	
+		
 	@Test
 	public void testResizeMarkdownOnDelete() {
-		String markdown = "1\n2\n3\n4\n5\n6\n7\n8";
+		String markdown = getMultilineText(2*minEditorLines);
 		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
 		when(mockView.getMarkdownText()).thenReturn(markdown);
-		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		//originally 9 lines (8 lines + 1 below)
-		verify(mockView).resizeMarkdownTextArea(9);
+		//originally 2*minEditorLines + 1 lines
+		verify(mockView).resizeMarkdownTextArea(2*minEditorLines + 1);
 		
-		markdown = "1\n2\n3\n4\n5\n6\n7";
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(9);
+		markdown = getMultilineText(minEditorLines + 1);
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(2*minEditorLines + 1);
 		when(mockView.getMarkdownText()).thenReturn(markdown);
-		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		//now should be 8 lines (7 lines + 1 below)
-		verify(mockView).resizeMarkdownTextArea(8);
+		//now should be minEditorLines + 2 lines
+		verify(mockView).resizeMarkdownTextArea(minEditorLines + 2);
 		
-		markdown = "1\n2\n3\n";
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(9);
+		markdown = getMultilineText(minEditorLines - 1);
+		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(minEditorLines + 2);
 		when(mockView.getMarkdownText()).thenReturn(markdown);
-		when(mockView.getCursorPos()).thenReturn(4);
 		presenter.resizeMarkdownTextArea();
-		//now should be 5 lines (minimum)
-		verify(mockView).resizeMarkdownTextArea(5);
+		//now should be minEditorLines lines (minimum)
+		verify(mockView).resizeMarkdownTextArea(minEditorLines);
+	}
+	
+	public String getMultilineText(int numLines) {
+		String text = "";
+		for (int i = 0; i < numLines; i++) {
+			text += String.valueOf(i) + "\n";
+		}
+		return text;
 	}
 	
 	@Test
@@ -727,5 +729,6 @@ public class MarkdownEditorWidgetTest {
 		assertTrue(currentFileHandleIds.size() == 1);
 		assertTrue(currentFileHandleIds.contains(fileHandleId1));
 	}
+	
 	
 }
