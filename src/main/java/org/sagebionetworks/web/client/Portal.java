@@ -82,6 +82,7 @@ public class Portal implements EntryPoint {
 							public void invoke() {
 								//listen for window close (or navigating away)
 								registerWindowClosingHandler(globalApplicationState);
+								registerOnPopStateHandler(globalApplicationState);
 								
 								// start version timer
 								ginjector.getVersionTimer().start();
@@ -125,5 +126,9 @@ public class Portal implements EntryPoint {
 		    		  closingEvent.setMessage(DisplayConstants.CLOSE_PORTAL_CONFIRMATION_MESSAGE);
 		      }
 		    });
+	}
+
+	private void registerOnPopStateHandler(final GlobalApplicationState globalApplicationState) {
+		globalApplicationState.initOnPopStateHandler();
 	}
 }

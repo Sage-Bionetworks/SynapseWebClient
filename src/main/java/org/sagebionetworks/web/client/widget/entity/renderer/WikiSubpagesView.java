@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -39,5 +40,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+
+		public CallbackP<WikiPageKey> getReloadWikiPageCallback();
 	}
 }
