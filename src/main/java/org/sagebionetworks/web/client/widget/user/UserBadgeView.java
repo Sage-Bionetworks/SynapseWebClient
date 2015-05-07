@@ -24,6 +24,7 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		void badgeClicked(ClickEvent event);
+		void onImageLoadError();
 	}
 
 }
