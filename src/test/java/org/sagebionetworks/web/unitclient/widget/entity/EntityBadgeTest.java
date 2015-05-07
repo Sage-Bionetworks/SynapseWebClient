@@ -2,9 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -26,6 +25,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -45,7 +45,7 @@ public class EntityBadgeTest {
 	EntityBadgeView mockView;
 	String entityId = "syn123";
 	EntityBadge widget;
-	
+	AnnotationTransformer mockTransformer;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -56,8 +56,9 @@ public class EntityBadgeTest {
 		mockEntityIconsCache = mock(EntityIconsCache.class);
 		getInfoCallback = mock(AsyncCallback.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockTransformer = mock(AnnotationTransformer.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache);
+		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockTransformer);
 		
 		//set up user profile
 		UserProfile userProfile =  new UserProfile();
@@ -67,7 +68,10 @@ public class EntityBadgeTest {
 	}
 	
 	private void setupEntity(Entity entity) throws JSONObjectAdapterException {
-		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		EntityBundle bundle = mock(EntityBundle.class);
+		when(bundle.getEntity()).thenReturn(entity);
+//		when(bundle.getAnnotations()).thenReturn(value);
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -104,7 +108,7 @@ public class EntityBadgeTest {
 	public void testGetInfoFailure() throws Exception {
 		//failure to get entity
 		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getInfo(entityId, getInfoCallback);
 		//exception should be passed back to callback
 		verify(getInfoCallback).onFailure(eq(ex));

@@ -5,10 +5,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,11 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Matchers.*;
+
+import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
@@ -33,12 +39,16 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
+import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
+import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
@@ -60,14 +70,32 @@ public class ProvUtilsTest {
 	SynapseClientAsync mockSynapseClient;
 	LayoutServiceAsync mockLayoutService;
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
-	
+	String rootWikiKeyId;
+	AnnotationTransformer mockTransformer;
+	KeyValueDisplay<String> keyValueDisplay;
+	Map<String,String> map;
+	List<String> order;
+	List<Annotation> annotationList;
+	Annotations annotations;
 	@Before
 	public void setup(){		
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockLayoutService = mock(LayoutServiceAsync.class);		
-		adapterFactory = new AdapterFactoryImpl();				
+		mockLayoutService = mock(LayoutServiceAsync.class);
+		mockTransformer = mock(AnnotationTransformer.class);
+		adapterFactory = new AdapterFactoryImpl();
+		
+		annotationList = new ArrayList<Annotation>();
+		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key1", Collections.EMPTY_LIST));
+		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key2", Collections.singletonList("foo")));
+		annotationList.add(new Annotation(ANNOTATION_TYPE.LONG, "key3", Collections.singletonList("42")));
+		when(mockTransformer.annotationsToList(any(Annotations.class))).thenReturn(annotationList);
+		when(mockTransformer.getFriendlyValues(any(Annotation.class))).thenReturn("friendly value");
+		rootWikiKeyId = "123";
+		map = new HashMap<String, String>();
+		order = new ArrayList<String>();
+		keyValueDisplay = new KeyValueDisplay<String>(map, order);
 	}
 
 	
@@ -442,5 +470,34 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 			}
 		};
+	}
+	
+	@Test
+	public void testAddAnnotationsAndWikiStatusEmpty() throws Exception {
+		rootWikiKeyId = null;
+		annotationList.clear();
+		ProvUtils.addAnnotationsAndWikiStatus(mockTransformer, keyValueDisplay, annotations, rootWikiKeyId);
+		//verify nothing was added to keyValueDisplay
+		assertTrue(map.isEmpty());
+		assertTrue(order.isEmpty());
+	}
+	
+	@Test
+	public void testWikiStatus() throws Exception {
+		rootWikiKeyId = "8888";
+		annotationList.clear();
+		ProvUtils.addAnnotationsAndWikiStatus(mockTransformer, keyValueDisplay, annotations, rootWikiKeyId);
+		assertEquals(1, map.size());
+		assertEquals(1, order.size());
+	}
+	
+	@Test
+	public void testAddAnnotationsAndWikiStatus() throws Exception {
+		rootWikiKeyId = "8888";
+		ProvUtils.addAnnotationsAndWikiStatus(mockTransformer, keyValueDisplay, annotations, rootWikiKeyId);
+		//in the @before we set up 3 annotation keys.  Plus the has a wiki note.
+		assertEquals(4, map.size());
+		assertEquals(4, order.size());
+		assertTrue(map.containsKey("key1"));
 	}
 }
