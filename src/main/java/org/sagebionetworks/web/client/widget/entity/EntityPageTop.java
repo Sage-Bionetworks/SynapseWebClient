@@ -177,7 +177,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.areaToken = areaToken;
 		if(areaChangedHandler != null) areaChangedHandler.areaChanged(area, areaToken);
 	}
-	
+
+	@Override
 	public void replaceArea(EntityArea area, String areaToken){
 		this.area = area;
 		this.areaToken = areaToken;

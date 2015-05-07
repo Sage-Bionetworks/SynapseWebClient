@@ -278,7 +278,9 @@ SynapseWidgetPresenter {
 					boolean isRootWiki = currentPage.getParentWikiId() == null;
 					wikiKey.setWikiPageId(currentPage.getId());
 					view.resetWikiMarkdown(currentPage.getMarkdown(), wikiKey, isRootWiki, true, null);
-					wikiReloadHandler.invoke(currentPage.getId());
+					if (wikiReloadHandler != null) {
+						wikiReloadHandler.invoke(currentPage.getId());
+					}
 				} catch (Exception e) {
 					onFailure(e);
 				}

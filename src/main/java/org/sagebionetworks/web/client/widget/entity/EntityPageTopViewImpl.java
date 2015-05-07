@@ -247,7 +247,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			@Override
 			public void invoke(String wikiPageId) {
 				controller.setWikiPageId(wikiPageId);
-				presenter.setArea(EntityArea.WIKI, wikiPageId);
+				presenter.replaceArea(EntityArea.WIKI, wikiPageId);
 				presenter.setWikiSubTokenToProjectArea(wikiPageId);
 			}
 		};
