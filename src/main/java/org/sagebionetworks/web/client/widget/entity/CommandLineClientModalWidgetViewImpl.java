@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.Iterator;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -21,13 +17,15 @@ public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.cl
 	@UiField(provided=true)
 	CommandLineClientInstallWidgetViewImpl install;
 	
+	Widget widget;
+	
 	@Inject
 	public CommandLineClientModalWidgetViewImpl(Binder uiBinder,
 			CommandLineClientEntityGetterUIWidgetViewImpl getEntity,
 			CommandLineClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;
-		uiBinder.createAndBindUi(this);
+		widget = uiBinder.createAndBindUi(this);
 	}
 	
 	public void configure(String id) {
@@ -35,7 +33,7 @@ public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.cl
 	}
 	
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 
 }
