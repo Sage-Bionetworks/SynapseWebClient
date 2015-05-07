@@ -38,7 +38,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
 	void showTeamsLoading();
-	void setTeams(List<Team> teams, boolean isOwner);
+	void setTeams(List<Team> teams);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
 	void clearProjects();

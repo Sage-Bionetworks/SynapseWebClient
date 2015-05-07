@@ -112,7 +112,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	public void configure(List<Team> teams, String searchTerm) {
 		mainContainer.clear();
 		searchField.setValue(searchTerm);
-		teamListWidget.configure(teams, true, false);
+		teamListWidget.configure(teams, true);
 		int start = presenter.getOffset();
 		String pageTitleStartNumber = start > 0 ? " (from result " + (start+1) + ")" : ""; 
 		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? " '"+searchTerm + "' " : "";

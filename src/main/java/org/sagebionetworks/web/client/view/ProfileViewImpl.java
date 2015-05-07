@@ -35,11 +35,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-
-
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -510,13 +506,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams, boolean isOwner) {
-		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
-			@Override
-			public void invoke(String teamId, Long requestCount) {
-				presenter.addMembershipRequests(requestCount.intValue());
-			}
-		});
+	public void setTeams(List<Team> teams) {
+		myTeamsWidget.configure(teams, false);
 	}
 	
 	private void addMyTeamProjectsFilter() {

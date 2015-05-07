@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
