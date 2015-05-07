@@ -71,7 +71,7 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		Query getTableQuery();
 
-				
+		void setWikiSubTokenToProjectArea(String wikiPageId);
 	}
 
 }

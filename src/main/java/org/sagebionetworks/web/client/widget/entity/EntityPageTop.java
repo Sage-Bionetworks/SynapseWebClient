@@ -326,6 +326,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return null;
 	}
 
+	@Override
+	public void setWikiSubTokenToProjectArea(String wikiPageId) {
+		projectAreaState.setLastWikiSubToken(areaToken);
+	}
 	
 	/*
 	 * Private Methods

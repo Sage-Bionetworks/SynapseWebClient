@@ -238,19 +238,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu = ginInjector.createActionMenuWidget();
 		controller = ginInjector.createEntityActionController();
 
+		initProjectLayout();
+
+		initClickHandlers();
+
 		// use this callback to update wikiPageId
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
 			public void invoke(String wikiPageId) {
 				controller.setWikiPageId(wikiPageId);
-				presenter.setArea(currentArea, wikiPageId);
+				presenter.setArea(EntityArea.WIKI, wikiPageId);
+				presenter.setWikiSubTokenToProjectArea(wikiPageId);
 			}
 		};
 		this.wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
-
-		initProjectLayout();
-
-		initClickHandlers();
 	}
 	
 	private void initProjectLayout() {
