@@ -242,6 +242,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			@Override
 			public void invoke(String wikiPageId) {
 				controller.setWikiPageId(wikiPageId);
+				presenter.setArea(currentArea, wikiPageId);
 			}
 		};
 		this.wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
