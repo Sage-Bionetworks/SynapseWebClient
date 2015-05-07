@@ -17,13 +17,15 @@ public class RClientModalWidgetViewImpl extends com.google.gwt.user.client.ui.Fl
 	@UiField(provided=true)
 	RClientInstallWidgetViewImpl install;
 	
+	Widget widget;
+	
 	@Inject
 	public RClientModalWidgetViewImpl(Binder uiBinder,
 			RClientEntityGetterUIWidgetViewImpl getEntity,
 			RClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;
-		uiBinder.createAndBindUi(this);
+		widget = uiBinder.createAndBindUi(this);
 	}
 	
 	public void configure(String id, Long versionNumber) {
@@ -31,6 +33,6 @@ public class RClientModalWidgetViewImpl extends com.google.gwt.user.client.ui.Fl
 	}
 	
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 }
