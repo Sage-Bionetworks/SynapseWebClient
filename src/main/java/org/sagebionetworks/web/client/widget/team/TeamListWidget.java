@@ -19,26 +19,13 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 
 	private TeamListWidgetView view;
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
-	private AuthenticationController authenticationController;
-	private AdapterFactory adapterFactory;
-	private RequestCountCallback requestCountCallback;
-	public 	interface RequestCountCallback {
-		void invoke(String teamId, Long requestCount);
-	}
 
 	@Inject
 	public TeamListWidget(TeamListWidgetView view, 
-			SynapseClientAsync synapseClient, 
-			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController,
-			AdapterFactory adapterFactory) {
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		view.setPresenter(this);
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
-		this.authenticationController = authenticationController;
-		this.adapterFactory = adapterFactory;
 	}
 	
 	@Override
