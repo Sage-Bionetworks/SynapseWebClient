@@ -45,7 +45,7 @@ public class TeamListWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(TeamListWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		widget = new TeamListWidget(mockView, mockSynapseClient, mockGlobalApplicationState,mockAuthenticationController, adapter);
+		widget = new TeamListWidget(mockView, mockGlobalApplicationState);
 		teamList = setupUserTeams(adapter, mockSynapseClient);
 		AsyncMockStubber.callSuccessWith(0l).when(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
 	}
