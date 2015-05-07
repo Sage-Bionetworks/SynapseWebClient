@@ -235,6 +235,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
+		actionMenu = ginInjector.createActionMenuWidget();
 		controller = ginInjector.createEntityActionController();
 
 		// use this callback to update wikiPageId
@@ -754,9 +755,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @return
 	 */
 	public ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId){
-		// Create a menu
-		actionMenu = ginInjector.createActionMenuWidget();
-		// Create a controller.
 		actionMenu.addControllerWidget(controller.asWidget());
 		controller.configure(actionMenu, bundle, wikiPageId, new EntityUpdatedHandler() {
 			@Override
