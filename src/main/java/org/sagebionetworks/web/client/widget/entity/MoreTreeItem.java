@@ -2,6 +2,10 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconPosition;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,7 +22,7 @@ public class MoreTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	ClickHandler handler;
 	
 	public enum MORE_TYPE {
-		FOLDER("More folders"), FILE("More files");
+		FOLDER("Show more folders"), FILE("Show more files");
 		
 		String innerText;
 		
@@ -31,7 +35,11 @@ public class MoreTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	public MoreTreeItem() { 
 		this.widget = new Button();
 		treeItem = new TreeItem(asWidget());
-		widget.setSize(ButtonSize.EXTRA_SMALL);
+		widget.setSize(ButtonSize.SMALL);
+		widget.setType(ButtonType.INFO);
+		widget.setIcon(IconType.ELLIPSIS_H);
+		widget.setIconSize(IconSize.LARGE);
+		widget.setIconPosition(IconPosition.RIGHT);
 	}
 	
 	public void configure(MORE_TYPE type) {
