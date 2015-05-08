@@ -375,47 +375,34 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getTeamBundles(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory,
-			boolean includeRequestCount) {
-		if (includeRequestCount) {
-			synapseClient.getTeamsRequestsBundleForUser(userId, new AsyncCallback<List<TeamRequestBundle>>() {
-				@Override
-				public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
-					if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
-						int requestCount = 0;
-						List<Team> teams = new ArrayList<Team>(teamsRequestBundles.size());
-						for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
+			final boolean includeRequestCount) {
+		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
+			@Override
+			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
+				if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
+					int requestCount = 0;
+					List<Team> teams = new ArrayList<Team>(teamsRequestBundles.size());
+					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
+						teams.add(teamAndRequest.getTeam());
+						if (includeRequestCount)
 							requestCount += teamAndRequest.getRequestCount();
-							teams.add(teamAndRequest.getTeam());
-						}
-						addMembershipRequests(requestCount);
-						view.setTeamsFilterVisible(!teams.isEmpty());
-						view.setTeamsFilterTeams(teams);
-						view.setTeams(teams);
 					}
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.setTeamsFilterVisible(false);
-					view.setTeamsError(caught.getMessage());
-				}
-			});
-		} else {
-			synapseClient.getTeamsForUser(userId, new AsyncCallback<List<Team>>() {
-				@Override
-				public void onSuccess(List<Team> teams) {
 					view.setTeamsFilterVisible(!teams.isEmpty());
 					view.setTeamsFilterTeams(teams);
-					if (teams != null && teams.size() > 0) {
-						view.setTeams(teams);
+					view.setTeams(teams);
+					if (includeRequestCount) {
+						addMembershipRequests(requestCount);
 					}
-				}
-				@Override
-				public void onFailure(Throwable caught) {
+				} else {
 					view.setTeamsFilterVisible(false);
-					view.setTeamsError(caught.getMessage());
 				}
-			});
-		}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setTeamsFilterVisible(false);
+				view.setTeamsError(caught.getMessage());
+			}
+		});
 	}
 	
 	

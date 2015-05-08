@@ -332,9 +332,8 @@ public interface SynapseClient extends RemoteService {
 	public String createTeam(String teamName) throws RestServiceException;
 	public void deleteTeam(String teamId) throws RestServiceException;
 	public PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
-	List<TeamRequestBundle> getTeamsRequestsBundleForUser(String userId)
-			throws RestServiceException;
-	public List<Team> getTeamsForUser(String userId) throws RestServiceException;
+	public List<TeamRequestBundle> getTeamsForUser(String userId,
+			boolean includeOpenRequests) throws RestServiceException;
 	public PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
 	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
@@ -514,8 +513,5 @@ public interface SynapseClient extends RemoteService {
 	Entity updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
 
 	Entity createExternalFile(String parentEntityId, String externalUrl,
-			String name) throws RestServiceException;
-
-
-	
+			String name) throws RestServiceException;	
 }

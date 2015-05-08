@@ -252,12 +252,12 @@ public interface SynapseClientAsync {
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeams(String userId, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
-	void getTeamsForUser(String userId, AsyncCallback<List<Team>> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
 	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
-
+	void getTeamsForUser(String userId, boolean includeRequestCount,
+			AsyncCallback<List<TeamRequestBundle>> asyncCallback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
@@ -415,6 +415,4 @@ public interface SynapseClientAsync {
 
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
-	void getTeamsRequestsBundleForUser(String userId,
-			AsyncCallback<List<TeamRequestBundle>> asyncCallback);
 }

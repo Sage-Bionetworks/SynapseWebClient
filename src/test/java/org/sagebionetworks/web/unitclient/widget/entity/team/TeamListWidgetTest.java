@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -56,7 +57,7 @@ public class TeamListWidgetTest {
 		testTeam.setName("My Test Team");
 		ArrayList<Team> teamList = new ArrayList<Team>();
 		teamList.add(testTeam);
-		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		return teamList;
 	}
 	
