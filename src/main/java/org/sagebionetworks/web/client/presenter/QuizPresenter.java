@@ -231,8 +231,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.hideLoading();
 					showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
-					//view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
-				
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
