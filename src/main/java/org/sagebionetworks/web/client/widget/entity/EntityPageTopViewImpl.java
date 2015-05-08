@@ -246,7 +246,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
 			public void invoke(String wikiId) {
-				//controller.setWikiPageId(wikiPageId);
 				wikiPageId = wikiId;
 				configureActionMenu();
 				presenter.setArea(EntityArea.WIKI, wikiId);
@@ -766,7 +765,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @return
 	 */
 	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle){
+		// Create a menu
 		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		// Create a controller.
 		final EntityActionController controller = ginInjector.createEntityActionController();
 		actionMenu.addControllerWidget(controller.asWidget());
 		controller.configure(actionMenu, bundle, wikiPageId, new EntityUpdatedHandler() {

@@ -39,10 +39,4 @@ public interface EntityActionController extends IsWidget {
 	 */
 	void onAnnotationsToggled(boolean shown);
 
-	/**
-	 * Notifies the EntityActionController that the wikiPageId has changed.
-	 * @param wikiPageId
-	 */
-	void setWikiPageId(String wikiPageId);
-
 }
