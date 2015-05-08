@@ -247,8 +247,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			@Override
 			public void invoke(String wikiPageId) {
 				controller.setWikiPageId(wikiPageId);
-				presenter.replaceArea(EntityArea.WIKI, wikiPageId);
-				presenter.setWikiSubTokenToProjectArea(wikiPageId);
+				presenter.setArea(EntityArea.WIKI, wikiPageId);
 			}
 		};
 		this.wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
@@ -438,7 +437,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
-		actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		resetEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 				
 		// File History
@@ -510,7 +509,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
 		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES));
 		// ActionMenu
-		actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		resetEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
@@ -540,7 +539,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 	
 		// ActionMenu
-		actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		resetEntityActionMenu(bundle, wikiPageId);
 		projectActionMenuContainer.add(actionMenu.asWidget());
 
 		// Wiki Tab: Wiki
@@ -654,7 +653,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		tableMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
-		actionMenu = createEntityActionMenu(bundle, null);
+		resetEntityActionMenu(bundle, null);
 		tableActionMenuContainer.add(actionMenu.asWidget());
 
 		// Table
@@ -751,11 +750,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	/**
-	 * Create a new action menu for an entity.
+	 * Reset action menu for an entity.
 	 * @param bundle
 	 * @return
 	 */
-	public ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId){
+	public void resetEntityActionMenu(EntityBundle bundle, String wikiPageId){
+		actionMenu.reset();
 		actionMenu.addControllerWidget(controller.asWidget());
 		controller.configure(actionMenu, bundle, wikiPageId, new EntityUpdatedHandler() {
 			@Override
@@ -772,8 +772,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				entityMetadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
-
-		return actionMenu;
 	}
 	
 }

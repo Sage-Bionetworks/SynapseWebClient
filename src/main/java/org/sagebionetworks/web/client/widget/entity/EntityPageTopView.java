@@ -53,8 +53,6 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		 */
 		void setArea(EntityArea area, String areaToken);
 
-		void replaceArea(EntityArea area, String areaToken);
-
 		void fireEntityUpdatedEvent();
 
 		boolean isLoggedIn();
@@ -72,8 +70,6 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		TableRowHeader getTableRowHeader();
 
 		Query getTableQuery();
-
-		void setWikiSubTokenToProjectArea(String wikiPageId);
 
 	}
 

@@ -178,7 +178,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if(areaChangedHandler != null) areaChangedHandler.areaChanged(area, areaToken);
 	}
 
-	@Override
 	public void replaceArea(EntityArea area, String areaToken){
 		this.area = area;
 		this.areaToken = areaToken;
@@ -327,11 +326,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return null;
 	}
 
-	@Override
-	public void setWikiSubTokenToProjectArea(String wikiPageId) {
-		projectAreaState.setLastWikiSubToken(areaToken);
-	}
-	
 	/*
 	 * Private Methods
 	 */
