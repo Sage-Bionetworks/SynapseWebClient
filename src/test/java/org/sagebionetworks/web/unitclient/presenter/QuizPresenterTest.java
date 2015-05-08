@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
-import org.sagebionetworks.repo.model.quiz.QuestionResponse;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.quiz.ResponseCorrectness;
