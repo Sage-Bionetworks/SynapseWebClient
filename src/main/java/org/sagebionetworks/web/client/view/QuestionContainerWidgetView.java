@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.Question;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,7 +27,8 @@ public interface QuestionContainerWidgetView extends IsWidget {
 
 		void setEnabled(boolean enabled);
 
-		void configure(Long questionNumber, Question question);
+		void configure(Long questionNumber, Question question,
+				MultichoiceResponse response);
 
 	}
 
@@ -34,9 +36,9 @@ public interface QuestionContainerWidgetView extends IsWidget {
 	void showSuccess(boolean isShown);
 	void showFailure(boolean isShown);
 	void addCheckBox(Long questionIndex, String questionPrompt,
-			ClickHandler clickHandler);
+			ClickHandler clickHandler, boolean isSelected);
 	void addRadioButton(Long long1, String string,
-			ClickHandler clickHandler);
+			ClickHandler clickHandler, boolean isSelected);
 	public void configure(Long questionNumber, String prompt);
 	void setIsEnabled(boolean isEnabled);
 	void configureMoreInfo(String ownerObjectId, String wikiTypeName,
