@@ -77,10 +77,11 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	}
 	
 	@Override
-	public void addRadioButton(Long questionIndex, String answerPrompt, ClickHandler clickHandler) {
+	public void addRadioButton(Long questionIndex, String answerPrompt, ClickHandler clickHandler, boolean isSelected) {
 		SimplePanel answerContainer = new SimplePanel();
 		answerContainer.addStyleName("radio padding-left-30 control-label");
 		RadioButton answerButton = new RadioButton("question-"+questionIndex);
+		answerButton.setValue(isSelected);
 		answerButton.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answerPrompt));
 		answerButton.addClickHandler(clickHandler);
 		answerContainer.add(answerButton.asWidget());
@@ -89,10 +90,11 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	}
 	
 	@Override
-	public void addCheckBox(Long questionIndex, String answerPrompt, ClickHandler clickHandler) {
+	public void addCheckBox(Long questionIndex, String answerPrompt, ClickHandler clickHandler, boolean isSelected) {
 		SimplePanel answerContainer = new SimplePanel();
 		answerContainer.addStyleName("checkbox padding-left-30 control-label");
 		final CheckBox checkbox= new CheckBox();
+		checkbox.setValue(isSelected);
 		checkbox.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answerPrompt));
 		checkbox.addClickHandler(clickHandler);
 		answerContainer.add(checkbox);
