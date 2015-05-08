@@ -15,13 +15,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,6 +113,7 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -174,6 +169,8 @@ public class SynapseClientImplTest {
 	MembershipInvtnSubmission testInvitation;
 	MessageToUser sentMessage;
 	Long storageLocationId = 9090L;
+	UserProfile testUserProfile;
+	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -200,6 +197,7 @@ public class SynapseClientImplTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
+		entity.setModifiedBy(testUserId);
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityById(entityId)).thenReturn(entity);
 		// Setup the annotations
@@ -310,6 +308,8 @@ public class SynapseClientImplTest {
 		bundle.setAccessRequirements(accessRequirements);
 		bundle.setUnmetAccessRequirements(accessRequirements);
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
+				.thenReturn(bundle);
+		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID)))
 				.thenReturn(bundle);
 
 		EntityBundle emptyBundle = new EntityBundle();
@@ -427,6 +427,12 @@ public class SynapseClientImplTest {
 						any(ProjectListSortColumn.class),
 						any(SortDirection.class), anyInt(), anyInt()))
 				.thenReturn(headers);
+		
+		testUserProfile = new UserProfile();
+		testUserProfile.setUserName("Test User");
+		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(
+				testUserProfile);
+
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -647,13 +653,8 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetUserProfile() throws Exception {
 		// verify call is directly calling the synapse client provider
-		UserProfile testUserProfile = new UserProfile();
-		testUserProfile.setUserName("Test User");
 		String testRepoUrl = "http://mytestrepourl";
-		String testUserId = "myUserId";
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
-		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(
-				testUserProfile);
 		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
 		assertEquals(userProfile, testUserProfile);
 	}
@@ -1854,5 +1855,14 @@ public class SynapseClientImplTest {
 		assertEquals(2, results.size());
 		assertEquals(teamA, results.get(0));
 		assertEquals(teamZ, results.get(1));
+	}
+	
+	@Test
+	public void testGetEntityInfo() throws RestServiceException,
+	JSONObjectAdapterException, SynapseException{
+		EntityBundlePlus entityBundlePlus = synapseClient.getEntityInfo(entityId);
+		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
+		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
+		assertEquals(testUserProfile, entityBundlePlus.getProfile());
 	}
 }
