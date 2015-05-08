@@ -1,14 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -26,6 +33,10 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
+import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -46,7 +57,13 @@ public class EntityBadgeTest {
 	String entityId = "syn123";
 	EntityBadge widget;
 	AnnotationTransformer mockTransformer;
-
+	String rootWikiKeyId;
+	KeyValueDisplay<String> keyValueDisplay;
+	Map<String,String> map;
+	List<String> order;
+	List<Annotation> annotationList;
+	Annotations annotations;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -58,20 +75,33 @@ public class EntityBadgeTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockTransformer = mock(AnnotationTransformer.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockTransformer);
+		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, mockGlobalApplicationState, mockTransformer);
 		
-		//set up user profile
-		UserProfile userProfile =  new UserProfile();
-		userProfile.setOwnerId("4444");
-		userProfile.setUserName("Bilbo");
-		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		annotationList = new ArrayList<Annotation>();
+		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key1", Collections.EMPTY_LIST));
+		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key2", Collections.singletonList("foo")));
+		annotationList.add(new Annotation(ANNOTATION_TYPE.LONG, "key3", Collections.singletonList("42")));
+		when(mockTransformer.annotationsToList(any(Annotations.class))).thenReturn(annotationList);
+		when(mockTransformer.getFriendlyValues(any(Annotation.class))).thenReturn("friendly value");
+		rootWikiKeyId = "123";
+		map = new HashMap<String, String>();
+		order = new ArrayList<String>();
+		keyValueDisplay = new KeyValueDisplay<String>(map, order);
 	}
 	
 	private void setupEntity(Entity entity) throws JSONObjectAdapterException {
+		UserProfile userProfile =  new UserProfile();
+		userProfile.setOwnerId("4444");
+		userProfile.setUserName("Bilbo");
+		
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
 //		when(bundle.getAnnotations()).thenReturn(value);
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
+		entityBundlePlus.setEntityBundle(bundle);
+		entityBundlePlus.setProfile(userProfile);
+		
+		AsyncMockStubber.callSuccessWith(entityBundlePlus).when(mockSynapseClient).getEntityInfo(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -108,23 +138,9 @@ public class EntityBadgeTest {
 	public void testGetInfoFailure() throws Exception {
 		//failure to get entity
 		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityInfo(anyString(), any(AsyncCallback.class));
 		widget.getInfo(entityId, getInfoCallback);
 		//exception should be passed back to callback
-		verify(getInfoCallback).onFailure(eq(ex));
-	}
-
-	@Test
-	public void testGetInfoProfileFailure() throws Exception {
-		String entityId = "syn12345";
-		Project testProject = new Project();
-		testProject.setModifiedBy("4444");
-		testProject.setId(entityId);
-		setupEntity(testProject);
-		Exception ex = new Exception("unhandled get profile error");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		
-		widget.getInfo(entityId, getInfoCallback);
 		verify(getInfoCallback).onFailure(eq(ex));
 	}
 	
@@ -168,4 +184,33 @@ public class EntityBadgeTest {
 		verify(mockView).setClickHandler(any(ClickHandler.class));
 	}
 
+
+	@Test
+	public void testAddAnnotationsAndWikiStatusEmpty() throws Exception {
+		rootWikiKeyId = null;
+		annotationList.clear();
+		widget.addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiKeyId);
+		//verify nothing was added to keyValueDisplay
+		assertTrue(map.isEmpty());
+		assertTrue(order.isEmpty());
+	}
+	
+	@Test
+	public void testWikiStatus() throws Exception {
+		rootWikiKeyId = "8888";
+		annotationList.clear();
+		widget.addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiKeyId);
+		assertEquals(1, map.size());
+		assertEquals(1, order.size());
+	}
+	
+	@Test
+	public void testAddAnnotationsAndWikiStatus() throws Exception {
+		rootWikiKeyId = "8888";
+		widget.addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiKeyId);
+		//in the @before we set up 3 annotation keys.  Plus the has a wiki note.
+		assertEquals(4, map.size());
+		assertEquals(4, order.size());
+		assertTrue(map.containsKey("key1"));
+	}
 }

@@ -211,28 +211,6 @@ public class ProvUtils {
 		return new KeyValueDisplay<String>(map, order);
 	}
 	
-	/**
-	 * Adds annotations and wiki status values to the given key value display
-	 * @param keyValueDisplay
-	 * @param annotations
-	 * @param rootWikiKeyId
-	 */
-	public static void addAnnotationsAndWikiStatus(AnnotationTransformer transformer, KeyValueDisplay<String> keyValueDisplay, Annotations annotations, String rootWikiKeyId) {
-		Map<String,String> map = keyValueDisplay.getMap();
-		List<String> order = keyValueDisplay.getKeyDisplayOrder();
-		
-		List<Annotation> annotationList = transformer.annotationsToList(annotations);
-		for (Annotation annotation : annotationList) {
-			String key = annotation.getKey();
-			order.add(key);
-			map.put(key, SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(annotation)));
-		}
-		if (DisplayUtils.isDefined(rootWikiKeyId)) {
-			order.add("*Note");
-			map.put("*Note", "Has a wiki");
-		}
-	}
-	
 	public static KeyValueDisplay<String> activityToKeyValueDisplay(Activity activity, String modifiedBy) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
