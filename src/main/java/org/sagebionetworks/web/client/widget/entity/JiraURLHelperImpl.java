@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerImpl;
 
 import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -208,7 +209,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 			AsyncCallback<Void> callback) {
 		Map<String, String> fieldValues = new HashMap<String, String>();
 		
-		String stackTrace = DisplayUtils.getStackTrace(t);
+		String stackTrace = ServiceErrorHandlerImpl.getStackTrace(t);
 		
 		StringBuilder description = new StringBuilder(); 
 		

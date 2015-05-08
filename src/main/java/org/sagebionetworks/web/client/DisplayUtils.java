@@ -79,6 +79,7 @@ import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
+import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -514,7 +515,7 @@ public class DisplayUtils {
 	public static void showErrorMessage(final Throwable t,
 			final JiraURLHelper jiraHelper, boolean isLoggedIn,
 			String friendlyErrorMessage) {
-		SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
+		SynapseJSNIUtilsImpl._consoleError(ServiceErrorHandlerImpl.getStackTrace(t));
 		if (!isLoggedIn) {
 			showErrorMessage(t.getMessage());
 			return;
@@ -1863,16 +1864,6 @@ public class DisplayUtils {
 		if (version != null)
 			str += "/rowversion/" + version;
 		return str;
-	}
-	
-	public static String getStackTrace(Throwable t) {
-		StringBuilder stackTrace = new StringBuilder();
-		if (t != null) {
-			for (StackTraceElement element : t.getStackTrace()) {
-				stackTrace.append(element + "\n");
-			}
-		}
-		return stackTrace.toString();
 	}
 	
 	/**

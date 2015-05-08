@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerImpl;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -115,7 +116,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	}
 	@Override
 	public void showSetUsernameError(Throwable t) {
-		SynapseJSNIUtilsImpl._consoleError(DisplayUtils.getStackTrace(t));
+		SynapseJSNIUtilsImpl._consoleError(ServiceErrorHandlerImpl.getStackTrace(t));
 		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Unable to set username: </h4> <span class=\"text-warning\">"+t.getMessage()+"</span>");
 		clear();
 	}

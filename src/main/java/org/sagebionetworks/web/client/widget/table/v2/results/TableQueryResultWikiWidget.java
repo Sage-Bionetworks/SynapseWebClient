@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandler;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -22,7 +23,8 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
 	@Inject
 	public TableQueryResultWikiWidget(TableQueryResultWikiWidgetView view, 
 			TableQueryResultWidget tableQueryResultWidget, 
-			SynapseJSNIUtils synapseJsniUtils) {
+			SynapseJSNIUtils synapseJsniUtils,
+			ServiceErrorHandler serviceErrorHandler) {
 		this.view = view;
 		this.tableQueryResultWidget = tableQueryResultWidget;
 		view.setTableQueryResultWidget(tableQueryResultWidget.asWidget());

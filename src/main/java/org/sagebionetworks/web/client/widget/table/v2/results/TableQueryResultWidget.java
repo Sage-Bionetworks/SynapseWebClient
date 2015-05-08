@@ -11,8 +11,10 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandler;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,17 +43,28 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	boolean isEditable;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
+	ServiceErrorHandler serviceErrorHandler;
+	CallbackP<Throwable> unhandledErrorCallback;
 	
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector){
+	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, ServiceErrorHandler serviceErrorHandler){
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
+		this.serviceErrorHandler = serviceErrorHandler;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
+		this.view.setServiceErrorWidget(serviceErrorHandler.asWidget());
+		
+		unhandledErrorCallback = new CallbackP<Throwable>() {
+			@Override
+			public void invoke(Throwable t) {
+				showError(t);
+			}
+		};
 	}
 	
 	/**
@@ -81,7 +94,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			
 			@Override
 			public void onFailure(Throwable failure) {
-				showError(failure);
+				serviceErrorHandler.onFailure(failure, unhandledErrorCallback);
 			}
 			
 			@Override
@@ -112,7 +125,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				showError(caught);
+				serviceErrorHandler.onFailure(caught, unhandledErrorCallback);
 			}
 		});
 
@@ -238,7 +251,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		synapseClient.toggleSortOnTableQuery(this.startingQuery.getSql(), header, new AsyncCallback<String>(){
 			@Override
 			public void onFailure(Throwable caught) {
-				showError(caught);
+				serviceErrorHandler.onFailure(caught, unhandledErrorCallback);
 			}
 
 			@Override

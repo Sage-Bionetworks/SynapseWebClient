@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerImpl;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
@@ -508,7 +509,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
 					//SWC-1843: do not redirect home.  log full exception to the console
-					synapseJSNIUtils.consoleError(caught.getMessage() + "\n" + DisplayUtils.getStackTrace(caught));
+					synapseJSNIUtils.consoleError(caught.getMessage() + "\n" + ServiceErrorHandlerImpl.getStackTrace(caught));
 				} else {
 					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);	
 				}

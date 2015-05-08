@@ -16,6 +16,7 @@
 				
 				<g:SimplePanel ui:field="rowEditorModalPanel"/>
 
+				<g:SimplePanel ui:field="serviceErrorModalContainer"/>
 
 			</b:PanelBody>
 		</b:Panel>

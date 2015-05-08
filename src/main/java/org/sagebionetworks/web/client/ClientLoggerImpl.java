@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client;
 
 import java.io.StringWriter;
 
+import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerImpl;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -86,7 +88,7 @@ public class ClientLoggerImpl implements ClientLogger{
 	public void errorToRepositoryServices(String message, Throwable e){
 		String exceptionName = e != null ? e.getClass().getName() : "";
 		String exceptionMessage = e != null && e.getMessage() != null ? e.getMessage() : "";
-		String stackTrace = DisplayUtils.getStackTrace(e); 
+		String stackTrace = ServiceErrorHandlerImpl.getStackTrace(e); 
 		this.synapseClient.logErrorToRepositoryServices(message + "-" + exceptionMessage + "-" + stackTrace, exceptionName, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {

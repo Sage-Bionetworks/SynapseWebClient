@@ -1,15 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -35,7 +28,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	SimplePanel rowEditorModalPanel;
 	@UiField
 	Alert errorAlert;
-
+	@UiField
+	SimplePanel serviceErrorModalContainer;
 
 	Widget widget;
 
@@ -89,5 +83,9 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setProgressWidgetVisible(boolean visible) {
 		this.progressPanel.setVisible(visible);
+	}
+	@Override
+	public void setServiceErrorWidget(Widget w) {
+		serviceErrorModalContainer.setWidget(w);
 	}
 }
