@@ -192,10 +192,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private JavaClientModalWidgetViewImpl javaLoadWidget;
 	private CommandLineClientModalWidgetViewImpl commandLineLoadWidget;
 
-	// cache these variable to re-configure the action menu while navigating within the wiki
-	private String wikiPageId;
-	private EntityBundle bundle;
-
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			FileTitleBar fileTitleBar,
@@ -245,10 +241,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// use this callback to update wikiPageId
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
-			public void invoke(String wikiId) {
-				wikiPageId = wikiId;
-				configureActionMenu();
-				presenter.setArea(EntityArea.WIKI, wikiId);
+			public void invoke(String wikiPageId) {
+				presenter.handleWikiReload(wikiPageId);
 			}
 		};
 		this.wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
@@ -309,7 +303,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader, String wikiPageId) {
 		this.versionNumber = versionNumber;
 		this.currentArea = area;
-		this.bundle = bundle;
 		DisplayUtils.hide(adminListItem);
 		clearContent();
 		
@@ -420,6 +413,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileTitleBar.clearState();
 	}
 
+	@Override
+	public void configureProjectActionMenu(EntityBundle bundle, String wikiPageId) {
+		projectActionMenuContainer.clear();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		projectActionMenuContainer.add(actionMenu.asWidget());
+	}
+
 	/*
 	 * Private Methods
 	 */
@@ -440,8 +440,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
 		fileActionMenuContainer.clear();
-		this.wikiPageId = wikiPageId;
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 				
 		// File History
@@ -514,8 +513,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES));
 		// ActionMenu
 		fileActionMenuContainer.clear();
-		this.wikiPageId = wikiPageId;
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
@@ -546,8 +544,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 		// ActionMenu
 		projectActionMenuContainer.clear();
-		this.wikiPageId = wikiPageId;
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		projectActionMenuContainer.add(actionMenu.asWidget());
 
 		// Wiki Tab: Wiki
@@ -662,8 +659,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
 		tableActionMenuContainer.clear();
-		this.wikiPageId = null;
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, null);
 		tableActionMenuContainer.add(actionMenu.asWidget());
 
 		// Table
@@ -764,7 +760,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @param bundle
 	 * @return
 	 */
-	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle){
+	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId){
 		// Create a menu
 		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
 		// Create a controller.
@@ -786,18 +782,5 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		});
 		return actionMenu;
-	}
-
-	/*
-	 * Should only be called when isProject is true
-	 */
-	private void configureActionMenu() {
-		if (isProject) {
-			projectActionMenuContainer.clear();
-			ActionMenuWidget actionMenu = createEntityActionMenu(bundle);
-			projectActionMenuContainer.add(actionMenu.asWidget());
-		} else {
-			DisplayUtils.showErrorMessage("Ops! Something is wrong... ");
-		}
 	}
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.Query;
@@ -326,6 +327,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return null;
 	}
 
+	@Override
+	public void handleWikiReload(String wikiPageId) {
+		if (bundle.getEntity() instanceof Project) {
+			setArea(EntityArea.WIKI, wikiPageId);
+			view.configureProjectActionMenu(bundle, wikiPageId);
+		}
+	}
+
 	/*
 	 * Private Methods
 	 */
@@ -346,5 +355,4 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
-
 }
