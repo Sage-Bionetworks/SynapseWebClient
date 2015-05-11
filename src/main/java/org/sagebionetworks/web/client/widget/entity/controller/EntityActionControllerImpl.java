@@ -41,6 +41,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -535,7 +536,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	        synapseClient.createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
 	            @Override
 	            public void onSuccess(WikiPage result) {
-	                view.showInfo("Page '" + name + "' Added", "");
+	                view.showInfo("'" + name + "' Page Added", "");
 	                entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
 	            }
 	            @Override
