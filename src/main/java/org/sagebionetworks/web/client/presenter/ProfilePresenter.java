@@ -387,7 +387,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clearTeamNotificationCount();
 		if (isOwner)
 			refreshTeamInvites();
-		getTeamBundles(currentUserId, synapseClient, adapterFactory, isOwner);
+		getTeamBundles(currentUserId, isOwner);
 	}
 	
 	@Override
@@ -408,8 +408,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}, openTeamInvitationsCallback);
 	}
 	
-	public void getTeamBundles(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory,
-			final boolean includeRequestCount) {
+	public void getTeamBundles(String userId, final boolean includeRequestCount) {
 		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
 			@Override
 			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
@@ -419,11 +418,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					myTeamsWidget.configure(false);
 					myTeamsWidget.clear();
 					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
+						// requests will always be 0 or greater
 						Long requestCount = teamAndRequest.getRequestCount();
 						Team team = teamAndRequest.getTeam();
 						myTeamsWidget.addTeam(team, requestCount);
 						view.addTeamsFilterTeam(team);
-						totalRequestCount += requestCount == null ? 0 : requestCount;
+						totalRequestCount += requestCount;
 					}
 					view.setTeamsFilterVisible(true);
 					if (includeRequestCount) {

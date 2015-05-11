@@ -1798,9 +1798,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			for (Team team: teamList) {
 				if (includeOpenRequests) {
 					Long openRequestCount = getOpenRequestCount(userId, team.getId());
-					bundle.add(new TeamRequestBundle(team, openRequestCount == null ? 0 : openRequestCount));
+					bundle.add(new TeamRequestBundle(team, openRequestCount == null ? 0L : openRequestCount));
 				} else {
-					bundle.add(new TeamRequestBundle(team, null));
+					bundle.add(new TeamRequestBundle(team, 0L));
 				}
 			}
 			return bundle;
