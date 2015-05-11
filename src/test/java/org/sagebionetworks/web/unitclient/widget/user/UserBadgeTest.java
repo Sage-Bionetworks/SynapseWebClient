@@ -2,9 +2,11 @@ package org.sagebionetworks.web.unitclient.widget.user;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -19,6 +21,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -52,6 +55,7 @@ public class UserBadgeTest {
 		profile.setFirstName("John");
 		profile.setLastName("Doe");
 		profile.setUserName("doeboy");
+		profile.setProfilePicureFileHandleId("1234");
 		displayName = DisplayUtils.getDisplayName(profile);
 		profile.setOwnerId(principalId);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -66,8 +70,24 @@ public class UserBadgeTest {
 	
 	@Test
 	public void testConfigureStatic(){
-		userBadge.configure(profile);		
+		userBadge.configure(profile);
 		verify(mockView).setDisplayName(displayName, displayName);
+		ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).showCustomUserPicture(urlCaptor.capture());
+		String url = urlCaptor.getValue();
+		assertFalse(url.contains(WebConstants.NOCACHE_PARAM));
+		
+		//simulate a load error
+		reset(mockView);
+		userBadge.onImageLoadError();
+		verify(mockView).showCustomUserPicture(urlCaptor.capture());
+		url = urlCaptor.getValue();
+		assertTrue(url.contains(WebConstants.NOCACHE_PARAM));
+		
+		//if it fails to load again, it should not attempt a reload 
+		reset(mockView);
+		userBadge.onImageLoadError();
+		verify(mockView, never()).showCustomUserPicture(anyString());
 	}
 	
 	@Test

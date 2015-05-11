@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -17,7 +15,6 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
@@ -442,7 +439,33 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private static native void _replaceHistoryState(String token)/*-{
-		$wnd.history.replaceState( {} , '', '#'+token );
+		var stateObj = { source: 'replaceState' };
+		$wnd.history.replaceState( stateObj , '', '#'+token );
 	}-*/;
-	
+
+	@Override
+	public void pushHistoryState(String token) {
+		_pushHistoryState(token);
+	}
+
+	private static native void _pushHistoryState(String token)/*-{
+		var stateObj = { source: 'pushState' };
+		$wnd.history.pushState( stateObj , '', '#'+token );
+	}-*/;
+
+	@Override
+	public void initOnPopStateHandler() {
+		_initOnPopStateHandler();
+	}
+
+	private static native void _initOnPopStateHandler()/*-{
+		// reload the page on pop state
+		//we set the source property of the state if we used pushState or replaceState
+		$wnd.addEventListener("popstate", function(event) {
+			var stateObj = event.state;
+			if (typeof stateObj !== "undefined" && stateObj !== null && typeof stateObj.source !== "undefined"){
+				$wnd.location.reload(false);
+			}
+		});
+	}-*/;
 }

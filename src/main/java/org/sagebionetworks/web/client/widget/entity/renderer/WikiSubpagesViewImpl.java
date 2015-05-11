@@ -57,7 +57,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 						final UpdateOrderHintCallback updateOrderHintCallback) {
 		clear();
 		
-		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage);
+		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		navTreeContainer = new FlowPanel();
