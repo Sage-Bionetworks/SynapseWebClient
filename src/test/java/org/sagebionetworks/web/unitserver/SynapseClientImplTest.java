@@ -1865,6 +1865,8 @@ public class SynapseClientImplTest {
 		assertEquals(2, results.size());
 		assertEquals(teamA, results.get(0).getTeam());
 		assertEquals(teamZ, results.get(1).getTeam());
+		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(anyString(), anyString(),
+				anyLong(), anyLong());
 	}
 	
 	@Test

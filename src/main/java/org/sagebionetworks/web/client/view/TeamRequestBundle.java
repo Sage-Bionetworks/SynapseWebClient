@@ -4,9 +4,7 @@ import java.io.Serializable;
 
 import org.sagebionetworks.repo.model.Team;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-public class TeamRequestBundle implements IsSerializable, Serializable {
+public class TeamRequestBundle implements Serializable {
 
 	private Team team;
 	private Long requestCount;

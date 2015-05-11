@@ -768,16 +768,6 @@ public class ProfilePresenterTest {
 		verify(mockView).addChallengeWidget(any(Widget.class));
 	}
 	
-	public ArrayList<Team> setupUserTeams(SynapseClientAsync mockSynapseClient) {
-		Team testTeam = new Team();
-		testTeam.setId("42");
-		testTeam.setName("My Test Team");
-		ArrayList<Team> teamList = new ArrayList<Team>();
-		teamList.add(testTeam);
-		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapseClient).getTeamsForUser(anyString(), false, any(AsyncCallback.class));
-		return teamList;
-	}
-	
 	public ArrayList<TeamRequestBundle> setupUserTeamBundles(SynapseClientAsync mockSynapseClient, long openRequestNumberPerTeam, int numTeams) {
 		ArrayList<TeamRequestBundle> teamBundleList = new ArrayList<TeamRequestBundle>();
 		for (int i = 0; i < numTeams; i++) {

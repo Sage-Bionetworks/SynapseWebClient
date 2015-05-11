@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -62,7 +61,6 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	@Override
 	public void addTeam(Team team, Long notificationCount) {
 		emptyHTML.setVisible(false);
-		GWT.debugger();
 		if (isBig) {
 			BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 			teamRenderer.configure(team, team.getDescription());

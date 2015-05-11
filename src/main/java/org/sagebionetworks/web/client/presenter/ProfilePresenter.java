@@ -47,6 +47,7 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -121,11 +122,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
-		myTeamsWidget.clear();
 		view.addMyTeamsWidget(myTeamsWidget);
 		view.addOpenInvitesWidget(openInvitesWidget);
-		inviteCount = 0;
-		openRequestCount = 0;
 	}
 
 	
@@ -177,13 +175,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	// Configuration
 	public void updateProfileView(String userId, final ProfileArea initialTab) {
-		view.clear();
-		view.showLoading();
-		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
-		view.setSortText(currentProjectSort.sortText);
+		inviteCount = 0;
+		openRequestCount = 0;
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
+		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		view.clear();
+		myTeamsWidget.clear();
+		view.showLoading();
+		view.setSortText(currentProjectSort.sortText);
+		myTeamsWidget.configure(false);
 		view.setProfileEditButtonVisible(isOwner);	
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
@@ -383,6 +385,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
+		myTeamsWidget.clear();
 		myTeamsWidget.showLoading();
 		view.clearTeamNotificationCount();
 		if (isOwner)
@@ -392,7 +395,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeamInvites() {
-		
+		GWT.debugger();
 		CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
 			@Override
 			public void invoke(List<OpenUserInvitationBundle> invites) {
@@ -412,11 +415,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
 			@Override
 			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
+				myTeamsWidget.clear();
 				if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
 					int totalRequestCount = 0;
 					view.addMyTeamProjectsFilter();
-					myTeamsWidget.configure(false);
-					myTeamsWidget.clear();
 					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
 						// requests will always be 0 or greater
 						Long requestCount = teamAndRequest.getRequestCount();
@@ -430,13 +432,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						addMembershipRequests(totalRequestCount);
 					}
 				} else {
-					myTeamsWidget.clear();
 					myTeamsWidget.showEmpty();
 					view.setTeamsFilterVisible(false);
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				myTeamsWidget.clear();
 				view.setTeamsFilterVisible(false);
 				view.setTeamsError(caught.getMessage());
 			}
