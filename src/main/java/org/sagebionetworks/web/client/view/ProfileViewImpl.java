@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.shared.event.AlertClosedEvent;
 import org.gwtbootstrap3.client.shared.event.AlertClosedHandler;
 import org.gwtbootstrap3.client.ui.Alert;
@@ -28,18 +26,12 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-
-
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -230,7 +222,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private OpenTeamInvitationsWidget openInvitesWidget;
-	private TeamListWidget myTeamsWidget;
 	private SettingsPresenter settingsPresenter;
 	
 	@Inject
@@ -240,7 +231,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SageImageBundle sageImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
-			TeamListWidget myTeamsWidget,
 			SettingsPresenter settingsPresenter) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
@@ -248,7 +238,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.openInvitesWidget = openInvitesWidget;
-		this.myTeamsWidget = myTeamsWidget;
 		this.settingsPresenter = settingsPresenter;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -379,6 +368,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		});
 	}
 	
+	@Override
+	public void addMyTeamsWidget(TeamListWidget myTeamsWidget) {
+		teamsTabContent.clear();
+		teamsTabContent.add(myTeamsWidget.asWidget());
+	}
+	
+	@Override
+	public void addOpenInvitesWidget(OpenTeamInvitationsWidget openInvitesWidget) {
+		openInvitesContainer.clear();
+		openInvitesContainer.add(openInvitesWidget.asWidget());
+	}
+	
 	public void clearSortOptions() {
 		sortProjectsDropDownMenu.clear();
 	}
@@ -455,11 +456,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
-		
+		openInvitesContainer.setVisible(isOwner);
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
-			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
@@ -469,7 +469,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		}
 		
 		//Teams
-		teamsTabContent.add(myTeamsWidget.asWidget());
 		DisplayUtils.show(navtabContainer);
 	}
 	
@@ -492,34 +491,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeamsFilterTeams(List<Team> teams) {
-		teamFiltersDropDownMenu.clear();
-		//also create a link for each team in the project filters
-		addMyTeamProjectsFilter();
-		teamFiltersDropDownMenu.add(new Divider());
-		for (final Team team : teams) {
-			AnchorListItem teamFilter = new AnchorListItem(team.getName());
-			teamFilter.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.applyFilterClicked(ProjectFilterEnum.TEAM, team);
-				}
-			});
-			teamFiltersDropDownMenu.add(teamFilter);
-		}
+	public void addTeamsFilterTeam(final Team team) {
+		AnchorListItem teamFilter = new AnchorListItem(team.getName());
+		teamFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.TEAM, team);
+			}
+		});
+		teamFiltersDropDownMenu.add(teamFilter);
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams, boolean isOwner) {
-		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
-			@Override
-			public void invoke(String teamId, Long requestCount) {
-				presenter.addMembershipRequests(requestCount.intValue());
-			}
-		});
-	}
-	
-	private void addMyTeamProjectsFilter() {
+	public void addMyTeamProjectsFilter() {
+		teamFiltersDropDownMenu.clear();
 		AnchorListItem teamFilter = new AnchorListItem("All of my teams");
 		teamFilter.addClickHandler(new ClickHandler() {
 			@Override
@@ -528,28 +513,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		teamFiltersDropDownMenu.add(teamFilter);
+		teamFiltersDropDownMenu.add(new Divider());
+		
 	}
 	
 	@Override
 	public void setTeamsFilterVisible(boolean isVisible) {
 		teamFilters.setVisible(isVisible);	
-	}
-	
-	@Override
-	public void refreshTeamInvites(){
-		CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
-			@Override
-			public void invoke(List<OpenUserInvitationBundle> invites) {
-				presenter.updateTeamInvites(invites);
-			}
-		};
-		openInvitesWidget.configure(new Callback() {
-			@Override
-			public void invoke() {
-				//refresh the teams and invites
-				presenter.refreshTeams();
-			}
-		}, openTeamInvitationsCallback);
 	}
 	
 	@Override
@@ -737,8 +707,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		createTeamTextBox.setValue("");
 		createProjectTextBox.setValue("");
 		
-		teamsTabContent.clear();
-		openInvitesContainer.clear();
+//		teamsTabContent.clear();
+//		openInvitesContainer.clear();
 		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
@@ -900,11 +870,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
 		this.editUserProfilePanel.clear();
 		this.editUserProfilePanel.add(userProfileModalWidget);
-	}
-	
-	@Override
-	public void showTeamsLoading() {
-		myTeamsWidget.showLoading();
 	}
 	
 	@Override

@@ -107,6 +107,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -1850,11 +1851,11 @@ public class SynapseClientImplTest {
 			JSONObjectAdapterException, SynapseException {
 		// the paginated results were set up to return {teamZ, teamA}, but
 		// servlet side we sort by name.
-		List<Team> results = synapseClient.getTeamsForUser("abba");
+		List<TeamRequestBundle> results = synapseClient.getTeamsForUser("abba", false);
 		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
 		assertEquals(2, results.size());
-		assertEquals(teamA, results.get(0));
-		assertEquals(teamZ, results.get(1));
+		assertEquals(teamA, results.get(0).getTeam());
+		assertEquals(teamZ, results.get(1).getTeam());
 	}
 	
 	@Test

@@ -60,10 +60,14 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -104,12 +108,16 @@ public class ProfilePresenterTest {
 	SortOptionEnum sort = SortOptionEnum.LATEST_ACTIVITY;
 	List<EntityHeader> myFavorites;
 	List<Team> myTeams;
+	List<TeamRequestBundle> myTeamBundles;
 	ProjectPagedResults projects;
 	List<ProjectHeader> myProjects;
 	ChallengePagedResults testChallengePagedResults;
 	List<ChallengeBundle> testChallenges;
 	ProjectBadge mockProjectBadge;
 	ChallengeBadge mockChallengeBadge;
+	ArrayList<Team> teamList;	
+	TeamListWidget mockTeamListWidget;
+	OpenTeamInvitationsWidget mockTeamInviteWidget;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -127,8 +135,10 @@ public class ProfilePresenterTest {
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		mockProjectBadge = mock(ProjectBadge.class);
 		mockChallengeBadge = mock(ChallengeBadge.class);
+		mockTeamListWidget = mock(TeamListWidget.class);
+		mockTeamInviteWidget = mock(OpenTeamInvitationsWidget.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockInjector);	
+				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, mockInjector);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -141,17 +151,28 @@ public class ProfilePresenterTest {
 		testUser.setSession(new Session());
 		testUser.getSession().setSessionToken("token");
 		testUser.setIsSSO(false);
+		Team testTeam = new Team();
+		testTeam.setId("42");
+		testTeam.setName("My Test Team");
+		this.teamList = new ArrayList<Team>();
+		this.teamList.add(testTeam);
 		
 		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
 		testUser.writeToJSONObject(adapter);
 		testUserJson = adapter.toJSONString(); 
 		
 		myTeams = TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
+		myTeamBundles = new ArrayList<TeamRequestBundle>();
+		for (int i = 0; i < myTeams.size(); i++) {
+			myTeamBundles.add(new TeamRequestBundle(myTeams.get(i), Long.valueOf(i)));
+		}
 		setupGetUserProfile();
 		
 		PassingRecord myPassingRecord = new PassingRecord();
 		String passingRecordJson = myPassingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(passingRecordJson).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(myTeamBundles).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+
 		
 		//set up get user projects test
 		EntityHeader project1 = new EntityHeader();
@@ -256,11 +277,11 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		//also verify that it is asking for the correct teams
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		
 		assertEquals(targetUserId, captor.getValue());
 		verifyProfileShown(false);
@@ -283,10 +304,10 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
 		//also verify that it is asking for the correct teams
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamsForUser(captor.capture(), anyBoolean(), any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
 	} 
 	
@@ -404,8 +425,8 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectSortVisible(true);
 		//should have refreshed teams too, since this is the owner
 		verify(mockView).clearTeamNotificationCount();
-		verify(mockView).refreshTeamInvites();
-		verify(mockView).setTeams(anyList(), eq(true));
+		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class), any(Long.class));
+		verify(mockView).setTeamNotificationCount(String.valueOf(1));	
 	}
 	
 	@Test
@@ -417,11 +438,8 @@ public class ProfilePresenterTest {
 		verify(mockView, Mockito.times(2)).showProjectsLoading(anyBoolean());
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
-		//should have refreshed teams too, since this is the owner
-		verify(mockView, never()).clearTeamNotificationCount();
-		verify(mockView, never()).refreshTeamInvites();
-		verify(mockView, never()).setTeams(anyList(), eq(true));
-		
+		//should not have refreshed team invites, since this is not the owner
+		//verify(mockView).clearTeamNotificationCount();
 	}
 
 	
@@ -755,44 +773,138 @@ public class ProfilePresenterTest {
 		verify(mockView).addChallengeWidget(any(Widget.class));
 	}
 	
+	public ArrayList<Team> setupUserTeams(SynapseClientAsync mockSynapseClient) {
+		Team testTeam = new Team();
+		testTeam.setId("42");
+		testTeam.setName("My Test Team");
+		ArrayList<Team> teamList = new ArrayList<Team>();
+		teamList.add(testTeam);
+		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapseClient).getTeamsForUser(anyString(), false, any(AsyncCallback.class));
+		return teamList;
+	}
+	
+	public ArrayList<TeamRequestBundle> setupUserTeamBundles(SynapseClientAsync mockSynapseClient, long openRequestNumber) {
+		Team testTeam = new Team();
+		testTeam.setId("42");
+		testTeam.setName("My Test Team");
+		ArrayList<TeamRequestBundle> teamBundleList = new ArrayList<TeamRequestBundle>();
+		teamBundleList.add(new TeamRequestBundle(testTeam, openRequestNumber));
+		AsyncMockStubber.callSuccessWith(teamBundleList).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		return teamBundleList;
+	}
+	
 	@Test
-	public void testGetTeams() {
+	public void testGetTeamBundlesNoRequests() throws Exception {
+		AsyncMockStubber.callSuccessWith(setupUserTeamBundles(mockSynapseClient,3)).
+		when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getTeamBundles("12345",mockSynapseClient, adapterFactory, false);
+		verify(mockSynapseClient).getTeamsForUser(eq("12345"), anyBoolean(), any(AsyncCallback.class));
+		verify(mockTeamListWidget).addTeam(any(Team.class), any(Long.class));
+		verify(mockView, Mockito.never()).setTeamNotificationCount(anyString());
+	}
+	
+	@Test
+	public void testGetTeamBundlesWithRequests() throws Exception {
+		AsyncMockStubber.callSuccessWith(setupUserTeamBundles(mockSynapseClient,3)).
+			when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getTeamBundles("12345",mockSynapseClient, adapterFactory, true);
+		verify(mockSynapseClient).getTeamsForUser(eq("12345"), anyBoolean(), any(AsyncCallback.class));
+		verify(mockTeamListWidget).addTeam(any(Team.class), any(Long.class));
+		verify(mockView).setTeamNotificationCount(anyString());
+	}
+	
+	@Test
+	public void testGetTeamBundlesFailure() throws Exception {
+		Exception ex = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getTeamBundles("12345",mockSynapseClient, adapterFactory, true);
+		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView).setTeamsError(ex.getMessage());
+	}
+	
+	@Test
+	public void testGetQueryForRequestCount() throws Exception {
+		//when request count is null, should do nothing
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getTeamBundles("12345",mockSynapseClient, adapterFactory, true);
+		verify(mockView, times(0)).setTeamNotificationCount(anyString());
+		verify(mockView, times(0)).showErrorMessage(anyString());
+
+		//when request count is 0, should do nothing
+
+		AsyncMockStubber.callSuccessWith(setupUserTeamBundles(mockSynapseClient, 0)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getTeamBundles("12345",mockSynapseClient, adapterFactory, true);
+		verify(mockView, times(0)).setTeamNotificationCount(anyString());
+		verify(mockView, times(0)).showErrorMessage(anyString());
+
+		//when request count is >0, should set the request count in the view
+		AsyncMockStubber.callSuccessWith(setupUserTeamBundles(mockSynapseClient, 5L)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getTeamBundles("12345",mockSynapseClient, adapterFactory, true);
+		verify(mockView).setTeamNotificationCount("5");
+		verify(mockView, times(0)).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testgetTeamsForUserFailure() throws Exception {
+		Exception ex = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).
+				getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getTeamBundles("12345",mockSynapseClient, adapterFactory, true);
+		verify(mockView).setTeamsError(ex.getMessage());
+	}
+	
+	
+	@Test
+	public void testTeamsTabNotOwner() {
+		profilePresenter.setIsOwner(false);
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
-		verify(mockView).showTeamsLoading();
-		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
-		verify(mockView).setTeams(eq(myTeams), anyBoolean());
+		verify(mockTeamListWidget).showLoading();
+		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView, Mockito.never()).setTeamNotificationCount(anyString());
+		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class), any(Long.class));
+	}
+	
+	
+	@Test
+	public void testTeamsTabOwner() {
+		profilePresenter.setIsOwner(true);
+		profilePresenter.tabClicked(ProfileArea.TEAMS);	
+		verify(mockTeamListWidget).showLoading();
+		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class), any(Long.class));
 	}
 	
 	@Test
 	public void testGetTeamsError() {
 		String errorMessage = "error loading teams";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
-		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsError(errorMessage);
 	}
 	
 	@Test
 	public void testGetTeamFilters() {
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
-		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(true);
-		verify(mockView).setTeamsFilterTeams(myTeams);
+		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class), any(Long.class));
 	}
 	
 	@Test
 	public void testGetTeamFiltersEmpty() {
-		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new ArrayList()).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
-		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(false);
 	}
+	
 	@Test
 	public void testGetTeamFiltersError() {
 		String errorMessage = "error loading teams";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
-		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).setTeamsFilterVisible(false);
 	}
 	
@@ -847,8 +959,8 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testUpdateTeamInvites() {
-		//reset team notification count
-		profilePresenter.setTeamNotificationCount(0);
+		//reset team invite count
+		profilePresenter.setInviteCount(0);
 		int inviteCount = 3;
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
@@ -856,54 +968,65 @@ public class ProfilePresenterTest {
 		}
 		profilePresenter.updateTeamInvites(invites);
 		
-		assertEquals(inviteCount, profilePresenter.getTeamNotificationCount());
+		assertEquals(inviteCount, profilePresenter.getInviteCount());
 		verify(mockView).setTeamNotificationCount(eq(Integer.toString(inviteCount)));
 	}
 	
 	@Test
 	public void testAddMembershipRequests() {
 		int beforeNotificationCount = 12; 
-		profilePresenter.setTeamNotificationCount(beforeNotificationCount);
+		profilePresenter.setOpenRequestCount(beforeNotificationCount);
+		int expectedAfterNotificationCount = 1;
+		profilePresenter.addMembershipRequests(expectedAfterNotificationCount);
 		
-		profilePresenter.addMembershipRequests(1);
-		
-		int expectedAfterNotificationCount = beforeNotificationCount+1;
-		assertEquals(expectedAfterNotificationCount, profilePresenter.getTeamNotificationCount());
+		assertEquals(expectedAfterNotificationCount, profilePresenter.getOpenRequestCount());
 		verify(mockView).setTeamNotificationCount(eq(Integer.toString(expectedAfterNotificationCount)));
 	}
 	
 	@Test
 	public void testUpdateTeamInvitesZero() {
-		profilePresenter.setTeamNotificationCount(0);
+		profilePresenter.setInviteCount(0);
 		profilePresenter.updateTeamInvites(new ArrayList<OpenUserInvitationBundle>());
 		
-		assertEquals(0, profilePresenter.getTeamNotificationCount());
+		assertEquals(0, profilePresenter.getInviteCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
 	
 	@Test
 	public void testAddMembershipRequestsZero() {
-		profilePresenter.setTeamNotificationCount(0);
+		profilePresenter.setOpenRequestCount(0);
 		profilePresenter.addMembershipRequests(0);
-		assertEquals(0, profilePresenter.getTeamNotificationCount());
+		assertEquals(0, profilePresenter.getOpenRequestCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
 	
 	@Test
 	public void testRefreshTeams() {
-		profilePresenter.setTeamNotificationCount(10);
+		int totalNotifications = 6; // must be even for tests to pass
+		int inviteCount = totalNotifications/2;
+		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
+		for (int i = 0; i < inviteCount; i++) {
+			invites.add(new OpenUserInvitationBundle());	
+		}	
+		setupUserTeamBundles(mockSynapseClient, totalNotifications/2);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.refreshTeams();
-		verify(mockView).refreshTeamInvites();
-		assertEquals(0, profilePresenter.getTeamNotificationCount());
-		verify(mockView).clearTeamNotificationCount();
+		ArgumentCaptor<CallbackP> updateTeamInvitesCallback = ArgumentCaptor.forClass(CallbackP.class);
+		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
+		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), updateTeamInvitesCallback.capture());
+		updateTeamInvitesCallback.getValue().invoke(invites);
+		//now that invites are updated, refreshing will update the current count to totalNotifications
+		refreshTeamsCallback.getValue().invoke();
+		verify(mockView, times(2)).setTeamNotificationCount(String.valueOf(totalNotifications));
+		verify(mockView, times(2)).clearTeamNotificationCount();
 	}
 	
 	@Test
 	public void testRefreshTeamsNotOwner() {
 		profilePresenter.setIsOwner(false);
 		profilePresenter.refreshTeams();
-		verify(mockView, never()).refreshTeamInvites();
+		// How do I test?
+		//verify(mockView, never()).refreshTeamInvites();
 	}
 
 	
