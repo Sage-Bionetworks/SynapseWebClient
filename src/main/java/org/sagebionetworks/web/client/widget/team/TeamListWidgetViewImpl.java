@@ -88,7 +88,6 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	@Override
 	public void configure(boolean isBig) {
 		this.isBig = isBig;
-		// clear(); Should I re-add empty?
 		team2Badge = new HashMap<String, HasNotificationUI>();
 		if (isBig)
 			addStyleName("row");

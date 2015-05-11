@@ -707,9 +707,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		createTeamTextBox.setValue("");
 		createProjectTextBox.setValue("");
 		
-//		teamsTabContent.clear();
-//		openInvitesContainer.clear();
-		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
 		projectFiltersUI.setVisible(false);
