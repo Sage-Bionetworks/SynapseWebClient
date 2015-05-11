@@ -516,7 +516,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckAddWikiSubpage(){
-		if (wikiPageId == null) {
+		if (entityBundle.getRootWikiId() == null) {
 			createWikiPage("Root");
 		} else {
 			view.showPromptDialog(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
@@ -542,7 +542,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	            @Override
 	            public void onFailure(Throwable caught) {
 	                if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-	                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
+	                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
 	            }
 	        });
 		}

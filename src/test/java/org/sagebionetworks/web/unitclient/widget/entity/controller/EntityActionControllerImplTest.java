@@ -21,6 +21,7 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -649,30 +650,95 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setToolsButtonVisible(true);
 	}
 	
-
-//	@Test
-//	public void testCreatePage() throws JSONObjectAdapterException{
-//		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-//		presenter.createPage("a new wiki page with this title");
-//		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-//		verify(mockView).showInfo(anyString(), anyString());
-//	}
-//	
-//	@Test
-//	public void testCreatePageWithCallback() throws JSONObjectAdapterException{
-//		org.sagebionetworks.web.client.utils.Callback onSuccessCallback =  mock(org.sagebionetworks.web.client.utils.Callback.class);
-//		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-//		presenter.createPage("a new wiki page with this title", onSuccessCallback);
-//		verify(onSuccessCallback).invoke();
-//	}
-//
-//	
-//	@Test
-//	public void testCreatePageFailure() throws JSONObjectAdapterException{		
-//		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-//		AsyncMockStubber.callFailureWith(new RuntimeException("creation failed")).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-//		presenter.createPage("a new wiki page with this title");
-//		verify(mockView).showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-//	}
+	@Test
+	public void testConfigureNoWikiSubpageProject(){
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, true);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
+		verify(mockActionMenu).addActionListener(Action.ADD_WIKI_SUBPAGE, controller);
+	}
 	
+	@Test
+	public void testConfigureWikiSubpageFolder(){
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
+	}
+	
+	@Test
+	public void testConfigureWikiSubpageTable(){
+		entityBundle.setEntity(new TableEntity());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
+	}
+	
+	@Test
+	public void testOnAddWikiSubpageNoUpdate(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_SUBPAGE);
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnRootAddWikiSubpageCanUpdate(){
+		//Edge case.  User attempts to add a subpage on a project that does not yet have a wiki.  Verify a root page is created (and page refreshed)...
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, null,mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_SUBPAGE);
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnAddWikiSubpageCanUpdate(){
+		//Set up so that we are on the root wiki page, and we run the add subpage command.
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId("123");
+		controller.configure(mockActionMenu, entityBundle, "123",mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_SUBPAGE);
+		//verify that it has not yet created the wiki page
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		//it prompts the user for a wiki page name
+		ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(PromptCallback.class);
+		verify(mockView).showPromptDialog(anyString(), callbackCaptor.capture());
+		PromptCallback capturedCallback = callbackCaptor.getValue();
+		//if called back with an undefined value, a wiki page is still not created
+		capturedCallback.callback("");
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		
+		capturedCallback.callback(null);
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		
+		capturedCallback.callback("a valid name");
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testCreateWikiPageFailure(){
+		//Set up so that we are on the root wiki page, and we run the add subpage command.
+		String error = "goodnight";
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId("123");
+		controller.configure(mockActionMenu, entityBundle, "123",mockEntityUpdatedHandler);
+		controller.createWikiPage("foo");
+		
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
 }
