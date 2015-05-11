@@ -15,7 +15,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,6 +114,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -167,6 +175,8 @@ public class SynapseClientImplTest {
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
+	PaginatedResults mockPaginatedMembershipRequest;
+
 	MessageToUser sentMessage;
 	Long storageLocationId = 9090L;
 	UserProfile testUserProfile;
@@ -187,7 +197,8 @@ public class SynapseClientImplTest {
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
-
+		mockPaginatedMembershipRequest = Mockito.mock(PaginatedResults.class);
+		when(mockPaginatedMembershipRequest.getTotalNumberOfResults()).thenReturn(3L);
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
@@ -1384,7 +1395,7 @@ public class SynapseClientImplTest {
 		Team team = new Team();
 		team.setId("test team id");
 		when(mockSynapse.getTeam(anyString())).thenReturn(team);
-
+		
 		// is member
 		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
 		membershipStatus.setIsMember(true);
@@ -1846,16 +1857,38 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetTeamsForUser() throws RestServiceException,
-			JSONObjectAdapterException, SynapseException {
+	public void testGetTeamBundlesNotOwner() throws RestServiceException, SynapseException {
 		// the paginated results were set up to return {teamZ, teamA}, but
 		// servlet side we sort by name.
-		List<Team> results = synapseClient.getTeamsForUser("abba");
+		List<TeamRequestBundle> results = synapseClient.getTeamsForUser("abba", false);
 		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
 		assertEquals(2, results.size());
-		assertEquals(teamA, results.get(0));
-		assertEquals(teamZ, results.get(1));
+		assertEquals(teamA, results.get(0).getTeam());
+		assertEquals(teamZ, results.get(1).getTeam());
+		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(anyString(), anyString(),
+				anyLong(), anyLong());
 	}
+	
+	@Test
+	public void testGetTeamBundlesOwner() throws RestServiceException, SynapseException {
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(true);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(
+				testTeamMember);
+		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(mockPaginatedMembershipRequest);
+		
+		List<TeamRequestBundle> results = synapseClient.getTeamsForUser("abba", true);
+		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
+		assertEquals(2, results.size());
+		assertEquals(teamA, results.get(0).getTeam());
+		assertEquals(teamZ, results.get(1).getTeam());
+		Long reqCount1 = results.get(0).getRequestCount();
+		Long reqCount2 = results.get(1).getRequestCount();
+		assertEquals(new Long(3L), results.get(0).getRequestCount());
+		assertEquals(new Long(3L), results.get(1).getRequestCount());
+
+	}
+	
 	
 	@Test
 	public void testGetEntityInfo() throws RestServiceException,
