@@ -169,33 +169,6 @@ SynapseWidgetPresenter {
 		} 
 	}
 
-	@Override
-	public void createPage(final String name) {
-		if (DisplayUtils.isDefined(name))
-			createPage(name, null);
-	}
-
-	public void createPage(final String name, final org.sagebionetworks.web.client.utils.Callback onSuccess) {
-		WikiPage page = new WikiPage();
-		page.setParentWikiId(wikiKey.getWikiPageId());
-		page.setTitle(name);
-        synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), page, new AsyncCallback<WikiPage>() {
-            @Override
-            public void onSuccess(WikiPage result) {
-                view.showInfo("Page '" + name + "' Added", "");
-            	if (onSuccess != null) {
-            		onSuccess.invoke();
-            	}
-                refresh();
-            }
-            @Override
-            public void onFailure(Throwable caught) {
-                if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-            }
-        });
-	}
-
 	public void clear(){
 		view.clear();
 	}

@@ -145,31 +145,6 @@ public class WikiPageWidgetTest {
 	}
 	
 	@Test
-	public void testCreatePage() throws JSONObjectAdapterException{
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		presenter.createPage("a new wiki page with this title");
-		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
-	}
-	
-	@Test
-	public void testCreatePageWithCallback() throws JSONObjectAdapterException{
-		org.sagebionetworks.web.client.utils.Callback onSuccessCallback =  mock(org.sagebionetworks.web.client.utils.Callback.class);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		presenter.createPage("a new wiki page with this title", onSuccessCallback);
-		verify(onSuccessCallback).invoke();
-	}
-
-	
-	@Test
-	public void testCreatePageFailure() throws JSONObjectAdapterException{		
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		AsyncMockStubber.callFailureWith(new RuntimeException("creation failed")).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-		presenter.createPage("a new wiki page with this title");
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-	}
-
-	@Test
 	public void testShowCreatedBy(){
 		presenter.showCreatedBy(false);
 		verify(mockView).showCreatedBy(false);

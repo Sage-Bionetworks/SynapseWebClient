@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -39,4 +40,10 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 */
 	void addMarkdownEditorModalWidget(IsWidget modalWidget);
 
+	/**
+	 * Prompt the user to enter a string value.
+	 * @param prompt
+	 * @param callback
+	 */
+	void showPromptDialog(String prompt, PromptCallback callback);
 }
