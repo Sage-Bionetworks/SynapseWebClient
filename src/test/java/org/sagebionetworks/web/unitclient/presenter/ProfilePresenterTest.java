@@ -434,7 +434,6 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockView, times(2)).addProjectWidget(any(Widget.class));
 		//should not have refreshed team invites, since this is not the owner
-		//verify(mockView).clearTeamNotificationCount();
 	}
 
 	
