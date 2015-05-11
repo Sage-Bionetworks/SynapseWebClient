@@ -384,7 +384,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
-		
 		view.clearTeamNotificationCount();
 		if (isOwner)
 			refreshTeamInvites();
