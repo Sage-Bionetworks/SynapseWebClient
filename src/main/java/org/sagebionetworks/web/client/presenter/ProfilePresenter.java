@@ -384,8 +384,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
-		myTeamsWidget.clear();
-		myTeamsWidget.showLoading();
+		
 		view.clearTeamNotificationCount();
 		if (isOwner)
 			refreshTeamInvites();
@@ -410,6 +409,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getTeamBundles(String userId, final boolean includeRequestCount) {
+		myTeamsWidget.clear();
+		myTeamsWidget.showLoading();
 		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
 			@Override
 			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
