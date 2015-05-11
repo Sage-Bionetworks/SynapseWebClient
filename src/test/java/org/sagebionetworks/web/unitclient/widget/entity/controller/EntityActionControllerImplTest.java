@@ -723,8 +723,6 @@ public class EntityActionControllerImplTest {
 		
 		capturedCallback.callback("a valid name");
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
-		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
-		
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
