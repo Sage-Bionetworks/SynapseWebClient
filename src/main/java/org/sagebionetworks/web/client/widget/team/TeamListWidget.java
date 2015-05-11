@@ -1,17 +1,9 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.view.TeamRequestBundle;
 
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -33,8 +25,8 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	public void configure(List<Team> teams, boolean isBig) {
-		view.configure(teams, isBig);
+	public void configure(boolean isBig) {
+		view.configure(isBig);
 	}	
 	
 	public Widget asWidget() {
@@ -48,6 +40,14 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	
 	public void showLoading() {
 		view.showLoading();
+	}
+	
+	public void showEmpty() {
+		view.showEmpty();
+	}
+	
+	public void addTeam(Team team, Long notificationCount) {
+		view.addTeam(team, notificationCount);
 	}
 
 }

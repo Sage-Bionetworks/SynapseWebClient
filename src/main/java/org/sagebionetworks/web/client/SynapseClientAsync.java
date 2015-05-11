@@ -58,6 +58,7 @@ import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -415,4 +416,5 @@ public interface SynapseClientAsync {
 
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
+	void getEntityInfo(String entityId, AsyncCallback<EntityBundlePlus> callback);
 }

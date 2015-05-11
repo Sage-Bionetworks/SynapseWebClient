@@ -52,11 +52,15 @@ public class TeamListWidgetTest {
 	}
 	
 	public static ArrayList<Team> setupUserTeams(JSONObjectAdapter adapter, SynapseClientAsync mockSynapseClient) throws JSONObjectAdapterException {
-		Team testTeam = new Team();
-		testTeam.setId("42");
-		testTeam.setName("My Test Team");
+		Team testTeam1 = new Team();
+		testTeam1.setId("42");
+		testTeam1.setName("My Test Team");
+		Team testTeam2 = new Team();
+		testTeam2.setId("24");
+		testTeam2.setName("Team Test My");
 		ArrayList<Team> teamList = new ArrayList<Team>();
-		teamList.add(testTeam);
+		teamList.add(testTeam1);
+		teamList.add(testTeam2);
 		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		return teamList;
 	}
@@ -65,8 +69,8 @@ public class TeamListWidgetTest {
 	public void testConfigureIsBig() {
 		//this is the configuration used by the Teams tab in the dashboard
 		boolean isBig = true;
-		widget.configure(teamList, isBig);
-		verify(mockView).configure(eq(teamList), eq(isBig));
+		widget.configure(isBig);
+		verify(mockView).configure(eq(isBig));
 	}
 	
 	@Test
@@ -74,8 +78,8 @@ public class TeamListWidgetTest {
 		//this is the configuration used by the old home page
 		boolean isBig = false;
 		//null request count callback
-		widget.configure(teamList, isBig);
-		verify(mockView).configure(eq(teamList), eq(isBig));
+		widget.configure(isBig);
+		verify(mockView).configure(eq(isBig));
 	}
 	
 }

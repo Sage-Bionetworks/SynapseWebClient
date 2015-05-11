@@ -29,12 +29,15 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
@@ -68,10 +71,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private UserProfileModalWidget userProfileModalWidget;
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
+	private OpenTeamInvitationsWidget openInvitesWidget;
 
 	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
-	private int teamNotificationCount;
+	private int inviteCount;
+	private int openRequestCount;
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentProjectOffset, currentChallengeOffset;
@@ -80,6 +85,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public ProjectFilterEnum filterType;
 	public Team filterTeam;
 	public SortOptionEnum currentProjectSort;
+	public TeamListWidget myTeamsWidget;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -92,6 +98,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			UserProfileModalWidget userProfileModalWidget,
 			LinkedInServiceAsync linkedInServic,
 			GWTWrapper gwt,
+			TeamListWidget myTeamsWidget,
+			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -104,6 +112,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.linkedInService = linkedInServic;
 		this.gwt = gwt;
+		this.myTeamsWidget = myTeamsWidget;
+		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -111,14 +121,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
+		myTeamsWidget.clear();
+		view.addMyTeamsWidget(myTeamsWidget);
+		view.addOpenInvitesWidget(openInvitesWidget);
+		inviteCount = 0;
+		openRequestCount = 0;
 	}
 
+	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Install the view
 		panel.setWidget(view);
 		
 	}
+	
 
 	@Override
 	public void setPlace(Profile place) {
@@ -366,12 +383,29 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
-		view.showTeamsLoading();
-		teamNotificationCount = 0;
+		myTeamsWidget.showLoading();
 		view.clearTeamNotificationCount();
 		if (isOwner)
-			view.refreshTeamInvites();
+			refreshTeamInvites();
 		getTeamBundles(currentUserId, synapseClient, adapterFactory, isOwner);
+	}
+	
+	@Override
+	public void refreshTeamInvites() {
+		
+		CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
+			@Override
+			public void invoke(List<OpenUserInvitationBundle> invites) {
+				updateTeamInvites(invites);
+			}
+		};
+		openInvitesWidget.configure(new Callback() {
+			@Override
+			public void invoke() {
+				//refresh the teams after joining one
+				refreshTeams();
+			}
+		}, openTeamInvitationsCallback);
 	}
 	
 	public void getTeamBundles(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory,
@@ -380,20 +414,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
 				if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
-					int requestCount = 0;
-					List<Team> teams = new ArrayList<Team>(teamsRequestBundles.size());
+					int totalRequestCount = 0;
+					view.addMyTeamProjectsFilter();
+					myTeamsWidget.configure(false);
+					myTeamsWidget.clear();
 					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
-						teams.add(teamAndRequest.getTeam());
-						if (includeRequestCount)
-							requestCount += teamAndRequest.getRequestCount();
+						Long requestCount = teamAndRequest.getRequestCount();
+						Team team = teamAndRequest.getTeam();
+						myTeamsWidget.addTeam(team, requestCount);
+						view.addTeamsFilterTeam(team);
+						totalRequestCount += requestCount == null ? 0 : requestCount;
 					}
-					view.setTeamsFilterVisible(!teams.isEmpty());
-					view.setTeamsFilterTeams(teams);
-					view.setTeams(teams);
+					view.setTeamsFilterVisible(true);
 					if (includeRequestCount) {
-						addMembershipRequests(requestCount);
+						addMembershipRequests(totalRequestCount);
 					}
 				} else {
+					myTeamsWidget.clear();
+					myTeamsWidget.showEmpty();
 					view.setTeamsFilterVisible(false);
 				}
 			}
@@ -669,31 +707,38 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void updateTeamInvites(List<OpenUserInvitationBundle> invites) {
-		if (invites != null && invites.size() > 0) {
-			teamNotificationCount += invites.size();
-			// update team notification count
-			if (teamNotificationCount > 0)
-				view.setTeamNotificationCount(Integer
-						.toString(teamNotificationCount));
+		if (invites != null && invites.size() != inviteCount) {
+			inviteCount = invites.size();
 		}
+		if (openRequestCount + inviteCount > 0)
+			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
 	}
 
 	@Override
 	public void addMembershipRequests(int count) {
-		teamNotificationCount += count;
-		if (teamNotificationCount > 0)
-			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+		if (count != openRequestCount) 
+			openRequestCount = count;		
+		if (openRequestCount + inviteCount > 0)
+			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
 	}
 	
 	/**
 	 * Exposed for test purposes only
 	 */
-	public int getTeamNotificationCount() {
-		return teamNotificationCount;
+	public int getOpenRequestCount() {
+		return openRequestCount;
 	}
 	
-	public void setTeamNotificationCount(int teamNotificationCount) {
-		this.teamNotificationCount = teamNotificationCount;
+	public int getInviteCount() {
+		return inviteCount;
+	}
+	
+	public void setOpenRequestCount(int openRequestCount) {
+		this.openRequestCount = openRequestCount;
+	}
+	
+	public void setInviteCount(int inviteCount) {
+		this.inviteCount = inviteCount;
 	}
 	
 	/**

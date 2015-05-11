@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -188,6 +189,8 @@ public class WikiPageWidgetTest {
 
 	@Test
 	public void testReloadWikiPageSuccess() {
+		CallbackP<String> mockWikiReloadHandler = mock(CallbackP.class);
+		presenter.setWikiReloadHandler(mockWikiReloadHandler);
 		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null);
 		WikiPage wikiPage = new WikiPage();
 		wikiPage.setId(wikiPageKey.getWikiPageId());
@@ -195,6 +198,7 @@ public class WikiPageWidgetTest {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.reloadWikiPage();
 		verify(mockView).resetWikiMarkdown(anyString(), eq(wikiPageKey), anyBoolean(), anyBoolean(), any(Long.class));
+		verify(mockWikiReloadHandler).invoke(anyString());
 	}
 
 	@Test
