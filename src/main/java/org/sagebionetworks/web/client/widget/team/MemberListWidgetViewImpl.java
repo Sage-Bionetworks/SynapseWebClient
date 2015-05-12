@@ -200,7 +200,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		accessCombo.setStyleName("form-control");
 		accessCombo.addItem(MEMBER_ACCESS);
 		accessCombo.addItem(ADMIN_ACCESS);
-		accessCombo.setWidth("140px");
+		accessCombo.setWidth("150px");
 		accessCombo.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
