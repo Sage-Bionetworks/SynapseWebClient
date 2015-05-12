@@ -192,7 +192,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 	
 	private void setupErrorState() {
-		synapseAlert.clearState();
 		this.view.setTableVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent(false, false);
