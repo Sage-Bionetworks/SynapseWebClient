@@ -25,14 +25,11 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
-import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,13 +43,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private HandlerManager handlerManager = new HandlerManager(this);
 	AdapterFactory adapterFactory;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
 	private final int MAX_FOLDER_LIMIT = 100;
-
+	EntitySelectedHandler entitySelectedHandler;
+	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, SynapseClientAsync synapseClient,
@@ -72,7 +69,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		handlerManager = new HandlerManager(this);
+		entitySelectedHandler = null;
 	}
 
 	public void clear() {
@@ -136,7 +133,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 							}
 						}
 						if (offset == 0) {
-							getChildrenFiles(parentId, parent, 0);
+							getChildrenLinks(parentId, parent);
 						} else {
 							if (parent == null)
 								view.setLoadingVisible(false);
@@ -228,6 +225,40 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 				});
 
 	}
+	
+	/**
+	 * Links are asked for once for a folder, and does not currently support pagination.
+	 * After link query response returns, it queries for files.
+	 * @param parentId
+	 * @param parent
+	 */
+	public void getChildrenLinks(
+			final String parentId,
+			final EntityTreeItem parent) {
+		EntityQuery childrenQuery = createGetChildrenQuery(parentId, 0,
+				org.sagebionetworks.repo.model.entity.query.EntityType.link);
+		synapseClient.executeEntityQuery(childrenQuery,
+				new AsyncCallback<EntityQueryResults>() {
+					@Override
+					public void onSuccess(EntityQueryResults results) {
+						if (!results.getEntities().isEmpty()) {
+							addResultsToParent(
+									parent,
+									results,
+									org.sagebionetworks.repo.model.entity.query.EntityType.link,
+									0, false);
+						}
+						getChildrenFiles(parentId, parent, 0);
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						DisplayUtils.handleServiceException(caught,
+								globalApplicationState,
+								authenticationController.isLoggedIn(), view);
+					}
+				});
+	}
 
 	@Override
 	public void setSelection(String id) {
@@ -239,24 +270,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		return currentSelection;
 	}
 
-	@SuppressWarnings("unchecked")
-	public void addEntitySelectedHandler(EntitySelectedHandler handler) {
-		handlerManager.addHandler(EntitySelectedEvent.getType(), handler);
+	public void setEntitySelectedHandler(EntitySelectedHandler handler) {
+		entitySelectedHandler = handler;
 	}
-
-	@SuppressWarnings("unchecked")
-	public void removeEntitySelectedHandler(EntitySelectedHandler handler) {
-		handlerManager.removeHandler(EntitySelectedEvent.getType(), handler);
-	}
-
-	@SuppressWarnings("unchecked")
-	public void addEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
-	}
-
-	@SuppressWarnings("unchecked")
-	public void removeEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		handlerManager.removeHandler(EntityUpdatedEvent.getType(), handler);
+	
+	public EntitySelectedHandler getEntitySelectedHandler() {
+		return entitySelectedHandler;
 	}
 
 	@Override
@@ -294,11 +313,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		alreadyFetchedEntityChildren.clear();
 	}
 
-	/*
-	 * Private Methods
-	 */
-	private void fireEntitySelectedEvent() {
-		handlerManager.fireEvent(new EntitySelectedEvent());
+	public void fireEntitySelectedEvent() {
+		if (entitySelectedHandler != null) {
+			entitySelectedHandler.onSelection(new EntitySelectedEvent());
+		}
 	}
 
 	public EntityQuery createGetChildrenQuery(String parentId, long offset,
@@ -344,7 +362,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			long offset, boolean isExpandable) {
 		List<EntityHeader> headers = getHeadersFromQueryResults(results);
 		if (parent == null) {
-			if (type == org.sagebionetworks.repo.model.entity.query.EntityType.file) {
+			if (type != org.sagebionetworks.repo.model.entity.query.EntityType.folder) {
 				for (EntityHeader header : headers) {
 					view.appendRootEntityTreeItem(makeTreeItemFromHeader(
 							header, true, false));
@@ -357,7 +375,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 				}
 			}
 		} else {
-			if (type == org.sagebionetworks.repo.model.entity.query.EntityType.file) {
+			if (type != org.sagebionetworks.repo.model.entity.query.EntityType.folder) {
 				for (EntityHeader header : headers) {
 					view.appendChildEntityTreeItem(
 							makeTreeItemFromHeader(header, false, false),

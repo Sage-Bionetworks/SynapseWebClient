@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -32,6 +32,8 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntitySelectedEvent;
+import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -100,11 +102,12 @@ public class EntityTreeBrowserTest {
 		entityTreeBrowser.getFolderChildren("123", null, 0);
 		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor
 				.forClass(EntityQuery.class);
-		verify(mockSynapseClient, times(2)).executeEntityQuery(
+		verify(mockSynapseClient, times(3)).executeEntityQuery(
 				captor.capture(), any(AsyncCallback.class));
 		List<EntityQuery> queries = captor.getAllValues();
 		assertEquals(EntityType.folder, queries.get(0).getFilterByType());
-		assertEquals(EntityType.file, queries.get(1).getFilterByType());
+		assertEquals(EntityType.link, queries.get(1).getFilterByType());
+		assertEquals(EntityType.file, queries.get(2).getFilterByType());
 	}
 
 	@Test
@@ -145,9 +148,10 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testMoreButtonRootLevel() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
-		setQueryResults(2 * maxLim, 0, maxLim);
+		setQueryResults(4 * maxLim, 0, maxLim);
 		entityTreeBrowser.getFolderChildren(parentId, null, 0);
 		// Creates the limited number of entity items
+		// 100 links, and 100 files
 		verify(mockView, times((int) entityTreeBrowser.getMaxLimit()))
 				.insertRootEntityTreeItem(any(EntityTreeItem.class),
 						Mockito.anyLong());
@@ -161,7 +165,7 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testMoreButtonChildLevel() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
-		setQueryResults(2 * maxLim, 0, maxLim);
+		setQueryResults(4 * maxLim, 0, maxLim);
 		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem, 0);
 		// Creates the limited number of entity items
 		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
@@ -176,7 +180,7 @@ public class EntityTreeBrowserTest {
 	@Test
 	public void testGetMoreButtonRequery() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
-		setQueryResults(2 * maxLim, 0, maxLim);
+		setQueryResults(4 * maxLim, 0, maxLim);
 		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem, 0);
 		// Adds the limited number of entity items
 		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
@@ -229,4 +233,21 @@ public class EntityTreeBrowserTest {
 		verify(mockView).appendRootEntityTreeItem(any(EntityTreeItem.class));
 		verify(mockView).setLoadingVisible(false);
 	}
+	
+	@Test
+	public void testEntitySelectedHandler() {
+		EntitySelectedHandler handler = mock(EntitySelectedHandler.class);
+		assertNull(entityTreeBrowser.getEntitySelectedHandler());
+		//set entity selected handler
+		entityTreeBrowser.setEntitySelectedHandler(handler);
+		assertEquals(handler, entityTreeBrowser.getEntitySelectedHandler());
+		//verify firing a selection event
+		entityTreeBrowser.fireEntitySelectedEvent();
+		verify(handler).onSelection(any(EntitySelectedEvent.class));
+		//verify clearing the state clears the selection handler
+		entityTreeBrowser.clearState();
+		assertNull(entityTreeBrowser.getEntitySelectedHandler());
+		entityTreeBrowser.fireEntitySelectedEvent();
+	}
+	
 }

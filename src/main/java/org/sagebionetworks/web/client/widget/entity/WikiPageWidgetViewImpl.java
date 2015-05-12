@@ -48,15 +48,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	private MarkdownWidget markdownWidget;
 	private SageImageBundle sageImageBundle;
-	private FlowPanel commandBar;
-	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiPageKey wikiKey;
 	WikiPageWidgetView.Presenter presenter;
-	private boolean isDescription = false;
 	private WikiHistoryWidget historyWidget;
 	PortalGinInjector ginInjector;
 	private boolean isHistoryOpen;
@@ -204,9 +201,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiPagePanel.add(topBarWrapper);
 
 		FlowPanel mainPanel = new FlowPanel();
-		if(isCurrentVersion) {
-			mainPanel.add(getCommands(canEdit));
-		}
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		wikiPagePanel.add(mainPanel);
 
@@ -358,26 +352,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return breadcrumbsWrapper;
 	}
 
-	private SimplePanel getCommands(Boolean canEdit) {
-		if (commandBarWrapper == null) {
-			commandBarWrapper = new SimplePanel();
-			commandBarWrapper.addStyleName("margin-bottom-20 margin-top-10");
-			commandBar = new FlowPanel();
-			commandBarWrapper.add(commandBar);
-		} else {
-			commandBar.clear();
-		}
-
-		if(!isDescription) {
-			Button addPageButton = createAddPageButton();
-			commandBar.add(addPageButton);
-			addPageButton.addStyleName("margin-left-5");
-		}
-
-		commandBarWrapper.setVisible(canEdit);
-		return commandBarWrapper;
-	}
-
 	private Button createHistoryButton() {
 		final Button btn = DisplayUtils.createIconButton(DisplayConstants.SHOW_WIKI_HISTORY, DisplayUtils.ButtonType.DEFAULT, null);			
 		btn.setStyleName("wikiHistoryButton", true);
@@ -436,23 +410,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 						showRestorationWarning(versionInView);
 					}
 				}
-			}
-		});
-		return btn;
-	}
-
-	private Button createAddPageButton() {
-		Button btn = DisplayUtils.createIconButton(DisplayConstants.ADD_PAGE, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
-		btn.addStyleName("display-inline");
-		btn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
-					@Override
-					public void callback(String name) {
-						presenter.createPage(name);
-					}
-				});
 			}
 		});
 		return btn;
