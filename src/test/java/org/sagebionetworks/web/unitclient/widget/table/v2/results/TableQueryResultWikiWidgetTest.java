@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -30,6 +31,7 @@ public class TableQueryResultWikiWidgetTest {
 	TableQueryResultWidget mockTableQueryResultWidget;
 	TableQueryResultWikiWidgetView mockView;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	SynapseAlert mockSynapseAlert;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
@@ -37,7 +39,8 @@ public class TableQueryResultWikiWidgetTest {
 		mockTableQueryResultWidget = mock(TableQueryResultWidget.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockView = mock(TableQueryResultWikiWidgetView.class);
-		widget = new TableQueryResultWikiWidget(mockView, mockTableQueryResultWidget, mockSynapseJSNIUtils);
+		mockSynapseAlert = mock(SynapseAlert.class);
+		widget = new TableQueryResultWikiWidget(mockView, mockTableQueryResultWidget, mockSynapseJSNIUtils, mockSynapseAlert);
 	}
 	
 	

@@ -79,7 +79,7 @@ import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
-import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -515,7 +515,7 @@ public class DisplayUtils {
 	public static void showErrorMessage(final Throwable t,
 			final JiraURLHelper jiraHelper, boolean isLoggedIn,
 			String friendlyErrorMessage) {
-		SynapseJSNIUtilsImpl._consoleError(ServiceErrorHandlerImpl.getStackTrace(t));
+		SynapseJSNIUtilsImpl._consoleError(SynapseAlertImpl.getStackTrace(t));
 		if (!isLoggedIn) {
 			showErrorMessage(t.getMessage());
 			return;

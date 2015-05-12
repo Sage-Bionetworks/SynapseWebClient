@@ -27,9 +27,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@UiField
 	SimplePanel rowEditorModalPanel;
 	@UiField
-	Alert errorAlert;
-	@UiField
-	SimplePanel serviceErrorModalContainer;
+	SimplePanel synapseAlertContainer;
 
 	Widget widget;
 
@@ -56,13 +54,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	}
 
 	@Override
-	public void showError(String message) {
-		errorAlert.setText(message);
-	}
-
-	@Override
 	public void setErrorVisible(boolean visible) {
-		errorAlert.setVisible(visible);
+		synapseAlertContainer.setVisible(visible);
 	}
 
 	@Override
@@ -85,7 +78,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 		this.progressPanel.setVisible(visible);
 	}
 	@Override
-	public void setServiceErrorWidget(Widget w) {
-		serviceErrorModalContainer.setWidget(w);
+	public void setSynapseAlertWidget(Widget w) {
+		synapseAlertContainer.setWidget(w);
 	}
 }

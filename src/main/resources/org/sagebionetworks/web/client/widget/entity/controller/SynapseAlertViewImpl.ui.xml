@@ -6,6 +6,13 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
   	<bh:Div>
+  		<b:Alert ui:field="loginAlert" type="DANGER">
+  			<bh:Strong text="You will need to login for access to this resource." />
+  			<b:Button ui:field="loginButton" size="EXTRA_SMALL" height="26px">Log in</b:Button>
+  		</b:Alert>
+  		<b:Alert ui:field="alert" type="DANGER">
+  			<bh:Strong ui:field="alertText"></bh:Strong>
+  		</b:Alert>
 	  	<b:Modal ui:field="jiraDialog" title="Synapse Error" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
 				<b:FieldSet>

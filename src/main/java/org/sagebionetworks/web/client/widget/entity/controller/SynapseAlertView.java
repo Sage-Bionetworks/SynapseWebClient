@@ -6,10 +6,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction for the view 
- * @author John
  *
  */
-public interface ServiceErrorHandlerView extends ShowsErrors, IsWidget {
+public interface SynapseAlertView extends ShowsErrors, IsWidget {
 	
 
 	/**
@@ -35,10 +34,15 @@ public interface ServiceErrorHandlerView extends ShowsErrors, IsWidget {
 	void hideJiraDialog();
 	void setPresenter(Presenter p);
 	
+	void clearState();
+	void showError(String error);
+	
+	void showLoginAlert();
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onCreateJiraIssue(String userReport);
+		void onLoginClicked();
 	}
 }

@@ -8,16 +8,13 @@
 	<g:HTMLPanel>
 		<b:Panel>
 			<b:PanelBody>
-				<b:Alert ui:field="errorAlert" type="DANGER"></b:Alert>
-
+				<g:SimplePanel ui:field="synapseAlertContainer"/>
+				
 				<g:SimplePanel ui:field="tablePanel" />
 				
 				<g:SimplePanel ui:field="progressPanel" />
 				
 				<g:SimplePanel ui:field="rowEditorModalPanel"/>
-
-				<g:SimplePanel ui:field="serviceErrorModalContainer"/>
-
 			</b:PanelBody>
 		</b:Panel>
 	</g:HTMLPanel>

@@ -181,10 +181,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
-import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandler;
-import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerImpl;
-import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerView;
-import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandlerViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
@@ -1061,7 +1061,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(FileHistoryRowView.class).to(FileHistoryRowViewImpl.class);
 		
-		bind(ServiceErrorHandlerView.class).to(ServiceErrorHandlerViewImpl.class);
-		bind(ServiceErrorHandler.class).to(ServiceErrorHandlerImpl.class);
+		bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
+		bind(SynapseAlert.class).to(SynapseAlertImpl.class);
 	}
 }

@@ -21,7 +21,7 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.entity.controller.ServiceErrorHandler;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
@@ -50,7 +50,7 @@ public class TableQueryResultWidgetTest {
 	RowSet rowSet;
 	QueryResult results;
 	SelectColumn select;
-	ServiceErrorHandler mockServiceErrorHandler;
+	SynapseAlert mockSynapseAlert;
 	
 	@Before
 	public void before(){
@@ -61,11 +61,11 @@ public class TableQueryResultWidgetTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockQueryResultEditor = Mockito.mock(QueryResultEditorWidget.class);
-		mockServiceErrorHandler = Mockito.mock(ServiceErrorHandler.class);
+		mockSynapseAlert = Mockito.mock(SynapseAlert.class);
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(jobTrackingStub);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockServiceErrorHandler);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert);
 		query = new Query();
 		query.setSql("select * from syn123");
 		row = new Row();
@@ -168,7 +168,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView).showError(TableQueryResultWidget.QUERY_CANCELED);
+		verify(mockSynapseAlert).showError(TableQueryResultWidget.QUERY_CANCELED);
 	}
 	
 	@Test
@@ -189,7 +189,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView).showError(error.getMessage());
+		verify(mockSynapseAlert).handleException(error);
 	}
 	
 }

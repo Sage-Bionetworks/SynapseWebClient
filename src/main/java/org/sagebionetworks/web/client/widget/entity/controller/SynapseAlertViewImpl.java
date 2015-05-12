@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -10,16 +12,14 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ServiceErrorHandlerViewImpl implements
-		ServiceErrorHandlerView {
+public class SynapseAlertViewImpl implements
+		SynapseAlertView {
 	
 	public interface Binder extends
-			UiBinder<Widget, ServiceErrorHandlerViewImpl> {
+			UiBinder<Widget, SynapseAlertViewImpl> {
 	}
 
 	Widget widget;
@@ -33,10 +33,20 @@ public class ServiceErrorHandlerViewImpl implements
 	@UiField
 	Button cancelButton;
 	
+	@UiField
+	Strong alertText;
+	@UiField
+	Alert alert;
+	
+	@UiField
+	Alert loginAlert;
+	@UiField
+	Button loginButton;
+	
 	Presenter presenter;
 	
 	@Inject
-	public ServiceErrorHandlerViewImpl(Binder binder){
+	public SynapseAlertViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -48,6 +58,12 @@ public class ServiceErrorHandlerViewImpl implements
 			@Override
 			public void onClick(ClickEvent event) {
 				jiraDialog.hide();
+			}
+		});
+		loginButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onLoginClicked();
 			}
 		});
 	}
@@ -84,5 +100,24 @@ public class ServiceErrorHandlerViewImpl implements
 	@Override
 	public void showJiraDialog(String errorMessage) {
 		jiraDialog.show();
+	}
+	
+	@Override
+	public void clearState() {
+		hideJiraDialog();
+		alert.setVisible(false);
+		alertText.setText("");
+		loginAlert.setVisible(false);
+	}
+	
+	@Override
+	public void showLoginAlert() {
+		loginAlert.setVisible(true);	
+	}
+	
+	@Override
+	public void showError(String error) {
+		alert.setText(error);
+		alert.setVisible(true);
 	}
 }

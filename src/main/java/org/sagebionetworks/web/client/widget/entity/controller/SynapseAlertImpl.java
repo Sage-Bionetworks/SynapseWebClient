@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -22,15 +21,15 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class ServiceErrorHandlerImpl implements ServiceErrorHandler, ServiceErrorHandlerView.Presenter {
+public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter {
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
-	ServiceErrorHandlerView view;
+	SynapseAlertView view;
 	Throwable ex;
 	
 	@Inject
-	public ServiceErrorHandlerImpl(
-			ServiceErrorHandlerView view,
+	public SynapseAlertImpl(
+			SynapseAlertView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authController
 			) {
@@ -38,15 +37,17 @@ public class ServiceErrorHandlerImpl implements ServiceErrorHandler, ServiceErro
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
 		view.setPresenter(this);
+		view.clearState();
 	}
 
 	@Override
-	public void onFailure(Throwable ex, CallbackP<Throwable> unhandledErrorCallback) {
+	public void handleException(Throwable ex) {
+		view.clearState();
 		this.ex = ex;
 		SynapseJSNIUtilsImpl._consoleError(getStackTrace(ex));
 		boolean isLoggedIn = authController.isLoggedIn();
 		if(ex instanceof ReadOnlyModeException) {
-			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
+			showError(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 		} else if(ex instanceof SynapseDownException) {
 			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 		} else if(ex instanceof UnauthorizedException) {
@@ -54,30 +55,27 @@ public class ServiceErrorHandlerImpl implements ServiceErrorHandler, ServiceErro
 			view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 		} else if(ex instanceof ForbiddenException) {			
-			if(!isLoggedIn) {				
-				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			if(!isLoggedIn) {
+				view.showLoginAlert();
 			} else {
-				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
+				showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
 			}
 		} else if(ex instanceof BadRequestException) {
 			//show error (not to file a jira though)
-			view.showErrorMessage(ex.getMessage());
+			showError(ex.getMessage());
 		} else if(ex instanceof NotFoundException) {
-			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
+			showError(DisplayConstants.ERROR_NOT_FOUND  + " " + ex.getMessage());
 		} else if (ex instanceof UnknownErrorException) {
 			//An unknown error occurred. 
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
 			if (!isLoggedIn) {
-				view.showErrorMessage(ex.getMessage());
+				showError(ex.getMessage());
 			} else {
 				view.showJiraDialog(ex.getMessage());	
 			}
 		} else {
-			//unhandled
-			// For other exceptions, allow the consumer to send a good message to the user
-			unhandledErrorCallback.invoke(ex);
+			//not recognized
+			showError(ex.getMessage());
 		}
 	}
 	
@@ -117,4 +115,20 @@ public class ServiceErrorHandlerImpl implements ServiceErrorHandler, ServiceErro
 		return view.asWidget();
 	}
 	
+	@Override
+	public void clearState() {
+		view.clearState();
+		ex = null;
+	}
+	
+	@Override
+	public void showError(String error) {
+		clearState();
+		view.showError(error);
+	}
+	
+	@Override
+	public void onLoginClicked() {
+		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
+	}
 }

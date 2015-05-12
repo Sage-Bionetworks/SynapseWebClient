@@ -42,15 +42,8 @@ public interface TableQueryResultView extends IsWidget {
 	 * Add the service error widget to the view.
 	 * @param w
 	 */
-	void setServiceErrorWidget(Widget w);
+	void setSynapseAlertWidget(Widget w);
 	
-	/**
-	 * Show an error message.
-	 * 
-	 * @param message
-	 */
-	void showError(String message);
-
 	/**
 	 * Show or hide the error alert.
 	 * 
