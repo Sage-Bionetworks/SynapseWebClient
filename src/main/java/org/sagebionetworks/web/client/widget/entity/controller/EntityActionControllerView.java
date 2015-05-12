@@ -27,6 +27,11 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param string
 	 */
 	void showInfo(String header, String message);
+	
+	/**
+	 * Show info dialog to the user.
+	 */
+	void showInfoDialog(String header, String message);
 
 	/**
 	 * This dialog must be added to the page.

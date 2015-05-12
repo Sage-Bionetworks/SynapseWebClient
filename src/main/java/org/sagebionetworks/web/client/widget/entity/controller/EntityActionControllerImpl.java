@@ -41,7 +41,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -137,6 +136,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureShareAction();
 			configureRenameAction();
 			configureEditWiki();
+			configureViewWikiSource();
 			configureAddWikiSubpage();
 			configureMove();
 			configureLink();
@@ -167,6 +167,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, false);
 		}
 	}
+	
+	private void configureViewWikiSource(){
+		//only visible if entity may have a wiki, and user can't Edit the wiki
+		if(isWikiableType(entityBundle.getEntity())){
+			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
+			actionMenu.addActionListener(Action.VIEW_WIKI_SOURCE, this);
+		}else{
+			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, false);
+			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
+		}
+	}
+
 	
 	private void configureAddWikiSubpage(){
 		if(entityBundle.getEntity() instanceof Project){
@@ -322,6 +335,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case EDIT_WIKI_PAGE:
 			onEditWiki();
+			break;
+		case VIEW_WIKI_SOURCE:
+			onViewWikiSource();
 			break;
 		case ADD_WIKI_SUBPAGE:
 			onAddWikiSubpage();
@@ -482,6 +498,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+	
+	private void onViewWikiSource() {
+		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		synapseClient.getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
+			@Override
+			public void onSuccess(WikiPage page) {
+				view.showInfoDialog("Wiki Source", page.getMarkdown());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});	
 	}
 	
 	private void onEditWiki() {
