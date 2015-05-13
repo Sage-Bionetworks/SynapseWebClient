@@ -19,8 +19,10 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
@@ -36,19 +38,24 @@ public class PreviewWidgetTest {
 	PreviewWidget previewWidget;
 	PreviewWidgetView mockView; 
 	RequestBuilderWrapper mockRequestBuilder;
+	AuthenticationController mockAuthenticationController;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	EntityBundle testBundle;
 	FileEntity testEntity;
 	List<FileHandle> testFileHandleList;
 	Response mockResponse;
+	SynapseAlert mockSynapseAlert;
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
+	
 	@Before
 	public void before() throws Exception{
 		mockView = mock(PreviewWidgetView.class);
 		mockRequestBuilder = mock(RequestBuilderWrapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils);
+		mockSynapseAlert = mock(SynapseAlert.class);
+		mockAuthenticationController = mock(AuthenticationController.class);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockAuthenticationController);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
@@ -63,7 +70,7 @@ public class PreviewWidgetTest {
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		when(mockResponse.getText()).thenReturn(zipTestString);
-		
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 	}
 	

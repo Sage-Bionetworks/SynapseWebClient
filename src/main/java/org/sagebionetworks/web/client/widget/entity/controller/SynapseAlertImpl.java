@@ -4,9 +4,8 @@ import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKE
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -18,7 +17,6 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,17 +24,20 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
 	SynapseAlertView view;
+	SynapseJSNIUtils synapseJSNIUtils;
 	Throwable ex;
 	
 	@Inject
 	public SynapseAlertImpl(
 			SynapseAlertView view,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authController
+			AuthenticationController authController,
+			SynapseJSNIUtils synapseJSNIUtils
 			) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);
 		view.clearState();
 	}
@@ -45,7 +46,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void handleException(Throwable ex) {
 		view.clearState();
 		this.ex = ex;
-		SynapseJSNIUtilsImpl._consoleError(getStackTrace(ex));
+		synapseJSNIUtils.consoleError(getStackTrace(ex));
 		boolean isLoggedIn = authController.isLoggedIn();
 		if(ex instanceof ReadOnlyModeException) {
 			showError(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
@@ -69,10 +70,9 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		} else if (ex instanceof UnknownErrorException) {
 			//An unknown error occurred. 
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
-			if (!isLoggedIn) {
-				showError(ex.getMessage());
-			} else {
-				view.showJiraDialog(ex.getMessage());	
+			showError(ex.getMessage());
+			if (isLoggedIn) {
+				view.showJiraDialog(ex.getMessage());
 			}
 		} else {
 			//not recognized
@@ -132,4 +132,11 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void onLoginClicked() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
 	}
+	
+	@Override
+	public void showMustLogin() {
+		clearState();
+		view.showLoginAlert();
+	}
+
 }

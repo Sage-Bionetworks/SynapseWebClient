@@ -36,7 +36,6 @@ public interface SynapseAlertView extends ShowsErrors, IsWidget {
 	
 	void clearState();
 	void showError(String error);
-	
 	void showLoginAlert();
 	/**
 	 * Presenter interface

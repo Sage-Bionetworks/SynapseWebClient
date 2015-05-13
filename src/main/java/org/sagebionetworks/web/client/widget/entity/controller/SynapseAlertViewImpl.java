@@ -120,4 +120,5 @@ public class SynapseAlertViewImpl implements
 		alert.setText(error);
 		alert.setVisible(true);
 	}
+	
 }

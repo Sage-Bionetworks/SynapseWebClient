@@ -11,5 +11,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface SynapseAlert extends IsWidget {
 	void handleException(Throwable t);
 	void showError(String error);
+	void showMustLogin();
 	void clearState();
 }
