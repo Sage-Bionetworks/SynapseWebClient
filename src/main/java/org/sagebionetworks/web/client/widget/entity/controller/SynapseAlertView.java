@@ -18,7 +18,6 @@ public interface SynapseAlertView extends ShowsErrors, IsWidget {
 	 */
 	void showConfirmDialog(String title, String string, Callback callback);
 	
-
 	/**
 	 * Show info to the user.
 	 * @param string
@@ -31,12 +30,30 @@ public interface SynapseAlertView extends ShowsErrors, IsWidget {
 	 * @param errorMessage
 	 */
 	void showJiraDialog(String errorMessage);
+	
+	/**
+	 * Instruct the view to hide the jira issue creation dialog.
+	 */
 	void hideJiraDialog();
+	
+	/**
+	 * Clears all state in the view (makes all components invisible).
+	 */
+	void clearState();
+	
+	/**
+	 * Show the error in an alert.
+	 * @param error
+	 */
+	void showError(String error);
+	
+	/**
+	 * Show a special login alert, that includes a link to the login page.
+	 */
+	void showLoginAlert();
+	
 	void setPresenter(Presenter p);
 	
-	void clearState();
-	void showError(String error);
-	void showLoginAlert();
 	/**
 	 * Presenter interface
 	 */

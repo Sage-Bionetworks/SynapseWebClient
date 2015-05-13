@@ -44,7 +44,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 
 	@Override
 	public void handleException(Throwable ex) {
-		view.clearState();
+		clearState();
 		this.ex = ex;
 		synapseJSNIUtils.consoleError(getStackTrace(ex));
 		boolean isLoggedIn = authController.isLoggedIn();
@@ -116,8 +116,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		return view.asWidget();
 	}
 	
-	@Override
-	public void clearState() {
+	protected void clearState() {
 		view.clearState();
 		ex = null;
 	}
