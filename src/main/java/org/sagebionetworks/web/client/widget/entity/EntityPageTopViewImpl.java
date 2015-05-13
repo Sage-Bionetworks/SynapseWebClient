@@ -191,7 +191,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PythonClientModalWidgetViewImpl pythonLoadWidget;
 	private JavaClientModalWidgetViewImpl javaLoadWidget;
 	private CommandLineClientModalWidgetViewImpl commandLineLoadWidget;
-	
+
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			FileTitleBar fileTitleBar,
@@ -237,6 +237,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		initProjectLayout();
 
 		initClickHandlers();
+
+		// use this callback to update wikiPageId
+		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
+			@Override
+			public void invoke(String wikiPageId) {
+				presenter.handleWikiReload(wikiPageId);
+			}
+		};
+		this.wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 	}
 	
 	private void initProjectLayout() {
@@ -404,6 +413,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileTitleBar.clearState();
 	}
 
+	@Override
+	public void configureProjectActionMenu(EntityBundle bundle, String wikiPageId) {
+		projectActionMenuContainer.clear();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		projectActionMenuContainer.add(actionMenu.asWidget());
+	}
+
 	/*
 	 * Private Methods
 	 */
@@ -423,6 +439,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
+		fileActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 				
@@ -495,6 +512,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
 		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES));
 		// ActionMenu
+		fileActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
 		// Entity Metadata
@@ -525,6 +543,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 	
 		// ActionMenu
+		projectActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		projectActionMenuContainer.add(actionMenu.asWidget());
 
@@ -639,6 +658,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		tableMetadataContainer.add(entityMetadata.asWidget());
 		// ActionMenu
+		tableActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, null);
 		tableActionMenuContainer.add(actionMenu.asWidget());
 
@@ -740,7 +760,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @param bundle
 	 * @return
 	 */
-	public ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId){
+	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId){
 		// Create a menu
 		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
 		// Create a controller.
@@ -761,8 +781,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				entityMetadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
-
 		return actionMenu;
 	}
-	
 }

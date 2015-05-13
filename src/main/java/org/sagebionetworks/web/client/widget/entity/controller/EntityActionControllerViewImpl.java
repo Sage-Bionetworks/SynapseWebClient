@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Pre;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -21,6 +25,11 @@ public class EntityActionControllerViewImpl implements
 	SimplePanel aclPanel;
 	@UiField
 	SimplePanel markdownEditorPanel;
+	
+	@UiField
+	Modal infoDialog;
+	@UiField
+	Pre infoDialogText;
 	
 	Widget widget;
 	
@@ -58,6 +67,18 @@ public class EntityActionControllerViewImpl implements
 	@Override
 	public void addMarkdownEditorModalWidget(IsWidget modalWidget) {
 		markdownEditorPanel.add(modalWidget);
+	}
+	
+	@Override
+	public void showPromptDialog(String prompt, PromptCallback callback) {
+		Bootbox.prompt(prompt, callback);
+	}
+	
+	@Override
+	public void showInfoDialog(String header, String message) {
+		infoDialog.setTitle(header);
+		infoDialogText.setText(message);
+		infoDialog.show();
 	}
 
 }
