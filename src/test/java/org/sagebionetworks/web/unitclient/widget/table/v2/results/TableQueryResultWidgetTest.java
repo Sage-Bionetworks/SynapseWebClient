@@ -31,6 +31,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class TableQueryResultWidgetTest {
 	
@@ -90,6 +91,8 @@ public class TableQueryResultWidgetTest {
 		// delta
 		delta = new PartialRowSet();
 		delta.setTableId("syn123");
+		
+		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 	}
 	
 	@Test
@@ -109,6 +112,19 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
+		verify(mockView).setSynapseAlertWidget(any(Widget.class));
+	}
+	
+	@Test
+	public void testConfigureNotLoggedIn() {
+		boolean isEditable = false;
+		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(false);
+		widget.configure(query, isEditable, mockListner);
+		verify(mockView).setTableVisible(false);
+		verify(mockView).setProgressWidgetVisible(false);
+		verify(mockView).setErrorVisible(true);
+		verify(mockView).setSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).showMustLogin();
 	}
 	
 	@Test

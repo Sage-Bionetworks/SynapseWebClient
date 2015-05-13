@@ -69,6 +69,7 @@ public class PreviewWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		when(mockResponse.getText()).thenReturn(zipTestString);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
+		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 	}
 	
 	public void testNoPreviewFileHandleAvailable(){
