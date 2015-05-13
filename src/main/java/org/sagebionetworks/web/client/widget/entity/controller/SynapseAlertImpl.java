@@ -50,7 +50,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		synapseJSNIUtils.consoleError(getStackTrace(ex));
 		boolean isLoggedIn = authController.isLoggedIn();
 		if(ex instanceof ReadOnlyModeException) {
-			showError(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
+			view.showError(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 		} else if(ex instanceof SynapseDownException) {
 			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 		} else if(ex instanceof UnauthorizedException) {
@@ -61,23 +61,23 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			if(!isLoggedIn) {
 				view.showLoginAlert();
 			} else {
-				showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
+				view.showError(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
 			}
 		} else if(ex instanceof BadRequestException) {
 			//show error (not to file a jira though)
-			showError(ex.getMessage());
+			view.showError(ex.getMessage());
 		} else if(ex instanceof NotFoundException) {
-			showError(DisplayConstants.ERROR_NOT_FOUND  + " " + ex.getMessage());
+			view.showError(DisplayConstants.ERROR_NOT_FOUND  + " " + ex.getMessage());
 		} else if (ex instanceof UnknownErrorException) {
 			//An unknown error occurred. 
 			//Exception handling on the backend now throws the reason into the exception message.  Easy!
-			showError(ex.getMessage());
+			view.showError(ex.getMessage());
 			if (isLoggedIn) {
 				view.showJiraDialog(ex.getMessage());
 			}
 		} else {
 			//not recognized
-			showError(ex.getMessage());
+			view.showError(ex.getMessage());
 		}
 	}
 	
@@ -100,16 +100,6 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 					+ userReport);
 				}
 			});
-	}
-	
-	public static String getStackTrace(Throwable t) {
-		StringBuilder stackTrace = new StringBuilder();
-		if (t != null) {
-			for (StackTraceElement element : t.getStackTrace()) {
-				stackTrace.append(element + "\n");
-			}
-		}
-		return stackTrace.toString();
 	}
 	
 	@Override
@@ -144,4 +134,14 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		view.showLoginAlert();
 	}
 
+
+	public static String getStackTrace(Throwable t) {
+		StringBuilder stackTrace = new StringBuilder();
+		if (t != null) {
+			for (StackTraceElement element : t.getStackTrace()) {
+				stackTrace.append(element + "\n");
+			}
+		}
+		return stackTrace.toString();
+	}
 }
