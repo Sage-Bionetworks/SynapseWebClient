@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.event.dom.client.ErrorEvent;
@@ -34,19 +33,16 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	SynapseJSNIUtils synapseJSNIUtils;
 	EntityBundle bundle;
 	SynapseAlert synapseAlert;
-	AuthenticationController authController;
 	
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
 			SynapseJSNIUtils synapseJSNIUtils,
-			SynapseAlert synapseAlert,
-			AuthenticationController authController) {
+			SynapseAlert synapseAlert) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseAlert = synapseAlert;
-		this.authController = authController;
 	}
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
@@ -90,7 +86,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 		view.clear();
 		
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
-		if(!authController.isLoggedIn()) {
+		if (!synapseAlert.isUserLoggedIn()) {
 			view.addSynapseAlertWidget(synapseAlert.asWidget());
 			synapseAlert.showMustLogin();
 		} else if (bundle != null) {
@@ -142,6 +138,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 				}
 			}
 		}
+		
 		return view.asWidget();
 	}
 	

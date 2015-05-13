@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -43,21 +42,18 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
-	AuthenticationController authcontroller;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
 			SynapseClientAsync synapseClient, 
 			PortalGinInjector ginInjector, 
-			SynapseAlert synapseAlert,
-			AuthenticationController authcontroller) {
+			SynapseAlert synapseAlert) {
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.synapseAlert = synapseAlert;
-		this.authcontroller = authcontroller;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
@@ -74,14 +70,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.isEditable = isEditable;
 		this.startingQuery = query;
 		this.queryListener = listener;
-		runQuery();
+		if (!synapseAlert.isUserLoggedIn()) {
+			setupErrorState();
+			synapseAlert.showMustLogin();
+		} else {
+			runQuery();
+		}
 	}
 
 	private void runQuery() {
-		if (!authcontroller.isLoggedIn()) {
-			showMustLogin();
-			return;
-		}
 		this.view.setErrorVisible(false);
 		fireStartEvent();
 		this.view.setTableVisible(false);
@@ -181,11 +178,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if(this.queryListener != null){
 			this.queryListener.queryExecutionFinished(wasSuccessful, resultsEditable);
 		}
-	}
-	
-	private void showMustLogin() {
-		setupErrorState();
-		synapseAlert.showMustLogin();
 	}
 	
 	/**

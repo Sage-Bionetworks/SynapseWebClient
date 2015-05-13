@@ -31,7 +31,6 @@ public class TableQueryResultWikiWidgetTest {
 	TableQueryResultWidget mockTableQueryResultWidget;
 	TableQueryResultWikiWidgetView mockView;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	SynapseAlert mockSynapseAlert;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
@@ -39,8 +38,7 @@ public class TableQueryResultWikiWidgetTest {
 		mockTableQueryResultWidget = mock(TableQueryResultWidget.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockView = mock(TableQueryResultWikiWidgetView.class);
-		mockSynapseAlert = mock(SynapseAlert.class);
-		widget = new TableQueryResultWikiWidget(mockView, mockTableQueryResultWidget, mockSynapseJSNIUtils, mockSynapseAlert);
+		widget = new TableQueryResultWikiWidget(mockView, mockTableQueryResultWidget, mockSynapseJSNIUtils);
 	}
 	
 	

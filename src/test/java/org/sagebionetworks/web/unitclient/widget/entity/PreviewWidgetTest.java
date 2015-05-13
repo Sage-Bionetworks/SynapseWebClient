@@ -38,7 +38,6 @@ public class PreviewWidgetTest {
 	PreviewWidget previewWidget;
 	PreviewWidgetView mockView; 
 	RequestBuilderWrapper mockRequestBuilder;
-	AuthenticationController mockAuthenticationController;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	EntityBundle testBundle;
 	FileEntity testEntity;
@@ -54,8 +53,7 @@ public class PreviewWidgetTest {
 		mockRequestBuilder = mock(RequestBuilderWrapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockSynapseAlert = mock(SynapseAlert.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockAuthenticationController);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
@@ -70,7 +68,6 @@ public class PreviewWidgetTest {
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		when(mockResponse.getText()).thenReturn(zipTestString);
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 	}
 	

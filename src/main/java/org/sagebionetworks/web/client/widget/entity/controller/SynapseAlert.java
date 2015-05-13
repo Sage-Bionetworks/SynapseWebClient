@@ -23,4 +23,11 @@ public interface SynapseAlert extends IsWidget {
 	 * Can be called when you know that the user must be logged in in order to use the widget. 
 	 */
 	void showMustLogin();
+	
+	/**
+	 * Convenience method to answer if the user is currently logged in.
+	 * @return
+	 */
+	boolean isUserLoggedIn();
+	
 }

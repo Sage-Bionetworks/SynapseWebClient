@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -130,6 +131,11 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	@Override
 	public void onLoginClicked() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
+	}
+	
+	@Override
+	public boolean isUserLoggedIn() {
+		return authController.isLoggedIn();
 	}
 	
 	@Override

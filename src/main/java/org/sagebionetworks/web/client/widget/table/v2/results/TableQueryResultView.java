@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;

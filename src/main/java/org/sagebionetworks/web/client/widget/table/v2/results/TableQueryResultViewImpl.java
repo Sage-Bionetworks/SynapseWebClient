@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
