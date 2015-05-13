@@ -10,13 +10,12 @@ import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -30,9 +29,6 @@ import com.google.inject.Inject;
  *
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
-	
-	private static final String CANNOT_READ_MESSAGE1 = "You do not have READ permission for the requested entity.";
-	private static final String CANNOT_READ_MESSAGE2 = "Anonymous users are unauthorized for all but public read operations.";
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -47,15 +43,21 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
+	AuthenticationController authcontroller;
 	
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, SynapseAlert synapseAlert){
+	public TableQueryResultWidget(TableQueryResultView view, 
+			SynapseClientAsync synapseClient, 
+			PortalGinInjector ginInjector, 
+			SynapseAlert synapseAlert,
+			AuthenticationController authcontroller) {
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.synapseAlert = synapseAlert;
+		this.authcontroller = authcontroller;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
@@ -76,6 +78,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 
 	private void runQuery() {
+		if (!authcontroller.isLoggedIn()) {
+			showMustLogin();
+			return;
+		}
 		this.view.setErrorVisible(false);
 		fireStartEvent();
 		this.view.setTableVisible(false);
@@ -177,28 +183,18 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		}
 	}
 	
+	private void showMustLogin() {
+		setupErrorState();
+		synapseAlert.showMustLogin();
+	}
+	
 	/**
 	 * Show an error.
 	 * @param caught
 	 */
 	private void showError(Throwable caught){
 		setupErrorState();
-		caught = plfm3380Workaround(caught);
 		synapseAlert.handleException(caught);
-	}
-
-	/**
-	 * Workaround for PLFM-3380. Can remove this code when it has been fixed.
-	 * @param t
-	 * @return
-	 */
-	private Throwable plfm3380Workaround(Throwable t) {
-		if (t instanceof BadRequestException && 
-				(t.getMessage().equals(CANNOT_READ_MESSAGE1) || t.getMessage().equals(CANNOT_READ_MESSAGE2))) {
-			return new ForbiddenException(t.getMessage());
-		} else {
-			return t;
-		}
 	}
 	
 	/**
