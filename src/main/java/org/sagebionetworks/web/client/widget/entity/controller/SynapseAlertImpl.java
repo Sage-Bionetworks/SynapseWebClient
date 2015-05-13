@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Down;
@@ -47,7 +48,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void handleException(Throwable ex) {
 		clearState();
 		this.ex = ex;
-		synapseJSNIUtils.consoleError(getStackTrace(ex));
+		synapseJSNIUtils.consoleError(DisplayUtils.getStackTrace(ex));
 		boolean isLoggedIn = authController.isLoggedIn();
 		if(ex instanceof ReadOnlyModeException) {
 			view.showError(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
@@ -132,16 +133,5 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void showMustLogin() {
 		clearState();
 		view.showLoginAlert();
-	}
-
-
-	public static String getStackTrace(Throwable t) {
-		StringBuilder stackTrace = new StringBuilder();
-		if (t != null) {
-			for (StackTraceElement element : t.getStackTrace()) {
-				stackTrace.append(element + "\n");
-			}
-		}
-		return stackTrace.toString();
 	}
 }
