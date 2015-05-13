@@ -514,7 +514,7 @@ public class DisplayUtils {
 	public static void showErrorMessage(final Throwable t,
 			final JiraURLHelper jiraHelper, boolean isLoggedIn,
 			String friendlyErrorMessage) {
-		SynapseJSNIUtilsImpl._consoleError(DisplayUtils.getStackTrace(t));
+		SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
 		if (!isLoggedIn) {
 			showErrorMessage(t.getMessage());
 			return;
@@ -1864,6 +1864,16 @@ public class DisplayUtils {
 			str += "/rowversion/" + version;
 		return str;
 	}
+
+	public static String getStackTrace(Throwable t) {
+		StringBuilder stackTrace = new StringBuilder();
+		if (t != null) {
+			for (StackTraceElement element : t.getStackTrace()) {
+				stackTrace.append(element + "\n");
+			}
+		}
+		return stackTrace.toString();
+	}
 	
 	/**
 	 * This is to work around a Chrome rendering bug, where some containers do not properly calculate their relative widths (in the dynamic bootstrap grid layout) when they are initially added.
@@ -1904,15 +1914,4 @@ public class DisplayUtils {
 			return "";
 		else return s;
 	 }
-
-	public static String getStackTrace(Throwable t) {
-		StringBuilder stackTrace = new StringBuilder();
-		if (t != null) {
-			for (StackTraceElement element : t.getStackTrace()) {
-				stackTrace.append(element + "\n");
-			}
-		}
-		return stackTrace.toString();
-	}
-
 }
