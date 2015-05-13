@@ -305,7 +305,7 @@ public class DisplayConstants {
 	public static final String STATUS_CREATED_BY = "Owner";
 	public static final String EMPTY = "Empty";
 	public static final String NONE_FOUND = "None Found";
-	public static final String LABEL_NO_MARKDOWN = "There is no content. Please click \""+EntityActionControllerImpl.EDIT_WIKI+"\" from the Tools menu.";
+	public static final String LABEL_NO_MARKDOWN = "There is no content. Please click Edit Wiki from the Tools menu.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";

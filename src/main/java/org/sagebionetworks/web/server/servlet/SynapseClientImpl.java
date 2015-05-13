@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.server.servlet;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -129,8 +133,10 @@ import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -158,8 +164,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
-
-@SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	
@@ -1770,9 +1774,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
+	
 	@Override
-	public List<Team> getTeamsForUser(String userId)
+	public List<TeamRequestBundle> getTeamsForUser(String userId, boolean includeOpenRequests)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1785,7 +1789,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		        	return o1.getName().compareToIgnoreCase(o2.getName());
 		        }
 			});
-			return teamList;
+			List<TeamRequestBundle> bundle = new ArrayList<TeamRequestBundle>(teamList.size());
+			for (Team team: teamList) {
+				if (includeOpenRequests) {
+					Long openRequestCount = getOpenRequestCount(userId, team.getId());
+					bundle.add(new TeamRequestBundle(team, openRequestCount == null ? 0L : openRequestCount));
+				} else {
+					bundle.add(new TeamRequestBundle(team, 0L));
+				}
+			}
+			return bundle;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
@@ -2006,6 +2019,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		TeamMember member = synapseClient.getTeamMember(teamId, currentUserId);
 		return member.getIsAdmin();
 	}
+	
 	
 	@Override
 	public Long getOpenRequestCount(String currentUserId, String teamId)
@@ -2857,5 +2871,23 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		// This method does nothing?
 		
+	}
+	
+	@Override
+	public EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			//first, get the entity bundle with all information that we want
+			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID;
+			EntityBundle bundle = synapseClient.getEntityBundle(entityId, partsMask);
+			//now get the profile for the last modified by
+			UserProfile modifiedByProfile = synapseClient.getUserProfile(bundle.getEntity().getModifiedBy());
+			EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
+			entityBundlePlus.setEntityBundle(bundle);
+			entityBundlePlus.setProfile(modifiedByProfile);
+			return entityBundlePlus;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 }

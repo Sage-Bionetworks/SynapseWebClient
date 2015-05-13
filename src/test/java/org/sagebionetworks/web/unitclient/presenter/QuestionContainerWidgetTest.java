@@ -78,8 +78,8 @@ public class QuestionContainerWidgetTest {
 	@Test
 	public void testConfigureRadioButtons() {
 		setExclusive(true);
-		questionContainerWidget.configure(1L, mockMultichoiceQuestion);
-		verify(mockView, times(2)).addRadioButton(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class));
+		questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
+		verify(mockView, times(2)).addRadioButton(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class), eq(false));
 		verify(mockView).configureMoreInfo(mockMoreInfoKey.getOwnerObjectId(),
 				mockMoreInfoKey.getOwnerObjectType().name(), mockMoreInfoKey.getWikiPageId());
 	}
@@ -87,8 +87,8 @@ public class QuestionContainerWidgetTest {
 	@Test
 	public void testConfigureCheckBoxes() {
 		setExclusive(false);
-		questionContainerWidget.configure(1L, mockMultichoiceQuestion);
-		verify(mockView, times(2)).addCheckBox(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class));
+		questionContainerWidget.configure(1L, mockMultichoiceQuestion, null);
+		verify(mockView, times(2)).addCheckBox(eq(mockMultichoiceQuestion.getQuestionIndex()), anyString(), any(ClickHandler.class), eq(false));
 		verify(mockView).configureMoreInfo(mockMoreInfoKey.getOwnerObjectId(),
 		mockMoreInfoKey.getOwnerObjectType().name(), mockMoreInfoKey.getWikiPageId());
 	}

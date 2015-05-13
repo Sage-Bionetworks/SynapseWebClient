@@ -26,8 +26,6 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	private Presenter presenter;
 	private EntityTreeBrowser myTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
-	private EntitySelectedHandler mySelectedHandler;
-	private EntitySelectedHandler favoritesSelectedHandler;
 	@UiField
 	SimplePanel myProjectsContainer;
 	@UiField
@@ -92,12 +90,6 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	@Override 
 	public void setPresenter(Presenter presenter) {		
 		// create a new handler for this presenter
-		if(mySelectedHandler != null) {
-			myTreeBrowser.removeEntitySelectedHandler(mySelectedHandler);
-		}
-		if(favoritesSelectedHandler != null) {
-			favoritesTreeBrowser.removeEntitySelectedHandler(favoritesSelectedHandler);
-		}
 		createSelectedHandlers();
 		this.presenter = presenter;
 	}
@@ -134,21 +126,21 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	 * Private Methods
 	 */
 	private void createSelectedHandlers() {
-		mySelectedHandler = new EntitySelectedHandler() {			
+		EntitySelectedHandler mySelectedHandler = new EntitySelectedHandler() {			
 			@Override
 			public void onSelection(EntitySelectedEvent event) {
 				presenter.entitySelected(myTreeBrowser.getSelected());
 			}
 		};
-		myTreeBrowser.addEntitySelectedHandler(mySelectedHandler);
+		myTreeBrowser.setEntitySelectedHandler(mySelectedHandler);
 
-		favoritesSelectedHandler = new EntitySelectedHandler() {			
+		EntitySelectedHandler favoritesSelectedHandler = new EntitySelectedHandler() {			
 			@Override
 			public void onSelection(EntitySelectedEvent event) {
 				presenter.entitySelected(favoritesTreeBrowser.getSelected());
 			}
 		};
-		favoritesTreeBrowser.addEntitySelectedHandler(favoritesSelectedHandler);
+		favoritesTreeBrowser.setEntitySelectedHandler(favoritesSelectedHandler);
 	}
 	
 	

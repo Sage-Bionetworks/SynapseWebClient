@@ -36,6 +36,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	SynapseJSNIUtils synapseJSNIUtils;
 	boolean isShowCompany;
 	String description;
+	boolean useCachedImage;
 	
 	@Inject
 	public UserBadge(UserBadgeView view, 
@@ -73,6 +74,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		} else if (isShowCompany) {
 			view.showDescription(profile.getCompany());
 		}
+		useCachedImage = true;
 		configurePicture();
 	}
 	
@@ -88,6 +90,9 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void configurePicture() {
 		if (profile != null && profile.getProfilePicureFileHandleId() != null) {
 			String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), true);
+			if (!useCachedImage) {
+				url += DisplayUtils.getParamForNoCaching();
+			}
 			view.showCustomUserPicture(url);
 		} else {
 			view.showAnonymousUserPicture();
@@ -207,4 +212,12 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		return view.asWidget();
 	}
 
+	@Override
+	public void onImageLoadError() {
+		if (useCachedImage) {
+			//try not caching the image on load
+			useCachedImage = false;
+			configurePicture();	
+		}
+	}
 }
