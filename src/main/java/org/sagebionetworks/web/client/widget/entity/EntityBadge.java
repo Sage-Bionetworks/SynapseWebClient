@@ -62,9 +62,9 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		
 		if (header.getModifiedByPrincipalId() != null) {
 			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
-			modifiedByUserBadge.asWidget().setVisible(true);
+			view.setModifiedByWidgetVisible(true);
 		} else {
-			modifiedByUserBadge.asWidget().setVisible(false);
+			view.setModifiedByWidgetVisible(false);
 		}
 		
 		if (header.getModifiedOn() != null) {

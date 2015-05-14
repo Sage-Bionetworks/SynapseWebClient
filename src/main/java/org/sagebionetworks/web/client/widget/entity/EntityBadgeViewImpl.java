@@ -36,7 +36,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	SageImageBundle sageImageBundle;
-	
+	Widget modifiedByWidget;
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
@@ -220,6 +220,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public void setModifiedByWidget(Widget w) {
 		modifiedByField.setWidget(w);
+		this.modifiedByWidget = w;
 	}
 	
 	@Override
@@ -232,6 +233,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		} else {
 			nonDefaultClickHandler.onClick(event);
 		}
+	}
+	
+	@Override
+	public void setModifiedByWidgetVisible(boolean visible) {
+		modifiedByWidget.setVisible(visible);
 	}
 	
 	/*

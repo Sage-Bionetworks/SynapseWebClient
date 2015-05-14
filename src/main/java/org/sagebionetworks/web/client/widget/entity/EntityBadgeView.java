@@ -32,6 +32,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	void setModifiedOn(String modifiedOnString);
 	
 	void setModifiedByWidget(Widget w);
+	void setModifiedByWidgetVisible(boolean visible);
 	
 	/**
 	 * Presenter interface
