@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelim
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -87,7 +88,8 @@ public class AttachmentConfigEditorTest {
 		ArgumentCaptor<FileUploadHandler> captor = ArgumentCaptor.forClass(FileUploadHandler.class);
 		verify(mockFileInputWidget).uploadSelectedFile(captor.capture());
 		String fileHandleId = "222";
-		captor.getValue().uploadSuccess(fileHandleId);
+		UploadedFile uploadedFile = new UploadedFile(null, fileHandleId);
+		captor.getValue().uploadSuccess(uploadedFile);
 		verify(mockView).showUploadSuccessUI();
 		verify(mockCallback).setPrimaryEnabled(true);
 		verify(mockAttachments).configure(wikiKey);

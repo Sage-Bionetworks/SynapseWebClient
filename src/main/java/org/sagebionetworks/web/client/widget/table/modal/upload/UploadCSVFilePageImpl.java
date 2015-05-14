@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -55,11 +56,11 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 			public void invoke() {
 				presenter.setLoading(true);				
 			}
-		}, new CallbackP<String>() {
+		}, new CallbackP<UploadedFile>() {
 			@Override
-			public void invoke(String fileHandleId) {
+			public void invoke(UploadedFile uploadFile) {
 				presenter.setLoading(false);	
-				fileHandleCreated(fileHandleId);
+				fileHandleCreated(uploadFile);
 			}			
 		});
 		
@@ -75,12 +76,12 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	 * Once a FileHandle is created move to the next page.
 	 * @param fileHandleId
 	 */
-	private void fileHandleCreated(String fileHandleId) {
-		FileMetadata[] meta = fileInputWidget.getFileMetadata();
-		String contentType = meta[0].getContentType();
-		String fileName =  meta[0].getFileName();
+	private void fileHandleCreated(UploadedFile uploadFile) {
+		FileMetadata meta = uploadFile.getFileMeta();
+		String contentType = meta.getContentType();
+		String fileName =  meta.getFileName();
 		ContentTypeDelimiter contentTypeDelimiter = ContentTypeDelimiter.findByContentType(contentType, fileName);
-		this.nextPage.configure(contentTypeDelimiter, fileName, this.parentId, fileHandleId, this.tableId);
+		this.nextPage.configure(contentTypeDelimiter, fileName, this.parentId, uploadFile.getFileHandleId(), this.tableId);
 		this.presenter.setNextActivePage(this.nextPage);
 	}
 

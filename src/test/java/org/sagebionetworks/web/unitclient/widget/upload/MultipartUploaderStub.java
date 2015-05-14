@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 
 /**
  * Test helper for MultipartUploader.
@@ -40,7 +41,7 @@ public class MultipartUploaderStub implements MultipartUploader {
 		if(error != null){
 			handler.uploadFailed(error);
 		}else{
-			handler.uploadSuccess(fileHandle);
+			handler.uploadSuccess(new UploadedFile(null, fileHandle));
 		}
 	}
 
@@ -57,9 +58,10 @@ public class MultipartUploaderStub implements MultipartUploader {
 	}
 
 	@Override
-	public FileMetadata[] getSelectedFileMetadata(String inputId) {
+	public FileMetadata[] getSelectedFileMetadata() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }

@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -113,8 +114,8 @@ public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Pr
 	 * Called after the file input widget uploads a file and creates a filehandle.
 	 */
 	@Override
-	public void uploadSuccess(String fileHandleId) {
-		view.setValue(fileHandleId);
+	public void uploadSuccess(UploadedFile fileUploaded) {
+		view.setValue(fileUploaded.getFileHandleId());
 		view.hideCollapse();
 	}
 

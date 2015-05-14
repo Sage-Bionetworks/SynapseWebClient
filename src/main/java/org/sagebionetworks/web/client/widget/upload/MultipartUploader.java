@@ -31,9 +31,9 @@ public interface MultipartUploader {
 	/**
 	 * Get the metadata about the selected files
 	 * 
-	 * @param inputId
 	 * @return
 	 */
-	FileMetadata[] getSelectedFileMetadata(String inputId);
+
+	FileMetadata[] getSelectedFileMetadata();
 
 }

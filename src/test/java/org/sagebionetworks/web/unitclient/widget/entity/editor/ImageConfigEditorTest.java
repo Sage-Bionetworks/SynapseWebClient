@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -23,6 +21,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -89,7 +88,8 @@ public class ImageConfigEditorTest {
 		ArgumentCaptor<FileUploadHandler> captor = ArgumentCaptor.forClass(FileUploadHandler.class);
 		verify(mockFileInputWidget).uploadSelectedFile(captor.capture());
 		String fileHandleId = "222";
-		captor.getValue().uploadSuccess(fileHandleId);
+		UploadedFile uploadedFile = new UploadedFile(null,  fileHandleId);
+		captor.getValue().uploadSuccess(uploadedFile);
 		verify(mockView).showUploadSuccessUI();
 		verify(mockCallback).setPrimaryEnabled(true);
 		assertTrue(editor.getNewFileHandleIds().contains(fileHandleId));

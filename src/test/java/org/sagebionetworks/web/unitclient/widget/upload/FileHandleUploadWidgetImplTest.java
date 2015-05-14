@@ -18,12 +18,13 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 
 public class FileHandleUploadWidgetImplTest {
 	
 	FileHandleUploadView mockView;
 	MultipartUploader mockMultipartUploader;
-	CallbackP<String> mockCallback;
+	CallbackP<UploadedFile> mockCallback;
 	FileHandleUploadWidgetImpl widget;
 	String inputId;
 	
@@ -49,6 +50,7 @@ public class FileHandleUploadWidgetImplTest {
 	@Test
 	public void testFileSelected(){
 		final String successFileHandle = "123";
+		final UploadedFile uploadedFile = new UploadedFile(null, successFileHandle);
 		// Stub a some progress then success.
 		doAnswer(new Answer<Void>() {
 			@Override
@@ -56,7 +58,7 @@ public class FileHandleUploadWidgetImplTest {
 				ProgressingFileUploadHandler handler = (ProgressingFileUploadHandler) invocation.getArguments()[1];
 				handler.updateProgress(0.1, "10%");
 				handler.updateProgress(0.9, "90%");
-				handler.uploadSuccess(successFileHandle);
+				handler.uploadSuccess(uploadedFile);
 				return null;
 			}
 		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
@@ -76,7 +78,7 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).updateProgress(100, "100%");
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
-		verify(mockCallback).invoke(successFileHandle);
+		verify(mockCallback).invoke(uploadedFile);
 	}
 	
 	@Test
@@ -108,7 +110,7 @@ public class FileHandleUploadWidgetImplTest {
 		// Failure should trigger the following:
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
-		verify(mockCallback, never()).invoke(anyString());
+		verify(mockCallback, never()).invoke(any(UploadedFile.class));
 		verify(mockView).showError(error);
 	}
 

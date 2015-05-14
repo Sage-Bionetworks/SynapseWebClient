@@ -2,8 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
@@ -11,6 +9,7 @@ import org.junit.Test;
 import org.sagebionetworks.web.client.widget.upload.FileInputView;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 
 public class FileInputWidgetImplTest {
 
@@ -31,6 +30,7 @@ public class FileInputWidgetImplTest {
 	public void testUploadSelectedFile(){
 		reset(mockView);
 		String fileHandleId = "123";
+		UploadedFile uploadedFile = new UploadedFile(null, fileHandleId);
 		multipartUploaderStub.setFileHandle(fileHandleId);
 		String[] progress = new String[]{"one","two", "three"};
 		multipartUploaderStub.setProgressText(progress);
@@ -38,13 +38,14 @@ public class FileInputWidgetImplTest {
 		verify(mockView).setInputEnabled(false);
 		// update at the start and end, plus each actual update
 		verify(mockView, times(progress.length+2)).updateProgress(anyDouble(), anyString());
-		verify(mockHandler).uploadSuccess(fileHandleId);
+		verify(mockHandler).uploadSuccess(any(UploadedFile.class));
 		verify(mockHandler, never()).uploadFailed(anyString());
 	}
 	
 	@Test
 	public void testUploadSelectedFailure(){
 		String fileHandleId = "123";
+		UploadedFile uploadedFile = new UploadedFile(null, fileHandleId);
 		multipartUploaderStub.setFileHandle(fileHandleId);
 		String[] progress = new String[]{"one","two", "three"};
 		multipartUploaderStub.setProgressText(progress);
@@ -56,7 +57,7 @@ public class FileInputWidgetImplTest {
 		verify(mockView, times(progress.length+1)).updateProgress(anyDouble(), anyString());
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
-		verify(mockHandler, never()).uploadSuccess(anyString());
+		verify(mockHandler, never()).uploadSuccess(any(UploadedFile.class));
 		verify(mockHandler).uploadFailed(error);
 	}
 	

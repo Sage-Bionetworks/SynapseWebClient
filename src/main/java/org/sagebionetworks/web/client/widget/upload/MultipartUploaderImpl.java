@@ -301,7 +301,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		State state = status.getState();
 		if (State.COMPLETED == state) {
 			handler.updateProgress(.99d, "99%");
-			handler.uploadSuccess(status.getFileHandleId());
+			FileMetadata fileMeta = getSelectedFileMetadata()[0];
+			UploadedFile uploadedFile = new UploadedFile(fileMeta, status.getFileHandleId());
+			handler.uploadSuccess(uploadedFile);
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later
@@ -385,14 +387,14 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 
 	@Override
-	public FileMetadata[] getSelectedFileMetadata(String inputId) {
+	public FileMetadata[] getSelectedFileMetadata() {
 		FileMetadata[] results = null;
-		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(inputId);
+		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
 		if(fileNames != null){
 			results = new FileMetadata[fileNames.length];
 			for(int i=0; i<fileNames.length; i++){
 				String name = fileNames[i];
-				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
+				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, i), name);
 				results[i] = new FileMetadata(name, contentType);
 			}
 		}

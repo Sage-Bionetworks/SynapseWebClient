@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -117,11 +118,11 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			view.setUploadButtonEnabled(false);
 			fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
 				@Override
-				public void uploadSuccess(String fileHandleId) {
+				public void uploadSuccess(UploadedFile fileUploaded) {
 					view.showUploadSuccessUI();
 					//enable the ok button
 					dialogCallback.setPrimaryEnabled(true);
-					addFileHandleId(fileHandleId);
+					addFileHandleId(fileUploaded.getFileHandleId());
 				}
 				
 				@Override

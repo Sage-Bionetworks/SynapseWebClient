@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,10 +58,10 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setLink(profile.getUrl());
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
 		imageWidget.configure(this.fileHandleId);
-		fileHandleUploadWidget.configure("Upload Image",new CallbackP<String>() {
+		fileHandleUploadWidget.configure("Upload Image",new CallbackP<UploadedFile>() {
 			@Override
-			public void invoke(String fileHandleId) {
-				setNewFileHandle(fileHandleId);
+			public void invoke(UploadedFile fileUploaded) {
+				setNewFileHandle(fileUploaded.getFileHandleId());
 			}
 		});
 	}

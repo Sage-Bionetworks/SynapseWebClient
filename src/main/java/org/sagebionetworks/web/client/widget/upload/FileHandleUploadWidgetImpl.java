@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.upload;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -11,9 +10,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	private FileHandleUploadView view;
 	private MultipartUploader multipartUploader;
-	private CallbackP<String> finishedUploadingCallback;
+	private CallbackP<UploadedFile> finishedUploadingCallback;
 	private Callback startedUploadingCallback;
-	private FileMetadata[] fileMeta;
 	
 	@Inject
 	public FileHandleUploadWidgetImpl(FileHandleUploadView view, MultipartUploader multipartUploader) {
@@ -29,13 +27,13 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	}
 
 	@Override
-	public void configure(String buttonText, CallbackP<String> finishedUploadingCallback) {
+	public void configure(String buttonText, CallbackP<UploadedFile> finishedUploadingCallback) {
 		configure(buttonText, null, finishedUploadingCallback);
 	}
 	
 	@Override
 	public void configure(String buttonText, Callback startedUploadingCallback,
-			CallbackP<String> finishedUploadingCallback) {
+			CallbackP<UploadedFile> finishedUploadingCallback) {
 		this.finishedUploadingCallback = finishedUploadingCallback;
 		this.startedUploadingCallback = startedUploadingCallback;
 		view.showProgress(false);
@@ -46,48 +44,35 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	@Override
 	public void onFileSelected() {
-		start();
-		view.showError("Upload in progress");
-		
-	}
-	
-	public void start() {
 		if (startedUploadingCallback != null) {
 			startedUploadingCallback.invoke();
 		}
-		fileMeta = multipartUploader.getSelectedFileMetadata(view.getInputId());
 		view.updateProgress(1, "1%");
 		view.showProgress(true);
 		view.setInputEnabled(false);
 		view.hideError();
-		doMultipartUpload();
+		doMultipartUpload();		
 	}
 	
 	@Override
 	public void reset() {
-		fileMeta = null;
 		view.setInputEnabled(true);
 		view.showProgress(false);
 		view.hideError();
+		view.resetForm();
 	}
-	
-	@Override
-	public FileMetadata[] getFileMetadata() {
-		return fileMeta;
-	}
-
 	
 	private void doMultipartUpload() {
 		// The uploader does the real work
 		multipartUploader.uploadSelectedFile(view.getInputId(),
 				new ProgressingFileUploadHandler() {
 					@Override
-					public void uploadSuccess(String fileHandleId) {
+					public void uploadSuccess(UploadedFile uploadedFile) {
 						// Set the view at 100%
 						view.updateProgress(100, "100%");
 						view.showProgress(false);
 						view.setInputEnabled(true);
-						finishedUploadingCallback.invoke(fileHandleId);
+						finishedUploadingCallback.invoke(uploadedFile);
 					}
 
 					@Override
@@ -102,7 +87,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 							String progressText) {
 						view.updateProgress(currentProgress*100, progressText);
 					}
-				}, null);
+		}, null);
 	}
+
 
 }
