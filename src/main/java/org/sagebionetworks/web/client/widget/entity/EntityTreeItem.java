@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,7 +21,7 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 		this.entityBadge = entityBadge;
 	}
 	
-	public void configure(EntityHeader header,  boolean isRootItem, boolean isExpandable) {
+	public void configure(EntityQueryResult header,  boolean isRootItem, boolean isExpandable) {
 		entityBadge.configure(header);
 		entityBadge.asWidget().addStyleName("padding-2 light-border-bottom");
 		treeItem = new TreeItem(asWidget());
@@ -53,7 +54,7 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 		entityBadge.hideLoadingIcon();
 	}
 	
-	public EntityHeader getHeader() {
+	public EntityQueryResult getHeader() {
 		return entityBadge.getHeader();
 	}
 	

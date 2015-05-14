@@ -1033,6 +1033,10 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 100%;
 }
 
+.maxWidth50px {
+	max-width: 50px;
+}
+
 .markdown {
 	color: #000000;
 }
@@ -1921,6 +1925,9 @@ iframe[seamless] {
     min-height: 300px;
 }
 
+.overflow-x-hidden {
+	overflow-x: hidden;
+}
 
 /*==================================*/
 /* GXT Overrides */
