@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<b:Modal title="Find Entities"
 		closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false"
-		size="LARGE">
+		addStyleNames="modal-fullscreen">
 		<b:ModalBody>
 			<b:Row>
 				<!-- left -->

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -48,6 +48,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Label idField;
 	
+	@UiField
+	SimplePanel modifiedByField;
+	@UiField
+	Label modifiedOnField;
+	
 	Image iconPicture;
 	ClickHandler nonDefaultClickHandler;
 	
@@ -85,7 +90,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}-*/;
 	
 	@Override
-	public void setEntity(final EntityHeader entityHeader) {
+	public void setEntity(final EntityQueryResult entityHeader) {
 		clear();
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
@@ -126,7 +131,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				}
 			};
 			
-			ImageResource icon = presenter.getIconForType(entityHeader.getType());
+			ImageResource icon = presenter.getIconForType(entityHeader.getEntityType());
 			iconPicture = new Image(icon);
 			iconPicture.setWidth("16px");
 			iconPicture.setHeight("16px");
@@ -212,7 +217,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		nonDefaultClickHandler = handler;
 	}
 	
-	private void entityClicked(EntityHeader entityHeader, ClickEvent event) {
+	@Override
+	public void setModifiedByWidget(Widget w) {
+		modifiedByField.setWidget(w);
+	}
+	
+	@Override
+	public void setModifiedOn(String modifiedOnString) {
+		modifiedOnField.setText(modifiedOnString);
+	}
+	private void entityClicked(EntityQueryResult entityHeader, ClickEvent event) {
 		if (nonDefaultClickHandler == null) {
 			presenter.entityClicked(entityHeader);
 		} else {

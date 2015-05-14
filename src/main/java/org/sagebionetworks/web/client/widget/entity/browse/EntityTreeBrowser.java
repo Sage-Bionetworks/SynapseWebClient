@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -91,13 +91,34 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void configure(List<EntityHeader> headers) {
 		view.clear();
 		view.setLoadingVisible(true);
-		for (EntityHeader header : headers) {
-			view.appendRootEntityTreeItem(makeTreeItemFromHeader(header, true,
+		EntityQueryResults results = getEntityQueryResultsFromHeaders(headers);
+		for (EntityQueryResult wrappedHeader : results.getEntities()) {
+			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(wrappedHeader, true,
 					false));
 		}
 		view.setLoadingVisible(false);
 	}
 
+	public EntityQueryResults getEntityQueryResultsFromHeaders(
+			List<EntityHeader> headers) {
+		EntityQueryResults results = new EntityQueryResults();
+		List<EntityQueryResult> resultList = new ArrayList<EntityQueryResult>();
+		
+		for (EntityHeader header : headers) {
+			EntityQueryResult result = new EntityQueryResult();
+			result.setId(header.getId());
+			result.setName(header.getName());
+			result.setEntityType(header.getType());
+			result.setVersionNumber(header.getVersionNumber());
+			resultList.add(result);
+		}
+		
+		results.setEntities(resultList);
+		results.setTotalEntityCount((long)headers.size());
+		
+		return results;
+	}
+	
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);
@@ -335,21 +356,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		return newQuery;
 	}
 
-	public List<EntityHeader> getHeadersFromQueryResults(
-			EntityQueryResults results) {
-		List<EntityHeader> headerList = new LinkedList<EntityHeader>();
-		for (EntityQueryResult result : results.getEntities()) {
-			EntityHeader header = new EntityHeader();
-			header.setId(result.getId());
-			header.setName(result.getName());
-			header.setType(result.getEntityType());
-			header.setVersionNumber(result.getVersionNumber());
-			headerList.add(header);
-		}
-		return headerList;
-	}
-
-	public EntityTreeItem makeTreeItemFromHeader(EntityHeader header,
+	public EntityTreeItem makeTreeItemFromQueryResult(EntityQueryResult header,
 			boolean isRootItem, boolean isExpandable) {
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
@@ -360,31 +367,30 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			EntityQueryResults results,
 			org.sagebionetworks.repo.model.entity.query.EntityType type,
 			long offset, boolean isExpandable) {
-		List<EntityHeader> headers = getHeadersFromQueryResults(results);
 		if (parent == null) {
 			if (type != org.sagebionetworks.repo.model.entity.query.EntityType.folder) {
-				for (EntityHeader header : headers) {
-					view.appendRootEntityTreeItem(makeTreeItemFromHeader(
+				for (EntityQueryResult header : results.getEntities()) {
+					view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(
 							header, true, false));
 				}
 			} else {
-				for (EntityHeader header : headers) {
+				for (EntityQueryResult header : results.getEntities()) {
 					view.insertRootEntityTreeItem(
-							makeTreeItemFromHeader(header, true, true),
+							makeTreeItemFromQueryResult(header, true, true),
 							offset++);
 				}
 			}
 		} else {
 			if (type != org.sagebionetworks.repo.model.entity.query.EntityType.folder) {
-				for (EntityHeader header : headers) {
+				for (EntityQueryResult header : results.getEntities()) {
 					view.appendChildEntityTreeItem(
-							makeTreeItemFromHeader(header, false, false),
+							makeTreeItemFromQueryResult(header, false, false),
 							parent);
 				}
 			} else {
-				for (EntityHeader header : headers) {
+				for (EntityQueryResult header : results.getEntities()) {
 					view.insertChildEntityTreeItem(
-							makeTreeItemFromHeader(header, false, true),
+							makeTreeItemFromQueryResult(header, false, true),
 							parent, offset++);
 				}
 			}
