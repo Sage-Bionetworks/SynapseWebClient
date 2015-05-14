@@ -188,8 +188,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				return;
 			}
 		}
-		this.
-		uploadBasedOnConfiguration();
+		this.uploadBasedOnConfiguration();
 	}
 	
 	public void updateS3UploadBannerView(String banner) {

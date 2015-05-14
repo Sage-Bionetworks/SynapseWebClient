@@ -38,35 +38,5 @@ public class UploadCSVFilePageImplTest {
 		verify(mockPresenter).setInstructionMessage(UploadCSVFilePageImpl.CHOOSE_A_CSV_OR_TSV_FILE);
 		verify(mockFileInputWidget).reset();
 	}
-
 	
-//	@Test
-//	public void testOnPrimaryFailed(){
-//		// For this case we need a stub
-//		FileInputWidgetStub stub = new FileInputWidgetStub();
-//		stub.setErrorString("something went wrong");
-//		stub.setMetadata(new FileMetadata[]{new FileMetadata("testing.csv", ContentTypeDelimiter.CSV.getContentType())});
-//		page = new UploadCSVFilePageImpl(stub, mockNextPage);
-//		page.setModalPresenter(mockPresenter);
-//		page.onPrimary();
-//		verify(mockPresenter).setErrorMessage(stub.getErrorString());
-//		verify(mockPresenter, never()).setNextActivePage(any(ModalPage.class));
-//	}
-	
-//	@Test
-//	public void testOnPrimarySuccess(){
-//		// For this case we need a stub
-//		String fileName = "testing.csv";
-//		String fileHandleId = "123";
-//		FileInputWidgetStub stub = new FileInputWidgetStub();
-//		stub.setFileHandle(fileHandleId);
-//		stub.setMetadata(new FileMetadata[]{new FileMetadata(fileName, ContentTypeDelimiter.CSV.getContentType())});
-//		page = new UploadCSVFilePageImpl(stub, mockNextPage);
-//		page.configure(parentId, tableId);
-//		page.setModalPresenter(mockPresenter);
-//		page.onPrimary();
-//		verify(mockPresenter, never()).setErrorMessage(anyString());
-//		verify(mockNextPage).configure(ContentTypeDelimiter.CSV, fileName, parentId, fileHandleId, tableId);
-//		verify(mockPresenter).setNextActivePage(mockNextPage);
-//	}
 }
