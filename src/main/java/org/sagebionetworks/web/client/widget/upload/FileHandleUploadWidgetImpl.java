@@ -13,7 +13,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	private MultipartUploader multipartUploader;
 	private CallbackP<String> finishedUploadingCallback;
 	private Callback startedUploadingCallback;
-	private boolean readyForUpload;
 	private FileMetadata[] fileMeta;
 	
 	@Inject
@@ -31,11 +30,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	@Override
 	public void configure(String buttonText, CallbackP<String> finishedUploadingCallback) {
-		this.finishedUploadingCallback = finishedUploadingCallback;
-		this.startedUploadingCallback = null;
-		view.showProgress(false);
-		view.hideError();
-		view.setButtonText(buttonText);
+		configure(buttonText, null, finishedUploadingCallback);
 	}
 	
 	@Override
@@ -51,11 +46,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	@Override
 	public void onFileSelected() {
-		GWT.debugger();
-		if (readyForUpload)
-			start();
-		else 
-			view.showError("Upload in progress");
+		start();
+		view.showError("Upload in progress");
 		
 	}
 	
@@ -64,7 +56,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			startedUploadingCallback.invoke();
 		}
 		fileMeta = multipartUploader.getSelectedFileMetadata(view.getInputId());
-		readyForUpload = false;
 		view.updateProgress(1, "1%");
 		view.showProgress(true);
 		view.setInputEnabled(false);
@@ -76,7 +67,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	public void reset() {
 		fileMeta = null;
 		view.setInputEnabled(true);
-		readyForUpload = true;
 		view.showProgress(false);
 		view.hideError();
 	}
@@ -97,7 +87,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 						view.updateProgress(100, "100%");
 						view.showProgress(false);
 						view.setInputEnabled(true);
-						readyForUpload = true;
 						finishedUploadingCallback.invoke(fileHandleId);
 					}
 

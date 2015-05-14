@@ -3,11 +3,8 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -52,11 +49,6 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 		this.presenter = presenter;
 		this.presenter.setInstructionMessage(CHOOSE_A_CSV_OR_TSV_FILE);
 		this.presenter.setPrimaryButtonText(NEXT);
-		reset();
-	}
-	
-	@Override
-	public void reset() {
 		this.fileInputWidget.reset();
 		this.fileInputWidget.configure("Browse...", new Callback() {
 			@Override
@@ -70,11 +62,11 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 				fileHandleCreated(fileHandleId);
 			}			
 		});
+		
 	}
 
 	@Override
 	public void configure(String parentId, String tableId) {
-		GWT.debugger();
 		this.parentId = parentId;
 		this.tableId = tableId;
 	}

@@ -17,6 +17,4 @@ public interface UploadCSVFilePage extends ModalPage {
 	 */
 	void configure(String parentId, String tableId);
 
-	void reset();
-
 }
