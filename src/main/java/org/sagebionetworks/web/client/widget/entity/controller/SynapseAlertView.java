@@ -1,22 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.sagebionetworks.web.client.ShowsErrors;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction for the view 
  *
  */
-public interface SynapseAlertView extends ShowsErrors, IsWidget {
-	
-
-	/**
-	 * Show the user a confirm dialog.
-	 * @param string
-	 * @param action
-	 */
-	void showConfirmDialog(String title, String string, Callback callback);
+public interface SynapseAlertView extends IsWidget {
 	
 	/**
 	 * Show info to the user.
@@ -53,7 +44,7 @@ public interface SynapseAlertView extends ShowsErrors, IsWidget {
 	void showLoginAlert();
 	
 	void setPresenter(Presenter p);
-	
+
 	/**
 	 * Presenter interface
 	 */

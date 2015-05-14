@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -72,16 +71,6 @@ public class SynapseAlertViewImpl implements
 		this.presenter = presenter;
 	}
 	
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void showConfirmDialog(String title, String string, Callback callback) {
-		DisplayUtils.showConfirmDialog(title, string, callback);
-	}
-
 	@Override
 	public void showInfo(String tile, String message) {
 		DisplayUtils.showInfo(tile, message);

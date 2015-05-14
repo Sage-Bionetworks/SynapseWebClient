@@ -30,4 +30,8 @@ public interface SynapseAlert extends IsWidget {
 	 */
 	boolean isUserLoggedIn();
 	
+	/**
+	 * Hide all errors that were previously shown.
+	 */
+	void clear();
 }
