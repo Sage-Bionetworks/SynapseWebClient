@@ -1,9 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -15,19 +19,19 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	public static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
 	
 	// Injected dependencies.
-	FileInputWidget fileInputWidget;
+	FileHandleUploadWidget fileInputWidget;
 	ModalPresenter presenter;
 	UploadCSVPreviewPage nextPage;
 	
-	// data fields
-	String fileHandleId;
+//	 data fields
+//	String fileHandleId;
 	String parentId;
 	String tableId;
-	ContentTypeDelimiter type;
-	String fileName;
+//	ContentTypeDelimiter type;
+//	String fileName;
 	
 	@Inject
-	public UploadCSVFilePageImpl(FileInputWidget fileInputWidget, UploadCSVPreviewPage uploadCSVConfigurationWidget) {
+	public UploadCSVFilePageImpl(FileHandleUploadWidget fileInputWidget, UploadCSVPreviewPage uploadCSVConfigurationWidget) {
 		super();
 		this.fileInputWidget = fileInputWidget;
 		this.nextPage = uploadCSVConfigurationWidget;
@@ -35,23 +39,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 
 	@Override
 	public void onPrimary() {
-		// proceed if valid
-		if(validateSelecedFile()){
-			presenter.setLoading(true);
-			// Upload the file
-			fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
-				
-				@Override
-				public void uploadSuccess(String fileHandleId) {
-					fileHandleCreated(fileHandleId);
-				}
-				
-				@Override
-				public void uploadFailed(String error) {
-					presenter.setErrorMessage(error);
-				}
-			});
-		}
+		presenter.setErrorMessage(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
 	}
 
 	@Override
@@ -64,33 +52,29 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 		this.presenter = presenter;
 		this.presenter.setInstructionMessage(CHOOSE_A_CSV_OR_TSV_FILE);
 		this.presenter.setPrimaryButtonText(NEXT);
-		this.fileInputWidget.reset();
+		reset();
 	}
-
-	/**
-	 * Validate the content type of the selected file.
-	 * @return
-	 */
-	public boolean validateSelecedFile(){
-		// first validate the input
-		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
-		if(meta == null || meta.length != 1){
-			presenter.setErrorMessage(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
-			return false;
-		}
-		String contentType = meta[0].getContentType();
-		try{
-			this.fileName =  meta[0].getFileName();
-			this.type = ContentTypeDelimiter.findByContentType(contentType, this.fileName);
-			return true;
-		}catch(IllegalArgumentException e){
-			presenter.setErrorMessage(UNKNOWN_TYPE_SLECTED);
-			return false;
-		}
+	
+	@Override
+	public void reset() {
+		this.fileInputWidget.reset();
+		this.fileInputWidget.configure("Browse...", new Callback() {
+			@Override
+			public void invoke() {
+				presenter.setLoading(true);				
+			}
+		}, new CallbackP<String>() {
+			@Override
+			public void invoke(String fileHandleId) {
+				presenter.setLoading(false);	
+				fileHandleCreated(fileHandleId);
+			}			
+		});
 	}
 
 	@Override
 	public void configure(String parentId, String tableId) {
+		GWT.debugger();
 		this.parentId = parentId;
 		this.tableId = tableId;
 	}
@@ -100,7 +84,11 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	 * @param fileHandleId
 	 */
 	private void fileHandleCreated(String fileHandleId) {
-		this.nextPage.configure(this.type, this.fileName, this.parentId, fileHandleId, this.tableId);
+		FileMetadata[] meta = fileInputWidget.getFileMetadata();
+		String contentType = meta[0].getContentType();
+		String fileName =  meta[0].getFileName();
+		ContentTypeDelimiter contentTypeDelimiter = ContentTypeDelimiter.findByContentType(contentType, fileName);
+		this.nextPage.configure(contentTypeDelimiter, fileName, this.parentId, fileHandleId, this.tableId);
 		this.presenter.setNextActivePage(this.nextPage);
 	}
 

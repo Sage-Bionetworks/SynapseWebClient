@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -9,7 +11,10 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	private FileHandleUploadView view;
 	private MultipartUploader multipartUploader;
-	private CallbackP<String> callback;
+	private CallbackP<String> finishedUploadingCallback;
+	private Callback startedUploadingCallback;
+	private boolean readyForUpload;
+	private FileMetadata[] fileMeta;
 	
 	@Inject
 	public FileHandleUploadWidgetImpl(FileHandleUploadView view, MultipartUploader multipartUploader) {
@@ -25,20 +30,60 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	}
 
 	@Override
-	public void configure(String buttonText, CallbackP<String> callback) {
-		this.callback = callback;
+	public void configure(String buttonText, CallbackP<String> finishedUploadingCallback) {
+		this.finishedUploadingCallback = finishedUploadingCallback;
+		this.startedUploadingCallback = null;
 		view.showProgress(false);
 		view.hideError();
 		view.setButtonText(buttonText);
 	}
+	
+	@Override
+	public void configure(String buttonText, Callback startedUploadingCallback,
+			CallbackP<String> finishedUploadingCallback) {
+		this.finishedUploadingCallback = finishedUploadingCallback;
+		this.startedUploadingCallback = startedUploadingCallback;
+		view.showProgress(false);
+		view.hideError();
+		view.setButtonText(buttonText);
+		
+	}
 
 	@Override
 	public void onFileSelected() {
+		GWT.debugger();
+		if (readyForUpload)
+			start();
+		else 
+			view.showError("Upload in progress");
+		
+	}
+	
+	public void start() {
+		if (startedUploadingCallback != null) {
+			startedUploadingCallback.invoke();
+		}
+		fileMeta = multipartUploader.getSelectedFileMetadata(view.getInputId());
+		readyForUpload = false;
 		view.updateProgress(1, "1%");
 		view.showProgress(true);
 		view.setInputEnabled(false);
 		view.hideError();
 		doMultipartUpload();
+	}
+	
+	@Override
+	public void reset() {
+		fileMeta = null;
+		view.setInputEnabled(true);
+		readyForUpload = true;
+		view.showProgress(false);
+		view.hideError();
+	}
+	
+	@Override
+	public FileMetadata[] getFileMetadata() {
+		return fileMeta;
 	}
 
 	
@@ -52,7 +97,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 						view.updateProgress(100, "100%");
 						view.showProgress(false);
 						view.setInputEnabled(true);
-						callback.invoke(fileHandleId);
+						readyForUpload = true;
+						finishedUploadingCallback.invoke(fileHandleId);
 					}
 
 					@Override
@@ -69,4 +115,5 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 					}
 				}, null);
 	}
+
 }
