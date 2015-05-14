@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;

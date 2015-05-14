@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
@@ -30,6 +31,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class TableQueryResultWidgetTest {
 	
@@ -49,6 +51,7 @@ public class TableQueryResultWidgetTest {
 	RowSet rowSet;
 	QueryResult results;
 	SelectColumn select;
+	SynapseAlert mockSynapseAlert;
 	
 	@Before
 	public void before(){
@@ -59,10 +62,11 @@ public class TableQueryResultWidgetTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockQueryResultEditor = Mockito.mock(QueryResultEditorWidget.class);
+		mockSynapseAlert = Mockito.mock(SynapseAlert.class);
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(jobTrackingStub);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
-		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector);
+		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert);
 		query = new Query();
 		query.setSql("select * from syn123");
 		row = new Row();
@@ -87,6 +91,8 @@ public class TableQueryResultWidgetTest {
 		// delta
 		delta = new PartialRowSet();
 		delta.setTableId("syn123");
+		
+		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 	}
 	
 	@Test
@@ -106,6 +112,19 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
+		verify(mockView).setSynapseAlertWidget(any(Widget.class));
+	}
+	
+	@Test
+	public void testConfigureNotLoggedIn() {
+		boolean isEditable = false;
+		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(false);
+		widget.configure(query, isEditable, mockListner);
+		verify(mockView).setTableVisible(false);
+		verify(mockView).setProgressWidgetVisible(false);
+		verify(mockView).setErrorVisible(true);
+		verify(mockView).setSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).showMustLogin();
 	}
 	
 	@Test
@@ -165,7 +184,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView).showError(TableQueryResultWidget.QUERY_CANCELED);
+		verify(mockSynapseAlert).showError(TableQueryResultWidget.QUERY_CANCELED);
 	}
 	
 	@Test
@@ -186,7 +205,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView).showError(error.getMessage());
+		verify(mockSynapseAlert).handleException(error);
 	}
 	
 }

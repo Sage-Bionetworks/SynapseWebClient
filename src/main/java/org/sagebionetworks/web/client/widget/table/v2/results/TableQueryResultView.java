@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface TableQueryResultView extends IsWidget {
 
@@ -38,12 +38,11 @@ public interface TableQueryResultView extends IsWidget {
 	void setPageWidget(TablePageWidget pageWidget);
 
 	/**
-	 * Show an error message.
-	 * 
-	 * @param message
+	 * Add the service error widget to the view.
+	 * @param w
 	 */
-	void showError(String message);
-
+	void setSynapseAlertWidget(Widget w);
+	
 	/**
 	 * Show or hide the error alert.
 	 * 

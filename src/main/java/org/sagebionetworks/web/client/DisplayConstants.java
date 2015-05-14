@@ -331,6 +331,7 @@ public class DisplayConstants {
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
 	public static final String WARNING_TEAM_NAME_EXISTS = "Sorry, a team with that name already exists. Please try another name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
+	public static final String ERROR_RESPONSE_UNAVAILABLE = "The web page is not available. Please check your Internet connection.";
 	public static final String TITLE_UNAUTHORIZED = "Unauthorized";
 	public static final String ATTACHMENT_DIALOG_BUTTON_TEXT = "Attach";
 	public static final String ATTACHMENT_DIALOG_WINDOW_TITLE = "Add New File Attachment";
