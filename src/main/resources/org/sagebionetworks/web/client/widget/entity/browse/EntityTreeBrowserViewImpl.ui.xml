@@ -30,6 +30,7 @@
 				</t:TableHeader>
 			</t:TableRow>
 		</t:Table>
+		<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
 	    <g:Tree ui:field="entityTree">
 		</g:Tree>  
 		<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
