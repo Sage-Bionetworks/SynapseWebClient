@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +22,14 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
@@ -36,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -63,6 +67,8 @@ public class EntityBadgeTest {
 	List<String> order;
 	List<Annotation> annotationList;
 	Annotations annotations;
+	UserBadge mockUserBadge;
+	SynapseJSNIUtils mockSynapseJSNIUtils; 
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -74,8 +80,10 @@ public class EntityBadgeTest {
 		getInfoCallback = mock(AsyncCallback.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockTransformer = mock(AnnotationTransformer.class);
+		mockUserBadge = mock(UserBadge.class);
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, mockGlobalApplicationState, mockTransformer);
+		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key1", Collections.EMPTY_LIST));
@@ -106,12 +114,36 @@ public class EntityBadgeTest {
 	
 	@Test
 	public void testConfigure() throws Exception {
-		//check the passthrough (view shows information from entity header
-		EntityHeader header = new EntityHeader();
+		EntityQueryResult header = new EntityQueryResult();
 		header.setId("syn008");
 		widget.configure(header);
 		verify(mockView).setEntity(header);
+		
+		//in this case, "modified by" and "modified on" are not set.
+		verify(mockView).setModifiedByWidgetVisible(false);
+		verify(mockView).setModifiedOn("");
 	}
+	
+	@Test
+	public void testConfigureWithModificationData() throws Exception {
+		EntityQueryResult header = new EntityQueryResult();
+		header.setId("syn008");
+		Long modifiedByPrincipalId = 12345L;
+		Date modifiedOn = new Date();
+		String smallDateString="10/02/2000 01:26:45PM";
+		when(mockSynapseJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
+		header.setModifiedByPrincipalId(modifiedByPrincipalId);
+		header.setModifiedOn(modifiedOn);
+		widget.configure(header);
+		verify(mockView).setEntity(header);
+		
+		//in this case, "modified by" and "modified on" are not set.
+		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
+		verify(mockView).setModifiedByWidgetVisible(true);
+		verify(mockSynapseJSNIUtils).convertDateToSmallString(modifiedOn);
+		verify(mockView).setModifiedOn(smallDateString);
+	}
+
 
 	@Test
 	public void testGetIconForType() throws Exception {
@@ -147,7 +179,7 @@ public class EntityBadgeTest {
 	@Test
 	public void testEntityClicked() throws Exception {
 		//check the passthrough
-		EntityHeader header = new EntityHeader();
+		EntityQueryResult header = new EntityQueryResult();
 		header.setId("syn93847");
 		widget.entityClicked(header);
 		verify(mockPlaceChanger).goTo(any(Synapse.class));
@@ -171,7 +203,7 @@ public class EntityBadgeTest {
 	
 	@Test
 	public void testGetEntity() {
-		EntityHeader header = new EntityHeader();
+		EntityQueryResult header = new EntityQueryResult();
 		header.setId("syn12345");
 		widget.configure(header);
 		assertTrue(header == widget.getHeader());

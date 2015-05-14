@@ -5,14 +5,23 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,16 +66,26 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setImagePreview(String fullFileUrl, String previewUrl) {
+	public void setImagePreview(final String fullFileUrl, String previewUrl) {
 		clear();
-		StringBuilder sb = new StringBuilder();
-		sb.append("<a href=\"");
-		sb.append(fullFileUrl);
-		sb.append("\"><img class=\"imageDescriptor\" ");
-		sb.append(" src=\"");
-		sb.append(previewUrl);
-		sb.append("\"></img></a>");
-		setPreview(sb.toString());
+	
+		final Image image = new Image();
+		image.addStyleName("imageButton imageDescriptor");
+		image.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(fullFileUrl, "", "");
+			}
+		});
+		image.addErrorHandler(new ErrorHandler() {
+			@Override
+		    public void onError(ErrorEvent event) {
+				presenter.imagePreviewLoadFailed(event);
+		    }
+		});
+		
+		add(image);
+		image.setUrl(previewUrl);
 	}
 	
 	@Override
@@ -126,9 +145,9 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		add(wrapper);
 	}
 	@Override
-	public void showErrorMessage(String message) {
+	public void addSynapseAlertWidget(Widget w) {
 		clear();
-		add(new HTMLPanel(message));
+		add(w);
 	}
 	
 }

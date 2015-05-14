@@ -37,16 +37,23 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	boolean isShowCompany;
 	String description;
 	boolean useCachedImage;
+	private AdapterFactory adapterFactory;
+	private ClientCache clientCache;
 	
 	@Inject
 	public UserBadge(UserBadgeView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			AdapterFactory adapterFactory,
+			ClientCache clientCache) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.adapterFactory = adapterFactory;
+		this.clientCache = clientCache;
+		
 		view.setPresenter(this);
 		view.setSize(BadgeSize.SMALL);
 		clearState();
@@ -113,12 +120,13 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	 * @param principalId
 	 */
 	public void configure(final String principalId) {
+		
 		//get user profile and configure
 		view.clear();
 		if (principalId != null && principalId.trim().length() > 0) {
 			view.showLoading();
 			
-			synapseClient.getUserProfile(principalId, new AsyncCallback<UserProfile>() {			
+			getUserProfile(principalId, adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {			
 				@Override
 				public void onSuccess(UserProfile result) {
 					configure(result);
@@ -165,8 +173,15 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public static void getUserProfile(final String principalId, final AdapterFactory adapterFactory, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
 		String profileString = clientCache.get(principalId + WebConstants.USER_PROFILE_SUFFIX);
 		if (profileString != null) {
-			parseProfile(profileString, adapterFactory, callback);
-		} else {
+			try {
+				UserProfile profile = new UserProfile(adapterFactory.createNew(profileString));
+				callback.onSuccess(profile);
+				return;
+			} catch (JSONObjectAdapterException e) {
+				//if any problems occur, try to get the user profile from with a rpc
+			}	
+		}
+		
 		synapseClient.getUserProfile(principalId, new AsyncCallback<UserProfile>() {			
 			@Override
 			public void onSuccess(UserProfile result) {
@@ -185,17 +200,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 				callback.onFailure(caught);
 			}
 		});
-	}
-	}
 	
-	public static void parseProfile(String profileString, AdapterFactory adapterFactory, AsyncCallback<UserProfile> callback) {
-		try {
-			UserProfile profile = new UserProfile(adapterFactory.createNew(profileString));
-			callback.onSuccess(profile);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
-
 	}
 	
 	public void clearState() {
