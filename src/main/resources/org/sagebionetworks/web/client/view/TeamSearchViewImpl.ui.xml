@@ -9,7 +9,7 @@
 		<b:Container addStyleNames="margin-top-15">
 		    <b:Row>
 				<b:InputGroup>
-				    <b:TextBox ui:field="searchField" addStyleNames="input-lg"/>
+				    <b:TextBox ui:field="searchField" addStyleNames="input-lg search-textbox"/>
 				    <b:InputGroupButton>
 				        <b:Button ui:field="searchButton" icon="SEARCH" addStyleNames="btn-lg">Search</b:Button>
 				    </b:InputGroupButton>
