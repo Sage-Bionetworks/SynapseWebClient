@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -85,7 +86,7 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 			@Override
 			public void onSuccess(PaginatedResults<Team> result) {
 				teamList = result;
-				view.configure(teamList.getResults(), searchTerm);	
+				view.configure(teamList.getResults(), searchTerm);
 				if (teamList.getResults().isEmpty()) {
 					view.showEmptyTeams();
 				}
