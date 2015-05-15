@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.TableFileValidator;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -23,13 +23,13 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	private AttachmentConfigView view;
 	private Map<String, String> descriptor;
 	private List<String> fileHandleIds;
-	private FileInputWidget fileInputWidget;
+	private FileHandleUploadWidget fileInputWidget;
 	private FileUpload uploadedFile;
 	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
 	
 	@Inject
-	public AttachmentConfigEditor(AttachmentConfigView view, FileInputWidget fileInputWidget, WikiAttachments wikiAttachments) {
+	public AttachmentConfigEditor(AttachmentConfigView view, FileHandleUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
 		this.fileInputWidget = fileInputWidget;
 		this.wikiAttachments = wikiAttachments;
@@ -39,7 +39,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
 		view.initView();
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
@@ -49,6 +49,16 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		uploadedFile = null;
+		this.fileInputWidget.configure("Browse...", null, new CallbackP<FileUpload>() {
+			@Override
+			public void invoke(FileUpload uploadFile) {
+				view.showUploadSuccessUI();
+				//enable the ok button
+				dialogCallback.setPrimaryEnabled(true);
+				addFileHandleId(uploadFile.getFileHandleId());
+			}			
+		}, new TableFileValidator());
+		
 	}
 	
 	
@@ -81,27 +91,6 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		else
 			return uploadedFile.getFileMeta().getFileName();
 	
-	}
-
-	@Override
-	public void uploadFileClicked() {
-		view.setUploadButtonEnabled(false);
-		fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
-			@Override
-			public void uploadSuccess(String fileHandleId) {
-				view.showUploadSuccessUI();
-				//enable the ok button
-				dialogCallback.setPrimaryEnabled(true);
-				addFileHandleId(fileHandleId);
-			}
-			
-			@Override
-			public void uploadFailed(String error) {
-				view.setUploadButtonEnabled(true);
-				view.showUploadFailureUI(error);
-			}
-		});
-		
 	}
 	
 	@Override

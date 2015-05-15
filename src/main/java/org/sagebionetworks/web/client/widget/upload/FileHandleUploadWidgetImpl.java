@@ -35,7 +35,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	@Override
 	public void configure(String buttonText, CallbackP<FileUpload> finishedUploadingCallback) {
-		configure(buttonText, null, finishedUploadingCallback, null);
+		configure(buttonText, null, finishedUploadingCallback);
 	}
 	
 	@Override

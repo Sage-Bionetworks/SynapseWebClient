@@ -1,28 +1,32 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEditorView;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
 public class FileCellEditorImplTest {
 	FileCellEditorView mockView;
-	FileInputWidget mockFileInputWidget;
+	FileHandleUploadWidget mockFileInputWidget;
 	FileCellEditorImpl editor;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(FileCellEditorView.class);
-		mockFileInputWidget = Mockito.mock(FileInputWidget.class);
+		mockFileInputWidget = Mockito.mock(FileHandleUploadWidget.class);
 		editor = new FileCellEditorImpl(mockView, mockFileInputWidget);
 	}
 	

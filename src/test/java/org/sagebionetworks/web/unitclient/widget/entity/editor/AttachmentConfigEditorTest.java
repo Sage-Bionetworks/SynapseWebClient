@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,16 +12,15 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -36,22 +33,31 @@ public class AttachmentConfigEditorTest {
 	WikiAttachments mockAttachments;
 	
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null, null);
-	FileInputWidget mockFileInputWidget;
+	FileHandleUploadWidget mockFileInputWidget;
 	String testFileName = "testing.txt";
 	String testAttachmentName = "attachment1.png";
+	String fileHandleId = "222";
 	DialogCallback mockCallback;
+	CallbackP<FileUpload> mockFinishedUploadingCallback;
+	FileMetadata[] mockMetadata;
+	FileUpload mockFileUpload;
+	
 	
 	@Before
-	public void setup(){
-		mockFileInputWidget = mock(FileInputWidget.class);
+	public void setup() {
+		mockFileUpload = mock(FileUpload.class);
+		mockFileInputWidget = mock(FileHandleUploadWidget.class);
 		mockView = mock(AttachmentConfigView.class);
 		mockCallback = mock(DialogCallback.class);
 		mockAttachments = mock(WikiAttachments.class);
 		editor = new AttachmentConfigEditor(mockView,mockFileInputWidget, mockAttachments);
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType())});
+		mockMetadata = new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType())};
+		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(mockMetadata);
 		when(mockView.isNewAttachment()).thenReturn(true);
 		when(mockAttachments.isValid()).thenReturn(true);
 		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
+		when(mockFileUpload.getFileMeta()).thenReturn(mockMetadata[0]);
+		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);
 	}
 	
 	@Test
@@ -68,50 +74,15 @@ public class AttachmentConfigEditorTest {
 	}
 	
 	@Test
-	public void testValidateSelectedFile() {
-		assertTrue(editor.validateSelectedFile());
-		
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{});
-		assertFalse(editor.validateSelectedFile());
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(null);
-		assertFalse(editor.validateSelectedFile());
-	}
-	
-	@Test
 	public void testUploadFileClickedSuccess() {
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, mockCallback);
-		verify(mockView).initView();
-		editor.uploadFileClicked();
-		verify(mockView).setUploadButtonEnabled(false);
-		
-		ArgumentCaptor<FileUploadHandler> captor = ArgumentCaptor.forClass(FileUploadHandler.class);
-		verify(mockFileInputWidget).uploadSelectedFile(captor.capture());
-		String fileHandleId = "222";
-		FileUpload uploadedFile = new FileUpload(null, fileHandleId);
-		captor.getValue().uploadSuccess(uploadedFile);
+		verify(mockView).initView();		
+		mockFinishedUploadingCallback.invoke(mockFileUpload);
 		verify(mockView).showUploadSuccessUI();
 		verify(mockCallback).setPrimaryEnabled(true);
 		verify(mockAttachments).configure(wikiKey);
 		assertTrue(editor.getNewFileHandleIds().contains(fileHandleId));
-	}
-	
-
-	@Test
-	public void testUploadFileClickedFailure() {
-		Map<String,String> descriptor = new HashMap<String, String>();
-		editor.configure(wikiKey, descriptor, mockCallback);
-		
-		editor.uploadFileClicked();
-		verify(mockView).setUploadButtonEnabled(false);
-		reset(mockView);
-		
-		ArgumentCaptor<FileUploadHandler> captor = ArgumentCaptor.forClass(FileUploadHandler.class);
-		verify(mockFileInputWidget).uploadSelectedFile(captor.capture());
-		String error = "this is my error";
-		captor.getValue().uploadFailed(error);
-		verify(mockView).showUploadFailureUI(error);
-		verify(mockView).setUploadButtonEnabled(true);
 	}
 	
 	@Test

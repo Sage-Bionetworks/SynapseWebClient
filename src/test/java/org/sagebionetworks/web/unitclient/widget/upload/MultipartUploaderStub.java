@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
-import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 
 /**
  * Test helper for MultipartUploader.

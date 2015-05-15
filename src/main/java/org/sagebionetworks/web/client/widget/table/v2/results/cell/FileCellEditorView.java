@@ -19,13 +19,7 @@ public interface FileCellEditorView extends IsWidget, TakesValue<String>,
 		public void onToggleCollapse();
 
 		/**
-		 * Called when the user clicks the upload file button of the modal
-		 * dialog.
-		 */
-		public void onUploadFile();
-
-		/**
-		 * Cancel the uplaod.
+		 * Cancel the upload.
 		 */
 		public void onCancelUpload();
 	}
@@ -64,16 +58,6 @@ public interface FileCellEditorView extends IsWidget, TakesValue<String>,
 	 * Hide the error message.
 	 */
 	public void hideErrorMessage();
-
-	/**
-	 * Set the loading state of the upload button.
-	 */
-	public void setUploadButtonLoading();
-
-	/**
-	 * Reset the state of the upload button.
-	 */
-	public void resetUploadButton();
 
 	/**
 	 * Set an error message for a value.

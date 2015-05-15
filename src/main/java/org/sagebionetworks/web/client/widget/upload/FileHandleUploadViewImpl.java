@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -15,7 +14,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 

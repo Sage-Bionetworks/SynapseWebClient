@@ -40,8 +40,6 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 	@UiField
 	SimplePanel fileInputWidgetPanel;
 	@UiField
-	Button uploadFileButton;
-	@UiField
 	Alert uploadAlert;
 	
 	Widget widget;
@@ -94,13 +92,6 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 				presenter.onToggleCollapse();
 			}
 		});
-		uploadFileButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onUploadFile();
-			}
-		});
 	}
 
 	@Override
@@ -127,16 +118,6 @@ public class FileCellEditorViewImpl implements FileCellEditorView {
 	@Override
 	public void hideErrorMessage() {
 		uploadAlert.setVisible(false);
-	}
-
-	@Override
-	public void setUploadButtonLoading() {
-		this.uploadFileButton.state().loading();
-	}
-
-	@Override
-	public void resetUploadButton() {
-		this.uploadFileButton.state().reset();
 	}
 
 	@Override

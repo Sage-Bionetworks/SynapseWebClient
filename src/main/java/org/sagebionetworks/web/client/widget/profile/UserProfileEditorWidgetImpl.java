@@ -4,9 +4,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
