@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -59,6 +60,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.server.servlet.NotificationTokenType;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -347,8 +349,8 @@ public interface SynapseClient extends RemoteService {
 	public Team updateTeam(Team team) throws RestServiceException;
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
-	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
-	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
+	public void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
+	public void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
 	
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
 	public String getCertificationQuiz() throws RestServiceException;
@@ -373,6 +375,8 @@ public interface SynapseClient extends RemoteService {
 	public HashMap<String, String> getSynapseProperties();
 	
 	public String getAPIKey() throws RestServiceException;
+	
+	public ResponseMessage handleSignedToken(NotificationTokenType tokenType, String token, String hostPageBaseURL) throws RestServiceException;
 	
 	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	

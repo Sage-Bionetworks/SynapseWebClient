@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -57,6 +58,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
+import org.sagebionetworks.web.server.servlet.NotificationTokenType;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -267,10 +269,10 @@ public interface SynapseClientAsync {
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
-	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
+	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
-	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
+	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	/////////////////
 	
 	/**
@@ -303,6 +305,8 @@ public interface SynapseClientAsync {
 
 	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
 
+	void handleSignedToken(NotificationTokenType tokenType, String token, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
+	
 	void getAPIKey(AsyncCallback<String> callback);
 
 	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<String>> asyncCallback);

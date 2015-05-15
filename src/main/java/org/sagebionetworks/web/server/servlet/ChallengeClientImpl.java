@@ -273,20 +273,25 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public Submission createTeamSubmission(Submission submission, String etag, String memberStateHash)
+	public Submission createTeamSubmission(Submission submission, String etag, String memberStateHash, String hostPageBaseURL)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createTeamSubmission(submission, etag, memberStateHash);
+			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
+			String notificationSettingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			return synapseClient.createTeamSubmission(submission, etag, memberStateHash, challengeEndpoint, notificationSettingsEndpoint);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	public Submission createIndividualSubmission(Submission submission, String etag)
+	
+	public Submission createIndividualSubmission(Submission submission, String etag, String hostPageBaseURL)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.createIndividualSubmission(submission, etag);
+			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
+			String notificationSettingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			return synapseClient.createIndividualSubmission(submission, etag, challengeEndpoint, notificationSettingsEndpoint);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}

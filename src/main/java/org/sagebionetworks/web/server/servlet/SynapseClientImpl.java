@@ -56,6 +56,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
@@ -67,8 +68,10 @@ import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -78,6 +81,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
@@ -96,6 +100,7 @@ import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
@@ -131,6 +136,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
+import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
@@ -1849,7 +1855,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	@Override
 	public void requestMembership(String currentUserId, String teamId,
-			String message) throws RestServiceException {
+			String message, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
@@ -1857,8 +1863,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// if we can join the team without creating the request (like if we
 			// are a team admin, or there is an open invitation), then just do
 			// that!
+			String notificationSettingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, currentUserId);
+				synapseClient.addTeamMember(teamId, currentUserId, getTeamEndpoint(hostPageBaseURL), notificationSettingsEndpoint);
 			} else if (!membershipStatus.getHasOpenRequest()) {
 				// otherwise, create the request
 				MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
@@ -1867,7 +1874,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				membershipRequest.setUserId(currentUserId);
 
 				// make new Synapse call
-				synapseClient.createMembershipRequest(membershipRequest);
+				synapseClient.createMembershipRequest(membershipRequest, getTeamEndpoint(hostPageBaseURL), notificationSettingsEndpoint);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1875,17 +1882,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void inviteMember(String userGroupId, String teamId, String message)
+	public void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, userGroupId);
+			String notificationSettingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			// if we can join the team without creating the invite (like if we
 			// are a team admin, or there is an open membership request), then
 			// just do that!
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, userGroupId);
+				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), notificationSettingsEndpoint);
 			} else if (!membershipStatus.getHasOpenInvitation()) {
 				// check to see if there is already an open invite
 				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
@@ -1894,7 +1902,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				membershipInvite.setInviteeId(userGroupId);
 
 				// make new Synapse call
-				synapseClient.createMembershipInvitation(membershipInvite);
+				String acceptInviteEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
+				synapseClient.createMembershipInvitation(membershipInvite, acceptInviteEndpoint, notificationSettingsEndpoint);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2431,6 +2440,46 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@Override
+	public ResponseMessage handleSignedToken(NotificationTokenType tokenType,
+			String token, String hostPageBaseURL) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			
+			JSONEntity signedToken = SerializationUtils.hexDecodeAndDeserialize(token, c);
+			if (signedToken instanceof JoinTeamSignedToken) {
+				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
+				String notificationEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+				return synapseClient.addTeamMember(joinTeamSignedToken, getTeamEndpoint(hostPageBaseURL), notificationEndpoint);
+			} else if (signedToken instanceof NotificationSettingsSignedToken) {
+				NotificationSettingsSignedToken notificationSignedToken = (NotificationSettingsSignedToken) signedToken;
+				return synapseClient.updateNotificationSettings(notificationSignedToken);
+			} else if (signedToken instanceof NewUserSignedToken) {
+				//TODO
+				throw new BadRequestException("Not yet implemented");
+			} else {
+				throw new BadRequestException("token class not recognized: " + tokenClassName);
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (ClassNotFoundException e) {
+			throw new BadRequestException(e.getMessage());
+		}
+	}
+	
+	public static String getTeamEndpoint(String hostPageBaseURL) {
+		return hostPageBaseURL + "#!Team:";
+	}
+	
+	public static String getNotificationEndpoint(NotificationTokenType type, String hostPageBaseURL) {
+		return hostPageBaseURL + "#!Notification:"+ type.toString() + "/";
+	}
+	
+	public static String getChallengeEndpoint(String hostPageBaseURL) {
+		return hostPageBaseURL + "#!Synapse:";
+	}
+	
+	
 	@Override
 	public String getAPIKey() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
