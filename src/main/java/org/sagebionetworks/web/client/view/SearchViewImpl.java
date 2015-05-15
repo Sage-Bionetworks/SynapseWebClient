@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -361,7 +362,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 		// setup field
 		searchField = new TextBox();
-		searchField.setStyleName("form-control input-lg");
+		searchField.setStyleName("form-control input-lg search-textbox");
 		searchField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -370,9 +371,11 @@ public class SearchViewImpl extends Composite implements SearchView {
 	            }					
 			}
 		});				
-
+		InputGroup searchFieldWrapper = new InputGroup();
+		searchFieldWrapper.add(searchField);
+		searchFieldWrapper.setWidth("100%");
 		// add to table and page
-		container = new SimplePanel(searchField);
+		container = new SimplePanel(searchFieldWrapper);
 		container.addStyleName("col-md-9 padding-right-5");
 		horizontalTable.add(container);
 		container = new SimplePanel(searchButton);
