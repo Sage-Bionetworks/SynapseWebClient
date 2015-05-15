@@ -143,6 +143,7 @@ public class EntityActionControllerImplTest {
 		permissions.setCanDelete(true);
 		permissions.setCanPublicRead(true);
 		permissions.setCanUpload(true);
+		permissions.setCanAddChild(true);
 		permissions.setCanEdit(true);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
@@ -299,7 +300,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureUploadNewFileNoUpload(){
-		entityBundle.getPermissions().setCanUpload(false);
+		entityBundle.getPermissions().setCanAddChild(false);
 		entityBundle.setEntity(new FileEntity());
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);

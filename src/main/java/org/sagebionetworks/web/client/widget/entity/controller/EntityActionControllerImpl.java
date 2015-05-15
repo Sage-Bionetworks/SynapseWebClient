@@ -41,6 +41,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -148,8 +149,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void configureFileUpload() {
 		if(entityBundle.getEntity() instanceof FileEntity ){
-			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanUpload());
-			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, permissions.getCanUpload());
+			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanAddChild());
+			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, permissions.getCanAddChild());
 			actionMenu.addActionListener(Action.UPLOAD_NEW_FILE, this);
 		}else{
 			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
