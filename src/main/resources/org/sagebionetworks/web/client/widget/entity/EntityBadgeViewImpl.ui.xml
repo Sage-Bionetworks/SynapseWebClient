@@ -19,10 +19,10 @@
 			<t:TableData width="350px" addStyleNames="visible-lg">
 				<g:SimplePanel ui:field="modifiedByField"/>
 			</t:TableData>
-			<t:TableData width="130px" addStyleNames="visible-sm visible-md visible-lg">
+			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="75px" addStyleNames="hidden-xs">
+			<t:TableData width="85px" addStyleNames="hidden-xs">
 				<g:Label ui:field="idField"/>
 			</t:TableData>
 		</t:TableRow>
