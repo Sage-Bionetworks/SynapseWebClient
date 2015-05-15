@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-public class UploadedFile {
+public class FileUpload {
 	private FileMetadata fileMeta;
 	private String fileHandleId;
 	
-	public UploadedFile(FileMetadata fileMeta, String fileHandleId) {
+	public FileUpload(FileMetadata fileMeta, String fileHandleId) {
 		this.fileMeta = fileMeta;
 		this.fileHandleId = fileHandleId;
 	}

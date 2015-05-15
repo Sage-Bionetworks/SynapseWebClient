@@ -45,10 +45,10 @@ public class FileInputWidgetImpl implements FileInputWidget,
 		multipartUploader.uploadSelectedFile(view.getInputId(),
 				new ProgressingFileUploadHandler() {
 					@Override
-					public void uploadSuccess(UploadedFile uploadedFile) {
+					public void uploadSuccess(String fileHandleId) {
 						// Set the view at 100%
 						view.updateProgress(100, "100%");
-						handler.uploadSuccess(uploadedFile);
+						handler.uploadSuccess(fileHandleId);
 					}
 
 					@Override
@@ -71,11 +71,6 @@ public class FileInputWidgetImpl implements FileInputWidget,
 		view.showProgress(false);
 		view.setInputEnabled(true);
 		view.resetForm();
-	}
-
-	@Override
-	public FileMetadata[] getSelectedFileMetadata() {
-		return this.multipartUploader.getSelectedFileMetadata();
 	}
 
 }

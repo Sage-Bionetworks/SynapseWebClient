@@ -15,8 +15,14 @@ public interface FileHandleUploadWidget extends IsWidget{
 	public void reset();
 
 	void configure(String buttonText, Callback startedUploadingCallback,
-			CallbackP<UploadedFile> finishedUploadingCallback);
+			CallbackP<FileUpload> finishedUploadingCallback);
 
 	void configure(String buttonText,
-			CallbackP<UploadedFile> finishedUploadingCallback);
+			CallbackP<FileUpload> finishedUploadingCallback);
+
+	void configure(String buttonText, Callback startedUploadingCallback,
+			CallbackP<FileUpload> finishedUploadingCallback,
+			FileValidator validator);
+
+	FileMetadata[] getSelectedFileMetadata();
 }

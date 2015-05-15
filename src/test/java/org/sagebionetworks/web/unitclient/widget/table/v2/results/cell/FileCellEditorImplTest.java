@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellEdito
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
-import org.sagebionetworks.web.client.widget.upload.UploadedFile;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 
 public class FileCellEditorImplTest {
 	FileCellEditorView mockView;
@@ -97,7 +97,7 @@ public class FileCellEditorImplTest {
 	@Test
 	public void testUploadSuccess(){
 		String fileHandleId = "123";
-		UploadedFile uploadedFile = new UploadedFile(null, fileHandleId);
+		FileUpload uploadedFile = new FileUpload(null, fileHandleId);
 		editor.uploadSuccess(uploadedFile);
 		verify(mockView).setValue(fileHandleId);
 		verify(mockView).hideCollapse();

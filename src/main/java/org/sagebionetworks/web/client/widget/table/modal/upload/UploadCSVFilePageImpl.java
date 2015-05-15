@@ -4,7 +4,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.UploadedFile;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.TableFileValidator;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -56,13 +57,13 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 			public void invoke() {
 				presenter.setLoading(true);				
 			}
-		}, new CallbackP<UploadedFile>() {
+		}, new CallbackP<FileUpload>() {
 			@Override
-			public void invoke(UploadedFile uploadFile) {
+			public void invoke(FileUpload uploadFile) {
 				presenter.setLoading(false);	
 				fileHandleCreated(uploadFile);
 			}			
-		});
+		}, new TableFileValidator());
 		
 	}
 
@@ -76,7 +77,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	 * Once a FileHandle is created move to the next page.
 	 * @param fileHandleId
 	 */
-	private void fileHandleCreated(UploadedFile uploadFile) {
+	private void fileHandleCreated(FileUpload uploadFile) {
 		FileMetadata meta = uploadFile.getFileMeta();
 		String contentType = meta.getContentType();
 		String fileName =  meta.getFileName();

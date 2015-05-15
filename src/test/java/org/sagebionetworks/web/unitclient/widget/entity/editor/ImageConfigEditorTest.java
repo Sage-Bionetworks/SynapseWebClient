@@ -21,7 +21,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
-import org.sagebionetworks.web.client.widget.upload.UploadedFile;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -88,7 +88,7 @@ public class ImageConfigEditorTest {
 		ArgumentCaptor<FileUploadHandler> captor = ArgumentCaptor.forClass(FileUploadHandler.class);
 		verify(mockFileInputWidget).uploadSelectedFile(captor.capture());
 		String fileHandleId = "222";
-		UploadedFile uploadedFile = new UploadedFile(null,  fileHandleId);
+		FileUpload uploadedFile = new FileUpload(null,  fileHandleId);
 		captor.getValue().uploadSuccess(uploadedFile);
 		verify(mockView).showUploadSuccessUI();
 		verify(mockCallback).setPrimaryEnabled(true);
@@ -120,7 +120,7 @@ public class ImageConfigEditorTest {
 		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
 		
 		when(mockView.isExternal()).thenReturn(false);
-		editor.addFileHandleId("123");
+		editor.addFile("123");
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
 	}
@@ -154,7 +154,7 @@ public class ImageConfigEditorTest {
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
 	        
-	        editor.addFileHandleId("123");
+	        editor.addFile("123");
 	        editor.updateDescriptorFromView();
 	        verify(mockView).checkParams();
 	        verify(mockAttachments).isValid();
@@ -168,7 +168,7 @@ public class ImageConfigEditorTest {
 	        when(mockView.isFromAttachments()).thenReturn(true);
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
-	        editor.addFileHandleId("123");
+	        editor.addFile("123");
 	        when(mockAttachments.isValid()).thenReturn(false);
 	        editor.updateDescriptorFromView();
 	}

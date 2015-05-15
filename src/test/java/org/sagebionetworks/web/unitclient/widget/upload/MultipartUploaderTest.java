@@ -35,7 +35,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
-import org.sagebionetworks.web.client.widget.upload.UploadedFile;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.CombineFileChunksException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -128,8 +128,8 @@ public class MultipartUploaderTest {
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		// the handler should get the id.
-		UploadedFile uploadedFile = new UploadedFile(null, status.getFileHandleId());
-		verify(mockHandler).uploadSuccess(any(UploadedFile.class));
+		FileUpload uploadedFile = new FileUpload(null, status.getFileHandleId());
+		verify(mockHandler).uploadSuccess(any(FileUpload.class));
 	}
 
 	
@@ -294,7 +294,7 @@ public class MultipartUploaderTest {
 	@Test
 	public void testGetSelectedFileMetadataNull(){
 		String inputId = "123";
-		UploadedFile uploadedFile = new UploadedFile(null,  inputId);
+		FileUpload uploadedFile = new FileUpload(null,  inputId);
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
 		assertEquals(null, uploader.getSelectedFileMetadata());
 	}

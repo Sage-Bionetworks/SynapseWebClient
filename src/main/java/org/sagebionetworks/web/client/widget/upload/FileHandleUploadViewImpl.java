@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -120,6 +121,8 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	public void setButtonText(String buttonText) {
 		this.uploadbutton.setText(buttonText);
 	}
+	
+
 
 
 }

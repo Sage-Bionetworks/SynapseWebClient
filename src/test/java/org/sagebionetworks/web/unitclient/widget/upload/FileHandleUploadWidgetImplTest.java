@@ -18,13 +18,13 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
-import org.sagebionetworks.web.client.widget.upload.UploadedFile;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 
 public class FileHandleUploadWidgetImplTest {
 	
 	FileHandleUploadView mockView;
 	MultipartUploader mockMultipartUploader;
-	CallbackP<UploadedFile> mockCallback;
+	CallbackP<FileUpload> mockCallback;
 	FileHandleUploadWidgetImpl widget;
 	String inputId;
 	
@@ -50,7 +50,7 @@ public class FileHandleUploadWidgetImplTest {
 	@Test
 	public void testFileSelected(){
 		final String successFileHandle = "123";
-		final UploadedFile uploadedFile = new UploadedFile(null, successFileHandle);
+		final FileUpload uploadedFile = new FileUpload(null, successFileHandle);
 		// Stub a some progress then success.
 		doAnswer(new Answer<Void>() {
 			@Override
@@ -110,7 +110,7 @@ public class FileHandleUploadWidgetImplTest {
 		// Failure should trigger the following:
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
-		verify(mockCallback, never()).invoke(any(UploadedFile.class));
+		verify(mockCallback, never()).invoke(any(FileUpload.class));
 		verify(mockView).showError(error);
 	}
 

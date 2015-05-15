@@ -2,8 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
-import org.sagebionetworks.web.client.widget.upload.UploadedFile;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -28,7 +28,7 @@ public class FileInputWidgetStub implements FileInputWidget{
 		if(errorString != null){
 			handler.uploadFailed(errorString);
 		}else if(fileHandle != null){
-			handler.uploadSuccess(new UploadedFile(null, fileHandle));
+			handler.uploadSuccess(fileHandle);
 		}
 	}
 
@@ -36,10 +36,10 @@ public class FileInputWidgetStub implements FileInputWidget{
 	public void reset() {
 	}
 
-	@Override
-	public FileMetadata[] getSelectedFileMetadata() {
-		return metadata;
-	}
+//	@Override
+//	public FileMetadata[] getSelectedFileMetadata() {
+//		return metadata;
+//	}
 
 	public String getErrorString() {
 		return errorString;

@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
-import org.sagebionetworks.web.client.widget.upload.UploadedFile;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -24,6 +24,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	private Map<String, String> descriptor;
 	private List<String> fileHandleIds;
 	private FileInputWidget fileInputWidget;
+	private FileUpload uploadedFile;
 	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
 	
@@ -47,16 +48,9 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		view.clear();
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
+		uploadedFile = null;
 	}
 	
-	public boolean validateSelectedFile() {
-		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
-		if(meta == null || meta.length != 1){
-			view.showErrorMessage("Please select a file and try again");
-			return false;
-		}
-		return true;
-	}
 	
 	public void clearState() {
 	}
@@ -82,31 +76,32 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	}
 	
 	private String getFileName() {
-		if (validateSelectedFile())
-			return fileInputWidget.getSelectedFileMetadata()[0].getFileName();
-		else return null;
-	}
+		if (uploadedFile == null)
+			return null;
+		else
+			return uploadedFile.getFileMeta().getFileName();
 	
+	}
+
 	@Override
 	public void uploadFileClicked() {
-		if (validateSelectedFile()) {
-			view.setUploadButtonEnabled(false);
-			fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
-				@Override
-				public void uploadSuccess(UploadedFile fileUploaded) {
-					view.showUploadSuccessUI();
-					//enable the ok button
-					dialogCallback.setPrimaryEnabled(true);
-					addFileHandleId(fileUploaded.getFileHandleId());
-				}
-				
-				@Override
-				public void uploadFailed(String error) {
-					view.setUploadButtonEnabled(true);
-					view.showUploadFailureUI(error);
-				}
-			});
-		}
+		view.setUploadButtonEnabled(false);
+		fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
+			@Override
+			public void uploadSuccess(String fileHandleId) {
+				view.showUploadSuccessUI();
+				//enable the ok button
+				dialogCallback.setPrimaryEnabled(true);
+				addFileHandleId(fileHandleId);
+			}
+			
+			@Override
+			public void uploadFailed(String error) {
+				view.setUploadButtonEnabled(true);
+				view.showUploadFailureUI(error);
+			}
+		});
+		
 	}
 	
 	@Override
