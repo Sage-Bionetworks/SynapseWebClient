@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -37,6 +40,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 	private FlowPanel wikiPageContainer;
 	private V2WikiOrderHint subpageOrderHint;
 	private AuthenticationController authenticationController;
+	private boolean canEdit;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
@@ -53,6 +57,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 	}
 
 	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
+		canEdit = false;
 		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
@@ -67,16 +72,15 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 			List<Reference> allRefs = new ArrayList<Reference>();
 			allRefs.add(ref);
 			ReferenceList list = new ReferenceList();
-			list.setReferences(allRefs);	
-			synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+			list.setReferences(allRefs);
+			int mask = ENTITY | PERMISSIONS ;
+			synapseClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
 				@Override
-				public void onSuccess(PaginatedResults<EntityHeader> headers) {
-					if (headers.getTotalNumberOfResults() == 1) {
-						EntityHeader theHeader = headers.getResults().get(0);
-						ownerObjectName = theHeader.getName();
-						ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
-						refreshTableOfContents();
-					}	
+				public void onSuccess(EntityBundle bundle) {
+					ownerObjectName = bundle.getEntity().getName();
+					ownerObjectLink = getLinkPlace(bundle.getEntity().getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
+					canEdit = bundle.getPermissions().getCanEdit();
+					refreshTableOfContents();
 				}
 				
 				@Override
@@ -105,6 +109,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 	
 	public void refreshTableOfContents() {
 		view.clear();
+		
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<PaginatedResults<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(PaginatedResults<V2WikiHeader> results) {
@@ -119,14 +124,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 						
 						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
-						view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
+						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
 						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
 								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
-						view.setEditOrderButtonVisible(authenticationController.isLoggedIn());
+						view.setEditOrderButtonVisible(canEdit);
 					}
 				});
 			}
