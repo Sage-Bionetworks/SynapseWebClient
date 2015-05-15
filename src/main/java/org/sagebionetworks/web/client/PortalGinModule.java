@@ -185,6 +185,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
@@ -602,7 +606,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// RegisterAccountView
 		bind(RegisterAccountViewImpl.class).in(Singleton.class);
 		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class);
-		
+
 		bind(RegisterWidgetView.class).to(RegisterWidgetViewImpl.class);
 
 		// ProfileView
@@ -1063,5 +1067,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(FileHistoryRowView.class).to(FileHistoryRowViewImpl.class);
 		bind(SynapseStandaloneWikiView.class).to(SynapseStandaloneWikiViewImpl.class);
+		
+		bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
+		bind(SynapseAlert.class).to(SynapseAlertImpl.class);
 	}
 }

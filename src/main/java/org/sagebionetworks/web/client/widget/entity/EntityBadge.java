@@ -5,16 +5,17 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
@@ -31,26 +32,47 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private EntityIconsCache iconsCache;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
-	private EntityHeader entityHeader;
+	private EntityQueryResult entityHeader;
 	private AnnotationTransformer transformer;
+	private UserBadge modifiedByUserBadge;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			EntityIconsCache iconsCache,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
-			AnnotationTransformer transformer) {
+			AnnotationTransformer transformer,
+			UserBadge modifiedByUserBadge,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
 		this.iconsCache = iconsCache;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
+		this.modifiedByUserBadge = modifiedByUserBadge;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);
+		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
 	}
 	
-	public void configure(EntityHeader header) {
+	public void configure(EntityQueryResult header) {
 		entityHeader = header;
 		view.setEntity(header);
+		
+		if (header.getModifiedByPrincipalId() != null) {
+			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
+			view.setModifiedByWidgetVisible(true);
+		} else {
+			view.setModifiedByWidgetVisible(false);
+		}
+		
+		if (header.getModifiedOn() != null) {
+			String modifiedOnString = synapseJSNIUtils.convertDateToSmallString(header.getModifiedOn());
+			view.setModifiedOn(modifiedOnString);
+		} else {
+			view.setModifiedOn("");
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -109,7 +131,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	@Override
-	public void entityClicked(EntityHeader entityHeader) {
+	public void entityClicked(EntityQueryResult entityHeader) {
 		globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));
 	}
 	
@@ -121,7 +143,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		view.showLoadingIcon();
 	}
 	
-	public EntityHeader getHeader() {
+	public EntityQueryResult getHeader() {
 		return entityHeader;
 	}
 	

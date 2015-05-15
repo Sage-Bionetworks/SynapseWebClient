@@ -83,7 +83,7 @@ public class EntityTreeBrowserTest {
 		when(mockInjector.getEntityTreeItemWidget()).thenReturn(
 				mockEntityTreeItem);
 		mockMoreTreeItem.type = MoreTreeItem.MORE_TYPE.FOLDER;
-		EntityHeader header = new EntityHeader();
+		EntityQueryResult header = new EntityQueryResult();
 		header.setId(parentId);
 		when(mockEntityTreeItem.getHeader()).thenReturn(header);
 //		when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
@@ -250,4 +250,48 @@ public class EntityTreeBrowserTest {
 		entityTreeBrowser.fireEntitySelectedEvent();
 	}
 	
+	private EntityHeader createEntityHeader(String id, String name, String type, Long versionNumber) {
+		EntityHeader header = new EntityHeader();
+		header.setId(id);
+		header.setName(name);
+		header.setType(type);
+		header.setVersionNumber(versionNumber);
+		return header;
+	}
+	
+	@Test
+	public void testGetEntityQueryResultsFromHeaders() {
+		List<EntityHeader> headers = new ArrayList<EntityHeader>();
+		String id, name, type;
+		Long versionNumber;
+		id = "12";
+		name = "project 1";
+		type = "project";
+		versionNumber = 1L;
+		headers.add(createEntityHeader(id, name, type, versionNumber));
+		
+		EntityQueryResults results = entityTreeBrowser.getEntityQueryResultsFromHeaders(headers);
+		assertEquals(1L, results.getTotalEntityCount().longValue());
+		assertEquals(1, results.getEntities().size());
+		EntityQueryResult result = results.getEntities().get(0);
+		assertEquals(id, result.getId());
+		assertEquals(name, result.getName());
+		assertEquals(type, result.getEntityType());
+		assertEquals(versionNumber, result.getVersionNumber());
+		
+		id = "24";
+		name = "project 2";
+		type = "file";
+		versionNumber = 3L;
+		headers.add(createEntityHeader(id, name, type, versionNumber));
+		
+		results = entityTreeBrowser.getEntityQueryResultsFromHeaders(headers);
+		assertEquals(2L, results.getTotalEntityCount().longValue());
+		assertEquals(2, results.getEntities().size());
+		result = results.getEntities().get(1);
+		assertEquals(id, result.getId());
+		assertEquals(name, result.getName());
+		assertEquals(type, result.getEntityType());
+		assertEquals(versionNumber, result.getVersionNumber());
+	}
 }
