@@ -3,14 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -67,12 +64,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
-			Reference ref = new Reference();
-			ref.setTargetId(wikiKey.getOwnerObjectId());
-			List<Reference> allRefs = new ArrayList<Reference>();
-			allRefs.add(ref);
-			ReferenceList list = new ReferenceList();
-			list.setReferences(allRefs);
 			int mask = ENTITY | PERMISSIONS ;
 			synapseClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
 				@Override
