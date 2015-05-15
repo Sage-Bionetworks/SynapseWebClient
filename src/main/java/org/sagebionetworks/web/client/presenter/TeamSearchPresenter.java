@@ -85,8 +85,12 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 			@Override
 			public void onSuccess(PaginatedResults<Team> result) {
 				teamList = result;
-				view.configure(teamList.getResults(), searchTerm);
+				view.configure(teamList.getResults(), searchTerm);	
+				if (teamList.getResults().isEmpty()) {
+					view.showEmptyTeams();
+				}
 			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
