@@ -26,7 +26,7 @@ public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Pr
 		fileInputWidget.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload file) {
-				GWT.debugger();
+				view.hideErrorMessage();
 				view.setValue(file.getFileHandleId());
 				view.hideCollapse();
 			}

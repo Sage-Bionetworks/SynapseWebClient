@@ -2,14 +2,18 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.upload.FileInputView;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidgetImpl;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
 public class FileInputWidgetImplTest {
 
@@ -38,7 +42,7 @@ public class FileInputWidgetImplTest {
 		verify(mockView).setInputEnabled(false);
 		// update at the start and end, plus each actual update
 		verify(mockView, times(progress.length+2)).updateProgress(anyDouble(), anyString());
-		verify(mockHandler).uploadSuccess(any(FileUpload.class));
+		verify(mockHandler).uploadSuccess(anyString());
 		verify(mockHandler, never()).uploadFailed(anyString());
 	}
 	
@@ -57,7 +61,7 @@ public class FileInputWidgetImplTest {
 		verify(mockView, times(progress.length+1)).updateProgress(anyDouble(), anyString());
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
-		verify(mockHandler, never()).uploadSuccess(any(FileUpload.class));
+		verify(mockHandler, never()).uploadSuccess(anyString());
 		verify(mockHandler).uploadFailed(error);
 	}
 	

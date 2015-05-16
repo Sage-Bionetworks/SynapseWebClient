@@ -28,6 +28,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
 	
+	
 	@Inject
 	public AttachmentConfigEditor(AttachmentConfigView view, FileHandleUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
@@ -49,15 +50,18 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		uploadedFile = null;
-		this.fileInputWidget.configure("Browse...", null, new CallbackP<FileUpload>() {
+		this.fileInputWidget.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload uploadFile) {
 				view.showUploadSuccessUI();
 				//enable the ok button
+				uploadedFile = uploadFile;
 				dialogCallback.setPrimaryEnabled(true);
 				addFileHandleId(uploadFile.getFileHandleId());
 			}			
-		}, new TableFileValidator());
+		});
+		//set new validation callback?
+		this.fileInputWidget.configureValidation(new TableFileValidator(), null);
 		
 	}
 	

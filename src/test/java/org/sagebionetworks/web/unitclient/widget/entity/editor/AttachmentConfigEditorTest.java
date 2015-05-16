@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.editor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
@@ -31,7 +33,7 @@ public class AttachmentConfigEditorTest {
 	AttachmentConfigEditor editor;
 	AttachmentConfigView mockView;
 	WikiAttachments mockAttachments;
-	
+	CallbackP mockFinishedCallback;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null, null);
 	FileHandleUploadWidget mockFileInputWidget;
 	String testFileName = "testing.txt";
@@ -58,6 +60,7 @@ public class AttachmentConfigEditorTest {
 		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
 		when(mockFileUpload.getFileMeta()).thenReturn(mockMetadata[0]);
 		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);
+		
 	}
 	
 	@Test
@@ -77,8 +80,13 @@ public class AttachmentConfigEditorTest {
 	public void testUploadFileClickedSuccess() {
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, mockCallback);
+		
+		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockFileInputWidget).configure(anyString(), captor.capture());
+		mockFinishedCallback = captor.getValue();
+		mockFinishedCallback.invoke(mockFileUpload);
+		
 		verify(mockView).initView();		
-		mockFinishedUploadingCallback.invoke(mockFileUpload);
 		verify(mockView).showUploadSuccessUI();
 		verify(mockCallback).setPrimaryEnabled(true);
 		verify(mockAttachments).configure(wikiKey);
@@ -88,12 +96,16 @@ public class AttachmentConfigEditorTest {
 	@Test
 	public void testConfigure() {
 		Map<String,String> descriptor = new HashMap<String, String>();
-		
 		editor.configure(wikiKey, descriptor, mockCallback);
+		
+		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockFileInputWidget).configure(anyString(), captor.capture());
+		mockFinishedCallback = captor.getValue();
+		mockFinishedCallback.invoke(mockFileUpload);
+		
 		verify(mockFileInputWidget).reset();
 		verify(mockView).clear();
 		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
-		
 		editor.addFileHandleId("123");
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
@@ -107,7 +119,6 @@ public class AttachmentConfigEditorTest {
 		when(mockView.isFromAttachments()).thenReturn(true);
 		Map<String,String> descriptor = new HashMap<String, String>();
 		editor.configure(wikiKey, descriptor, mockCallback);
-		
 		editor.addFileHandleId("123");
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();

@@ -143,14 +143,13 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	 * @return
 	 */
 	public boolean isValid() {
-		return true;
-//		boolean valid = true;
-//		for(Cell cell: cells){
-//			if(!((CellEditor)cell).isValid()){
-//				valid = false;
-//			}
-//		}
-//		return valid;
+		boolean valid = true;
+		for(Cell cell: cells){
+			if(!((CellEditor)cell).isValid()){
+				valid = false;
+			}
+		}
+		return valid;
 	}
 
 }

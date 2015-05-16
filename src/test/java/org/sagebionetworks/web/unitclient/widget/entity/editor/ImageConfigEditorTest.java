@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,13 +16,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -31,24 +33,44 @@ public class ImageConfigEditorTest {
 	ImageConfigEditor editor;
 	ImageConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	FileInputWidget mockFileInputWidget;
-	String testFileName = "testing.png";
-	String testAttachmentName = "attachment1.png";
+	FileHandleUploadWidget mockFileInputWidget;
 	DialogCallback mockCallback;
 	WikiAttachments mockAttachments;
+	CallbackP mockFinishedCallback;
+	FileUpload mockFileUpload;
+	FileMetadata mockFileMeta;
+	Map<String, String> descriptor;
+	String fileHandleId = "222";
+	String testFileName = "testing.png";
+	String testAttachmentName = "attachment1.png";
+
 	
 	@Before
 	public void setup(){
-		mockFileInputWidget = mock(FileInputWidget.class);
+		mockFileInputWidget = mock(FileHandleUploadWidget.class);
 		mockView = mock(ImageConfigView.class);
 		mockCallback = mock(DialogCallback.class);
 		mockAttachments = mock(WikiAttachments.class);
+		mockFileUpload = mock(FileUpload.class);
+		mockFileMeta = mock(FileMetadata.class);
+		descriptor = new HashMap<String, String>();
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, WidgetConstants.FLOAT_LEFT);
 		editor = new ImageConfigEditor(mockView, mockFileInputWidget, mockAttachments);
+		//leave map as null?
+		editor.configure(wikiKey, descriptor, mockCallback);
 		when(mockAttachments.isValid()).thenReturn(true);
 		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, "image/png")});
 		when(mockView.isSynapseEntity()).thenReturn(false);
 		when(mockView.isFromAttachments()).thenReturn(false);
+		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMeta);
+		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);
+		when(mockFileMeta.getFileName()).thenReturn(testFileName);
+		// will look at the file name if the content type is null
+		when(mockFileMeta.getContentType()).thenReturn(null);
+		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockFileInputWidget).configure(anyString(), captor.capture());
+		mockFinishedCallback = captor.getValue();
 	}
 	
 	@Test
@@ -62,65 +84,27 @@ public class ImageConfigEditorTest {
 		verify(mockView).setPresenter(editor);
 		verify(mockView).setFileInputWidget(any(Widget.class));
 		verify(mockView).setWikiAttachmentsWidget(any(Widget.class));
+		verify(mockFileInputWidget).configure(anyString(), any(CallbackP.class));
+		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
+		verify(mockAttachments).configure(any(WikiPageKey.class));
+		verify(mockView).setAlignment(anyString());
 	}
 
-
-	@Test
-	public void testValidateSelectedFile() {
-		assertTrue(editor.validateSelectedFile());
-		
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{});
-		assertFalse(editor.validateSelectedFile());
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(null);
-		assertFalse(editor.validateSelectedFile());
-	}
-	
-	
 
 	@Test
 	public void testUploadFileClickedSuccess() {
-		Map<String,String> descriptor = new HashMap<String, String>();
-		editor.configure(wikiKey, descriptor, mockCallback);
 		verify(mockView).initView();
-		editor.uploadFileClicked();
-		verify(mockView).setUploadButtonEnabled(false);
-		
-		ArgumentCaptor<FileUploadHandler> captor = ArgumentCaptor.forClass(FileUploadHandler.class);
-		verify(mockFileInputWidget).uploadSelectedFile(captor.capture());
-		String fileHandleId = "222";
-		FileUpload uploadedFile = new FileUpload(null,  fileHandleId);
-		captor.getValue().uploadSuccess(uploadedFile);
+		mockFinishedCallback.invoke(mockFileUpload);
 		verify(mockView).showUploadSuccessUI();
 		verify(mockCallback).setPrimaryEnabled(true);
 		assertTrue(editor.getNewFileHandleIds().contains(fileHandleId));
 	}
 	
-
-	@Test
-	public void testUploadFileClickedFailure() {
-		Map<String,String> descriptor = new HashMap<String, String>();
-		editor.configure(wikiKey, descriptor, mockCallback);
-		
-		editor.uploadFileClicked();
-		verify(mockView).setUploadButtonEnabled(false);
-		reset(mockView);
-		
-		ArgumentCaptor<FileUploadHandler> captor = ArgumentCaptor.forClass(FileUploadHandler.class);
-		verify(mockFileInputWidget).uploadSelectedFile(captor.capture());
-		String error = "this is my error";
-		captor.getValue().uploadFailed(error);
-		verify(mockView).showUploadFailureUI(error);
-		verify(mockView).setUploadButtonEnabled(true);
-	}
-	
 	@Test
 	public void testConfigure() {
-		Map<String,String> descriptor = new HashMap<String, String>();
-		editor.configure(wikiKey, descriptor, mockCallback);
 		verify(mockView).configure(any(WikiPageKey.class), any(DialogCallback.class));
-		
 		when(mockView.isExternal()).thenReturn(false);
-		editor.addFile("123");
+		mockFinishedCallback.invoke(mockFileUpload);
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
 	}
@@ -153,8 +137,7 @@ public class ImageConfigEditorTest {
 	        when(mockView.isFromAttachments()).thenReturn(true);
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
-	        
-	        editor.addFile("123");
+	        mockFinishedCallback.invoke(mockFileUpload);
 	        editor.updateDescriptorFromView();
 	        verify(mockView).checkParams();
 	        verify(mockAttachments).isValid();
@@ -168,7 +151,7 @@ public class ImageConfigEditorTest {
 	        when(mockView.isFromAttachments()).thenReturn(true);
 	        Map<String,String> descriptor = new HashMap<String, String>();
 	        editor.configure(wikiKey, descriptor, mockCallback);
-	        editor.addFile("123");
+	        mockFinishedCallback.invoke(mockFileUpload);
 	        when(mockAttachments.isValid()).thenReturn(false);
 	        editor.updateDescriptorFromView();
 	}

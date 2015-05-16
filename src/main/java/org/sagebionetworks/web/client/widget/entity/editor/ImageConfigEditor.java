@@ -5,12 +5,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
+import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -44,7 +49,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		this.file = null;
 		view.initView();
 		fileInputWidget.reset();
-		fileInputWidget.configure("Browse...",  null, new CallbackP<FileUpload>() {
+		fileInputWidget.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				view.showUploadSuccessUI();
@@ -52,7 +57,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				dialogCallback.setPrimaryEnabled(true);
 				file = fileUpload;				
 			}
-		}, new ImageFileValidator()); 
+		});	
+		fileInputWidget.configureValidation(new ImageFileValidator(), new Callback() {
+			@Override
+			public void invoke() {
+				view.showErrorMessage(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
+			}
+		});
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		//and try to prepopulate with values from the map.  if it fails, ignore

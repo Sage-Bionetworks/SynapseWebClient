@@ -17,6 +17,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	private CallbackP<FileUpload> finishedUploadingCallback;
 	private Callback startedUploadingCallback;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private Callback invalidFileCallback;
 	
 	@Inject
 	public FileHandleUploadWidgetImpl(FileHandleUploadView view, MultipartUploader multipartUploader,
@@ -35,24 +36,21 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	@Override
 	public void configure(String buttonText, CallbackP<FileUpload> finishedUploadingCallback) {
-		configure(buttonText, null, finishedUploadingCallback);
-	}
-	
-	@Override
-	public void configure(String buttonText, Callback startedUploadingCallback,
-			CallbackP<FileUpload> finishedUploadingCallback) {
-		configure(buttonText, startedUploadingCallback, finishedUploadingCallback, new NotEmptyFileValidator());
-	}
-	
-	@Override
-	public void configure(String buttonText, Callback startedUploadingCallback,
-			CallbackP<FileUpload> finishedUploadingCallback, FileValidator validator) {
 		this.finishedUploadingCallback = finishedUploadingCallback;
-		this.startedUploadingCallback = startedUploadingCallback;
-		this.validator = validator;
 		view.showProgress(false);
 		view.hideError();
 		view.setButtonText(buttonText);
+	}
+	
+	@Override
+	public void configureUploadingCallback(Callback startedUploadingCallback) {
+		this.startedUploadingCallback = startedUploadingCallback;
+	}
+	
+	@Override
+	public void configureValidation(FileValidator validator, Callback invalidFileCallback) {
+		this.validator = validator;
+		this.invalidFileCallback = invalidFileCallback;
 	}
 	
 	@Override
@@ -96,7 +94,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	public void onFileSelected() {
 		// Support for multiple file uploads?
 		FileMetadata fileMeta = getSelectedFileMetadata()[0];
-		boolean isValidUpload = validator.isValid(fileMeta.getFileName());
+		boolean isValidUpload = validator == null || validator.isValid(fileMeta.getFileName());
 		if (isValidUpload) {
 			if (startedUploadingCallback != null) {
 				startedUploadingCallback.invoke();
@@ -107,7 +105,11 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			view.hideError();
 			doMultipartUpload(fileMeta);		
 		} else {
-			view.showError("Please select a valid filetype.");
+			if (invalidFileCallback == null) {
+				view.showError("Please select a valid filetype.");
+			} else {
+				invalidFileCallback.invoke();
+			}
 		}
 	}
 	

@@ -129,7 +129,7 @@ public class MultipartUploaderTest {
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		// the handler should get the id.
 		FileUpload uploadedFile = new FileUpload(null, status.getFileHandleId());
-		verify(mockHandler).uploadSuccess(any(FileUpload.class));
+		verify(mockHandler).uploadSuccess(anyString());
 	}
 
 	
@@ -289,14 +289,6 @@ public class MultipartUploaderTest {
 	public void testChunkCount() {
 		//see SWC-1436
 		assertEquals(2L, uploader.getChunkCount(8404992L));
-	}
-	
-	@Test
-	public void testGetSelectedFileMetadataNull(){
-		String inputId = "123";
-		FileUpload uploadedFile = new FileUpload(null,  inputId);
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
-		assertEquals(null, uploader.getSelectedFileMetadata());
 	}
 	
 }

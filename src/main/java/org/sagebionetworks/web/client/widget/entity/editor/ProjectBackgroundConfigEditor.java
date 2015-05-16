@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
 
-import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.inject.Inject;
