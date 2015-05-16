@@ -19,6 +19,7 @@ public interface TeamSearchView extends IsWidget, SynapseView {
 	public void setPresenter(Presenter presenter);
 	
 	public void configure(List<Team> teams, String searchTerm);
+	public void showEmptyTeams();
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
 		int getOffset();

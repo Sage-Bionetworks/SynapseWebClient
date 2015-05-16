@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface PreviewWidgetView extends IsWidget{
 	/**
@@ -19,13 +21,14 @@ public interface PreviewWidgetView extends IsWidget{
 	 */
 	public void setTablePreview(String text, String delimiter);
 	
-	public void showErrorMessage(String message);
+	void addSynapseAlertWidget(Widget w);
 	public void clear();
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void imagePreviewLoadFailed(ErrorEvent e);
 	}
 
 

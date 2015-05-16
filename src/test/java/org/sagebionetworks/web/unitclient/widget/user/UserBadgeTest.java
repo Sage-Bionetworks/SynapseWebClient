@@ -1,8 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -65,7 +72,7 @@ public class UserBadgeTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils);
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, adapterFactory, mockCache);
 	}
 	
 	@Test
@@ -94,7 +101,8 @@ public class UserBadgeTest {
 	public void testConfigureAsync() throws Exception {
 		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		userBadge.setMaxNameLength(max);
-		userBadge.configure(profile);
+		userBadge.configure(principalId);
+		verify(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
 	}
 	
@@ -133,4 +141,29 @@ public class UserBadgeTest {
 		userBadge.badgeClicked(null);
 		verify(mockClickHandler).onClick(any(ClickEvent.class));
 	}
+	
+	@Test
+	public void testConfigureAsyncFailFromCache() throws Exception {
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
+		userBadge.setMaxNameLength(max);
+		when(mockCache.get(anyString())).thenReturn("invalid user profile json");
+		userBadge.configure(principalId);
+		verify(mockCache).get(anyString());
+		verify(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
+		verify(mockView).setDisplayName(eq(displayName), anyString());
+	}
+	
+	@Test
+	public void testConfigureSuccessFromCache() throws Exception {
+		userBadge.setMaxNameLength(max);
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		profile.writeToJSONObject(adapter);
+		when(mockCache.get(anyString())).thenReturn(adapter.toJSONString());
+		
+		userBadge.configure(principalId);
+		verify(mockCache).get(anyString());
+		verify(mockSynapseClient, never()).getUserProfile(eq(principalId), any(AsyncCallback.class));
+		verify(mockView).setDisplayName(eq(displayName), anyString());
+	}
+
 }

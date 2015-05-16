@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -31,12 +32,17 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	RequestBuilderWrapper requestBuilder;
 	SynapseJSNIUtils synapseJSNIUtils;
 	EntityBundle bundle;
+	SynapseAlert synapseAlert;
 	
 	@Inject
-	public PreviewWidget(PreviewWidgetView view, RequestBuilderWrapper requestBuilder,SynapseJSNIUtils synapseJSNIUtils) {
+	public PreviewWidget(PreviewWidgetView view, 
+			RequestBuilderWrapper requestBuilder,
+			SynapseJSNIUtils synapseJSNIUtils,
+			SynapseAlert synapseAlert) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.synapseAlert = synapseAlert;
 	}
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
@@ -78,7 +84,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	
 	public Widget asWidget() {
 		view.clear();
-		if (bundle != null) {
+		
+		//if not logged in, don't even try to load the preview.  Just direct user to log in.
+		if (!synapseAlert.isUserLoggedIn()) {
+			view.addSynapseAlertWidget(synapseAlert.asWidget());
+			synapseAlert.showMustLogin();
+		} else if (bundle != null) {
 			PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
 			FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 			final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
@@ -97,7 +108,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 					try {
 						requestBuilder.sendRequest(null, new RequestCallback() {
 							public void onError(final Request request, final Throwable e) {
-								view.showErrorMessage(DisplayConstants.PREVIEW_FAILED_TEXT + SafeHtmlUtils.htmlEscapeAllowEntities(e.getMessage()));
+								view.addSynapseAlertWidget(synapseAlert.asWidget());
+								synapseAlert.handleException(e);
 							}
 							public void onResponseReceived(final Request request, final Response response) {
 								//add the response text
@@ -120,11 +132,20 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 							}
 						});
 					} catch (final Exception e) {
-						view.showErrorMessage(DisplayConstants.PREVIEW_FAILED_TEXT+SafeHtmlUtils.htmlEscapeAllowEntities(e.getMessage()));
+						view.addSynapseAlertWidget(synapseAlert.asWidget());
+						synapseAlert.handleException(e);
 					}
 				}
 			}
 		}
+		
 		return view.asWidget();
+	}
+	
+	@Override
+	public void imagePreviewLoadFailed(ErrorEvent e) {
+		//show the load error
+		view.addSynapseAlertWidget(synapseAlert.asWidget());
+		synapseAlert.showError("Unable to load image preview");
 	}
 }

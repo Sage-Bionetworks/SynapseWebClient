@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
@@ -53,7 +54,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@UiField(provided=true)
 	Tree entityTree;
 	@UiField
-	Div entityTreeHeader;
+	Table entityTreeHeader;
 	
 	private Widget widget;
 
