@@ -17,6 +17,7 @@ import org.mockito.stubbing.Answer;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.upload.AbstractFileValidator;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
@@ -114,21 +115,10 @@ public class FileHandleUploadWidgetImplTest {
 		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
-		FileValidator validator = new FileValidator() {
-			Callback mockFailedValidationCallback;
+		AbstractFileValidator validator = new AbstractFileValidator() {
 			@Override
 			public boolean isValid(FileMetadata file) {
 				return false;
-			}
-
-			@Override
-			public void setInvalidFileCallback(Callback mockFailedValidationCallback) {
-				this.mockFailedValidationCallback = mockFailedValidationCallback;
-			}
-
-			@Override
-			public Callback getInvalidFileCallback() {
-				return this.mockFailedValidationCallback;
 			}
 
 			@Override
@@ -171,18 +161,10 @@ public class FileHandleUploadWidgetImplTest {
 		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
-		FileValidator validator = new FileValidator () {
+		AbstractFileValidator validator = new AbstractFileValidator () {
 			@Override
 			public boolean isValid(FileMetadata file) {
 				return false;
-			}
-
-			@Override
-			public void setInvalidFileCallback(Callback invalidCallback) {}
-
-			@Override
-			public Callback getInvalidFileCallback() {
-				return null;
 			}
 
 			@Override
@@ -190,7 +172,6 @@ public class FileHandleUploadWidgetImplTest {
 				return null;
 			}
 		};
-		validator.setInvalidFileCallback(mockFailedValidationCallback);
 		widget.setValidation(validator);
 		reset(mockView);
 		// method under test.

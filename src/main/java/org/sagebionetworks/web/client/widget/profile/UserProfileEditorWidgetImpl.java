@@ -14,7 +14,6 @@ import com.google.inject.Inject;
 public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
 	
 	public static final String PLEASE_ENTER_A_VALID_URL = "Please enter a valid URL";
-	public static final String PLEAE_SELECT_AN_IMAGE = "File was determined not to be an image.";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
 	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
 	public static final String MUST_BE_AT_LEAST_3_CHARACTERS = "Must be at least 3 characters";

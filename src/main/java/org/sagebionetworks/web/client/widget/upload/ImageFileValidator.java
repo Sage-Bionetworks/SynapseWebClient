@@ -4,7 +4,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
-public class ImageFileValidator implements FileValidator {
+public class ImageFileValidator extends AbstractFileValidator {
 	
 	private Callback invalidCallback;
 	
@@ -20,16 +20,6 @@ public class ImageFileValidator implements FileValidator {
 			String extension = filename.substring(filename.lastIndexOf(".")+1);
 			return DisplayUtils.isRecognizedImageContentType("image/"+extension);
 		}
-	}
-
-	@Override
-	public void setInvalidFileCallback(Callback invalidCallback) {
-		this.invalidCallback = invalidCallback;
-	}
-
-	@Override
-	public Callback getInvalidFileCallback() {
-		return invalidCallback;
 	}
 
 	@Override
