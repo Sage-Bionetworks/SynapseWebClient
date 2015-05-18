@@ -230,7 +230,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	private final static native double _getFileSize(String fileFieldId, int index) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileSize = ('files' in fileToUploadElement) ? fileToUploadElement.files[index].size : 0;
+		var fileSize = 0;
+		if (fileToUploadElement != null && ('files' in fileToUploadElement))
+			fileSize = fileToUploadElement.files[index].size;
 		return fileSize;
 	}-*/;
 	
