@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.unitshared.asynch;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sagebionetworks.client.AsynchJobType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 public class AsynchTypeTest {
 
-	@Ignore
 	@Test
 	public void testAllTypes(){
 		// The names of the AsynchType enumeration must match the java client enumerations AsynchJobType

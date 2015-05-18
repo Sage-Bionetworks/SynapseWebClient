@@ -2441,11 +2441,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ResponseMessage handleSignedToken(NotificationTokenType tokenType,
+	public ResponseMessage handleSignedToken(String tokenTypeName,
 			String token, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			
+			NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
 			JSONEntity signedToken = SerializationUtils.hexDecodeAndDeserialize(token, tokenType.classType);
 			if (signedToken instanceof JoinTeamSignedToken) {
 				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;

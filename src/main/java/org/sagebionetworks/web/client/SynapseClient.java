@@ -60,7 +60,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.server.servlet.NotificationTokenType;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -376,7 +375,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getAPIKey() throws RestServiceException;
 	
-	public ResponseMessage handleSignedToken(NotificationTokenType tokenType, String token, String hostPageBaseURL) throws RestServiceException;
+	public ResponseMessage handleSignedToken(String tokenTypeName, String token, String hostPageBaseURL) throws RestServiceException;
 	
 	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	

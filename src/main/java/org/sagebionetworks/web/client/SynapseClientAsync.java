@@ -58,7 +58,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.server.servlet.NotificationTokenType;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -305,7 +304,7 @@ public interface SynapseClientAsync {
 
 	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
 
-	void handleSignedToken(NotificationTokenType tokenType, String token, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
+	void handleSignedToken(String tokenTypeName, String token, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
 	void getAPIKey(AsyncCallback<String> callback);
 
