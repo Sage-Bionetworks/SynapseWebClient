@@ -27,8 +27,6 @@ import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,7 +42,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private AdapterFactory adapterFactory;
 	private Quiz quiz;
 	private PortalGinInjector ginInjector;
-	private boolean isSubmitInitialized;
 	private Map<Long, QuestionContainerWidget> questionIndexToQuestionWidget;
 	
 	@Inject
@@ -86,42 +83,26 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	@Override
 	public void showQuiz(Quiz quiz) {
 		view.clear();
+		questionIndexToQuestionWidget.clear();
 		if (quiz.getHeader() != null)
 			view.setQuizHeader(quiz.getHeader());
-		//clear old questions
 		List<Question> questions = quiz.getQuestions();
 		Long questionNumber = Long.valueOf(1);
 		for (Question question : questions) {
 			QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
 			questionIndexToQuestionWidget.put(questionNumber, newQuestion);
-			newQuestion.configure(questionNumber, question);
+			newQuestion.configure(questionNumber, question, null);
 			view.addQuestionContainerWidget(newQuestion.asWidget());
 			questionNumber++;
-		}
-		
-		//initialize if necessary
-		if (!isSubmitInitialized) {
-			isSubmitInitialized = true;
-			view.addSubmitHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (!checkAllAnswered()) {
-						view.showErrorMessage(DisplayConstants.ERROR_ALL_QUESTIONS_REQUIRED);
-					} else {
-						view.setSubmitEnabled(false);
-						submitAnswers();
-					}
-						
-				}
-			});
-		}
+		}	
 		view.reset();
 	}
 	
 	private boolean checkAllAnswered() {
-		for (Long questionNumber : questionIndexToQuestionWidget.keySet()) {
-			if (questionIndexToQuestionWidget.get(questionNumber).getAnswers().isEmpty()) 
+		for (Long questionIndex : questionIndexToQuestionWidget.keySet()) {
+			if (questionIndexToQuestionWidget.get(questionIndex).getAnswers().isEmpty()) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -168,6 +149,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	@Override
 	public void showSuccess(UserProfile profile, PassingRecord passingRecord) {
+		showQuizFromPassingRecord(passingRecord);
 		scoreQuiz(passingRecord);
 		//show success UI (certificate) and quiz
 		view.showSuccess(profile, passingRecord);
@@ -175,9 +157,24 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	@Override
 	public void showFailure(PassingRecord passingRecord) {
+		showQuizFromPassingRecord(passingRecord);
 		scoreQuiz(passingRecord);
 		//show failure message and quiz
 		view.showFailure(passingRecord);
+	}
+	
+	@Override
+	public void showQuizFromPassingRecord(PassingRecord passingRecord) {
+		view.clear();
+		List<ResponseCorrectness> responseCorrections = passingRecord.getCorrections();
+		Long questionNumber = Long.valueOf(1);
+		for (ResponseCorrectness response: responseCorrections) {
+			QuestionContainerWidget newQuestion = ginInjector.getQuestionContainerWidget();
+			questionIndexToQuestionWidget.put(questionNumber, newQuestion);
+			newQuestion.configure(questionNumber, response.getQuestion(), (MultichoiceResponse) response.getResponse());
+			view.addQuestionContainerWidget(newQuestion.asWidget());
+			questionNumber++;
+		}
 	}
 	
 	private void scoreQuiz(PassingRecord passingRecord) {
@@ -199,7 +196,16 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		}
 	}
 	
-
+	@Override
+	public void submitClicked() {
+		if (!checkAllAnswered()) {
+			view.showErrorMessage(DisplayConstants.ERROR_ALL_QUESTIONS_REQUIRED);
+		} else {
+			view.setSubmitEnabled(false);
+			submitAnswers();
+		}
+	}
+	
 	@Override
     public String mayStop() {
         view.clear();
@@ -210,8 +216,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	public void setPlace(org.sagebionetworks.web.client.place.Quiz place) {
 		view.setPresenter(this);
 		view.clear();
-		this.isSubmitInitialized = false;
-		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
+		questionIndexToQuestionWidget.clear();
 		getIsCertified();
 	}
 	
@@ -225,8 +230,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					//otherwise, show the quiz
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.hideLoading();
-					view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
-				
+					showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

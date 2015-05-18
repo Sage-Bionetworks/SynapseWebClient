@@ -21,13 +21,15 @@ public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.cl
 	@UiField(provided=true)
 	CommandLineClientInstallWidgetViewImpl install;
 	
+	Widget widget;
+	
 	@Inject
 	public CommandLineClientModalWidgetViewImpl(Binder uiBinder,
 			CommandLineClientEntityGetterUIWidgetViewImpl getEntity,
 			CommandLineClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;
-		uiBinder.createAndBindUi(this);
+		widget = uiBinder.createAndBindUi(this);
 	}
 	
 	public void configure(String id) {
@@ -35,7 +37,7 @@ public class CommandLineClientModalWidgetViewImpl extends com.google.gwt.user.cl
 	}
 	
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 
 }

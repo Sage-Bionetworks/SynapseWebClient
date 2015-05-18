@@ -29,12 +29,14 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
@@ -45,14 +47,11 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
@@ -72,10 +71,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private UserProfileModalWidget userProfileModalWidget;
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
+	private OpenTeamInvitationsWidget openInvitesWidget;
 
 	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
-	private int teamNotificationCount;
+	private int inviteCount;
+	private int openRequestCount;
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentProjectOffset, currentChallengeOffset;
@@ -84,6 +85,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public ProjectFilterEnum filterType;
 	public Team filterTeam;
 	public SortOptionEnum currentProjectSort;
+	public TeamListWidget myTeamsWidget;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -96,6 +98,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			UserProfileModalWidget userProfileModalWidget,
 			LinkedInServiceAsync linkedInServic,
 			GWTWrapper gwt,
+			TeamListWidget myTeamsWidget,
+			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -108,6 +112,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.linkedInService = linkedInServic;
 		this.gwt = gwt;
+		this.myTeamsWidget = myTeamsWidget;
+		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -115,14 +121,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
+		view.addMyTeamsWidget(myTeamsWidget);
+		view.addOpenInvitesWidget(openInvitesWidget);
 	}
 
+	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Install the view
 		panel.setWidget(view);
 		
 	}
+	
 
 	@Override
 	public void setPlace(Profile place) {
@@ -164,13 +174,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	// Configuration
 	public void updateProfileView(String userId, final ProfileArea initialTab) {
-		view.clear();
-		view.showLoading();
-		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
-		view.setSortText(currentProjectSort.sortText);
+		inviteCount = 0;
+		openRequestCount = 0;
 		isOwner = authenticationController.isLoggedIn()
 				&& authenticationController.getCurrentUserPrincipalId().equals(
 						userId);
+		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		view.clear();
+		myTeamsWidget.clear();
+		view.showLoading();
+		view.setSortText(currentProjectSort.sortText);
+		myTeamsWidget.configure(false);
 		view.setProfileEditButtonVisible(isOwner);	
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
@@ -301,26 +315,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void refreshProjects() {
 		currentProjectOffset = 0;
 		view.clearProjects();
-		getMoreProjects();
-		
-		//initialize team filters
-		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				//could not load teams for team filters
-				view.setTeamsFilterVisible(false);
-			}
-			@Override
-			public void onSuccess(List<Team> teams) {
-				view.setTeamsFilterVisible(!teams.isEmpty());
-				view.setTeamsFilterTeams(teams);
-			}
-		};
-		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
-		
-		//also refresh the teams tab if you are the owner (to show notifications)
-		if (isOwner)
-			refreshTeams();
+		getMoreProjects();		
+		//also refresh the teams tab
+		refreshTeams();
 	}
 	
 	public void refreshChallenges() {
@@ -387,24 +384,65 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
-		view.showTeamsLoading();
-		teamNotificationCount = 0;
 		view.clearTeamNotificationCount();
 		if (isOwner)
-			view.refreshTeamInvites();
-		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
+			refreshTeamInvites();
+		getTeamBundles(currentUserId, isOwner);
+	}
+	
+	@Override
+	public void refreshTeamInvites() {
+		CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
 			@Override
-			public void onFailure(Throwable caught) {
-				view.setTeamsError(caught.getMessage());
-			}
-			@Override
-			public void onSuccess(List<Team> teams) {
-				view.setTeams(teams,isOwner);
+			public void invoke(List<OpenUserInvitationBundle> invites) {
+				updateTeamInvites(invites);
 			}
 		};
-		
-		TeamListWidget.getTeams(currentUserId, synapseClient, adapterFactory, teamCallback);
+		openInvitesWidget.configure(new Callback() {
+			@Override
+			public void invoke() {
+				//refresh the teams after joining one
+				refreshTeams();
+			}
+		}, openTeamInvitationsCallback);
 	}
+	
+	public void getTeamBundles(String userId, final boolean includeRequestCount) {
+		myTeamsWidget.clear();
+		myTeamsWidget.showLoading();
+		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
+			@Override
+			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
+				myTeamsWidget.clear();
+				if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
+					int totalRequestCount = 0;
+					view.addMyTeamProjectsFilter();
+					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
+						// requests will always be 0 or greater
+						Long requestCount = teamAndRequest.getRequestCount();
+						Team team = teamAndRequest.getTeam();
+						myTeamsWidget.addTeam(team, requestCount);
+						view.addTeamsFilterTeam(team);
+						totalRequestCount += requestCount;
+					}
+					view.setTeamsFilterVisible(true);
+					if (includeRequestCount) {
+						addMembershipRequests(totalRequestCount);
+					}
+				} else {
+					myTeamsWidget.showEmpty();
+					view.setTeamsFilterVisible(false);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				myTeamsWidget.clear();
+				view.setTeamsFilterVisible(false);
+				view.setTeamsError(caught.getMessage());
+			}
+		});
+	}
+	
 	
 	public void getMoreChallenges() {
 		view.showChallengesLoading(true);
@@ -669,31 +707,38 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void updateTeamInvites(List<OpenUserInvitationBundle> invites) {
-		if (invites != null && invites.size() > 0) {
-			teamNotificationCount += invites.size();
-			// update team notification count
-			if (teamNotificationCount > 0)
-				view.setTeamNotificationCount(Integer
-						.toString(teamNotificationCount));
+		if (invites != null && invites.size() != inviteCount) {
+			inviteCount = invites.size();
 		}
+		if (openRequestCount + inviteCount > 0)
+			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
 	}
 
 	@Override
 	public void addMembershipRequests(int count) {
-		teamNotificationCount += count;
-		if (teamNotificationCount > 0)
-			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+		if (count != openRequestCount) 
+			openRequestCount = count;		
+		if (openRequestCount + inviteCount > 0)
+			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
 	}
 	
 	/**
 	 * Exposed for test purposes only
 	 */
-	public int getTeamNotificationCount() {
-		return teamNotificationCount;
+	public int getOpenRequestCount() {
+		return openRequestCount;
 	}
 	
-	public void setTeamNotificationCount(int teamNotificationCount) {
-		this.teamNotificationCount = teamNotificationCount;
+	public int getInviteCount() {
+		return inviteCount;
+	}
+	
+	public void setOpenRequestCount(int openRequestCount) {
+		this.openRequestCount = openRequestCount;
+	}
+	
+	public void setInviteCount(int inviteCount) {
+		this.inviteCount = inviteCount;
 	}
 	
 	/**

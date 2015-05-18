@@ -21,7 +21,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage);
-		public void createPage(String name);
 		public void previewClicked(final Long versionToPreview, Long currentVersion);
 		public void restoreClicked(final Long wikiVersion);
 		public WikiPage getWikiPage();

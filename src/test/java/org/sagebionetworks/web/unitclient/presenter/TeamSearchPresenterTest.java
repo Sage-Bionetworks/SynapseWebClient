@@ -109,5 +109,15 @@ public class TeamSearchPresenterTest {
 		team.setCanPublicJoin(true);
 		assertTrue(TeamSearchPresenter.getCanPublicJoin(team));
 	}
-
+	@Test
+	public void testEmptyTeams() {
+		PaginatedResults<Team> teams = new PaginatedResults<Team>();
+		teams.setResults(new ArrayList<Team>());
+		teams.setTotalNumberOfResults(0);
+		AsyncMockStubber.callSuccessWith(teams).when(mockSynapse).getTeamsBySearch(
+				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		presenter.search("test", null);
+		verify(mockSynapse).getTeamsBySearch(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).showEmptyTeams();
+	}
 }

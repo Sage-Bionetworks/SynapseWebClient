@@ -4,19 +4,27 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:HTMLPanel>
-		<table cellspacing='0' cellpadding='0'>
-			<tr>
-				<td align="left" width="20px" style="vertical-align: top;">					
-					<g:SimplePanel ui:field="iconContainer" />
-				</td>
-				<td>
-				    <b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
-			    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
-					</b:Tooltip>
-				</td>
-			</tr>
-		</table>
-	</g:HTMLPanel>    
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	<t:Table width="100%">
+		<t:TableRow>
+			<t:TableData width="20px">
+				<g:SimplePanel ui:field="iconContainer"/>
+			</t:TableData>
+			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden">
+				<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
+		    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
+				</b:Tooltip>
+			</t:TableData>
+			<t:TableData width="350px" addStyleNames="visible-lg">
+				<g:SimplePanel ui:field="modifiedByField"/>
+			</t:TableData>
+			<t:TableData width="130px" addStyleNames="visible-sm visible-md visible-lg">
+				<g:Label ui:field="modifiedOnField"/>
+			</t:TableData>
+			<t:TableData width="75px" addStyleNames="hidden-xs">
+				<g:Label ui:field="idField"/>
+			</t:TableData>
+		</t:TableRow>
+	</t:Table>    
 </ui:UiBinder>

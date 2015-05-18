@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -25,6 +26,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,7 +36,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	SageImageBundle sageImageBundle;
-	
+	Widget modifiedByWidget;
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
@@ -43,6 +45,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel iconContainer;
 	@UiField
 	FlowPanel entityContainer;
+	@UiField
+	Label idField;
+	
+	@UiField
+	SimplePanel modifiedByField;
+	@UiField
+	Label modifiedOnField;
+	
 	Image iconPicture;
 	ClickHandler nonDefaultClickHandler;
 	
@@ -57,10 +67,30 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		initWidget(uiBinder.createAndBindUi(this));
+		idField.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				markText(idField.getElement());
+			}
+		});
 	}
 	
+	private native void markText(Element elem) /*-{
+	    if ($doc.selection && $doc.selection.createRange) {
+	        var range = $doc.selection.createRange();
+	        range.moveToElementText(elem);
+	        range.select();
+	    } else if ($doc.createRange && $wnd.getSelection) {
+	        var range = $doc.createRange();
+	        range.selectNode(elem);
+	        var selection = $wnd.getSelection();
+	        selection.removeAllRanges();
+	        selection.addRange(range);
+	    }
+	}-*/;
+	
 	@Override
-	public void setEntity(final EntityHeader entityHeader) {
+	public void setEntity(final EntityQueryResult entityHeader) {
 		clear();
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
@@ -101,7 +131,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				}
 			};
 			
-			ImageResource icon = presenter.getIconForType(entityHeader.getType());
+			ImageResource icon = presenter.getIconForType(entityHeader.getEntityType());
 			iconPicture = new Image(icon);
 			iconPicture.setWidth("16px");
 			iconPicture.setHeight("16px");
@@ -109,6 +139,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			iconPicture.addClickHandler(clickHandler);
 			iconContainer.setWidget(iconPicture);
 			entityContainer.add(anchor);
+			idField.setText(entityHeader.getId());
 		} 		
 	}
 	
@@ -186,12 +217,27 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		nonDefaultClickHandler = handler;
 	}
 	
-	private void entityClicked(EntityHeader entityHeader, ClickEvent event) {
+	@Override
+	public void setModifiedByWidget(Widget w) {
+		modifiedByField.setWidget(w);
+		this.modifiedByWidget = w;
+	}
+	
+	@Override
+	public void setModifiedOn(String modifiedOnString) {
+		modifiedOnField.setText(modifiedOnString);
+	}
+	private void entityClicked(EntityQueryResult entityHeader, ClickEvent event) {
 		if (nonDefaultClickHandler == null) {
 			presenter.entityClicked(entityHeader);
 		} else {
 			nonDefaultClickHandler.onClick(event);
 		}
+	}
+	
+	@Override
+	public void setModifiedByWidgetVisible(boolean visible) {
+		modifiedByWidget.setVisible(visible);
 	}
 	
 	/*

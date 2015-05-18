@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
@@ -48,8 +49,6 @@ import com.google.inject.Inject;
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
 	public static final String MOVE_PREFIX = "Move ";
-
-	public static final String EDIT_WIKI = "Edit Wiki";
 
 	public static final String THE = "The ";
 
@@ -136,7 +135,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureDeleteAction();
 			configureShareAction();
 			configureRenameAction();
-		configureEditWiki();
+			configureEditWiki();
+			configureViewWikiSource();
+			configureAddWikiSubpage();
 			configureMove();
 			configureLink();
 			configureSubmit();
@@ -160,13 +161,37 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(isWikiableType(entityBundle.getEntity())){
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
-			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI);
 			actionMenu.addActionListener(Action.EDIT_WIKI_PAGE, this);
 		}else{
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, false);
 		}
 	}
+	
+	private void configureViewWikiSource(){
+		//only visible if entity may have a wiki, and user can't Edit the wiki
+		if(isWikiableType(entityBundle.getEntity())){
+			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
+			actionMenu.addActionListener(Action.VIEW_WIKI_SOURCE, this);
+		}else{
+			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, false);
+			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
+		}
+	}
+
+	
+	private void configureAddWikiSubpage(){
+		if(entityBundle.getEntity() instanceof Project){
+			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.ADD_WIKI_SUBPAGE, this);
+		}else{
+			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
+			actionMenu.setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
+		}
+	}
+
 	
 	private void configureMove(){
 		if(isMovableType(entityBundle.getEntity()) ){
@@ -310,6 +335,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case EDIT_WIKI_PAGE:
 			onEditWiki();
+			break;
+		case VIEW_WIKI_SOURCE:
+			onViewWikiSource();
+			break;
+		case ADD_WIKI_SUBPAGE:
+			onAddWikiSubpage();
 			break;
 		case MOVE_ENTITY:
 			onMove();
@@ -469,6 +500,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 	
+	private void onViewWikiSource() {
+		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		synapseClient.getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
+			@Override
+			public void onSuccess(WikiPage page) {
+				view.showInfoDialog("Wiki Source", page.getMarkdown());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});	
+	}
+	
 	private void onEditWiki() {
 		// Validate the user can update this entity.
 		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
@@ -486,10 +531,53 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void invoke(WikiPage param) {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-	}
+			}
 		});
 	}
 
+	private void onAddWikiSubpage() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckAddWikiSubpage();
+			}
+		});
+	}
+	
+	private void postCheckAddWikiSubpage(){
+		if (entityBundle.getRootWikiId() == null) {
+			createWikiPage("Root");
+		} else {
+			view.showPromptDialog(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
+				@Override
+				public void callback(String result) {
+					createWikiPage(result);
+				}
+			});
+		}
+	}
+	
+	public void createWikiPage(final String name) {
+		if (DisplayUtils.isDefined(name)) {
+			WikiPage page = new WikiPage();
+			page.setParentWikiId(wikiPageId);
+			page.setTitle(name);
+	        synapseClient.createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
+	            @Override
+	            public void onSuccess(WikiPage result) {
+	                view.showInfo("'" + name + "' Page Added", "");
+	                entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+	            }
+	            @Override
+	            public void onFailure(Throwable caught) {
+	                if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+	                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
+	            }
+	        });
+		}
+	}
+	
 	private void onRename() {
 		// Validate the user can update this entity.
 		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -25,6 +27,10 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,6 +42,8 @@ import com.google.inject.Inject;
  *
  */
 public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter, SynapseWidgetPresenter {
+	
+	public final int MIN_VISIBLE_EDITOR_LINES = 5;
 	
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
@@ -148,7 +156,64 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.setTitleEditorVisible(currentPage.getParentWikiId() != null);
 		view.setTitle(currentPage.getTitle());
 		globalApplicationState.setIsEditing(true);
+		setMarkdownTextAreaHandlers();
+  	  	resizeMarkdownTextArea();
+		view.setDeleteClickHandler(getDeleteClickHandler());
 		view.showEditorModal();
+		gwt.scheduleExecution(new Callback() {
+			@Override
+			public void invoke() {
+		    	  resizeMarkdownTextArea();
+		    	  if (view.isEditorModalAttachedAndVisible()) 
+			    	  gwt.scheduleExecution(this, 500);
+			}
+		}, 500);	
+	}
+	
+	private void setMarkdownTextAreaHandlers() {		
+		view.addTextAreaKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				markdownEditorClicked();
+			}
+		});
+		view.addTextAreaClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				markdownEditorClicked();
+			}
+		});
+	}
+	
+	public ClickHandler getDeleteClickHandler() {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				view.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
+					@Override
+					public void callback(boolean isConfirmed) {
+						if (isConfirmed)
+							handleCommand(MarkdownEditorAction.DELETE);
+					}
+				});
+			}
+		};
+	}
+	
+	public void resizeMarkdownTextArea() {
+		int visLines = view.getMarkdownTextAreaVisibleLines();
+		int index = 0;
+		int numLines = 0;
+		String editorText = view.getMarkdownText();
+		do {
+			index = 1 + editorText.indexOf("\n",index);
+			numLines++;
+		} while (index > 0 && index < editorText.length());
+		if (visLines < MIN_VISIBLE_EDITOR_LINES || visLines != numLines + 1) {
+			// Keeps a minimum size of MIN_VISIBLE_EDITOR_LINES lines
+			view.resizeMarkdownTextArea(numLines + 1 > MIN_VISIBLE_EDITOR_LINES 
+					? numLines + 1 : MIN_VISIBLE_EDITOR_LINES);
+		}
 	}
 	
 	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {

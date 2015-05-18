@@ -1864,7 +1864,7 @@ public class DisplayUtils {
 			str += "/rowversion/" + version;
 		return str;
 	}
-	
+
 	public static String getStackTrace(Throwable t) {
 		StringBuilder stackTrace = new StringBuilder();
 		if (t != null) {
@@ -1914,5 +1914,4 @@ public class DisplayUtils {
 			return "";
 		else return s;
 	 }
-
 }

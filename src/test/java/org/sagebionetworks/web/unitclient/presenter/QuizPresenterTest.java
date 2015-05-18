@@ -23,10 +23,12 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
+import org.sagebionetworks.repo.model.quiz.ResponseCorrectness;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -53,9 +55,12 @@ public class QuizPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	PortalGinInjector mockInjector;
 	QuestionContainerWidget mockQuestionContainer;
+	PassingRecord mockPassingRecord;
+	MultichoiceResponse mockQuestionResponse;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	org.sagebionetworks.web.client.place.Quiz place;
+	
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -65,6 +70,8 @@ public class QuizPresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockQuestionContainer = mock(QuestionContainerWidget.class);
 		mockInjector = mock(PortalGinInjector.class);
+		mockPassingRecord = mock(PassingRecord.class);
+		mockQuestionResponse = mock(MultichoiceResponse.class);
 		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
@@ -152,6 +159,18 @@ public class QuizPresenterTest {
 		return quiz;
 	}
 	
+	private void configureMockPassingRecord(Quiz quiz) {
+		List<ResponseCorrectness> responseCorrectness = new ArrayList<ResponseCorrectness>();
+		for (Question question: quiz.getQuestions()) {
+			ResponseCorrectness rc = new ResponseCorrectness();
+			rc.setQuestion(question);
+			rc.setResponse(mockQuestionResponse);
+			rc.setIsCorrect(true);
+			responseCorrectness.add(rc);
+		}
+		when(mockPassingRecord.getCorrections()).thenReturn(responseCorrectness);
+	}
+	
 	public static MultichoiceAnswer getAnswer(long answerIndex, String prompt) {
 		MultichoiceAnswer a = new MultichoiceAnswer();
 		a.setAnswerIndex(answerIndex);
@@ -204,15 +223,13 @@ public class QuizPresenterTest {
 		questionWidgetMap.put(0L, mockQuestionOne);
 		questionWidgetMap.put(4L, mockQuestionTwo);
 		presenter.setQuestionIndexToQuestionWidgetMap(questionWidgetMap);
-		
-		PassingRecord pr = new PassingRecord();
-		pr.setPassed(true);
-		setPassingRecordResponse(pr);
+		when(mockPassingRecord.getPassed()).thenReturn(true);
+		setPassingRecordResponse(mockPassingRecord);
 
 		presenter.submitAnswers();
 		
 		//since we set it up to return true, it should show the success/pass UI
-		verify(mockView).showSuccess(any(UserProfile.class), any(PassingRecord.class));
+		verify(mockView).showSuccess(any(UserProfile.class), eq(mockPassingRecord));
 		
 		//let's also check the response object
 		ArgumentCaptor<QuizResponse> arg = ArgumentCaptor.forClass(QuizResponse.class);
@@ -223,13 +240,12 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testSubmitAnswersFailed() throws JSONObjectAdapterException {
-		PassingRecord pr = new PassingRecord();
-		pr.setPassed(false);
-		setPassingRecordResponse(pr);
+		when(mockPassingRecord.getPassed()).thenReturn(false);
+		setPassingRecordResponse(mockPassingRecord);
 		presenter.submitAnswers();
 		
 		//since we set it up to return false, it should show the failed UI
-		verify(mockView).showFailure(eq(pr));
+		verify(mockView).showFailure(eq(mockPassingRecord));
 	}
 	
 	@Test
@@ -237,6 +253,19 @@ public class QuizPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).submitCertificationQuizResponse(any(QuizResponse.class), any(AsyncCallback.class));
 		presenter.submitAnswers();
 		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testShowQuizFromPassingRecord() {
+		configureMockPassingRecord(mockQuiz());
+		presenter.showQuizFromPassingRecord(mockPassingRecord);
+		verify(mockView, Mockito.times(5)).addQuestionContainerWidget(any(Widget.class));
+	}
+	
+	@Test
+	public void testShowQuiz() {
+		presenter.showQuiz(mockQuiz());
+		verify(mockView, Mockito.times(5)).addQuestionContainerWidget(any(Widget.class));
 	}
 	
 }

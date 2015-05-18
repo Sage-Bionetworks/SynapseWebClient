@@ -60,6 +60,11 @@
 	padding: 2px 4px 2px 3px;
 }
 
+.light-border-bottom {
+	border-bottom: 1px solid #f1f1f1;
+}
+
+
 .sendButton {
 	display: block;
 	font-size: 16pt;
@@ -523,6 +528,9 @@ a.shortBtn {
 
 .margin-right-40 {
 	margin-right: 40px;
+}
+.margin-right-65 {
+	margin-right: 65px;
 }
 
 .margin-0-imp {
@@ -1025,6 +1033,10 @@ h1, h2, h3, h4, h5, h6 {
 	max-width: 100%;
 }
 
+.maxWidth50px {
+	max-width: 50px;
+}
+
 .markdown {
 	color: #000000;
 }
@@ -1055,7 +1067,6 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
-  width: auto !important;
 }
 
 .markdowntable td {
@@ -1225,6 +1236,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .entityTreeItem, .entityTreeItem-font {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
+	padding-right: 0px !important; /** Override gwt TreeItem BASE_BARE_ELEM padding of 3px **/
+}
+
+.entityTreeItem table {
+	width: 100%;
+}
+/** Select the td that is the first child under an element with class entityTreeItem.
+This is the icon table cell (gwt TreeItem exposes very little to the outside, so this is how we can style this container) **/
+.entityTreeItem td:first-child {
+	width:16px;
 }
 
 .entityTreeItem-selected a,
@@ -1845,6 +1866,7 @@ a.projectTitle:hover {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+
 .signin-panel input[type="password"] {
   margin-bottom: 10px;
   border-top-left-radius: 0;
@@ -1903,6 +1925,9 @@ iframe[seamless] {
     min-height: 300px;
 }
 
+.overflow-x-hidden {
+	overflow-x: hidden;
+}
 
 /*==================================*/
 /* GXT Overrides */

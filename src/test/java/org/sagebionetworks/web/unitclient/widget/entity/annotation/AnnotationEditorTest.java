@@ -1,7 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.entity.annotation;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +18,8 @@ import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationCellFactory;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditorView;
@@ -27,7 +35,7 @@ public class AnnotationEditorTest {
 	AnnotationEditor editor;
 	AnnotationEditorView mockView;
 	AnnotationCellFactory mockAnnotationCellFactory;
-	CellEditor mockCellEditor, mockCellEditor2;
+	CellEditor mockCellEditor, mockCellEditor2, mockCellEditor3;
 	Annotation annotation;
 	static String ANNOTATION_KEY = "size";
 	static String ANNOTATION_KEY_FROM_VIEW = "different_key";
@@ -40,9 +48,11 @@ public class AnnotationEditorTest {
 		annotationValues = new ArrayList<String>();
 		mockCellEditor = mock(CellEditor.class);
 		mockCellEditor2 = mock(CellEditor.class);
+		mockCellEditor3 = mock(CellEditor.class);
 		when(mockView.getKey()).thenReturn(ANNOTATION_KEY_FROM_VIEW);
 		when(mockCellEditor.isValid()).thenReturn(true);
-		when(mockAnnotationCellFactory.createEditor(any(Annotation.class))).thenReturn(mockCellEditor, mockCellEditor2);
+		when(mockCellEditor2.isValid()).thenReturn(true);
+		when(mockAnnotationCellFactory.createEditor(any(Annotation.class))).thenReturn(mockCellEditor, mockCellEditor2,mockCellEditor3);
 		annotation = new Annotation(ANNOTATION_TYPE.STRING, ANNOTATION_KEY, annotationValues);
 	}
 
@@ -72,7 +82,8 @@ public class AnnotationEditorTest {
 	public void testConfigureNoValues() {
 		//configure with no values
 		editor.configure(annotation, null);
-		verify(mockView, never()).addNewEditor(any(CellEditor.class));
+		//should add a single editor
+		verify(mockView).addNewEditor(any(CellEditor.class));
 		verify(mockView).setPresenter(editor);
 		verify(mockView).configure(ANNOTATION_KEY, editor.getAnnotationTypes().indexOf(ANNOTATION_TYPE.STRING));
 	}
@@ -81,25 +92,26 @@ public class AnnotationEditorTest {
 	public void testOnAddNewValue() {
 		editor.configure(annotation, null);
 		editor.onAddNewValue();
-		verify(mockAnnotationCellFactory).createEditor(any(Annotation.class));
-		verify(mockView).addNewEditor(any(CellEditor.class));
-		verify(mockCellEditor).setFocus(true);
+		verify(mockAnnotationCellFactory, times(2)).createEditor(any(Annotation.class));
+		verify(mockView, times(2)).addNewEditor(any(CellEditor.class));
+		verify(mockCellEditor2).setFocus(true);
 	}
 
 	@Test
 	public void testCreateNewEditor() {
 		editor.configure(annotation, null);
 		CellEditor createdEditor = editor.createNewEditor();
-		assertEquals(mockCellEditor, createdEditor);
+		assertEquals(mockCellEditor2, createdEditor);
 		ArgumentCaptor<KeyDownHandler> captor = ArgumentCaptor.forClass(KeyDownHandler.class);
-		verify(mockCellEditor).addKeyDownHandler(captor.capture());
+		verify(mockCellEditor2).addKeyDownHandler(captor.capture());
 		//test clicking ENTER adds a new editor
 		KeyDownEvent mockEvent = mock(KeyDownEvent.class);
 		when(mockEvent.getNativeKeyCode()).thenReturn(KeyCodes.KEY_ENTER);
-		verify(mockView, never()).addNewEditor(any(CellEditor.class));
-		captor.getValue().onKeyDown(mockEvent);
+		//addNewEditor() already called once from initializing with no values
 		verify(mockView).addNewEditor(any(CellEditor.class));
-		verify(mockCellEditor2).setFocus(true);
+		captor.getValue().onKeyDown(mockEvent);
+		verify(mockView, times(2)).addNewEditor(any(CellEditor.class));
+		verify(mockCellEditor3).setFocus(true);
 	}
 
 	@Test
