@@ -7,13 +7,13 @@
 	<bh:Div>
 		<bh:Div addStyleNames="color-line" />
 		<g:SimplePanel ui:field="header" />
-		<b:Container addStyleNames="min-height-500">
+		<b:Container addStyleNames="min-height-500 margin-top-60">
 			<b:Row>
 				<b:Column size="XS_12">
 					<g:SimplePanel ui:field="synapseAlertContainer" />
 					<bh:Div ui:field="successUI">
 						<b:Alert type="SUCCESS">
-							<b:Heading size="H2" ui:field="successMessage" />
+							<b:Heading size="H3" ui:field="successMessage" />
 						</b:Alert>
 					</bh:Div>
 				</b:Column>
