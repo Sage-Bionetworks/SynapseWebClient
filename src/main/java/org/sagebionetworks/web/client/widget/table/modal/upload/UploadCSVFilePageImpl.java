@@ -22,12 +22,10 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	ModalPresenter presenter;
 	UploadCSVPreviewPage nextPage;
 	
-//	 data fields
-//	String fileHandleId;
+	// data fields
 	String parentId;
 	String tableId;
-//	ContentTypeDelimiter type;
-//	String fileName;
+
 	
 	@Inject
 	public UploadCSVFilePageImpl(FileHandleUploadWidget fileInputWidget, UploadCSVPreviewPage uploadCSVConfigurationWidget) {
@@ -65,7 +63,6 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 				presenter.setLoading(true);				
 			}
 		});
-		//add callback here when invalid
 		this.fileInputWidget.configureValidation(new TableFileValidator(), new Callback() {
 			@Override
 			public void invoke() {
@@ -82,7 +79,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 
 	/**
 	 * Once a FileHandle is created move to the next page.
-	 * @param fileHandleId
+	 * @param uploadFile, the fileHandleId and metadata surrounding a file upload
 	 */
 	private void fileHandleCreated(FileUpload uploadFile) {
 		FileMetadata meta = uploadFile.getFileMeta();

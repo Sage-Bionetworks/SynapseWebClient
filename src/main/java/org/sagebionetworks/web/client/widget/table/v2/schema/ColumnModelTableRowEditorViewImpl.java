@@ -192,8 +192,7 @@ public class ColumnModelTableRowEditorViewImpl extends AbstractColumnModelTableR
 
 	@Override
 	public boolean validateDefault() {
-		return true;
-//		return this.defaultWidget.isValid();
+		return this.defaultWidget.isValid();
 	}
 
 	@Override

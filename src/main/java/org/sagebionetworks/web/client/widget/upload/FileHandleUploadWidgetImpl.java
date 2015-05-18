@@ -92,7 +92,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	@Override
 	public void onFileSelected() {
-		// Support for multiple file uploads?
 		FileMetadata fileMeta = getSelectedFileMetadata()[0];
 		boolean isValidUpload = validator == null || validator.isValid(fileMeta.getFileName());
 		if (isValidUpload) {
