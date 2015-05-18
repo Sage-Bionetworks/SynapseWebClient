@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -2444,7 +2445,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public ResponseMessage handleSignedToken(String tokenTypeName,
 			String token, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		
 		try {
+			if (!EnumUtils.isValidEnum(NotificationTokenType.class, tokenTypeName)) {
+				throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
+			}
 			NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
 			JSONEntity signedToken = SerializationUtils.hexDecodeAndDeserialize(token, tokenType.classType);
 			if (signedToken instanceof JoinTeamSignedToken) {
