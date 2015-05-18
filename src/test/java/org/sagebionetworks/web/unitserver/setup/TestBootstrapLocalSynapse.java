@@ -53,6 +53,8 @@ public class TestBootstrapLocalSynapse {
 	private static final String NOT_CERTIFIED_USER = "notCertifiedUser";
 	private static final String PASSWORD = "password";
 	private static final Long ACT_TEAM_ID=464532L;
+	private static final String LOCAL_TEAM_ENDPOINT = "http://localhost:8080/#!Team:";
+	private static final String LOCAL_SETTINGS_ENDPOINT = "http://localhost:8080/#!Notifications:";
 	SynapseAdminClientImpl adminClient = new SynapseAdminClientImpl();
 	SynapseClientImpl synapseClient = new SynapseClientImpl();
 	List<UserData> userData = new LinkedList<UserData>();
@@ -197,7 +199,7 @@ public class TestBootstrapLocalSynapse {
 			System.out.println("Created user: "+username+". Id: "+principalId);
 			this.userData.add(new UserData(principalId.toString(), username));
 			if(isAccessComplianceTeamMember){
-				adminClient.addTeamMember(ACT_TEAM_ID.toString(), principalId.toString());
+				adminClient.addTeamMember(ACT_TEAM_ID.toString(), principalId.toString(), LOCAL_TEAM_ENDPOINT, LOCAL_SETTINGS_ENDPOINT );
 			}
 			return principalId;
 		} catch (Exception e) {

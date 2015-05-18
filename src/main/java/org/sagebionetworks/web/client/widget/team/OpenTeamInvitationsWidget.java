@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -25,17 +26,20 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	private SynapseClientAsync synapseClient;
 	private Callback teamUpdatedCallback;
 	private AuthenticationController authenticationController;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public OpenTeamInvitationsWidget(OpenTeamInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			GWTWrapper gwt) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.gwt = gwt;
 	}
 
 	public void configure(final Callback teamUpdatedCallback, final CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback) {
@@ -86,21 +90,22 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	@Override
 	public void joinTeam(String teamId) {
 		//issue join request for the selected team
-		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, "", new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				view.showInfo(DisplayConstants.JOIN_TEAM_SUCCESS, "");
-				teamUpdatedCallback.invoke();
-				//refresh the open invitations
-				configure(teamUpdatedCallback, (CallbackP<List<OpenUserInvitationBundle>>)null);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
-			}
+		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, "", gwt.getHostPageBaseURL(), 
+				new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						view.showInfo(DisplayConstants.JOIN_TEAM_SUCCESS, "");
+						teamUpdatedCallback.invoke();
+						//refresh the open invitations
+						configure(teamUpdatedCallback, (CallbackP<List<OpenUserInvitationBundle>>)null);
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+							view.showErrorMessage(caught.getMessage());
+						} 
+					}
 		});		
 	}
 

@@ -71,7 +71,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -1863,9 +1862,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// if we can join the team without creating the request (like if we
 			// are a team admin, or there is an open invitation), then just do
 			// that!
-			String notificationSettingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, currentUserId, getTeamEndpoint(hostPageBaseURL), notificationSettingsEndpoint);
+				synapseClient.addTeamMember(teamId, currentUserId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (!membershipStatus.getHasOpenRequest()) {
 				// otherwise, create the request
 				MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
@@ -1874,7 +1873,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				membershipRequest.setUserId(currentUserId);
 
 				// make new Synapse call
-				synapseClient.createMembershipRequest(membershipRequest, getTeamEndpoint(hostPageBaseURL), notificationSettingsEndpoint);
+				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
+				synapseClient.createMembershipRequest(membershipRequest, joinTeamEndpoint, settingsEndpoint);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1888,12 +1888,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, userGroupId);
-			String notificationSettingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			// if we can join the team without creating the invite (like if we
 			// are a team admin, or there is an open membership request), then
 			// just do that!
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), notificationSettingsEndpoint);
+				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (!membershipStatus.getHasOpenInvitation()) {
 				// check to see if there is already an open invite
 				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
@@ -1902,8 +1902,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				membershipInvite.setInviteeId(userGroupId);
 
 				// make new Synapse call
-				String acceptInviteEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
-				synapseClient.createMembershipInvitation(membershipInvite, acceptInviteEndpoint, notificationSettingsEndpoint);
+				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
+				synapseClient.createMembershipInvitation(membershipInvite, joinTeamEndpoint, settingsEndpoint);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2446,11 +2446,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			
-			JSONEntity signedToken = SerializationUtils.hexDecodeAndDeserialize(token, c);
+			JSONEntity signedToken = SerializationUtils.hexDecodeAndDeserialize(token, tokenType.classType);
 			if (signedToken instanceof JoinTeamSignedToken) {
 				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
-				String notificationEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
-				return synapseClient.addTeamMember(joinTeamSignedToken, getTeamEndpoint(hostPageBaseURL), notificationEndpoint);
+				String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+				return synapseClient.addTeamMember(joinTeamSignedToken, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (signedToken instanceof NotificationSettingsSignedToken) {
 				NotificationSettingsSignedToken notificationSignedToken = (NotificationSettingsSignedToken) signedToken;
 				return synapseClient.updateNotificationSettings(notificationSignedToken);
@@ -2458,12 +2458,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				//TODO
 				throw new BadRequestException("Not yet implemented");
 			} else {
-				throw new BadRequestException("token class not recognized: " + tokenClassName);
+				throw new BadRequestException("token not supported: " + tokenType);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (ClassNotFoundException e) {
-			throw new BadRequestException(e.getMessage());
 		}
 	}
 	

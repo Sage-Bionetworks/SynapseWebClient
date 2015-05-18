@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -40,6 +41,7 @@ public class OpenTeamInvitationsWidgetTest {
 	String teamId = "123";
 	OpenTeamInvitationsWidget widget;
 	AuthenticationController mockAuthenticationController;
+	GWTWrapper mockGWTWrapper;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	Team testTeam;
 	MembershipInvitation testInvite;
@@ -53,7 +55,8 @@ public class OpenTeamInvitationsWidgetTest {
 		mockView = mock(OpenTeamInvitationsWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
+		mockGWTWrapper = mock(GWTWrapper.class);
+		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockGWTWrapper);
 		
 		testTeam = new Team();
 		testTeam.setId(teamId);
@@ -76,7 +79,7 @@ public class OpenTeamInvitationsWidgetTest {
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -100,17 +103,17 @@ public class OpenTeamInvitationsWidgetTest {
 	public void testJoin() throws Exception {
 		widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
 		widget.joinTeam(teamId);
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockTeamUpdatedCallback).invoke();
 	}
 	
 	@Test
 	public void testJoinFail() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
 		widget.joinTeam(teamId);
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 		verify(mockTeamUpdatedCallback, never()).invoke();
 	}

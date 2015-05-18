@@ -41,6 +41,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -67,6 +68,7 @@ public class EvaluationSubmitterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	JSONObjectAdapter jSONObjectAdapter = new JSONObjectAdapterImpl();
 	EvaluationSubmitter mockEvaluationSubmitter;
+	GWTWrapper mockGWTWrapper;
 	FileEntity entity;
 	EntityBundle bundle;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
@@ -87,7 +89,8 @@ public class EvaluationSubmitterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient);
+		mockGWTWrapper = mock(GWTWrapper.class);
+		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockGWTWrapper);
 		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");
@@ -97,7 +100,7 @@ public class EvaluationSubmitterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		returnSubmission = new Submission();
 		returnSubmission.setId("363636");
-		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
 
 		
 		PaginatedResults<Evaluation> availableEvaluations = new PaginatedResults<Evaluation>();
@@ -152,7 +155,7 @@ public class EvaluationSubmitterTest {
 		submitter.configure(entity, null);
 		submitter.onNextClicked(null, null, e1);
 		//should invoke submission directly without terms of use
-		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
 
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		//submitted status shown
@@ -180,7 +183,7 @@ public class EvaluationSubmitterTest {
 		submitter.onNextClicked(null,  submissionName,  e1);
 		//should invoke submission directly without terms of use
 		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
-		verify(mockChallengeClient).createIndividualSubmission(captor.capture(), anyString(), any(AsyncCallback.class));
+		verify(mockChallengeClient).createIndividualSubmission(captor.capture(), anyString(), anyString(), any(AsyncCallback.class));
 		Submission submission = captor.getValue();
 		assertNull(submission.getContributors());
 		assertEquals(submissionName, submission.getName());
@@ -191,12 +194,12 @@ public class EvaluationSubmitterTest {
 		submitter.configure(entity, null);
 		reset(mockView);
 		
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(ACCESS_TYPE.class), any(AsyncCallback.class));
 
 		submitter.onNextClicked(null, null, e1);
 		//Should invoke once directly without terms of use
-		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
 		
 		//submitted status shown
 		verify(mockView).showErrorMessage(anyString());
@@ -384,7 +387,7 @@ public class EvaluationSubmitterTest {
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		submitter.onNextClicked(new Reference(), "named submission", new Evaluation());
 		verify(mockView).hideModal1();
-		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
+		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test

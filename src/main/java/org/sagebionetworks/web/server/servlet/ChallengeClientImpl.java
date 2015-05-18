@@ -278,8 +278,8 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
-			String notificationSettingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
-			return synapseClient.createTeamSubmission(submission, etag, memberStateHash, challengeEndpoint, notificationSettingsEndpoint);
+			String settingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			return synapseClient.createTeamSubmission(submission, etag, memberStateHash, challengeEndpoint, settingsEndpoint);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -290,8 +290,8 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
-			String notificationSettingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
-			return synapseClient.createIndividualSubmission(submission, etag, challengeEndpoint, notificationSettingsEndpoint);
+			String settingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			return synapseClient.createIndividualSubmission(submission, etag, challengeEndpoint, settingsEndpoint);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}

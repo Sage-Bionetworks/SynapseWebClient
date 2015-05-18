@@ -101,7 +101,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.configure(teamId, false, false, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
 	}
@@ -188,7 +188,7 @@ public class JoinTeamWidgetTest {
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		//no ARs shown...
 		verify(mockView, times(0)).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -239,7 +239,7 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testJoinRequestStep3() throws Exception {
 		joinWidget.sendJoinRequestStep3();
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		//verify that team updated callback is invoked
 		verify(mockTeamUpdatedCallback).invoke();
@@ -249,9 +249,9 @@ public class JoinTeamWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep3Failure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(),anyString(), anyString(), any(AsyncCallback.class));
 		joinWidget.sendJoinRequest("", false);
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	@SuppressWarnings("unchecked")
@@ -264,7 +264,7 @@ public class JoinTeamWidgetTest {
 		Callback mockWidgetRefreshRequired = mock(Callback.class);
 		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);
 		joinWidget.sendJoinRequestStep3();
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		//verify that wiki page refresh is invoked
 		verify(mockWidgetRefreshRequired).invoke();

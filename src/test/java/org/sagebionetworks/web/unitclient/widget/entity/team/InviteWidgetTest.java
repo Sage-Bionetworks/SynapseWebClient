@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -28,6 +29,7 @@ public class InviteWidgetTest {
 	InviteWidget inviteWidget;
 	AuthenticationController mockAuthenticationController;
 	Callback mockRefreshCallback;
+	GWTWrapper mockGWTWrapper;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -35,7 +37,8 @@ public class InviteWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(InviteWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState);
+		mockGWTWrapper = mock(GWTWrapper.class);
+		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockGWTWrapper);
 		mockRefreshCallback = mock(Callback.class);
 		inviteWidget.configure(teamId, mockRefreshCallback);
 	}
@@ -43,10 +46,10 @@ public class InviteWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSendInvitation() throws Exception {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		String principalId = "5";
 		inviteWidget.sendInvitation(principalId, "you are invited!", "Wildcat");
-		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockRefreshCallback).invoke();
 	}
@@ -54,10 +57,10 @@ public class InviteWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSendInvitationFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		String principalId = "5";
 		inviteWidget.sendInvitation(principalId, "you are invited!", "Wildcat");
-		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 }
