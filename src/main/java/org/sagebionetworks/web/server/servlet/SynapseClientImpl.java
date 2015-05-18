@@ -2470,7 +2470,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	public static String getNotificationEndpoint(NotificationTokenType type, String hostPageBaseURL) {
-		return hostPageBaseURL + "#!Notification:"+ type.toString() + "/";
+		return hostPageBaseURL + "#!SignedToken:"+ type.toString() + "/";
 	}
 	
 	public static String getChallengeEndpoint(String hostPageBaseURL) {

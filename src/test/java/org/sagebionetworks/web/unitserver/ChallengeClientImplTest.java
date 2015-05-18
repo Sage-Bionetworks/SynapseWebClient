@@ -177,7 +177,7 @@ public class ChallengeClientImplTest {
 		Submission mockSubmission = mock(Submission.class);
 		String etag = "test etag";
 		synapseClient.createIndividualSubmission(mockSubmission, etag, TEST_HOME_PAGE_BASE);
-		verify(mockSynapse).createIndividualSubmission(mockSubmission, etag, TEST_HOME_PAGE_BASE+"#!Synapse:", TEST_HOME_PAGE_BASE+"#!Notification:Settings/");
+		verify(mockSynapse).createIndividualSubmission(mockSubmission, etag, TEST_HOME_PAGE_BASE+"#!Synapse:", TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/");
 	}
 	
 	@Test
@@ -186,7 +186,7 @@ public class ChallengeClientImplTest {
 		String etag = "test etag";
 		String memberStateHash = "1244458373";
 		synapseClient.createTeamSubmission(mockSubmission, etag, memberStateHash, TEST_HOME_PAGE_BASE);
-		verify(mockSynapse).createTeamSubmission(mockSubmission, etag, memberStateHash, TEST_HOME_PAGE_BASE+"#!Synapse:", TEST_HOME_PAGE_BASE+"#!Notification:Settings/");
+		verify(mockSynapse).createTeamSubmission(mockSubmission, etag, memberStateHash, TEST_HOME_PAGE_BASE+"#!Synapse:", TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/");
 	}
 	private void setupTeams(String... teamNames) throws SynapseException{
 		List<Team> teams = new ArrayList<Team>();

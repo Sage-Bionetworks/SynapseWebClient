@@ -54,7 +54,7 @@ public class TestBootstrapLocalSynapse {
 	private static final String PASSWORD = "password";
 	private static final Long ACT_TEAM_ID=464532L;
 	private static final String LOCAL_TEAM_ENDPOINT = "http://localhost:8080/#!Team:";
-	private static final String LOCAL_SETTINGS_ENDPOINT = "http://localhost:8080/#!Notifications:";
+	private static final String LOCAL_SETTINGS_ENDPOINT = "http://localhost:8080/#!SignedToken:";
 	SynapseAdminClientImpl adminClient = new SynapseAdminClientImpl();
 	SynapseClientImpl synapseClient = new SynapseClientImpl();
 	List<UserData> userData = new LinkedList<UserData>();
