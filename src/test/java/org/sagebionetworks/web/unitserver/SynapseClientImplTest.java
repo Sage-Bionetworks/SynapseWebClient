@@ -1281,7 +1281,7 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenRequest(true);
 		// verify it does not create a new request since one is already open
-		synapseClient.requestMembership("123", "a team", "", anyString());
+		synapseClient.requestMembership("123", "a team", "", "");
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
 				anyString(), anyString(), anyString());
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
@@ -1292,7 +1292,7 @@ public class SynapseClientImplTest {
 	public void testInviteMemberCanJoin() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
-		synapseClient.inviteMember("123", "a team", "", anyString());
+		synapseClient.inviteMember("123", "a team", "", "");
 		verify(mockSynapse).addTeamMember(anyString(), anyString(), anyString(), anyString());
 	}
 
@@ -1300,14 +1300,14 @@ public class SynapseClientImplTest {
 	public void testRequestMembershipCanJoin() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
-		synapseClient.requestMembership("123", "a team", "", anyString());
+		synapseClient.requestMembership("123", "a team", "", "");
 		verify(mockSynapse).addTeamMember(anyString(), anyString(), anyString(), anyString());
 	}
 
 	@Test
 	public void testInviteMember() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		synapseClient.inviteMember("123", "a team", "", anyString());
+		synapseClient.inviteMember("123", "a team", "", "");
 		verify(mockSynapse).createMembershipInvitation(
 				any(MembershipInvtnSubmission.class), anyString(), anyString());
 	}
@@ -1315,7 +1315,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testRequestMembership() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		synapseClient.requestMembership("123", "a team", "", anyString());
+		synapseClient.requestMembership("123", "a team", "", "");
 		verify(mockSynapse).createMembershipRequest(
 				any(MembershipRqstSubmission.class), anyString(), anyString());
 	}

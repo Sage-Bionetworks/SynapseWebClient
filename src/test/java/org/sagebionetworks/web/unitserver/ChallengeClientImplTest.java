@@ -75,6 +75,7 @@ public class ChallengeClientImplTest {
 	
 	public static final String TEST_CHALLENGE_PROJECT_NAME = "test challenge project name";
 	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
+	public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	ServiceUrlProvider mockUrlProvider;
@@ -175,8 +176,8 @@ public class ChallengeClientImplTest {
 		//pass through
 		Submission mockSubmission = mock(Submission.class);
 		String etag = "test etag";
-		synapseClient.createIndividualSubmission(mockSubmission, etag, null);
-		verify(mockSynapse).createIndividualSubmission(mockSubmission, etag, null, null);
+		synapseClient.createIndividualSubmission(mockSubmission, etag, TEST_HOME_PAGE_BASE);
+		verify(mockSynapse).createIndividualSubmission(mockSubmission, etag, TEST_HOME_PAGE_BASE+"#!Synapse:", TEST_HOME_PAGE_BASE+"#!Notification:Settings/");
 	}
 	
 	@Test
@@ -184,8 +185,8 @@ public class ChallengeClientImplTest {
 		Submission mockSubmission = mock(Submission.class);
 		String etag = "test etag";
 		String memberStateHash = "1244458373";
-		synapseClient.createTeamSubmission(mockSubmission, etag, memberStateHash, null);
-		verify(mockSynapse).createTeamSubmission(mockSubmission, etag, memberStateHash, null, null);
+		synapseClient.createTeamSubmission(mockSubmission, etag, memberStateHash, TEST_HOME_PAGE_BASE);
+		verify(mockSynapse).createTeamSubmission(mockSubmission, etag, memberStateHash, TEST_HOME_PAGE_BASE+"#!Synapse:", TEST_HOME_PAGE_BASE+"#!Notification:Settings/");
 	}
 	private void setupTeams(String... teamNames) throws SynapseException{
 		List<Team> teams = new ArrayList<Team>();
