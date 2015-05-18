@@ -247,11 +247,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native String _getFilesSelected(String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 	    var out = "";
-	
-	    for (i = 0; i < fileToUploadElement.files.length; i++) {
-	        var file = fileToUploadElement.files[i];
-	        out += file.name + ';';
-	    }
+		if (fileToUploadElement != null) {
+		    for (i = 0; i < fileToUploadElement.files.length; i++) {
+		        var file = fileToUploadElement.files[i];
+		        out += file.name + ';';
+		    }
+		}
 	    return out;
 	}-*/;
 	
