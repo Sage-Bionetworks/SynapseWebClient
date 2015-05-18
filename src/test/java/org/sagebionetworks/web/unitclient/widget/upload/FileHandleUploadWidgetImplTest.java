@@ -48,7 +48,6 @@ public class FileHandleUploadWidgetImplTest {
 		mockFailedValidationCallback = mock(Callback.class);
 		widget = new FileHandleUploadWidgetImpl(mockView, mockMultipartUploader, jsniUtils);
 		inputId = "987";
-//		mockMetadata = new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType());
 
 		//The metadata returned should correspond to testFileName
 		when(mockView.getInputId()).thenReturn(inputId);
