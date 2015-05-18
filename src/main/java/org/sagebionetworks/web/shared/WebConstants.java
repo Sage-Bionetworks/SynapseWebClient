@@ -30,9 +30,9 @@ public class WebConstants {
 	
 	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
 	
-	public static final String INVALID_IMAGE_FILETYPE_MESSAGE = "The uploaded image file type is not recognized on most browsers. Please convert to PNG or JPEG and try again.";
+	public static final String INVALID_IMAGE_FILETYPE_MESSAGE = "The file selected is not recognized as an image file type. Please convert to PNG or JPEG and try again.";
 	
-	public static final String INVALID_TABLE_FILETYPE_MESSAGE = "The uploaded table file type is not recognized on most browsers. Please convert to TXT or CSV and try again.";
+	public static final String INVALID_TABLE_FILETYPE_MESSAGE = "The file selected is not recognized as an table file type. Please convert to TXT or CSV and try again.";
 	
 	public static final String DEFAULT_FILE_HANDLE_WIDGET_TEXT = "Browse...";
 	
