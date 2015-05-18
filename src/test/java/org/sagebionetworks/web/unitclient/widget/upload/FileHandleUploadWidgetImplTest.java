@@ -114,12 +114,30 @@ public class FileHandleUploadWidgetImplTest {
 		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
-		widget.configureValidation(new FileValidator() {
+		FileValidator validator = new FileValidator() {
+			Callback mockFailedValidationCallback;
 			@Override
-			public boolean isValid(String fileName) {
+			public boolean isValid(FileMetadata file) {
 				return false;
 			}
-		}, mockFailedValidationCallback);
+
+			@Override
+			public void setInvalidFileCallback(Callback mockFailedValidationCallback) {
+				this.mockFailedValidationCallback = mockFailedValidationCallback;
+			}
+
+			@Override
+			public Callback getInvalidFileCallback() {
+				return this.mockFailedValidationCallback;
+			}
+
+			@Override
+			public String getInvalidMessage() {
+				return null;
+			}
+		};
+		validator.setInvalidFileCallback(mockFailedValidationCallback);
+		widget.setValidation(validator);
 		reset(mockView);
 		// method under test.
 		widget.onFileSelected();
@@ -153,12 +171,27 @@ public class FileHandleUploadWidgetImplTest {
 		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
-		widget.configureValidation(new FileValidator() {
+		FileValidator validator = new FileValidator () {
 			@Override
-			public boolean isValid(String fileName) {
+			public boolean isValid(FileMetadata file) {
 				return false;
 			}
-		}, null);
+
+			@Override
+			public void setInvalidFileCallback(Callback invalidCallback) {}
+
+			@Override
+			public Callback getInvalidFileCallback() {
+				return null;
+			}
+
+			@Override
+			public String getInvalidMessage() {
+				return null;
+			}
+		};
+		validator.setInvalidFileCallback(mockFailedValidationCallback);
+		widget.setValidation(validator);
 		reset(mockView);
 		// method under test.
 		widget.onFileSelected();

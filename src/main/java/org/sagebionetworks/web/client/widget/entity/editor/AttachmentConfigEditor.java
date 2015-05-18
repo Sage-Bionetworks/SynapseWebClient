@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.TableFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -50,7 +51,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		uploadedFile = null;
-		this.fileInputWidget.configure("Browse...", new CallbackP<FileUpload>() {
+		this.fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload uploadFile) {
 				view.showUploadSuccessUI();
@@ -60,9 +61,6 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 				addFileHandleId(uploadFile.getFileHandleId());
 			}			
 		});
-		//set new validation callback?
-		this.fileInputWidget.configureValidation(new TableFileValidator(), null);
-		
 	}
 	
 	

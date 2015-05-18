@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.TableFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -50,25 +51,27 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 		this.presenter.setInstructionMessage(CHOOSE_A_CSV_OR_TSV_FILE);
 		this.presenter.setPrimaryButtonText(NEXT);
 		this.fileInputWidget.reset();
-		this.fileInputWidget.configure("Browse...", new CallbackP<FileUpload>() {
+		this.fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload uploadFile) {
 				presenter.setLoading(false);	
 				fileHandleCreated(uploadFile);
 			}			
 		});
-		this.fileInputWidget.configureUploadingCallback(new Callback() {
+		this.fileInputWidget.setUploadingCallback(new Callback() {
 			@Override
 			public void invoke() {
 				presenter.setLoading(true);				
 			}
 		});
-		this.fileInputWidget.configureValidation(new TableFileValidator(), new Callback() {
+		TableFileValidator validator = new TableFileValidator();
+		validator.setInvalidFileCallback(new Callback() {
 			@Override
 			public void invoke() {
 				presenter.setErrorMessage(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
 			}
-		});		
+		});
+		fileInputWidget.setValidation(validator);
 	}
 
 	@Override

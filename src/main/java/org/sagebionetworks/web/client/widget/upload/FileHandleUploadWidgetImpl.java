@@ -17,7 +17,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	private CallbackP<FileUpload> finishedUploadingCallback;
 	private Callback startedUploadingCallback;
 	private SynapseJSNIUtils synapseJsniUtils;
-	private Callback invalidFileCallback;
 	
 	@Inject
 	public FileHandleUploadWidgetImpl(FileHandleUploadView view, MultipartUploader multipartUploader,
@@ -43,14 +42,13 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	}
 	
 	@Override
-	public void configureUploadingCallback(Callback startedUploadingCallback) {
+	public void setUploadingCallback(Callback startedUploadingCallback) {
 		this.startedUploadingCallback = startedUploadingCallback;
 	}
 	
 	@Override
-	public void configureValidation(FileValidator validator, Callback invalidFileCallback) {
+	public void setValidation(FileValidator validator) {
 		this.validator = validator;
-		this.invalidFileCallback = invalidFileCallback;
 	}
 	
 	@Override
@@ -93,7 +91,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	@Override
 	public void onFileSelected() {
 		FileMetadata fileMeta = getSelectedFileMetadata()[0];
-		boolean isValidUpload = validator == null || validator.isValid(fileMeta.getFileName());
+		boolean isValidUpload = validator == null || validator.isValid(fileMeta);
 		if (isValidUpload) {
 			if (startedUploadingCallback != null) {
 				startedUploadingCallback.invoke();
@@ -104,8 +102,13 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			view.hideError();
 			doMultipartUpload(fileMeta);		
 		} else {
+			Callback invalidFileCallback = validator.getInvalidFileCallback();
 			if (invalidFileCallback == null) {
-				view.showError("Please select a valid filetype.");
+				String invalidMessage = validator.getInvalidMessage();
+				if (invalidMessage == null)
+					view.showError("Please select a valid filetype.");
+				else
+					view.showError(invalidMessage);	
 			} else {
 				invalidFileCallback.invoke();
 			}

@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -49,7 +50,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		this.file = null;
 		view.initView();
 		fileInputWidget.reset();
-		fileInputWidget.configure("Browse...", new CallbackP<FileUpload>() {
+		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				view.showUploadSuccessUI();
@@ -58,12 +59,14 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				file = fileUpload;				
 			}
 		});	
-		fileInputWidget.configureValidation(new ImageFileValidator(), new Callback() {
+		ImageFileValidator validator = new ImageFileValidator();
+		validator.setInvalidFileCallback(new Callback() {
 			@Override
 			public void invoke() {
 				view.showErrorMessage(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
 			}
 		});
+		fileInputWidget.setValidation(validator);
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		//and try to prepopulate with values from the map.  if it fails, ignore

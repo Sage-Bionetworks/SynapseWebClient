@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -23,7 +24,7 @@ public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Pr
 	public FileCellEditorImpl(final FileCellEditorView view, FileHandleUploadWidget fileInputWidget){
 		this.view = view;
 		this.fileInputWidget = fileInputWidget;
-		fileInputWidget.configure("Browse...", new CallbackP<FileUpload>() {
+		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload file) {
 				view.hideErrorMessage();

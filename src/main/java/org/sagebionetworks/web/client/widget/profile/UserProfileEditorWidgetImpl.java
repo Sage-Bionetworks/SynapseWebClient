@@ -62,7 +62,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 				setNewFileHandle(fileUploaded.getFileHandleId());
 			}
 		});
-		fileHandleUploadWidget.configureValidation(new ImageFileValidator(), null);
+		fileHandleUploadWidget.setValidation(new ImageFileValidator());
 	}
 
 	@Override
