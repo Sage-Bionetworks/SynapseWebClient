@@ -2476,17 +2476,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	public static <E extends Enum<E>> boolean isValidEnum(Class<E> enumClass, String enumName) {
-        if (enumName == null) {
-            return false;
-        }
-        try {
-            Enum.valueOf(enumClass, enumName);
-            return true;
-        } catch (IllegalArgumentException ex) {
-            return false;
-        }
-    }
+	public static <E extends Enum<E>> boolean isValidEnum(Class<E> enumClass,
+			String enumName) {
+		if (enumName == null) {
+			return false;
+		}
+		try {
+			Enum.valueOf(enumClass, enumName);
+			return true;
+		} catch (IllegalArgumentException ex) {
+			return false;
+		}
+	}
 	
 	public static String getTeamEndpoint(String hostPageBaseURL) {
 		return hostPageBaseURL + "#!Team:";
