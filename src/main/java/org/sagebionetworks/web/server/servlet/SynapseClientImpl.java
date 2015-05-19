@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -2447,7 +2446,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		
 		try {
-			if (!EnumUtils.isValidEnum(NotificationTokenType.class, tokenTypeName)) {
+			if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
 				//error interpreting the token type, respond with a bad request
 				throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
 			}
@@ -2476,6 +2475,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	public static <E extends Enum<E>> boolean isValidEnum(Class<E> enumClass, String enumName) {
+        if (enumName == null) {
+            return false;
+        }
+        try {
+            Enum.valueOf(enumClass, enumName);
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
 	
 	public static String getTeamEndpoint(String hostPageBaseURL) {
 		return hostPageBaseURL + "#!Team:";
