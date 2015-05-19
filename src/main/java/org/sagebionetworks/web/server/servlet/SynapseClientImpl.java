@@ -2448,10 +2448,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		
 		try {
 			if (!EnumUtils.isValidEnum(NotificationTokenType.class, tokenTypeName)) {
+				//error interpreting the token type, respond with a bad request
 				throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
 			}
 			NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
-			JSONEntity signedToken = SerializationUtils.hexDecodeAndDeserialize(token, tokenType.classType);
+			JSONEntity signedToken = null;
+			try {
+				signedToken = SerializationUtils.hexDecodeAndDeserialize(token, tokenType.classType);
+			} catch (Exception e) {
+				//error decoding, respond with a bad request
+				throw new BadRequestException(e.getMessage());
+			}
 			if (signedToken instanceof JoinTeamSignedToken) {
 				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
 				String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);

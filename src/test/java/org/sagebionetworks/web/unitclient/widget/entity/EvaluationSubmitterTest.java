@@ -60,7 +60,7 @@ public class EvaluationSubmitterTest {
 		
 	private static final String EVALUATION_2_SUBMISSION_RECEIPT_MESSAGE = "Evaluation 2 Submission Receipt Message";
 	private static final String EVALUATION_1_SUBMISSION_RECEIPT_MESSAGE = "Evaluation 1 Submission Receipt Message";
-	private static final String HOST_PAGE_URL = "http://localhost:8080/test/";
+	public static final String HOST_PAGE_URL = "http://localhost:8080/test/";
 	EvaluationSubmitter submitter;
 	EvaluationSubmitterView mockView;
 	AuthenticationController mockAuthenticationController;

@@ -5,6 +5,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.unitclient.widget.entity.EvaluationSubmitterTest;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -41,6 +43,7 @@ public class InviteWidgetTest {
 		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState, mockGWTWrapper);
 		mockRefreshCallback = mock(Callback.class);
 		inviteWidget.configure(teamId, mockRefreshCallback);
+		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -49,7 +52,7 @@ public class InviteWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		String principalId = "5";
 		inviteWidget.sendInvitation(principalId, "you are invited!", "Wildcat");
-		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockRefreshCallback).invoke();
 	}
@@ -60,7 +63,7 @@ public class InviteWidgetTest {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		String principalId = "5";
 		inviteWidget.sendInvitation(principalId, "you are invited!", "Wildcat");
-		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 }
