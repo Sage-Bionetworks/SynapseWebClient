@@ -145,6 +145,7 @@ public class EntityActionControllerImplTest {
 		permissions.setCanUpload(true);
 		permissions.setCanAddChild(true);
 		permissions.setCanEdit(true);
+		permissions.setCanCertifiedUserEdit(true);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
@@ -300,7 +301,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureUploadNewFileNoUpload(){
-		entityBundle.getPermissions().setCanEdit(false);
+		entityBundle.getPermissions().setCanCertifiedUserEdit(false);
 		entityBundle.setEntity(new FileEntity());
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
