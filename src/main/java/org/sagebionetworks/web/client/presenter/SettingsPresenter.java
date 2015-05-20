@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SettingsView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,6 +31,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SynapseClientAsync synapseClient;
 	private GWTWrapper gwt;
 	private String apiKey = null;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public SettingsPresenter(SettingsView view,
@@ -37,14 +39,17 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	private void getAPIKey() {
@@ -58,9 +63,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-						view.setApiKey(DisplayConstants.ERROR_LOADING);
-					}
+					synAlert.handleException(caught);
 				}
 			});
 		} else {
@@ -126,8 +129,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -143,8 +145,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -201,14 +202,13 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(caught.getMessage());
-				}
+				synAlert.handleException(caught);
 			}
 		});
 	}
 	
 	private void updateView() {
+		synAlert.clear();
 		updateUserStorage();
 		getUserNotificationEmail();
 		getAPIKey();
@@ -225,8 +225,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -263,6 +262,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		});
 	}
 	
+	// The entry point of this class, called from the ProfilePresenter
 	public Widget asWidget() {
 		this.view.render();
 		updateView();

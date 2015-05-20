@@ -99,6 +99,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Button changeApiKey;
 	
+	@UiField
+	SimplePanel synAlertPanel;
+	
 	private Presenter presenter;
 	
 	@Inject
@@ -166,6 +169,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		Window.scrollTo(0, 0); // scroll user to top of page
+	}
+	
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}
 	
 	@Override

@@ -81,9 +81,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					} 
+					synAlert.handleException(caught);
 				}
 			}
 		});

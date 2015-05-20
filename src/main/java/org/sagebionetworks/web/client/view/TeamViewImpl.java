@@ -57,6 +57,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 	SimplePanel mediaObjectContainer;
 	@UiField
 	FlowPanel commandsContainer;
+	@UiField
+	SimplePanel synAlertPanel;
+	
 	private Team team;
 	private DropdownButton toolsButton;
 	private Presenter presenter;
@@ -316,6 +319,11 @@ public class TeamViewImpl extends Composite implements TeamView {
 				presenter.refresh(teamId);
 			}
 		};
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		this.synAlertPanel.setWidget(synAlert);
 	}
 
 }

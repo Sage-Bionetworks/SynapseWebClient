@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -43,6 +44,7 @@ public class ProjectsHomePresenterTest {
 	JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
+	SynapseAlert mockSynAlert;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();	
 	
 	@Before
@@ -51,13 +53,14 @@ public class ProjectsHomePresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockSynAlert = mock(SynapseAlert.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseClient = mock(SynapseClientAsync.class);	
 		projectsHomePresenter = new ProjectsHomePresenter(mockView,
 				mockGlobalApplicationState, 
 				mockAuthenticationController,
 				mockSynapseClient, 
-				adapterFactory);
+				adapterFactory, mockSynAlert);
 		verify(mockView).setPresenter(projectsHomePresenter);
 	}	
 	

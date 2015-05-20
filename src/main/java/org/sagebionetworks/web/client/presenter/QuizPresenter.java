@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuizView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -43,6 +44,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private Quiz quiz;
 	private PortalGinInjector ginInjector;
 	private Map<Long, QuestionContainerWidget> questionIndexToQuestionWidget;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public QuizPresenter(QuizView view,  
@@ -51,7 +53,8 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			SynapseClientAsync synapseClient,
 			AdapterFactory adapterFactory,
 			JSONObjectAdapter jsonObjectAdapter,
-			PortalGinInjector ginInjector){
+			PortalGinInjector ginInjector,
+			SynapseAlert synAlert){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -59,6 +62,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
+		this.synAlert = synAlert;
 		this.view.setPresenter(this);
 		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 	}
@@ -84,6 +88,8 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	public void showQuiz(Quiz quiz) {
 		view.clear();
 		questionIndexToQuestionWidget.clear();
+		synAlert.clear();
+		view.setSynAlertWidget(synAlert.asWidget());
 		if (quiz.getHeader() != null)
 			view.setQuizHeader(quiz.getHeader());
 		List<Question> questions = quiz.getQuestions();
@@ -140,9 +146,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -241,9 +245,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				if (caught instanceof NotFoundException) {
 					getQuiz();
 				} else {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-						view.showErrorMessage(caught.getMessage());
-					}
+					synAlert.handleException(caught);
 				}
 			}
 		});
@@ -266,9 +268,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
 	}

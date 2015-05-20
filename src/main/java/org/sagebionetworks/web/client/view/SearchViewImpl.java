@@ -96,6 +96,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 	SimplePanel currentFacetsPanel;
 	@UiField
 	SimplePanel paginationPanel;
+	@UiField
+	SimplePanel synAlertPanel;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -596,6 +598,11 @@ public class SearchViewImpl extends Composite implements SearchView {
 		a.setHTML(anchorName);
 		a.setHref(DisplayUtils.getSearchHistoryToken(currentSearchJSON, newStart));
 		return a;
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}	
 
 	

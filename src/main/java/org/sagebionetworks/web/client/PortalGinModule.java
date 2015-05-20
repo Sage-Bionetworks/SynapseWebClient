@@ -690,6 +690,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// QuestionContainerWidget
 		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetViewImpl.class);
 		
+		// SynapseAlertWidget
+		bind(SynapseAlert.class).to(SynapseAlertImpl.class);
+		
 		// DoiWidget
 		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
 		

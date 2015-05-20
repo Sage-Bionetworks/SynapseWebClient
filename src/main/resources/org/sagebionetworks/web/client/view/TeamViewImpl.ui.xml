@@ -13,6 +13,7 @@
 	    		<g:FlowPanel ui:field="commandsContainer" styleName="col-md-3"/>
 	        </div>
 	    	<div class="row">
+	    	    <g:SimplePanel ui:field="synAlertPanel"/>
 		    	<g:FlowPanel ui:field="mainContainer" styleName="col-md-12"/>
 		   	</div>
 	    	

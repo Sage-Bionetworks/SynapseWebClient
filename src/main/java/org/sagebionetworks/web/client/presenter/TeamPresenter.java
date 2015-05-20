@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TeamView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.TeamBundle;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -28,21 +29,24 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Team team;
 	private TeamMembershipStatus teamMembershipStatus;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override
@@ -56,6 +60,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
+		synAlert.clear();
 		showView(place);
 	}
 	
@@ -90,9 +95,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -112,9 +115,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				}
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -130,9 +131,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				}
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -155,9 +154,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					}
+					synAlert.handleException(caught);
 				}
 			});
 		}

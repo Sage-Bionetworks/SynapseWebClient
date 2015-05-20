@@ -38,6 +38,7 @@
 							</b:Column>
 						</b:Row>
 			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
+			        	<g:SimplePanel ui:field="profileSynAlertPanel"/>
 			        	<g:FlowPanel ui:field="viewProfilePanel" />
 			        	<b:Row>
 			        		<b:Column size="XS_6">
@@ -104,6 +105,7 @@
 											</b:ButtonGroup>
 										</b:ButtonGroup>
 										<g:FlowPanel ui:field="projectsTabContent" addStyleNames="margin-top-10"/>
+										<g:SimplePanel ui:field="projectSynAlertPanel"/>
 										<g:SimplePanel ui:field="emptyProjectUI" addStyleNames="smallGreyText padding-15">
 										    	<bh:Text>- Empty</bh:Text>
 										</g:SimplePanel>
@@ -161,6 +163,7 @@
 							<g:FlowPanel ui:field="openInvitesContainer" />
 							<div class="panel panel-default padding-5 min-height-200" ui:field="teamsHighlightBox">
 								<b:Heading ui:field="teamsHeading" size="H3"></b:Heading>
+								<g:SimplePanel ui:field="teamSynAlertPanel"/>
 								<g:FlowPanel ui:field="teamsTabContent" styleName="margin-10"/>
 							</div>
 						</div>

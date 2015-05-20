@@ -73,7 +73,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
 	private OpenTeamInvitationsWidget openInvitesWidget;
-	private SynapseAlert synAlert;
 
 	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
@@ -88,6 +87,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public Team filterTeam;
 	public SortOptionEnum currentProjectSort;
 	public TeamListWidget myTeamsWidget;
+	public SynapseAlert profileSynAlert;
+	public SynapseAlert projectSynAlert;
+	public SynapseAlert teamSynAlert;
+
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -102,8 +105,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
-			PortalGinInjector ginInjector,
-			SynapseAlert synAlert) {
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -118,15 +120,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
-		this.synAlert = synAlert;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
 		}
+		profileSynAlert = ginInjector.getSynapseAlertWidget();
+		projectSynAlert = ginInjector.getSynapseAlertWidget();
+		teamSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
 		view.addMyTeamsWidget(myTeamsWidget);
 		view.addOpenInvitesWidget(openInvitesWidget);
+		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
+		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
+		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
 	}
 
 	
@@ -143,7 +150,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
+		resetSynAlertWidgets();
 		showView(place);
+	}
+	
+	private void resetSynAlertWidgets() {
+		profileSynAlert.clear();
+		projectSynAlert.clear();
+		teamSynAlert.clear();
 	}
 	
 	@Override
@@ -217,7 +231,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
+				profileSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -605,9 +619,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					} 
+					projectSynAlert.handleException(caught);
 				}
 			}
 		});
@@ -634,9 +646,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					}
+					teamSynAlert.handleException(caught);
+
 				}
 			}
 		});
@@ -902,8 +913,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage("An error occurred. Please try reloading the page.");					
+				profileSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -932,8 +942,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage("An error occurred. Please try reloading the page.");									
+					profileSynAlert.handleException(caught);								
 				}
 			});
 		}

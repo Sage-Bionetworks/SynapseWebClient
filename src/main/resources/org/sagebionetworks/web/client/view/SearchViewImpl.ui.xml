@@ -21,6 +21,7 @@
 							<g:SimplePanel ui:field="currentFacetsPanel" />
 						</div>
 					</div>
+					<g:SimplePanel ui:field="synAlertPanel"/>
 					<g:SimplePanel ui:field="resultsPanel" styleName="margin-top-15"/>
 					<g:SimplePanel ui:field="paginationPanel" />
 				</div>

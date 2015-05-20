@@ -212,6 +212,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Alert getCertifiedAlert;
 	
+	@UiField
+	SimplePanel profileSynAlertPanel;
+	@UiField
+	SimplePanel projectSynAlertPanel;
+	@UiField
+	SimplePanel teamSynAlertPanel;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
@@ -378,6 +385,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void addOpenInvitesWidget(OpenTeamInvitationsWidget openInvitesWidget) {
 		openInvitesContainer.clear();
 		openInvitesContainer.add(openInvitesWidget.asWidget());
+	}
+	
+	@Override
+	public void setProfileSynAlertWidget(Widget profileSynAlert) {
+		profileSynAlertPanel.setWidget(profileSynAlert);
+	}
+	
+	@Override
+	public void setProjectSynAlertWidget(Widget projectSynAlert) {
+		projectSynAlertPanel.setWidget(projectSynAlert);
+	}
+	
+	@Override
+	public void setTeamSynAlertWidget(Widget teamSynAlert) {
+		teamSynAlertPanel.setWidget(teamSynAlert);
 	}
 	
 	public void clearSortOptions() {
