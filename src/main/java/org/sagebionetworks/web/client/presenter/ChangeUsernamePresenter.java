@@ -43,6 +43,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynapseAlertWidget(synAlert.asWidget());
 	}
 	
 	@Override
@@ -56,7 +57,6 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 		this.place = place;
 		this.view.setPresenter(this);
 		synAlert.clear();
-		view.setSynapseAlertWidget(synAlert.asWidget());
 	}
 	
 	@Override
@@ -77,6 +77,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 					@Override
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);
+						synAlert.showError("Unable to set username: " + DisplayConstants.USERNAME_FORMAT_ERROR);
 					}
 				};
 				updateProfile(profile, profileUpdatedCallback);

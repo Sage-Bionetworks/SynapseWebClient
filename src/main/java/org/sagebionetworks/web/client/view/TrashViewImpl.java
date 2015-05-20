@@ -92,14 +92,12 @@ public class TrashViewImpl extends Composite implements TrashView {
 	public TrashViewImpl(TrashViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget,
 			SageImageBundle sageImageBundle,
-			SynapseJSNIUtils synapseJsniUtils,
-			SimplePanel synAlertPanel) {
+			SynapseJSNIUtils synapseJsniUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.synAlertPanel = synAlertPanel;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
