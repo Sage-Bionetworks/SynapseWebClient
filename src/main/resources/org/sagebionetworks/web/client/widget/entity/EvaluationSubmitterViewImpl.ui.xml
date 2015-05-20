@@ -11,6 +11,7 @@
 	  	<b:Modal title="Submit to Challenge"
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
 			<b:ModalBody>
+			    <g:SimplePanel ui:field="synAlertPanel"/>
 				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup ui:field="entityFinderUI">

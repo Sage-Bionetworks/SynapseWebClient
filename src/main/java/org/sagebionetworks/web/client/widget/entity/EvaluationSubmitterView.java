@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 
@@ -42,4 +43,6 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 		void onIndividualSubmissionOptionClicked();
 		void onTeamSubmissionOptionClicked();
 	}
+
+	void setSynAlertWidget(Widget asWidget);
 }

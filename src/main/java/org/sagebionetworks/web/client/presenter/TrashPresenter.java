@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TrashView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -45,17 +46,21 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private AuthenticationController authController;
 	private PaginatedResults<TrashedEntity> trashList;
 	private int offset;
+	private SynapseAlert synAlert;
 
 	@Inject
 	public TrashPresenter(TrashView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
-			AuthenticationController authController){
+			AuthenticationController authController,
+			SynapseAlert synAlert){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
+		this.synAlert = synAlert;
 		this.view.setPresenter(this);
+		this.view.setSynAlertWidget(synAlert.asWidget());
 	}	
 	
 	@Override
@@ -69,6 +74,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
+		this.synAlert.clear();
 		showView(place);
 	}
 	
@@ -194,8 +200,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	}
 	
 	private void createFailureDisplay(String title, Throwable caught) {
-		if (!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
-			view.displayFailureMessage(title, caught.getMessage());
-		}
+		// NOT SURE IF I SHOULD INCLUDE THE TITLE?
+		synAlert.handleException(caught);
 	}
 }

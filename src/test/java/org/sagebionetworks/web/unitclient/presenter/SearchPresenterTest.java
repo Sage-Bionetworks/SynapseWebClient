@@ -45,7 +45,7 @@ public class SearchPresenterTest {
 	JSONObjectAdapter jsonObjectAdapter;
 	PlaceChanger mockPlaceChanger;
 	IconsImageBundle mockIconsImageBundle;
-	SynapseAlert synAlert;
+	SynapseAlert mockSynAlert;
 
 	String exampleTerm;
 	String exampleTermSearchQueryJson;
@@ -57,7 +57,7 @@ public class SearchPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		synAlert = mock(SynapseAlert.class);
+		mockSynAlert = mock(SynapseAlert.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		IconsImageBundle mockIconsImageBundle = mock(IconsImageBundle.class);
 
@@ -67,7 +67,7 @@ public class SearchPresenterTest {
 				mockGlobalApplicationState, mockAuthenticationController,
 				mockSynapseClient,
 				new JSONObjectAdapterImpl(),
-				mockIconsImageBundle, synAlert);
+				mockIconsImageBundle, mockSynAlert);
 		
 		exampleTerm = "searchQueryTerm";
 		exampleTermSearchQuery = SearchQueryUtils.getDefaultSearchQuery();

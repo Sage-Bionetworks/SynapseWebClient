@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -66,6 +67,7 @@ public class EvaluationSubmitterTest {
 	ChallengeClientAsync mockChallengeClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	JSONObjectAdapter jSONObjectAdapter = new JSONObjectAdapterImpl();
+	SynapseAlert mockSynAlert;
 	EvaluationSubmitter mockEvaluationSubmitter;
 	FileEntity entity;
 	EntityBundle bundle;
@@ -87,7 +89,9 @@ public class EvaluationSubmitterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient);
+		mockSynAlert = mock(SynapseAlert.class);
+		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockSynAlert);
+		verify(mockView).setSynAlertWidget(mockSynAlert.asWidget());
 		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");
@@ -231,11 +235,12 @@ public class EvaluationSubmitterTest {
 	
 	@Test
 	public void testShowAvailableEvaluationsFailure1() throws RestServiceException, JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
+		Exception caught = new ForbiddenException("this is forbidden");
+		AsyncMockStubber.callFailureWith(caught).when(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		submitter.configure(entity, null);
 		verify(mockChallengeClient).getAvailableEvaluations(any(AsyncCallback.class));
 		//no evaluations to join error message
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	/****

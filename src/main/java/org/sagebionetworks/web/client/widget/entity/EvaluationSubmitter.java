@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -43,6 +44,7 @@ public class EvaluationSubmitter implements Presenter {
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
+	private SynapseAlert synAlert;
 	private Entity submissionEntity;
 	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
@@ -59,13 +61,16 @@ public class EvaluationSubmitter implements Presenter {
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			ChallengeClientAsync challengeClient) {
+			ChallengeClientAsync challengeClient,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.view.setPresenter(this);
+		this.view.setSynAlertWidget(synAlert.asWidget());
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
+		this.synAlert = synAlert;
 	}
 	
 	/**
@@ -81,6 +86,7 @@ public class EvaluationSubmitter implements Presenter {
 		isIndividualSubmission = true;
 		teams = new ArrayList<Team>();
 		selectedTeamEligibleMembers = new ArrayList<Long>();
+		synAlert.clear();
 		view.resetNextButton();
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
@@ -127,8 +133,7 @@ public class EvaluationSubmitter implements Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		};
 	}
@@ -221,8 +226,7 @@ public class EvaluationSubmitter implements Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		};
 	}
@@ -298,8 +302,7 @@ public class EvaluationSubmitter implements Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setContributorsLoading(false);
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				
 			}
 		});
 	}
@@ -325,8 +328,7 @@ public class EvaluationSubmitter implements Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
