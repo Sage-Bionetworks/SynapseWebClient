@@ -149,8 +149,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void configureFileUpload() {
 		if(entityBundle.getEntity() instanceof FileEntity ){
-			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanAddChild());
-			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, permissions.getCanAddChild());
+			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.UPLOAD_NEW_FILE, permissions.getCanEdit());
 			actionMenu.addActionListener(Action.UPLOAD_NEW_FILE, this);
 		}else{
 			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
