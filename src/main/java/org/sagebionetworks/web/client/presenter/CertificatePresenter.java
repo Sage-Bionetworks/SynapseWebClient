@@ -30,6 +30,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
 	private SynapseAlert synAlert;
+
 	
 	@Inject
 	public CertificatePresenter(CertificateView view,  

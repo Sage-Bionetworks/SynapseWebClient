@@ -158,7 +158,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 			}
 			
 			@Override
-			public void onCanceled() {				
+			public void onCanceled() {			
 			}
 		});
 	}

@@ -213,7 +213,8 @@ public class EntityBadgeTest {
 	public void testSetClickHandler() {
 		ClickHandler mockClickHandler = mock(ClickHandler.class);
 		widget.setClickHandler(mockClickHandler);
-		verify(mockView).setClickHandler(any(ClickHandler.class));
+		verify(mockView).setClickHandler(mockClickHandler);
+		verify(mockUserBadge).setCustomClickHandler(mockClickHandler);
 	}
 
 

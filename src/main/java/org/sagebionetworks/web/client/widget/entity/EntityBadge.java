@@ -148,6 +148,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	public void setClickHandler(ClickHandler handler) {
+		modifiedByUserBadge.setCustomClickHandler(handler);
 		view.setClickHandler(handler);
 	}
 
