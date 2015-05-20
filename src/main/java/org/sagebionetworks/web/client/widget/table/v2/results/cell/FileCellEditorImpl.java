@@ -1,27 +1,37 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.web.client.StringUtils;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Presenter, FileUploadHandler{
+public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Presenter {
 	
 	public static final String MUST_BE_A_FILE_ID_NUMBER = "Must be a File ID number";
 	public static final String PLEASE_SELECT_A_FILE_TO_UPLOAD = "Please select a file to upload.";
 	FileCellEditorView view;
-	FileInputWidget fileInputWidget;
+	FileHandleUploadWidget fileInputWidget;
 	
 	@Inject
-	public FileCellEditorImpl(FileCellEditorView view, FileInputWidget fileInputWidget){
+	public FileCellEditorImpl(final FileCellEditorView view, FileHandleUploadWidget fileInputWidget){
 		this.view = view;
 		this.fileInputWidget = fileInputWidget;
+		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
+			@Override
+			public void invoke(FileUpload file) {
+				view.hideErrorMessage();
+				view.setValue(file.getFileHandleId());
+				view.hideCollapse();
+			}
+		});
 		this.view.setPresenter(this);
 		this.view.addFileInputWidget(fileInputWidget);
 	}
@@ -91,37 +101,7 @@ public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Pr
 	public void onToggleCollapse() {
 		view.hideErrorMessage();
 		this.fileInputWidget.reset();
-		view.resetUploadButton();
 		view.toggleCollapse();
-	}
-
-	@Override
-	public void onUploadFile() {
-		// are any files selected?
-		FileMetadata[] metaArray = this.fileInputWidget.getSelectedFileMetadata();
-		if(metaArray == null || metaArray.length != 1){
-			view.showErrorMessage(PLEASE_SELECT_A_FILE_TO_UPLOAD);
-		}else{
-			view.hideErrorMessage();
-			view.setUploadButtonLoading();
-			// tell the upload widget to upload the file.
-			this.fileInputWidget.uploadSelectedFile(this);
-		}
-	}
-
-	/**
-	 * Called after the file input widget uploads a file and creates a filehandle.
-	 */
-	@Override
-	public void uploadSuccess(String fileHandleId) {
-		view.setValue(fileHandleId);
-		view.hideCollapse();
-	}
-
-	@Override
-	public void uploadFailed(String error) {
-		view.showErrorMessage(error);
-		view.resetUploadButton();
 	}
 
 	@Override

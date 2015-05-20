@@ -26,14 +26,5 @@ public interface MultipartUploader {
 	 * @param handler
 	 */
 	void uploadFile(String fileName, String fileInputId, int fileIndex, ProgressingFileUploadHandler handler, Long storageLocationId);
-	
-
-	/**
-	 * Get the metadata about the selected files
-	 * 
-	 * @param inputId
-	 * @return
-	 */
-	FileMetadata[] getSelectedFileMetadata(String inputId);
 
 }

@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.CombineFileChunksException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -127,7 +128,8 @@ public class MultipartUploaderTest {
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		// the handler should get the id.
-		verify(mockHandler).uploadSuccess(status.getFileHandleId());
+		FileUpload uploadedFile = new FileUpload(null, status.getFileHandleId());
+		verify(mockHandler).uploadSuccess(anyString());
 	}
 
 	
@@ -287,31 +289,6 @@ public class MultipartUploaderTest {
 	public void testChunkCount() {
 		//see SWC-1436
 		assertEquals(2L, uploader.getChunkCount(8404992L));
-	}
-	
-	@Test
-	public void testGetSelectedFileMetadataNull(){
-		String inputId = "123";
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
-		assertEquals(null, uploader.getSelectedFileMetadata(inputId));
-	}
-	
-	@Test
-	public void testGetSelectedFileMetadataEmpty(){
-		String inputId = "123";
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[0]);
-		assertNotNull(uploader.getSelectedFileMetadata(inputId));
-	}
-	
-	@Test
-	public void testGetSelectedFileMetadata(){
-		String inputId = "123";
-		when(synapseJsniUtils.getMultipleUploadFileNames(inputId)).thenReturn(new String[]{"a","b"});
-		when(synapseJsniUtils.getContentType(inputId, 0)).thenReturn("text/csv");
-		when(synapseJsniUtils.getContentType(inputId, 1)).thenReturn("text/tab-separated-values");
-		FileMetadata[] results = uploader.getSelectedFileMetadata(inputId);
-		FileMetadata[] expected = new FileMetadata[]{new FileMetadata("a", "text/csv"), new FileMetadata("b", "text/tab-separated-values")};
-		assertTrue(Arrays.equals(expected, results));
 	}
 	
 }

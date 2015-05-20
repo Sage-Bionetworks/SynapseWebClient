@@ -29,5 +29,5 @@ public interface UploadTableModalWidget extends IsWidget{
 	 * @param wizardCallback
 	 */
 	public void showModal(WizardCallback wizardCallback);
-	
+		
 }

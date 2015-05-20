@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.TableFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -15,19 +19,17 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	public static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
 	
 	// Injected dependencies.
-	FileInputWidget fileInputWidget;
+	FileHandleUploadWidget fileInputWidget;
 	ModalPresenter presenter;
 	UploadCSVPreviewPage nextPage;
 	
 	// data fields
-	String fileHandleId;
 	String parentId;
 	String tableId;
-	ContentTypeDelimiter type;
-	String fileName;
+
 	
 	@Inject
-	public UploadCSVFilePageImpl(FileInputWidget fileInputWidget, UploadCSVPreviewPage uploadCSVConfigurationWidget) {
+	public UploadCSVFilePageImpl(FileHandleUploadWidget fileInputWidget, UploadCSVPreviewPage uploadCSVConfigurationWidget) {
 		super();
 		this.fileInputWidget = fileInputWidget;
 		this.nextPage = uploadCSVConfigurationWidget;
@@ -35,23 +37,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 
 	@Override
 	public void onPrimary() {
-		// proceed if valid
-		if(validateSelecedFile()){
-			presenter.setLoading(true);
-			// Upload the file
-			fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
-				
-				@Override
-				public void uploadSuccess(String fileHandleId) {
-					fileHandleCreated(fileHandleId);
-				}
-				
-				@Override
-				public void uploadFailed(String error) {
-					presenter.setErrorMessage(error);
-				}
-			});
-		}
+		presenter.setErrorMessage(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
 	}
 
 	@Override
@@ -65,28 +51,27 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 		this.presenter.setInstructionMessage(CHOOSE_A_CSV_OR_TSV_FILE);
 		this.presenter.setPrimaryButtonText(NEXT);
 		this.fileInputWidget.reset();
-	}
-
-	/**
-	 * Validate the content type of the selected file.
-	 * @return
-	 */
-	public boolean validateSelecedFile(){
-		// first validate the input
-		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
-		if(meta == null || meta.length != 1){
-			presenter.setErrorMessage(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
-			return false;
-		}
-		String contentType = meta[0].getContentType();
-		try{
-			this.fileName =  meta[0].getFileName();
-			this.type = ContentTypeDelimiter.findByContentType(contentType, this.fileName);
-			return true;
-		}catch(IllegalArgumentException e){
-			presenter.setErrorMessage(UNKNOWN_TYPE_SLECTED);
-			return false;
-		}
+		this.fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
+			@Override
+			public void invoke(FileUpload uploadFile) {
+				presenter.setLoading(false);	
+				fileHandleCreated(uploadFile);
+			}			
+		});
+		this.fileInputWidget.setUploadingCallback(new Callback() {
+			@Override
+			public void invoke() {
+				presenter.setLoading(true);				
+			}
+		});
+		TableFileValidator validator = new TableFileValidator();
+		validator.setInvalidFileCallback(new Callback() {
+			@Override
+			public void invoke() {
+				presenter.setErrorMessage(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
+			}
+		});
+		fileInputWidget.setValidation(validator);
 	}
 
 	@Override
@@ -97,10 +82,14 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 
 	/**
 	 * Once a FileHandle is created move to the next page.
-	 * @param fileHandleId
+	 * @param uploadFile, the fileHandleId and metadata surrounding a file upload
 	 */
-	private void fileHandleCreated(String fileHandleId) {
-		this.nextPage.configure(this.type, this.fileName, this.parentId, fileHandleId, this.tableId);
+	private void fileHandleCreated(FileUpload uploadFile) {
+		FileMetadata meta = uploadFile.getFileMeta();
+		String contentType = meta.getContentType();
+		String fileName =  meta.getFileName();
+		ContentTypeDelimiter contentTypeDelimiter = ContentTypeDelimiter.findByContentType(contentType, fileName);
+		this.nextPage.configure(contentTypeDelimiter, fileName, this.parentId, uploadFile.getFileHandleId(), this.tableId);
 		this.presenter.setNextActivePage(this.nextPage);
 	}
 

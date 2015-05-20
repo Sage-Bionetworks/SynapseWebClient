@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -28,7 +29,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	void setWikiAttachmentsWidget(Widget widget);
 	void showUploadFailureUI(String error);
 	void showUploadSuccessUI();
-	void setUploadButtonEnabled(boolean enabled);
 	public String getAlignment();
 	public String getSynapseId();
 	public void setExternalVisible(boolean visible);
@@ -42,7 +42,5 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void addFileHandleId(String fileHandleId);
-		void uploadFileClicked();
 	}
 }

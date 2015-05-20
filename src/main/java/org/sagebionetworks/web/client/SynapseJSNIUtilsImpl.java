@@ -230,7 +230,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	private final static native double _getFileSize(String fileFieldId, int index) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileSize = ('files' in fileToUploadElement) ? fileToUploadElement.files[index].size : 0;
+		var fileSize = 0;
+		if (fileToUploadElement && ('files' in fileToUploadElement))
+			fileSize = fileToUploadElement.files[index].size;
 		return fileSize;
 	}-*/;
 	
@@ -245,11 +247,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native String _getFilesSelected(String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 	    var out = "";
-	
-	    for (i = 0; i < fileToUploadElement.files.length; i++) {
-	        var file = fileToUploadElement.files[i];
-	        out += file.name + ';';
-	    }
+		if (fileToUploadElement) {
+		    for (i = 0; i < fileToUploadElement.files.length; i++) {
+		        var file = fileToUploadElement.files[i];
+		        out += file.name + ';';
+		    }
+		}
 	    return out;
 	}-*/;
 	
