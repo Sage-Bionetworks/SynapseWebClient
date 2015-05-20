@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseStandaloneWikiPresenter;
+import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
@@ -181,6 +182,8 @@ public interface PortalGinInjector extends Ginjector {
 	public AccountPresenter getAccountPresenter();
 	
 	public NewAccountPresenter getNewAccountPresenter();
+	
+	public SignedTokenPresenter getSignedTokenPresenter();
 	
 	public ChangeUsernamePresenter getChangeUsernamePresenter();
 	

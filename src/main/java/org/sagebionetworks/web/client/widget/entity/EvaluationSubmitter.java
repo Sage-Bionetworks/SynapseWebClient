@@ -16,10 +16,10 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -30,7 +30,6 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -43,6 +42,7 @@ public class EvaluationSubmitter implements Presenter {
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
+	private GWTWrapper gwt;
 	private Entity submissionEntity;
 	private String submissionEntityId, submissionName;
 	private Long submissionEntityVersion;
@@ -59,13 +59,15 @@ public class EvaluationSubmitter implements Presenter {
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			ChallengeClientAsync challengeClient) {
+			ChallengeClientAsync challengeClient,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
+		this.gwt = gwt;
 	}
 	
 	/**
@@ -363,12 +365,12 @@ public class EvaluationSubmitter implements Presenter {
 		try {
 			String memberStateHash = null;
 			if (isIndividualSubmission) {
-				challengeClient.createIndividualSubmission(newSubmission, etag, getSubmissionCallback());
+				challengeClient.createIndividualSubmission(newSubmission, etag, gwt.getHostPageBaseURL(), getSubmissionCallback());
 			} else {
 				//team submission
 				newSubmission.setTeamId(selectedTeam.getId());
 				memberStateHash = selectedTeamMemberStateHash;
-				challengeClient.createTeamSubmission(newSubmission, etag, memberStateHash, getSubmissionCallback());
+				challengeClient.createTeamSubmission(newSubmission, etag, memberStateHash, gwt.getHostPageBaseURL(), getSubmissionCallback());
 			}
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitshared.asynch;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.sagebionetworks.client.AsynchJobType;

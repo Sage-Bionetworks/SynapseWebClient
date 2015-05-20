@@ -294,8 +294,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		if (endByte >= fileSize)
 			endByte = fileSize-1;
 		return new ByteRange(startByte, endByte);
-	}
-	
+	}	
 	
 	private void processDaemonStatus(UploadDaemonStatus status, List<ChunkRequest> requestList, int currentAttempt){
 		State state = status.getState();
@@ -349,7 +348,21 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		synapseJsniUtils.consoleError(uploadLog.toString());
 		uploadLog = new StringBuilder();
 	}
-	
+
+
+	@Override
+	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler, Long storageLocationId) {
+		// First get the name of the file
+		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
+		if(names == null || names.length < 1){
+			handler.uploadFailed(PLEASE_SELECT_A_FILE);
+			return;
+		}
+		int index = 0;
+		String fileName = names[0];
+		uploadFile(fileName, fileInputId, index, handler, null);
+	}
+
 	public String fixDefaultContentType(String type, String fileName) {
 		String contentType = type;
 		String lowercaseFilename = fileName.toLowerCase();
@@ -368,35 +381,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			}
 		}
 		return contentType;
-	}
-
-
-	@Override
-	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler, Long storageLocationId) {
-		// First get the name of the file
-		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
-		if(names == null || names.length < 1){
-			handler.uploadFailed(PLEASE_SELECT_A_FILE);
-			return;
-		}
-		int index = 0;
-		String fileName = names[0];
-		uploadFile(fileName, fileInputId, index, handler, null);
-	}
-
-	@Override
-	public FileMetadata[] getSelectedFileMetadata(String inputId) {
-		FileMetadata[] results = null;
-		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(inputId);
-		if(fileNames != null){
-			results = new FileMetadata[fileNames.length];
-			for(int i=0; i<fileNames.length; i++){
-				String name = fileNames[i];
-				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
-				results[i] = new FileMetadata(name, contentType);
-			}
-		}
-		return results;
 	}
 
 	

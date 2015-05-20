@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.RestartActivityOptional;
 import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -93,6 +94,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Profile.class);
 		openAccessPlaces.add(Certificate.class);
 		openAccessPlaces.add(StandaloneWiki.class);
+		openAccessPlaces.add(SignedToken.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(Home.class);
@@ -104,6 +106,7 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(ChangeUsername.class);
 		excludeFromLastPlace.add(Trash.class);
 		excludeFromLastPlace.add(Certificate.class);
+		excludeFromLastPlace.add(SignedToken.class);
 	}
 
 	@Override

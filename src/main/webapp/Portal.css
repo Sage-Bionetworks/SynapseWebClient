@@ -160,6 +160,9 @@
 	cursor: hand;
 }
 
+.border-none {
+	border: none;
+}
 .userProfileImage {
 	border-radius: 3px;
 }

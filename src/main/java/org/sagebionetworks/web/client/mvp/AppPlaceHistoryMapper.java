@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -45,6 +46,7 @@ import com.google.gwt.place.shared.WithTokenizers;
 		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class, Certificate.Tokenizer.class, 
 		NewAccount.Tokenizer.class,
 		ChangeUsername.Tokenizer.class, Trash.Tokenizer.class, PeopleSearch.Tokenizer.class,
-		StandaloneWiki.Tokenizer.class})
+		StandaloneWiki.Tokenizer.class,
+		SignedToken.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }
