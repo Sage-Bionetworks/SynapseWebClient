@@ -20,6 +20,7 @@
 		<div class="separator separator-header-page"></div>
 		<g:Image ui:field="entityBackgroundImage" addStyleNames="entityBackgroundImage" />
 		<g:SimplePanel ui:field="entityPageTopPanel"/>
+        <g:SimplePanel ui:field="synAlertContainer"/>
         <div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>

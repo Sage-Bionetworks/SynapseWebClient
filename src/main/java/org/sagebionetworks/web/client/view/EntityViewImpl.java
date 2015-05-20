@@ -45,6 +45,8 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@UiField
 	SimplePanel entityPageTopPanel;
 	@UiField
+	SimplePanel synAlertContainer;
+	@UiField
 	Image entityBackgroundImage;
 	
 	private Presenter presenter;
@@ -131,7 +133,12 @@ public class EntityViewImpl extends Composite implements EntityView {
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
+	
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertContainer.setWidget(synAlert);
+	}
+	
 
 	@Override
 	public void clear() {

@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 
@@ -28,6 +29,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private SynapseAlert synAlert;
 	
 	private int offset;
 	private String searchTerm;
@@ -37,12 +39,13 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 	public PeopleSearchPresenter(PeopleSearchView view,
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		
+		this.synAlert = synAlert;
 		view.setPresenter(this);
 	}
 	
@@ -57,6 +60,8 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
+		this.synAlert.clear();
+		view.setSynAlertWidget(synAlert.asWidget());
 		showView(place);
 	}
 	
@@ -83,9 +88,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				}
+				synAlert.handleException(caught);
 			}
 			
 		});

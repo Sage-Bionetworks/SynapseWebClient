@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -72,6 +73,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GWTWrapper gwt;
 	private OpenTeamInvitationsWidget openInvitesWidget;
+	private SynapseAlert synAlert;
 
 	private PortalGinInjector ginInjector;
 	private AdapterFactory adapterFactory;
@@ -100,7 +102,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -115,6 +118,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		this.synAlert = synAlert;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -912,7 +916,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		// If not, grab the user's info for an update.
 		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
 		if(secret == null || secret.equals("")) {
-			view.showErrorMessage("You request has timed out. Please reload the page and try again.");
+			view.showErrorMessage("Your request has timed out. Please reload the page and try again.");
 		} else {
 			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
 				@Override

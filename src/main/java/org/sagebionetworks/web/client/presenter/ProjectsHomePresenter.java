@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -24,6 +25,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
+	private SynapseAlert synAlert;
 	AdapterFactory adapterFactory;
 	
 	@Inject
@@ -31,14 +33,18 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 			GlobalApplicationState globalApplicationState,		
 			AuthenticationController authenticationController, 
 			SynapseClientAsync synapseClient, 
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
+		this.synAlert = synAlert;
 		
 		view.setPresenter(this);
+		synAlert.clear();
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override
@@ -51,6 +57,8 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	public void setPlace(ProjectsHome place) {
 		this.place = place;
 		view.setPresenter(this);
+		synAlert.clear();
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override

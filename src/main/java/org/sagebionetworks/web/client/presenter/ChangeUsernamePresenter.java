@@ -7,9 +7,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ChangeUsernameView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -25,21 +27,24 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private JSONObjectAdapter jsonObjectAdapter;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public ChangeUsernamePresenter(ChangeUsernameView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalAppState,
 			AuthenticationController authController,
-			JSONObjectAdapter jsonObjectAdapter){
+			JSONObjectAdapter jsonObjectAdapter,
+			SynapseAlert synAlert){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
 	}
-
+	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Install the view
@@ -50,6 +55,8 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 	public void setPlace(ChangeUsername place) {
 		this.place = place;
 		this.view.setPresenter(this);
+		synAlert.clear();
+		view.setSynapseAlertWidget(synAlert.asWidget());
 	}
 	
 	@Override
@@ -69,14 +76,14 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						if (!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view))
-							view.showSetUsernameError(caught);
+						synAlert.handleException(caught);
 					}
 				};
 				updateProfile(profile, profileUpdatedCallback);
 			} else {
 				//invalid username
-				view.showUsernameInvalid();
+				synAlert.showError("Username format is invalid. " + DisplayConstants.USERNAME_FORMAT_ERROR);
+				view.clear();
 			}
 		}
 	}
@@ -98,10 +105,9 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 	
 	@Override
     public String mayStop() {
+		synAlert.clear();
         view.clear();
         return null;
-    }
-	
-	
+    }	
 	
 }

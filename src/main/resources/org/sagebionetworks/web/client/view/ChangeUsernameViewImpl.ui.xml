@@ -15,7 +15,7 @@
 		   				<h4 class="form-signin-heading">Synapse now requires a username. Please take a moment to carefully choose yours.</h4>
 						<g:TextBox ui:field="username" styleName="form-control"/>
 						<g:Button ui:field="changeUsernameButton" styleName="btn btn-primary btn-lg margin-top-10 right" />
-						<span ui:field="messageLabel" />
+						<g:SimplePanel ui:field="errorContainer"/>
 					</div>						
 				</div>
 		   	</div>

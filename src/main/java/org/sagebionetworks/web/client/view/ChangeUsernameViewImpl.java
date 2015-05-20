@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -39,7 +40,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	@UiField
 	TextBox username;
 	@UiField
-	SpanElement messageLabel;
+	SimplePanel errorContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -50,13 +51,11 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 			Header headerWidget, Footer footerWidget,
 			SageImageBundle imageBundle) {
 		initWidget(binder.createAndBindUi(this));
-		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		
 		username.getElement().setAttribute("placeholder", "Username");
 		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
 		username.addKeyDownHandler(new KeyDownHandler() {				
@@ -69,7 +68,6 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 		changeUsernameButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				messageLabel.setInnerHTML("");
 				changeUsernameButton.setEnabled(false);
 				presenter.setUsername(username.getValue());
 			}
@@ -107,16 +105,9 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 		changeUsernameButton.setEnabled(true);
 		username.setValue("");
 	}
-	
+
 	@Override
-	public void showUsernameInvalid() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username format is invalid.</h4> <span class=\"text-warning\">"+DisplayConstants.USERNAME_FORMAT_ERROR+"</span>");
-		clear();
-	}
-	@Override
-	public void showSetUsernameError(Throwable t) {
-		SynapseJSNIUtilsImpl._consoleError(DisplayUtils.getStackTrace(t));
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Unable to set username: </h4> <span class=\"text-warning\">"+t.getMessage()+"</span>");
-		clear();
+	public void setSynapseAlertWidget(Widget synAlert) {
+		errorContainer.add(synAlert);
 	}
 }

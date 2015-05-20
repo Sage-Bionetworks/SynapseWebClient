@@ -24,6 +24,8 @@
 					> All Projects
 				</li>
 			</ul>
+			
+			<g:SimplePanel ui:field="synAlertPanel"/>
 
 			<div class="well margin-top-15">
 				<g:SimplePanel ui:field="createProjectPanel" />

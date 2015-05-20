@@ -46,9 +46,12 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	@UiField
 	SimplePanel paginationPanel;
 	@UiField
+	SimplePanel synAlertPanel;
+	@UiField
 	Button searchButton;
 	@UiField
 	TextBox searchField;
+	
 	
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -166,6 +169,11 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 		a.setHTML(anchorName);
 		a.setHref(DisplayUtils.getPeopleSearchHistoryToken(searchTerm, newStart));
 		return a;
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		this.synAlertPanel.setWidget(synAlert);
 	}
 
 }
