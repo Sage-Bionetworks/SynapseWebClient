@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -209,24 +210,34 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
 			synapseClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
+
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
 						currentUploadType = UploadType.S3;
 						view.showUploadingToSynapseStorage();
+
 					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
 						currentUploadType = UploadType.S3;
 						storageLocationId = uploadDestinations.get(0).getStorageLocationId();
 						updateS3UploadBannerView(uploadDestinations.get(0).getBanner());
+
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
-						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
-						storageLocationId = d.getStorageLocationId();
-						if (UploadType.SFTP == d.getUploadType()){
-							currentUploadType = UploadType.SFTP;
-							currentExternalUploadUrl = d.getUrl();
-							getSftpHost(currentExternalUploadUrl, d.getBanner());
+						ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
+						storageLocationId = externalUploadDestination.getStorageLocationId();
+						currentUploadType = externalUploadDestination.getUploadType();
+						if (currentUploadType == UploadType.SFTP){
+							currentExternalUploadUrl = externalUploadDestination.getUrl();
+							getSftpHost(currentExternalUploadUrl, externalUploadDestination.getBanner());
 							disableMultipleFileUploads();
 						} else {
-							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + d.getUploadType()));
+							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + externalUploadDestination.getUploadType()));
 						}
+
+					} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
+						ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
+						storageLocationId = externalUploadDestination.getStorageLocationId();
+						currentUploadType = externalUploadDestination.getUploadType();
+						updateS3UploadBannerView(externalUploadDestination.getBanner());
+
 					} else {
 						//unsupported upload destination type
 						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
