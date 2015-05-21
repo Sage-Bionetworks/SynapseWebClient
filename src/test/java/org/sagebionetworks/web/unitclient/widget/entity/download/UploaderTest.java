@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -34,6 +35,7 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.State;
@@ -315,10 +317,9 @@ public class UploaderTest {
 	}
 	
 	@Test
-	public void testUploadToExternalInvalid() {
+	public void testUploadToInvalidExternalHTTPS() {
 		ExternalUploadDestination d = new ExternalUploadDestination();
-		d.setUploadType(UploadType.S3);
-		
+		d.setUploadType(UploadType.HTTPS);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
@@ -326,6 +327,30 @@ public class UploaderTest {
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
 	}
+
+	@Test
+	public void testUploadToInvalidExternalS3() {
+		ExternalUploadDestination d = new ExternalUploadDestination();
+		d.setUploadType(UploadType.S3);
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(d);
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertNull(uploader.getStorageLocationId());
+		verifyUploadError();
+	}
+
+	@Test
+	public void testUploadToValidExternalS3() {
+		ExternalS3UploadDestination d = new ExternalS3UploadDestination();
+		d.setUploadType(UploadType.S3);
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(d);
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertNotNull(uploader.getStorageLocationId());
+	}
+
 	
 	@Test
 	public void testInvalidUploadDestination() {
