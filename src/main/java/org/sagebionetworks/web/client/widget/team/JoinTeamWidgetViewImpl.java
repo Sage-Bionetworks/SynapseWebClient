@@ -59,8 +59,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void configure(boolean isLoggedIn, 
-			boolean canPublicJoin, 
+	public void configure(boolean isLoggedIn,
 			TeamMembershipStatus teamMembershipStatus, 
 			String isMemberMessage, 
 			String buttonText, 

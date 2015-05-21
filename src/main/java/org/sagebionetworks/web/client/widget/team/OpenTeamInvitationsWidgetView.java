@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface OpenTeamInvitationsWidgetView extends IsWidget, SynapseView {
 	
@@ -17,13 +17,10 @@ public interface OpenTeamInvitationsWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	/**
-	 * shows nothing if membershipInvitations is empty.
-	 */
-	public void configure(List<Team> membershipInvitations, List<String> inviteMessages);
+	void addTeamInvite(Team team, String inviteMessage, Widget joinButtonWidget);
+	void clear();
 	public interface Presenter extends SynapsePresenter {
 		//use to go to team page
 		void goTo(Place place);
-		void joinTeam(String teamId);
 	}
 }
