@@ -160,7 +160,7 @@ public class UploaderTest {
 		//this is the full success test
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
-		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
+		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 	
@@ -168,7 +168,6 @@ public class UploaderTest {
 	public void testSetExternalPathFailedCreate() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
-		
 		verify(view).showErrorMessage(anyString());
 	}
 	
@@ -176,7 +175,6 @@ public class UploaderTest {
 	public void testSetExternalPathFailedUpdateFile() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
-		
 		verify(view).showErrorMessage(anyString());
 	}
 	
@@ -184,7 +182,7 @@ public class UploaderTest {
 	public void testSetExternalFileEntityPathWithFileEntity() throws Exception {
 		uploader.asWidget(testEntity);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
-		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
+		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 
@@ -344,11 +342,13 @@ public class UploaderTest {
 	public void testUploadToValidExternalS3() {
 		ExternalS3UploadDestination d = new ExternalS3UploadDestination();
 		d.setUploadType(UploadType.S3);
+		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
-		assertNotNull(uploader.getStorageLocationId());
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
+		verify(view).showUploadingBanner(Uploader.DEFAULT_EXTERNAL_S3_BANNER);
 	}
 
 	
