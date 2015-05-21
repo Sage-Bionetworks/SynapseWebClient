@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -43,6 +44,8 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		
 		
 		void queryForSftpLoginInstructions(String directDownloadUrl);
+
+		void setS3StorageDescription(CallbackP<String> callbackP);
 	}
 
 }

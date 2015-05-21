@@ -1,13 +1,19 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -33,8 +39,8 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	
 	public void configure(EntityBundle bundle) {		
 		view.setPresenter(this);
-		this.entityBundle = bundle; 		
-		
+		this.entityBundle = bundle;
+
 		// Get EntityType
 		EntityType entityType = EntityType.getEntityTypeForClass(bundle.getEntity().getClass());
 		view.createTitlebar(bundle, entityType, authenticationController);
@@ -98,8 +104,35 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 			}
 		});
 	}
-	
+
+	@Override
+	public void setS3StorageDescription(CallbackP<String> callback) {
+		getS3StorageDescription(callback);
+	}
+
+
 	/*
 	 * Private Methods
 	 */
+
+	private void getS3StorageDescription(final CallbackP<String> callback) {
+		final String entityId = entityBundle.getEntity().getId();
+		synapseClient.getUploadDestinations(entityId, new AsyncCallback<List<UploadDestination>>() {
+			public void onSuccess(List<UploadDestination> uploadDestinations) {
+				if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
+					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
+					String bucket = externalUploadDestination.getBucket();
+					String key = externalUploadDestination.getBaseKey();
+					callback.invoke(" - External S3 Storage: s3://" + bucket + "/" + key + "/" + entityBundle.getEntity().getName() + ")");
+				} else {
+					callback.invoke(" - Synapse Storage)");
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.showErrorMessage("Failed to get the upload destination for entity Id " + entityId);
+			}
+		});
+	}
 }

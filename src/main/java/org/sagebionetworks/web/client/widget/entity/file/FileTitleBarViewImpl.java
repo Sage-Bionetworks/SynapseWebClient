@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
@@ -139,7 +140,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 		synapseIconForEntity.applyTo(entityIcon);
-		//fileHandle is null if user can't access the filehandle associated with this fileentity
+		//fileHandle is null if user can't access the filehandle associated with this file entity
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 		boolean isFilenamePanelVisible = fileHandle != null;
 		fileNameContainer.setVisible(isFilenamePanelVisible);
@@ -151,11 +152,18 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			}
 			else if (fileHandle instanceof S3FileHandleInterface){
 				fileName.setInnerText(fileHandle.getFileName());
-				
-				S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-				// TODO: get the upload destination - if it's external s3, show external s3 storage
-				
-				fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
+
+				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
+				presenter.setS3StorageDescription(new CallbackP<String>() {
+
+					@Override
+					public void invoke(String s3StorageDescription) {
+						fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + s3StorageDescription);
+						
+					}
+					
+				});
+
 				final String md5 = s3FileHandle.getContentMd5();
 				if (md5 != null) {
 					md5Link.configure(md5);
