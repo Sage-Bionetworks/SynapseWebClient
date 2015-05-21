@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,10 +23,12 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -34,6 +36,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.EvaluationSubmitterTest;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class OpenTeamInvitationsWidgetTest {
 
@@ -43,7 +46,8 @@ public class OpenTeamInvitationsWidgetTest {
 	String teamId = "123";
 	OpenTeamInvitationsWidget widget;
 	AuthenticationController mockAuthenticationController;
-	GWTWrapper mockGWTWrapper;
+	PortalGinInjector mockPortalGinInjector;
+	JoinTeamWidget mockJoinTeamWidget;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	Team testTeam;
 	MembershipInvitation testInvite;
@@ -57,9 +61,9 @@ public class OpenTeamInvitationsWidgetTest {
 		mockView = mock(OpenTeamInvitationsWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		mockGWTWrapper = mock(GWTWrapper.class);
-		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockGWTWrapper);
-		
+		mockPortalGinInjector = mock(PortalGinInjector.class);
+		mockJoinTeamWidget = mock(JoinTeamWidget.class);
+		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPortalGinInjector);
 		testTeam = new Team();
 		testTeam.setId(teamId);
 		testTeam.setName("Bob's Team");
@@ -80,19 +84,31 @@ public class OpenTeamInvitationsWidgetTest {
 		mockTeamUpdatedCallback = mock(Callback.class);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
+		when(mockPortalGinInjector.getJoinTeamWidget()).thenReturn(mockJoinTeamWidget);
 	}
 	
 	@Test
 	public void testConfigure() throws Exception {
 		widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
 		verify(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
-		verify(mockView).configure(anyListOf(Team.class), anyListOf(String.class));
+		verify(mockView).addTeamInvite(any(Team.class), any(String.class), any(Widget.class));
+		verify(mockPortalGinInjector).getJoinTeamWidget();
+		ArgumentCaptor<Callback> refreshCallbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockJoinTeamWidget).configure(eq(teamId), refreshCallbackCaptor.capture());
 		ArgumentCaptor<List> invitesArg = ArgumentCaptor.forClass(List.class);				   
 		verify(mockOpenTeamInvitationsCallback).invoke(invitesArg.capture());
 		assertEquals(testReturn, invitesArg.getValue());
+		
+		
+		//test refresh (if one would join using the join team widget)
+		verify(mockTeamUpdatedCallback, never()).invoke();
+		Callback refreshCallback = refreshCallbackCaptor.getValue();
+		refreshCallback.invoke();
+		verify(mockTeamUpdatedCallback).invoke();
+		verify(mockSynapseClient, times(2)).getOpenInvitations(anyString(), any(AsyncCallback.class));
+		verify(mockView, times(2)).addTeamInvite(any(Team.class), any(String.class), any(Widget.class));
+		verify(mockPortalGinInjector, times(2)).getJoinTeamWidget();
+		verify(mockJoinTeamWidget, times(2)).configure(eq(teamId), any(Callback.class));
 	}
 	
 	public void testConfigureFailureGetOpenInvites() throws Exception {
@@ -101,24 +117,4 @@ public class OpenTeamInvitationsWidgetTest {
 		verify(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
-	@Test
-	public void testJoin() throws Exception {
-		widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
-		widget.joinTeam(teamId);
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockTeamUpdatedCallback).invoke();
-	}
-	
-	@Test
-	public void testJoinFail() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
-		widget.joinTeam(teamId);
-		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-		verify(mockTeamUpdatedCallback, never()).invoke();
-	}
-	
 }
