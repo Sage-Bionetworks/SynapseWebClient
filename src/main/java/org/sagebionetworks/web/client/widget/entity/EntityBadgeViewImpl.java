@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -28,6 +27,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -46,7 +46,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	FlowPanel entityContainer;
 	@UiField
-	Label idField;
+	TextBox idField;
 	
 	@UiField
 	SimplePanel modifiedByField;
@@ -70,24 +70,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		idField.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				markText(idField.getElement());
+				idField.selectAll();
 			}
 		});
 	}
 	
-	private native void markText(Element elem) /*-{
-	    if ($doc.selection && $doc.selection.createRange) {
-	        var range = $doc.selection.createRange();
-	        range.moveToElementText(elem);
-	        range.select();
-	    } else if ($doc.createRange && $wnd.getSelection) {
-	        var range = $doc.createRange();
-	        range.selectNode(elem);
-	        var selection = $wnd.getSelection();
-	        selection.removeAllRanges();
-	        selection.addRange(range);
-	    }
-	}-*/;
 	
 	@Override
 	public void setEntity(final EntityQueryResult entityHeader) {

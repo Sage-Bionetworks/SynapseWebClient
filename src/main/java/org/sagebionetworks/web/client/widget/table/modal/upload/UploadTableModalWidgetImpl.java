@@ -41,4 +41,5 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget {
 	public void showModal(WizardCallback wizardCallback) {
 		this.modalWizarWidget.showModal(wizardCallback);
 	}
+
 }

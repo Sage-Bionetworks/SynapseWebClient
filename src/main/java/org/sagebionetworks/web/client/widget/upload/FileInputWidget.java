@@ -23,13 +23,5 @@ public interface FileInputWidget extends IsWidget {
 	 * Reset the widget to clear all state.
 	 */
 	public void reset();
-	
-	/**
-	 * Get the metadata about the selected files.
-	 * 
-	 * @return
-	 */
-	public FileMetadata[] getSelectedFileMetadata();
-	
 
 }

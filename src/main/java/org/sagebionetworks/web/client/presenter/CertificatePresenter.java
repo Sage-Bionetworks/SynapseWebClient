@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.CertificateView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -28,6 +29,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
+	private SynapseAlert synapseAlert;
 	
 	@Inject
 	public CertificatePresenter(CertificateView view,  
@@ -37,6 +39,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 			AdapterFactory adapterFactory,
 			ClientCache clientCache){
 		this.view = view;
+		this.synapseAlert = synapseAlert;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;

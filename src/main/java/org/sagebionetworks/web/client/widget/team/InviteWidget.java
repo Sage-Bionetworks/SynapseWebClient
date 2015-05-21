@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -17,14 +18,20 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private AuthenticationController authenticationController;
 	private String teamId;
 	private Callback teamUpdatedCallback;
+	private GWTWrapper gwt;
 	
 	@Inject
-	public InviteWidget(InviteWidgetView view, SynapseClientAsync synapseClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState) {
+	public InviteWidget(InviteWidgetView view, 
+			SynapseClientAsync synapseClient, 
+			AuthenticationController authenticationController, 
+			GlobalApplicationState globalApplicationState,
+			GWTWrapper gwt) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.gwt = gwt;
 	}
 
 	public void configure(String teamId, Callback teamUpdatedCallback) {
@@ -36,7 +43,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	
 	@Override
 	public void sendInvitation(String principalId, String message, final String userDisplayName) {
-		synapseClient.inviteMember(principalId, teamId, message, new AsyncCallback<Void>() {
+		synapseClient.inviteMember(principalId, teamId, message, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Invitation Sent", "The invitation has been sent to " + userDisplayName);
