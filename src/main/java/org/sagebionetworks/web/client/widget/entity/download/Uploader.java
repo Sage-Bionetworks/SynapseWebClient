@@ -244,7 +244,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							if (bucket != null || key != null)
 								banner += "Uploading to an external S3 storage: ";
 							if (externalUploadDestination.getBucket() != null)
-								 bucket = " bucket = " + bucket;
+								banner += " bucket = " + bucket;
 							if (externalUploadDestination.getBaseKey() != null)
 								banner += " key = " + key;
 						}
