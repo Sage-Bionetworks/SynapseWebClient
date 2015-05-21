@@ -153,6 +153,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				fileName.setInnerText(fileHandle.getFileName());
 				
 				S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
+				// TODO: get the upload destination - if it's external s3, show external s3 storage
 				
 				fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
 				final String md5 = s3FileHandle.getContentMd5();
