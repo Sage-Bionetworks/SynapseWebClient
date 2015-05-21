@@ -236,12 +236,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						storageLocationId = externalUploadDestination.getStorageLocationId();
 						currentUploadType = externalUploadDestination.getUploadType();
 						String banner = externalUploadDestination.getBanner();
-						String bucket = externalUploadDestination.getBucket();
-						String key = externalUploadDestination.getBaseKey();
 						if (!DisplayUtils.isDefined(banner)) {
-							banner = "Uploading to S3: " + bucket;
+							banner = "Uploading to S3: " + externalUploadDestination.getBucket();
 							if (externalUploadDestination.getBaseKey() != null)
-								banner += "/" + key;
+								banner += "/" + externalUploadDestination.getBaseKey();
 						}
 						updateS3UploadBannerView(banner);
 
