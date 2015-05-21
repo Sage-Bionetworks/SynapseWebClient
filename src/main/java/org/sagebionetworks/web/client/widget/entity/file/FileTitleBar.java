@@ -106,16 +106,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	}
 
 	@Override
-	public void setS3StorageDescription(CallbackP<String> callback) {
-		getS3StorageDescription(callback);
-	}
-
-
-	/*
-	 * Private Methods
-	 */
-
-	private void getS3StorageDescription(final CallbackP<String> callback) {
+	public void setS3Description(final CallbackP<String> callback) {
 		final String entityId = entityBundle.getEntity().getId();
 		synapseClient.getUploadDestinations(entityId, new AsyncCallback<List<UploadDestination>>() {
 			public void onSuccess(List<UploadDestination> uploadDestinations) {
@@ -123,7 +114,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
 					String bucket = externalUploadDestination.getBucket();
 					String key = externalUploadDestination.getBaseKey();
-					callback.invoke(" - External S3 Storage: s3://" + bucket + "/" + key + "/" + entityBundle.getEntity().getName() + ")");
+					callback.invoke(" - s3://" + bucket + "/" + key + "/" + entityBundle.getEntity().getName() + ")");
 				} else {
 					callback.invoke(" - Synapse Storage)");
 				}
@@ -135,4 +126,9 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 			}
 		});
 	}
+
+
+	/*
+	 * Private Methods
+	 */
 }

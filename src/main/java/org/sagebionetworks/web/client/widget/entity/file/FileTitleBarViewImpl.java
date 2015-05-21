@@ -154,12 +154,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				fileName.setInnerText(fileHandle.getFileName());
 
 				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-				presenter.setS3StorageDescription(new CallbackP<String>() {
-
+				presenter.setS3Description(new CallbackP<String>() {
 					@Override
 					public void invoke(String s3StorageDescription) {
 						fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + s3StorageDescription);
-						
 					}
 					
 				});

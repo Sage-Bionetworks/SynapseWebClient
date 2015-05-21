@@ -348,7 +348,6 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
-		verify(view).showUploadingBanner(Uploader.DEFAULT_EXTERNAL_S3_BANNER);
 	}
 
 	

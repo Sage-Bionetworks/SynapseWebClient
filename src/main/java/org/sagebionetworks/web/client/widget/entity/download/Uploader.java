@@ -52,8 +52,7 @@ import com.google.inject.Inject;
  */
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable, ProgressingFileUploadHandler {
 	
-	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB	
-	public static final String DEFAULT_EXTERNAL_S3_BANNER = "External S3 Storage's banner has not set or is an empty string.";
+	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
 	private UploaderView view;
 	private HandlerManager handlerManager;
 	private Entity entity;
@@ -239,18 +238,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						String banner = externalUploadDestination.getBanner();
 						String bucket = externalUploadDestination.getBucket();
 						String key = externalUploadDestination.getBaseKey();
-						// if there is no banner set for this upload destination, try to show the bucket and key
 						if (!DisplayUtils.isDefined(banner)) {
-							if (bucket != null || key != null)
-								banner += "Uploading to an external S3 storage: ";
-							if (externalUploadDestination.getBucket() != null)
-								banner += " bucket = " + bucket;
+							banner = "Uploading to S3: " + bucket;
 							if (externalUploadDestination.getBaseKey() != null)
-								banner += " key = " + key;
-						}
-						// if banner, bucket and key are all null, show a default banner
-						if (!DisplayUtils.isDefined(banner)) {
-							banner = DEFAULT_EXTERNAL_S3_BANNER;
+								banner += "/" + key;
 						}
 						updateS3UploadBannerView(banner);
 

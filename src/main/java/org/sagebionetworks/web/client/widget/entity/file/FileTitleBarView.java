@@ -45,7 +45,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		
 		void queryForSftpLoginInstructions(String directDownloadUrl);
 
-		void setS3StorageDescription(CallbackP<String> callbackP);
+		void setS3Description(CallbackP<String> callbackP);
 	}
 
 }
