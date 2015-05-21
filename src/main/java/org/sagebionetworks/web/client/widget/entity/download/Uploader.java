@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
-import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -54,6 +53,7 @@ import com.google.inject.Inject;
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable, ProgressingFileUploadHandler {
 	
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB	
+	public static final String DEFAULT_EXTERNAL_S3_BANNER = "External S3 Storage's banner has not set or is an empty string.";
 	private UploaderView view;
 	private HandlerManager handlerManager;
 	private Entity entity;
@@ -236,7 +236,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
 						storageLocationId = externalUploadDestination.getStorageLocationId();
 						currentUploadType = externalUploadDestination.getUploadType();
-						updateS3UploadBannerView(externalUploadDestination.getBanner());
+						String banner = externalUploadDestination.getBanner();
+						if (!DisplayUtils.isDefined(banner)) {
+							banner = DEFAULT_EXTERNAL_S3_BANNER;
+						}
+						updateS3UploadBannerView(banner);
 
 					} else {
 						//unsupported upload destination type
