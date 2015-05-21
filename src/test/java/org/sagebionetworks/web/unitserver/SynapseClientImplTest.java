@@ -1042,9 +1042,7 @@ public class SynapseClientImplTest {
 		String newName = "a new name";
 		synapseClient.updateExternalFile(testId, testUrl, newName, storageLocationId);
 		file.setName(newName);
-		verify(mockSynapse).putEntity(eq(file)); // should equal the previous
-													// file but with the new
-													// name
+		verify(mockSynapse).putEntity(eq(file)); // should equal the previous file but with the new name
 	}
 
 	@Test
@@ -1067,6 +1065,7 @@ public class SynapseClientImplTest {
 		// verify name is set
 		assertEquals(fileName, handle.getFileName());
 		assertEquals(externalUrl, handle.getExternalURL());
+		assertEquals(storageLocationId, handle.getStorageLocationId());
 	}
 
 	@Test
