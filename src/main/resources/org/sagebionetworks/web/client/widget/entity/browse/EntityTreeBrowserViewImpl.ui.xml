@@ -25,7 +25,7 @@
 				<t:TableHeader width="165px" addStyleNames="visible-sm visible-md visible-lg">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
-				<t:TableHeader width="85px" addStyleNames="hidden-xs">
+				<t:TableHeader width="75px">
 					<bh:Span text="ID" />
 				</t:TableHeader>
 			</t:TableRow>

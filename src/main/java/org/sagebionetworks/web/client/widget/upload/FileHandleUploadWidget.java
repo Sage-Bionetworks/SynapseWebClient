@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 /**
@@ -10,10 +11,15 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface FileHandleUploadWidget extends IsWidget{
+	
+	public void reset();
 
-	/**
-	 * Configure the widget before using.
-	 * @param callback Will be called with the uploaded fileHandleId if the user successfully uploads a file.
-	 */
-	public void configure(String buttonText, CallbackP<String> callback);
+	FileMetadata[] getSelectedFileMetadata();
+
+	void setUploadingCallback(Callback startedUploadingCallback);
+
+	void configure(String buttonText,
+			CallbackP<FileUpload> finishedUploadingCallback);
+
+	void setValidation(FileValidator validator);
 }

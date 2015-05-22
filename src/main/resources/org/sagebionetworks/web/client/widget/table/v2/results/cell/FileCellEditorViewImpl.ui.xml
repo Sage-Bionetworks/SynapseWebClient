@@ -22,10 +22,6 @@
 					<bh:Div styleName="margin-top-15" />
 					<b:Alert ui:field="uploadAlert" type="DANGER" visible="false"></b:Alert>
 				</b:ModalBody>
-				<b:ModalFooter>
-					<b:Button ui:field="uploadFileButton" type="PRIMARY"
-						dataLoadingText="Uploading...">Upload</b:Button>
-				</b:ModalFooter>
 			</b:Panel>
 		</b:Collapse>
 	</g:HTMLPanel>

@@ -78,7 +78,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
 			shb.appendHtmlConstant(ClientProperties.BREADCRUMB_SEP);
 			shb.appendEscaped(current);
-			panel.add(new HTML(shb.toSafeHtml()));
+			panel.add(new InlineHTML(shb.toSafeHtml()));
 		}
 	}
 

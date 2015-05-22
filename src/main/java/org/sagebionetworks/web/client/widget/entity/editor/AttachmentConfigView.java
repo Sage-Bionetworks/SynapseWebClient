@@ -20,7 +20,6 @@ public interface AttachmentConfigView extends IsWidget, WidgetEditorView {
 	void setWikiAttachmentsWidget(Widget widget);
 	void showUploadFailureUI(String error);
 	void showUploadSuccessUI();
-	void setUploadButtonEnabled(boolean enabled);
 	boolean isNewAttachment();
 	boolean isFromAttachments();
 	
@@ -29,6 +28,5 @@ public interface AttachmentConfigView extends IsWidget, WidgetEditorView {
 	 */
 	public interface Presenter {
 		void addFileHandleId(String fileHandleId);
-		void uploadFileClicked();
 	}
 }

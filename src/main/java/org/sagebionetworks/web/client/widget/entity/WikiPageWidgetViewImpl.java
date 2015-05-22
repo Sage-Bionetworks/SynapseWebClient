@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -197,7 +197,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
 		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
-		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
+		Heading h2 = new Heading(HeadingSize.H2);
+		h2.setText(titleString);
+		h2.addStyleName("margin-bottom-0-imp");
+		topBarWrapper.add(h2);
 		wikiPagePanel.add(topBarWrapper);
 
 		FlowPanel mainPanel = new FlowPanel();

@@ -12,6 +12,7 @@ import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ANNOTATION_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ENTITY_NAME;
 import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
+import static org.sagebionetworks.web.client.ClientProperties.TABLE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.TB;
 import static org.sagebionetworks.web.client.ClientProperties.WHITE_SPACE;
 import static org.sagebionetworks.web.client.ClientProperties.WIKI_URL;
@@ -1486,6 +1487,11 @@ public class DisplayUtils {
 	public static boolean isRecognizedImageContentType(String contentType) {
 		String lowerContentType = contentType.toLowerCase();
 		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
+	}
+	
+	public static boolean isRecognizedTableContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return TABLE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 	
 	public static boolean isTextType(String contentType) {
