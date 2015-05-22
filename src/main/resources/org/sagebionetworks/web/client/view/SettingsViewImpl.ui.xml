@@ -6,9 +6,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
-		<div class="margin-top-10-imp"></div>
-		<div class="">
-		    <g:SimplePanel ui:field="synAlertPanel"/>
+		<div>
 			<div class="well">
 				<h4>
 					<span class="glyphicon glyphicon-info-sign" style="position: relative; top: 4px;"></span>
@@ -30,12 +28,14 @@
 						    <div ui:field="newEmailError" style="display:none" class="text-danger margin-left-5"></div>
 						</div>
 						<div ui:field="newEmailAlert" class="alert alert-info" style="display:none" role="alert"></div>
+						<g:SimplePanel ui:field="addressSynAlertPanel"/>
 					</div>
-				    <g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box">
-					    <g:FlowPanel styleName="checkbox margin-left-10">
-					       <b:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
+				    <g:HTMLPanel ui:field="notificationsPanel" styleName="highlight-box">
+					    <g:FlowPanel styleName="margin-left-10">
+					       <b:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" addStyleNames="margin-0-imp"/> 
 					    </g:FlowPanel>
-					</g:SimplePanel>
+					    <g:SimplePanel ui:field="notificationSynAlertPanel"/>
+					</g:HTMLPanel>
 				</div>
 				<div class="col-md-6">
 					<div ui:field="changeSynapsePasswordUI">
@@ -62,7 +62,7 @@
 								      <div ui:field="password2Error" style="display:none" class="help-block"></div>
 								    </div>
 								  </div>
-								  <div class="form-group row">
+								  <div class="row">
 									  <div class="col-sm-12">
 									      <g:Button ui:field="changePasswordBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
 									      <g:FlowPanel ui:field="forgotPasswordContainer"/>
@@ -75,7 +75,7 @@
 			</div>
 			
 			
-			<div ui:field="apiKeyHighlightBox" class="highlight-box margin-bottom-40">
+			<div ui:field="apiKeyHighlightBox" class="highlight-box">
 				<p>Using an API key allows you to authenticate your scripts for an
 					indefinite amount of time. It is important that you treat your API
 					key with
@@ -85,6 +85,7 @@
 						<g:ScrollPanel styleName="center"><bh:Text ui:field="apiKeyContainer" text=""></bh:Text></g:ScrollPanel>
 					</b:PanelBody>
 				</b:Panel>
+				<g:SimplePanel ui:field="apiSynAlertPanel"/>
 				<g:Button ui:field="changeApiKey" styleName="btn btn-default margin-top-10">Change API Key</g:Button>
 			</div>
 

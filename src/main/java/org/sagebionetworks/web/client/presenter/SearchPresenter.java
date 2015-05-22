@@ -71,8 +71,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		this.iconsImageBundle = iconsImageBundle;
 		this.synAlert = synAlert;
 		currentSearch = getBaseSearchQuery();
-		
 		view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override
@@ -85,7 +85,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public void setPlace(Search place) {
 		this.place = place;
 		synAlert.clear();
-		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
 		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null) queryTerm = "";
@@ -291,9 +290,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			newQuery = false;
 			return;
 		}
-		
-		
-		synapseClient.search(currentSearch, new AsyncCallback<SearchResults>() {			
+		AsyncCallback<SearchResults> callback = new AsyncCallback<SearchResults>() {			
 			@Override
 			public void onSuccess(SearchResults result) {
 				currentResult = result;
@@ -303,9 +300,11 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.clear();
 				synAlert.handleException(caught);
 			}
-		});
+		};
+		synapseClient.search(currentSearch, callback);
 	}
 
 	private boolean isEmptyQuery() {

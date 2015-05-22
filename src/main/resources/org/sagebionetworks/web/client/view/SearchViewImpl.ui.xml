@@ -22,15 +22,15 @@
 						</div>
 					</div>
 					<g:SimplePanel ui:field="synAlertPanel"/>
-					<g:SimplePanel ui:field="resultsPanel" styleName="margin-top-15"/>
+					<g:SimplePanel ui:field="resultsPanel" styleName="margin-top-10"/>
 					<g:SimplePanel ui:field="paginationPanel" />
 				</div>
-				<div class="col-md-3 col-md-pull-9">
+				<g:HTMLPanel ui:field="narrowResultsPanel" addStyleNames="col-md-3 col-md-pull-9">
 					<div class="well">
 						<h5>Narrow Results</h5>
 						<g:SimplePanel ui:field="facetPanel" />
 					</div>
-				</div>
+				</g:HTMLPanel>
 				<div class="clear"></div>
 			</div>
 		</div>

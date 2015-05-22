@@ -81,13 +81,14 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	
 	@Override
 	public void search(final String searchTerm, final Integer offset) {
+		view.setMainContainerVisible(true);
 		this.searchTerm = searchTerm;
 		if (offset == null)
 			this.offset = 0;
 		else
 			this.offset = offset;
 		//execute search, and update view with the results
-		synapseClient.getTeamsBySearch(searchTerm, SEARCH_TEAM_LIMIT, offset, new AsyncCallback<PaginatedResults<Team>>() {
+		AsyncCallback<PaginatedResults<Team>> callback = new AsyncCallback<PaginatedResults<Team>>() {
 			@Override
 			public void onSuccess(PaginatedResults<Team> result) {
 				teamList = result;
@@ -98,9 +99,11 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setMainContainerVisible(false);
 				synAlert.handleException(caught);
 			}
-		});
+		};
+		synapseClient.getTeamsBySearch(searchTerm, SEARCH_TEAM_LIMIT, offset, callback);
 	}
 	
 	@Override

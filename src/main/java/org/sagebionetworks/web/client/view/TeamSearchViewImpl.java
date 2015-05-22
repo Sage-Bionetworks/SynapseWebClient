@@ -82,6 +82,11 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	}
 	
 	@Override
+	public void setMainContainerVisible(boolean isVisible) {
+		mainContainer.setVisible(isVisible);
+	}
+	
+	@Override
 	public void showLoading() {
 		mainContainer.clear();
 		mainContainer.add(DisplayUtils.getLoadingWidget(sageImageBundle));

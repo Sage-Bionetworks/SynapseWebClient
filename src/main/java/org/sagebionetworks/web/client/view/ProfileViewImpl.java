@@ -215,7 +215,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel profileSynAlertPanel;
 	@UiField
-	SimplePanel projectSynAlertPanel;
+	FlowPanel projectSynAlertPanel;
 	@UiField
 	SimplePanel teamSynAlertPanel;
 	
@@ -394,7 +394,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setProjectSynAlertWidget(Widget projectSynAlert) {
-		projectSynAlertPanel.setWidget(projectSynAlert);
+		projectSynAlertPanel.clear();
+		projectSynAlertPanel.add(projectSynAlert);
 	}
 	
 	@Override

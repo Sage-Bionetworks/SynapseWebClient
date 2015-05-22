@@ -86,6 +86,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 		view.clear();
 		view.showLoading();
 		UserBadge.getUserProfile(principalId, adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+		
 			@Override
 			public void onSuccess(UserProfile profile) {
 				initStep2(principalId, profile);
@@ -93,6 +94,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.hideLoading();
 				synAlert.handleException(caught);
 			}
 		});
@@ -116,10 +118,12 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 					//show user is not certified
 					view.showNotCertified(profile);
 				} else {
+					view.hideLoading();
 					synAlert.handleException(caught);
 				}
 			}
 		});
+
 	}
 	
 	@Override

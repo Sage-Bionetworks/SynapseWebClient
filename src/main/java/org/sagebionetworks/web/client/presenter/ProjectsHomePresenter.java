@@ -78,11 +78,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(caught instanceof ConflictException) {
-					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
-				} else {
-					synAlert.handleException(caught);
-				}
+				synAlert.handleException(caught);		
 			}
 		});
 	}

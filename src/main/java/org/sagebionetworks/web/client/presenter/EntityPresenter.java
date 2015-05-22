@@ -170,6 +170,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
 					view.show403();
 				} else {
+					view.clear();
 					synAlert.handleException(caught);
 				}
 			}			

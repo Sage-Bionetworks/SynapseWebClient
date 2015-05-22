@@ -32,4 +32,5 @@ public interface PeopleSearchView extends IsWidget, SynapseView {
 
 
 	public void setSynAlertWidget(Widget asWidget);
+	public void setSynAlertWidgetVisible(boolean b);
 }

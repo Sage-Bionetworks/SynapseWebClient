@@ -56,6 +56,11 @@ public interface SettingsView extends IsWidget, SynapseView {
 
 	public void setApiKey(String apiKey);
 
-	void setSynAlertWidget(Widget synAlert);
+
+	public void setNotificationSynAlertWidget(Widget asWidget);
+
+	public void setAddressSynAlertWidget(Widget asWidget);
+
+	public void setAPISynAlertWidget(Widget synAlert);
 
 }

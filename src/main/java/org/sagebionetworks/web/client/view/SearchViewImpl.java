@@ -98,6 +98,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 	SimplePanel paginationPanel;
 	@UiField
 	SimplePanel synAlertPanel;
+	@UiField
+	HTMLPanel narrowResultsPanel;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -178,7 +180,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 		resultsPanel.clear();
 		resultsPanel.add(searchResultsPanel);
 		loadShowing = false;
-		
+		narrowResultsPanel.setVisible(true);
+		currentFacetsPanel.setVisible(true);
 		// scroll user to top of page
 		Window.scrollTo(0, 0);
 	}
@@ -340,6 +343,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	@Override
 	public void clear() {
+		resultsPanel.clear();
+		paginationPanel.clear();
+		narrowResultsPanel.setVisible(false);
+		currentFacetsPanel.setVisible(false);
 	}
 
 	

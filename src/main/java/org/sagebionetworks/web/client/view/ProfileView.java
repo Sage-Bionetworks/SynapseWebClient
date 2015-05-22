@@ -105,4 +105,5 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setProjectSynAlertWidget(Widget profileSynAlert);
 
 	void setTeamSynAlertWidget(Widget profileSynAlert);
+
 }

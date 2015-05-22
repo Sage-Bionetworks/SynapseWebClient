@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -93,14 +94,18 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Text apiKeyContainer;
 	
 	@UiField
-	SimplePanel notificationsPanel;
+	HTMLPanel notificationsPanel;
 	@UiField
 	CheckBox emailNotificationsCheckbox;
 	@UiField
 	Button changeApiKey;
 	
 	@UiField
-	SimplePanel synAlertPanel;
+	SimplePanel addressSynAlertPanel;
+	@UiField
+	SimplePanel notificationSynAlertPanel;
+	@UiField
+	SimplePanel apiSynAlertPanel;
 	
 	private Presenter presenter;
 	
@@ -169,11 +174,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		Window.scrollTo(0, 0); // scroll user to top of page
-	}
-	
-	@Override
-	public void setSynAlertWidget(Widget synAlert) {
-		synAlertPanel.setWidget(synAlert);
 	}
 	
 	@Override
@@ -360,4 +360,20 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		apiKeyContainer.setText(apiKey);
 	}
 
+
+	@Override
+	public void setNotificationSynAlertWidget(Widget notificationSynAlert) {
+		notificationSynAlertPanel.setWidget(notificationSynAlert);
+	}
+
+
+	@Override
+	public void setAddressSynAlertWidget(Widget addressSynAlert) {
+		addressSynAlertPanel.setWidget(addressSynAlert);
+	}
+
+	@Override
+	public void setAPISynAlertWidget(Widget apiSynAlert) {
+		apiSynAlertPanel.setWidget(apiSynAlert);
+	}
 }

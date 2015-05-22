@@ -28,4 +28,6 @@ public interface TeamSearchView extends IsWidget, SynapseView {
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 	}
 	public void setSynAlertWidget(Widget asWidget);
+
+	void setMainContainerVisible(boolean isVisible);
 }

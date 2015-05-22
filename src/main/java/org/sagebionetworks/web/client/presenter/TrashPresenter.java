@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
@@ -77,7 +76,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.synAlert.clear();
 		showView(place);
 	}
-	
+		
 	@Override
 	public void purgeAll() {
 		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
@@ -200,7 +199,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	}
 	
 	private void createFailureDisplay(String title, Throwable caught) {
-		// NOT SURE IF I SHOULD INCLUDE THE TITLE?
-		synAlert.handleException(caught);
+		synAlert.showError(title + " could not be deleted. Reason: " + caught.getMessage());
 	}
 }

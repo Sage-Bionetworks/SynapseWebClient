@@ -18,7 +18,6 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -64,6 +63,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
 		this.view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 		questionIndexToQuestionWidget = new HashMap<Long, QuestionContainerWidget>();
 	}
 	
@@ -89,7 +89,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		view.clear();
 		questionIndexToQuestionWidget.clear();
 		synAlert.clear();
-		view.setSynAlertWidget(synAlert.asWidget());
 		if (quiz.getHeader() != null)
 			view.setQuizHeader(quiz.getHeader());
 		List<Question> questions = quiz.getQuestions();
@@ -135,7 +134,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			questionResponses.add(response);
 		}
 		submission.setQuestionResponses(questionResponses);
-		synapseClient.submitCertificationQuizResponse(submission, new AsyncCallback<PassingRecord>() {
+		AsyncCallback<PassingRecord> callback = new AsyncCallback<PassingRecord>() {
 			@Override
 			public void onSuccess(PassingRecord passingRecord) {
 				if (passingRecord.getPassed())
@@ -148,7 +147,8 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
-		});
+		};
+		synapseClient.submitCertificationQuizResponse(submission, callback);
 	}
 	
 	@Override
@@ -226,7 +226,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	public void getIsCertified() {
 		view.showLoading();
-		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
@@ -248,12 +248,13 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					synAlert.handleException(caught);
 				}
 			}
-		});
+		};
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), callback);
 	}
 	
 	public void getQuiz() {
 		view.showLoading();
-		synapseClient.getCertificationQuiz(new AsyncCallback<String>() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String quizJson) {
 				try {
@@ -270,6 +271,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				view.hideLoading();
 				synAlert.handleException(caught);
 			}
-		});
+		};
+		synapseClient.getCertificationQuiz(callback);
 	}
 }

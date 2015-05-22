@@ -647,10 +647,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
 					teamSynAlert.handleException(caught);
-
 				}
 			}
 		});
+
 	}
 	
 	private boolean checkIsLoggedIn() {

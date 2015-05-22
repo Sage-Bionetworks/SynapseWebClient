@@ -100,6 +100,7 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	@Override
 	public void clear() {
 		userGroupListWidget.clear();
+		paginationPanel.clear();
 	}
 
 	@Override
@@ -116,7 +117,7 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	
 	@Override
 	public void configure(List<UserGroupHeader> users, String searchTerm) {
-		userGroupListWidget.clear();
+		clear();
 		userGroupListWidget.configure(users, true);
 		peopleListPanel.setWidget(userGroupListWidget.asWidget());
 		searchField.setValue(searchTerm);
@@ -159,7 +160,6 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 			}
 		}
 		
-		paginationPanel.clear();
 		if (entries.size() > 1)
 			paginationPanel.add(ul);
 	}
@@ -173,7 +173,13 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 
 	@Override
 	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setVisible(false);
 		this.synAlertPanel.setWidget(synAlert);
+	}
+
+	@Override
+	public void setSynAlertWidgetVisible(boolean isVisible) {
+		synAlertPanel.setVisible(isVisible);
 	}
 
 }

@@ -77,7 +77,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 					@Override
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);
-						synAlert.showError("Unable to set username: " + DisplayConstants.USERNAME_FORMAT_ERROR);
+						synAlert.showError("Unable to set username. Try again later.");
 					}
 				};
 				updateProfile(profile, profileUpdatedCallback);

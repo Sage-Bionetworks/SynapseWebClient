@@ -142,7 +142,8 @@ public class EntityViewImpl extends Composite implements EntityView {
 
 	@Override
 	public void clear() {
-
+		entityPageTop.clearState();
+		entityPageTopPanel.clear();
 	}
 
 	@Override

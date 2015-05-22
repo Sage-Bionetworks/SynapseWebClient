@@ -27,9 +27,9 @@
 			
 			<div class="well margin-top-15">
 				<g:SimplePanel ui:field="createProjectPanel" />
+				<g:SimplePanel ui:field="synAlertPanel"/>	
 			</div>
 			
-			<g:SimplePanel ui:field="synAlertPanel"/>
 
 			<h2>What is a Synapse Project?</h2>
 			<h5>

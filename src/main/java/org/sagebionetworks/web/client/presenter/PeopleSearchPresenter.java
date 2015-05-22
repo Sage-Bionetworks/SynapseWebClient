@@ -78,7 +78,9 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 		else
 			this.offset = offset;
 		//execute search, and update view with the results
-		synapseClient.getUserGroupHeadersByPrefix(searchTerm, (long) SEARCH_PEOPLE_LIMIT, (long) this.offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
+		//synapseClient.getUserGroupHeadersByPrefix(searchTerm, (long) SEARCH_PEOPLE_LIMIT, (long) this.offset, 
+		AsyncCallback<UserGroupHeaderResponsePage> callback = 
+				new AsyncCallback<UserGroupHeaderResponsePage>() {
 
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {
@@ -88,10 +90,13 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.clear();
+				view.setSynAlertWidgetVisible(true);
 				synAlert.handleException(caught);
 			}
 			
-		});
+		};
+		synapseClient.getUserGroupHeadersByPrefix(searchTerm, (long) SEARCH_PEOPLE_LIMIT, (long) this.offset, callback);
 	}
 	
 	@Override
