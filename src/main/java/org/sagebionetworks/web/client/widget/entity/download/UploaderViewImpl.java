@@ -161,7 +161,7 @@ public class UploaderViewImpl extends FlowPanel implements
 						return;
 					}
 
-					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
+					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), presenter.getStorageLocationId());
 				} else {
 					formFieldsPanel.setVisible(false);
 					fileUploadLabel.setVisible(false);

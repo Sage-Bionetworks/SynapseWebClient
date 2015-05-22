@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -31,6 +32,15 @@ import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -45,6 +55,8 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * This filter detects ajax crawler (Google).  If so, it takes over the renders the javascript page and handles the response.
@@ -160,10 +172,12 @@ public class CrawlFilter implements Filter {
 		try{
 			UserProfile profile = synapseClient.getUserProfile(entity.getCreatedBy());
 			StringBuilder createdByBuilder = new StringBuilder();
-			if (profile.getFirstName() != null)
+			if (profile.getFirstName() != null) {
 				createdByBuilder.append(profile.getFirstName() + " ");
-			if (profile.getLastName() != null)
+			}
+			if (profile.getLastName() != null) {
 				createdByBuilder.append(profile.getLastName() + " ");
+			}
 			createdByBuilder.append(profile.getUserName());
 
 			createdBy = createdByBuilder.toString();
@@ -179,11 +193,13 @@ public class CrawlFilter implements Filter {
 		html.append("<!DOCTYPE html><html><head><title>"+name +" - "+ entity.getId()+"</title></head><body>");
 		
 		html.append("<h1>"+name+"</h1>");
-		if (description != null)
+		if (description != null) {
 			html.append(description + "<br />");
-		if (createdBy != null)
+		}
+		if (createdBy != null) {
 			html.append("Created By " + createdBy + "<br />");
-		if (markdown != null)
+		}
+		if (markdown != null) {
 			try {
 				String wikiHtml = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, false, "");
 				//extract plain text from wiki html
@@ -191,6 +207,7 @@ public class CrawlFilter implements Filter {
 			} catch (IOException e) {
 			}
 			html.append(markdown + "<br />");
+		}
 		html.append("<br />");
 		for (String key : annotations.getStringAnnotations().keySet()) {
 			List<String> value = annotations.getStringAnnotations().get(key);
@@ -205,11 +222,11 @@ public class CrawlFilter implements Filter {
 			html.append(escapeHtml(key) + escapeHtml(getValueString(value)) + "<br />");
 		}
 		
-		//and ask for all descendents
+		//and ask for all children
 		try {
-			EntityIdList childList = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
-			for (EntityId childId : childList.getIdList()) {
-				html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getId()+"</a><br />");
+			EntityQueryResults childList = synapseClient.executeEntityQuery(createGetChildrenQuery(entityId));
+			for (EntityQueryResult childId : childList.getEntities()) {
+				html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getName()+"</a><br />");
 			}} catch(Exception e) {};
 		html.append("</body></html>");
 		return html.toString();
@@ -262,6 +279,17 @@ public class CrawlFilter implements Filter {
 		}
 	}
 
+
+	public EntityQuery createGetChildrenQuery(String parentId) {
+		EntityQuery newQuery = new EntityQuery();
+		Condition condition = EntityQueryUtils.buildCondition(
+				EntityFieldName.parentId, Operator.EQUALS, parentId);
+		newQuery.setConditions(Arrays.asList(condition));
+		newQuery.setLimit(Long.MAX_VALUE);
+		newQuery.setOffset(0L);
+		return newQuery;
+	}
+	
 	@Override
 	public void init(FilterConfig config) throws ServletException {
 		this.sc = config.getServletContext();

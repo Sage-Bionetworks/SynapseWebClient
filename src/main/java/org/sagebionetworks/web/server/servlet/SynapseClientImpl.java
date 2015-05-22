@@ -1023,8 +1023,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public Entity updateExternalFile(String entityId,
-			String externalUrl, String name) throws RestServiceException {
+	public Entity updateExternalFile(String entityId, String externalUrl,
+			String name, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isManuallySettingName = isManuallySettingExternalName(name);
@@ -1036,6 +1036,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 			ExternalFileHandle efh = new ExternalFileHandle();
 			efh.setExternalURL(externalUrl);
+			efh.setStorageLocationId(storageLocationId);
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
@@ -1058,8 +1059,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public Entity createExternalFile(String parentEntityId,
-			String externalUrl, String name) throws RestServiceException {
+	public Entity createExternalFile(String parentEntityId, String externalUrl,
+			String name, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isManuallySettingName = isManuallySettingExternalName(name);
@@ -1068,6 +1069,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			efh.setExternalURL(externalUrl);
 			if (isManuallySettingName)
 				efh.setFileName(name);
+			efh.setStorageLocationId(storageLocationId);
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			newEntity.setDataFileHandleId(clone.getId());

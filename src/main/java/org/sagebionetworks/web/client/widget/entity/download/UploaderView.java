@@ -49,7 +49,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void setExternalFilePath(String path, String name);
+		void setExternalFilePath(String path, String name, Long storageLocationId);
 		
 		void handleUploads();
 		
@@ -68,5 +68,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 		
 		void disableMultipleFileUploads();
 		String getSelectedFilesText();
+
+		Long getStorageLocationId();
 	}
 }
