@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -34,6 +35,7 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.State;
@@ -132,9 +134,9 @@ public class UploaderTest {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
-		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		//by default, there is no name conflict
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view,
@@ -157,32 +159,30 @@ public class UploaderTest {
 	public void testSetNewExternalPath() throws Exception {
 		//this is the full success test
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
-		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
+		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 	
 	@Test
 	public void testSetExternalPathFailedCreate() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
-		
+		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(view).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testSetExternalPathFailedUpdateFile() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
-		
+		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(view).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testSetExternalFileEntityPathWithFileEntity() throws Exception {
 		uploader.asWidget(testEntity);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
-		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
+		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 
@@ -315,10 +315,9 @@ public class UploaderTest {
 	}
 	
 	@Test
-	public void testUploadToExternalInvalid() {
+	public void testUploadToInvalidExternalHTTPS() {
 		ExternalUploadDestination d = new ExternalUploadDestination();
-		d.setUploadType(UploadType.S3);
-		
+		d.setUploadType(UploadType.HTTPS);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
@@ -326,6 +325,31 @@ public class UploaderTest {
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
 	}
+
+	@Test
+	public void testUploadToInvalidExternalS3() {
+		ExternalUploadDestination d = new ExternalUploadDestination();
+		d.setUploadType(UploadType.S3);
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(d);
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertNull(uploader.getStorageLocationId());
+		verifyUploadError();
+	}
+
+	@Test
+	public void testUploadToValidExternalS3() {
+		ExternalS3UploadDestination d = new ExternalS3UploadDestination();
+		d.setUploadType(UploadType.S3);
+		d.setStorageLocationId(storageLocationId);
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(d);
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
+	}
+
 	
 	@Test
 	public void testInvalidUploadDestination() {
@@ -458,7 +482,7 @@ public class UploaderTest {
 		r.setMessage(newUrl);
 		uploader.handleSubmitResult(r);
 		//should try to create a new external file
-		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 	}
 	
 	@Test
