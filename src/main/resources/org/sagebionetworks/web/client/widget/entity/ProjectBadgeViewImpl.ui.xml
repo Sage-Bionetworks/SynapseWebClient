@@ -7,7 +7,7 @@
   >
   	<ui:with field='iconsImageBundle' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<bh:Div>
-		<g:Image resource='{iconsImageBundle.synapseProject16}' addStyleNames="displayInline margin-right-5" />
+		<b:Icon ui:field="icon" type="LIST_ALT" addStyleNames="displayInline margin-right-5"/>
 		<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" trigger="HOVER">
 			<g:Anchor ui:field="anchor" addStyleNames="displayInline font-size-1.1em"/>
 		</b:Tooltip>

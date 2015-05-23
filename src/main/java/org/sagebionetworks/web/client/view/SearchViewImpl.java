@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -39,7 +40,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -402,7 +402,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private Panel getResult(int i, Hit hit) {				
 		FlowPanel attributionPanel = new FlowPanel();		
 		
-		ImageResource icon = presenter.getIconForHit(hit);
+		Icon icon = presenter.getIconForHit(hit);
 		
 		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 		createdByBadge.configure(getSearchUserId(hit.getCreated_by()));
@@ -432,8 +432,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		hitPanel.addStyleName("serv hit margin-bottom-20");
 		SafeHtmlBuilder resultBuilder = new SafeHtmlBuilder();
 		resultBuilder.appendHtmlConstant("	   <h4>" + i + ". \n");
-		if(icon != null) 
-			resultBuilder.appendHtmlConstant(DisplayUtils.getIconHtml(icon));
 		resultBuilder.appendHtmlConstant("         <a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(hit.getId()) + "\">")
 		.appendEscaped(hit.getName())
 		.appendHtmlConstant("</a>");

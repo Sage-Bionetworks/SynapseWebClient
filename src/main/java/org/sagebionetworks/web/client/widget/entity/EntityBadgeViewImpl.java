@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -16,13 +18,13 @@ import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -42,7 +44,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Tooltip tooltip;
 	@UiField
-	SimplePanel iconContainer;
+	FocusPanel iconContainer;
+	@UiField
+	Icon icon;
+	
 	@UiField
 	FlowPanel entityContainer;
 	@UiField
@@ -53,7 +58,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Label modifiedOnField;
 	
-	Image iconPicture;
 	ClickHandler nonDefaultClickHandler;
 	
 	boolean isPopoverInitialized;
@@ -117,17 +121,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 					anchor.fireEvent(event);
 				}
 			};
-			
-			ImageResource icon = presenter.getIconForType(entityHeader.getEntityType());
-			iconPicture = new Image(icon);
-			iconPicture.setWidth("16px");
-			iconPicture.setHeight("16px");
-			iconPicture.addStyleName("imageButton displayInline");
-			iconPicture.addClickHandler(clickHandler);
-			iconContainer.setWidget(iconPicture);
+			iconContainer.addClickHandler(clickHandler);
 			entityContainer.add(anchor);
 			idField.setText(entityHeader.getId());
 		} 		
+	}
+	@Override
+	public void setIcon(IconType iconType) {
+		icon.setType(iconType);
 	}
 	
 	public void showPopover(final Anchor anchor, final String entityId, final String entityName) {
@@ -196,7 +197,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void hideLoadingIcon() {
-		iconContainer.setWidget(iconPicture);
+		iconContainer.setWidget(icon);
 	}
 	
 	@Override

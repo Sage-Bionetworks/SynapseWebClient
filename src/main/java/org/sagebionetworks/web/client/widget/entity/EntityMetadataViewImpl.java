@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Versionable;
@@ -15,10 +16,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,7 +41,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	HTMLPanel dataUseContainer;
 	@UiField
-	Image entityIcon;
+	Icon entityIcon;
 	@UiField
 	SpanElement entityName;
 	@UiField
@@ -106,9 +105,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		
-		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
-		synapseIconForEntity.applyTo(entityIcon);
+		entityIcon.setType(DisplayUtils.getIconTypeForEntity(e));
 		
 		setEntityName(e.getName());
 		setEntityId(e.getId());

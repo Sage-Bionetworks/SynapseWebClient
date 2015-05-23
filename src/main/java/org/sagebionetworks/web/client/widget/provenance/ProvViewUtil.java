@@ -2,12 +2,12 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -32,6 +32,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ProvViewUtil {	
@@ -166,6 +167,7 @@ public class ProvViewUtil {
 	}
 	
 	private static ProvNodeContainer createEntityContainer(String id, String entityId, String name, String versionLabel, Long versionNumber, String entityType, IconsImageBundle iconsImageBundle) {
+		FlowPanel container = new FlowPanel();
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		Anchor link = new Anchor();
 		if(versionNumber != null) {
@@ -175,9 +177,8 @@ public class ProvViewUtil {
 		}			
 		
 		// icon
-		ImageResource icon = DisplayUtils.getSynapseIconForEntityClassName(entityType, IconSize.PX16, iconsImageBundle);
-		builder.appendHtmlConstant(AbstractImagePrototype.create(icon).getHTML());
-		builder.appendHtmlConstant("<br/>");
+		Icon icon = DisplayUtils.getSynapseIconForEntityClassName(entityType, IconSize.TIMES2);
+		container.add(new SimplePanel(icon));
 		
 		// name
 		String stubName = DisplayUtils.stubStrPartialWord(name, ENTITY_LINE_NUMBER_CHARS);
@@ -206,7 +207,8 @@ public class ProvViewUtil {
 		ProvNodeContainer node = new ProvNodeContainer();
 		if(id != null) node.getElement().setId(id);
 		node.setStyleName(PROV_ENTTITY_NODE_STYLE);
-		node.addContent(link);
+		container.add(link);
+		node.addContent(container);
 		return node;
 	}
 

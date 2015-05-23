@@ -9,8 +9,8 @@
 
 	<g:HTMLPanel styleName="margin-left-15 margin-right-15">											
 				<bh:Div ui:field="projectTitleUI">
-			       	<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.synapseProject24}' />
-					<g:Anchor ui:field="projectHeaderAnchor" styleName="dropLargeIconText projectTitle" text="" />
+					<b:Icon ui:field="icon" type="LIST_ALT" addStyleNames="displayInline margin-right-5" size="TIMES3"/>
+			       	<g:Anchor ui:field="projectHeaderAnchor" styleName="dropLargeIconText projectTitle" text="" />
 				</bh:Div>
 				
 				<!--Project level information -->

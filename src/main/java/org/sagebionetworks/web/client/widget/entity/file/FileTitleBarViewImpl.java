@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
@@ -28,11 +29,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -40,7 +39,6 @@ import com.google.inject.Inject;
 public class FileTitleBarViewImpl extends Composite implements FileTitleBarView {
 
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	private LicensedDownloader licensedDownloader;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
@@ -62,7 +60,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	SimplePanel md5LinkContainer;
 	@UiField
-	Image entityIcon;
+	Icon entityIcon;
 	@UiField
 	SpanElement fileName;
 	@UiField
@@ -78,14 +76,12 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	
 	@Inject
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloaderHandler,
 			FavoriteWidget favoriteWidget,
 			GlobalApplicationState globalAppState,
 			Md5Link md5Link,
 			LoginModalWidget loginRequiredModalWidget) {
-		this.iconsImageBundle = iconsImageBundle;
 		this.licensedDownloader = licensedDownloaderHandler;
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
@@ -138,8 +134,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 		
-		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
-		synapseIconForEntity.applyTo(entityIcon);
+		entityIcon.setType(DisplayUtils.getIconTypeForEntity(entity));
+		
 		//fileHandle is null if user can't access the filehandle associated with this file entity
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 		boolean isFilenamePanelVisible = fileHandle != null;

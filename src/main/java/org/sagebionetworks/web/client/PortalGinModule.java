@@ -65,10 +65,10 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
-import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
-import org.sagebionetworks.web.client.view.SynapseStandaloneWikiViewImpl;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.view.SignedTokenViewImpl;
+import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
+import org.sagebionetworks.web.client.view.SynapseStandaloneWikiViewImpl;
 import org.sagebionetworks.web.client.view.SynapseWikiView;
 import org.sagebionetworks.web.client.view.SynapseWikiViewImpl;
 import org.sagebionetworks.web.client.view.TeamSearchView;
@@ -111,7 +111,6 @@ import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -909,8 +908,6 @@ public class PortalGinModule extends AbstractGinModule {
 				
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
-		
-		bind(EntityIconsCache.class).in(Singleton.class);
 		
 		bind(EntityBadgeView.class).to(EntityBadgeViewImpl.class);
 		

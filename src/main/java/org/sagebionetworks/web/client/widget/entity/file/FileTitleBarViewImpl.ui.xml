@@ -11,7 +11,7 @@
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
 			<h2 style="margin-bottom: 0px;">
-			 	<span class="liftLargeIcon"><g:Image ui:field="entityIcon"/></span>
+			 	<span class="liftLargeIcon"><b:Icon ui:field="entityIcon" type="FILE"/></span>
 			 	<b:Anchor ui:field="directDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT"/>
 			 	<b:Anchor ui:field="authorizedDirectDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT" />
 			 	

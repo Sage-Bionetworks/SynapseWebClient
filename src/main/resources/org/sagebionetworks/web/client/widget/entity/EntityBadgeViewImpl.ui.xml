@@ -9,7 +9,9 @@
 	<t:Table width="100%">
 		<t:TableRow>
 			<t:TableData width="20px">
-				<g:SimplePanel ui:field="iconContainer"/>
+				<g:FocusPanel ui:field="iconContainer">
+					<b:Icon ui:field="icon" type="FILE"/>
+				</g:FocusPanel>
 			</t:TableData>
 			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden">
 				<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
