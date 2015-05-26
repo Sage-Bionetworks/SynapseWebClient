@@ -1006,7 +1006,7 @@ public class SynapseClientImplTest {
 		ArgumentCaptor<FileEntity> arg = ArgumentCaptor
 				.forClass(FileEntity.class);
 
-		synapseClient.updateExternalFile(testId, testUrl, null);
+		synapseClient.updateExternalFile(testId, testUrl, null, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
 		verify(mockSynapse).createExternalFileHandle(
@@ -1027,7 +1027,7 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, "");
+		synapseClient.updateExternalFile(testId, testUrl, "", storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
@@ -1040,11 +1040,9 @@ public class SynapseClientImplTest {
 		// and (finally) verify the correct name if it is explicitly set
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
 		String newName = "a new name";
-		synapseClient.updateExternalFile(testId, testUrl, newName);
+		synapseClient.updateExternalFile(testId, testUrl, newName, storageLocationId);
 		file.setName(newName);
-		verify(mockSynapse).putEntity(eq(file)); // should equal the previous
-													// file but with the new
-													// name
+		verify(mockSynapse).putEntity(eq(file)); // should equal the previous file but with the new name
 	}
 
 	@Test
@@ -1059,7 +1057,7 @@ public class SynapseClientImplTest {
 				.thenReturn(new ExternalFileHandle());
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -1067,6 +1065,7 @@ public class SynapseClientImplTest {
 		// verify name is set
 		assertEquals(fileName, handle.getFileName());
 		assertEquals(externalUrl, handle.getExternalURL());
+		assertEquals(storageLocationId, handle.getStorageLocationId());
 	}
 
 	@Test

@@ -36,7 +36,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	private UserGroupSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
 	private CallbackP<UserGroupSuggestion> callback;
-	
+	boolean isLoading;
 	@Inject
 	public UserGroupSuggestBox(UserGroupSuggestBoxView view,
 			AuthenticationController authenticationController,
@@ -53,6 +53,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	}
 	
 	public void configureURLs(String baseFileHandleUrl, String baseProfileAttachmentUrl) {
+		isLoading = false;
 		this.baseFileHandleUrl = baseFileHandleUrl;
 		this.baseProfileAttachmentUrl = baseProfileAttachmentUrl;
 	}
@@ -95,36 +96,41 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	}
 	
 	public void getSuggestions(final SuggestOracle.Request request, final SuggestOracle.Callback callback) {
-		view.showLoading();
-		
-		String prefix = request.getQuery();
-		final List<Suggestion> suggestions = new LinkedList<Suggestion>();
-		synapseClient.getUserGroupHeadersByPrefix(prefix, PAGE_SIZE, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
-			@Override
-			public void onSuccess(UserGroupHeaderResponsePage result) {
-				// Update view fields.
-				view.updateFieldStateForSuggestions(result, offset);
-				
-				// Load suggestions.
-				for (UserGroupHeader header : result.getChildren()) {
-					suggestions.add(oracle.makeUserGroupSuggestion(header, view.getText()));
-				}
-
-				// Set up response
-				SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
-				callback.onSuggestionsReady(request, response);
-				
-				view.hideLoading();
-			}
+		if (!isLoading) {
+			isLoading = true;
+			view.showLoading();
 			
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
-					view.showErrorMessage(caught.getMessage());
+			String prefix = request.getQuery();
+			final List<Suggestion> suggestions = new LinkedList<Suggestion>();
+			synapseClient.getUserGroupHeadersByPrefix(prefix, PAGE_SIZE, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
+				@Override
+				public void onSuccess(UserGroupHeaderResponsePage result) {
+					// Update view fields.
+					view.updateFieldStateForSuggestions(result, offset);
+					
+					// Load suggestions.
+					for (UserGroupHeader header : result.getChildren()) {
+						suggestions.add(oracle.makeUserGroupSuggestion(header, view.getText()));
+					}
+	
+					// Set up response
+					SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
+					callback.onSuggestionsReady(request, response);
+					
+					view.hideLoading();
+					isLoading = false;
 				}
-			}
-
-		});
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
+						view.showErrorMessage(caught.getMessage());
+					}
+					isLoading = false;
+				}
+	
+			});
+		}
 	}
 	
 	@Override
