@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -225,10 +224,10 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	@Override
-	public Icon getIconForHit(Hit hit) {
+	public IconType getIconForHit(Hit hit) {
 		if(hit == null) return null;
 		EntityType type = EntityType.valueOf(hit.getNode_type());
-		return DisplayUtils.getSynapseIconForEntityType(type, IconSize.TIMES4);
+		return DisplayUtils.getIconTypeForEntityClassName(type.getEntityTypeClassName());
 	}
 	
 	@Override

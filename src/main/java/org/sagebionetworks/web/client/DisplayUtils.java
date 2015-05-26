@@ -974,12 +974,6 @@ public class DisplayUtils {
 		return "<a href=\"" + DisplayUtils.getSynapseHistoryToken(id) + "\">" + display + "</a>";
 	}
 	
-	public static Icon getSynapseIconForEntityType(EntityType type, IconSize iconSize) {
-		String className = type == null ? null : type.getEntityTypeClassName();		
-		return getSynapseIconForEntityClassName(className, iconSize);
-	}
-
-	
 	/**
 	 * Create a loading panel with a centered spinner.
 	 * 
@@ -1022,7 +1016,7 @@ public class DisplayUtils {
 			icon = IconType.LINK;
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
-			icon = IconType.FOLDER_O;
+			icon = IconType.FOLDER;
 		} else if(FileEntity.class.getName().equals(className)) {
 			// File
 			icon = IconType.FILE_O;			
