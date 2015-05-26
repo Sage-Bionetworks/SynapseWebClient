@@ -135,7 +135,7 @@ public class ProvViewUtil {
 
 		// icon
 		ImageResource icon;
-		if(node.getUrl().contains("github.com")) icon = iconsImageBundle.github16();
+		if(node.getUrl().contains("github.com") || node.getUrl().contains("githubusercontent.com")) icon = iconsImageBundle.github16();
 		else if(node.getUrl().contains("genomespace.org")) icon = iconsImageBundle.genomespace16();
 		else icon = iconsImageBundle.documentExternal16();		
 		builder.appendHtmlConstant(AbstractImagePrototype.create(icon).getHTML());
