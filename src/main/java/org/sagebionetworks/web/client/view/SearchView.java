@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.view;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -51,7 +53,7 @@ public interface SearchView extends IsWidget, SynapseView {
 		
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 
-		ImageResource getIconForHit(Hit hit);
+		IconType getIconForHit(Hit hit);
 		
 		String getCurrentSearchJSON();
 		

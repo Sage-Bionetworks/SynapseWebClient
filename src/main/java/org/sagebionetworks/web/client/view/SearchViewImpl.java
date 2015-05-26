@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.search.Facet;
@@ -39,7 +43,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -402,7 +405,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private Panel getResult(int i, Hit hit) {				
 		FlowPanel attributionPanel = new FlowPanel();		
 		
-		ImageResource icon = presenter.getIconForHit(hit);
+		IconType iconType = presenter.getIconForHit(hit);
 		
 		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 		createdByBadge.configure(getSearchUserId(hit.getCreated_by()));
@@ -430,15 +433,18 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		FlowPanel hitPanel = new FlowPanel();
 		hitPanel.addStyleName("serv hit margin-bottom-20");
-		SafeHtmlBuilder resultBuilder = new SafeHtmlBuilder();
-		resultBuilder.appendHtmlConstant("	   <h4>" + i + ". \n");
-		if(icon != null) 
-			resultBuilder.appendHtmlConstant(DisplayUtils.getIconHtml(icon));
-		resultBuilder.appendHtmlConstant("         <a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(hit.getId()) + "\">")
-		.appendEscaped(hit.getName())
-		.appendHtmlConstant("</a>");
+		Heading h4 = new Heading(HeadingSize.H4);
+		FlowPanel headingPanel = new FlowPanel();
+		h4.add(headingPanel);
+		org.gwtbootstrap3.client.ui.Anchor link = new org.gwtbootstrap3.client.ui.Anchor(hit.getName(), DisplayUtils.getSynapseHistoryToken(hit.getId()));
+		headingPanel.add(new Text(i+"."));
+		Icon icon = new Icon(iconType);
+		icon.addStyleName("lightGreyText margin-right-5 margin-left-5");
+		headingPanel.add(icon);
+		headingPanel.add(link);
+		hitPanel.add(h4);
 		
-		resultBuilder.appendHtmlConstant("    </h4>\n");
+		SafeHtmlBuilder resultBuilder = new SafeHtmlBuilder();
 		if(null != hit.getPath()) {
 			resultBuilder.append(getPathHtml(hit.getPath())).appendHtmlConstant("<br/>\n");
 		}
