@@ -84,7 +84,7 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).viewTrashForUser(
 				anyLong(), anyLong(), any(AsyncCallback.class));
 		presenter.getTrash(ARBITRARY_OFFSET);
-		verify(mockSynAlert).handleException(caught);
+		verify(mockSynAlert).showError(anyString());
 	}
 	
 	@Test
@@ -101,7 +101,7 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).purgeTrashForUser(
 				any(AsyncCallback.class));
 		presenter.purgeAll();
-		verify(mockSynAlert).handleException(caught);	
+		verify(mockSynAlert).showError(anyString());	
 	}
 
 	@Test
@@ -118,7 +118,7 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).purgeMultipleTrashedEntitiesForUser(
 				anySet(), any(AsyncCallback.class));
 		presenter.purgeEntities(new HashSet<TrashedEntity>(trashList.getResults()));
-		verify(mockSynAlert).handleException(caught);	
+		verify(mockSynAlert).showError(anyString());	
 	}
 	
 	@Test
@@ -139,7 +139,7 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).getEntity(
 				anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
-		verify(mockSynAlert).handleException(caught);
+		verify(mockSynAlert).showError(anyString());
 	}
 	
 	@Test

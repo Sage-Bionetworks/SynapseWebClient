@@ -43,6 +43,7 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 		void onIndividualSubmissionOptionClicked();
 		void onTeamSubmissionOptionClicked();
 	}
-
-	void setSynAlertWidget(Widget asWidget);
+	void setChallengesSynAlertWidget(Widget synAlert);
+	void setTeamSelectSynAlertWidget(Widget synAlert);
+	void setContributorsSynAlertWidget(Widget synAlert);
 }

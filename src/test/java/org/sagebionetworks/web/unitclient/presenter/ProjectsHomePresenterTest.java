@@ -104,7 +104,7 @@ public class ProjectsHomePresenterTest {
 		
 		projectsHomePresenter.createProject(name);
 
-		verify(mockView).showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+		verify(mockSynAlert).handleException(any(Exception.class));
 	}
 
 }

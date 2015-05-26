@@ -11,7 +11,6 @@
 	  	<b:Modal title="Submit to Challenge"
 				dataBackdrop="STATIC" dataKeyboard="false" ui:field="modal1">
 			<b:ModalBody>
-			    <g:SimplePanel ui:field="synAlertPanel"/>
 				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup ui:field="entityFinderUI">
@@ -29,6 +28,7 @@
 								<g:SimplePanel ui:field="evaluationListContainer" />
 							</b:FormGroup>
 						</b:FormGroup>
+						<g:SimplePanel ui:field="challengeListSynAlertPanel"/>
 						<b:FormGroup>
 							<b:FormLabel for="submissionName">Submission name (optional)</b:FormLabel>
 							<b:TextBox ui:field="submissionNameField" b:id="submissionName" />
@@ -58,6 +58,7 @@
 									<g:ListBox ui:field="teamComboBox" styleName="form-control" />
 									<b:Anchor ui:field="registerMyTeamLink" text="Register a different team" />
 								</b:FormGroup>
+								<g:SimplePanel ui:field="teamSelectSynAlertPanel"/>
 								<b:FormGroup>
 									<bh:Div ui:field="contributorsLoadingUI">
 										<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
@@ -66,6 +67,7 @@
 									<b:FormLabel>Contributors</b:FormLabel>
 									<b:Panel ui:field="contributorsPanel"  addStyleNames="padding-5" />
 								</b:FormGroup> 
+								<g:SimplePanel ui:field="contributorSynAlertPanel"/>
 							</bh:Div>
 							<bh:Div ui:field="emptyTeamsUI">
 								<bh:Paragraph emphasis="WARNING">No registered teams were found</bh:Paragraph>
