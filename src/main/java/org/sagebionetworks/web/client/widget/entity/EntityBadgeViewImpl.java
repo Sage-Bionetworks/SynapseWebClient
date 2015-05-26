@@ -121,6 +121,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 					anchor.fireEvent(event);
 				}
 			};
+			iconContainer.setWidget(icon);
 			iconContainer.addClickHandler(clickHandler);
 			entityContainer.add(anchor);
 			idField.setText(entityHeader.getId());

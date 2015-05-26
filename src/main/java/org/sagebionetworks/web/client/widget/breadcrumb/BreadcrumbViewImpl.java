@@ -54,7 +54,8 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 			final LinkData data = breadcrumbs.get(i);
 			String text = data.getText();
 			text = stubString(text);
-			Anchor anchor = new Anchor(text);
+			Anchor anchor = new Anchor();
+			anchor.setText(text);
 			anchor.setIcon(data.getIconType());
 			anchor.addStyleName("displayInline");
 			anchor.addClickHandler(new ClickHandler() {				

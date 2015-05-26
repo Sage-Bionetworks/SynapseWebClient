@@ -4,13 +4,10 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<ui:with field='icons'
-		type='org.sagebionetworks.web.client.IconsImageBundle' />
-
 	<g:HTMLPanel styleName="margin-left-15 margin-right-15">											
 				<bh:Div ui:field="projectTitleUI">
-					<b:Icon ui:field="icon" type="LIST_ALT" addStyleNames="displayInline margin-right-5" size="TIMES3"/>
-			       	<g:Anchor ui:field="projectHeaderAnchor" styleName="dropLargeIconText projectTitle" text="" />
+					<b:Icon ui:field="icon" type="LIST_ALT" addStyleNames="displayInline margin-right-5 lightGreyText" size="TIMES2"/>
+			       	<g:Anchor ui:field="projectHeaderAnchor" styleName="projectTitle" text="" />
 				</bh:Div>
 				
 				<!--Project level information -->

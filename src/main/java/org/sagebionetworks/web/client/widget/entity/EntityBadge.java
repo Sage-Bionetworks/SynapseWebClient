@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -61,7 +60,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	public void configure(EntityQueryResult header) {
 		entityHeader = header;
 		view.setEntity(header);
-		view.setIcon(getIconTypeForEntityClassName(header.getEntityType()));
+		view.setIcon(getIconTypeForEntityType(header.getEntityType()));
 		if (header.getModifiedByPrincipalId() != null) {
 			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
 			view.setModifiedByWidgetVisible(true);
@@ -78,30 +77,20 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 
-	public static IconType getIconTypeForEntityClassName(String className) {
-		IconType icon = null;
-		if(Link.class.getName().equals(className)) {
-			icon = IconType.LINK;
-		} else if(Folder.class.getName().equals(className)) {
-			// Folder
-			icon = IconType.FOLDER;
-		} else if(FileEntity.class.getName().equals(className)) {
-			// File
-			icon = IconType.FILE;			
-		} else if(Project.class.getName().equals(className)) {
-			// Project
-			icon = IconType.LIST_ALT;
-		} else if(TableEntity.class.getName().equals(className)) {
-			// TableEntity
-			icon = IconType.TABLE;
-		} else {
-			// default
-			icon = IconType.FILE;
+	public static IconType getIconTypeForEntityType(String entityType) {
+		String className = FileEntity.class.getName();
+		if (entityType.equalsIgnoreCase("file")) {
+			className = FileEntity.class.getName();
+		} else if (entityType.equalsIgnoreCase("folder")) {
+			className = Folder.class.getName();
+		} else if (entityType.equalsIgnoreCase("project")) {
+			className = Project.class.getName();
+		} else if (entityType.equalsIgnoreCase("table")) {
+			className = TableEntity.class.getName();
 		}
-		return icon;
+		return DisplayUtils.getIconTypeForEntityClassName(className);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 	}
 

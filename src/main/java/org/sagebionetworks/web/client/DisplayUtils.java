@@ -979,10 +979,6 @@ public class DisplayUtils {
 		return getSynapseIconForEntityClassName(className, iconSize);
 	}
 
-	public static Icon getSynapseIconForEntity(Entity entity, IconSize iconSize) {
-		String className = entity == null ? null : entity.getClass().getName();
-		return getSynapseIconForEntityClassName(className, iconSize);
-	}
 	
 	/**
 	 * Create a loading panel with a centered spinner.
@@ -1019,24 +1015,23 @@ public class DisplayUtils {
 	}
 	
 	public static IconType getIconTypeForEntityClassName(String className) {
-		IconType icon = null;
+		// default
+		IconType icon = IconType.FILE_O;
+		
 		if(Link.class.getName().equals(className)) {
 			icon = IconType.LINK;
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
-			icon = IconType.FOLDER;
+			icon = IconType.FOLDER_O;
 		} else if(FileEntity.class.getName().equals(className)) {
 			// File
-			icon = IconType.FILE;			
+			icon = IconType.FILE_O;			
 		} else if(Project.class.getName().equals(className)) {
 			// Project
 			icon = IconType.LIST_ALT;
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
 			icon = IconType.TABLE;
-		} else {
-			// default
-			icon = IconType.FILE;
 		}
 		return icon;
 	}

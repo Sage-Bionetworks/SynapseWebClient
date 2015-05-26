@@ -24,8 +24,8 @@
 			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="75px" >
-				<g:TextBox ui:field="idField" width="75px" addStyleNames="border-none noBackground" readOnly="true" />
+			<t:TableData width="100px" >
+				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground" readOnly="true" />
 			</t:TableData>
 		</t:TableRow>
 	</t:Table>    
