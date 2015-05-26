@@ -79,14 +79,16 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 
 	public static IconType getIconTypeForEntityType(String entityType) {
 		String className = FileEntity.class.getName();
-		if (entityType.equalsIgnoreCase("file")) {
-			className = FileEntity.class.getName();
-		} else if (entityType.equalsIgnoreCase("folder")) {
-			className = Folder.class.getName();
-		} else if (entityType.equalsIgnoreCase("project")) {
-			className = Project.class.getName();
-		} else if (entityType.equalsIgnoreCase("table")) {
-			className = TableEntity.class.getName();
+		if (entityType != null) {
+			if (entityType.equalsIgnoreCase("file")) {
+				className = FileEntity.class.getName();
+			} else if (entityType.equalsIgnoreCase("folder")) {
+				className = Folder.class.getName();
+			} else if (entityType.equalsIgnoreCase("project")) {
+				className = Project.class.getName();
+			} else if (entityType.equalsIgnoreCase("table")) {
+				className = TableEntity.class.getName();
+			}
 		}
 		return DisplayUtils.getIconTypeForEntityClassName(className);
 	}
