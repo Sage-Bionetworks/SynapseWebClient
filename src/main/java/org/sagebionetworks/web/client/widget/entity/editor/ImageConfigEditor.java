@@ -42,11 +42,11 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		this.wikiAttachments = wikiAttachments;
 		view.setFileInputWidget(fileInputWidget.asWidget());
 		view.setWikiAttachmentsWidget(wikiAttachments.asWidget());
-		fileHandleIds = new ArrayList<String>();
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
+		fileHandleIds = new ArrayList<String>();
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
 		this.file = null;
