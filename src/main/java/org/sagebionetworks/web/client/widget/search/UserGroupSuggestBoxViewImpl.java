@@ -138,6 +138,7 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 	@Override
 	public void setPlaceholderText(String text) {
 		selectedItem.getElement().setAttribute("placeholder", text);
+		suggestBox.getValueBox().getElement().setAttribute("placeholder", text);
 	}
 	
 	@Override
