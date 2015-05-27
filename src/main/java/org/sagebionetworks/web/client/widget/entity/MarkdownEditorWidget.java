@@ -43,7 +43,9 @@ import com.google.inject.Inject;
  */
 public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter, SynapseWidgetPresenter {
 	
-	public final int MIN_VISIBLE_EDITOR_LINES = 5;
+	// units are px
+	public final int MIN_EDITOR_HEIGHT = 160;
+	public final int EDITOR_BOTTOM_MARGIN = 40;
 	
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
@@ -174,7 +176,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.addTextAreaKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
-				markdownEditorClicked();
+				resizeMarkdownTextArea();
 			}
 		});
 		view.addTextAreaClickHandler(new ClickHandler() {
@@ -201,19 +203,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 	
 	public void resizeMarkdownTextArea() {
-		int visLines = view.getMarkdownTextAreaVisibleLines();
-		int index = 0;
-		int numLines = 0;
-		String editorText = view.getMarkdownText();
-		do {
-			index = 1 + editorText.indexOf("\n",index);
-			numLines++;
-		} while (index > 0 && index < editorText.length());
-		if (visLines < MIN_VISIBLE_EDITOR_LINES || visLines != numLines + 1) {
-			// Keeps a minimum size of MIN_VISIBLE_EDITOR_LINES lines
-			view.resizeMarkdownTextArea(numLines + 1 > MIN_VISIBLE_EDITOR_LINES 
-					? numLines + 1 : MIN_VISIBLE_EDITOR_LINES);
-		}
+		long height = view.getScrollHeight(view.getMarkdown());
+		if (height < MIN_EDITOR_HEIGHT)
+			height = MIN_EDITOR_HEIGHT;
+		view.setMarkdownHeight((height + EDITOR_BOTTOM_MARGIN) + "px");
 	}
 	
 	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {

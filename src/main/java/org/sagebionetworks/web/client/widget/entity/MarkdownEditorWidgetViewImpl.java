@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -58,7 +56,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Div mdCommands;
 	
 	@UiField
-	public TextArea markdownTextArea;
+	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
+	@UiField 
+	public com.google.gwt.user.client.ui.TextArea resizingTextArea;
 	
 	@UiField
 	public FlowPanel formattingGuideContainer;
@@ -350,18 +350,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		formattingGuideContainer.clear();
 		formattingGuideContainer.add(markdownWidget);
 	}
-
-	public String getMarkdownText() {
-		return  markdownTextArea.getText();
-	}
-	
-	public int getMarkdownTextAreaVisibleLines() {
-		return markdownTextArea.getVisibleLines();
-	}
-		
-	public void resizeMarkdownTextArea(int visibleLines) {
-		markdownTextArea.setVisibleLines(visibleLines);
-	}
 	
 	@Override
 	public void setAlphaCommandsVisible(boolean visible) {
@@ -454,6 +442,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setMarkdownFocus() {
 		markdownTextArea.setFocus(true);
 	}
+	
+	@Override
+	public void setMarkdownHeight(String height) {
+		markdownTextArea.setHeight(height);
+	}
+	
 	@Override
 	public int getSelectionLength() {
 		return markdownTextArea.getSelectionLength();
@@ -467,6 +461,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setTitleEditorVisible(boolean visible) {
 		titleField.setVisible(visible);
+	}
+	
+	@Override
+	public int getScrollHeight(String text) {
+		resizingTextArea.setText("");
+		resizingTextArea.setText(text);
+		return resizingTextArea.getElement().getScrollHeight();
 	}
 
 	
