@@ -27,7 +27,6 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -44,7 +43,9 @@ import com.google.inject.Inject;
  */
 public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter, SynapseWidgetPresenter {
 	
-	public final int MIN_VISIBLE_EDITOR_LINES = 5;
+	// units are px
+	public final int MIN_EDITOR_HEIGHT = 160;
+	public final int EDITOR_BOTTOM_MARGIN = 40;
 	
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
@@ -203,9 +204,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void resizeMarkdownTextArea() {
 		long height = view.getScrollHeight(view.getMarkdown());
-		if (height < 160)
-			height = 160;
-		view.setMarkdownHeight((height + 40) + "px");
+		if (height < MIN_EDITOR_HEIGHT)
+			height = MIN_EDITOR_HEIGHT;
+		view.setMarkdownHeight((height + EDITOR_BOTTOM_MARGIN) + "px");
 	}
 	
 	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {

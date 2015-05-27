@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -351,18 +349,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
 		formattingGuideContainer.clear();
 		formattingGuideContainer.add(markdownWidget);
-	}
-
-	public String getMarkdownText() {
-		return markdownTextArea.getText();
-	}
-	
-	public int getMarkdownTextAreaVisibleLines() {
-		return markdownTextArea.getVisibleLines();
-	}
-		
-	public void resizeMarkdownTextArea(int visibleLines) {
-		markdownTextArea.setVisibleLines(visibleLines);
 	}
 	
 	@Override
