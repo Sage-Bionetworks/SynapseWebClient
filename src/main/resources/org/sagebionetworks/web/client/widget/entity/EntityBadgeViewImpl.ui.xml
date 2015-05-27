@@ -6,7 +6,7 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<t:Table width="100%" height="30px">
+	<t:Table width="100%" height="25px">
 		<t:TableRow>
 			<t:TableData width="20px">
 				<g:FocusPanel ui:field="iconContainer">
@@ -25,7 +25,7 @@
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
 			<t:TableData width="100px" >
-				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground" readOnly="true" />
+				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
 		</t:TableRow>
 	</t:Table>    

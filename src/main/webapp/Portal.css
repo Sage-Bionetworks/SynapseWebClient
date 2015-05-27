@@ -160,7 +160,8 @@
 	cursor: hand;
 }
 
-.border-none {
+/* File browser input box needs more fine-tuned selector for override*/
+.border-none, input[type=text][readonly].border-none {
 	border: none;
 }
 .userProfileImage {
@@ -983,7 +984,9 @@ i.font-size-150 {
 .font-size-15 {
 	font-size: 15px;
 }
-.font-size-14 {
+
+/* font size 14px.  File browser input box needs more fine-tuned selector for override*/
+.font-size-14, input[type=text][readonly].font-size-14 {
 	font-size: 14px;
 }
 
