@@ -302,7 +302,10 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	// The entry point of this class, called from the ProfilePresenter
 	public Widget asWidget() {
-		this.view.render();
+		this.apiSynAlert.clear();
+		this.notificationSynAlert.clear();
+		this.addressSynAlert.clear();
+		this.view.render();		
 		updateView();
 		return view.asWidget();
 	}

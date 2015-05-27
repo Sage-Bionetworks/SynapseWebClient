@@ -62,6 +62,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	@Override
     public String mayStop() {
         view.clear();
+        synAlert.clear();
         return null;
     }
 

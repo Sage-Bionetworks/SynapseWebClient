@@ -680,6 +680,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void showView(Profile place) {
 		view.clear();
+		profileSynAlert.clear();
+		projectSynAlert.clear();
+		teamSynAlert.clear();
 		String token = place.toToken();
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
