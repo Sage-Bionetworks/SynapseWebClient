@@ -99,4 +99,11 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addMyTeamsWidget(TeamListWidget myTeamsWidget);
 
 	void addOpenInvitesWidget(OpenTeamInvitationsWidget openInvitesWidget);
+
+	void setProfileSynAlertWidget(Widget profileSynAlert);
+
+	void setProjectSynAlertWidget(Widget profileSynAlert);
+
+	void setTeamSynAlertWidget(Widget profileSynAlert);
+
 }

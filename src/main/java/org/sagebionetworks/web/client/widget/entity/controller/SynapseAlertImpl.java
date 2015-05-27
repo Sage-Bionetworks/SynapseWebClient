@@ -131,5 +131,6 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void clear() {
 		view.clearState();
 		ex = null;
+		
 	}
 }

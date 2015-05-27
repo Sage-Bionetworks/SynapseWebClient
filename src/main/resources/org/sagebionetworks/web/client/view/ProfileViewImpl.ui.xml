@@ -12,167 +12,176 @@
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
-		<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true" visible="false">
-			<t:Table>
-				<t:TableRow>
-					<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
-						<g:Image addStyleNames="displayInline margin-right-10" height="64px" width="50px" resource='{sageImageBundle.certificate}'/>
-					</t:TableData>
-					<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
-					    <b:Anchor addStyleNames="boldText" href="#!Quiz:Certification" text="Get Certified!"></b:Anchor>
-						<bh:Paragraph text="There are times where human data can only be shared with certain restrictions. 
-								Learn what the rules are and how to apply and comply with data privacy levels. 
-								This topic is covered during certification."/>
-					</t:TableData>
-				</t:TableRow>
-			</t:Table>
-	</b:Alert>
-		<div class="margin-10">
-			<div class="row margin-top-5">
-			    <div ui:field="profileUI" class="col-md-5 col-xs-12">
-			        <div class="padding-15 light-border">
-		        	    <b:Row ui:field="profilePictureLoadingUI" visible="false">
-				            <b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
-				            	<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
-				            	<bh:Text>&nbsp; Loading...</bh:Text>
+		<g:HTMLPanel>
+			<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true">
+				<t:Table>
+					<t:TableRow>
+						<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+							<g:Image addStyleNames="displayInline margin-right-10" height="64px" width="50px" resource='{sageImageBundle.certificate}'/>
+						</t:TableData>
+						<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+						    <b:Anchor addStyleNames="boldText" href="#!Quiz:Certification" text="Get Certified!"></b:Anchor>
+							<bh:Paragraph text="There are times where human data can only be shared with certain restrictions. 
+									Learn what the rules are and how to apply and comply with data privacy levels. 
+									This topic is covered during certification."/>
+						</t:TableData>
+					</t:TableRow>
+				</t:Table>
+			</b:Alert>
+			
+			<div class="margin-10">
+				<div class="row margin-top-5">
+				    <div ui:field="profileUI" class="col-md-5 col-xs-12">
+				        <div class="padding-15 light-border">
+			        	    <b:Row ui:field="profilePictureLoadingUI" visible="false">
+					            <b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
+					            	<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
+					            	<bh:Text>&nbsp; Loading...</bh:Text>
+								</b:Column>
+							</b:Row>
+							<g:SimplePanel ui:field="profileSynAlertPanel"/>
+				            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
+				        	<g:FlowPanel ui:field="viewProfilePanel" />
+				        	<b:Row>
+				        		<b:Column size="XS_6">
+				        			<b:Button ui:field="importLinkedIn" icon="LINKEDIN_SQUARE">Import from LinkedIn</b:Button>
+				        		</b:Column>
+				        		<b:Column size="XS_6">
+				        			<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO" pull="RIGHT" >Edit Profile</b:Button>
+				        		</b:Column>
+				        	</b:Row>
+				        	<g:SimplePanel ui:field="editUserProfilePanel"/>
+				        </div>
+				        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
+				    </div>
+				    <div ui:field="dashboardUI" class="col-md-7 col-xs-12">
+				    	<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false"/>
+				        <b:Row ui:field="profileInfoLoadingUI" visible="false">
+				        	<b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
+								<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
+								<bh:Text>&nbsp; Loading...</bh:Text>
 							</b:Column>
 						</b:Row>
-			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
-			        	<g:FlowPanel ui:field="viewProfilePanel" />
-			        	<b:Row>
-			        		<b:Column size="XS_6">
-			        			<b:Button ui:field="importLinkedIn" icon="LINKEDIN_SQUARE">Import from LinkedIn</b:Button>
-			        		</b:Column>
-			        		<b:Column size="XS_6">
-			        			<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO" pull="RIGHT" >Edit Profile</b:Button>
-			        		</b:Column>
-			        	</b:Row>
-			        	<g:SimplePanel ui:field="editUserProfilePanel"/>
-			        </div>
-			        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
-			    </div>
-			    <div ui:field="dashboardUI" class="col-md-7 col-xs-12">
-			    	<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false"/>
-			        <b:Row ui:field="profileInfoLoadingUI" visible="false">
-			        	<b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
-							<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
-							<bh:Text>&nbsp; Loading...</bh:Text>
-						</b:Column>
-					</b:Row>
-				    <div class="row" ui:field="navtabContainer">
-					    <ul class="nav nav-tabs entity-tabs margin-top-15">
-						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>
-						    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" text="Challenges" ui:field="challengesLink"/></li>
-						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" text="Teams" ui:field="teamsLink"/></li>
-						    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" text="Settings" ui:field="settingsLink"/></li>
-					    </ul>
-					</div>
-					<div class="row">
-						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
-							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
-							    <div class="col-xs-8 col-sm-6">
-									<div class="input-group">
-										<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
-										<span class="input-group-btn">
-											<b:Button ui:field="createProjectButton" type="DEFAULT">Create Project</b:Button>
-										</span>
+					    <div class="row" ui:field="navtabContainer">
+						    <ul class="nav nav-tabs entity-tabs margin-top-15">
+							    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>
+							    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" text="Challenges" ui:field="challengesLink"/></li>
+							    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" text="Teams" ui:field="teamsLink"/></li>
+							    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" text="Settings" ui:field="settingsLink"/></li>
+						    </ul>
+						</div>
+						<div class="row">
+							<div class="tab-background padding-10" ui:field="projectsTabContainer">
+								<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
+								    <div class="col-xs-8 col-sm-6">
+										<div class="input-group">
+											<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
+											<span class="input-group-btn">
+												<b:Button ui:field="createProjectButton" type="DEFAULT">Create Project</b:Button>
+											</span>
+										</div>
 									</div>
+									<div class="col-xs-4 col-sm-6">
+									    <b:Button ui:field="projectSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Projects" />
+									</div>
+									<b:Column size="XS_12">
+										<g:FlowPanel ui:field="projectSynAlertPanel"/>
+									 </b:Column>
 								</div>
-								<div class="col-xs-4 col-sm-6">
-								    <b:Button ui:field="projectSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Projects" />
-								</div>
-							</div>
-							<div class="panel panel-default padding-5 min-height-200" ui:field="projectsHighlightBox">
-								<b:Row>
-									<b:Column size="XS_12 SM_1 MD_3" push="SM_11 MD_9">
-										<b:ButtonGroup pull="RIGHT">
-											<b:Button ui:field="projectSortButton" dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px"></b:Button>
-											<b:DropDownMenu ui:field="sortProjectsDropDownMenu"></b:DropDownMenu>
-										</b:ButtonGroup>
-									</b:Column>
-									<b:Column size="XS_12 SM_11 MD_9" pull="SM_1 MD_3" ui:field="projectRows">
-										<b:Heading ui:field="projectsHeading" size="H3"></b:Heading>
-										<b:ButtonGroup ui:field="projectFiltersUI">
-											<b:Button ui:field="allProjectsFilter" size="SMALL">All</b:Button>
-											<b:Button ui:field="myProjectsFilter" size="SMALL">Created by me</b:Button>
-											<b:Button ui:field="favoritesFilter" icon="STAR" addStyleNames="favoriteIcon" size="SMALL">Favorites</b:Button>
-											<b:Button ui:field="sharedDirectlyWithMeFilter" size="SMALL">Shared directly with me</b:Button>
-											<b:ButtonGroup>
-												<b:Button ui:field="teamFilters" dataToggle="DROPDOWN" size="SMALL">By Team</b:Button>
-												<b:DropDownMenu ui:field="teamFiltersDropDownMenu">
-												</b:DropDownMenu>
+								<div class="panel panel-default padding-5 min-height-200" ui:field="projectsHighlightBox">
+									<b:Row>
+										<b:Column size="XS_12 SM_1 MD_3" push="SM_11 MD_9">
+											<b:ButtonGroup pull="RIGHT">
+												<b:Button ui:field="projectSortButton" dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px"></b:Button>
+												<b:DropDownMenu ui:field="sortProjectsDropDownMenu"></b:DropDownMenu>
 											</b:ButtonGroup>
-										</b:ButtonGroup>
-										<g:FlowPanel ui:field="projectsTabContent" addStyleNames="margin-top-10"/>
-										<g:SimplePanel ui:field="emptyProjectUI" addStyleNames="smallGreyText padding-15">
-										    	<bh:Text>- Empty</bh:Text>
-										</g:SimplePanel>
-									</b:Column>
-
-
-
+										</b:Column>
+										<b:Column size="XS_12 SM_11 MD_9" pull="SM_1 MD_3" ui:field="projectRows">
+											<b:Heading ui:field="projectsHeading" size="H3"></b:Heading>
+											<b:ButtonGroup ui:field="projectFiltersUI">
+												<b:Button ui:field="allProjectsFilter" size="SMALL">All</b:Button>
+												<b:Button ui:field="myProjectsFilter" size="SMALL">Created by me</b:Button>
+												<b:Button ui:field="favoritesFilter" icon="STAR" addStyleNames="favoriteIcon" size="SMALL">Favorites</b:Button>
+												<b:Button ui:field="sharedDirectlyWithMeFilter" size="SMALL">Shared directly with me</b:Button>
+												<b:ButtonGroup>
+													<b:Button ui:field="teamFilters" dataToggle="DROPDOWN" size="SMALL">By Team</b:Button>
+													<b:DropDownMenu ui:field="teamFiltersDropDownMenu">
+													</b:DropDownMenu>
+												</b:ButtonGroup>
+											</b:ButtonGroup>
+											<g:FlowPanel ui:field="projectsTabContent" addStyleNames="margin-top-10"/>	
+											<g:SimplePanel ui:field="emptyProjectUI" addStyleNames="smallGreyText padding-15">
+											    	<bh:Text>- Empty</bh:Text>
+											</g:SimplePanel>
+										</b:Column>
+	
+	
+	
+									</b:Row>
+									<div ui:field="projectsLoadingUI" >
+										<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+										&nbsp;Loading...
+									</div>
+									<div class="clearfix">
+									    <b:Button ui:field="moreProjectsButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
+									</div>
+									<g:FlowPanel ui:field="favoritesHelpPanel" addStyleNames="help-panel" visible="false">
+										<b:BlockQuote styleName="panel">
+											<b:Icon type="STAR" pull="LEFT" addStyleNames="font-size-90 favoriteIcon" />
+											<b:Heading text="Favorites" size="H4"></b:Heading>
+											<bh:Text text="Save the entity you’d like to revisit by marking it as a favorite. To mark an entity as a favorite, click the star icon next to its name."></bh:Text>
+										</b:BlockQuote>
+									</g:FlowPanel>
+								</div>
+								<b:Row>
+									<b:Column size="XS_12"><b:Anchor href="#!ProjectsHome:0">What's a Project?</b:Anchor></b:Column>
 								</b:Row>
-								<div ui:field="projectsLoadingUI" >
-									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-									&nbsp;Loading...
+							</div>
+							<div class="tab-background padding-10" ui:field="challengesTabContainer">
+						    	<div class="panel panel-default padding-5 min-height-200" ui:field="challengesHighlightBox">
+						    		<b:Heading ui:field="challengesHeading" size="H3"></b:Heading>
+						    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
+						    	</div>
+						    	<div ui:field="challengesLoadingUI" >
+										<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+										&nbsp;Loading...
 								</div>
 								<div class="clearfix">
-								    <b:Button ui:field="moreProjectsButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
+								    <b:Button ui:field="moreChallengesButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
 								</div>
-								<g:FlowPanel ui:field="favoritesHelpPanel" addStyleNames="help-panel" visible="false">
-									<b:BlockQuote styleName="panel">
-										<b:Icon type="STAR" pull="LEFT" addStyleNames="font-size-90 favoriteIcon" />
-										<b:Heading text="Favorites" size="H4"></b:Heading>
-										<bh:Text text="Save the entity you’d like to revisit by marking it as a favorite. To mark an entity as a favorite, click the star icon next to its name."></bh:Text>
-									</b:BlockQuote>
-								</g:FlowPanel>
-							</div>
-							<b:Row>
-								<b:Column size="XS_12"><b:Anchor href="#!ProjectsHome:0">What's a Project?</b:Anchor></b:Column>
-							</b:Row>
-						</div>
-						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer">
-					    	<div class="panel panel-default padding-5 min-height-200" ui:field="challengesHighlightBox">
-					    		<b:Heading ui:field="challengesHeading" size="H3"></b:Heading>
-					    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
-					    	</div>
-					    	<div ui:field="challengesLoadingUI" >
-									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-									&nbsp;Loading...
-							</div>
-							<div class="clearfix">
-							    <b:Button ui:field="moreChallengesButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
-							</div>
-					    </div>
-					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="teamsTabContainer">
-					    	<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
-							    <div class="col-xs-8 col-sm-6">
-									<div class="input-group">
-										<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
-										<span class="input-group-btn">
-											<b:Button ui:field="createTeamButton" type="DEFAULT">Create Team</b:Button>
-										</span>
+						    </div>
+						    <div class="tab-background padding-10" ui:field="teamsTabContainer">
+						    	<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
+								    <div class="col-xs-8 col-sm-6">
+										<div class="input-group">
+											<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
+											<span class="input-group-btn">
+												<b:Button ui:field="createTeamButton" type="DEFAULT">Create Team</b:Button>
+											</span>
+										</div>
 									</div>
+									 <div class="col-xs-4 col-sm-6">
+									    <b:Button ui:field="teamSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Teams" />
+									</div>
+									<b:Column size="XS_12">
+										<g:SimplePanel ui:field="teamSynAlertPanel"/>
+									</b:Column>
 								</div>
-								 <div class="col-xs-4 col-sm-6">
-								    <b:Button ui:field="teamSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Search All Teams" />
+								<g:FlowPanel ui:field="openInvitesContainer" />
+								<div class="panel panel-default padding-5 min-height-200" ui:field="teamsHighlightBox">
+									<b:Heading ui:field="teamsHeading" size="H3"></b:Heading>
+									<g:FlowPanel ui:field="teamsTabContent" addStyleNames="margin-10"/>
 								</div>
 							</div>
-							<g:FlowPanel ui:field="openInvitesContainer" />
-							<div class="panel panel-default padding-5 min-height-200" ui:field="teamsHighlightBox">
-								<b:Heading ui:field="teamsHeading" size="H3"></b:Heading>
-								<g:FlowPanel ui:field="teamsTabContent" styleName="margin-10"/>
-							</div>
+						    <div class="tab-background padding-10" ui:field="settingsTabContainer">
+						        <g:FlowPanel ui:field="settingsTabContent" />
+						    </div>
 						</div>
-					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer">
-					        <g:FlowPanel ui:field="settingsTabContent" />
-					    </div>
 					</div>
 				</div>
+				<p>&nbsp;</p>
 			</div>
-			<p>&nbsp;</p>
-		</div>
-
+		</g:HTMLPanel>
 		<!-- start footer -->
 		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />

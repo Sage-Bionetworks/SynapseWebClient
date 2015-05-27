@@ -21,5 +21,7 @@ public interface CertificateView extends IsWidget, SynapseView {
 		void goToLastPlace();
 		void okButtonClicked();
     }
+
+	void setSynapseAlertWidget(Widget synAlert);
 	
 }
