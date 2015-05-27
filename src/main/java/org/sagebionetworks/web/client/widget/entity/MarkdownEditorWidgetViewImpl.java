@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -58,7 +58,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Div mdCommands;
 	
 	@UiField
-	public TextArea markdownTextArea;
+	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
+	@UiField 
+	public com.google.gwt.user.client.ui.TextArea resizingTextArea;
 	
 	@UiField
 	public FlowPanel formattingGuideContainer;
@@ -352,7 +354,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 
 	public String getMarkdownText() {
-		return  markdownTextArea.getText();
+		return markdownTextArea.getText();
 	}
 	
 	public int getMarkdownTextAreaVisibleLines() {
@@ -454,6 +456,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setMarkdownFocus() {
 		markdownTextArea.setFocus(true);
 	}
+	
+	@Override
+	public void setMarkdownHeight(String height) {
+		markdownTextArea.setHeight(height);
+	}
+	
 	@Override
 	public int getSelectionLength() {
 		return markdownTextArea.getSelectionLength();
@@ -467,6 +475,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setTitleEditorVisible(boolean visible) {
 		titleField.setVisible(visible);
+	}
+	
+	@Override
+	public int getScrollHeight(String text) {
+		resizingTextArea.setText("");
+		resizingTextArea.setText(text);
+		return resizingTextArea.getElement().getScrollHeight();
 	}
 
 	

@@ -65,4 +65,8 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	boolean isEditorModalAttachedAndVisible();
 
 	void confirm(String string, ConfirmCallback confirmCallback);
+
+	int getScrollHeight(String text);
+
+	void setMarkdownHeight(String string);
 }

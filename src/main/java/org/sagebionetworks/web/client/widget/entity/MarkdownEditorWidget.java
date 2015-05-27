@@ -27,6 +27,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -174,7 +175,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.addTextAreaKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
-				markdownEditorClicked();
+				resizeMarkdownTextArea();
 			}
 		});
 		view.addTextAreaClickHandler(new ClickHandler() {
@@ -201,19 +202,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 	
 	public void resizeMarkdownTextArea() {
-		int visLines = view.getMarkdownTextAreaVisibleLines();
-		int index = 0;
-		int numLines = 0;
-		String editorText = view.getMarkdownText();
-		do {
-			index = 1 + editorText.indexOf("\n",index);
-			numLines++;
-		} while (index > 0 && index < editorText.length());
-		if (visLines < MIN_VISIBLE_EDITOR_LINES || visLines != numLines + 1) {
-			// Keeps a minimum size of MIN_VISIBLE_EDITOR_LINES lines
-			view.resizeMarkdownTextArea(numLines + 1 > MIN_VISIBLE_EDITOR_LINES 
-					? numLines + 1 : MIN_VISIBLE_EDITOR_LINES);
-		}
+		long height = view.getScrollHeight(view.getMarkdown());
+		if (height < 160)
+			height = 160;
+		view.setMarkdownHeight((height + 40) + "px");
 	}
 	
 	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {

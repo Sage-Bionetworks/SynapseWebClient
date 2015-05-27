@@ -118,6 +118,7 @@
 	font-size: 11px;
 }
 
+
 .nobordertable-imp td {
   border: 0px !important;
   padding: 0px;
@@ -1326,6 +1327,10 @@ ol.lowerroman {
 .pagesTree span{
 	font-family: Verdana,Arial,sans-serif;
 	font-size: 13px;
+}
+
+.padding-0 {
+	padding: 0px;
 }
 
 .padding-top-15 {
