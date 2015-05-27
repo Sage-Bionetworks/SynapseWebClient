@@ -43,7 +43,6 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 		this.synAlert = synAlert;
 		
 		view.setPresenter(this);
-		synAlert.clear();
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
@@ -57,7 +56,6 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 	public void setPlace(ProjectsHome place) {
 		this.place = place;
 		view.setPresenter(this);
-		synAlert.clear();
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
@@ -69,6 +67,7 @@ public class ProjectsHomePresenter extends AbstractActivity implements ProjectsH
 
 	@Override
 	public void createProject(final String name) {
+		synAlert.clear();
 		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {

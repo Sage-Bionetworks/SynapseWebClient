@@ -56,11 +56,11 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 	public void setPlace(ChangeUsername place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		synAlert.clear();
 	}
 	
 	@Override
 	public void setUsername(String newUsername) {
+		synAlert.clear();
 		UserProfile profile = authController.getCurrentUserSessionData().getProfile();
 		if (profile != null) {
 			//quick check to see if it's valid.
@@ -77,7 +77,6 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 					@Override
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);
-						synAlert.showError("Unable to set username. Try again later.");
 					}
 				};
 				updateProfile(profile, profileUpdatedCallback);

@@ -130,6 +130,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	private AsyncCallback<PaginatedResults<Evaluation>> getEvalCallback() {
+		challengeListSynAlert.clear();
 		AsyncCallback<PaginatedResults<Evaluation>> callback = new AsyncCallback<PaginatedResults<Evaluation>>() {
 			@Override
 			public void onSuccess(PaginatedResults<Evaluation> results) {
@@ -224,6 +225,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	private AsyncCallback<List<Team>> getTeamsCallback() {
+		teamSelectSynAlert.clear();
 		AsyncCallback<List<Team>> callback = new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> results) {
@@ -277,6 +279,7 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void getContributorList(final Evaluation evaluation, final Team selectedTeam) {
+		contributorSynAlert.clear();
 		//get contributor list for this team
 		view.setContributorsLoading(true);
 		AsyncCallback<TeamSubmissionEligibility> callback = new AsyncCallback<TeamSubmissionEligibility>() {

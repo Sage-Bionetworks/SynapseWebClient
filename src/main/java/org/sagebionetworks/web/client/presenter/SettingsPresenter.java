@@ -64,6 +64,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 
 	private void getAPIKey() {
+		apiSynAlert.clear();
 		// lookup API key
 		if (apiKey == null) {
 			AsyncCallback<String> callback = new AsyncCallback<String>() {
@@ -136,6 +137,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 
 	public void getUserNotificationEmail() {
+		addressSynAlert.clear();
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String notificationEmail) {
@@ -151,6 +153,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 
 	public void setUserNotificationEmail(final String email) {
+		addressSynAlert.clear();
 		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void callback) {
@@ -193,6 +196,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	public void updateMyNotificationSettings(
 			final boolean sendEmailNotifications,
 			final boolean markEmailedMessagesAsRead) {
+		notificationSynAlert.clear();
 		// get my profile
 		AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
 			@Override
@@ -243,6 +247,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	@Override
 	public void changeApiKey() {
+		apiSynAlert.clear();
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {

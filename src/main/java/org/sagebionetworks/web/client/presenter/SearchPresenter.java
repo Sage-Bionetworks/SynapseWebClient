@@ -84,7 +84,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void setPlace(Search place) {
 		this.place = place;
-		synAlert.clear();
 		view.setPresenter(this);
 		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null) queryTerm = "";
@@ -280,7 +279,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return query;
 	}
 	
-	private void executeSearch() { 						
+	private void executeSearch() { 	
+		synAlert.clear();
 		view.showLoading();
 		// Is there a search defined? If not, display empty result.
 		if (isEmptyQuery()) {

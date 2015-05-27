@@ -88,7 +88,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	public void showQuiz(Quiz quiz) {
 		view.clear();
 		questionIndexToQuestionWidget.clear();
-		synAlert.clear();
 		if (quiz.getHeader() != null)
 			view.setQuizHeader(quiz.getHeader());
 		List<Question> questions = quiz.getQuestions();
@@ -119,6 +118,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	@Override
 	public void submitAnswers() {
+		synAlert.clear();
 		//submit question/answer combinations for approval
 		//create response object from answers
 		QuizResponse submission = new QuizResponse();
@@ -225,6 +225,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	public void getIsCertified() {
+		synAlert.clear();
 		view.showLoading();
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
@@ -253,6 +254,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	public void getQuiz() {
+		synAlert.clear();
 		view.showLoading();
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override

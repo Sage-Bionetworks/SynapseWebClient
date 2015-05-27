@@ -73,12 +73,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
-		this.synAlert.clear();
 		showView(place);
 	}
 		
 	@Override
 	public void purgeAll() {
+		synAlert.clear();
 		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
 			@Override
 			public void onSuccess(Void result) {
@@ -96,14 +96,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 
 	@Override
 	public void getTrash(Integer offset) {
+		synAlert.clear();
 		if (offset == null) {
 			this.offset = 0;
 		} else {
 			this.offset = offset;
 		}
-		
-		
-		
 		synapseClient.viewTrashForUser(this.offset, TRASH_LIMIT, new AsyncCallback<PaginatedResults<TrashedEntity>>() {
 			@Override
 			public void onSuccess(PaginatedResults<TrashedEntity> result) {
@@ -125,6 +123,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	@Override
 	public void purgeEntities(Set<TrashedEntity> trashedEntities) {
+		synAlert.clear();
 		// Get ids and names for purging and displaying purged entities.
 		final Set<String> entityIds = new HashSet<String>();
 		final Set<String> entityNames = new HashSet<String>();
@@ -153,6 +152,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	@Override
 	public void restoreEntity(final TrashedEntity trashedEntity) {
+		synAlert.clear();
 		synapseClient.restoreFromTrash(trashedEntity.getEntityId(), trashedEntity.getOriginalParentId(), new AsyncCallback<Void>() {
 
 			@Override

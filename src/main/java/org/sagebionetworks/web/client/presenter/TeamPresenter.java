@@ -60,7 +60,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
-		synAlert.clear();
 		showView(place);
 	}
 	
@@ -82,6 +81,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	
 	@Override
 	public void refresh(final String teamId) {
+		synAlert.clear();
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
@@ -106,6 +106,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 
 	@Override
 	public void deleteTeam() {
+		synAlert.clear();
 		synapseClient.deleteTeam(team.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -122,6 +123,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 
 	@Override
 	public void leaveTeam() {
+		synAlert.clear();
 		String userId = authenticationController.getCurrentUserPrincipalId();
 		synapseClient.deleteTeamMember(userId, userId, team.getId(), new AsyncCallback<Void>() {
 			@Override
@@ -138,6 +140,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 
 	@Override
 	public void updateTeamInfo(String name, String description, boolean canPublicJoin, String fileHandleId) {
+		synAlert.clear();
 		if (name == null || name.trim().length() == 0) {
 			view.showErrorMessage(DisplayConstants.ERROR_NAME_MUST_BE_DEFINED);
 		}

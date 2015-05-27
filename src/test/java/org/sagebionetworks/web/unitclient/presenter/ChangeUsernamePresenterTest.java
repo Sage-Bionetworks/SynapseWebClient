@@ -78,7 +78,6 @@ public class ChangeUsernamePresenterTest {
 	private void setPlace() {
 		ChangeUsername place = Mockito.mock(ChangeUsername.class);
 		presenter.setPlace(place);
-		verify(mockSynAlert).clear();
 		verify(mockView).setSynapseAlertWidget(mockSynAlert.asWidget());
 	}
 	

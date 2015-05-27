@@ -94,7 +94,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.versionNumber = place.getVersionNumber();
 		this.area = place.getArea();
 		this.areaToken = place.getAreaToken();
-		this.synAlert.clear();
 		refresh();
 	}
 	
@@ -125,6 +124,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void refresh() {
+		synAlert.clear();
 		view.setBackgroundImageVisible(false);
 		// Hide the view panel contents until async callback completes
 		view.showLoading();

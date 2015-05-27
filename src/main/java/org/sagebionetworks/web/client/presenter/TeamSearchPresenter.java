@@ -63,7 +63,6 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
-		synAlert.clear();
 		showView(place);
 	}
 	
@@ -81,6 +80,7 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	
 	@Override
 	public void search(final String searchTerm, final Integer offset) {
+		synAlert.clear();
 		view.setMainContainerVisible(true);
 		this.searchTerm = searchTerm;
 		if (offset == null)

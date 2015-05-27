@@ -60,7 +60,6 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
-		this.synAlert.clear();
 		view.setSynAlertWidget(synAlert.asWidget());
 		showView(place);
 	}
@@ -72,6 +71,7 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 	
 	@Override
 	public void search(final String searchTerm, Integer offset) {
+		this.synAlert.clear();
 		this.searchTerm = searchTerm;
 		if (offset == null)
 			this.offset = 0;

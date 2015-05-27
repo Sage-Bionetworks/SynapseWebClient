@@ -222,6 +222,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void getUserProfile(final ProfileArea initialTab) {
+		this.profileSynAlert.clear();
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile profile) {
@@ -601,6 +602,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void createProject(final String name) {
+		projectSynAlert.clear();
 		//validate project name
 		if (!DisplayUtils.isDefined(name)) {
 			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
@@ -628,6 +630,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void createTeam(final String teamName) {
+		teamSynAlert.clear();
 		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
 			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
@@ -901,6 +904,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void redirectToLinkedIn() {
+		profileSynAlert.clear();
 		linkedInService.returnAuthUrl(gwt.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
 			@Override
 			public void onSuccess(LinkedInInfo result) {
@@ -924,6 +928,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateProfileWithLinkedIn(String requestToken, String verifier) {
 		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
 		// If not, grab the user's info for an update.
+		profileSynAlert.clear();
 		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
 		if(secret == null || secret.equals("")) {
 			view.showErrorMessage("Your request has timed out. Please reload the page and try again.");
