@@ -8,16 +8,40 @@
 		<bh:Div addStyleNames="color-line" />
 		<g:SimplePanel ui:field="header" />
 		<b:Container addStyleNames="min-height-500 margin-top-60">
-			<b:Row>
-				<b:Column size="XS_12">
-					<g:SimplePanel ui:field="synapseAlertContainer" />
-					<bh:Div ui:field="successUI">
+			<!-- Confirm unsubscribe UI -->
+			<bh:Div ui:field="confirmUnsubscribeUI" visible="false">
+				<b:Row>
+					<b:Column size="XS_12, MD_6" offset="MD_3">
+						<g:SimplePanel ui:field="unsubscribeUserBadgeContainer" addStyleNames="displayInline"/>
+						<b:Heading size="H5" text=", are you sure you want to stop receiving messages from Synapse?" addStyleNames="displayInline moveup-5" />
+					</b:Column>
+				</b:Row>
+				<b:Row addStyleNames="margin-top-60">
+					<b:Column size="XS_12, MD_6" offset="MD_3">
+						<b:Button ui:field="confirmUnsubscribe" type="PRIMARY" text="Unsubscribe" addStyleNames="margin-left-5" pull="RIGHT"></b:Button>
+						<b:Button ui:field="cancelUnsubscribe" type="DEFAULT" text="Cancel" pull="RIGHT"></b:Button>
+					</b:Column>
+				</b:Row>
+			</bh:Div>
+			<!-- Success UI -->
+			<b:Row ui:field="successUI">
+				<b:Column size="XS_12, MD_6" offset="MD_3">
+					<bh:Div>
 						<b:Alert type="SUCCESS">
 							<b:Heading size="H3" ui:field="successMessage" />
 						</b:Alert>
 					</bh:Div>
 				</b:Column>
-				<b:Column size="XS_12">
+			</b:Row>
+			
+			<!-- Error UI and standard ok button-->
+			<b:Row>
+				<b:Column size="XS_12, MD_6" offset="MD_3">
+					<g:SimplePanel ui:field="synapseAlertContainer" />
+				</b:Column>
+			</b:Row>
+			<b:Row addStyleNames="margin-top-60">
+				<b:Column size="XS_12, MD_6" offset="MD_3">
 					<b:Button ui:field="okButton" type="PRIMARY" text="Continue" size="LARGE" pull="RIGHT"></b:Button>
 				</b:Column>
 			</b:Row>

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -29,9 +30,19 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	@UiField
 	Button okButton;
 	@UiField
-	Div successUI;
+	Button confirmUnsubscribe;
+	@UiField
+	Button cancelUnsubscribe;
+	
+	@UiField
+	Row successUI;
 	@UiField
 	Heading successMessage;
+	
+	@UiField
+	Div confirmUnsubscribeUI;
+	@UiField
+	SimplePanel unsubscribeUserBadgeContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -51,11 +62,19 @@ public class SignedTokenViewImpl implements SignedTokenView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		
-		okButton.addClickHandler(new ClickHandler() {
+		ClickHandler okClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.okClicked();
+			}
+		};
+		okButton.addClickHandler(okClickHandler);
+		cancelUnsubscribe.addClickHandler(okClickHandler);
+		
+		confirmUnsubscribe.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.unsubscribeConfirmed();
 			}
 		});
 	}
@@ -80,6 +99,8 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	@Override
 	public void clear() {
 		successUI.setVisible(false);
+		confirmUnsubscribeUI.setVisible(false);
+		okButton.setVisible(true);
 	}
 
 	@Override
@@ -91,5 +112,15 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	public void showSuccess(String message) {
 		successMessage.setText(message);
 		successUI.setVisible(true);
+	}
+	
+	@Override
+	public void showConfirmUnsubscribe() {
+		confirmUnsubscribeUI.setVisible(true);
+		okButton.setVisible(false);
+	}
+	@Override
+	public void setUnsubscribingUserBadge(Widget w) {
+		unsubscribeUserBadgeContainer.setWidget(w);
 	}
 }

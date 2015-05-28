@@ -71,6 +71,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -2443,23 +2444,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ResponseMessage handleSignedToken(String tokenTypeName,
-			String token, String hostPageBaseURL) throws RestServiceException {
+	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		
 		try {
-			if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
-				//error interpreting the token type, respond with a bad request
-				throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
-			}
-			NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
-			JSONEntity signedToken = null;
-			try {
-				signedToken = SerializationUtils.hexDecodeAndDeserialize(token, tokenType.classType);
-			} catch (Exception e) {
-				//error decoding, respond with a bad request
-				throw new BadRequestException(e.getMessage());
-			}
 			if (signedToken instanceof JoinTeamSignedToken) {
 				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
 				String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
@@ -2471,11 +2459,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				//TODO
 				throw new BadRequestException("Not yet implemented");
 			} else {
-				throw new BadRequestException("token not supported: " + tokenType);
+				throw new BadRequestException("token not supported: " + signedToken.getClass().getName());
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	@Override
+	public SignedTokenInterface hexDecodeAndSerialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
+		if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
+			//error interpreting the token type, respond with a bad request
+			throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
+		}
+		NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
+		SignedTokenInterface signedToken = null;
+		try {
+			signedToken = SerializationUtils.hexDecodeAndDeserialize(signedTokenString, tokenType.classType);
+		} catch (Exception e) {
+			//error decoding, respond with a bad request
+			throw new BadRequestException(e.getMessage());
+		}
+		return signedToken;
 	}
 	
 	public static <E extends Enum<E>> boolean isValidEnum(Class<E> enumClass,
