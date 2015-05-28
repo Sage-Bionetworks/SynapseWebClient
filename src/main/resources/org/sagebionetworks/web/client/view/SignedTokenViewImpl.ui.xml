@@ -9,7 +9,7 @@
 	<bh:Div>
 		<bh:Div addStyleNames="color-line" />
 		<g:SimplePanel ui:field="header" />
-		<b:Container addStyleNames="min-height-500 margin-top-60">
+		<b:Container addStyleNames="min-height-200 margin-top-60">
 			<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
 				<g:Image resource='{sageImageBundle.loading31}' />
 				<bh:Text>&nbsp;Loading...</bh:Text>
@@ -18,9 +18,9 @@
 			<b:Modal ui:field="confirmUnsubscribeUI" title="Are you sure you want to stop receiving messages from Synapse?" closable="true"
 				fade="true" dataBackdrop="STATIC" dataKeyboard="false" b:id="confirmUnsubscribeUI">
 				<b:ModalBody>
-					<g:SimplePanel ui:field="unsubscribeUserBadgeContainer" addStyleNames="displayInline"/>
+					<g:SimplePanel ui:field="unsubscribeUserBadgeContainer" />
 					<bh:Paragraph addStyleNames="margin-top-10">
-						You'll miss out on invitations to join a team, requests to join your team, and Challenge submission notification.
+						You'll miss out on invitations to join a team, requests to join your team, and Challenge submission notifications.
 					</bh:Paragraph>
 				</b:ModalBody>
 				<b:ModalFooter>
