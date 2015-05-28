@@ -9,17 +9,16 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class SignedTokenPresenter extends AbstractActivity implements SignedTokenView.Presenter, Presenter<SignedToken> {
-		
 	private SignedToken place;
 	private SignedTokenView view;
 	private SynapseClientAsync synapseClient;
@@ -65,11 +64,12 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		signedToken = null;
 		synapseAlert.clear();
 		view.clear();
-		
+		view.setLoadingVisible(true);
 		//hex decode the token
 		synapseClient.hexDecodeAndSerialize(tokenType, signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
 			@Override
 			public void onSuccess(SignedTokenInterface result) {
+				view.setLoadingVisible(false);
 				signedToken = result;
 				if (result instanceof NotificationSettingsSignedToken) {
 					handleSettingsToken();
@@ -79,6 +79,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				synapseAlert.handleException(caught);
 			}
 		});
@@ -92,13 +93,16 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	
 	public void handleSignedToken() {
 		view.clear();
+		view.setLoadingVisible(true);
 		synapseClient.handleSignedToken(signedToken, gwt.getHostPageBaseURL(), new AsyncCallback<ResponseMessage>() {
 			@Override
 			public void onSuccess(ResponseMessage result) {
+				view.setLoadingVisible(false);
 				view.showSuccess(result.getMessage());		
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				synapseAlert.handleException(caught);
 			}
 		});

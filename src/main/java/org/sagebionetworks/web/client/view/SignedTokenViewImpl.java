@@ -2,8 +2,9 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -40,10 +41,12 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	Heading successMessage;
 	
 	@UiField
-	Div confirmUnsubscribeUI;
+	Modal confirmUnsubscribeUI;
 	@UiField
 	SimplePanel unsubscribeUserBadgeContainer;
 	
+	@UiField
+	Span loadingUI;
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -99,8 +102,9 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	@Override
 	public void clear() {
 		successUI.setVisible(false);
-		confirmUnsubscribeUI.setVisible(false);
+		confirmUnsubscribeUI.hide();
 		okButton.setVisible(true);
+		loadingUI.setVisible(false);
 	}
 
 	@Override
@@ -116,11 +120,15 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	
 	@Override
 	public void showConfirmUnsubscribe() {
-		confirmUnsubscribeUI.setVisible(true);
+		confirmUnsubscribeUI.show();
 		okButton.setVisible(false);
 	}
 	@Override
 	public void setUnsubscribingUserBadge(Widget w) {
 		unsubscribeUserBadgeContainer.setWidget(w);
+	}
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
 	}
 }

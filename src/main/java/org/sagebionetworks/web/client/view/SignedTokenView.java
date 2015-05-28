@@ -11,6 +11,7 @@ public interface SignedTokenView extends IsWidget {
 	void showConfirmUnsubscribe();
 	void clear();
 	void setUnsubscribingUserBadge(Widget w);
+	void setLoadingVisible(boolean visible);
 	
 	/**
 	 * Set this view's presenter
