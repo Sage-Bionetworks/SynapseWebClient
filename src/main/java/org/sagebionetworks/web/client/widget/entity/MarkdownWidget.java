@@ -41,9 +41,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
-	private IconsImageBundle iconsImageBundle;
 	private CookieProvider cookies;
-	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	GWTWrapper gwt;
 	PortalGinInjector ginInjector;
@@ -59,10 +57,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 	@Inject
 	public MarkdownWidget(SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
-			IconsImageBundle iconsImageBundle,
 			CookieProvider cookies,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
 			ResourceLoader resourceLoader, 
 			GWTWrapper gwt,
 			PortalGinInjector ginInjector,
@@ -72,10 +67,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.widgetRegistrar = widgetRegistrar;
-		this.iconsImageBundle = iconsImageBundle;
 		this.cookies = cookies;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.resourceLoader = resourceLoader;
 		this.gwt = gwt;
 		this.ginInjector = ginInjector;
@@ -115,7 +107,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 	public void loadTableSorters() {
 		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
 		int i = 0;
-		Element table = view.getElementById(id + i);
+		ElementWrapper table = view.getElementById(id + i);
 		while (table != null) {
 			synapseJSNIUtils.tablesorter(id+i);
 			i++;
@@ -128,9 +120,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
-		Element el = view.getElementById(currentWidgetDiv);
+		ElementWrapper el = view.getElementById(currentWidgetDiv);
 		while (el != null) {
-			final Element loadElement = el;
+			final Element loadElement = el.getElement();
 			final AsyncCallback<Void> mathjaxLoadedCallback = new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
@@ -167,7 +159,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
-		Element el = view.getElementById(currentWidgetDiv);
+		ElementWrapper el = view.getElementById(currentWidgetDiv);
 		while (el != null) {
 				//based on the contents of the element, create the correct widget descriptor and renderer
 				String innerText = el.getAttribute("widgetParams");
