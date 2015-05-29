@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface TeamView extends IsWidget, SynapseView {
 	
@@ -24,4 +25,6 @@ public interface TeamView extends IsWidget, SynapseView {
 		void updateTeamInfo(String name, String description, boolean canPublicJoin, String iconFileHandleId);
 		void refresh(String teamId);
 	}
+
+	void setSynAlertWidget(Widget asWidget);
 }

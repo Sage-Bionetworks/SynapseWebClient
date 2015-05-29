@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -35,6 +36,7 @@ public class PeopleSearchPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapse;
 	CookieProvider mockCookies;
+	SynapseAlert mockSynAlert;
 	UserGroupHeaderResponsePage peopleList = getTestPeople();
 	
 	@Before
@@ -44,7 +46,8 @@ public class PeopleSearchPresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapse = mock(SynapseClientAsync.class);
 		mockCookies = mock(CookieProvider.class);
-		presenter = new PeopleSearchPresenter(mockView, mockSynapse, mockAuthenticationController, mockGlobalApplicationState);
+		mockSynAlert = mock(SynapseAlert.class);
+		presenter = new PeopleSearchPresenter(mockView, mockSynapse, mockAuthenticationController, mockGlobalApplicationState, mockSynAlert);
 		
 		AsyncMockStubber.callSuccessWith(peopleList).when(mockSynapse).getUserGroupHeadersByPrefix(
 				anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
@@ -66,10 +69,11 @@ public class PeopleSearchPresenterTest {
 	
 	@Test
 	public void testSearchFailure() throws RestServiceException {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapse).getUserGroupHeadersByPrefix(
+		Exception caught = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).getUserGroupHeadersByPrefix(
 				anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 		presenter.search("test", null);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	private static UserGroupHeaderResponsePage getTestPeople() {

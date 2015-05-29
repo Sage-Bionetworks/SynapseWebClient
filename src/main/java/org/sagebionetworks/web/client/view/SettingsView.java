@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface SettingsView extends IsWidget, SynapseView {
 	
@@ -53,5 +55,12 @@ public interface SettingsView extends IsWidget, SynapseView {
 	}
 
 	public void setApiKey(String apiKey);
+
+
+	public void setNotificationSynAlertWidget(Widget asWidget);
+
+	public void setAddressSynAlertWidget(Widget asWidget);
+
+	public void setAPISynAlertWidget(Widget synAlert);
 
 }

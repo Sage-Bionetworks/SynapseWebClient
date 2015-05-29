@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -375,7 +376,9 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getAPIKey() throws RestServiceException;
 	
-	public ResponseMessage handleSignedToken(String tokenTypeName, String token, String hostPageBaseURL) throws RestServiceException;
+	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;
+	
+	public SignedTokenInterface hexDecodeAndSerialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
 	
 	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	

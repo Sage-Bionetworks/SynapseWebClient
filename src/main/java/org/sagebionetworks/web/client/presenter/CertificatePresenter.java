@@ -29,7 +29,8 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
-	private SynapseAlert synapseAlert;
+	private SynapseAlert synAlert;
+
 	
 	@Inject
 	public CertificatePresenter(CertificateView view,  
@@ -37,16 +38,18 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			AdapterFactory adapterFactory,
-			ClientCache clientCache){
+			ClientCache clientCache,
+			SynapseAlert synAlert){
 		this.view = view;
-		this.synapseAlert = synapseAlert;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.clientCache = clientCache;
+		this.synAlert = synAlert;
 		this.view.setPresenter(this);
+		view.setSynapseAlertWidget(synAlert.asWidget());
 	}
 	
 	@Override
@@ -79,9 +82,11 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 	}
 	
 	public void initStep1(final String principalId) {
+		synAlert.clear();
 		view.clear();
 		view.showLoading();
 		UserBadge.getUserProfile(principalId, adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+		
 			@Override
 			public void onSuccess(UserProfile profile) {
 				initStep2(principalId, profile);
@@ -89,9 +94,8 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(caught.getMessage());
-				}
+				view.hideLoading();
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -114,12 +118,12 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 					//show user is not certified
 					view.showNotCertified(profile);
 				} else {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-						view.showErrorMessage(caught.getMessage());
-					}
+					view.hideLoading();
+					synAlert.handleException(caught);
 				}
 			}
 		});
+
 	}
 	
 	@Override

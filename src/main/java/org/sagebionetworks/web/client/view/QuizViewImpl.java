@@ -70,6 +70,9 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@UiField
 	SpanElement loadingUI;
 	
+	@UiField
+	SimplePanel synAlertPanel;
+	
 	private Presenter presenter;
 	private CertificateWidget certificateWidget;
 	private Header headerWidget;
@@ -162,6 +165,11 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Override
 	public void setQuizHeader(String quizHeader) {
 		this.quizHeader.setInnerHTML(SimpleHtmlSanitizer.sanitizeHtml(quizHeader).asString());
+	}
+	
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}
 	
 	@Override

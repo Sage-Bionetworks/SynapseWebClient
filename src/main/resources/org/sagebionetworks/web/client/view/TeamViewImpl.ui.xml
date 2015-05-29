@@ -12,6 +12,7 @@
 	            <g:SimplePanel ui:field="mediaObjectContainer" styleName="col-md-9"/>
 	    		<g:FlowPanel ui:field="commandsContainer" styleName="col-md-3"/>
 	        </div>
+	        <g:SimplePanel ui:field="synAlertPanel"/>
 	    	<div class="row">
 		    	<g:FlowPanel ui:field="mainContainer" styleName="col-md-12"/>
 		   	</div>
