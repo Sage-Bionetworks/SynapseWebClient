@@ -63,7 +63,7 @@ import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTe
 
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.dev.util.collect.HashSet;
-import com.google.gwt.user.client.Element;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 

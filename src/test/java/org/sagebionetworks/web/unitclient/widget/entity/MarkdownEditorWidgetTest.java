@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -63,8 +65,10 @@ public class MarkdownEditorWidgetTest {
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
 	ResourceLoader mockResourceLoader;
+	PortalGinInjector mockInjector;
 	GWTWrapper mockGwt;
 	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
+	MarkdownWidget mockMarkdownWidget;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
 	CallbackP<WikiPage> mockDescriptorUpdatedHandler;
@@ -87,8 +91,11 @@ public class MarkdownEditorWidgetTest {
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockInjector = mock(PortalGinInjector.class);
+		mockMarkdownWidget = mock(MarkdownWidget.class);
+		when(mockInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState);
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState, mockInjector);
 		MIN_EDITOR_HEIGHT = presenter.MIN_EDITOR_HEIGHT;
 		EDITOR_BOTTOM_MARGIN = presenter.EDITOR_BOTTOM_MARGIN;
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
@@ -177,22 +184,16 @@ public class MarkdownEditorWidgetTest {
 		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showPreviewHTML(htmlReturned, wikiPageKey, mockWidgetRegistrar);
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockView).showPreviewModal();
 	}
 	
 	@Test
 	public void testPreviewFailure() throws Exception {
-		AsyncMockStubber
-				.callFailureWith(new Exception())
-				.when(mockSynapseClient)
-				.markdown2Html(anyString(), anyBoolean(), anyBoolean(),anyString(),
-						any(AsyncCallback.class));
-		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockView).showPreviewModal();
 	}
 	
 	@Test

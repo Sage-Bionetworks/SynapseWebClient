@@ -113,7 +113,7 @@
 		
 	    <b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
-		    <g:FlowPanel ui:field="formattingGuideContainer" />
+		    <g:SimplePanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>
 		  <b:ModalFooter>
 		    <b:Button ui:field="formattingGuideOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
@@ -122,7 +122,7 @@
 		
 	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
-		    <g:FlowPanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
+		    <g:SimplePanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
 		  </b:ModalBody>
 		  <b:ModalFooter>
 		    <b:Button ui:field="previewOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>

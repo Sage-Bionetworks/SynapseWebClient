@@ -9,13 +9,10 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
-
-	void configure(WikiPageKey formattingGuideWikiPageKey,
-			String markdown);
 	
-	void showPreviewHTML(String result, WikiPageKey wikiKey, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException;
 	/**
 	 * Set the presenter.
 	 * @param presenter
@@ -62,4 +59,12 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	int getScrollHeight(String text);
 
 	void setMarkdownHeight(String string);
+
+	void setMarkdownPreviewWidget(Widget markdownPreviewWidget);
+
+	void setFormattingGuideWidget(Widget formattingGuideWidget);
+
+	void configure(String markdown);
+
+	void showPreviewModal();
 }
