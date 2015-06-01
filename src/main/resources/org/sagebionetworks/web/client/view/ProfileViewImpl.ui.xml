@@ -56,12 +56,12 @@
 				    </div>
 				    <div ui:field="dashboardUI" class="col-md-7 col-xs-12">
 				    	<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false"/>
-				        <b:Row ui:field="profileInfoLoadingUI" visible="false">
+				        <!--  <b:Row ui:field="profileInfoLoadingUI" visible="false">
 				        	<b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
 								<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
 								<bh:Text>&nbsp; Loading...</bh:Text>
 							</b:Column>
-						</b:Row>
+						</b:Row>-->
 					    <div class="row" ui:field="navtabContainer">
 						    <ul class="nav nav-tabs entity-tabs margin-top-15">
 							    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>

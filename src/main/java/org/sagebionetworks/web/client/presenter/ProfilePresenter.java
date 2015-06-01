@@ -204,6 +204,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setSortText(currentProjectSort.sortText);
 		myTeamsWidget.configure(false);
 		view.setProfileEditButtonVisible(isOwner);	
+		view.showTabs(isOwner);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
@@ -219,11 +220,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			else
 				getUserProfile(initialTab);
 		}
+		tabClicked(initialTab == ProfileArea.SETTINGS ? ProfileArea.PROJECTS : initialTab);
 	}
 	
 	private void getUserProfile(final ProfileArea initialTab) {
 		this.profileSynAlert.clear();
-		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+		//synapseClient.getUserProfile(currentUserId, 
+		AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile profile) {
 					initializeShowHideProfile(isOwner);
@@ -234,7 +237,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.hideLoading();
 				profileSynAlert.handleException(caught);
 			}
-		});
+		};
+		synapseClient.getUserProfile(currentUserId, callback);
 	}
 	
 	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner, final ProfileArea area) {
@@ -244,8 +248,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				try {
 					view.hideLoading();
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					view.updateView(profile, isOwner, passingRecord);
-					tabClicked(area);
+					view.setProfile(profile, isOwner);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -254,8 +257,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
 				if (caught instanceof NotFoundException) {
-					view.updateView(profile, isOwner, null);
-					tabClicked(area);
+					view.setProfile(profile, isOwner);
 					initializeShowHideCertification(isOwner);
 				}
 				else
