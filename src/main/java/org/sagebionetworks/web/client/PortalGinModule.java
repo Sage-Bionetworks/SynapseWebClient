@@ -131,6 +131,8 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -887,6 +889,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
+		
+		// MarkdownWidget
+		bind(MarkdownWidgetView.class).to(MarkdownWidgetViewImpl.class);
 		
 		// MarkdownEditorWidget
 		bind(MarkdownEditorWidgetView.class).to(MarkdownEditorWidgetViewImpl.class);

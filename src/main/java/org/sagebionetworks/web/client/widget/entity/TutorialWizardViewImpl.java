@@ -64,7 +64,7 @@ public class TutorialWizardViewImpl implements TutorialWizardView {
 		pageContents = new ArrayList<MarkdownWidget>();
         loadAllPageContents(ownerObjectId, headers);
         currentPageIndex = 0;
-        body.add(wrap(pageContents.get(currentPageIndex)));
+        body.add(wrap(pageContents.get(currentPageIndex).asWidget()));
         
         dialog.setTitle(wikiHeaders.get(currentPageIndex).getTitle());
  		prevButton.setEnabled(false);
@@ -118,7 +118,7 @@ public class TutorialWizardViewImpl implements TutorialWizardView {
 	
 	private void updatePageContents(Modal dialog, ModalBody body, int currentPageIndex) {
 		body.clear();
-		body.add(wrap(pageContents.get(currentPageIndex)));
+		body.add(wrap(pageContents.get(currentPageIndex).asWidget()));
  		dialog.setTitle(wikiHeaders.get(currentPageIndex).getTitle());
 	}
 	
