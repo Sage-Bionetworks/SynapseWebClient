@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -28,8 +29,9 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	SimplePanel footer;
 	
 	@UiField
+	SimplePanel errorContainer;	
+	@UiField
 	SimplePanel certificateContainer;
-	
 	@UiField
 	Panel userNotCertifiedPanel;
 	@UiField
@@ -59,7 +61,6 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		certificateContainer.setWidget(certificateWidget.asWidget());
-		
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -109,6 +110,11 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 		certificateContainer.setVisible(true);
 		okButton.setVisible(true);
 		DisplayUtils.scrollToTop();
+	}
+	
+	@Override
+	public void setSynapseAlertWidget(Widget synAlert) {
+		errorContainer.setWidget(synAlert);
 	}
 	
 	

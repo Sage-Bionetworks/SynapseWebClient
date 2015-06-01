@@ -88,6 +88,7 @@ public class SynapseAlertViewImpl implements
 	
 	@Override
 	public void showJiraDialog(String errorMessage) {
+		widget.setVisible(true);
 		jiraDialog.show();
 	}
 	
@@ -97,15 +98,18 @@ public class SynapseAlertViewImpl implements
 		alert.setVisible(false);
 		alertText.setText("");
 		loginAlert.setVisible(false);
+		widget.setVisible(false);
 	}
 	
 	@Override
 	public void showLoginAlert() {
+		widget.setVisible(true);
 		loginAlert.setVisible(true);	
 	}
 	
 	@Override
 	public void showError(String error) {
+		widget.setVisible(true);
 		alert.setText(error);
 		alert.setVisible(true);
 	}

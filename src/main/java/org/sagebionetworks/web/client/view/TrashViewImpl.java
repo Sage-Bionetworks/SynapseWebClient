@@ -76,6 +76,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 	TBody tableBody;
 	@UiField
 	SimplePanel emptyTrashDisplay;
+	@UiField
+	SimplePanel synAlertPanel;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -89,7 +91,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Inject
 	public TrashViewImpl(TrashViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJsniUtils) {
+			SageImageBundle sageImageBundle,
+			SynapseJSNIUtils synapseJsniUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -417,5 +420,10 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private void showButtons() {
 		deleteAllButton.setVisible(true);
 		deleteSelectedButton.setVisible(true);
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		this.synAlertPanel.setWidget(synAlert);
 	}
 }

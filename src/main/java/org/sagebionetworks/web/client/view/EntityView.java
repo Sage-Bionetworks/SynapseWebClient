@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface EntityView extends IsWidget, SynapseView {
 	
@@ -54,5 +55,7 @@ public interface EntityView extends IsWidget, SynapseView {
 	
 	void setBackgroundImageVisible(boolean isVisible);
 	void setBackgroundImageUrl(String url);
+
+	void setSynAlertWidget(Widget synAlert);
 	
 }

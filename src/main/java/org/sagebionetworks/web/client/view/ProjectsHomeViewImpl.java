@@ -36,6 +36,8 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	SimplePanel footer;
 	@UiField
 	SimplePanel createProjectPanel;
+	@UiField
+	SimplePanel synAlertPanel;
 		
 	private Presenter presenter;
 	private IconsImageBundle icons;
@@ -130,6 +132,11 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+	
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}
 
 

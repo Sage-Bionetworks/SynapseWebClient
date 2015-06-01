@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SearchView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
@@ -46,6 +47,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private IconsImageBundle iconsImageBundle;
+	private SynapseAlert synAlert;
 	
 	private SearchQuery currentSearch;
 	private SearchResults currentResult;
@@ -60,17 +62,18 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
-			IconsImageBundle iconsImageBundle) {
+			IconsImageBundle iconsImageBundle,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.iconsImageBundle = iconsImageBundle;
-		
+		this.synAlert = synAlert;
 		currentSearch = getBaseSearchQuery();
-		
 		view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override
@@ -277,7 +280,8 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		return query;
 	}
 	
-	private void executeSearch() { 						
+	private void executeSearch() { 	
+		synAlert.clear();
 		view.showLoading();
 		// Is there a search defined? If not, display empty result.
 		if (isEmptyQuery()) {
@@ -287,9 +291,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			newQuery = false;
 			return;
 		}
-		
-		
-		synapseClient.search(currentSearch, new AsyncCallback<SearchResults>() {			
+		AsyncCallback<SearchResults> callback = new AsyncCallback<SearchResults>() {			
 			@Override
 			public void onSuccess(SearchResults result) {
 				currentResult = result;
@@ -299,11 +301,11 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-				}
+				view.clear();
+				synAlert.handleException(caught);
 			}
-		});
+		};
+		synapseClient.search(currentSearch, callback);
 	}
 
 	private boolean isEmptyQuery() {
