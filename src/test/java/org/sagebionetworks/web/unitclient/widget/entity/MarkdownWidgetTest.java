@@ -58,7 +58,6 @@ public class MarkdownWidgetTest {
 	
 	@Before
 	public void setup() {
-		GWTMockUtilities.disarm();
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
@@ -164,10 +163,4 @@ public class MarkdownWidgetTest {
 		presenter.loadMarkdownFromWikiPage(mockWikiPageKey, isPreview, false);
 		verify(mockSynAlert).showError(anyString());
 	}
-	
-	@After
-	public void teardown() {
-		GWTMockUtilities.restore();
-	}
-	
 }
