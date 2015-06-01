@@ -199,12 +199,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						userId);
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		view.clear();
-		myTeamsWidget.clear();
 		view.showLoading();
 		view.setSortText(currentProjectSort.sortText);
-		myTeamsWidget.configure(false);
 		view.setProfileEditButtonVisible(isOwner);	
 		view.showTabs(isOwner);
+		myTeamsWidget.clear();
+		myTeamsWidget.configure(false);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
@@ -230,7 +230,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(UserProfile profile) {
 					initializeShowHideProfile(isOwner);
-					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
+					getIsCertifiedAndUpdateView(profile, isOwner);
 				}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -241,13 +241,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getUserProfile(currentUserId, callback);
 	}
 	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner, final ProfileArea area) {
+	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner) {
 		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
 					view.hideLoading();
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
+					if (passingRecord != null)
+						view.addCertifiedBadge();
 					view.setProfile(profile, isOwner);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
