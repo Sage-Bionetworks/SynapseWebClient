@@ -225,8 +225,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void getUserProfile(final ProfileArea initialTab) {
 		this.profileSynAlert.clear();
-		//synapseClient.getUserProfile(currentUserId, 
-		AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
+		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile profile) {
 					initializeShowHideProfile(isOwner);
@@ -237,8 +236,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.hideLoading();
 				profileSynAlert.handleException(caught);
 			}
-		};
-		synapseClient.getUserProfile(currentUserId, callback);
+		});
 	}
 	
 	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner) {
