@@ -51,7 +51,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class HomePresenterTest {
 
 	HomePresenter homePresenter;
-	CookieProvider cookieProvider;
 	HomeView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -74,7 +73,6 @@ public class HomePresenterTest {
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
 		mockView = mock(HomeView.class);
-		cookieProvider = mock(CookieProvider.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -123,7 +121,7 @@ public class HomePresenterTest {
 				mockGlobalApplicationState,
 				mockRssService,
 				adapter,
-				cookieProvider);
+				mockCookies);
 		verify(mockView).setPresenter(homePresenter);
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 		
@@ -210,11 +208,11 @@ public class HomePresenterTest {
 	
 	@Test
 	public void testAnonymousLoggedInRecently() {
-		when(mockCookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY)).thenReturn("true");
+		when(mockCookies.getCookie(eq(CookieKeys.USER_LOGGED_IN_RECENTLY))).thenReturn("true");
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
-		verify(mockView).showRegisterUI();
+		verify(mockView).showLoginUI();
 	}
 
 	@Test
