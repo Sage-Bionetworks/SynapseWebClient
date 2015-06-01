@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -86,6 +87,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public Team filterTeam;
 	public SortOptionEnum currentProjectSort;
 	public TeamListWidget myTeamsWidget;
+	public SynapseAlert profileSynAlert;
+	public SynapseAlert projectSynAlert;
+	public SynapseAlert teamSynAlert;
+
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -119,10 +124,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
 		}
+		profileSynAlert = ginInjector.getSynapseAlertWidget();
+		projectSynAlert = ginInjector.getSynapseAlertWidget();
+		teamSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
 		view.addMyTeamsWidget(myTeamsWidget);
 		view.addOpenInvitesWidget(openInvitesWidget);
+		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
+		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
+		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
 	}
 
 	
@@ -139,7 +150,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
+		resetSynAlertWidgets();
 		showView(place);
+	}
+	
+	private void resetSynAlertWidgets() {
+		profileSynAlert.clear();
+		projectSynAlert.clear();
+		teamSynAlert.clear();
 	}
 	
 	@Override
@@ -204,6 +222,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void getUserProfile(final ProfileArea initialTab) {
+		this.profileSynAlert.clear();
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile profile) {
@@ -213,7 +232,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
+				profileSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -583,6 +602,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void createProject(final String name) {
+		projectSynAlert.clear();
 		//validate project name
 		if (!DisplayUtils.isDefined(name)) {
 			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
@@ -601,9 +621,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					} 
+					projectSynAlert.handleException(caught);
 				}
 			}
 		});
@@ -612,6 +630,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void createTeam(final String teamName) {
+		teamSynAlert.clear();
 		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
 			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
@@ -630,12 +649,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					}
+					teamSynAlert.handleException(caught);
 				}
 			}
 		});
+
 	}
 	
 	private boolean checkIsLoggedIn() {
@@ -662,6 +680,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void showView(Profile place) {
 		view.clear();
+		profileSynAlert.clear();
+		projectSynAlert.clear();
+		teamSynAlert.clear();
 		String token = place.toToken();
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
@@ -886,6 +907,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void redirectToLinkedIn() {
+		profileSynAlert.clear();
 		linkedInService.returnAuthUrl(gwt.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
 			@Override
 			public void onSuccess(LinkedInInfo result) {
@@ -898,8 +920,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage("An error occurred. Please try reloading the page.");					
+				profileSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -910,9 +931,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateProfileWithLinkedIn(String requestToken, String verifier) {
 		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
 		// If not, grab the user's info for an update.
+		profileSynAlert.clear();
 		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
 		if(secret == null || secret.equals("")) {
-			view.showErrorMessage("You request has timed out. Please reload the page and try again.");
+			view.showErrorMessage("Your request has timed out. Please reload the page and try again.");
 		} else {
 			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
 				@Override
@@ -928,8 +950,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage("An error occurred. Please try reloading the page.");									
+					profileSynAlert.handleException(caught);								
 				}
 			});
 		}

@@ -18,14 +18,15 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -52,6 +53,10 @@ public class EvaluationSubmitter implements Presenter {
 	private Team selectedTeam;
 	private String selectedTeamMemberStateHash;
 	private List<Long> selectedTeamEligibleMembers;
+	private PortalGinInjector ginInjector;
+	private SynapseAlert challengeListSynAlert;
+	private SynapseAlert teamSelectSynAlert;
+	private SynapseAlert contributorSynAlert;
 	boolean isIndividualSubmission;
 	
 	@Inject
@@ -60,7 +65,8 @@ public class EvaluationSubmitter implements Presenter {
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			ChallengeClientAsync challengeClient,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -68,6 +74,13 @@ public class EvaluationSubmitter implements Presenter {
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
 		this.gwt = gwt;
+		this.ginInjector = ginInjector;
+		this.challengeListSynAlert = ginInjector.getSynapseAlertWidget();
+		this.teamSelectSynAlert = ginInjector.getSynapseAlertWidget();
+		this.contributorSynAlert = ginInjector.getSynapseAlertWidget();
+		this.view.setChallengesSynAlertWidget(challengeListSynAlert.asWidget());
+		this.view.setTeamSelectSynAlertWidget(teamSelectSynAlert.asWidget());
+		this.view.setContributorsSynAlertWidget(contributorSynAlert.asWidget());
 	}
 	
 	/**
@@ -83,6 +96,9 @@ public class EvaluationSubmitter implements Presenter {
 		isIndividualSubmission = true;
 		teams = new ArrayList<Team>();
 		selectedTeamEligibleMembers = new ArrayList<Long>();
+		challengeListSynAlert.clear();
+		teamSelectSynAlert.clear();
+		contributorSynAlert.clear();
 		view.resetNextButton();
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
@@ -114,7 +130,8 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	private AsyncCallback<PaginatedResults<Evaluation>> getEvalCallback() {
-		return new AsyncCallback<PaginatedResults<Evaluation>>() {
+		challengeListSynAlert.clear();
+		AsyncCallback<PaginatedResults<Evaluation>> callback = new AsyncCallback<PaginatedResults<Evaluation>>() {
 			@Override
 			public void onSuccess(PaginatedResults<Evaluation> results) {
 				List<Evaluation> evaluations = results.getResults();
@@ -129,10 +146,11 @@ public class EvaluationSubmitter implements Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				// modal 1
+				challengeListSynAlert.handleException(caught);
 			}
 		};
+		return callback;
 	}
 	
 		
@@ -207,7 +225,8 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	private AsyncCallback<List<Team>> getTeamsCallback() {
-		return new AsyncCallback<List<Team>>() {
+		teamSelectSynAlert.clear();
+		AsyncCallback<List<Team>> callback = new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> results) {
 				view.clearTeams();
@@ -223,10 +242,11 @@ public class EvaluationSubmitter implements Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				// modal 2
+				teamSelectSynAlert.handleException(caught);
 			}
 		};
+		return callback;
 	}
 	
 	@Override
@@ -259,9 +279,10 @@ public class EvaluationSubmitter implements Presenter {
 	}
 	
 	public void getContributorList(final Evaluation evaluation, final Team selectedTeam) {
+		contributorSynAlert.clear();
 		//get contributor list for this team
 		view.setContributorsLoading(true);
-		challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), new AsyncCallback<TeamSubmissionEligibility>() {
+		AsyncCallback<TeamSubmissionEligibility> callback = new AsyncCallback<TeamSubmissionEligibility>() {
 			@Override
 			public void onSuccess(TeamSubmissionEligibility teamEligibility) {
 				view.setContributorsLoading(false);
@@ -299,11 +320,12 @@ public class EvaluationSubmitter implements Presenter {
 			};
 			@Override
 			public void onFailure(Throwable caught) {
+				// modal 2
 				view.setContributorsLoading(false);
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				contributorSynAlert.handleException(caught);
 			}
-		});
+		};
+		challengeClient.getTeamSubmissionEligibility(evaluation.getId(), selectedTeam.getId(), callback);
 	}
 	
 	public void lookupEtagAndCreateSubmission(final String id, final Long ver) {
@@ -327,8 +349,7 @@ public class EvaluationSubmitter implements Presenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}

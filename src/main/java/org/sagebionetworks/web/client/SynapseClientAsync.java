@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -304,7 +305,9 @@ public interface SynapseClientAsync {
 
 	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
 
-	void handleSignedToken(String tokenTypeName, String token, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
+	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
+	
+	void hexDecodeAndSerialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
 	
 	void getAPIKey(AsyncCallback<String> callback);
 

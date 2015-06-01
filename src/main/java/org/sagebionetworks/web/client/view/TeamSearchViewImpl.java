@@ -48,6 +48,8 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	TextBox searchField;
 	@UiField
 	Button searchButton;
+	@UiField
+	SimplePanel synAlertPanel;
 	
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -77,6 +79,11 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	
 	@Override
 	public void clear() {
+	}
+	
+	@Override
+	public void setMainContainerVisible(boolean isVisible) {
+		mainContainer.setVisible(isVisible);
 	}
 	
 	@Override
@@ -173,6 +180,11 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 		a.setHTML(anchorName);
 		a.setHref(DisplayUtils.getTeamSearchHistoryToken(searchTerm, newStart));
 		return a;
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}	
 
 }

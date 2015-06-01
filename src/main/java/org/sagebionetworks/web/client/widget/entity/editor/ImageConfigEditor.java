@@ -32,6 +32,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	private FileHandleUploadWidget fileInputWidget;
 	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
+	private List<String> fileHandleIds;
 	
 	@Inject
 	public ImageConfigEditor(ImageConfigView view, FileHandleUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
@@ -45,6 +46,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
+		fileHandleIds = new ArrayList<String>();
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
 		this.file = null;
@@ -56,7 +58,8 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				view.showUploadSuccessUI();
 				//enable the ok button
 				dialogCallback.setPrimaryEnabled(true);
-				file = fileUpload;				
+				file = fileUpload;
+				fileHandleIds.add(file.getFileHandleId());
 			}
 		});	
 		ImageFileValidator validator = new ImageFileValidator();
@@ -133,8 +136,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 
 	@Override
 	public List<String> getNewFileHandleIds() {
-		List<String> fileHandleIds = new ArrayList<String>();
-		fileHandleIds.add(file.getFileHandleId());
 		return fileHandleIds;
 	}
 

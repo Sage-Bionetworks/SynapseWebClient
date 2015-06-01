@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TeamSearchView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -40,6 +41,7 @@ public class TeamSearchPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapse;
 	CookieProvider mockCookies;
+	SynapseAlert mockSynAlert;
 	PaginatedResults<Team> teamList = getTestTeams();
 	
 	@Before
@@ -50,7 +52,8 @@ public class TeamSearchPresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapse = mock(SynapseClientAsync.class);
 		mockCookies = mock(CookieProvider.class);
-		presenter = new TeamSearchPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapse, mockCookies);
+		mockSynAlert = mock(SynapseAlert.class);
+		presenter = new TeamSearchPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapse, mockCookies, mockSynAlert);
 		
 		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapse).getTeamsBySearch(
 				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
@@ -91,10 +94,11 @@ public class TeamSearchPresenterTest {
 	
 	@Test
 	public void testSearchFailure() throws RestServiceException {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapse).getTeamsBySearch(
+		Exception caught = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).getTeamsBySearch(
 				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		presenter.search("test", null);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test

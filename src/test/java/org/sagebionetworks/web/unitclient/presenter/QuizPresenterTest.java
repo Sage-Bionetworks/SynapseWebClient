@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuizView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -57,6 +58,7 @@ public class QuizPresenterTest {
 	QuestionContainerWidget mockQuestionContainer;
 	PassingRecord mockPassingRecord;
 	MultichoiceResponse mockQuestionResponse;
+	SynapseAlert mockSynAlert;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	org.sagebionetworks.web.client.place.Quiz place;
@@ -72,7 +74,8 @@ public class QuizPresenterTest {
 		mockInjector = mock(PortalGinInjector.class);
 		mockPassingRecord = mock(PassingRecord.class);
 		mockQuestionResponse = mock(MultichoiceResponse.class);
-		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector);
+		mockSynAlert = mock(SynapseAlert.class);
+		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockInjector, mockSynAlert);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
 		when(mockInjector.getQuestionContainerWidget()).thenReturn(mockQuestionContainer);
@@ -195,12 +198,13 @@ public class QuizPresenterTest {
 	
 	@Test
 	public void testGetQuizFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
+		Exception caught = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		presenter.getQuiz();
 		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		verify(mockView).showLoading();
 		verify(mockView).hideLoading();
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test
@@ -250,9 +254,10 @@ public class QuizPresenterTest {
 	
 	@Test
 	public void testSubmitAnswersError() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).submitCertificationQuizResponse(any(QuizResponse.class), any(AsyncCallback.class));
+		Exception caught = new Exception("unhandled");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).submitCertificationQuizResponse(any(QuizResponse.class), any(AsyncCallback.class));
 		presenter.submitAnswers();
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test

@@ -47,6 +47,7 @@ import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -264,6 +265,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	public QuestionContainerWidget getQuestionContainerWidget();
+	public SynapseAlert getSynapseAlertWidget();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();

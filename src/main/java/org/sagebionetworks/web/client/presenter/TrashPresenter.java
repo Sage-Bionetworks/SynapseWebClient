@@ -6,12 +6,12 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TrashView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -45,17 +45,21 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private AuthenticationController authController;
 	private PaginatedResults<TrashedEntity> trashList;
 	private int offset;
+	private SynapseAlert synAlert;
 
 	@Inject
 	public TrashPresenter(TrashView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
-			AuthenticationController authController){
+			AuthenticationController authController,
+			SynapseAlert synAlert){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
+		this.synAlert = synAlert;
 		this.view.setPresenter(this);
+		this.view.setSynAlertWidget(synAlert.asWidget());
 	}	
 	
 	@Override
@@ -71,9 +75,10 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.view.clear();
 		showView(place);
 	}
-	
+		
 	@Override
 	public void purgeAll() {
+		synAlert.clear();
 		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
 			@Override
 			public void onSuccess(Void result) {
@@ -91,14 +96,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 
 	@Override
 	public void getTrash(Integer offset) {
+		synAlert.clear();
 		if (offset == null) {
 			this.offset = 0;
 		} else {
 			this.offset = offset;
 		}
-		
-		
-		
 		synapseClient.viewTrashForUser(this.offset, TRASH_LIMIT, new AsyncCallback<PaginatedResults<TrashedEntity>>() {
 			@Override
 			public void onSuccess(PaginatedResults<TrashedEntity> result) {
@@ -120,6 +123,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	@Override
 	public void purgeEntities(Set<TrashedEntity> trashedEntities) {
+		synAlert.clear();
 		// Get ids and names for purging and displaying purged entities.
 		final Set<String> entityIds = new HashSet<String>();
 		final Set<String> entityNames = new HashSet<String>();
@@ -148,6 +152,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	@Override
 	public void restoreEntity(final TrashedEntity trashedEntity) {
+		synAlert.clear();
 		synapseClient.restoreFromTrash(trashedEntity.getEntityId(), trashedEntity.getOriginalParentId(), new AsyncCallback<Void>() {
 
 			@Override
@@ -194,8 +199,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	}
 	
 	private void createFailureDisplay(String title, Throwable caught) {
-		if (!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
-			view.displayFailureMessage(title, caught.getMessage());
-		}
+		synAlert.showError(title + " could not be deleted. Reason: " + caught.getMessage());
 	}
 }

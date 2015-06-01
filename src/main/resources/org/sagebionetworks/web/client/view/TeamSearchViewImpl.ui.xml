@@ -16,7 +16,8 @@
 				</b:InputGroup>
 			</b:Row>
 			<b:Row>
-	       		<g:FlowPanel ui:field="mainContainer" addStyleNames="min-height-400 margin-top-10"/>
+			    <g:SimplePanel ui:field="synAlertPanel"/>
+	       		<g:FlowPanel ui:field="mainContainer" addStyleNames="margin-top-10"/>
 	       	</b:Row>
 	       	<b:Row>
 				<g:SimplePanel ui:field="paginationPanel"/>

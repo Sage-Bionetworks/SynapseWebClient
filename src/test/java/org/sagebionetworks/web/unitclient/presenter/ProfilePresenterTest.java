@@ -65,6 +65,7 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -116,6 +117,7 @@ public class ProfilePresenterTest {
 	ProjectBadge mockProjectBadge;
 	ChallengeBadge mockChallengeBadge;
 	TeamListWidget mockTeamListWidget;
+	SynapseAlert mockSynAlert;
 	OpenTeamInvitationsWidget mockTeamInviteWidget;
 	
 	@Before
@@ -136,6 +138,8 @@ public class ProfilePresenterTest {
 		mockChallengeBadge = mock(ChallengeBadge.class);
 		mockTeamListWidget = mock(TeamListWidget.class);
 		mockTeamInviteWidget = mock(OpenTeamInvitationsWidget.class);
+		mockSynAlert = mock(SynapseAlert.class);
+		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, mockInjector);	
 		verify(mockView).setPresenter(profilePresenter);
@@ -235,7 +239,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testStart() {
+		verify(mockInjector, times(3)).getSynapseAlertWidget();
 		profilePresenter.setPlace(place);
+		verify(mockInjector, times(3)).getSynapseAlertWidget();
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		
 		
@@ -665,9 +671,10 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateProjectError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		Exception caught = new Exception("unhandled");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.createProject("valid name");
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test
@@ -744,9 +751,10 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateTeamError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		Exception caught = new Exception("unhandled");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		profilePresenter.createTeam("valid name");
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test

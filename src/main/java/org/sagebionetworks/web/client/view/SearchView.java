@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface SearchView extends IsWidget, SynapseView {
 	
@@ -59,5 +60,7 @@ public interface SearchView extends IsWidget, SynapseView {
 		
 		Long getStart();
 	}
+
+	public void setSynAlertWidget(Widget asWidget);
 
 }

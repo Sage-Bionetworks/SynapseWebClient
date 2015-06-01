@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TeamView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.TeamBundle;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -28,21 +29,24 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Team team;
 	private TeamMembershipStatus teamMembershipStatus;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 
 	@Override
@@ -77,6 +81,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	
 	@Override
 	public void refresh(final String teamId) {
+		synAlert.clear();
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
@@ -90,9 +95,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -103,6 +106,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 
 	@Override
 	public void deleteTeam() {
+		synAlert.clear();
 		synapseClient.deleteTeam(team.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -112,15 +116,14 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				}
+				synAlert.handleException(caught);
 			}
 		});
 	}
 
 	@Override
 	public void leaveTeam() {
+		synAlert.clear();
 		String userId = authenticationController.getCurrentUserPrincipalId();
 		synapseClient.deleteTeamMember(userId, userId, team.getId(), new AsyncCallback<Void>() {
 			@Override
@@ -130,15 +133,14 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				}
+				synAlert.handleException(caught);
 			}
 		});
 	}
 
 	@Override
 	public void updateTeamInfo(String name, String description, boolean canPublicJoin, String fileHandleId) {
+		synAlert.clear();
 		if (name == null || name.trim().length() == 0) {
 			view.showErrorMessage(DisplayConstants.ERROR_NAME_MUST_BE_DEFINED);
 		}
@@ -155,9 +157,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					}
+					synAlert.handleException(caught);
 				}
 			});
 		}
