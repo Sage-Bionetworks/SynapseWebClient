@@ -34,4 +34,6 @@ public interface QuizView extends IsWidget, SynapseView {
 		void submitClicked();
 		void showQuizFromPassingRecord(PassingRecord passingRecord);
     }
+
+	void setSynAlertWidget(Widget synAlert);
 }

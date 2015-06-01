@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SearchView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,6 +45,7 @@ public class SearchPresenterTest {
 	JSONObjectAdapter jsonObjectAdapter;
 	PlaceChanger mockPlaceChanger;
 	IconsImageBundle mockIconsImageBundle;
+	SynapseAlert mockSynAlert;
 
 	String exampleTerm;
 	String exampleTermSearchQueryJson;
@@ -55,6 +57,7 @@ public class SearchPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockSynAlert = mock(SynapseAlert.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		IconsImageBundle mockIconsImageBundle = mock(IconsImageBundle.class);
 
@@ -64,7 +67,7 @@ public class SearchPresenterTest {
 				mockGlobalApplicationState, mockAuthenticationController,
 				mockSynapseClient,
 				new JSONObjectAdapterImpl(),
-				mockIconsImageBundle);
+				mockIconsImageBundle, mockSynAlert);
 		
 		exampleTerm = "searchQueryTerm";
 		exampleTermSearchQuery = SearchQueryUtils.getDefaultSearchQuery();

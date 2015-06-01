@@ -91,6 +91,12 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	Div availableTeamsUI;
 	@UiField
 	Div emptyTeamsUI;
+	@UiField
+	SimplePanel challengeListSynAlertPanel;
+	@UiField
+	SimplePanel teamSelectSynAlertPanel;
+	@UiField
+	SimplePanel contributorSynAlertPanel;
 	
 	private PortalGinInjector ginInjector;
 	@Inject
@@ -355,5 +361,20 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void setContributorsLoading(boolean isVisible) {
 		contributorsLoadingUI.setVisible(isVisible);
+	}
+
+	@Override
+	public void setChallengesSynAlertWidget(Widget synAlert) {
+		this.challengeListSynAlertPanel.setWidget(synAlert);
+	}
+	
+	@Override
+	public void setTeamSelectSynAlertWidget(Widget synAlert) {
+		this.teamSelectSynAlertPanel.setWidget(synAlert);
+	}
+	
+	@Override
+	public void setContributorsSynAlertWidget(Widget synAlert) {
+		this.contributorSynAlertPanel.setWidget(synAlert);
 	}
 }

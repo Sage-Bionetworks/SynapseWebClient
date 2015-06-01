@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvitation;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -24,25 +22,34 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	private OpenTeamInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private Callback teamUpdatedCallback;
 	private AuthenticationController authenticationController;
-	private GWTWrapper gwt;
+	private PortalGinInjector ginInjector;
+	private Callback teamUpdatedCallback, refreshCallback;
 	
 	@Inject
 	public OpenTeamInvitationsWidget(OpenTeamInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
 			AuthenticationController authenticationController,
-			GWTWrapper gwt) {
+			PortalGinInjector ginInjector
+			) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.gwt = gwt;
+		this.ginInjector = ginInjector;
+		this.refreshCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		};
 	}
 
 	public void configure(final Callback teamUpdatedCallback, final CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback) {
+		this.teamUpdatedCallback = teamUpdatedCallback;
+		
 		view.clear();
 		//using the current user, ask for all of the open invitations extended to this user.
 		if (authenticationController.isLoggedIn()) {
@@ -52,7 +59,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 				public void onSuccess(ArrayList<OpenUserInvitationBundle> result) {
 					if (openTeamInvitationsCallback != null)
 						openTeamInvitationsCallback.invoke(result);
-					configure(teamUpdatedCallback, result);
+					showTeamInvites(result);
 				}
 				
 				@Override
@@ -65,50 +72,37 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 		}
 	};
 	
-	public void configure(Callback teamUpdatedCallback, List<OpenUserInvitationBundle> invites) {
-		this.teamUpdatedCallback = teamUpdatedCallback;
+	/**
+	 * Update the view to display the given team invitations, with a Join button for each team.
+	 * @param invites
+	 */
+	public void showTeamInvites(List<OpenUserInvitationBundle> invites) {
 		//create the associated object list, and pass to the view to render
-		List<Team> teams = new ArrayList<Team>();
-		List<String> inviteMessages = new ArrayList<String>();
+		view.clear();
 		for (OpenUserInvitationBundle b : invites) {
 			String invitationMessage = "";
 			MembershipInvitation invite = b.getMembershipInvitation();
-			if (invite.getMessage() != null)
+			if (invite.getMessage() != null) {
 				invitationMessage = invite.getMessage();
-			inviteMessages.add(invitationMessage);
-			teams.add(b.getTeam());
+			}
+			JoinTeamWidget joinButton = ginInjector.getJoinTeamWidget();
+			joinButton.configure(b.getTeam().getId(), refreshCallback);
+			view.addTeamInvite(b.getTeam(), invitationMessage, joinButton.asWidget());
 		}
-		view.configure(teams, inviteMessages);
 	}
-
+	
+	public void refresh() {
+		if (teamUpdatedCallback != null) {
+			teamUpdatedCallback.invoke();	
+		}
+		configure(teamUpdatedCallback, (CallbackP<List<OpenUserInvitationBundle>>)null);
+	}
 	
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	@Override
-	public void joinTeam(String teamId) {
-		//issue join request for the selected team
-		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, "", gwt.getHostPageBaseURL(), 
-				new AsyncCallback<Void>() {
-					@Override
-					public void onSuccess(Void result) {
-						view.showInfo(DisplayConstants.JOIN_TEAM_SUCCESS, "");
-						teamUpdatedCallback.invoke();
-						//refresh the open invitations
-						configure(teamUpdatedCallback, (CallbackP<List<OpenUserInvitationBundle>>)null);
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-							view.showErrorMessage(caught.getMessage());
-						} 
-					}
-		});		
-	}
-
 	public void clear() {
 		view.clear();
 	}

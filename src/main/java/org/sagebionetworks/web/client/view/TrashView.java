@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface TrashView extends IsWidget, SynapseView {
 	/**
@@ -64,4 +65,6 @@ public interface TrashView extends IsWidget, SynapseView {
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 		
 	}
+
+	void setSynAlertWidget(Widget asWidget);
 }

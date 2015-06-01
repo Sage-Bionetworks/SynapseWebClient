@@ -65,6 +65,7 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -116,6 +117,7 @@ public class ProfilePresenterTest {
 	ProjectBadge mockProjectBadge;
 	ChallengeBadge mockChallengeBadge;
 	TeamListWidget mockTeamListWidget;
+	SynapseAlert mockSynAlert;
 	OpenTeamInvitationsWidget mockTeamInviteWidget;
 	
 	@Before
@@ -136,6 +138,8 @@ public class ProfilePresenterTest {
 		mockChallengeBadge = mock(ChallengeBadge.class);
 		mockTeamListWidget = mock(TeamListWidget.class);
 		mockTeamInviteWidget = mock(OpenTeamInvitationsWidget.class);
+		mockSynAlert = mock(SynapseAlert.class);
+		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, adapterFactory, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, mockInjector);	
 		verify(mockView).setPresenter(profilePresenter);
@@ -234,8 +238,28 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testUpdateProfileView() {
+		boolean isOwner = true;
+		String userId = userProfile.getOwnerId();
+		ProfileArea initialTab = ProfileArea.PROJECTS;
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(isOwner);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		profilePresenter.updateProfileView(userId, initialTab);
+		
+		verify(mockView).clear();
+		verify(mockTeamListWidget, Mockito.atLeastOnce()).clear();
+		verify(mockView).showLoading();
+		verify(mockView).setSortText(SortOptionEnum.LATEST_ACTIVITY.sortText);
+		verify(mockView).setProfileEditButtonVisible(isOwner);
+		verify(mockView).showTabs(isOwner);
+		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testStart() {
+		verify(mockInjector, times(3)).getSynapseAlertWidget();
 		profilePresenter.setPlace(place);
+		verify(mockInjector, times(3)).getSynapseAlertWidget();
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		
 		
@@ -323,13 +347,14 @@ public class ProfilePresenterTest {
 		profilePresenter.updateProfileView("1", ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTabSelected(eq(ProfileArea.PROJECTS));
+		verify(mockView).addCertifiedBadge();
 	}		
 	
 	@Test
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
+		verify(mockView).addCertifiedBadge();
 		
 		//by default, it should not load ALL projects for the current user if going straight to settings
 		assertNull(profilePresenter.getFilterType());
@@ -340,9 +365,9 @@ public class ProfilePresenterTest {
 		//have not taken the test
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.TEAMS);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).setTabSelected(eq(ProfileArea.TEAMS));
+		verify(mockView, never()).addCertifiedBadge();
 	}
 	
 	@Test
@@ -350,9 +375,10 @@ public class ProfilePresenterTest {
 		//some other error occurred
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 	
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.PROJECTS);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
+		verify(mockView, never()).addCertifiedBadge();
 	}
 	
 	@Test
@@ -360,9 +386,10 @@ public class ProfilePresenterTest {
 		PassingRecord myPassingRecord = new PassingRecord();
 		String passingRecordJson = myPassingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(passingRecordJson).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView, never()).setGetCertifiedVisible(anyBoolean());		
+		verify(mockView).addCertifiedBadge();
 	}
 	
 	@Test
@@ -370,9 +397,10 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).setGetCertifiedVisible(true);
+		verify(mockView, never()).addCertifiedBadge();
 	}
 	
 	@Test
@@ -380,9 +408,10 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).setGetCertifiedVisible(true);
+		verify(mockView, never()).addCertifiedBadge();
 	}
 	
 	
@@ -391,9 +420,10 @@ public class ProfilePresenterTest {
 		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
 		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("false");
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.TEAMS);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).setGetCertifiedVisible(false);
+		verify(mockView, never()).addCertifiedBadge();
 	}
 	
 	
@@ -665,9 +695,10 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateProjectError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		Exception caught = new Exception("unhandled");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.createProject("valid name");
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test
@@ -744,9 +775,10 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateTeamError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		Exception caught = new Exception("unhandled");
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		profilePresenter.createTeam("valid name");
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test

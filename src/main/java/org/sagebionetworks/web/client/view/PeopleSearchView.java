@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface PeopleSearchView extends IsWidget, SynapseView {
 
@@ -28,4 +29,8 @@ public interface PeopleSearchView extends IsWidget, SynapseView {
 		int getOffset();
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 	}
+
+
+	public void setSynAlertWidget(Widget asWidget);
+	public void setSynAlertWidgetVisible(boolean b);
 }

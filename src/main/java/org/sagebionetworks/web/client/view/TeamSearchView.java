@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface TeamSearchView extends IsWidget, SynapseView {
 	
@@ -26,4 +27,7 @@ public interface TeamSearchView extends IsWidget, SynapseView {
 		void search(String searchTerm, Integer offset);
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 	}
+	public void setSynAlertWidget(Widget asWidget);
+
+	void setMainContainerVisible(boolean isVisible);
 }

@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -63,8 +65,10 @@ public class MarkdownEditorWidgetTest {
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
 	ResourceLoader mockResourceLoader;
+	PortalGinInjector mockInjector;
 	GWTWrapper mockGwt;
 	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
+	MarkdownWidget mockMarkdownWidget;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
 	CallbackP<WikiPage> mockDescriptorUpdatedHandler;
@@ -72,7 +76,7 @@ public class MarkdownEditorWidgetTest {
 	WikiPage testPage;
 	String fileHandleId1 = "44";
 	String fileHandleId2 = "45";
-	int minEditorLines;
+	int EDITOR_BOTTOM_MARGIN, MIN_EDITOR_HEIGHT;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -87,9 +91,13 @@ public class MarkdownEditorWidgetTest {
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockInjector = mock(PortalGinInjector.class);
+		mockMarkdownWidget = mock(MarkdownWidget.class);
+		when(mockInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState);
-		minEditorLines = presenter.MIN_VISIBLE_EDITOR_LINES;
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState, mockInjector);
+		MIN_EDITOR_HEIGHT = presenter.MIN_EDITOR_HEIGHT;
+		EDITOR_BOTTOM_MARGIN = presenter.EDITOR_BOTTOM_MARGIN;
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
@@ -99,7 +107,7 @@ public class MarkdownEditorWidgetTest {
 		testPage = new WikiPage();
 		testPage.setId("wikiPageId");
 		testPage.setMarkdown(testPageMarkdownText);
-		when(mockView.getMarkdownText()).thenReturn(testPageMarkdownText);
+		when(mockView.getMarkdown()).thenReturn(testPageMarkdownText);
 		testPage.setTitle("My Test Wiki Title");
 		List<String> fileHandleIds = new ArrayList<String>();
 		//our page has two file handles already
@@ -176,22 +184,16 @@ public class MarkdownEditorWidgetTest {
 		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showPreviewHTML(htmlReturned, wikiPageKey, mockWidgetRegistrar);
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockView).showPreviewModal();
 	}
 	
 	@Test
 	public void testPreviewFailure() throws Exception {
-		AsyncMockStubber
-				.callFailureWith(new Exception())
-				.when(mockSynapseClient)
-				.markdown2Html(anyString(), anyBoolean(), anyBoolean(),anyString(),
-						any(AsyncCallback.class));
-		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockView).showPreviewModal();
 	}
 	
 	@Test
@@ -283,74 +285,35 @@ public class MarkdownEditorWidgetTest {
 	@Test
 	public void testResizeMarkdownEmpty() {
 		String markdown = "";
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
-		when(mockView.getMarkdownText()).thenReturn(markdown);
+		String minSize = (MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px";
+		when(mockView.getMarkdown()).thenReturn(markdown);
+		when(mockView.getScrollHeight(anyString())).thenReturn(0);
 		presenter.resizeMarkdownTextArea();
-		verify(mockView).resizeMarkdownTextArea(minEditorLines);
-		String newText = getMultilineText(minEditorLines-1);
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(minEditorLines);
-		when(mockView.getMarkdownText()).thenReturn(newText);
+		verify(mockView).setMarkdownHeight(minSize);
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT / 2);
 		presenter.resizeMarkdownTextArea();
-		//shouldn't resize at this size, therefore remaining at one invocation
-		verify(mockView).resizeMarkdownTextArea(minEditorLines);
+		verify(mockView, Mockito.times(2)).setMarkdownHeight(minSize);
 		//should resize after minEditorLines line threshold
-		newText += getMultilineText(minEditorLines);
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(minEditorLines);
-		when(mockView.getMarkdownText()).thenReturn(newText);
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 2);
 		presenter.resizeMarkdownTextArea();
-		//7 lines, so should show an 8th line below
-		verify(mockView).resizeMarkdownTextArea(2*minEditorLines);
-	}
-	
-	@Test
-	public void testResizeMarkdownLongText() {
-		String markdown = getMultilineText(2*minEditorLines);
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
-		when(mockView.getMarkdownText()).thenReturn(markdown);
-		presenter.resizeMarkdownTextArea();
-		verify(mockView).resizeMarkdownTextArea(2*minEditorLines + 1);
-	}	
-	
-	@Test
-	public void testResizeMarkdownOnInsert() {
-		String markdown = getMultilineText(2*minEditorLines);
-		String newText = getMultilineText(minEditorLines);
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
-		when(mockView.getMarkdownText()).thenReturn(markdown);
-		presenter.resizeMarkdownTextArea();
-		//originally 2*minEditorLines + 1 lines
-		verify(mockView).resizeMarkdownTextArea(2*minEditorLines + 1);
-		
-		markdown += newText;
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(2*minEditorLines + 1);
-		when(mockView.getMarkdownText()).thenReturn(markdown);
-		presenter.resizeMarkdownTextArea();
-		//now should be 3*minEditorLines + 1 lines
-		verify(mockView).resizeMarkdownTextArea(3*minEditorLines + 1);
+		verify(mockView).setMarkdownHeight((MIN_EDITOR_HEIGHT * 2 + EDITOR_BOTTOM_MARGIN) + "px");
 	}
 		
 	@Test
 	public void testResizeMarkdownOnDelete() {
-		String markdown = getMultilineText(2*minEditorLines);
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(0);
-		when(mockView.getMarkdownText()).thenReturn(markdown);
+		String minSize = (MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px";
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 50);
 		presenter.resizeMarkdownTextArea();
-		//originally 2*minEditorLines + 1 lines
-		verify(mockView).resizeMarkdownTextArea(2*minEditorLines + 1);
+		verify(mockView).setMarkdownHeight((50*MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px");
 		
-		markdown = getMultilineText(minEditorLines + 1);
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(2*minEditorLines + 1);
-		when(mockView.getMarkdownText()).thenReturn(markdown);
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 25);
 		presenter.resizeMarkdownTextArea();
-		//now should be minEditorLines + 2 lines
-		verify(mockView).resizeMarkdownTextArea(minEditorLines + 2);
+		verify(mockView).setMarkdownHeight((25*MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px");
 		
-		markdown = getMultilineText(minEditorLines - 1);
-		when(mockView.getMarkdownTextAreaVisibleLines()).thenReturn(minEditorLines + 2);
-		when(mockView.getMarkdownText()).thenReturn(markdown);
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT / 2);
 		presenter.resizeMarkdownTextArea();
-		//now should be minEditorLines lines (minimum)
-		verify(mockView).resizeMarkdownTextArea(minEditorLines);
+		verify(mockView).setMarkdownHeight(minSize);
+
 	}
 	
 	public String getMultilineText(int numLines) {

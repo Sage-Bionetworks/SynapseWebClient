@@ -57,6 +57,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 	SimplePanel mediaObjectContainer;
 	@UiField
 	FlowPanel commandsContainer;
+	@UiField
+	SimplePanel synAlertPanel;
+	
 	private Team team;
 	private DropdownButton toolsButton;
 	private Presenter presenter;
@@ -187,7 +190,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (teamMembershipStatus != null) {
 			if (!teamMembershipStatus.getIsMember()) {
 				//not a member, add Join widget
-				joinTeamWidget.configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), false, teamMembershipStatus, getRefreshCallback(team.getId()), null, null, null, null, false);
+				joinTeamWidget.configure(team.getId(), false, teamMembershipStatus, getRefreshCallback(team.getId()), null, null, null, null, false);
 				Widget joinTeamView = joinTeamWidget.asWidget();
 				joinTeamView.addStyleName("margin-top-15");	
 				mainContainer.add(joinTeamView);
@@ -316,6 +319,11 @@ public class TeamViewImpl extends Composite implements TeamView {
 				presenter.refresh(teamId);
 			}
 		};
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		this.synAlertPanel.setWidget(synAlert);
 	}
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -26,6 +27,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -39,6 +41,7 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -56,6 +59,7 @@ public class EntityPresenterTest {
 	CookieProvider mockCookies;
 	PlaceChanger mockPlaceChanger;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	SynapseAlert mockSynAlert;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
 	Entity EntityModel1;
@@ -77,7 +81,8 @@ public class EntityPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockCookies, mockSynapseJSNIUtils);
+		mockSynAlert = mock(SynapseAlert.class);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockCookies, mockSynapseJSNIUtils, mockSynAlert);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -101,6 +106,7 @@ public class EntityPresenterTest {
 		verify(mockView, times(2)).setPresenter(entityPresenter);
 		//verify that background image is cleared
 		verify(mockView).setBackgroundImageVisible(false);
+		verify(mockView).setSynAlertWidget(mockSynAlert.asWidget());
 	}	
 	
 	@Test
@@ -154,9 +160,13 @@ public class EntityPresenterTest {
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
 		entityPresenter.setPlace(place);
+		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
 		//verify synapse client call
-		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), captor.capture());
 		verify(mockView).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
+		Exception caught = new Exception("test");
+		captor.getValue().onFailure(caught);
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	private AccessRequirement createNewAR(ACCESS_TYPE type) {
@@ -165,6 +175,20 @@ public class EntityPresenterTest {
 		id++;
 		ar.setId(id);
 		return ar;
+	}
+	
+	@Test
+	public void testRefreshFailure() {
+		//will show full project page for wiki based entities when in alpha mode
+				when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
+				when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+				Long version = null;
+				Synapse place = new Synapse(entityId, version, area, areaToken);
+				entityPresenter.setPlace(place);
+				//verify synapse client call
+				verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+				verify(mockView).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
+		
 	}
 	
 	@Test

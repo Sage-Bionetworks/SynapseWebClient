@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -29,6 +27,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -46,7 +45,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private IconsImageBundle iconsImageBundle;
 	private ResourceLoader resourceLoader;
-	private MarkdownWidget markdownWidget;
 	private Presenter presenter;
 	
 	@UiField
@@ -58,10 +56,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Div mdCommands;
 	
 	@UiField
-	public TextArea markdownTextArea;
+	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
+	@UiField 
+	public com.google.gwt.user.client.ui.TextArea resizingTextArea;
 	
 	@UiField
-	public FlowPanel formattingGuideContainer;
+	public SimplePanel formattingGuideContainer;
 	
 	/**
 	 * List of toolbar commands
@@ -172,7 +172,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	//preview
 	@UiField
-	public FlowPanel previewHtmlContainer;
+	public SimplePanel previewHtmlContainer;
 	@UiField
 	public Modal previewModal;
 	@UiField
@@ -196,16 +196,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJSNIUtils,
 			IconsImageBundle iconsImageBundle,
-			ResourceLoader resourceLoader, 
-			MarkdownWidget markdownWidget) {
+			ResourceLoader resourceLoader) {
 		super();
 		this.widget = binder.createAndBindUi(this);
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.iconsImageBundle = iconsImageBundle;
 		this.resourceLoader = resourceLoader;
-		this.markdownWidget = markdownWidget;
-		markdownWidget.addStyleName("margin-10");
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		buttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BUTTON_LINK));
@@ -314,22 +311,9 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.presenter = presenter;
 	}
 	
-	/**
-	 * 
-	 * @param ownerId
-	 * @param ownerType
-	 * @param markdownTextArea
-	 * @param formPanel
-	 * @param callback
-	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
-	 */
-	public void configure( 
-			WikiPageKey formattingGuideWikiPageKey,
-			String markdown) {
-		markdownTextArea.setText(markdown);
-		if (formattingGuideWikiPageKey != null)
-			initFormattingGuide(formattingGuideWikiPageKey);
-		
+	@Override
+	public void configure(String markdown) {
+		markdownTextArea.setText(markdown);		
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			@Override
 			public void execute() {
@@ -343,24 +327,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setAttachmentCommandsVisible(boolean visible) {
 		attachmentLink.setVisible(visible);
 		attachmentButton.setVisible(visible);
-	}
-	
-	public void initFormattingGuide(WikiPageKey formattingGuideWikiPageKey) {
-		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
-		formattingGuideContainer.clear();
-		formattingGuideContainer.add(markdownWidget);
-	}
-
-	public String getMarkdownText() {
-		return  markdownTextArea.getText();
-	}
-	
-	public int getMarkdownTextAreaVisibleLines() {
-		return markdownTextArea.getVisibleLines();
-	}
-		
-	public void resizeMarkdownTextArea(int visibleLines) {
-		markdownTextArea.setVisibleLines(visibleLines);
 	}
 	
 	@Override
@@ -387,24 +353,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setEditButtonEnabled(boolean enabled) {
 		editWidgetButton.setEnabled(enabled);
 	}
-
-	@Override
-	public void showPreviewHTML(String result, WikiPageKey wikiKey, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
-		HTMLPanel panel;
-		if(result == null || "".equals(result)) {
-	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
-		}
-		else{
-			panel = new HTMLPanel(result);
-		}
-		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
-		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
-		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, true, null, null);
-		
-		previewHtmlContainer.clear();
-		previewHtmlContainer.add(panel);
-		previewModal.show();
-	}
+	
+	
 	
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -454,6 +404,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setMarkdownFocus() {
 		markdownTextArea.setFocus(true);
 	}
+	
+	@Override
+	public void setMarkdownHeight(String height) {
+		markdownTextArea.setHeight(height);
+	}
+	
 	@Override
 	public int getSelectionLength() {
 		return markdownTextArea.getSelectionLength();
@@ -468,6 +424,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setTitleEditorVisible(boolean visible) {
 		titleField.setVisible(visible);
 	}
+	
+	@Override
+	public int getScrollHeight(String text) {
+		resizingTextArea.setText("");
+		resizingTextArea.setText(text);
+		return resizingTextArea.getElement().getScrollHeight();
+	}
 
 	
 	@Override
@@ -478,5 +441,20 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setTitle(String title) {
 		titleField.setValue(title);
+	}
+
+	@Override
+	public void setMarkdownPreviewWidget(Widget markdownPreviewWidget) {
+		previewHtmlContainer.setWidget(markdownPreviewWidget);
+	}
+
+	@Override
+	public void setFormattingGuideWidget(Widget formattingGuideWidget) {
+		formattingGuideContainer.setWidget(formattingGuideWidget);
+	}
+
+	@Override
+	public void showPreviewModal() {
+		previewModal.show();
 	}
 }

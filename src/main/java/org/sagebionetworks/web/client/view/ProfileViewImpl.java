@@ -14,7 +14,6 @@ import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -200,8 +199,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement challengesLoadingUI;
 	@UiField 
 	Row profilePictureLoadingUI;
-	@UiField 
-	Row profileInfoLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -211,6 +208,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button hideProfileButton;
 	@UiField
 	Alert getCertifiedAlert;
+	
+	@UiField
+	SimplePanel profileSynAlertPanel;
+	@UiField
+	FlowPanel projectSynAlertPanel;
+	@UiField
+	SimplePanel teamSynAlertPanel;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -380,6 +384,22 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		openInvitesContainer.add(openInvitesWidget.asWidget());
 	}
 	
+	@Override
+	public void setProfileSynAlertWidget(Widget profileSynAlert) {
+		profileSynAlertPanel.setWidget(profileSynAlert);
+	}
+	
+	@Override
+	public void setProjectSynAlertWidget(Widget projectSynAlert) {
+		projectSynAlertPanel.clear();
+		projectSynAlertPanel.add(projectSynAlert);
+	}
+	
+	@Override
+	public void setTeamSynAlertWidget(Widget teamSynAlert) {
+		teamSynAlertPanel.setWidget(teamSynAlert);
+	}
+	
 	public void clearSortOptions() {
 		sortProjectsDropDownMenu.clear();
 	}
@@ -447,15 +467,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord) {
-		clear();
-		DisplayUtils.hide(settingsListItem);
-		if (passingRecord != null) {
-			viewProfilePanel.add(certifiedUserBadgePanel);
-		}
-			
+	public void setProfile(UserProfile profile, boolean isOwner) {
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
+		if (!isOwner) {
+			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
+		}
+	}
+	
+	@Override
+	public void showTabs(boolean isOwner) {
+		DisplayUtils.hide(settingsListItem);
 		openInvitesContainer.setVisible(isOwner);
 		if (isOwner) {
 			resetHighlightBoxes();
@@ -464,12 +486,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
-		} else {
-			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
-		}
-		
+		}		
 		//Teams
 		DisplayUtils.show(navtabContainer);
+	}
+	
+	@Override
+	public void addCertifiedBadge() {
+		viewProfilePanel.add(certifiedUserBadgePanel);
 	}
 	
 	private void resetHighlightBoxes() {
@@ -668,13 +692,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showLoading() {
 		profilePictureLoadingUI.setVisible(true);
-		profileInfoLoadingUI.setVisible(true);
 	}
 
 	@Override
 	public void hideLoading() {
 		profilePictureLoadingUI.setVisible(false);
-		profileInfoLoadingUI.setVisible(false);
 	}
 	
 	@Override
