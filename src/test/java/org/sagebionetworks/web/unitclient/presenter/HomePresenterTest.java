@@ -32,9 +32,11 @@ import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationException;
@@ -49,7 +51,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class HomePresenterTest {
 
 	HomePresenter homePresenter;
-	CookieProvider cookieProvider;
 	HomeView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -72,7 +73,6 @@ public class HomePresenterTest {
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
 		mockView = mock(HomeView.class);
-		cookieProvider = mock(CookieProvider.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -120,7 +120,8 @@ public class HomePresenterTest {
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
 				mockRssService,
-				adapter);
+				adapter,
+				mockCookies);
 		verify(mockView).setPresenter(homePresenter);
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 		
@@ -194,5 +195,31 @@ public class HomePresenterTest {
 		verify(mockAuthenticationController).getCurrentUserSessionData();
 		//should automatically log you out
 		verify(mockAuthenticationController).logoutUser();
+	}
+	
+	@Test
+	public void testAnonymousNotLoggedInRecently() {
+		when(mockCookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY)).thenReturn(null);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		Home place = Mockito.mock(Home.class);
+		homePresenter.setPlace(place);
+		verify(mockView).showRegisterUI();
+	}
+	
+	@Test
+	public void testAnonymousLoggedInRecently() {
+		when(mockCookies.getCookie(eq(CookieKeys.USER_LOGGED_IN_RECENTLY))).thenReturn("true");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		Home place = Mockito.mock(Home.class);
+		homePresenter.setPlace(place);
+		verify(mockView).showLoginUI();
+	}
+
+	@Test
+	public void testOnUserChange() {
+		String userId = "77776";
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		homePresenter.onUserChange();
+		verify(mockPlaceChanger).goTo(any(Profile.class));
 	}
 }

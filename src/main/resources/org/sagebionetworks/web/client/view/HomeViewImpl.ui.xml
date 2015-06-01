@@ -23,6 +23,7 @@
 						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" />
 					</bh:Div>
 					<bh:Div ui:field="registerUI"></bh:Div>
+					<bh:Div ui:field="loginUI" addStyleNames="synapse-blue-bg padding-10" />
 				</b:Column>
 			</b:Row>
 		</b:Container>

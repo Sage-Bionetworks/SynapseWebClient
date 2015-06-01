@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.login.LoginWidget;
 
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -51,7 +50,6 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	public CertificateViewImpl(Binder uiBinder,
 			Header headerWidget, 
 			Footer footerWidget,
-			LoginWidget loginWidget, 
 			CertificateWidget certificateWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.headerWidget = headerWidget;

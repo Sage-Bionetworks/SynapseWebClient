@@ -9,8 +9,11 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -31,13 +34,15 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private AuthenticationController authenticationController;
 	private RssServiceAsync rssService;
 	private AdapterFactory adapterFactory;
+	private CookieProvider cookies;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
 			RssServiceAsync rssService,
-			AdapterFactory adapterFactory){
+			AdapterFactory adapterFactory,
+			CookieProvider cookies){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -45,6 +50,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.rssService = rssService;
 		this.adapterFactory = adapterFactory;
 		this.authenticationController = authenticationController;
+		this.cookies = cookies;
 		this.view.setPresenter(this);
 	}
 
@@ -68,7 +74,11 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			//validate token
 			validateToken();
 		} else {
-			view.showAnonymousUI();
+			if (cookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY) != null) {
+				view.showLoginUI();
+			} else {
+				view.showRegisterUI();
+			}
 		}
 	}
 		
@@ -140,5 +150,10 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		if (authenticationController.isLoggedIn() && !authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
 			authenticationController.logoutUser();
 		}
+	}
+	
+	@Override
+	public void onUserChange() {
+		globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
 	}
 }
