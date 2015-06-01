@@ -73,10 +73,12 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.synAlert = synAlert;
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 	
 	@Override
 	public void configure(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
+		synAlert.clear();
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.isPreview= isPreview;
@@ -196,6 +198,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 	}
 	
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview, final boolean isIgnoreLoadingFailure) {
+		synAlert.clear();
 		//get the wiki page
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
