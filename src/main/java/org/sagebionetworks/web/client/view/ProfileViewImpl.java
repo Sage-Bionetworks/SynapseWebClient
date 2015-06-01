@@ -199,8 +199,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement challengesLoadingUI;
 	@UiField 
 	Row profilePictureLoadingUI;
-//	@UiField 
-//	Row profileInfoLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -694,13 +692,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showLoading() {
 		profilePictureLoadingUI.setVisible(true);
-//		profileInfoLoadingUI.setVisible(true);
 	}
 
 	@Override
 	public void hideLoading() {
 		profilePictureLoadingUI.setVisible(false);
-//		profileInfoLoadingUI.setVisible(false);
 	}
 	
 	@Override
