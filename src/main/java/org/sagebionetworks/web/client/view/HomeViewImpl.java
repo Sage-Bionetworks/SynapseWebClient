@@ -22,6 +22,8 @@ import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -62,7 +64,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Div dashboardUI;
 	@UiField
 	Div registerUI;
-	
+	@UiField
+	Div loginUI;
 	@UiField
 	SimplePanel rClientInstallPanel;
 	@UiField
@@ -115,6 +118,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	SynapseJSNIUtils synapseJSNIUtils;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
+	LoginWidget loginWidget;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -127,13 +131,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 			final AuthenticationController authController,
 			SynapseJSNIUtils synapseJSNIUtils,
 			UserBadge userBadge,
-			RegisterWidget registerWidget) {
+			RegisterWidget registerWidget,
+			LoginWidget loginWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.iconsImageBundle = icons;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.userBadge = userBadge;
+		this.loginWidget = loginWidget;
 		userBadge.setSize(BadgeSize.DEFAULT_PICTURE_ONLY);
 		myDashboardButtonContents = new HorizontalPanel();
 		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
@@ -159,6 +165,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		registerUI.add(registerWidget.asWidget());
 		
+		loginWidget.setUserListener(new UserListener() {
+			@Override
+			public void userChanged(UserSessionData newUser) {
+				presenter.onUserChange();
+			}
+		});
 		// Other links
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
 		
@@ -237,16 +249,21 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void showLoggedInUI(UserSessionData userData) {
-		clearUserProfilePicture();
 		setUserProfilePicture(userData);
-		registerUI.setVisible(false);
 		dashboardUI.setVisible(true);
 	}
+
 	@Override
-	public void showAnonymousUI() {
-		clearUserProfilePicture();
+	public void showLoginUI() {
+		loginUI.clear();
+		loginWidget.asWidget().removeFromParent();
+		loginUI.add(loginWidget.asWidget());
+		loginUI.setVisible(true);
+	}
+	
+	@Override
+	public void showRegisterUI() {
 		registerUI.setVisible(true);
-		dashboardUI.setVisible(false);
 	}
 	
 	private void clearUserProfilePicture() {
@@ -283,7 +300,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-		}
+		clear();
+	}
 	
 	@Override
 	public void showErrorMessage(String message) {
@@ -302,6 +320,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void clear() {
+		clearUserProfilePicture();
+		dashboardUI.setVisible(false);
+		registerUI.setVisible(false);
+		loginUI.setVisible(false);
 	}
 
 
