@@ -263,6 +263,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.RestServiceButtonWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.RestServiceButtonWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
@@ -883,6 +885,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableOfContentsWidgetView.class).to(TableOfContentsWidgetViewImpl.class);
 		bind(WikiFilesPreviewWidgetView.class).to(WikiFilesPreviewWidgetViewImpl.class);
 		bind(ButtonLinkWidgetView.class).to(ButtonLinkWidgetViewImpl.class);
+		bind(RestServiceButtonWidgetView.class).to(RestServiceButtonWidgetViewImpl.class);
 		bind(EmptyWidgetView.class).to(EmptyWidgetViewImpl.class);
 		bind(VideoWidgetView.class).to(VideoWidgetViewImpl.class);
 		

@@ -148,6 +148,10 @@ public class WidgetConstants {
 	public static final int SHINYSITE_DEFAULT_HEIGHT_PX = 400;
 	
 	public static final String LINK_URL_KEY = "url";
+	public static final String URI_KEY = "uri";
+	public static final String ENDPOINT_KEY = "endpoint";
+	public static final String BUTTON_TYPE_KEY = "buttonType";
+	public static final String METHOD_KEY = "method";
 	public static final String TEXT_KEY = "text";
 	
 	public static final String REGISTER_CHALLENGE_TEAM_CONTENT_TYPE="registerChallengeTeam";
