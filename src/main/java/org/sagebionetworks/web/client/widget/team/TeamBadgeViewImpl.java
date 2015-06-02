@@ -14,7 +14,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
@@ -82,7 +81,6 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			add(anchor);
 			add(notificationsPanel);
 		} 		
-		
 	}
 	
 	@Override
@@ -91,17 +89,14 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		notificationsPanel.clear();
 		
 		InlineLabel nameLabel = new InlineLabel(name);
-		nameLabel.addStyleName("font-size-13 boldText");
-		
-		HTML profilePicture;
+		nameLabel.addStyleName("font-size-15 boldText");
+		Icon profilePicture;
 		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
-			//profilePicture = new HTML(DisplayUtils.getFontelloIcon("globe font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
-			String html = AbstractImagePrototype.create(iconsImageBundle.globe16()).getHTML();
-			profilePicture = new HTML(html);
+			profilePicture = new Icon(IconType.GLOBE);
 		} else {
-			profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before margin-right-5"));
+			profilePicture = new Icon(IconType.USERS);
 		}
-		profilePicture.addStyleName("displayInline margin-right-5");
+		profilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4 margin-left-5");
 		add(profilePicture);
 			
 		add(nameLabel);
