@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -142,6 +143,7 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.Endpoint;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -3003,5 +3005,65 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	/**
+POST
+getSharedClientConnection().postJson(repoEndpoint, uri, JSONObject.toString(), getUserAgent(), null);
+
+GET
+getSharedClientConnection().getJson(repoEndpoint, uri, getUserAgent());
+
+DELETE
+getSharedClientConnection().deleteUri(repoEndpoint, uri, getUserAgent());
+
+PUT
+getSharedClientConnection().putJson(repoEndpoint, url, JSONObject.toString(), getUserAgent());
+
+	 */
+	
+	@Override
+	public String getFromRepo(String uri) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return synapseClient.getEntity(uri).toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String postToRepo(String uri, String json, Map<String, String> paramsMap) {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			String repoEndpoint = synapseClient.getRepoEndpoint();
+			JSONObject response = synapseClient.getSharedClientConnection().postJson(repoEndpoint, uri, json, PORTAL_USER_AGENT, paramsMap);
+			return response.toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void deleteFromRepo(String uri, Map<String, String> paramsMap) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			String repoEndpoint = synapseClient.getRepoEndpoint();
+			synapseClient.getSharedClientConnection().deleteUri(repoEndpoint, uri, PORTAL_USER_AGENT, paramsMap);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String putToRepo(String uri, String json) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			String repoEndpoint = synapseClient.getRepoEndpoint();
+			JSONObject response = synapseClient.getSharedClientConnection().putJson(repoEndpoint, uri, json, PORTAL_USER_AGENT);
+			return response.toString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+
 	}
 }

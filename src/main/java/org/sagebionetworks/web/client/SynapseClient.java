@@ -63,7 +63,6 @@ import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.Endpoint;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -527,13 +526,12 @@ public interface SynapseClient extends RemoteService {
 	
 	/**
 	 * Expose basic rest service calls
-	 * @param endpoint AUTH, REPO, FILE, or SEARCH
 	 * @param uri path to service
 	 * @return Returns the JSON response string (when applicable)
 	 * @throws RestServiceException
 	 */
-	String get(Endpoint endpoint, String uri) throws RestServiceException;
-	void delete(Endpoint endpoint, String uri) throws RestServiceException;
-	String post(Endpoint endpoint, String uri, String json, Map<String, String> paramsMap);
-	String put(Endpoint endpoint, String uri) throws RestServiceException;
+	String getFromRepo(String uri) throws RestServiceException;
+	void deleteFromRepo(String uri, Map<String, String> paramsMap) throws RestServiceException;
+	String postToRepo(String uri, String json, Map<String, String> paramsMap);
+	String putToRepo(String uri, String json) throws RestServiceException;
 }

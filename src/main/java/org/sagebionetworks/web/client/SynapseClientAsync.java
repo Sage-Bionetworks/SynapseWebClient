@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -423,4 +424,13 @@ public interface SynapseClientAsync {
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
 	void getEntityInfo(String entityId, AsyncCallback<EntityBundlePlus> callback);
+
+	void getFromRepo(String uri, AsyncCallback<String> callback);
+
+	void deleteFromRepo(String uri, Map<String, String> paramsMap,  AsyncCallback<Void> callback);
+
+	void postToRepo(String uri, String json,
+			Map<String, String> paramsMap, AsyncCallback<String> callback);
+
+	void putToRepo(String uri, String json, AsyncCallback<String> callback);
 }

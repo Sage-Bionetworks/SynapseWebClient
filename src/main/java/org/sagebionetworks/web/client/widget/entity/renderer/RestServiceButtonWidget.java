@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.Endpoint;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -24,7 +23,7 @@ public class RestServiceButtonWidget implements ButtonLinkWidgetView.Presenter, 
 	private Map<String,String> descriptor;
 	SynapseClientAsync synapseClient;
 	String method, uri;
-	Endpoint endpoint;
+	
 	@Inject
 	public RestServiceButtonWidget( 
 			ButtonLinkWidgetView view,
@@ -40,7 +39,6 @@ public class RestServiceButtonWidget implements ButtonLinkWidgetView.Presenter, 
 		this.descriptor = widgetDescriptor;
 		uri = descriptor.get(WidgetConstants.URI_KEY);
 		method = descriptor.get(WidgetConstants.METHOD_KEY);
-		endpoint = Endpoint.valueOf(descriptor.get(WidgetConstants.ENDPOINT_KEY));
 		String buttonText = descriptor.get(WidgetConstants.TEXT_KEY);
 		ButtonType buttonType = ButtonType.DEFAULT;
 		if (descriptor.containsKey(WidgetConstants.BUTTON_TYPE_KEY)){
