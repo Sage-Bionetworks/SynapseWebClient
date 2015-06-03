@@ -59,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConf
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.RestServiceButtonConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
@@ -84,6 +85,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.RegisterChallengeTeamWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.RestServiceButtonWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
@@ -225,6 +227,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VideoConfigEditor getVideoConfigEditor();
 	public TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
 	public ProjectBackgroundConfigEditor getProjectBackgroundConfigEditor();
+	public RestServiceButtonConfigEditor getRestServiceButtonConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -250,6 +253,7 @@ public interface PortalGinInjector extends Ginjector {
 	public RegisterChallengeTeamWidget getRegisterChallengeTeamWidget();
 	public ChallengeTeamsWidget getChallengeTeamsWidget();
 	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
+	public RestServiceButtonWidget getRestServiceButtonWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();

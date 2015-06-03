@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -60,7 +59,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WikiPageKey wikiKey;
 	private CallbackP<WikiPage> wikiPageUpdatedHandler;
 	private GlobalApplicationState globalApplicationState;
-	private PortalGinInjector ginInjector;
 	private MarkdownWidget markdownPreview;
 	private MarkdownWidget formattingGuide;
 	
@@ -81,7 +79,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
 		this.globalApplicationState = globalApplicationState;
-		this.markdownPreview = markdownPreview;
 		widgetSelectionState = new WidgetSelectionState();
 		markdownPreview = ginInjector.getMarkdownWidget();
 		formattingGuide = ginInjector.getMarkdownWidget();
@@ -348,6 +345,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case INSERT_API_SUPERTABLE:
 			insertNewWidget(WidgetConstants.API_TABLE_CONTENT_TYPE);
+			break;
+		case INSERT_API_SUPERBUTTON:
+			insertNewWidget(WidgetConstants.REST_SERVICE_BUTTON_CONTENT_TYPE);
 			break;
 		case INSERT_WIKI_FILES_PREVIEW:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);

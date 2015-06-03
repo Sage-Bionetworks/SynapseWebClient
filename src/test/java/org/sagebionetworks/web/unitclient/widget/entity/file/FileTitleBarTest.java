@@ -8,13 +8,10 @@ import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -53,20 +50,6 @@ public class FileTitleBarTest {
 		fileTitleBar.asWidget();
 	}
 	
-	@Test
-	public void testIsDataNotInFile() {
-		FileEntity fileEntity = new FileEntity();
-		fileEntity.setDataFileHandleId(null);
-		Assert.assertFalse(FileTitleBar.isDataPossiblyWithin(fileEntity));
-	}
-	
-	@Test
-	public void testIsDataInFile() {
-		FileEntity fileEntity = new FileEntity();
-		fileEntity.setDataFileHandleId("123");
-		Assert.assertTrue(FileTitleBar.isDataPossiblyWithin(fileEntity));
-	}
-
 	@Test
 	public void testSetS3DescriptionForExternalS3() {
 		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -522,4 +523,15 @@ public interface SynapseClient extends RemoteService {
 	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
 
 	EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException;
+	
+	/**
+	 * Expose basic rest service calls
+	 * @param uri path to service
+	 * @return Returns the JSON response string (when applicable)
+	 * @throws RestServiceException
+	 */
+	String getFromRepo(String uri) throws RestServiceException;
+	void deleteFromRepo(String uri, Map<String, String> paramsMap) throws RestServiceException;
+	String postToRepo(String uri, String json, Map<String, String> paramsMap) throws RestServiceException;
+	String putToRepo(String uri, String json) throws RestServiceException;
 }

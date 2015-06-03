@@ -7,26 +7,15 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -41,10 +30,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	public interface Binder extends UiBinder<Widget, MarkdownEditorWidgetViewImpl> {}
 	
-	private SynapseClientAsync synapseClient;
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private IconsImageBundle iconsImageBundle;
-	private ResourceLoader resourceLoader;
 	private Presenter presenter;
 	
 	@UiField
@@ -114,6 +99,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem externalWebsiteLink;
 	@UiField
 	public AnchorListItem supertableLink;
+	@UiField
+	public AnchorListItem superbuttonLink;
 	@UiField
 	public AnchorListItem registerChallengeTeamLink;
 	@UiField
@@ -192,17 +179,10 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@Inject
 	public MarkdownEditorWidgetViewImpl(
-			Binder binder,
-			SynapseClientAsync synapseClient,
-			SynapseJSNIUtils synapseJSNIUtils,
-			IconsImageBundle iconsImageBundle,
-			ResourceLoader resourceLoader) {
+			Binder binder
+			) {
 		super();
 		this.widget = binder.createAndBindUi(this);
-		this.synapseClient = synapseClient;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.iconsImageBundle = iconsImageBundle;
-		this.resourceLoader = resourceLoader;
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		buttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BUTTON_LINK));
@@ -223,6 +203,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));
 		externalWebsiteLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE));
 		supertableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERTABLE));
+		superbuttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERBUTTON));
 		wikifilesPreviewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW));
 		tutorialWizardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD));
 		registerChallengeTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REGISTER_CHALLENGE_TEAM));

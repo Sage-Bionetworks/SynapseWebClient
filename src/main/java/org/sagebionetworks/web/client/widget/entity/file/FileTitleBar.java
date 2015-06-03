@@ -84,13 +84,6 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		return authenticationController.isLoggedIn();
 	}
 
-	
-	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
-		String dataFileHandleId = fileEntity.getDataFileHandleId();
-		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
-	}
-
-	
 	public void queryForSftpLoginInstructions(String url) {
 		synapseClient.getHost(url, new AsyncCallback<String>() {
 			@Override
