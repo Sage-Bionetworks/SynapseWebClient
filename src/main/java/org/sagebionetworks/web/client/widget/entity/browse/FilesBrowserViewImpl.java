@@ -157,6 +157,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		sharingAndDataUseWidget.configure(folderEntityId, true,
 				refreshSharingAndDataUseWidget);
 		newFolderDialog.show();
+		addFolderButton.setFocus(false);
 	}
 
 	@Override
