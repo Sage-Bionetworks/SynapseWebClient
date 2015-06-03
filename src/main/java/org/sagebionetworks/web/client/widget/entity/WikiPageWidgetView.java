@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface WikiPageWidgetView extends IsWidget, SynapseView {
 
@@ -38,4 +39,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void showModifiedBy(boolean isVisible);
 	public void resetWikiMarkdown(String markdown, final WikiPageKey wikiKey,
 			boolean isRootWiki, boolean isCurrentVersion, final Long versionInView);
+	public void setSynapseAlertWidget(Widget asWidget);
+	public void clearWikiPagePanelWithSynapseAlert();
 }

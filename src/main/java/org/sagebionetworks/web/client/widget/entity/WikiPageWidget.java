@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -47,6 +48,7 @@ SynapseWidgetPresenter {
 	private Long versionInView;
 	private CallbackP<WikiPageKey> reloadWikiPageCallback;
 	private CallbackP<String> wikiReloadHandler;
+	private SynapseAlert synapseAlert;
 
 	public interface Callback{
 		public void pageUpdated();
@@ -57,13 +59,16 @@ SynapseWidgetPresenter {
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseAlert synapseAlert) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.synapseAlert = synapseAlert;
 		view.setPresenter(this);
+		view.setSynapseAlertWidget(synapseAlert.asWidget());
 	}
 
 	@Override
@@ -89,6 +94,7 @@ SynapseWidgetPresenter {
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
+		this.synapseAlert.clear();
 
 		// set up callback
 		if (callback != null)
@@ -243,6 +249,7 @@ SynapseWidgetPresenter {
 	}
 
 	public void reloadWikiPage() {
+		synapseAlert.clear();
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage result) {
@@ -270,29 +277,21 @@ SynapseWidgetPresenter {
 	private void handleGetV2WikiPageAsV1Failure(Throwable caught) {
 		// if it is because of a missing root (and we have edit permission),
 		// then the pages browser should have a Create Wiki button
-		if (caught instanceof NotFoundException) {
-			//show insert wiki button if user can edit and it's embedded in another entity page
-			if (isEmbeddedInOwnerPage) {
-				if (canEdit) {
-					view.showWarningMessageInPage(DisplayConstants.NO_WIKI_FOUND);
-				} else {
-					view.clear();
-				}
-			} else
-				//otherwise, if it's not embedded in the owner page, show a 404
+		if (caught instanceof NotFoundException && callback!= null) {
+			callback.noWikiFound();
+		}
+		if (isEmbeddedInOwnerPage) {
+			synapseAlert.handleException(caught);
+			view.clearWikiPagePanelWithSynapseAlert();
+		} else {
+			if (caught instanceof NotFoundException) {
 				view.show404();
-			
-			if (callback != null)
-				callback.noWikiFound();
-		}
-		else if (caught instanceof ForbiddenException) {
-			//if it's not embedded in the owner page, show a 403
-			if (!isEmbeddedInOwnerPage)
+			} else if (caught instanceof ForbiddenException) {
 				view.show403();
-		}
-		else {
-			if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-				view.showWarningMessageInPage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+			} else {
+				synapseAlert.handleException(caught);
+				view.clearWikiPagePanelWithSynapseAlert();
+			}
 		}
 	}
 
