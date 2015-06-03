@@ -11,12 +11,10 @@ import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
@@ -136,8 +134,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 
-		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
-		synapseIconForEntity.applyTo(entityIcon);
+		entityIcon.setType(DisplayUtils.getIconTypeForEntity(entity));
+		
 		//fileHandle is null if user can't access the filehandle associated with this file entity
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 		boolean isFilenamePanelVisible = fileHandle != null;
