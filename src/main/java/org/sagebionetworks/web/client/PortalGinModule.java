@@ -223,6 +223,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.RestServiceButtonConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.RestServiceButtonConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
@@ -872,6 +874,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);
 		bind(VideoConfigView.class).to(VideoConfigViewImpl.class);
 		bind(TableQueryResultWikiView.class).to(TableQueryResultWikiViewImpl.class);
+		bind(RestServiceButtonConfigView.class).to(RestServiceButtonConfigViewImpl.class);
 		
 		// UI Widget Renderers
 		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);
@@ -888,7 +891,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RestServiceButtonWidgetView.class).to(RestServiceButtonWidgetViewImpl.class);
 		bind(EmptyWidgetView.class).to(EmptyWidgetViewImpl.class);
 		bind(VideoWidgetView.class).to(VideoWidgetViewImpl.class);
-		
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);

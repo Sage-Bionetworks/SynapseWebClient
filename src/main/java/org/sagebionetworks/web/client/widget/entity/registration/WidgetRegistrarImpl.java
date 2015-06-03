@@ -81,6 +81,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getSynapseTableQueryResultEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE)) {
 			presenter = ginInjector.getProjectBackgroundConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.REST_SERVICE_BUTTON_CONTENT_TYPE)) {
+			presenter = ginInjector.getRestServiceButtonConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
