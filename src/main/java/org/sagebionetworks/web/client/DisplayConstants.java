@@ -737,6 +737,7 @@ public class DisplayConstants {
 	
 	public static final String UPLOAD_DESTINATION = "All uploaded files will be stored in ";
 	public static final String DOWNLOAD_CREDENTIALS_REQUIRED = "Sign in to download from ";
+	public static final String ENTER_A_USER_NAME = "Enter a user name...";
 
 }
 

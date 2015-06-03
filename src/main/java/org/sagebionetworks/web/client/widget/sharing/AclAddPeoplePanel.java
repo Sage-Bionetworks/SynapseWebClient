@@ -45,7 +45,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 	public AclAddPeoplePanel(AclAddPeoplePanelUiBinder uiBinder, UserGroupSuggestBox suggestBox) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.suggestBox = suggestBox;
-		
+		suggestBox.setPlaceholderText(DisplayConstants.ENTER_A_USER_NAME);
 		suggestBoxPanel.add(suggestBox.asWidget());
 		notifyTooltip.setTitle(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 	}

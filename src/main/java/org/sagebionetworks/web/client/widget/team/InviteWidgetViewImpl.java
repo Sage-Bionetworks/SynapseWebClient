@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
@@ -61,7 +62,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 			
 			// user/group Suggest Box
 			peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
-			peopleSuggestBox.setPlaceholderText("Enter a user name...");
+			peopleSuggestBox.setPlaceholderText(DisplayConstants.ENTER_A_USER_NAME);
 			peopleSuggestBox.setWidth(FIELD_WIDTH + "px");
 			inviteUIPanel.add(peopleSuggestBox.asWidget());
 			

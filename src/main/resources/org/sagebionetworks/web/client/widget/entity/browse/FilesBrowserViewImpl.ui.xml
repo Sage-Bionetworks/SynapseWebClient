@@ -27,7 +27,7 @@
 			<b:ModalBody>
 				<b:FormGroup>
 					<b:FormLabel for="folderName">Name</b:FormLabel>
-					<b:TextBox ui:field="folderNameField" name="foldername" b:id="folderName" />
+					<b:TextBox ui:field="folderNameField" name="foldername" b:id="folderName" placeholder="Enter a folder name..." />
 				</b:FormGroup>
 				<g:SimplePanel ui:field="sharingAndDataUseContainer" />
 			</b:ModalBody>
