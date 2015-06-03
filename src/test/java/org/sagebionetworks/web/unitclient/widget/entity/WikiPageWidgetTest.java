@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -45,6 +46,7 @@ public class WikiPageWidgetTest {
 	WikiPageWidget presenter;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
+	SynapseAlert mockSynapseAlert;
 
 	WikiPage testPage;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
@@ -55,8 +57,9 @@ public class WikiPageWidgetTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
+		mockSynapseAlert = mock(SynapseAlert.class);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient,
-				mockGlobalApplicationState, mockAuthenticationController);
+				mockGlobalApplicationState, mockAuthenticationController, mockSynapseAlert);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
 		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
@@ -94,7 +97,7 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPageCannotEditIsEmbedded(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
-		verify(mockView).clear();
+		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 
 	
@@ -114,7 +117,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, mockCallback, true);
-		verify(mockView).showWarningMessageInPage(anyString());
+		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
@@ -141,7 +144,7 @@ public class WikiPageWidgetTest {
 	public void testConfigureOtherErrorGettingWikiPage(){
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		verify(mockView).showWarningMessageInPage(anyString());
+		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 	
 	@Test
@@ -182,6 +185,6 @@ public class WikiPageWidgetTest {
 		// fail to reload wiki page
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.reloadWikiPage();
-		verify(mockView).clear();
+		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 }
