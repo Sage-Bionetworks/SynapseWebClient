@@ -349,7 +349,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			insertNewWidget(WidgetConstants.API_TABLE_CONTENT_TYPE);
 			break;
 		case INSERT_API_SUPERBUTTON:
-			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.REST_SERVICE_BUTTON_CONTENT_TYPE + "?"+WidgetConstants.TEXT_KEY+"=click me&"+WidgetConstants.BUTTON_TYPE_KEY+"=DEFAULT&"+WidgetConstants.URI_KEY+"=/teams&"+WidgetConstants.METHOD_KEY +"=get&"+WidgetConstants.REQUEST_JSON_KEY+"&"+WidgetConstants.WIDGET_END_MARKDOWN);
+			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.REST_SERVICE_BUTTON_CONTENT_TYPE + "?"+WidgetConstants.TEXT_KEY+"=click me&"+WidgetConstants.BUTTON_TYPE_KEY+"=DEFAULT&"+WidgetConstants.URI_KEY+"=/teams&"+WidgetConstants.METHOD_KEY +"=get&"+WidgetConstants.REQUEST_JSON_KEY+"="+WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
 		case INSERT_WIKI_FILES_PREVIEW:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
