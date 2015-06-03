@@ -1,66 +1,67 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RestServiceButtonWidgetViewImpl extends FlowPanel implements RestServiceButtonWidgetView {
+public class RestServiceButtonWidgetViewImpl implements RestServiceButtonWidgetView {
+
+	public interface Binder extends	UiBinder<Widget, RestServiceButtonWidgetViewImpl> {}
 
 	private Presenter presenter;
-	private GWTWrapper gwt;
+	private Widget widget;
+	@UiField
+	Button button;
+	@UiField
+	Div synpaseAlertContainer;
 	
 	@Inject
-	public RestServiceButtonWidgetViewImpl(GWTWrapper gwt) {
-		this.gwt = gwt;
+	public RestServiceButtonWidgetViewImpl(Binder binder) {
+		widget = binder.createAndBindUi(this);
+		button.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClick();
+			}
+		});
+
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, String buttonText, final String url, boolean isHighlight, final boolean openInNewWindow) {
-		clear();
-		Button button = new Button(buttonText);
-		if (isHighlight)
-			button.setType(ButtonType.INFO);
-		button.setSize(ButtonSize.LARGE);
-		button.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				if (openInNewWindow)
-					DisplayUtils.newWindow(url, "", "");
-				else
-					gwt.assignThisWindowWith(url);
-			}
-		});
-		add(button);
-	}
-	
-	public void showError(String error) {
-		clear();
-		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
+	public void configure(String buttonText, ButtonType buttonType) {
+		button.setText(buttonText);
+		button.setType(buttonType);
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return this;
-	}	
+		return widget;
+	}
+	
+	@Override
+	public void setSynapseAlert(Widget widget) {
+		synpaseAlertContainer.add(widget);
+	}
 
 	@Override 
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
 	
-	/*
-	 * Private Methods
-	 */
-
+	@Override
+	public void showSuccessMessage() {
+		DisplayUtils.showInfo(DisplayConstants.SUCCESS, "");
+	}
 }

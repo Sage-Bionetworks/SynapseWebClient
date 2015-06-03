@@ -532,6 +532,6 @@ public interface SynapseClient extends RemoteService {
 	 */
 	String getFromRepo(String uri) throws RestServiceException;
 	void deleteFromRepo(String uri, Map<String, String> paramsMap) throws RestServiceException;
-	String postToRepo(String uri, String json, Map<String, String> paramsMap);
+	String postToRepo(String uri, String json, Map<String, String> paramsMap) throws RestServiceException;
 	String putToRepo(String uri, String json) throws RestServiceException;
 }

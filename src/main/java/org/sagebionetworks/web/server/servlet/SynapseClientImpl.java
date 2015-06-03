@@ -143,7 +143,6 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
-import org.sagebionetworks.web.shared.Endpoint;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -3032,7 +3031,7 @@ getSharedClientConnection().putJson(repoEndpoint, url, JSONObject.toString(), ge
 	}
 	
 	@Override
-	public String postToRepo(String uri, String json, Map<String, String> paramsMap) {
+	public String postToRepo(String uri, String json, Map<String, String> paramsMap) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			String repoEndpoint = synapseClient.getRepoEndpoint();

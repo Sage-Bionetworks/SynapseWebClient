@@ -57,6 +57,8 @@ public class WidgetConstants {
 	public static final String USER_TEAM_BADGE_CONTENT_TYPE = "badge";
 	public static final String USER_TEAM_BADGE_FRIENDLY_NAME ="Badge";
 
+	public static final String REST_SERVICE_BUTTON_CONTENT_TYPE = "superbutton";
+	public static final String REST_SERVICE_BUTTON_FRIENDLY_NAME = "Super Button (Synapse API Based)";
 	
 	public static final String OLD_JOIN_EVALUATION_CONTENT_TYPE = "joinevaluation";
 	public static final String JOIN_TEAM_CONTENT_TYPE = "jointeam";
@@ -151,6 +153,7 @@ public class WidgetConstants {
 	public static final String URI_KEY = "uri";
 	public static final String BUTTON_TYPE_KEY = "buttonType";
 	public static final String METHOD_KEY = "method";
+	public static final String REQUEST_JSON_KEY = "requestBodyJson";
 	public static final String TEXT_KEY = "text";
 	
 	public static final String REGISTER_CHALLENGE_TEAM_CONTENT_TYPE="registerChallengeTeam";

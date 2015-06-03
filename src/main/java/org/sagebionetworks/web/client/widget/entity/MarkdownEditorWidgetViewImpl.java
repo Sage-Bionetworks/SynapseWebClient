@@ -115,6 +115,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem supertableLink;
 	@UiField
+	public AnchorListItem superbuttonLink;
+	@UiField
 	public AnchorListItem registerChallengeTeamLink;
 	@UiField
 	public AnchorListItem challengeParticipantsLink;
@@ -223,6 +225,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));
 		externalWebsiteLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE));
 		supertableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERTABLE));
+		superbuttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERBUTTON));
 		wikifilesPreviewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW));
 		tutorialWizardLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD));
 		registerChallengeTeamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_REGISTER_CHALLENGE_TEAM));

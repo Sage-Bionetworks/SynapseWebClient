@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.shared.WikiPageKey;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface RestServiceButtonWidgetView extends IsWidget {
 
@@ -10,13 +11,16 @@ public interface RestServiceButtonWidgetView extends IsWidget {
 	 * Set the presenter.
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
+	void setPresenter(Presenter presenter);
+	void configure(String buttonText, ButtonType buttonType);
+	void setSynapseAlert(Widget widget);
 	
-	public void configure(WikiPageKey wikiKey, String buttonText, String url, boolean isHighlight, boolean openInNewWindow);
+	void showSuccessMessage();
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void onClick();
 	}
 }

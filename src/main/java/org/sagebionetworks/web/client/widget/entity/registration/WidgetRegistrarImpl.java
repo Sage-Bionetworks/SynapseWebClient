@@ -148,7 +148,10 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getChallengeTeamsWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
 			presenter = ginInjector.getChallengeParticipantsWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.REST_SERVICE_BUTTON_CONTENT_TYPE)) {
+			presenter = ginInjector.getRestServiceButtonWidget();
 		}	 
+	 
 		//TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -232,6 +235,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE, WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.REST_SERVICE_BUTTON_CONTENT_TYPE, WidgetConstants.REST_SERVICE_BUTTON_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
