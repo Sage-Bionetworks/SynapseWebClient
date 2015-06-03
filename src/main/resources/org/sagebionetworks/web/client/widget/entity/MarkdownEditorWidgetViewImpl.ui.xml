@@ -23,10 +23,11 @@
 					    <b:AnchorListItem ui:field="joinTeamLink">Join Team Button</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="linkLink">Link</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="provenanceGraphLink">Provenance Graph</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="queryLink">Query Table</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="referenceLink">Reference</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="submitToEvaluationLink">Submit to Evaluation</b:AnchorListItem>
-					    <b:AnchorListItem ui:field="tableLink">Table</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="tableLink">Table: Paste tabular data</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="synapseTableLink">Table: Query on a Synapse Table</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="queryLink">Table: Query on Files/Folders</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="videoLink">Video</b:AnchorListItem>
@@ -44,7 +45,6 @@
 						    <b:AnchorListItem ui:field="challengeTeamsLink">Challenge Teams List</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="challengeParticipantsLink">Challenge Participants List</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
-						    <b:AnchorListItem ui:field="synapseTableLink">Synapse Table</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="entityBackgroundLink">Set Project Background Image</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="wikifilesPreviewLink">Wiki Files Preview</b:AnchorListItem>
 						    <b:AnchorListItem ui:field="tutorialWizardLink">Tutorial Wizard</b:AnchorListItem>
@@ -113,7 +113,7 @@
 		
 	    <b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
-		    <g:FlowPanel ui:field="formattingGuideContainer" />
+		    <g:SimplePanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>
 		  <b:ModalFooter>
 		    <b:Button ui:field="formattingGuideOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
@@ -122,7 +122,7 @@
 		
 	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false">
 		  <b:ModalBody>
-		    <g:FlowPanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
+		    <g:SimplePanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
 		  </b:ModalBody>
 		  <b:ModalFooter>
 		    <b:Button ui:field="previewOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
