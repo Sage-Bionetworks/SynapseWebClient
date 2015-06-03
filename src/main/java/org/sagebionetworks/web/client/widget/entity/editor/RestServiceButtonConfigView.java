@@ -13,9 +13,12 @@ public interface RestServiceButtonConfigView extends IsWidget, WidgetEditorView 
 	void setPresenter(Presenter presenter);
 	
 	String getURI();
+	void setUri(String uri);
 	String getMethod();
 	String getRequestJson();
+	void setRequestJson(String requestJson);
 	String getButtonText();
+	void setButtonText(String buttonText);
 	String getButtonType();
 	
 	/**

@@ -25,6 +25,16 @@ public class RestServiceButtonConfigEditor implements RestServiceButtonConfigVie
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
+
+		if(widgetDescriptor.containsKey(WidgetConstants.URI_KEY)) {
+			view.setUri(widgetDescriptor.get(WidgetConstants.URI_KEY));
+		}
+		if(widgetDescriptor.containsKey(WidgetConstants.REQUEST_JSON_KEY)) {
+			view.setRequestJson(widgetDescriptor.get(WidgetConstants.REQUEST_JSON_KEY));
+		}
+		if(widgetDescriptor.containsKey(WidgetConstants.TEXT_KEY)) {
+			view.setButtonText(widgetDescriptor.get(WidgetConstants.TEXT_KEY));
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

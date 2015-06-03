@@ -76,6 +76,10 @@ public class RestServiceButtonConfigViewImpl implements RestServiceButtonConfigV
 	public String getURI() {
 		return uriField.getValue();
 	}
+	@Override
+	public void setUri(String uri) {
+		uriField.setValue(uri);
+	}
 
 	@Override
 	public String getMethod() {
@@ -87,10 +91,18 @@ public class RestServiceButtonConfigViewImpl implements RestServiceButtonConfigV
 	public String getRequestJson() {
 		return requestJsonField.getText();
 	}
+	@Override
+	public void setRequestJson(String requestJson) {
+		requestJsonField.setText(requestJson);
+	}
 
 	@Override
 	public String getButtonText() {
 		return buttonTextField.getText();
+	}
+	@Override
+	public void setButtonText(String buttonText) {
+		buttonTextField.setText(buttonText);
 	}
 
 	@Override
