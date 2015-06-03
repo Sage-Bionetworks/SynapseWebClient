@@ -40,5 +40,5 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void resetWikiMarkdown(String markdown, final WikiPageKey wikiKey,
 			boolean isRootWiki, boolean isCurrentVersion, final Long versionInView);
 	public void setSynapseAlertWidget(Widget asWidget);
-	public void clearWikiPagePanelWithSynapseAlert();
+	public void clearWikiPagePanel();
 }

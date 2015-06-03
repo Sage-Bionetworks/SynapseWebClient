@@ -282,7 +282,7 @@ SynapseWidgetPresenter {
 		}
 		if (isEmbeddedInOwnerPage) {
 			synapseAlert.handleException(caught);
-			view.clearWikiPagePanelWithSynapseAlert();
+			view.clearWikiPagePanel();
 		} else {
 			if (caught instanceof NotFoundException) {
 				view.show404();
@@ -290,7 +290,7 @@ SynapseWidgetPresenter {
 				view.show403();
 			} else {
 				synapseAlert.handleException(caught);
-				view.clearWikiPagePanelWithSynapseAlert();
+				view.clearWikiPagePanel();
 			}
 		}
 	}

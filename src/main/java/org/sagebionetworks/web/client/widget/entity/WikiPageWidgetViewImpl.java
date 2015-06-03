@@ -189,8 +189,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	private void resetWikiPagePanel() {
-		wikiPagePanel.clear();
-		wikiPagePanel.add(synapseAlertPanel);
+		clearWikiPagePanel();
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			Alert notice = createDifferentVersionNotice();
@@ -426,7 +425,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void clearWikiPagePanelWithSynapseAlert() {
+	public void clearWikiPagePanel() {
 		wikiPagePanel.clear();
 		wikiPagePanel.add(synapseAlertPanel);
 	}

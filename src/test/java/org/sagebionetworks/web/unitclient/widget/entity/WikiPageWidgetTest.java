@@ -98,6 +98,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView).clearWikiPagePanel();
 	}
 
 	
@@ -118,6 +119,7 @@ public class WikiPageWidgetTest {
 		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, mockCallback, true);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView).clearWikiPagePanel();
 	}
 	
 	@Test
@@ -145,6 +147,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView).clearWikiPagePanel();
 	}
 	
 	@Test
@@ -186,5 +189,6 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.reloadWikiPage();
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+		verify(mockView).clearWikiPagePanel();
 	}
 }
