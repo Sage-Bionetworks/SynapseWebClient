@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
@@ -59,6 +60,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WikiPageKey wikiKey;
 	private CallbackP<WikiPage> wikiPageUpdatedHandler;
 	private GlobalApplicationState globalApplicationState;
+	private PortalGinInjector ginInjector;
+	private MarkdownWidget markdownPreview;
+	private MarkdownWidget formattingGuide;
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -67,8 +71,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			GWTWrapper gwt,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			WidgetRegistrar widgetRegistrar,
-			GlobalApplicationState globalApplicationState
-			) {
+			GlobalApplicationState globalApplicationState,
+			PortalGinInjector ginInjector) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -77,9 +81,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
 		this.globalApplicationState = globalApplicationState;
-		
+		this.markdownPreview = markdownPreview;
 		widgetSelectionState = new WidgetSelectionState();
+		markdownPreview = ginInjector.getMarkdownWidget();
+		formattingGuide = ginInjector.getMarkdownWidget();
 		view.setPresenter(this);
+		view.setMarkdownPreviewWidget(markdownPreview.asWidget());
+		view.setFormattingGuideWidget(formattingGuide.asWidget());
 	}
 	
 	/**
@@ -99,7 +107,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.clear();
 		view.setAttachmentCommandsVisible(true);
 		view.setAlphaCommandsVisible(DisplayUtils.isInTestWebsite(cookies));
-	
 		if (formattingGuideWikiPageKey == null) {
 			//get the page name to wiki key map
 			getFormattingGuideWikiKey(new CallbackP<WikiPageKey>() {
@@ -154,9 +161,10 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void configure(WikiPage page) {
 		currentPage = page;
-		view.configure(formattingGuideWikiPageKey, currentPage.getMarkdown());
+		view.configure(currentPage.getMarkdown());
 		view.setTitleEditorVisible(currentPage.getParentWikiId() != null);
 		view.setTitle(currentPage.getTitle());
+		formattingGuide.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
 		globalApplicationState.setIsEditing(true);
 		setMarkdownTextAreaHandlers();
   	  	resizeMarkdownTextArea();
@@ -226,21 +234,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void showPreview() {
 	    //get the html for the markdown
-	    synapseClient.markdown2Html(view.getMarkdown(), true, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
-	    	@Override
-			public void onSuccess(String result) {
-	    		try {
-					view.showPreviewHTML(result, wikiKey, widgetRegistrar);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				//preview failed
-				view.showErrorMessage(DisplayConstants.PREVIEW_FAILED_TEXT + caught.getMessage());
-			}
-		});
+		markdownPreview.configure(view.getMarkdown(), wikiKey, true, null);
+		view.showPreviewModal();
 	}
 	
 	public void insertMarkdown(String md) {

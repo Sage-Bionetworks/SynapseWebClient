@@ -58,7 +58,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.core.client.Callback;
-import com.google.gwt.user.client.Element;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvUtilsTest {

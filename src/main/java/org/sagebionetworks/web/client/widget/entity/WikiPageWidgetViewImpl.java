@@ -179,9 +179,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.isCurrentVersion = isCurrentVersion;
 		this.versionInView = versionInView;
 		if(!isCurrentVersion) {
-			markdownWidget.setMarkdown(markdown, wikiKey, false, versionInView);
+			markdownWidget.configure(markdown, wikiKey, false, versionInView);
 		} else {
-			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
+			markdownWidget.configure(markdown, wikiKey, false, null);
 		}
 		resetWikiPagePanel();
 	}

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -15,21 +14,20 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Element;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -38,14 +36,12 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class MarkdownWidget extends FlowPanel implements SynapseView {
+public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 	
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
-	private IconsImageBundle iconsImageBundle;
 	private CookieProvider cookies;
-	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	GWTWrapper gwt;
 	PortalGinInjector ginInjector;
@@ -55,56 +51,34 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	private boolean isPreview;
 	private Long wikiVersionInView;
 	
+	private MarkdownWidgetView view;
+	private SynapseAlert synAlert;
+	
 	@Inject
 	public MarkdownWidget(SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
-			IconsImageBundle iconsImageBundle,
 			CookieProvider cookies,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
 			ResourceLoader resourceLoader, 
 			GWTWrapper gwt,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			MarkdownWidgetView view,
+			SynapseAlert synAlert) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.widgetRegistrar = widgetRegistrar;
-		this.iconsImageBundle = iconsImageBundle;
 		this.cookies = cookies;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.resourceLoader = resourceLoader;
 		this.gwt = gwt;
 		this.ginInjector = ginInjector;
+		this.view = view;
+		this.synAlert = synAlert;
+		view.setSynAlertWidget(synAlert.asWidget());
 	}
 	
-	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview, final boolean isIgnoreLoadingFailure) {
-		//get the wiki page
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
-			@Override
-			public void onSuccess(WikiPage page) {
-				wikiKey.setWikiPageId(page.getId());
-				setMarkdown(page.getMarkdown(), wikiKey, isPreview, null);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!isIgnoreLoadingFailure)
-					MarkdownWidget.this.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
-			}
-		});				
-	}
-
-	public void refresh() {
-		setMarkdown(md, wikiKey, isPreview, null);
-	}
-	
-	/**
-	 * @param md
-	 * @param wikiVersionInView TODO
-	 * @param attachmentBaseUrl if null, will use file handles
-	 */
-	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
-		final SynapseView view = this;
+	@Override
+	public void configure(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
+		synAlert.clear();
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.isPreview= isPreview;
@@ -112,111 +86,45 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				try {
-					clear();
-					String content = "";
-					
-					if(result == null || result.isEmpty()) {
-						content += SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>").asString();
-					}
-					
-					if (result != null) {
-						content += result;
-					}
-					FlowPanel wikiSubpagesPanel = new FlowPanel();
-					add(wikiSubpagesPanel);
-
-					HTMLPanel panel = new HTMLPanel(content);
-					panel.addStyleName("margin-right-40 margin-left-10");
-					add(panel);
-					synapseJSNIUtils.highlightCodeBlocks();
-					DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
-					MarkdownWidget.loadMath(panel, synapseJSNIUtils, isPreview, resourceLoader);
-					Callback widgetRefreshRequired = new Callback() {
-						@Override
-						public void invoke() {
-							refresh();
-						}
-					};
-					//asynchronously load the widgets
-					Set<String> contentTypes = loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, isPreview, widgetRefreshRequired, wikiVersionInView);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
+				view.clearMarkdown();
+				if(result == null || result.isEmpty()) {
+					view.setEmptyVisible(true);
+				} else {
+					// DOM loaded, ready for parsing
+					view.setMarkdown(result);
+					loadTableSorters();
+					loadMath(wikiKey, isPreview);
+					loadWidgets(wikiKey, isPreview);
 				}
+				
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				clear();
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
 	
 	
-	/**
-	 * Shared method for loading the widgets into the html returned by the service (used to render the entity page, and to generate a preview of the description)
-	 * @param panel
-	 * @param widgetRegistrar
-	 * @param synapseClient
-	 * @param wikiVersionInView TODO
-	 * @param bundle
-	 * @param nodeModelCreator
-	 * @param modalView
-	 * @throws JSONObjectAdapterException 
-	 */
-	public static Set<String> loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, 
-			final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, 
-			IconsImageBundle iconsImageBundle, Boolean isPreview, Callback widgetRefreshRequired, 
-			Long wikiVersionInView) throws JSONObjectAdapterException {
-		Set<String> contentTypes = new HashSet<String>();
-		final String suffix = DisplayUtils.getPreviewSuffix(isPreview);
-		//look for every element that has the right format
+	public void loadTableSorters() {
+		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
 		int i = 0;
-		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
-		Element el = panel.getElementById(currentWidgetDiv);
-		while (el != null) {
-				//based on the contents of the element, create the correct widget descriptor and renderer
-				String innerText = el.getAttribute("widgetParams");
-				if (innerText != null) {
-					try {
-						innerText = innerText.trim();
-						String contentType = widgetRegistrar.getWidgetContentType(innerText);
-						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, widgetRefreshRequired, wikiVersionInView);
-						if (presenter == null)
-							throw new IllegalArgumentException("Unable to render widget from the specified markdown.");
-						panel.add(presenter.asWidget(), currentWidgetDiv);
-						contentTypes.add(contentType);
-					}catch(Throwable e) {
-						//try our best to load all of the widgets. if one fails to load, then fail quietly.
-						String message = innerText;
-						if (e.getMessage() != null)
-							message += "<br>" + e.getMessage();
-						panel.add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)), currentWidgetDiv);
-					}
-				}
-			
+		ElementWrapper table = view.getElementById(id + i);
+		while (table != null) {
+			synapseJSNIUtils.tablesorter(id+i);
 			i++;
-			currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
-			el = panel.getElementById(currentWidgetDiv);
+			table = view.getElementById(id + i);
 		}
-		return contentTypes;
 	}
 	
-	
-	/**
-	 * Shared method for loading the math elements returned by the Synapse Markdown parser
-	 * @throws JSONObjectAdapterException 
-	 */
-	public static void loadMath(final HTMLPanel panel, final SynapseJSNIUtils synapseJSNIUtils, Boolean isPreview, final ResourceLoader resourceLoader) throws JSONObjectAdapterException {
-		final String suffix = DisplayUtils.getPreviewSuffix(isPreview);
+	public void loadMath(WikiPageKey wikiKey, boolean isPreview) {
+		final String suffix = isPreview ? "-preview" : "";
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
-		Element el = panel.getElementById(currentWidgetDiv);
+		ElementWrapper el = view.getElementById(currentWidgetDiv);
 		while (el != null) {
-			final Element loadElement = el;
+			final Element loadElement = el.getElement();
 			final AsyncCallback<Void> mathjaxLoadedCallback = new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
@@ -243,20 +151,78 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 				resourceLoader.requires(ClientProperties.MATHJAX_JS, mathjaxInitializedCallback);
 			i++;
 			currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
-			el = panel.getElementById(currentWidgetDiv);
+			el = view.getElementById(currentWidgetDiv);
 		}
 	}
 	
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+	public Set<String> loadWidgets(WikiPageKey wikiKey, boolean isPreview) {
+		Set<String> contentTypes = new HashSet<String>();
+		final String suffix = isPreview ? "-preview" : "";
+		//look for every element that has the right format
+		int i = 0;
+		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+		ElementWrapper el = view.getElementById(currentWidgetDiv);
+		while (el != null) {
+				//based on the contents of the element, create the correct widget descriptor and renderer
+				String innerText = el.getAttribute("widgetParams");
+				if (innerText != null) {
+					try {
+						innerText = innerText.trim();
+						String contentType = widgetRegistrar.getWidgetContentType(innerText);
+						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, 
+								new Callback() {
+									@Override
+									public void invoke() {
+										refresh();
+									}
+						}, wikiVersionInView);
+						if (presenter == null)
+							throw new IllegalArgumentException("Unable to render widget from the specified markdown.");
+						view.addWidget(presenter.asWidget(), currentWidgetDiv);
+						contentTypes.add(contentType);
+					}catch(Throwable e) {
+						//try our best to load all of the widgets. if one fails to load, then fail quietly.
+						String message = innerText;
+						if (e.getMessage() != null)
+							message += "<br>" + e.getMessage();
+						view.addWidget(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)), currentWidgetDiv);
+					}
+				}
+			
+			i++;
+			currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+			el = view.getElementById(currentWidgetDiv);
+		}
+		return contentTypes;
+	}
+	
+	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview, final boolean isIgnoreLoadingFailure) {
+		synAlert.clear();
+		//get the wiki page
+		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
+			@Override
+			public void onSuccess(WikiPage page) {
+				wikiKey.setWikiPageId(page.getId());
+				configure(page.getMarkdown(), wikiKey, isPreview, null);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!isIgnoreLoadingFailure)
+					synAlert.showError(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+			}
+		});				
 	}
 
-	@Override
-	public void showLoading() {
+	
+	
+	
+	public void refresh() {
+		configure(md, wikiKey, isPreview, null);
 	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	
+	public Widget asWidget() {
+		return view.asWidget();
 	}
+	
 }

@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -11,8 +14,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
@@ -56,7 +57,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			
 			final Anchor anchor = new Anchor();
 			anchor.setText(name);
-			anchor.addStyleName("usernameLink");
+			anchor.addStyleName("font-size-15");
 			anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
 			
 			ClickHandler clickHandler = new ClickHandler() {
@@ -68,21 +69,18 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			if (team.getIcon() != null && team.getIcon().length() > 0) {
 				Image profilePicture = new Image();
 				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
-				profilePicture.setWidth("16px");
-				profilePicture.setHeight("16px");
-				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-5");
+				profilePicture.setHeight("24px");
+				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);
 				add(profilePicture);
 			} else {
-				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before margin-right-5"));
-				profilePicture.addStyleName("displayInline");
-				profilePicture.addClickHandler(clickHandler);
-				add(profilePicture);
+				Icon defaultProfilePicture = new Icon(IconType.USERS);
+				defaultProfilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4");
+				add(defaultProfilePicture);
 			}
 			add(anchor);
 			add(notificationsPanel);
 		} 		
-		
 	}
 	
 	@Override
@@ -91,17 +89,14 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		notificationsPanel.clear();
 		
 		InlineLabel nameLabel = new InlineLabel(name);
-		nameLabel.addStyleName("font-size-13 boldText");
-		
-		HTML profilePicture;
+		nameLabel.addStyleName("font-size-15 boldText");
+		Icon profilePicture;
 		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
-			//profilePicture = new HTML(DisplayUtils.getFontelloIcon("globe font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
-			String html = AbstractImagePrototype.create(iconsImageBundle.globe16()).getHTML();
-			profilePicture = new HTML(html);
+			profilePicture = new Icon(IconType.GLOBE);
 		} else {
-			profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before margin-right-5"));
+			profilePicture = new Icon(IconType.USERS);
 		}
-		profilePicture.addStyleName("displayInline margin-right-5");
+		profilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4 margin-left-5");
 		add(profilePicture);
 			
 		add(nameLabel);

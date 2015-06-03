@@ -106,20 +106,20 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	}
 
 	@Override
-	public void setS3Description(final CallbackP<String> callback) {
+	public void setS3Description() {
 		final String entityId = entityBundle.getEntity().getId();
 		synapseClient.getUploadDestinations(entityId, new AsyncCallback<List<UploadDestination>>() {
 			public void onSuccess(List<UploadDestination> uploadDestinations) {
 				if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
 					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
-					String description = " - s3://" + externalUploadDestination.getBucket() + "/";
+					String description = "| s3://" + externalUploadDestination.getBucket() + "/";
 					if (externalUploadDestination.getBaseKey() != null) {
 						description += externalUploadDestination.getBaseKey() + "/";
 					};
-					description += entityBundle.getEntity().getName() + ")";
-					callback.invoke(description);
+					description += entityBundle.getEntity().getName();
+					view.setFileLocation(description);
 				} else {
-					callback.invoke(" - Synapse Storage)");
+					view.setFileLocation("| Synapse Storage");
 				}
 			}
 
