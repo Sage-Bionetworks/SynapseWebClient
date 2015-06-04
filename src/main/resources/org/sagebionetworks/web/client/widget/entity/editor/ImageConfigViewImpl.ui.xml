@@ -11,7 +11,7 @@
 			<b:TabListItem ui:field="uploadTabListItem" active="true" dataTarget="#tab1" text="Upload"/>
 			<b:TabListItem ui:field="externalTabListItem" dataTarget="#tab2" text="From the Web"/>
 			<b:TabListItem ui:field="synapseTabListItem" dataTarget="#tab3" text="From Synapse File"/>
-			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab4" text="From Attachments"/>
+			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab4" text="Previously Uploaded"/>
 		</b:NavTabs>
 		<b:TabContent>
 			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
