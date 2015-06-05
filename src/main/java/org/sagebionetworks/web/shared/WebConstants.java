@@ -124,7 +124,7 @@ public class WebConstants {
 
 	public static final String USER_PROFILE_USER_ID = "userId";
 	
-	public static final String USER_PROFILE_IMIAGE_ID = "imageId";
+	public static final String USER_PROFILE_IMAGE_ID = "imageId";
 	
 	public static final String USER_PROFILE_PREVIEW = "preview";
 	

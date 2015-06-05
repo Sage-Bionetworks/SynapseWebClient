@@ -63,7 +63,7 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 		String userId = request
 				.getParameter(WebConstants.USER_PROFILE_USER_ID);
 		String fileId = request
-				.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID);
+				.getParameter(WebConstants.USER_PROFILE_IMAGE_ID);
 		String previewString = request
 				.getParameter(WebConstants.USER_PROFILE_PREVIEW);
 		// default to true

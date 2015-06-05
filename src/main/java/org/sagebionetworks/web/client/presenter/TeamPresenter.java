@@ -8,8 +8,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidget;
+import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
+import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -30,6 +34,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private Team team;
 	private TeamMembershipStatus teamMembershipStatus;
 	private SynapseAlert synAlert;
+	private TeamLeaveModalWidget leaveTeamWidget;
+	private TeamDeleteModalWidget deleteTeamWidget;
+	private TeamEditModalWidget editTeamWidget;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -37,7 +44,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert, TeamLeaveModalWidget leaveTeamWidget,
+			TeamDeleteModalWidget deleteTeamWidget,
+			TeamEditModalWidget editTeamWidget) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = authenticationController;
@@ -45,8 +54,14 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
+		this.leaveTeamWidget = leaveTeamWidget;
+		this.deleteTeamWidget = deleteTeamWidget;
+		this.editTeamWidget = editTeamWidget;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
+		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
+		view.setDeleteTeamWidget(deleteTeamWidget.asWidget());
+		view.setEditTeamWidget(editTeamWidget.asWidget());
 	}
 
 	@Override
@@ -124,18 +139,26 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void leaveTeam() {
 		synAlert.clear();
-		String userId = authenticationController.getCurrentUserPrincipalId();
-		synapseClient.deleteTeamMember(userId, userId, team.getId(), new AsyncCallback<Void>() {
+//		String userId = authenticationController.getCurrentUserPrincipalId();
+//		synapseClient.deleteTeamMember(userId, userId, team.getId(), new AsyncCallback<Void>() {
+//			@Override
+//			public void onSuccess(Void result) {
+//				view.showInfo(DisplayConstants.LEAVE_TEAM_SUCCESS, "");
+//				refresh();
+//			}
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				synAlert.handleException(caught);
+//			}
+//		});
+		leaveTeamWidget.setRefreshCallback(new Callback() {
 			@Override
-			public void onSuccess(Void result) {
-				view.showInfo(DisplayConstants.LEAVE_TEAM_SUCCESS, "");
+			public void invoke() {
 				refresh();
 			}
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
 		});
+		leaveTeamWidget.setTeam(team);
+		leaveTeamWidget.showDialog();
 	}
 
 	@Override
@@ -161,6 +184,45 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				}
 			});
 		}
+	}
+
+	@Override
+	public void showEditModal() {
+		synAlert.clear();
+		editTeamWidget.setRefreshCallback(new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		});
+		editTeamWidget.setTeam(team);
+		editTeamWidget.setVisible(true);
+	}
+
+	@Override
+	public void showDeleteModal() {
+		synAlert.clear();
+		deleteTeamWidget.setRefreshCallback(new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		});
+		deleteTeamWidget.setTeam(team);
+		deleteTeamWidget.showDialog();
+	}
+
+	@Override
+	public void showLeaveModal() {
+		synAlert.clear();
+		leaveTeamWidget.setRefreshCallback(new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		});
+		leaveTeamWidget.setTeam(team);
+		leaveTeamWidget.showDialog();		
 	}
 }
 

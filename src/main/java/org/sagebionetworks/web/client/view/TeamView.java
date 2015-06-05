@@ -24,7 +24,13 @@ public interface TeamView extends IsWidget, SynapseView {
 		void leaveTeam();
 		void updateTeamInfo(String name, String description, boolean canPublicJoin, String iconFileHandleId);
 		void refresh(String teamId);
+		void showEditModal();
+		void showDeleteModal();
+		void showLeaveModal();
 	}
 
 	void setSynAlertWidget(Widget asWidget);
+	void setLeaveTeamWidget(Widget asWidget);
+	void setDeleteTeamWidget(Widget asWidget);
+	void setEditTeamWidget(Widget asWidget);
 }
