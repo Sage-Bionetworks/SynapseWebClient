@@ -28,12 +28,17 @@
 		        <b:FormGroup>
 		            <b:FormLabel for="uploadWidget">Upload new Team Icon</b:FormLabel>
 		            <b:Row b:id="uploadWidget">
-		                <b:Column size="MD_6">
+		                <b:Column size="MD_4">
 							<b:Icon ui:field="defaultIcon" type="USER"
 								addStyleNames="font-size-150 lightGreyText" visible="true"/>
-							<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>		                </b:Column>
-		                <b:Column size="MD_6">
-		                    <g:SimplePanel ui:field="uploadWidgetPanel"/>
+							<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+							<bh:Div ui:field="teamImageLoading" visible="false">
+								<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+								<bh:Text>&nbsp;Loading...</bh:Text>
+							</bh:Div>		                
+						</b:Column>
+		                <b:Column size="MD_8">
+		                    <g:SimplePanel addStyleNames="displayInline" ui:field="uploadWidgetPanel"/>
 		                	<bh:Span ui:field="uploadedFileName"/>
 		                </b:Column>
 		            </b:Row>

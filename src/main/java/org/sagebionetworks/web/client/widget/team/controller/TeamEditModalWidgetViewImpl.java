@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Image;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -56,6 +57,9 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	Image previewImage;
 	
 	@UiField
+	Div teamImageLoading;
+	
+	@UiField
 	Span uploadedFileName;
 	
 	public interface Binder extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {}
@@ -63,14 +67,10 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	Widget widget;
 	Presenter presenter;
 	Team team;
-	String baseImageURL;
-	
 	
 	@Inject
-	public TeamEditModalWidgetViewImpl(Binder uiBinder,
-			SynapseJSNIUtils jsniUtils) {
+	public TeamEditModalWidgetViewImpl(Binder uiBinder) {
 		this.widget = uiBinder.createAndBindUi(this);
-		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -131,6 +131,9 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		String primaryButtonText = isLoading ? "Uploading" : "Save";
 		primaryButton.setText(primaryButtonText);
 		primaryButton.setEnabled(!isLoading);
+		defaultIcon.setVisible(!isLoading);
+		previewImage.setVisible(!isLoading);
+		teamImageLoading.setVisible(isLoading);
 	}
 	
 	@Override
@@ -157,13 +160,6 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 			editDescriptionField.setValue(team.getDescription());
 			publicJoinCheckbox.setValue(team.getCanPublicJoin());
 			uploadedFileName.setText("");
-			String teamIconFileHandle = team.getIcon();
-			if (teamIconFileHandle == null) {
-				defaultIcon.setVisible(true);
-				previewImage.setVisible(false);
-			} else {
-				setImageURL(teamIconFileHandle);
-			}
 			this.modal.show();
 		} else {
 			this.modal.hide();
@@ -171,8 +167,17 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	}
 	
 	@Override
-	public void setImageURL(String fileHandleId) {
+	public void setImageURL(String url) {
 		defaultIcon.setVisible(false);
-		previewImage.setUrl(baseImageURL + "?imageid=" + fileHandleId);
+		previewImage.setVisible(true);
+		teamImageLoading.setVisible(false);
+		previewImage.setUrl(url);
 	}	
+	
+	@Override
+	public void setDefaultIconVisible() {
+		defaultIcon.setVisible(true);
+		previewImage.setVisible(false);
+		teamImageLoading.setVisible(false);
+	}
 }

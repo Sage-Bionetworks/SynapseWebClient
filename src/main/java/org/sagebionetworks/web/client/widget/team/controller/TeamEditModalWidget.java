@@ -4,6 +4,8 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -26,22 +28,27 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	SynapseClientAsync synapseClient;
 	FileHandleUploadWidget uploader;
 	String uploadedFileHandleId;
+	String baseImageURL;
 	
 	@Inject
 	public TeamEditModalWidget(SynapseAlert synAlert,
 			final TeamEditModalWidgetView view, SynapseClientAsync synapseClient,
-			FileHandleUploadWidget uploader) {
+			FileHandleUploadWidget uploader, final SynapseJSNIUtils jsniUtils,
+			final AuthenticationController authenticationController) {
 		this.synAlert = synAlert;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.uploader = uploader;
+		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		uploader.configure("Browse", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
-				view.setUploadedFileName(fileUpload.getFileMeta().getFileName());
+				view.setUploadedFileName("Filename: " + fileUpload.getFileMeta().getFileName());
 				view.setLoading(false);
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(uploadedFileHandleId);
+				view.setImageURL(jsniUtils.getBaseProfileAttachmentUrl() + "?userId=" + 
+						authenticationController.getCurrentUserPrincipalId() + "&imageId=" + uploadedFileHandleId +
+						"&applied=false");
 			}
 		});
 		uploader.setValidation(new ImageFileValidator());
@@ -115,6 +122,12 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 
 	@Override
 	public void setVisible(boolean isVisible) {
+		if (isVisible) {
+			if (team.getIcon() != null)
+				view.setImageURL(baseImageURL + "?teamId=" + team.getId());
+			else
+				view.setDefaultIconVisible();
+		}
 		view.setVisible(isVisible);
 	}
 

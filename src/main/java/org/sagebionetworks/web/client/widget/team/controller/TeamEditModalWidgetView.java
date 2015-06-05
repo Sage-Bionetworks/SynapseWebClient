@@ -51,4 +51,6 @@ public interface TeamEditModalWidgetView {
 
 	void setImageURL(String fileHandleId);
 
+	void setDefaultIconVisible();
+
 }
