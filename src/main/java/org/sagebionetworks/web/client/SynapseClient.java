@@ -384,7 +384,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public String createColumnModel(String columnModelJson) throws RestServiceException;
 
-	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
+	public String sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
 	

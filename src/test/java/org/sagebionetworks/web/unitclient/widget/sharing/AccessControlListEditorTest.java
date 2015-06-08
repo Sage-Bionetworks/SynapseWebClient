@@ -104,7 +104,7 @@ public class AccessControlListEditorTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
 
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
 		mockPushToSynapseCallback = mock(Callback.class);
 		
@@ -245,7 +245,7 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
-		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -293,7 +293,7 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
-		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		Set recipientSet = recipientSetCaptor.getValue();
 		//should try to send a notification message to a single recipient principal id, USER2_ID.  Verify team is not notified
 		assertEquals(1, recipientSet.size());
@@ -314,7 +314,7 @@ public class AccessControlListEditorTest {
 		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 
-		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -337,7 +337,7 @@ public class AccessControlListEditorTest {
 		verify(mockPushToSynapseCallback).invoke();
 
 		//verify we do not even attempt to send a message to public
-		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -376,7 +376,7 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 		
-		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -408,7 +408,7 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 		
-		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -431,7 +431,7 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 		
-		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
