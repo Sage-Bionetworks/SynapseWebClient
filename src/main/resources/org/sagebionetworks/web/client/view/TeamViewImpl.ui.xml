@@ -16,9 +16,9 @@
 	    		    <b:ButtonGroup pull="RIGHT">
 	    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
 		    		    <b:DropDownMenu>
-		    		        <b:AnchorListItem icon="PLUS" ui:field="inviteMemberItem">Invite User</b:AnchorListItem>
-					        <b:AnchorListItem icon="EDIT" ui:field="editTeamItem">Edit Team</b:AnchorListItem>
-					        <b:AnchorListItem icon="REMOVE" ui:field="deleteTeamItem">Delete Team</b:AnchorListItem>
+		    		        <b:AnchorListItem icon="PLUS" ui:field="inviteMemberItem" visible="false">Invite User</b:AnchorListItem>
+					        <b:AnchorListItem icon="EDIT" ui:field="editTeamItem" visible="false">Edit Team</b:AnchorListItem>
+					        <b:AnchorListItem icon="REMOVE" ui:field="deleteTeamItem" visible="false">Delete Team</b:AnchorListItem>
 					        <b:AnchorListItem ui:field="leaveTeamItem" visible="false">Leave Team</b:AnchorListItem>
 			    		</b:DropDownMenu>
 	    		    </b:ButtonGroup>

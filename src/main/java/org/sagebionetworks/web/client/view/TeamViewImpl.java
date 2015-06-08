@@ -193,15 +193,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 		totalMemberCountField.setText(totalMemberCount.toString());
 		publicJoinField.setVisible(team.getCanPublicJoin());
 		if (isAdmin) {
-
 			Callback refreshCallback = getRefreshCallback(team.getId());
 			openMembershipRequestsWidget.configure(team.getId(), refreshCallback);
 			mainContainer.add(openMembershipRequestsWidget.asWidget());
 			openUserInvitationsWidget.configure(team.getId(), refreshCallback);
 			mainContainer.add(openUserInvitationsWidget.asWidget());
-			
-			//fill in the tools menu button
-			commandsContainer.setVisible(true);
+			deleteTeamItem.setVisible(true);
+			editTeamItem.setVisible(true);
+			inviteMemberItem.setVisible(true);
 		}
 		
 		if (teamMembershipStatus != null) {
@@ -212,8 +211,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 				joinTeamView.addStyleName("margin-top-15");	
 				mainContainer.add(joinTeamView);
 			}
-			else { 
+			else {
 				leaveTeamItem.setVisible(true);
+				commandsContainer.setVisible(true);
 			}
 		}
 		memberListWidget.configure(team.getId(), isAdmin, getRefreshCallback(team.getId()));

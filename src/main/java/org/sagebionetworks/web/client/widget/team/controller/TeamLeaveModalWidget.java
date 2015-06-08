@@ -67,6 +67,7 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 	}
 
 	public void showDialog() {
+		synAlert.clear();
 		view.show();
 	}
 

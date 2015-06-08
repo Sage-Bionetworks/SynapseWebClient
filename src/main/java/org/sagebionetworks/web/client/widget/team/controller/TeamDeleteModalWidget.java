@@ -67,6 +67,7 @@ public class TeamDeleteModalWidget implements IsWidget, TeamDeleteModalWidgetVie
 
 	@Override
 	public void showDialog() {
+		synAlert.clear();
 		view.show();
 	}
 
