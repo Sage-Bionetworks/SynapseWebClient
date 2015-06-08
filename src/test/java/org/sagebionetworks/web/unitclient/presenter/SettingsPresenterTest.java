@@ -7,6 +7,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -328,12 +329,16 @@ public class SettingsPresenterTest {
 	@Test
 	public void testConfirmAPIKeyChange(){
 		profilePresenter.changeApiKey();
-		verify(mockView).showConfirm(anyString(),  any(ConfirmCallback.class));
-	}
-	
-	@Test
-	public void testAPIKeyChangeConfirmed(){
-		profilePresenter.changeApiKeyPostConfirmation();
+		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		verify(mockView).showConfirm(anyString(),  captor.capture());
+		
+		ConfirmCallback callback = captor.getValue();
+		//test not confirmed (user clicked cancel)
+		callback.callback(false);
+		verify(mockSynapseClient, never()).deleteApiKey(any(AsyncCallback.class));
+		verify(mockView, never()).setApiKey(APIKEY2);
+		
+		callback.callback(true);
 		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		verify(mockView).setApiKey(APIKEY2);
 	}

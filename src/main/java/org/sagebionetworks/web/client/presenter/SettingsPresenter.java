@@ -257,8 +257,10 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		apiSynAlert.clear();
 		ConfirmCallback callback = new ConfirmCallback() {
 			@Override
-			public void callback(boolean result) {
-				changeApiKeyPostConfirmation();				
+			public void callback(boolean isConfirmed) {
+				if(isConfirmed) {
+					changeApiKeyPostConfirmation();	
+				}
 			}
 		};
 		view.showConfirm(DisplayConstants.API_KEY_CONFIRMATION, callback);
