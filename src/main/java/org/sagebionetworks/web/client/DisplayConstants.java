@@ -718,6 +718,7 @@ public class DisplayConstants {
 	
 	public static final String ERROR_CREATING_COLUMN = "Error creating column";
 	public static final String API_KEY_CHANGED = "API Key successfully changed";
+	public static final String API_KEY_CONFIRMATION = "Any scripts using the old API key will break. Are you sure you want Synapse to generate a new API Key?";
 	public static final String MAX_STRING_LENGTH = "Maximum String Length";
 	public static final String MAX_LENGTH_REASON = "The smaller the maximum length, the more columns you can include in your table.";
 	public static final String BACK_TO_TABLE = "Back to Table";

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
@@ -254,6 +255,18 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Override
 	public void changeApiKey() {
 		apiSynAlert.clear();
+		ConfirmCallback callback = new ConfirmCallback() {
+			@Override
+			public void callback(boolean isConfirmed) {
+				if(isConfirmed) {
+					changeApiKeyPostConfirmation();	
+				}
+			}
+		};
+		view.showConfirm(DisplayConstants.API_KEY_CONFIRMATION, callback);
+	}
+	
+	public void changeApiKeyPostConfirmation(){
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {

@@ -7,6 +7,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -49,6 +51,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class SettingsPresenterTest {
 	
 	private static final String APIKEY = "MYAPIKEY";
+	private static final String APIKEY2 = "MYAPIKEY2";
 	SettingsPresenter profilePresenter;
 	SettingsView mockView;
 	AuthenticationController mockAuthenticationController;
@@ -96,6 +99,7 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(email).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(APIKEY2).when(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		
 		profile.setDisplayName("tester");
 		profile.setEmail(username);
@@ -320,5 +324,31 @@ public class SettingsPresenterTest {
 		verify(mockSynAlert, times(7)).clear();
 		verify(mockView).hideAPIKey();
 		verify(mockView).asWidget();
+	}
+	
+	@Test
+	public void testConfirmAPIKeyChange(){
+		profilePresenter.changeApiKey();
+		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		verify(mockView).showConfirm(anyString(),  captor.capture());
+		
+		ConfirmCallback callback = captor.getValue();
+		//test not confirmed (user clicked cancel)
+		callback.callback(false);
+		verify(mockSynapseClient, never()).deleteApiKey(any(AsyncCallback.class));
+		verify(mockView, never()).setApiKey(APIKEY2);
+		
+		callback.callback(true);
+		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
+		verify(mockView).setApiKey(APIKEY2);
+	}
+	
+	@Test
+	public void testAPIKeyChangeConfirmedFailure(){
+		Exception e = new Exception();
+		AsyncMockStubber.callFailureWith(e).when(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
+		profilePresenter.changeApiKeyPostConfirmation();
+		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(e);
 	}
 }
