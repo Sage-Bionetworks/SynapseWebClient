@@ -14,8 +14,10 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,14 +37,16 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SynapseAlert notificationSynAlert;
 	private SynapseAlert addressSynAlert;
 	private PortalGinInjector ginInjector;
-
+	private UserProfileModalWidget userProfileModalWidget;
+	
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient, GWTWrapper gwt,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			UserProfileModalWidget userProfileModalWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -50,6 +54,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
 		this.gwt = gwt;
+		this.userProfileModalWidget = userProfileModalWidget;
 		view.setPresenter(this);
 		setSynAlertWidgets();
 	}
@@ -63,7 +68,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		view.setAddressSynAlertWidget(addressSynAlert.asWidget());
 	}
 
-	private void getAPIKey() {
+	@Override
+	public void getAPIKey() {
 		apiSynAlert.clear();
 		// lookup API key
 		if (apiKey == null) {
@@ -236,12 +242,12 @@ public class SettingsPresenter implements SettingsView.Presenter {
 
 	// configuration
 	private void updateView() {
+		view.hideAPIKey();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
 		updateUserStorage();
 		getUserNotificationEmail();
-		getAPIKey();
 		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
@@ -308,5 +314,15 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.view.render();		
 		updateView();
 		return view.asWidget();
+	}
+	
+	@Override
+	public void onEditProfile() {
+		userProfileModalWidget.showEditProfile(authenticationController.getCurrentUserPrincipalId(), new Callback() {
+			@Override
+			public void invoke() {
+				goTo(new Profile(Profile.SETTINGS_DELIMITER));
+			}
+		});
 	}
 }
