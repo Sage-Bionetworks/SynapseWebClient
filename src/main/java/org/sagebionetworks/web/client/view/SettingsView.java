@@ -52,6 +52,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void changeApiKey();
 		
 		void addEmail(String emailAddress);
+		void onEditProfile();
+		void getAPIKey();
 	}
 
 	public void setApiKey(String apiKey);
@@ -62,5 +64,5 @@ public interface SettingsView extends IsWidget, SynapseView {
 	public void setAddressSynAlertWidget(Widget asWidget);
 
 	public void setAPISynAlertWidget(Widget synAlert);
-
+	void hideAPIKey();
 }
