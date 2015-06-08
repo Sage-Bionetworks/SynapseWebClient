@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.view;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -415,5 +417,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		apiKeyUI.setVisible(false);
 		changeApiKey.setVisible(false);
 		showApiKey.setVisible(true);
+	}
+	
+	@Override
+	public void showConfirm(String message, ConfirmCallback callback) {
+		Bootbox.confirm(message, callback);
 	}
 }

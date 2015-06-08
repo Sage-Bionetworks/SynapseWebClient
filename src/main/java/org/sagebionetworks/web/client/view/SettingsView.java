@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
@@ -65,4 +66,5 @@ public interface SettingsView extends IsWidget, SynapseView {
 
 	public void setAPISynAlertWidget(Widget synAlert);
 	void hideAPIKey();
+	void showConfirm(String message, ConfirmCallback callback);
 }

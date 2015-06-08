@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -49,6 +50,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class SettingsPresenterTest {
 	
 	private static final String APIKEY = "MYAPIKEY";
+	private static final String APIKEY2 = "MYAPIKEY2";
 	SettingsPresenter profilePresenter;
 	SettingsView mockView;
 	AuthenticationController mockAuthenticationController;
@@ -96,6 +98,7 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(email).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(APIKEY2).when(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		
 		profile.setDisplayName("tester");
 		profile.setEmail(username);
@@ -320,5 +323,27 @@ public class SettingsPresenterTest {
 		verify(mockSynAlert, times(7)).clear();
 		verify(mockView).hideAPIKey();
 		verify(mockView).asWidget();
+	}
+	
+	@Test
+	public void testConfirmAPIKeyChange(){
+		profilePresenter.changeApiKey();
+		verify(mockView).showConfirm(anyString(),  any(ConfirmCallback.class));
+	}
+	
+	@Test
+	public void testAPIKeyChangeConfirmed(){
+		profilePresenter.changeApiKeyPostConfirmation();
+		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
+		verify(mockView).setApiKey(APIKEY2);
+	}
+	
+	@Test
+	public void testAPIKeyChangeConfirmedFailure(){
+		Exception e = new Exception();
+		AsyncMockStubber.callFailureWith(e).when(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
+		profilePresenter.changeApiKeyPostConfirmation();
+		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(e);
 	}
 }
