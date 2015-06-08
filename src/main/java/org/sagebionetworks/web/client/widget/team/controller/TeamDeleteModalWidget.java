@@ -50,7 +50,7 @@ public class TeamDeleteModalWidget implements IsWidget, TeamDeleteModalWidgetVie
 			@Override
 			public void onSuccess(Void result) {
 				//go home
-				DisplayUtils.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS, "");
+				view.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS, "");
 				globalApplicationState.gotoLastPlace();
 			}
 			@Override

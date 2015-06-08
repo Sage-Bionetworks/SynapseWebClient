@@ -25,5 +25,7 @@ public interface TeamLeaveModalWidgetView {
 	void setPresenter(Presenter presenter);
 
 	void show();
+
+	void showInfo(String title, String message);
 	
 }

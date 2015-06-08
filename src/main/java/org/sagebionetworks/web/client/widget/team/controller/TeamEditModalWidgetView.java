@@ -51,4 +51,6 @@ public interface TeamEditModalWidgetView {
 
 	void setDefaultIconVisible();
 
+	void showInfo(String title, String message);
+
 }

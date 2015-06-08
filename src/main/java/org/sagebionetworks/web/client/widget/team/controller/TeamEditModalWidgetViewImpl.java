@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -173,5 +174,10 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		defaultIcon.setVisible(true);
 		previewImage.setVisible(false);
 		teamImageLoading.setVisible(false);
+	}
+	
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 }

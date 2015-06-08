@@ -64,15 +64,13 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	
 	@Override
 	public void setRefreshCallback(Callback refreshCallback) {
-		// could be configured with the team name built in so you don't need
-		// to set the name through setTeam?
 		this.refreshCallback = refreshCallback;
 	}
 	
 	@Override
 	public void onConfirm(String newName, String newDescription, boolean canPublicJoin) {
 		if (newName != null && newName.equals(team.getName()) && newDescription != null && newDescription.equals(team.getDescription())
-				&& team.getCanPublicJoin() == canPublicJoin && uploadedFileHandleId != null && team.getIcon().equals(uploadedFileHandleId)) {
+				&& team.getCanPublicJoin() == canPublicJoin && (uploadedFileHandleId == null || team.getIcon().equals(uploadedFileHandleId))) {
 			synAlert.showError("No changes were provided");
 		} else {
 			if (newName == null || newName.trim().length() == 0) {
@@ -87,7 +85,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				synapseClient.updateTeam(team, new AsyncCallback<Team>() {
 					@Override
 					public void onSuccess(Team result) {
-						DisplayUtils.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
+						view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
 						if (refreshCallback != null)
 							refreshCallback.invoke();
 						view.setVisible(false);

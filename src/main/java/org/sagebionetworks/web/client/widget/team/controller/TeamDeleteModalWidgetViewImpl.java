@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.team.controller;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetView.Presenter;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetViewImpl.Binder;
 
@@ -69,5 +70,9 @@ public class TeamDeleteModalWidgetViewImpl implements TeamDeleteModalWidgetView 
 		this.presenter = presenter;
 	}
 	
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
 
 }

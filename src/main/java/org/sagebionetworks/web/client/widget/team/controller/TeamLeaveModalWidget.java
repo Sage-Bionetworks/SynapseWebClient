@@ -50,7 +50,7 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 		synapseClient.deleteTeamMember(userId, userId, team.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				DisplayUtils.showInfo(DisplayConstants.LEAVE_TEAM_SUCCESS, "");
+				view.showInfo(DisplayConstants.LEAVE_TEAM_SUCCESS, "");
 				if (refreshCallback != null)
 					refreshCallback.invoke();
 			}
