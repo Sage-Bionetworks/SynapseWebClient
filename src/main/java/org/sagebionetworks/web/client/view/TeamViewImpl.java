@@ -49,6 +49,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	Column mediaObjectContainer;
 	@UiField
+	SimplePanel inviteMemberPanel;
+	@UiField
 	SimplePanel teamEditPanel;
 	@UiField
 	SimplePanel teamLeavePanel;
@@ -66,6 +68,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	AnchorListItem editTeamItem;
 	@UiField
 	AnchorListItem deleteTeamItem;
+	@UiField
+	AnchorListItem inviteMemberItem;
 	
 	private Team team;
 	private DropdownButton toolsButton;
@@ -113,6 +117,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	private void setDropdownHandlers() {
+		inviteMemberItem.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showInviteModal();
+			}
+		});
 		editTeamItem.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -175,7 +185,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.team = team;
 		String pictureUrl = null;
 		if (team.getIcon() != null) {
-			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
+			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()) + "&imageId=" + team.getIcon();
 		}
 		
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
@@ -185,9 +195,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (isAdmin) {
 
 			Callback refreshCallback = getRefreshCallback(team.getId());
-			//show invite UI
-			inviteWidget.configure(team.getId(), refreshCallback);
-			mainContainer.add(inviteWidget.asWidget());
 			openMembershipRequestsWidget.configure(team.getId(), refreshCallback);
 			mainContainer.add(openMembershipRequestsWidget.asWidget());
 			openUserInvitationsWidget.configure(team.getId(), refreshCallback);
@@ -242,6 +249,11 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setEditTeamWidget(Widget editWidget) {
 		this.teamEditPanel.setWidget(editWidget);
+	}
+	
+	@Override
+	public void setInviteMemberWidget(Widget inviteWidget) {
+		this.inviteMemberPanel.setWidget(inviteWidget);
 	}
 
 }

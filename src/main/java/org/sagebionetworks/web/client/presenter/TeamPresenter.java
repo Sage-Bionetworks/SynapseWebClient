@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
@@ -37,6 +38,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private TeamLeaveModalWidget leaveTeamWidget;
 	private TeamDeleteModalWidget deleteTeamWidget;
 	private TeamEditModalWidget editTeamWidget;
+	private InviteWidget inviteWidget;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -46,7 +48,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseAlert synAlert, TeamLeaveModalWidget leaveTeamWidget,
 			TeamDeleteModalWidget deleteTeamWidget,
-			TeamEditModalWidget editTeamWidget) {
+			TeamEditModalWidget editTeamWidget, InviteWidget inviteWidget) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = authenticationController;
@@ -57,11 +59,13 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.leaveTeamWidget = leaveTeamWidget;
 		this.deleteTeamWidget = deleteTeamWidget;
 		this.editTeamWidget = editTeamWidget;
+		this.inviteWidget = inviteWidget;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
 		view.setDeleteTeamWidget(deleteTeamWidget.asWidget());
 		view.setEditTeamWidget(editTeamWidget.asWidget());
+		view.setInviteMemberWidget(inviteWidget.asWidget());
 	}
 
 	@Override
@@ -139,18 +143,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void leaveTeam() {
 		synAlert.clear();
-//		String userId = authenticationController.getCurrentUserPrincipalId();
-//		synapseClient.deleteTeamMember(userId, userId, team.getId(), new AsyncCallback<Void>() {
-//			@Override
-//			public void onSuccess(Void result) {
-//				view.showInfo(DisplayConstants.LEAVE_TEAM_SUCCESS, "");
-//				refresh();
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				synAlert.handleException(caught);
-//			}
-//		});
 		leaveTeamWidget.setRefreshCallback(new Callback() {
 			@Override
 			public void invoke() {
@@ -184,6 +176,19 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void showInviteModal() {
+		synAlert.clear();
+		inviteWidget.setRefreshCallback(new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		});
+		inviteWidget.setTeam(team);
+		inviteWidget.setVisible(true);
 	}
 
 	@Override

@@ -12,12 +12,12 @@
 		<b:ModalBody>
 		    <b:FieldSet>
 		        <b:FormGroup>
-		            <b:FormLabel for="editName">Team name</b:FormLabel>
+		            <b:FormLabel for="editName">Name</b:FormLabel>
 		        	<b:TextBox ui:field="editNameField" b:id="editName"
 		            	addStyleNames="margin-left-10 margin-bottom-10 hide-resize"/>
 		        </b:FormGroup>
 		        <b:FormGroup>
-		            <b:FormLabel for="editDescription">Team Description</b:FormLabel>
+		            <b:FormLabel for="editDescription">Description</b:FormLabel>
 		            <b:TextArea ui:field="editDescriptionField" b:id="editDescription"
 			            addStyleNames="margin-left-10 margin-bottom-10 hide-resize"/>
 		        </b:FormGroup>
@@ -26,20 +26,21 @@
 		                addStyleNames="checkbox margin-left-10 displayInlineBlock"/>
 		        </b:FormGroup>
 		        <b:FormGroup>
-		            <b:FormLabel for="uploadWidget">Upload new Team Icon</b:FormLabel>
+		            <b:FormLabel for="uploadWidget">Upload new Icon</b:FormLabel>
 		            <b:Row b:id="uploadWidget">
 		                <b:Column size="MD_4">
-							<b:Icon ui:field="defaultIcon" type="USER"
+		                    <bh:Div ui:field="iconContainer">
+		                        <b:Icon ui:field="defaultIcon" type="USER"
 								addStyleNames="font-size-150 lightGreyText" visible="true"/>
-							<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+								<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+		                    </bh:Div>
 							<bh:Div ui:field="teamImageLoading" visible="false">
 								<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 								<bh:Text>&nbsp;Loading...</bh:Text>
 							</bh:Div>		                
 						</b:Column>
-		                <b:Column size="MD_8">
-		                    <g:SimplePanel addStyleNames="displayInline" ui:field="uploadWidgetPanel"/>
-		                	<bh:Span ui:field="uploadedFileName"/>
+		                <b:Column size="MD_8" >
+		                    <g:SimplePanel ui:field="uploadWidgetPanel"/>
 		                </b:Column>
 		            </b:Row>
 		        </b:FormGroup>

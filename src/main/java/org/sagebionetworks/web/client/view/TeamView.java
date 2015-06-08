@@ -27,10 +27,12 @@ public interface TeamView extends IsWidget, SynapseView {
 		void showEditModal();
 		void showDeleteModal();
 		void showLeaveModal();
+		void showInviteModal();
 	}
 
 	void setSynAlertWidget(Widget asWidget);
 	void setLeaveTeamWidget(Widget asWidget);
 	void setDeleteTeamWidget(Widget asWidget);
 	void setEditTeamWidget(Widget asWidget);
+	void setInviteMemberWidget(Widget inviteWidget);
 }

@@ -43,8 +43,6 @@ public interface TeamEditModalWidgetView {
 
 	void setUploadWidget(Widget uploader);
 
-	void setUploadedFileName(String fileName);
-
 	void setLoading(boolean isLoading);
 
 	void setVisible(boolean isVisible);

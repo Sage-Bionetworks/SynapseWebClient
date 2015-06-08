@@ -60,8 +60,8 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	Div teamImageLoading;
 	
 	@UiField
-	Span uploadedFileName;
-	
+	Div iconContainer;
+
 	public interface Binder extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {}
 	
 	Widget widget;
@@ -81,6 +81,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		secondaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				presenter.clear();
 				modal.hide();
 			}
 		});
@@ -122,17 +123,11 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	}
 	
 	@Override
-	public void setUploadedFileName(String fileName) {
-		uploadedFileName.setText(fileName);
-	}
-	
-	@Override
 	public void setLoading(boolean isLoading) {
 		String primaryButtonText = isLoading ? "Uploading" : "Save";
 		primaryButton.setText(primaryButtonText);
 		primaryButton.setEnabled(!isLoading);
-		defaultIcon.setVisible(!isLoading);
-		previewImage.setVisible(!isLoading);
+		iconContainer.setVisible(!isLoading);
 		teamImageLoading.setVisible(isLoading);
 	}
 	
@@ -159,7 +154,6 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 			editNameField.setValue(team.getName());
 			editDescriptionField.setValue(team.getDescription());
 			publicJoinCheckbox.setValue(team.getCanPublicJoin());
-			uploadedFileName.setText("");
 			this.modal.show();
 		} else {
 			this.modal.hide();

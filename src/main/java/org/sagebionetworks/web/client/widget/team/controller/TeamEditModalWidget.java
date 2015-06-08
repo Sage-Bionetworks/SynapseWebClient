@@ -33,7 +33,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	@Inject
 	public TeamEditModalWidget(SynapseAlert synAlert,
 			final TeamEditModalWidgetView view, SynapseClientAsync synapseClient,
-			FileHandleUploadWidget uploader, final SynapseJSNIUtils jsniUtils,
+			final FileHandleUploadWidget uploader, final SynapseJSNIUtils jsniUtils,
 			final AuthenticationController authenticationController) {
 		this.synAlert = synAlert;
 		this.view = view;
@@ -43,18 +43,17 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		uploader.configure("Browse", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
-				view.setUploadedFileName("Filename: " + fileUpload.getFileMeta().getFileName());
+				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
 				view.setLoading(false);
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(jsniUtils.getBaseProfileAttachmentUrl() + "?userId=" + 
-						authenticationController.getCurrentUserPrincipalId() + "&imageId=" + uploadedFileHandleId +
-						"&applied=false");
+				view.setImageURL(baseImageURL + "?rawFileHandleId=" + uploadedFileHandleId);
 			}
 		});
 		uploader.setValidation(new ImageFileValidator());
 		uploader.setUploadingCallback(new Callback() {
 			@Override
 			public void invoke() {
+				uploader.setUploadedFileText("");
 				view.setLoading(true);
 			}
 		});
@@ -83,7 +82,8 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				team.setName(newName);
 				team.setDescription(newDescription);
 				team.setCanPublicJoin(canPublicJoin);
-				team.setIcon(uploadedFileHandleId);
+				if (uploadedFileHandleId != null)
+					team.setIcon(uploadedFileHandleId);
 				synapseClient.updateTeam(team, new AsyncCallback<Team>() {
 					@Override
 					public void onSuccess(Team result) {
@@ -122,9 +122,10 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 
 	@Override
 	public void setVisible(boolean isVisible) {
+		clear();
 		if (isVisible) {
 			if (team.getIcon() != null)
-				view.setImageURL(baseImageURL + "?teamId=" + team.getId());
+				view.setImageURL(baseImageURL + "?rawFileHandleId=" + team.getIcon());
 			else
 				view.setDefaultIconVisible();
 		}

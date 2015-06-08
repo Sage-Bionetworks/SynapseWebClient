@@ -1,11 +1,17 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -16,54 +22,91 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
-	private String teamId;
+	private Team team;
 	private Callback teamUpdatedCallback;
 	private GWTWrapper gwt;
+	private SynapseAlert synAlert;
+	private UserGroupSuggestBox peopleSuggestWidget;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public InviteWidget(InviteWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
-			GWTWrapper gwt) {
+			GWTWrapper gwt, SynapseAlert synAlert,
+			UserGroupSuggestBox peopleSuggestBox,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
-		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.gwt = gwt;
+		this.synAlert = synAlert;
+		this.peopleSuggestWidget = peopleSuggestBox;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		view.setSuggestWidget(peopleSuggestBox.asWidget());
+		view.setSynAlertWidget(synAlert.asWidget());
+		view.setPresenter(this);
 	}
-
-	public void configure(String teamId, Callback teamUpdatedCallback) {
-		//set team
-		this.teamId = teamId;
-		this.teamUpdatedCallback = teamUpdatedCallback;
-		view.configure();
-	};
 	
 	@Override
-	public void sendInvitation(String principalId, String message, final String userDisplayName) {
-		synapseClient.inviteMember(principalId, teamId, message, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				view.showInfo("Invitation Sent", "The invitation has been sent to " + userDisplayName);
-				teamUpdatedCallback.invoke();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
-			}
-		});
+	public void configure() {
+		clear();
+		peopleSuggestWidget.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
+		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
 	}
 	
 	public void clear() {
-		view.clear();
+		view.clear();	
+		peopleSuggestWidget.clear();
+		
 	}
 	
 	public Widget asWidget() {
-		view.setPresenter(this);
+		configure();
 		return view.asWidget();
+	}
+
+	public void setRefreshCallback(Callback teamUpdatedCallback) {
+		this.teamUpdatedCallback = teamUpdatedCallback;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
+	}
+	
+	@Override
+	public void sendInvite(String invitationMessage) {
+		UserGroupSuggestion suggestion = peopleSuggestWidget.getSelectedSuggestion();
+		if(suggestion != null) {
+			UserGroupHeader header = suggestion.getHeader();
+			String principalId = header.getOwnerId();
+			final String firstName = header.getFirstName();
+			final String lastName = header.getLastName();
+			final String userName = header.getUserName();
+			
+			synapseClient.inviteMember(principalId, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					view.setVisible(false);
+					view.showInfo("Invitation Sent", "An invitation has been sent to " + DisplayUtils.getDisplayName(firstName, lastName, userName));
+					teamUpdatedCallback.invoke();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+			});			
+		}
+		else {
+			synAlert.showError("Please select a user to send an invite to.");
+		}
+	}
+
+	public void setVisible(boolean isVisible) {
+		if (isVisible)
+			clear();
+		view.setVisible(isVisible);
 	}
 }

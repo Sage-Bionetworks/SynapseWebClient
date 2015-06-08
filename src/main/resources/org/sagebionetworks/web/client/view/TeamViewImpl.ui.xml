@@ -16,6 +16,7 @@
 	    		    <b:ButtonGroup pull="RIGHT">
 	    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
 		    		    <b:DropDownMenu>
+		    		        <b:AnchorListItem icon="PLUS" ui:field="inviteMemberItem">Invite User</b:AnchorListItem>
 					        <b:AnchorListItem icon="EDIT" ui:field="editTeamItem">Edit Team</b:AnchorListItem>
 					        <b:AnchorListItem icon="REMOVE" ui:field="deleteTeamItem">Delete Team</b:AnchorListItem>
 					        <b:AnchorListItem ui:field="leaveTeamItem" visible="false">Leave Team</b:AnchorListItem>
@@ -24,16 +25,17 @@
 		    		<g:SimplePanel ui:field="teamEditPanel"/>
 	    			<g:SimplePanel ui:field="teamDeletePanel"/>
 	    			<g:SimplePanel ui:field="teamLeavePanel"/>
+	    			<g:SimplePanel ui:field="inviteMemberPanel"/>
 	    		</b:Column>
 		    		
 	        </b:Row>
 	        <g:SimplePanel ui:field="synAlertPanel"/>
 	    	<div class="row">
 		    	<g:HTMLPanel ui:field="mainContainer" styleName="col-md-12">
-		    	    <bh:Span addStyleNames="padding-left-74 boldText margin-right-5">Total members: </bh:Span>
+		    	    <bh:Span addStyleNames="boldText margin-right-5">Total members: </bh:Span>
 		    	    <bh:Span ui:field="totalMemberCountField"/>
 		    	    <br/>
-		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="padding-left-74 boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
+		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
 		    	</g:HTMLPanel>
 		   	</div>
 		   	<div>
