@@ -2556,13 +2556,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String sendMessage(Set<String> recipients, String subject,
-			String messageBody) throws RestServiceException {
+	public String sendMessage(
+			Set<String> recipients, 
+			String subject,
+			String messageBody,
+			String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			MessageToUser message = new MessageToUser();
 			message.setRecipients(recipients);
 			message.setSubject(subject);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			MessageToUser sentMessage = synapseClient.sendStringMessage(
 					message, messageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage
