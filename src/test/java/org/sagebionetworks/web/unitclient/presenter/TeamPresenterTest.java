@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;

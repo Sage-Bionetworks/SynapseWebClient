@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.team.controller;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
