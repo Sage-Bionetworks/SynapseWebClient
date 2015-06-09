@@ -1522,11 +1522,13 @@ public class SynapseClientImplTest {
 		recipients.add("333");
 		String subject = "The Mathematics of Quantum Neutrino Fields";
 		String messageBody = "Atoms are not to be trusted, they make up everything";
-		synapseClient.sendMessage(recipients, subject, messageBody);
+		String hostPageBaseURL = "http://localhost/Portal.html";
+		synapseClient.sendMessage(recipients, subject, messageBody, hostPageBaseURL);
 		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertEquals(recipients, toSendMessage.getRecipients());
+		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
 	}
 
 	@Test
