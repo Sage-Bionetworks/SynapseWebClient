@@ -195,32 +195,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		leaveTeamWidget.setTeam(team);
 		leaveTeamWidget.showDialog();
 	}
-
-	@Override
-	public void updateTeamInfo(String name, String description, boolean canPublicJoin, String fileHandleId) {
-		synAlert.clear();
-		if (name == null || name.trim().length() == 0) {
-			//syn alert handles?!
-			view.showErrorMessage(DisplayConstants.ERROR_NAME_MUST_BE_DEFINED);
-		}
-		else {
-			team.setName(name);
-			team.setDescription(description);
-			team.setCanPublicJoin(canPublicJoin);
-			team.setIcon(fileHandleId);
-			synapseClient.updateTeam(team, new AsyncCallback<Team>() {
-				@Override
-				public void onSuccess(Team result) {
-					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
-					refresh();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-			});
-		}
-	}
 	
 	@Override
 	public void showInviteModal() {
@@ -238,6 +212,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	@Override
 	public void showEditModal() {
 		synAlert.clear();
+		editTeamWidget.clear();
 		editTeamWidget.setRefreshCallback(new Callback() {
 			@Override
 			public void invoke() {

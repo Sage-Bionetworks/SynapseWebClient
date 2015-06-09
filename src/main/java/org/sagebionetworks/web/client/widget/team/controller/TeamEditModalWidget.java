@@ -114,6 +114,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	
 	@Override
 	public void clear() {
+		synAlert.clear();
 		uploader.reset();
 		uploadedFileHandleId = null;
 	}

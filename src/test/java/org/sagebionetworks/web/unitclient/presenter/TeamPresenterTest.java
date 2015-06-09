@@ -177,33 +177,5 @@ public class TeamPresenterTest {
 		verify(mockOpenUserInvitationsWidget, never()).configure(eq(teamId), any(Callback.class));
 		verify(mockView, never()).showAdminMenuItems();
 	}
-	
-	@Test
-	public void testUpdateTeamInfoSuccess() {
-		presenter.setTeam(mockTeam);
-		AsyncMockStubber.callSuccessWith(mockTeam).when(mockSynClient)
-				.updateTeam(any(Team.class), any(AsyncCallback.class));
-		presenter.updateTeamInfo(newName, newDesc, newPublicJoin, newIcon);
-		//Because refresh is called again, it calls another synAlert.clear()
-		verify(mockSynAlert, Mockito.times(2)).clear();
-		verify(mockTeam).setName(newName);
-		verify(mockTeam).setDescription(newDesc);
-		verify(mockTeam).setCanPublicJoin(newPublicJoin);
-		verify(mockTeam).setIcon(newIcon);
-		verify(mockView).showInfo(anyString(), anyString());
-	}
-	
-	@Test
-	public void testUpdateTeamInfoFailure() {
-		presenter.setTeam(mockTeam);
-		AsyncMockStubber.callFailureWith(caught).when(mockSynClient)
-				.updateTeam(any(Team.class), any(AsyncCallback.class));
-		presenter.updateTeamInfo(newName, newDesc, newPublicJoin, newIcon);
-		verify(mockSynAlert).clear();
-		verify(mockTeam).setName(newName);
-		verify(mockTeam).setDescription(newDesc);
-		verify(mockTeam).setCanPublicJoin(newPublicJoin);
-		verify(mockTeam).setIcon(newIcon);
-		verify(mockSynAlert).handleException(caught);
-	}
+
 }
