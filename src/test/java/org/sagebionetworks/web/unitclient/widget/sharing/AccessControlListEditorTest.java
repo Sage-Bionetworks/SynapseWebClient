@@ -49,7 +49,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class AccessControlListEditorTest {
-	
+	private static final String HOST_PAGE_BASE_URL="http://www.wwu.edu/";
 	// The ACLEditor
 	private AccessControlListEditor acle;
 
@@ -117,6 +117,7 @@ public class AccessControlListEditorTest {
 		);
 		acle.configure(project, true, mockHasChangeHandler);
 		when(mockACLEView.isNotifyPeople()).thenReturn(true);
+		when(mockGwt.getHostPageBaseURL()).thenReturn(HOST_PAGE_BASE_URL);
 	}
 	
 	private static Project createProject() {
@@ -293,7 +294,7 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
-		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), eq(HOST_PAGE_BASE_URL), any(AsyncCallback.class));
 		Set recipientSet = recipientSetCaptor.getValue();
 		//should try to send a notification message to a single recipient principal id, USER2_ID.  Verify team is not notified
 		assertEquals(1, recipientSet.size());

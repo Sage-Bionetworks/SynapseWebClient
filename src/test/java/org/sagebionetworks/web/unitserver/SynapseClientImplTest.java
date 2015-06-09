@@ -1528,6 +1528,7 @@ public class SynapseClientImplTest {
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertEquals(recipients, toSendMessage.getRecipients());
+		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
 	}
 
 	@Test
