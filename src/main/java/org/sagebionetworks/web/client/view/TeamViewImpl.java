@@ -136,7 +136,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void clear() {
 		mediaObjectContainer.clear();
 		commandsContainer.setVisible(false);
-		leaveTeamItem.setVisible(true);
+		inviteMemberItem.setVisible(false);
+		editTeamItem.setVisible(false);
+		deleteTeamItem.setVisible(false);
+		leaveTeamItem.setVisible(false);
 	}
 	
 	@Override
