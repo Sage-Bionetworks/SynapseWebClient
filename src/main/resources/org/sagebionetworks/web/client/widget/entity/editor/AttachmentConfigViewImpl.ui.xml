@@ -9,7 +9,7 @@
 		<!-- Tabs -->
 		<b:NavTabs>
 			<b:TabListItem ui:field="uploadTabListItem" active="true" dataTarget="#tab1" text="Upload"/>
-			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab2" text="From Attachments"/>
+			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab2" text="Previously Uploaded"/>
 		</b:NavTabs>
 		<b:TabContent>
 			<b:TabPane active="true" b:id="tab1" addStyleNames="margin-top-15">

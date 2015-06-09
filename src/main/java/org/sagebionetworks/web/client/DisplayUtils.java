@@ -1795,8 +1795,7 @@ public class DisplayUtils {
 	}
 
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
-		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Settings:0";
-		//alternatively, could use the gwt I18n Messages class client side
+		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n";
 	}
 	
 	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){

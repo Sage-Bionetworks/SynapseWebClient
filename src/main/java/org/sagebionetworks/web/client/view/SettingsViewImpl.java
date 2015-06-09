@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -44,7 +47,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	DivElement changeSynapsePasswordHighlightBox;
 	@UiField
 	DivElement apiKeyHighlightBox;
-		
+	@UiField
+	DivElement editProfilePanel;
+	@UiField
+	Panel apiKeyUI;
+	@UiField
+	org.gwtbootstrap3.client.ui.Button editProfileButton;
+	
 	@UiField
 	FlowPanel forgotPasswordContainer;
 	Anchor forgotPasswordLink;
@@ -91,14 +100,16 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	SpanElement storageUsageSpan;
 	@UiField
-	Text apiKeyContainer;
+	TextBox apiKeyContainer;
 	
 	@UiField
 	HTMLPanel notificationsPanel;
 	@UiField
 	CheckBox emailNotificationsCheckbox;
 	@UiField
-	Button changeApiKey;
+	org.gwtbootstrap3.client.ui.Button changeApiKey;
+	@UiField
+	org.gwtbootstrap3.client.ui.Button showApiKey;
 	
 	@UiField
 	SimplePanel addressSynAlertPanel;
@@ -134,6 +145,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			}
 		});
 		
+		showApiKey.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getAPIKey();
+			}
+		});
+		
 		forgotPasswordLink = new Anchor();
 		forgotPasswordLink.addStyleName("link movedown-4 margin-left-10");
 		forgotPasswordLink.setText(DisplayConstants.FORGOT_PASSWORD);
@@ -149,6 +167,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		notificationsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Settings");
 		changeSynapsePasswordHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
+		editProfilePanel.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
 		
 		newEmailField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
@@ -166,7 +185,20 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 					presenter.addEmail(newEmailField.getValue());
 				}
 			}
-		});		
+		});
+		editProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onEditProfile();
+			}
+		});
+		
+		apiKeyContainer.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				apiKeyContainer.selectAll();
+			}
+		});
 	}
 
 
@@ -358,6 +390,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setApiKey(String apiKey) {
 		apiKeyContainer.setText(apiKey);
+		apiKeyUI.setVisible(true);
+		changeApiKey.setVisible(true);
+		showApiKey.setVisible(false);
 	}
 
 
@@ -375,5 +410,17 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setAPISynAlertWidget(Widget apiSynAlert) {
 		apiSynAlertPanel.setWidget(apiSynAlert);
+	}
+	
+	@Override
+	public void hideAPIKey() {
+		apiKeyUI.setVisible(false);
+		changeApiKey.setVisible(false);
+		showApiKey.setVisible(true);
+	}
+	
+	@Override
+	public void showConfirm(String message, ConfirmCallback callback) {
+		Bootbox.confirm(message, callback);
 	}
 }
