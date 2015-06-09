@@ -60,7 +60,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public void clear() {
 		view.clear();	
 		peopleSuggestWidget.clear();
-		
+		synAlert.clear();
 	}
 	
 	public Widget asWidget() {
