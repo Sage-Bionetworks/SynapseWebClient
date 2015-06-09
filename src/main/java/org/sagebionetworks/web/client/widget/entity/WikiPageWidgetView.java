@@ -30,7 +30,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	}
 	
 	public void configure(String markdown, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);
-	public void showWarningMessageInPage(String message);
+	public void showNoteInPage(String message);
 	public void show404();
 	public void show403();
 	
@@ -40,5 +40,5 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void resetWikiMarkdown(String markdown, final WikiPageKey wikiKey,
 			boolean isRootWiki, boolean isCurrentVersion, final Long versionInView);
 	public void setSynapseAlertWidget(Widget asWidget);
-	public void clearWikiPagePanel();
+	public void showSynapseAlertWidget();
 }
