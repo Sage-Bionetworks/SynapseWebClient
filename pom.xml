@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2015-05-14-1746-f3b00c4</synapse.version>
+ 		<synapse.version>94.0-2-g8f9492a</synapse.version>
 		<gwtVersion>2.7.0</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -333,7 +333,7 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>2014-11-06-918e7d7-14</version>
+			<version>2015-06-04-987164c-15</version>
 		</dependency>
 		
 		

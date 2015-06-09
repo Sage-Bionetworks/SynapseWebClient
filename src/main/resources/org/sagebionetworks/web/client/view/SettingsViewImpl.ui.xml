@@ -30,6 +30,9 @@
 						<div ui:field="newEmailAlert" class="alert alert-info" style="display:none" role="alert"></div>
 						<g:SimplePanel ui:field="addressSynAlertPanel"/>
 					</div>
+					<div ui:field="editProfilePanel" class="highlight-box">
+						<b:Button ui:field="editProfileButton" icon="EDIT" >Edit Profile</b:Button>
+					</div>
 				    <g:HTMLPanel ui:field="notificationsPanel" styleName="highlight-box">
 					    <g:FlowPanel styleName="margin-left-10">
 					       <b:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" addStyleNames="margin-0-imp"/> 
@@ -80,13 +83,16 @@
 					indefinite amount of time. It is important that you treat your API
 					key with
 					the same security as your password.</p>
-				<b:Panel>
+				<b:Panel ui:field="apiKeyUI">
 					<b:PanelBody>
-						<g:ScrollPanel styleName="center"><bh:Text ui:field="apiKeyContainer" text=""></bh:Text></g:ScrollPanel>
+						<g:ScrollPanel styleName="center">
+							<g:TextBox ui:field="apiKeyContainer" addStyleNames="border-none noBackground center" readOnly="true" width="100%" />
+						</g:ScrollPanel>
 					</b:PanelBody>
 				</b:Panel>
 				<g:SimplePanel ui:field="apiSynAlertPanel"/>
-				<g:Button ui:field="changeApiKey" styleName="btn btn-default margin-top-10">Change API Key</g:Button>
+				<b:Button ui:field="showApiKey" addStyleNames="margin-top-10" text="Show API Key"/>
+				<b:Button ui:field="changeApiKey" addStyleNames="margin-top-10" text="Change API Key"/>
 			</div>
 
 			<div class="clear"></div>

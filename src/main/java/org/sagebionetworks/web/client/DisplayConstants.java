@@ -34,7 +34,6 @@ public class DisplayConstants {
 	public static final String SHARED_ON_SYNAPSE = " has shared an item with you on Synapse";
 	public static final String SHARED_ON_SYNAPSE_SUBJECT = " (shared on Synapse)";
 	public static final String UPDATED_NOTIFICATION_SETTINGS = "Updated Notification Settings";
-	public static final String TURN_OFF_NOTIFICATIONS = "To turn off email notifications, please visit your profile page at ";
 	public static final String TEMP_MSKCC_DESCRIPTION = "Genetic and epigenetic alterations have been identified that lead to transcriptional Annotation of prostate cancer genomes provides a foundation for discoveries that can impact disease understanding and treatment. Concordant assessment of DNA copy number, mRNA expression, and focused exon resequencing in the 218 prostate cancer tumors represented in this dataset haveidentified the nuclear receptor coactivator NCOA2 as an oncogene in approximately 11% of tumors. Additionally, the androgen-driven TMPRSS2-ERG fusion was associated with a previously unrecognized, prostate-specific deletion at chromosome 3p14 that implicates FOXP1, RYBP, and SHQ1 as potential cooperative tumor suppressors. DNA copy-number data from primary tumors revealed that copy-number alterations robustly define clusters of low- and high-risk disease beyond that achieved by Gleason score.";
 	
 	public static final String CREATE_DATASET_TEXT = "Please fill out the initial descriptive fields for the dataset you would like to create. You may add detailed annotations and upload Layers to this dataset by editing it once it is created.";
@@ -718,6 +717,7 @@ public class DisplayConstants {
 	
 	public static final String ERROR_CREATING_COLUMN = "Error creating column";
 	public static final String API_KEY_CHANGED = "API Key successfully changed";
+	public static final String API_KEY_CONFIRMATION = "Any scripts using the old API key will break. Are you sure you want Synapse to generate a new API Key?";
 	public static final String MAX_STRING_LENGTH = "Maximum String Length";
 	public static final String MAX_LENGTH_REASON = "The smaller the maximum length, the more columns you can include in your table.";
 	public static final String BACK_TO_TABLE = "Back to Table";

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Versionable;
@@ -14,12 +15,15 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRender
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -45,7 +49,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SpanElement entityName;
 	@UiField
-	SpanElement entityId;
+	TextBox idField;
 	@UiField
 	SimplePanel favoritePanel;
 	@UiField
@@ -84,6 +88,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		doiPanel.setWidget(doiWidget.asWidget());
 		annotationsContainer.setWidget(annotationsWidget.asWidget());
 		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
+		idField.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				idField.selectAll();
+			}
+		});
+
 	}
 
 	@Override
@@ -173,7 +184,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	public void setEntityId(String text) {
-		entityId.setInnerText(text);
+		idField.setText(text);
 	}
 	
 	@Override

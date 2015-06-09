@@ -64,6 +64,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private boolean isEmbeddedInOwnerPage;
 	private HorizontalPanel modifiedPanel, createdPanel;
 	private SimplePanel historyPanel;
+	private SimplePanel synapseAlertPanel;
 
 	public interface OwnerObjectNameCallback{
 		public void ownerObjectNameInitialized();
@@ -86,6 +87,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		modifiedPanel = new HorizontalPanel();
 		createdPanel = new HorizontalPanel();
 		historyPanel = new SimplePanel();
+		synapseAlertPanel = new SimplePanel();
 	}
 
 	@Override
@@ -187,7 +189,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	private void resetWikiPagePanel() {
-		wikiPagePanel.clear();
+		clearWikiPagePanel();
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			Alert notice = createDifferentVersionNotice();
@@ -235,7 +237,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	 */
 	private void showDefaultViewWithWiki() {
 		clear();
-
 		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
 		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
@@ -416,5 +417,16 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			}
 		});
 		return btn;
+	}
+
+	@Override
+	public void setSynapseAlertWidget(Widget synapseAlert) {
+		synapseAlertPanel.add(synapseAlert);
+	}
+
+	@Override
+	public void clearWikiPagePanel() {
+		wikiPagePanel.clear();
+		wikiPagePanel.add(synapseAlertPanel);
 	}
 }

@@ -315,7 +315,7 @@ public interface SynapseClientAsync {
 
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	
-	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
+	void sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL, AsyncCallback<String> callback);
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
