@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.entity.ContentType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -174,7 +176,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
-	
+	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
+	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
+			.create("text/html", MESSAGE_CHARSET);
+
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	// This will be appended to the User-Agent header.
 	public static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
@@ -2568,8 +2573,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			message.setSubject(subject);
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
-			MessageToUser sentMessage = synapseClient.sendStringMessage(
-					message, messageBody);
+			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
+			String fileHandleId = synapseClient.uploadToFileHandle(
+					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
+					HTML_MESSAGE_CONTENT_TYPE);
+			message.setFileHandleId(fileHandleId);
+			MessageToUser sentMessage = synapseClient.sendMessage(message);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
