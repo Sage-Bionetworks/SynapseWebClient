@@ -12,6 +12,10 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
+import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
+import org.sagebionetworks.web.client.widget.team.MemberListWidget;
+import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidget;
+import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
@@ -22,6 +26,8 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TeamPresenter extends AbstractActivity implements TeamView.Presenter, Presenter<org.sagebionetworks.web.client.place.Team> {
@@ -33,12 +39,15 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Team team;
-	private TeamMembershipStatus teamMembershipStatus;
 	private SynapseAlert synAlert;
 	private TeamLeaveModalWidget leaveTeamWidget;
 	private TeamDeleteModalWidget deleteTeamWidget;
 	private TeamEditModalWidget editTeamWidget;
 	private InviteWidget inviteWidget;
+	private JoinTeamWidget joinTeamWidget;
+	private MemberListWidget memberListWidget;
+	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
+	private OpenUserInvitationsWidget openUserInvitationsWidget;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -48,9 +57,12 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseAlert synAlert, TeamLeaveModalWidget leaveTeamWidget,
 			TeamDeleteModalWidget deleteTeamWidget,
-			TeamEditModalWidget editTeamWidget, InviteWidget inviteWidget) {
+			TeamEditModalWidget editTeamWidget, InviteWidget inviteWidget,
+			JoinTeamWidget joinTeamWidget,  
+			MemberListWidget memberListWidget, 
+			OpenMembershipRequestsWidget openMembershipRequestsWidget,
+			OpenUserInvitationsWidget openUserInvitationsWidget) {
 		this.view = view;
-		view.setPresenter(this);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
@@ -60,12 +72,20 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.deleteTeamWidget = deleteTeamWidget;
 		this.editTeamWidget = editTeamWidget;
 		this.inviteWidget = inviteWidget;
+		this.joinTeamWidget = joinTeamWidget;
+		this.memberListWidget = memberListWidget;
+		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
+		this.openUserInvitationsWidget = openUserInvitationsWidget;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
 		view.setDeleteTeamWidget(deleteTeamWidget.asWidget());
 		view.setEditTeamWidget(editTeamWidget.asWidget());
 		view.setInviteMemberWidget(inviteWidget.asWidget());
+		view.setJoinTeamWidget(joinTeamWidget.asWidget());
+		view.setOpenMembershipRequestWidget(memberListWidget.asWidget());
+		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
+		view.setMemberListWidget(openUserInvitationsWidget.asWidget());
 	}
 
 	@Override
@@ -104,13 +124,35 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
+				view.clear();
 				team = result.getTeam();
-				if (result.getTeamMembershipStatus() != null)
-					teamMembershipStatus = result.getTeamMembershipStatus();
-				else
-					teamMembershipStatus = null;
+				TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
 				boolean isAdmin = result.isUserAdmin();
-				view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
+				Callback refreshCallback = new Callback() {
+					@Override
+					public void invoke() {
+						refresh(teamId);
+					}
+				};
+				view.setPublicJoinVisible(team.getCanPublicJoin());
+				view.setTotalMemberCount(result.getTotalMemberCount().toString());
+				view.setMediaObjectPanel(team);			
+				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
+
+				if (teamMembershipStatus != null) {
+					if (!teamMembershipStatus.getIsMember())
+						//not a member, add Join widget
+						joinTeamWidget.configure(teamId, false, teamMembershipStatus,
+								refreshCallback, null, null, null, null, false);
+					else {
+						view.showMemberMenuItems();
+						if (isAdmin) {
+							openMembershipRequestsWidget.configure(teamId, refreshCallback);
+							openUserInvitationsWidget.configure(teamId, refreshCallback);
+							view.showAdminMenuItems();
+						}
+					}
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -118,6 +160,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 		});
 	}
+		
 	private void showView(org.sagebionetworks.web.client.place.Team place) {
 		String teamId = place.getTeamId();
 		refresh(teamId);
@@ -157,6 +200,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	public void updateTeamInfo(String name, String description, boolean canPublicJoin, String fileHandleId) {
 		synAlert.clear();
 		if (name == null || name.trim().length() == 0) {
+			//syn alert handles?!
 			view.showErrorMessage(DisplayConstants.ERROR_NAME_MUST_BE_DEFINED);
 		}
 		else {
@@ -228,6 +272,11 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		});
 		leaveTeamWidget.setTeam(team);
 		leaveTeamWidget.showDialog();		
+	}
+	
+	//testing only
+	public void setTeam(Team team) {
+		this.team = team;
 	}
 }
 

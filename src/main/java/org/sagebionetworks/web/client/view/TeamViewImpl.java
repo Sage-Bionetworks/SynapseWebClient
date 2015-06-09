@@ -47,7 +47,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	Column commandsContainer;
 	@UiField
-	Column mediaObjectContainer;
+	SimplePanel mediaObjectContainer;
 	@UiField
 	SimplePanel inviteMemberPanel;
 	@UiField
@@ -58,6 +58,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 	SimplePanel teamDeletePanel;
 	@UiField
 	SimplePanel synAlertPanel;
+	@UiField
+	SimplePanel joinTeamPanel;
+	@UiField
+	SimplePanel openMembershipRequestsPanel;
+	@UiField
+	SimplePanel openUserInvitationsPanel;
+	@UiField
+	SimplePanel memberListPanel;
 	@UiField
 	Span totalMemberCountField;
 	@UiField
@@ -75,41 +83,22 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private DropdownButton toolsButton;
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private MemberListWidget memberListWidget;
-	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
-	private OpenUserInvitationsWidget openUserInvitationsWidget;
-	private InviteWidget inviteWidget;
-	private JoinTeamWidget joinTeamWidget;
 	private Header headerWidget;
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private UploadDialogWidget uploader;
 	
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
-			SageImageBundle sageImageBundle, 
-			MemberListWidget memberListWidget, 
-			OpenMembershipRequestsWidget openMembershipRequestsWidget,
-			OpenUserInvitationsWidget openUserInvitationsWidget,
+			SageImageBundle sageImageBundle,
 			InviteWidget inviteWidget, 
-			JoinTeamWidget joinTeamWidget, 
 			Header headerWidget, 
 			Footer footerWidget, 
-			SynapseJSNIUtils synapseJSNIUtils,
-			UploadDialogWidget uploader			
-			) {
+			SynapseJSNIUtils synapseJSNIUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.sageImageBundle = sageImageBundle;
-		this.memberListWidget = memberListWidget;
-		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
-		this.openUserInvitationsWidget = openUserInvitationsWidget;
-		this.inviteWidget = inviteWidget;
-		this.joinTeamWidget = joinTeamWidget;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.uploader = uploader;
-		uploader.disableMultipleFileUploads();
 		setDropdownHandlers();
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -179,57 +168,28 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	@Override
-	public void configure(final Team team, boolean isAdmin, TeamMembershipStatus teamMembershipStatus, Long totalMemberCount) {
-		clear();
-		
-		this.team = team;
+	public void showMemberMenuItems() {
+		leaveTeamItem.setVisible(true);
+		commandsContainer.setVisible(true);
+	}
+	
+	@Override
+	public void showAdminMenuItems() {
+		deleteTeamItem.setVisible(true);
+		editTeamItem.setVisible(true);
+		inviteMemberItem.setVisible(true);
+		commandsContainer.setVisible(true);
+	}
+	
+	@Override
+	public void setMediaObjectPanel(Team team) {
 		String pictureUrl = null;
 		if (team.getIcon() != null) {
 			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()) + "&imageId=" + team.getIcon();
 		}
-		
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
-		mediaObjectContainer.add(mediaObjectPanel);
-		totalMemberCountField.setText(totalMemberCount.toString());
-		publicJoinField.setVisible(team.getCanPublicJoin());
-		if (isAdmin) {
-			Callback refreshCallback = getRefreshCallback(team.getId());
-			openMembershipRequestsWidget.configure(team.getId(), refreshCallback);
-			mainContainer.add(openMembershipRequestsWidget.asWidget());
-			openUserInvitationsWidget.configure(team.getId(), refreshCallback);
-			mainContainer.add(openUserInvitationsWidget.asWidget());
-			deleteTeamItem.setVisible(true);
-			editTeamItem.setVisible(true);
-			inviteMemberItem.setVisible(true);
-		}
-		
-		if (teamMembershipStatus != null) {
-			if (!teamMembershipStatus.getIsMember()) {
-				//not a member, add Join widget
-				joinTeamWidget.configure(team.getId(), false, teamMembershipStatus, getRefreshCallback(team.getId()), null, null, null, null, false);
-				Widget joinTeamView = joinTeamWidget.asWidget();
-				joinTeamView.addStyleName("margin-top-15");	
-				mainContainer.add(joinTeamView);
-			}
-			else {
-				leaveTeamItem.setVisible(true);
-				commandsContainer.setVisible(true);
-			}
-		}
-		memberListWidget.configure(team.getId(), isAdmin, getRefreshCallback(team.getId()));
-		Widget memberListView = memberListWidget.asWidget();
-		memberListView.addStyleName("margin-top-15");
-		mainContainer.add(memberListView);
+		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());
 	}	
-	
-	private Callback getRefreshCallback(final String teamId) {
-		return new Callback() {
-			@Override
-			public void invoke() {
-				presenter.refresh(teamId);
-			}
-		};
-	}
 
 	@Override
 	public void setSynAlertWidget(Widget synAlert) {
@@ -254,6 +214,36 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setInviteMemberWidget(Widget inviteWidget) {
 		this.inviteMemberPanel.setWidget(inviteWidget);
+	}
+	
+	@Override
+	public void setJoinTeamWidget(Widget joinWidget) {
+		this.joinTeamPanel.setWidget(joinWidget);
+	}
+	
+	@Override
+	public void setOpenMembershipRequestWidget(Widget openMembershipRequestWidget) {
+		this.openMembershipRequestsPanel.setWidget(openMembershipRequestWidget);
+	}
+	
+	@Override
+	public void setOpenUserInvitationsWidget(Widget openUserInvitationsWidget) {
+		this.openUserInvitationsPanel.setWidget(openUserInvitationsWidget);
+	}
+	
+	@Override
+	public void setMemberListWidget(Widget memberListWidget) {
+		this.memberListPanel.setWidget(memberListWidget);
+	}
+
+	@Override
+	public void setPublicJoinVisible(Boolean canPublicJoin) {
+		publicJoinField.setVisible(canPublicJoin);
+	}
+
+	@Override
+	public void setTotalMemberCount(String memberCount) {
+		totalMemberCountField.setText(memberCount);
 	}
 
 }

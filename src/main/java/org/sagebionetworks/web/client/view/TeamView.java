@@ -15,9 +15,7 @@ public interface TeamView extends IsWidget, SynapseView {
 	 * Set this view's presenter
 	 * @param presenter
 	 */
-	void setPresenter(Presenter presenter);
-	void configure(Team team, boolean isAdmin, TeamMembershipStatus teamMembershipStatus, Long totalMemberCount);
-	
+	void setPresenter(Presenter presenter);	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
 		void deleteTeam();
@@ -35,4 +33,13 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setDeleteTeamWidget(Widget asWidget);
 	void setEditTeamWidget(Widget asWidget);
 	void setInviteMemberWidget(Widget inviteWidget);
+	void setJoinTeamWidget(Widget asWidget);
+	void showMemberMenuItems();
+	void showAdminMenuItems();
+	void setOpenMembershipRequestWidget(Widget asWidget);
+	void setOpenUserInvitationsWidget(Widget asWidget);
+	void setMemberListWidget(Widget asWidget);
+	void setPublicJoinVisible(Boolean canPublicJoin);
+	void setTotalMemberCount(String string);
+	void setMediaObjectPanel(Team team);
 }

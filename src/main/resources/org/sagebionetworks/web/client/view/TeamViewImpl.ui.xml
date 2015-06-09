@@ -11,7 +11,9 @@
 		<div class="separator separator-header-page"></div>
 	    <div class="margin-top-left-10 margin-right-15">
 	        <b:Row>
-	            <b:Column ui:field="mediaObjectContainer" size="MD_9"/>
+	            <b:Column size="MD_9">
+	                <g:SimplePanel ui:field="mediaObjectContainer"/>
+	            </b:Column>    
 	    		<b:Column ui:field="commandsContainer" size="MD_3">
 	    		    <b:ButtonGroup pull="RIGHT">
 	    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
@@ -36,6 +38,10 @@
 		    	    <bh:Span ui:field="totalMemberCountField"/>
 		    	    <br/>
 		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
+		    		<g:SimplePanel ui:field="joinTeamPanel"/>
+		    		<g:SimplePanel ui:field="openMembershipRequestsPanel"/>
+		    		<g:SimplePanel ui:field="openUserInvitationsPanel"/>
+		    		<g:SimplePanel ui:field="memberListPanel"/>
 		    	</g:HTMLPanel>
 		   	</div>
 		   	<div>
