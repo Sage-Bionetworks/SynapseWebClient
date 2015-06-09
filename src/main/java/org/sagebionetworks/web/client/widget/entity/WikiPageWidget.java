@@ -281,8 +281,16 @@ SynapseWidgetPresenter {
 			callback.noWikiFound();
 		}
 		if (isEmbeddedInOwnerPage) {
-			synapseAlert.handleException(caught);
-			view.clearWikiPagePanel();
+			if (caught instanceof NotFoundException) {
+				if (canEdit) {
+					view.showNoteInPage(DisplayConstants.LABEL_NO_MARKDOWN);
+				}else {
+					view.showNoteInPage(DisplayConstants.NO_WIKI_FOUND);
+				}
+			} else {
+				synapseAlert.handleException(caught);
+				view.showSynapseAlertWidget();	
+			}
 		} else {
 			if (caught instanceof NotFoundException) {
 				view.show404();
@@ -290,7 +298,7 @@ SynapseWidgetPresenter {
 				view.show403();
 			} else {
 				synapseAlert.handleException(caught);
-				view.clearWikiPagePanel();
+				view.showSynapseAlertWidget();
 			}
 		}
 	}
