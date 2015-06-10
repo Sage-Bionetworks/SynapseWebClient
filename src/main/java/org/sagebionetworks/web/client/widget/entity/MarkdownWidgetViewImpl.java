@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 
+import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl.Binder;
 
@@ -27,7 +28,7 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	SimplePanel synAlertPanel;
 	
 	@UiField
-	HTMLPanel emptyPanel;
+	Italic emptyPanel;
 	
 	@Inject
 	public MarkdownWidgetViewImpl(final Binder uiBinder,
