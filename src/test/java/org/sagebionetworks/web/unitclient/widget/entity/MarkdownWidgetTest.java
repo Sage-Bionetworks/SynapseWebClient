@@ -137,7 +137,9 @@ public class MarkdownWidgetTest {
 		verify(mockWikiPageKey).setWikiPageId(anyString());
 		
 		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView, Mockito.never()).setEmptyVisible(anyBoolean());
+		verify(mockView).setEmptyVisible(true);
+		verify(mockView).setMarkdown("");
+		verify(mockView).setEmptyVisible(false);
 		verify(mockView).setMarkdown(sampleHTML);
 		// Called three times between tablesorter, loadMath, and loadWidgets, 
 		// then another three to determine null
@@ -155,6 +157,22 @@ public class MarkdownWidgetTest {
 		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), anyMap(), any(Callback.class), any(Long.class));
 		verify(mockView).addWidget(any(Widget.class), Mockito.eq(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + "-preview"));
 	}
+	
+
+	@Test
+	public void testLoadMarkdownFromWikiEmpty() {
+		boolean isPreview = true;
+		String sampleHTML = "";
+		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		String markdown="input markdown that is transformed into empty html";
+		presenter.configure(markdown, mockWikiPageKey, isPreview, 1L);
+		
+		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockView).setEmptyVisible(true);
+		verify(mockView).setMarkdown("");
+		verify(mockView, Mockito.never()).setEmptyVisible(false);
+	}
+	
 	
 	@Test
 	public void testLoadMarkdownFromWikiPageFailure() {
