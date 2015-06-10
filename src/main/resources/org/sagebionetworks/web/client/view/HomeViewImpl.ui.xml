@@ -74,7 +74,7 @@
 			<b:Row addStyleNames="synapse-blue-bg margin-top-40">
 				<b:Column size="SM_12">
 					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="WAYS TO USE SYNAPSE"
+							text="EXPLORE HOW RESEARCHERS ARE USING SYNAPSE"
 					></b:Heading>
 				</b:Column>
 			</b:Row>
