@@ -1,28 +1,15 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-
-	<ui:style>
-		.important {
-		font-weight: bold;
-		}
-
-		.rowTop {
-		vertical-align: top;
-		}
-	</ui:style>
-
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator separator-header-page"></div>
 		<h2>Coming Soon</h2>
-		<div style="margin: 15px;">
-			<g:SimplePanel ui:field="entityView" />
-		</div>
-		<g:FlexTable ui:field="flextTable1"></g:FlexTable>
+		<b:Button ui:field="jsExceptionButton" text="Click for JS exception" type="DANGER"></b:Button>
 		This page is coming soon.
 		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />	    

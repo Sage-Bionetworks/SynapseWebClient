@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.io.StringWriter;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -84,10 +82,8 @@ public class ClientLoggerImpl implements ClientLogger{
 	 * @param message
 	 */
 	public void errorToRepositoryServices(String message, Throwable e){
-		String exceptionName = e != null ? e.getClass().getName() : "";
-		String exceptionMessage = e != null && e.getMessage() != null ? e.getMessage() : "";
-		String stackTrace = DisplayUtils.getStackTrace(e); 
-		this.synapseClient.logErrorToRepositoryServices(message + "-" + exceptionMessage + "-" + stackTrace, exceptionName, new AsyncCallback<Void>() {
+		//wrap in a RuntimeException because JavascriptException can't go over the gwt rpc wire (missing no-arg constructor)
+		this.synapseClient.logErrorToRepositoryServices(message, e.getMessage(), e.getStackTrace(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Nothing to do here.

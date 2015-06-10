@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
@@ -170,6 +171,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.gwt.core.server.StackTraceDeobfuscator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -189,6 +191,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseMarkdownProcessor.getInstance();
 	}
 
+	private static StackTraceDeobfuscator deobfuscator = null;
+	
 	private Cache<MarkdownCacheRequest, WikiPage> wiki2Markdown = CacheBuilder
 			.newBuilder().maximumSize(35).expireAfterAccess(1, TimeUnit.HOURS)
 			.build(new CacheLoader<MarkdownCacheRequest, WikiPage>() {
@@ -466,15 +470,31 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		log.error(message);
 	}
 
+	
+	private void initDeobfuscator() {
+		if (deobfuscator == null) {
+			String path = getServletContext().getRealPath("/Portal/.junit_symbolMaps/");
+			deobfuscator = StackTraceDeobfuscator.fromFileSystem(path);
+		}
+	}
 	@Override
-	public void logErrorToRepositoryServices(String message, String label) throws RestServiceException {
+	public void logErrorToRepositoryServices(String message, String exceptionMessage, StackTraceElement[] t) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			LogEntry entry = new LogEntry();
+			String exceptionString = "";
 			String outputLabel = "";
-			if (label != null) {
-				outputLabel = label.substring(0, Math.min(label.length(), MAX_LOG_ENTRY_LABEL_SIZE));
+			if (t != null) {
+				//deobfuscate the stack trace
+				initDeobfuscator();
+				RuntimeException th = new RuntimeException(exceptionMessage);
+				th.setStackTrace(t);
+				String strongName = getPermutationStrongName();
+				deobfuscator.deobfuscateStackTrace(th, strongName);
+				exceptionString = ExceptionUtils.getStackTrace(th);
+				outputLabel = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
 			}
+			
+			LogEntry entry = new LogEntry();
 			new PortalVersionHolder();
 			entry.setLabel("SWC/" + PortalVersionHolder.getVersionInfo() + "/" + outputLabel);
 			String userId = "";
@@ -482,7 +502,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (profile != null) {
 				userId = "userId="+profile.getOwnerId()+" ";
 			}
-			entry.setMessage(userId+message);
+			entry.setMessage(userId+message+"\n"+exceptionString);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

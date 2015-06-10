@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client.view;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
@@ -19,6 +22,8 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -36,7 +41,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel entityView;
+	Button jsExceptionButton;
 		
 	private Presenter presenter;
 	private IconsImageBundle icons;
@@ -68,14 +73,18 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());	
-		
+		jsExceptionButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				throwException();
+			}
+		});
 	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		//provenanceWidget.setHeight(400);
-//		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
 		
 		header.clear();
 		headerWidget.configure(false);
@@ -84,12 +93,13 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
-		
-		//test error reporting
-	    Throwable t = new SynapseBadRequestException("This was a bad request");
-	    DisplayUtils.showErrorMessage(t, jiraErrorHelper, authenticationController.isLoggedIn(), "Error loading the Coming Soon test place");
 	}
 
+
+	private static native void throwException() /*-{
+		throw "something bad happened in js";
+	}-*/;
+	
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -110,18 +120,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	@Override
 	public void setEntity(Entity entity) {
-		Long version = null;
-		if(entity instanceof Versionable) 
-			version = ((Versionable)entity).getVersionNumber();			
-		Map<String,String> configMap = new HashMap<String,String>();
-		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), null) +","+"syn114241";
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityList);
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(false));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
-	    provenanceWidget.configure(null, configMap, null, null);
-	    provenanceWidget.setHeight(800);	
-	    entityView.setWidget(provenanceWidget.asWidget());
+		
 	}
 	
 }
