@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -88,6 +89,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		createdPanel = new HorizontalPanel();
 		historyPanel = new SimplePanel();
 		synapseAlertPanel = new SimplePanel();
+		this.wikiPagePanel = new FlowPanel();
+		addStyleName("min-height-200");
 	}
 
 	@Override
@@ -103,9 +106,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void showWarningMessageInPage(String message) {
+	public void showNoteInPage(String message) {
 		clear();
-		add(new Alert(message, AlertType.WARNING));
+		add(new Italic(message));
 	}
 
 	@Override
@@ -115,7 +118,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.ownerObjectName = ownerObjectName;
 		this.canEdit = canEdit;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
-		this.wikiPagePanel = new FlowPanel();
 		resetWikiMarkdown(markdown, wikiKey, isRootWiki, isCurrentVersion, versionInView);
 		showDefaultViewWithWiki();
 	}
@@ -189,7 +191,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	private void resetWikiPagePanel() {
-		clearWikiPagePanel();
+		wikiPagePanel.clear();
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			Alert notice = createDifferentVersionNotice();
@@ -421,12 +423,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	@Override
 	public void setSynapseAlertWidget(Widget synapseAlert) {
-		synapseAlertPanel.add(synapseAlert);
+		synapseAlertPanel.setWidget(synapseAlert);
 	}
-
+	
 	@Override
-	public void clearWikiPagePanel() {
-		wikiPagePanel.clear();
-		wikiPagePanel.add(synapseAlertPanel);
+	public void showSynapseAlertWidget() {
+		clear();
+		add(synapseAlertPanel);
 	}
 }

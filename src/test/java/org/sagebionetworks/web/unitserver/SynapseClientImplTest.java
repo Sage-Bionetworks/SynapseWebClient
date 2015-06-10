@@ -426,8 +426,7 @@ public class SynapseClientImplTest {
 		sentMessage = new MessageToUser();
 		sentMessage.setId("987");
 		when(
-				mockSynapse.sendStringMessage(any(MessageToUser.class),
-						anyString())).thenReturn(sentMessage);
+				mockSynapse.sendMessage(any(MessageToUser.class))).thenReturn(sentMessage);
 
 		// getMyProjects getUserProjects
 		PaginatedResults headers = new PaginatedResults<ProjectHeader>();
@@ -1515,7 +1514,6 @@ public class SynapseClientImplTest {
 	@Test
 	public void testSendMessage() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		// essentially a pass through to sendStringMessage
 		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor
 				.forClass(MessageToUser.class);
 		Set<String> recipients = new HashSet<String>();
@@ -1524,7 +1522,8 @@ public class SynapseClientImplTest {
 		String messageBody = "Atoms are not to be trusted, they make up everything";
 		String hostPageBaseURL = "http://localhost/Portal.html";
 		synapseClient.sendMessage(recipients, subject, messageBody, hostPageBaseURL);
-		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
+		verify(mockSynapse).uploadToFileHandle(any(byte[].class), eq(SynapseClientImpl.HTML_MESSAGE_CONTENT_TYPE));
+		verify(mockSynapse).sendMessage(arg.capture());
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertEquals(recipients, toSendMessage.getRecipients());
