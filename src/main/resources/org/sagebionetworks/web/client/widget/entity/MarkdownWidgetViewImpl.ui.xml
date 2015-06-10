@@ -10,8 +10,6 @@
 	    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
 	    <g:HTMLPanel ui:field="contentPanel" addStyleNames="margin-right-40 margin-left-10"/>
 	    <g:SimplePanel ui:field="synAlertPanel"/>
-	    <g:HTMLPanel ui:field="emptyPanel" visible="false">
-	    	There is no content. Please click Edit Wiki from the Tools menu.
-	    </g:HTMLPanel>
+	    <bh:Italic ui:field="emptyPanel">There is no content. Please click Edit Wiki from the Tools menu.</bh:Italic>
 	</g:FlowPanel>
 </ui:UiBinder>
