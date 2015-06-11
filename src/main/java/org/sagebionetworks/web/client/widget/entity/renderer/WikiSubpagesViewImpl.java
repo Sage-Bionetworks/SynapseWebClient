@@ -57,50 +57,47 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 						final UpdateOrderHintCallback updateOrderHintCallback) {
 		clear();
 		
-		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		navTreeContainer = new FlowPanel();
 		navTreeContainer.addStyleName("margin-bottom-10");
+
 		//this widget shows nothing if it doesn't have any pages!
-		if (navTree.getRootChildrenCount() == 0)
+		if (wikiHeaders.size() <=1 )
 			return;
 		
 		//only show the tree if the root has children
-		if (navTree.getRootChildrenCount() > 0) {
+	
+		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
+		
+		showHideButton = DisplayUtils.createButton("");
+		editOrderButton = DisplayUtils.createButton("Edit Order");
+		editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
 
-			showHideButton = DisplayUtils.createButton("");
-			editOrderButton = DisplayUtils.createButton("Edit Order");
-			editOrderButton.addStyleName("btn btn-default btn-xs pull-left");
-
-			editOrderButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					orderEditorModal.configure(wikiHeaders, ownerObjectName);
-					orderEditorModal.show(updateOrderHintCallback);
-				}
-			});
-			
-			showHideButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (isShowingSubpages)
-						hideSubpages();
-					else
-						showSubpages();
-				}
-			});
-			
-			navTreeContainer.add(navTree.asWidget());
-			
-			add(navTreeContainer);
-			add(editOrderButton);
-			add(showHideButton);
-			
-			showSubpages();
-		} else {
-			hideSubpages();
-		}
+		editOrderButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				orderEditorModal.configure(wikiHeaders, ownerObjectName);
+				orderEditorModal.show(updateOrderHintCallback);
+			}
+		});
+		
+		showHideButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (isShowingSubpages)
+					hideSubpages();
+				else
+					showSubpages();
+			}
+		});
+		
+		navTreeContainer.add(navTree.asWidget());
+		
+		add(navTreeContainer);
+		add(editOrderButton);
+		add(showHideButton);
+		showSubpages();
 		clearWidths();
 	}
 	

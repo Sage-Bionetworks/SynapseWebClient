@@ -20,6 +20,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExampleEntity;
@@ -28,6 +29,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -54,6 +56,7 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
 
 public class EntityPageTopTest {
 
@@ -144,6 +147,10 @@ public class EntityPageTopTest {
 		two.setColumn("one");
 		two.setDirection(SortDirection.DESC);
 		query.setSort(Arrays.asList(one, two));
+		
+		ObjectSchema schema = new ObjectSchema();
+		schema.setTitle("");
+		when(mockSchemaCache.getSchemaEntity(any(Entity.class))).thenReturn(schema);
 	}
 		
 	@Test 
@@ -151,7 +158,23 @@ public class EntityPageTopTest {
 		// default project visit, no area, no area token
 		pageTop.configure(projectBundle, null, projectHeader, null, null);
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
-		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
+
+		//check that the area is pushed to the url
+		pageTop.refresh();
+		ArgumentCaptor<Synapse> placeCaptor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockGlobalApplicationState).replaceCurrentPlace(placeCaptor.capture());
+		Synapse place = placeCaptor.getValue();
+		assertEquals(EntityArea.WIKI, place.getArea());
+		assertNull(place.getAreaToken());
+	}
+	
+	@Test 
+	public void testTableInPageNoState() {		
+		// default table visit, no area, no area token
+		pageTop.configure(entityBundleTable, null, projectHeader, null, null);
+		pageTop.refresh();
+		verify(mockGlobalApplicationState, never()).replaceCurrentPlace(any(Place.class));
 	}
 
 	@Test 
