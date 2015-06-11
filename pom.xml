@@ -223,6 +223,7 @@
 				</executions>
 				<configuration>
 					<webappDirectory>${webappDirectory}</webappDirectory>
+					<packagingIncludes>/Portal/.junit_symbolMaps/*</packagingIncludes>
 					<!-- This will create a jar that can be used for integration testing -->
 					<attachClasses>true</attachClasses>
 				</configuration>
