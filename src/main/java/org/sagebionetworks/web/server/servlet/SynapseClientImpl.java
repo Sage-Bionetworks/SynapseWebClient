@@ -502,7 +502,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (profile != null) {
 				userId = "userId="+profile.getOwnerId()+" ";
 			}
-			entry.setMessage(userId+message+"\n"+exceptionString);
+			String entryMessage = userId+message+"\n"+exceptionString;
+			entry.setMessage(entryMessage);
+			logInfo(entryMessage);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
