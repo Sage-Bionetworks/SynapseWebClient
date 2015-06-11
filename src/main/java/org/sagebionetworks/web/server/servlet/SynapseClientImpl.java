@@ -1159,6 +1159,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public Activity getOrCreateActivityForEntityVersion(String entityId,
+			Long versionNumber) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getActivityForEntityVersion(
+					entityId, versionNumber);
+		} catch (SynapseException e) {
+			// not found, so create
+			// synapseClient.createActivity();
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void putActivity(Activity update) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.putActivity(update);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit,

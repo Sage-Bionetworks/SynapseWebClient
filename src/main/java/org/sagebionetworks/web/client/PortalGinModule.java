@@ -185,6 +185,12 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListRowView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListRowViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
@@ -1074,5 +1080,10 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
 		bind(SynapseAlert.class).to(SynapseAlertImpl.class);
+		
+		bind(ProvenanceEditorWidgetView.class).to(ProvenanceEditorWidgetViewImpl.class);
+		bind(ProvenanceListWidgetView.class).to(ProvenanceListWidgetViewImpl.class);
+		bind(ProvenanceListRowView.class).to(ProvenanceListRowViewImpl.class);
+
 	}
 }

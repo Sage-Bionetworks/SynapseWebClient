@@ -59,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -99,6 +100,7 @@ public class EntityActionControllerImplTest {
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
 	MarkdownEditorWidget mockMarkdownEditorWidget;
+	ProvenanceEditorWidget mockProvenanceEditorWidget;
 	Reference selected;
 
 	@Before
@@ -114,7 +116,7 @@ public class EntityActionControllerImplTest {
 		mockMarkdownEditorWidget = Mockito.mock(MarkdownEditorWidget.class);
 		mockAccessControlListModalWidget = Mockito
 				.mock(AccessControlListModalWidget.class);
-		
+		mockProvenanceEditorWidget = Mockito.mock(ProvenanceEditorWidget.class);
 		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
 		mockEntityUpdatedHandler = Mockito.mock(EntityUpdatedHandler.class);
 		mockEntityFinder = Mockito.mock(EntityFinder.class);
@@ -131,7 +133,7 @@ public class EntityActionControllerImplTest {
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
 				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget);
+				mockMarkdownEditorWidget, mockProvenanceEditorWidget);
 		
 		parentId = "syn456";
 		entityId = "syn123";

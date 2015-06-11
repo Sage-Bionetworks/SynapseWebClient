@@ -84,6 +84,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
 	MarkdownEditorWidget wikiEditor;
+	ProvenanceEditorWidget provenanceEditor;
 
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -96,7 +97,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
 			UploadDialogWidget uploader,
-			MarkdownEditorWidget wikiEditor) {
+			MarkdownEditorWidget wikiEditor,
+			ProvenanceEditorWidget provenanceEditor) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -110,7 +112,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.submitter = submitter;
 		this.uploader = uploader;
 		this.wikiEditor = wikiEditor;
+		this.provenanceEditor = provenanceEditor;
 		this.view.addMarkdownEditorModalWidget(wikiEditor.asWidget());
+		this.view.addProvenanceEditorModalWidget(provenanceEditor.asWidget());
 	}
 
 	@Override
@@ -143,7 +147,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureSubmit();
 			configureAnnotations();
 			configureFileUpload();
+			configureProvenance();
 		}
+	}
+	
+	private void configureProvenance() {
+		actionMenu.setActionVisible(Action.EDIT_PROVENANCE, true);
+		actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, true);
+		actionMenu.addActionListener(Action.EDIT_PROVENANCE, this);
 	}
 	
 	private void configureFileUpload() {
@@ -353,10 +364,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case UPLOAD_NEW_FILE:
 			onUploadFile();
-			break;	
+			break;
+		case EDIT_PROVENANCE:
+			onEditProvenance();
+			break;
 		default:
 			break;
 		}
+	}
+	
+	private void onEditProvenance() {
+		provenanceEditor.configure(this.entityBundle);
+		provenanceEditor.setVisible(true);
 	}
 	
 	private void onUploadFile() {

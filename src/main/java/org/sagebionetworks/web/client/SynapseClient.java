@@ -522,4 +522,9 @@ public interface SynapseClient extends RemoteService {
 	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
 
 	EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException;
+
+	void putActivity(Activity update) throws RestServiceException;
+
+	Activity getOrCreateActivityForEntityVersion(String entityId,
+			Long versionNumber) throws RestServiceException;
 }
