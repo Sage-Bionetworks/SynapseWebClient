@@ -186,11 +186,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void refreshArea(Synapse.EntityArea area, String areaToken) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, area, areaToken));
-	}
-
-	@Override
 	public void gotoProjectArea(EntityArea area, EntityArea currentArea) {
 		String entityId = projectHeader.getId();
 		String areaToken = null;
@@ -343,6 +338,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private void sendDetailsToView(Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
+		if (area == null && bundle.getEntity() instanceof Project) {
+			globalApplicationState.replaceCurrentPlace(new Synapse(bundle.getEntity().getId(), versionNumber, EntityArea.WIKI, null));	
+		}
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
 	}
 	
