@@ -3,13 +3,15 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl.Binder;
+import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,9 +50,25 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	}
 
 	@Override
-	public void setMarkdown(String result) {
+	public void setMarkdown(final String result) {
 		contentPanel.getElement().setInnerHTML(result);
 		jsniUtils.highlightCodeBlocks();
+	}
+	
+	@Override
+	public void callbackWhenAttached(final Callback callback) {
+		final Timer t = new Timer() {
+	      @Override
+	      public void run() {
+	    	  if (contentPanel.isAttached()) {
+	    		  callback.invoke();
+	    	  } else {
+	    		  schedule(100);
+	    	  }
+	      }
+	    };
+
+	    t.schedule(100);
 	}
 
 	@Override
@@ -72,6 +90,7 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	@Override
 	public void clearMarkdown() {
 		contentPanel.clear();
+		setMarkdown("");
 	}
 	
 }
