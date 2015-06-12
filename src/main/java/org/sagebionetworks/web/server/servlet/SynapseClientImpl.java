@@ -473,7 +473,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	private void initDeobfuscator() {
 		if (deobfuscator == null) {
-			String path = getServletContext().getRealPath("/Portal/.junit_symbolMaps/");
+			String path = getServletContext().getRealPath("/WEB-INF/");
 			deobfuscator = StackTraceDeobfuscator.fromFileSystem(path);
 		}
 	}

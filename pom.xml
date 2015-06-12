@@ -223,12 +223,34 @@
 				</executions>
 				<configuration>
 					<webappDirectory>${webappDirectory}</webappDirectory>
-					<packagingIncludes>/Portal/.junit_symbolMaps/*</packagingIncludes>
 					<!-- This will create a jar that can be used for integration testing -->
 					<attachClasses>true</attachClasses>
 				</configuration>
 			</plugin>
-
+			
+			<!-- This next section is to copy the source maps into the WEB-INF directory (during the package phase, from junit output) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>exploded</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>${webappDirectory}/Portal/.junit_symbolMaps/</directory>
+							<targetPath>WEB-INF</targetPath>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			
 			<!-- We use this assembly to package the GWT RPC dependencies so they 
 				are aviablible fore integration testing. -->
 			<plugin>
