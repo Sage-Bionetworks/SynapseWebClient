@@ -72,6 +72,10 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 		});
 	};
 
+	@Override
+	public void clear() {
+		view.clear();
+	}
 	
 	@Override
 	public void goTo(Place place) {

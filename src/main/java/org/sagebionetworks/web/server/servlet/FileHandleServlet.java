@@ -146,12 +146,13 @@ public class FileHandleServlet extends HttpServlet {
 		Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
 		String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);		
 		URL resolvedUrl = null;
+		String rawFileHandleId = request.getParameter(WebConstants.RAW_FILE_HANDLE_PARAM);
 		
 		try {
 			resolveUrlAndRedirect(request, response, client, isProxy, teamId,
 					entityId, entityVersion, tableColumnId, tableRowId,
 					tableRowVersionNumbrer, ownerId, ownerType, fileName,
-					isPreview, redirectUrlString, resolvedUrl);
+					isPreview, redirectUrlString, resolvedUrl, rawFileHandleId);
 		} catch (SynapseNotFoundException e) {
 			// Retry preview once, after 1.5 seconds
 			if(isPreview) {
@@ -160,7 +161,7 @@ public class FileHandleServlet extends HttpServlet {
 					resolveUrlAndRedirect(request, response, client, isProxy, teamId,
 							entityId, entityVersion, tableColumnId, tableRowId,
 							tableRowVersionNumbrer, ownerId, ownerType, fileName,
-							isPreview, redirectUrlString, resolvedUrl);					
+							isPreview, redirectUrlString, resolvedUrl, rawFileHandleId);					
 				} catch (InterruptedException e1) { 
 					// ...
 				} catch (SynapseNotFoundException e1) {
@@ -181,15 +182,16 @@ public class FileHandleServlet extends HttpServlet {
 			String entityVersion, String tableColumnId, String tableRowId,
 			String tableRowVersionNumbrer, String ownerId, String ownerType,
 			String fileName, Boolean isPreview, String redirectUrlString,
-			URL resolvedUrl) throws MalformedURLException,
+			URL resolvedUrl, String rawFileHandleId) throws MalformedURLException,
 			UnsupportedEncodingException, ClientProtocolException, IOException,
 			SynapseException, ServletException {
 		if (redirectUrlString != null) {
 			//simple redirect
 			resolvedUrl = new URL(URLDecoder.decode(redirectUrlString, "UTF-8"));
 		}
-		
-		if (ownerId != null && ownerType != null) {
+		if (rawFileHandleId != null ) {
+			resolvedUrl = client.getFileHandleTemporaryUrl(rawFileHandleId);
+		} else if (ownerId != null && ownerType != null) {
 			ObjectType type = ObjectType.valueOf(ownerType);
 			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
 			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(ownerId, type, wikiId);

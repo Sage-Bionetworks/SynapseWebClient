@@ -80,7 +80,7 @@ public class UserProfileAttachmentServletTest {
 	public void testGetUserProfilePreview() throws ServletException, IOException{
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		// call under test
@@ -94,7 +94,7 @@ public class UserProfileAttachmentServletTest {
 		preview = "false";
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		// call under test
@@ -112,7 +112,7 @@ public class UserProfileAttachmentServletTest {
 		preview = "false";
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		servlet.doGet(mockRequest, mockResponse);
@@ -125,7 +125,7 @@ public class UserProfileAttachmentServletTest {
 		applied = "false";
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		// call under test

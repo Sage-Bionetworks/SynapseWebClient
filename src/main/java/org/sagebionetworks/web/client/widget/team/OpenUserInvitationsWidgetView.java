@@ -30,5 +30,6 @@ public interface OpenUserInvitationsWidgetView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void removeInvitation(String ownerId);
 		void getNextBatch();
+		void clear();
 	}
 }
