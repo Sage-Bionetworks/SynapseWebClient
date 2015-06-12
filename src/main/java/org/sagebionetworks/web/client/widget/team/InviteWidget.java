@@ -100,11 +100,16 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		}
 	}
 
-	public void setVisible(boolean isVisible) {
+	@Override
+	public void show() {
 		clear();
-		if (isVisible)
-			view.show();
-		else
-			view.hide();
+		view.clear();
+		view.show();
 	}
+	
+	@Override
+	public void hide() {
+		view.hide();
+	}
+
 }

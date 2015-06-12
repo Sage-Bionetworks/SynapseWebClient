@@ -188,7 +188,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	public void showInviteModal() {
 		synAlert.clear();
 		inviteWidget.configure(team);
-		inviteWidget.setVisible(true);
+		inviteWidget.show();
 	}
 
 	@Override

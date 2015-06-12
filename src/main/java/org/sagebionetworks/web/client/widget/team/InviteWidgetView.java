@@ -18,6 +18,8 @@ public interface InviteWidgetView extends IsWidget {
 	public interface Presenter extends SynapsePresenter {
 		void sendInvite(String invitationMessage);
 		void configure(Team team);
+		void show();
+		void hide();
 	}
 	public void setSynAlertWidget(Widget asWidget);
 	void setSuggestWidget(Widget suggestWidget);
