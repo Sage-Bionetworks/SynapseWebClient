@@ -471,26 +471,43 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	
-	private void initDeobfuscator() {
+	public StackTraceDeobfuscator getDeobfuscator() {
+		//lazy init deobfuscator
 		if (deobfuscator == null) {
 			String path = getServletContext().getRealPath("/WEB-INF/");
 			deobfuscator = StackTraceDeobfuscator.fromFileSystem(path);
 		}
+		return deobfuscator;
 	}
+	
+	/**
+	 * Deobfuscate a client stack trace
+	 * @param exceptionType
+	 * @param exceptionMessage
+	 * @param t 
+	 * @return
+	 */
+	public String deobfuscateException(String exceptionType, String exceptionMessage, StackTraceElement[] t, String permutationStrongName) {
+		StackTraceDeobfuscator deobfuscator = getDeobfuscator();
+		RuntimeException th = new RuntimeException(exceptionType + ":" + exceptionMessage);
+		th.setStackTrace(t);
+		deobfuscator.deobfuscateStackTrace(th, permutationStrongName);
+		return ExceptionUtils.getStackTrace(th).substring("java.lang.RuntimeException: ".length());
+	}
+	
 	@Override
-	public void logErrorToRepositoryServices(String message, String exceptionMessage, StackTraceElement[] t) throws RestServiceException {
+	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t) throws RestServiceException {
+			logErrorToRepositoryServices(message, exceptionType, exceptionMessage, t, getPermutationStrongName());
+	}
+	
+	//(tested)
+	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, String strongName) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			String exceptionString = "";
 			String outputLabel = "";
 			if (t != null) {
-				//deobfuscate the stack trace
-				initDeobfuscator();
-				RuntimeException th = new RuntimeException(exceptionMessage);
-				th.setStackTrace(t);
-				String strongName = getPermutationStrongName();
-				deobfuscator.deobfuscateStackTrace(th, strongName);
-				exceptionString = ExceptionUtils.getStackTrace(th);
+				exceptionString = deobfuscateException(exceptionType, exceptionMessage, t, strongName);
 				outputLabel = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
 			}
 			
@@ -504,12 +521,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			String entryMessage = userId+message+"\n"+exceptionString;
 			entry.setMessage(entryMessage);
-			logInfo(entryMessage);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
 	
 	@Override
 	public void logInfo(String message) {
@@ -3040,4 +3057,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
 }

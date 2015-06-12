@@ -32,7 +32,7 @@ public class ClientLoggerImplTest {
 		String errorMessage = "Unable to upload a file for some specific reason.";
 		clientLogger.errorToRepositoryServices(errorMessage, e);
 		
-		verify(mockSynapseClient).logErrorToRepositoryServices(eq(errorMessage), eq(exceptionMessage), eq(e.getStackTrace()), any(AsyncCallback.class));
+		verify(mockSynapseClient).logErrorToRepositoryServices(eq(errorMessage), null, eq(exceptionMessage), eq(e.getStackTrace()), any(AsyncCallback.class));
 	}
 	
 

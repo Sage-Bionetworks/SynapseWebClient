@@ -107,10 +107,11 @@ public interface SynapseClientAsync {
 	/**
 	 * 
 	 * @param message
+	 * @param exceptionType TODO
 	 * @param t
 	 * @param callback
 	 */
-	void logErrorToRepositoryServices(String message, String exceptionMessage, StackTraceElement[] t, AsyncCallback<Void> callback);
+	void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, AsyncCallback<Void> callback);
 	
 	void logInfo(String message, AsyncCallback<Void> callback);
 

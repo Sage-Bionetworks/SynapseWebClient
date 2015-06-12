@@ -83,7 +83,7 @@ public class ClientLoggerImpl implements ClientLogger{
 	 */
 	public void errorToRepositoryServices(String message, Throwable e){
 		//wrap in a RuntimeException because JavascriptException can't go over the gwt rpc wire (missing no-arg constructor)
-		this.synapseClient.logErrorToRepositoryServices(message, e.getMessage(), e.getStackTrace(), new AsyncCallback<Void>() {
+		this.synapseClient.logErrorToRepositoryServices(message, e.getClass().getSimpleName(), e.getMessage(), e.getStackTrace(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Nothing to do here.
