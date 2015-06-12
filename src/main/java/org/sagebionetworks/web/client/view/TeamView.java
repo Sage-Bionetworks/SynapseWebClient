@@ -18,13 +18,12 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setPresenter(Presenter presenter);	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
-		void deleteTeam();
-		void leaveTeam();
 		void refresh(String teamId);
 		void showEditModal();
 		void showDeleteModal();
 		void showLeaveModal();
 		void showInviteModal();
+		void clear();
 	}
 
 	void setSynAlertWidget(Widget asWidget);

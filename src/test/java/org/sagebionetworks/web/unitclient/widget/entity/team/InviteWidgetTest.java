@@ -62,7 +62,7 @@ public class InviteWidgetTest {
 		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockAuthenticationController,
 				mockGlobalApplicationState, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockJSNIUtils);
 		mockRefreshCallback = mock(Callback.class);
-		inviteWidget.setTeam(mockTeam);
+		inviteWidget.configure(mockTeam);
 		inviteWidget.setRefreshCallback(mockRefreshCallback);
 		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
 		when(mockHeader.getOwnerId()).thenReturn(userId);
@@ -78,7 +78,7 @@ public class InviteWidgetTest {
 		inviteWidget.sendInvite("You are invited!");
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockRefreshCallback).invoke();
-		verify(mockView).setVisible(false);
+		verify(mockView).hide();
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -87,6 +87,8 @@ public class TeamPresenterTest {
 		mockTeam = mock(Team.class);
 		mockTeamBundle = mock(TeamBundle.class);
 		mockTeamMembershipStatus = mock(TeamMembershipStatus.class);
+		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient)
+		.getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		//team bundle
 		when(mockTeamBundle.getTeam()).thenReturn(mockTeam);
@@ -112,7 +114,6 @@ public class TeamPresenterTest {
 		boolean isAdmin = true;
 		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
 		when(mockTeamMembershipStatus.getIsMember()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		presenter.refresh(teamId);
 		
 		//once
@@ -135,7 +136,6 @@ public class TeamPresenterTest {
 		boolean isAdmin = false;
 		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
 		when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
-		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		presenter.refresh(teamId);
 		
 		//once
@@ -158,8 +158,6 @@ public class TeamPresenterTest {
 		boolean isAdmin = false;
 		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
 		when(mockTeamMembershipStatus.getIsMember()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient)
-				.getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		presenter.refresh(teamId);
 		
 		//once

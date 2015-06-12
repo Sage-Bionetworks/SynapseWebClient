@@ -46,7 +46,7 @@ public class TeamLeaveModalWidgetTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
 		presenter = new TeamLeaveModalWidget(mockSynAlert, mockSynapseClient, mockAuthenticationController, mockView);
 		presenter.setRefreshCallback(mockRefreshCallback);
-		presenter.setTeam(mockTeam);
+		presenter.configure(mockTeam);
 	}
 	
 	@Test

@@ -55,6 +55,11 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		configure(teamId, null, 0, isAdmin, teamUpdatedCallback);
 	};
 	
+	@Override
+	public void clear() {
+		view.clear();
+	}
+	
 	public void refreshMembers(final String searchTerm, int offset) {
 		this.searchTerm = searchTerm;
 		this.offset = offset;
@@ -140,4 +145,5 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		view.setPresenter(this);
 		return view.asWidget();
 	}
+	
 }

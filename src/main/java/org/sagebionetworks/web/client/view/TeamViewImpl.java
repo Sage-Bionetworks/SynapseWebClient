@@ -133,6 +133,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		editTeamItem.setVisible(false);
 		deleteTeamItem.setVisible(false);
 		leaveTeamItem.setVisible(false);
+		publicJoinField.setVisible(false);
 	}
 	
 	@Override

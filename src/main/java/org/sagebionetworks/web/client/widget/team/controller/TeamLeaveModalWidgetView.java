@@ -17,7 +17,7 @@ public interface TeamLeaveModalWidgetView {
 		void onConfirm();
 		Widget asWidget();
 		void setRefreshCallback(Callback refreshCallback);
-		void setTeam(Team team);
+		void configure(Team team);
 	}
 
 	void setSynAlertWidget(Widget asWidget);
@@ -27,5 +27,7 @@ public interface TeamLeaveModalWidgetView {
 	void show();
 
 	void showInfo(String title, String message);
+
+	void hide();
 	
 }

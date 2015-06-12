@@ -17,14 +17,13 @@ public interface TeamEditModalWidgetView {
 
 		void setRefreshCallback(Callback refreshCallback);
 
-		void setTeam(Team team);
+		void configure(Team team);
 
-		void setVisible(boolean isVisible);
+		void onConfirm();
 
-		void onConfirm(String newName, String newDescription,
-				boolean canPublicJoin);
+		void hide();
 
-		void clear();
+		void show();
 	}
 
 	public Widget asWidget();
@@ -39,18 +38,24 @@ public interface TeamEditModalWidgetView {
 
 	boolean getPublicJoin();
 
-	void setTeam(Team team);
-
 	void setUploadWidget(Widget uploader);
-
-	void setLoading(boolean isLoading);
-
-	void setVisible(boolean isVisible);
 
 	void setImageURL(String fileHandleId);
 
 	void setDefaultIconVisible();
 
 	void showInfo(String title, String message);
+
+	void show();
+
+	void hide();
+
+	void showLoading();
+
+	void hideLoading();
+
+	void clear();
+
+	public void configure(Team team);
 
 }

@@ -38,11 +38,6 @@ public class TeamDeleteModalWidget implements IsWidget, TeamDeleteModalWidgetVie
 	}
 	
 	@Override
-	public void setTeam(Team team) {
-		this.team = team;
-	}
-	
-	@Override
 	public void onConfirm() {
 		synAlert.clear();
 		synapseClient.deleteTeam(team.getId(), new AsyncCallback<Void>() {
@@ -51,6 +46,7 @@ public class TeamDeleteModalWidget implements IsWidget, TeamDeleteModalWidgetVie
 				//go home
 				view.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS, "");
 				globalApplicationState.gotoLastPlace();
+				view.hide();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -68,6 +64,11 @@ public class TeamDeleteModalWidget implements IsWidget, TeamDeleteModalWidgetVie
 	public void showDialog() {
 		synAlert.clear();
 		view.show();
+	}
+
+	@Override
+	public void configure(Team team) {
+		this.team = team;
 	}
 
 }

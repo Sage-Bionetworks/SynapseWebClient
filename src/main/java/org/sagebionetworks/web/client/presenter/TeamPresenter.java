@@ -83,6 +83,16 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.setOpenMembershipRequestWidget(memberListWidget.asWidget());
 		view.setOpenUserInvitationsWidget(openMembershipRequestsWidget.asWidget());
 		view.setMemberListWidget(openUserInvitationsWidget.asWidget());
+		Callback refreshCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh();
+			}
+		};
+		leaveTeamWidget.setRefreshCallback(refreshCallback);
+		editTeamWidget.setRefreshCallback(refreshCallback);
+		deleteTeamWidget.setRefreshCallback(refreshCallback);
+		inviteWidget.setRefreshCallback(refreshCallback);
 	}
 
 	@Override
@@ -96,7 +106,17 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
+		clear();
 		showView(place);
+	}
+	
+	@Override
+	public void clear() {
+		memberListWidget.clear();
+		joinTeamWidget.clear();
+		openMembershipRequestsWidget.clear();
+		openUserInvitationsWidget.clear();
+		view.clear();
 	}
 	
 	@Override
@@ -117,6 +137,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	
 	@Override
 	public void refresh(final String teamId) {
+		clear();
 		synAlert.clear();
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
@@ -162,87 +183,32 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		String teamId = place.getTeamId();
 		refresh(teamId);
 	}
-
-	@Override
-	public void deleteTeam() {
-		synAlert.clear();
-		synapseClient.deleteTeam(team.getId(), new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				//go home
-				view.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS, "");
-				globalApplicationState.gotoLastPlace();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
-	}
-
-	@Override
-	public void leaveTeam() {
-		synAlert.clear();
-		leaveTeamWidget.setRefreshCallback(new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
-		});
-		leaveTeamWidget.setTeam(team);
-		leaveTeamWidget.showDialog();
-	}
 	
 	@Override
 	public void showInviteModal() {
 		synAlert.clear();
-		inviteWidget.setRefreshCallback(new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
-		});
-		inviteWidget.setTeam(team);
+		inviteWidget.configure(team);
 		inviteWidget.setVisible(true);
 	}
 
 	@Override
 	public void showEditModal() {
 		synAlert.clear();
-		editTeamWidget.clear();
-		editTeamWidget.setRefreshCallback(new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
-		});
-		editTeamWidget.setTeam(team);
-		editTeamWidget.setVisible(true);
+		editTeamWidget.configure(team);
+		editTeamWidget.show();
 	}
 
 	@Override
 	public void showDeleteModal() {
 		synAlert.clear();
-		deleteTeamWidget.setRefreshCallback(new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
-		});
-		deleteTeamWidget.setTeam(team);
+		deleteTeamWidget.configure(team);
 		deleteTeamWidget.showDialog();
 	}
 
 	@Override
 	public void showLeaveModal() {
 		synAlert.clear();
-		leaveTeamWidget.setRefreshCallback(new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
-		});
-		leaveTeamWidget.setTeam(team);
+		leaveTeamWidget.configure(team);
 		leaveTeamWidget.showDialog();		
 	}
 	

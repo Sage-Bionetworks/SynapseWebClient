@@ -40,11 +40,11 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		this.synapseClient = synapseClient;
 		this.uploader = uploader;
 		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
-		uploader.configure("Browse", new CallbackP<FileUpload>() {
+		uploader.configure("Browse...", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
-				view.setLoading(false);
+				view.hideLoading();
 				uploadedFileHandleId = fileUpload.getFileHandleId();
 				view.setImageURL(baseImageURL + "?rawFileHandleId=" + uploadedFileHandleId);
 			}
@@ -54,7 +54,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			@Override
 			public void invoke() {
 				uploader.setUploadedFileText("");
-				view.setLoading(true);
+				view.showLoading();
 			}
 		});
 		view.setUploadWidget(uploader.asWidget());
@@ -68,43 +68,35 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	}
 	
 	@Override
-	public void onConfirm(String newName, String newDescription, boolean canPublicJoin) {
-		if (newName != null && newName.equals(team.getName()) && newDescription != null && newDescription.equals(team.getDescription())
-				&& team.getCanPublicJoin() == canPublicJoin && (uploadedFileHandleId == null || team.getIcon().equals(uploadedFileHandleId))) {
-			synAlert.showError("No changes were provided");
-		} else {
-			if (newName == null || newName.trim().length() == 0) {
-				synAlert.showError("You must provide a name.");
-			}
-			else {
-				team.setName(newName);
-				team.setDescription(newDescription);
-				team.setCanPublicJoin(canPublicJoin);
-				if (uploadedFileHandleId != null)
-					team.setIcon(uploadedFileHandleId);
-				synapseClient.updateTeam(team, new AsyncCallback<Team>() {
-					@Override
-					public void onSuccess(Team result) {
-						view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
-						if (refreshCallback != null)
-							refreshCallback.invoke();
-						view.setVisible(false);
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						uploader.reset();
-						view.setLoading(false);
-						synAlert.handleException(caught);
-					}
-				});
-			}
+	public void onConfirm() {
+		String newName = view.getName();
+		String newDescription = view.getDescription();
+		boolean canPublicJoin = view.getPublicJoin();
+		if (newName == null || newName.trim().length() == 0) {
+			synAlert.showError("You must provide a name.");
 		}
-	}
-	
-	@Override
-	public void setTeam(Team team) {
-		this.team = team;
-		view.setTeam(team);
+		else {
+			team.setName(newName);
+			team.setDescription(newDescription);
+			team.setCanPublicJoin(canPublicJoin);
+			if (uploadedFileHandleId != null)
+				team.setIcon(uploadedFileHandleId);
+			synapseClient.updateTeam(team, new AsyncCallback<Team>() {
+				@Override
+				public void onSuccess(Team result) {
+					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
+					if (refreshCallback != null)
+						refreshCallback.invoke();
+					view.hide();
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					uploader.reset();
+					view.hideLoading();
+					synAlert.handleException(caught);
+				}
+			});
+		}
 	}
 	
 	@Override
@@ -112,23 +104,30 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		return view.asWidget();
 	}
 	
+	// resets view including widgets with ui, then shows the modal
 	@Override
-	public void clear() {
-		synAlert.clear();
+	public void show() {
 		uploader.reset();
-		uploadedFileHandleId = null;
+		synAlert.clear();
+		view.hideLoading();
+		view.clear();
+		view.configure(team);
+		if (team.getIcon() != null)
+			view.setImageURL(baseImageURL + "?rawFileHandleId=" + team.getIcon());
+		else
+			view.setDefaultIconVisible();
+		view.show();
 	}
-
+	
 	@Override
-	public void setVisible(boolean isVisible) {
-		clear();
-		if (isVisible) {
-			if (team.getIcon() != null)
-				view.setImageURL(baseImageURL + "?rawFileHandleId=" + team.getIcon());
-			else
-				view.setDefaultIconVisible();
-		}
-		view.setVisible(isVisible);
+	public void hide() {
+		view.hide();
+	}
+	
+	@Override
+	public void configure(Team team) {
+		uploadedFileHandleId = null;
+		this.team = team;
 	}
 
 }

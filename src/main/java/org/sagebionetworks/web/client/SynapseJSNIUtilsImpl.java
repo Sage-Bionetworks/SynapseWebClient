@@ -421,7 +421,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	/**
 	 * provides a callback mechanism for when CSS resources that have been added to the dom are fully loaded
 	 * @param cssUrl
-	 * @param callback
+	 * @param finishedUploadingCallback
 	 */
 	private static native void _addCssLoadHandler(String cssUrl, Command command) /*-{
 		// Use Image load error callback to detect loading as no reliable/cross-browser callback exists for Link element

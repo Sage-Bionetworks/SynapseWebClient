@@ -69,7 +69,6 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				clear();
 				inviteUIModal.hide();
 			}
 		});
@@ -101,12 +100,13 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	}
 	
 	@Override
-	public void setVisible(boolean isVisible) {
-		if (isVisible) {
-			clear();
-			inviteUIModal.show();
-		} else
-			inviteUIModal.hide();
+	public void show() {
+		inviteUIModal.show();
+	}
+	
+	@Override
+	public void hide() {
+		inviteUIModal.hide();
 	}
 
 	@Override

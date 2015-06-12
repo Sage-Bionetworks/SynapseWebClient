@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team.controller;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -19,6 +21,7 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidg
 import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidgetView;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetView;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -48,7 +51,7 @@ public class TeamDeleteModalWidgetTest {
 		when(mockTeam.getId()).thenReturn(teamId);
 		presenter = new TeamDeleteModalWidget(mockSynAlert, mockSynapseClient, mockGlobalApplicationState, mockView);
 		presenter.setRefreshCallback(mockRefreshCallback);
-		presenter.setTeam(mockTeam);
+		presenter.configure(mockTeam);
 	}
 	
 	@Test
@@ -59,22 +62,22 @@ public class TeamDeleteModalWidgetTest {
 	
 	@Test
 	public void testOnConfirmSuccess() {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient)
+		.deleteTeam(eq(teamId), any(AsyncCallback.class));
 		presenter.onConfirm();
 		verify(mockSynAlert).clear();
-		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).deleteTeam(eq(teamId), captor.capture());
-		captor.getValue().onSuccess(null);
+		verify(mockSynapseClient).deleteTeam(eq(teamId), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
 	
 	@Test
 	public void testOnConfirmFailure() {
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient)
+		.deleteTeam(eq(teamId), any(AsyncCallback.class));
 		presenter.onConfirm();
 		verify(mockSynAlert).clear();
-		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).deleteTeam(eq(teamId), captor.capture());
-		captor.getValue().onFailure(caught);
+		verify(mockSynapseClient).deleteTeam(eq(teamId), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 	}
 	

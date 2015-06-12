@@ -51,8 +51,9 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	}
 	
 	@Override
-	public void configure() {
+	public void configure(Team team) {
 		clear();
+		this.team = team;
 		peopleSuggestWidget.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
 	}
@@ -64,16 +65,11 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	}
 	
 	public Widget asWidget() {
-		configure();
 		return view.asWidget();
 	}
 
 	public void setRefreshCallback(Callback teamUpdatedCallback) {
 		this.teamUpdatedCallback = teamUpdatedCallback;
-	}
-
-	public void setTeam(Team team) {
-		this.team = team;
 	}
 	
 	@Override
@@ -89,7 +85,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 			synapseClient.inviteMember(principalId, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.setVisible(false);
+					view.hide();
 					view.showInfo("Invitation Sent", "An invitation has been sent to " + DisplayUtils.getDisplayName(firstName, lastName, userName));
 					teamUpdatedCallback.invoke();
 				}
@@ -105,8 +101,10 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	}
 
 	public void setVisible(boolean isVisible) {
+		clear();
 		if (isVisible)
-			clear();
-		view.setVisible(isVisible);
+			view.show();
+		else
+			view.hide();
 	}
 }

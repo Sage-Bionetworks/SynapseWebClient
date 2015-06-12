@@ -38,11 +38,6 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 	}
 	
 	@Override
-	public void setTeam(Team team) {
-		this.team = team;
-	}
-	
-	@Override
 	public void onConfirm() {
 		synAlert.clear();
 		String userId = authenticationController.getCurrentUserPrincipalId();
@@ -52,6 +47,7 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 				view.showInfo(DisplayConstants.LEAVE_TEAM_SUCCESS, "");
 				if (refreshCallback != null)
 					refreshCallback.invoke();
+				view.hide();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -68,6 +64,11 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 	public void showDialog() {
 		synAlert.clear();
 		view.show();
+	}
+
+	@Override
+	public void configure(Team team) {
+		this.team = team;
 	}
 
 }

@@ -75,14 +75,12 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onConfirm(editNameField.getValue(), editDescriptionField.getValue(),
-						publicJoinCheckbox.getValue());
+				presenter.onConfirm();
 			}
 		});
 		secondaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.clear();
 				modal.hide();
 			}
 		});
@@ -95,12 +93,14 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 			}
 		};
 		editNameField.addKeyDownHandler(saveInfo);
-		editDescriptionField.addKeyDownHandler(saveInfo);
 	}
 	
 	@Override
-	public void setTeam(Team team) {
+	public void configure(Team team) {
 		this.team = team;
+		editNameField.setValue(team.getName());
+		editDescriptionField.setValue(team.getDescription());
+		publicJoinCheckbox.setValue(team.getCanPublicJoin());
 	}
 
 	@Override
@@ -124,12 +124,19 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	}
 	
 	@Override
-	public void setLoading(boolean isLoading) {
-		String primaryButtonText = isLoading ? "Uploading" : "Save";
-		primaryButton.setText(primaryButtonText);
-		primaryButton.setEnabled(!isLoading);
-		iconContainer.setVisible(!isLoading);
-		teamImageLoading.setVisible(isLoading);
+	public void showLoading() {
+		primaryButton.setText("Uploading");
+		primaryButton.setEnabled(false);
+		iconContainer.setVisible(false);
+		teamImageLoading.setVisible(true);
+	}
+	
+	@Override
+	public void hideLoading() {
+		primaryButton.setText("Save");
+		primaryButton.setEnabled(true);
+		iconContainer.setVisible(true);
+		teamImageLoading.setVisible(false);
 	}
 	
 	@Override
@@ -146,19 +153,24 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	public boolean getPublicJoin() {
 		return publicJoinCheckbox.getValue();
 	}
-
+	
 	@Override
-	public void setVisible(boolean isVisible) {
-		if (isVisible) {
-			presenter.clear();
-			setLoading(false);
-			editNameField.setValue(team.getName());
-			editDescriptionField.setValue(team.getDescription());
-			publicJoinCheckbox.setValue(team.getCanPublicJoin());
-			this.modal.show();
-		} else {
-			this.modal.hide();
-		}
+	public void show() {
+		modal.show();
+	}
+	
+	@Override
+	public void hide() {
+		modal.hide();
+	}
+	
+	@Override
+	public void clear() {
+		editNameField.setValue("");
+		editDescriptionField.setValue("");
+		//defaults to the checkbox unchecked, as it's the most common case
+		publicJoinCheckbox.setValue(false);
+		setDefaultIconVisible();
 	}
 	
 	@Override

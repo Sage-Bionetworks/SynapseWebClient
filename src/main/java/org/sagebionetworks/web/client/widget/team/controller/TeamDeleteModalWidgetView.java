@@ -15,11 +15,11 @@ public interface TeamDeleteModalWidgetView extends IsWidget {
 
 		void setRefreshCallback(Callback refreshCallback);
 
-		void setTeam(Team team);
-
 		void onConfirm();
 
 		void showDialog();
+
+		void configure(Team team);
 		
 	}
 
@@ -32,4 +32,6 @@ public interface TeamDeleteModalWidgetView extends IsWidget {
 	void setPresenter(Presenter presenter);
 
 	void showInfo(String title, String message);
+
+	void hide();
 }

@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.FileValidator;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -42,7 +43,8 @@ public class TeamEditModalWidgetTest {
 	FileUpload mockFileUpload;
 	FileMetadata mockFileMeta;
 	
-	CallbackP<FileUpload> callback;
+	Callback startedUploadingCallback;
+	CallbackP<FileUpload> finishedUploadingCallback;
 	String oldName = "oldName";
 	String newName = "newName";
 	String oldDesc = "oldDesc";
@@ -67,17 +69,26 @@ public class TeamEditModalWidgetTest {
 		mockFileMeta = mock(FileMetadata.class);
 		presenter = new TeamEditModalWidget(mockSynAlert, mockView, mockSynapseClient,
 				mockUploader, mockJSNIUtils, mockAuthenticationController);
-		presenter.setTeam(mockTeam);
+		presenter.configure(mockTeam);
 		presenter.setRefreshCallback(mockRefreshCallback);
-		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockUploader).configure(anyString(), captor.capture());
-		callback = captor.getValue();
 		
+		ArgumentCaptor<Callback> startedUploadingCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockUploader).setUploadingCallback(startedUploadingCaptor.capture());
+		// can invoke to check when loading finishes
+		startedUploadingCallback = startedUploadingCaptor.getValue();
+		
+		ArgumentCaptor<CallbackP> finishedUploadingCaptor = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockUploader).configure(anyString(), finishedUploadingCaptor.capture());
+		// can invoke to check when loading finishes
+		finishedUploadingCallback = finishedUploadingCaptor.getValue();
+		
+		AsyncMockStubber.callSuccessWith(mockTeam).when(mockSynapseClient)
+				.updateTeam(eq(mockTeam), any(AsyncCallback.class));
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMeta);
 		when(mockFileMeta.getFileName()).thenReturn("new filename");
-		when(mockTeam.getName()).thenReturn(oldName);
-		when(mockTeam.getDescription()).thenReturn(oldDesc);
-		when(mockTeam.getCanPublicJoin()).thenReturn(oldPublicJoin);
+		when(mockView.getName()).thenReturn(newName);
+		when(mockView.getDescription()).thenReturn(newDesc);
+		when(mockView.getPublicJoin()).thenReturn(newPublicJoin);
 		when(mockTeam.getIcon()).thenReturn(oldIcon);
 	}
 	
@@ -90,87 +101,115 @@ public class TeamEditModalWidgetTest {
 		verify(mockView).setUploadWidget(mockUploader.asWidget());
 		verify(mockView).setAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setPresenter(presenter);
-		verify(mockView).setTeam(mockTeam);
-	}
-	
-	@Test
-	public void testConfirmNoChanges() {
-		presenter.onConfirm(oldName, oldDesc, oldPublicJoin);
-		verify(mockSynAlert).showError("No changes were provided");
 	}
 	
 	@Test
 	public void testConfirmNoName() {
-		presenter.onConfirm("", newDesc, newPublicJoin);
+		when(mockView.getName()).thenReturn("");
+		presenter.onConfirm();
 		verify(mockSynAlert).showError("You must provide a name.");
+	}
+	
+	@Test
+	public void testImageLoading() {
 	}
 	
 	@Test
 	public void testConfirmSuccessfulChanges() {
 		when(mockFileUpload.getFileHandleId()).thenReturn("newIcon");
-		callback.invoke(mockFileUpload);
-		verify(mockView).setLoading(false);
+		finishedUploadingCallback.invoke(mockFileUpload);
+		verify(mockView).hideLoading();
 		verify(mockView).setImageURL(anyString());
 		verify(mockFileUpload).getFileHandleId();
 		
-		presenter.onConfirm(newName, newDesc, newPublicJoin);
+		presenter.onConfirm();
+		verify(mockView).getName();
+		verify(mockView).getDescription();
+		verify(mockView).getPublicJoin();
 		verify(mockTeam).setName(newName);
 		verify(mockTeam).setDescription(newDesc);
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
 		
-		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).updateTeam(eq(mockTeam), captor.capture());
-		captor.getValue().onSuccess(mockTeam);
+		verify(mockSynapseClient).updateTeam(eq(mockTeam), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockRefreshCallback).invoke();
-		verify(mockView).setVisible(false);
+		verify(mockView).hide();
 	}
+	
+	@Test
+	public void testConfirmNoIconUploaded() {
+		when(mockFileUpload.getFileHandleId()).thenReturn(null);
+		finishedUploadingCallback.invoke(mockFileUpload);
+		verify(mockView).hideLoading();
+		verify(mockView).setImageURL(anyString());
+		verify(mockFileUpload).getFileHandleId();
+		
+		presenter.onConfirm();
+		verify(mockView).getName();
+		verify(mockView).getDescription();
+		verify(mockView).getPublicJoin();
+		verify(mockTeam).setName(newName);
+		verify(mockTeam).setDescription(newDesc);
+		verify(mockTeam).setCanPublicJoin(newPublicJoin);
+		verify(mockTeam, never()).setIcon(newIcon);
+		
+		verify(mockSynapseClient).updateTeam(eq(mockTeam), any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockRefreshCallback).invoke();
+		verify(mockView).hide();
+	}	
 	
 	@Test
 	public void testConfirmFailedChanges() {
-		when(mockFileUpload.getFileHandleId()).thenReturn("newIcon");
-		callback.invoke(mockFileUpload);
-		verify(mockView).setLoading(false);
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient)
+				.updateTeam(eq(mockTeam), any(AsyncCallback.class));
+		when(mockFileUpload.getFileHandleId()).thenReturn(newIcon);
+		finishedUploadingCallback.invoke(mockFileUpload);
+		verify(mockView).hideLoading();
 		verify(mockView).setImageURL(anyString());
 		verify(mockFileUpload).getFileHandleId();
 		
-		presenter.onConfirm(newName, newDesc, newPublicJoin);
+		presenter.onConfirm();
 		verify(mockTeam).setName(newName);
 		verify(mockTeam).setDescription(newDesc);
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
 		
-		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).updateTeam(eq(mockTeam), captor.capture());
-		captor.getValue().onFailure(caught);
+		verify(mockSynapseClient).updateTeam(eq(mockTeam), any(AsyncCallback.class));
 		verify(mockUploader).reset();
-		verify(mockView, Mockito.atLeast(1)).setLoading(false);
+		verify(mockView, Mockito.atLeast(1)).hideLoading();
 		verify(mockSynAlert).handleException(caught);
+		verify(mockView, never()).hide();
 	}
 	
 	@Test
-	public void testSetVisibleTrueIconExists() {
-		boolean visible = true;
-		presenter.setVisible(visible);
+	public void testShowIconExists() {
+		presenter.show();
+		verify(mockUploader).reset();
+		verify(mockSynAlert).clear();
+		verify(mockView).hideLoading();
+		verify(mockView).configure(mockTeam);
 		verify(mockView).setImageURL(anyString());
-		verify(mockView).setVisible(visible);
+		verify(mockView).show();
 	}
 	
 	@Test
-	public void testSetVisibleTrueIconDoesNotExist() {
-		boolean visible = true;
+	public void testShowIconDoesNotExist() {
 		when(mockTeam.getIcon()).thenReturn(null);
-		presenter.setVisible(visible);
+		presenter.show();
+		verify(mockUploader).reset();
+		verify(mockSynAlert).clear();
+		verify(mockView).hideLoading();
+		verify(mockView).configure(mockTeam);
 		verify(mockView).setDefaultIconVisible();
-		verify(mockView).setVisible(visible);
+		verify(mockView).show();
 	}
 	
 	@Test
-	public void testSetVisibleFalse() {
-		boolean visible = false;
-		presenter.setVisible(visible);
-		verify(mockView).setVisible(visible);
+	public void testHide() {
+		presenter.hide();
+		verify(mockView).hide();
 		verify(mockView, never()).setDefaultIconVisible();
 		verify(mockView, never()).setImageURL(anyString());
 	}

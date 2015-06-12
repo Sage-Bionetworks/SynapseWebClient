@@ -41,7 +41,6 @@ public class TeamLeaveModalWidgetViewImpl implements IsWidget, TeamLeaveModalWid
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onConfirm();
-				modal.hide();
 			}
 		});
 		cancelButton.addClickHandler(new ClickHandler() {
@@ -70,6 +69,11 @@ public class TeamLeaveModalWidgetViewImpl implements IsWidget, TeamLeaveModalWid
 	@Override
 	public void show() {
 		this.modal.show();
+	}
+	
+	@Override
+	public void hide() {
+		this.modal.hide();
 	}
 	
 	@Override

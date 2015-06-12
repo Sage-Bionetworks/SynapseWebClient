@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.SpanElement;
@@ -46,7 +47,7 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	@UiField
 	Alert alert;
 	@UiField
-	SpanElement uploadedFileNameField;
+	Span uploadedFileNameField;
 	
 	@Inject
 	public FileHandleUploadViewImpl(Binder binder){
@@ -82,7 +83,7 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 
 	@Override
 	public void setUploadedFileText(String text) {
-		uploadedFileNameField.setInnerText(text);
+		uploadedFileNameField.setText(text);
 	}
 	
 	@Override

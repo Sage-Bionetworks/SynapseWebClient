@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
@@ -15,14 +16,13 @@ public interface InviteWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	public interface Presenter extends SynapsePresenter {
-
 		void sendInvite(String invitationMessage);
-
-		void configure();
+		void configure(Team team);
 	}
-	public void setVisible(boolean isVisible);
 	public void setSynAlertWidget(Widget asWidget);
 	void setSuggestWidget(Widget suggestWidget);
 	public void clear();
 	public void showInfo(String string, String string2);
+	void show();
+	void hide();
 }
