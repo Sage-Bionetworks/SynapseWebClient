@@ -9,8 +9,6 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -80,23 +78,26 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 	public void configure(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
 		synAlert.clear();
 		view.setEmptyVisible(true);
-		view.setMarkdown("");
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.isPreview= isPreview;
 		this.wikiVersionInView = wikiVersionInView;
 		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(String result) {
-				view.clearMarkdown();
-				if(result != null && !result.isEmpty()) {
-					view.setEmptyVisible(false);
-					view.setMarkdown(result);
-					loadTableSorters();
-					loadMath(wikiKey, isPreview);
-					loadWidgets(wikiKey, isPreview);
-				}
-				
+			public void onSuccess(final String result) {
+				view.callbackWhenAttached(new Callback() {
+					@Override
+					public void invoke() {
+						view.clearMarkdown();
+						if(result != null && !result.isEmpty()) {
+							view.setEmptyVisible(false);
+							view.setMarkdown(result);
+							loadTableSorters();
+							loadMath(wikiKey, isPreview);
+							loadWidgets(wikiKey, isPreview);
+						}						
+					}
+				});
 			}
 			@Override
 			public void onFailure(Throwable caught) {
