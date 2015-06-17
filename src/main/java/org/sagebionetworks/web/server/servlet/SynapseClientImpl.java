@@ -1167,9 +1167,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			return synapseClient.getActivityForEntityVersion(
 					entityId, versionNumber);
-		} catch (SynapseException e) {
+		} catch (SynapseNotFoundException ex) {
 			// not found, so create
-			// synapseClient.createActivity();
+				Activity newActivity;
+				try {
+					newActivity = synapseClient.createActivity(new Activity());
+					synapseClient.putEntity(synapseClient.getEntityById(entityId), newActivity.getId());
+				} catch (SynapseException e) {
+					throw ExceptionUtil.convertSynapseException(e);
+				}
+				return newActivity;
+		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}

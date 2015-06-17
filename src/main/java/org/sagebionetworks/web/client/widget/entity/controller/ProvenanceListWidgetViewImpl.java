@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -9,6 +10,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -24,6 +27,12 @@ public class ProvenanceListWidgetViewImpl extends Composite implements Provenanc
 	
 	@UiField
 	Button addURLButton;
+	
+	@UiField
+	SimplePanel entityFinderPanel;
+	
+	@UiField
+	SimplePanel urlDialogPanel;
 	
 	Presenter presenter;
 	Widget widget;
@@ -56,8 +65,28 @@ public class ProvenanceListWidgetViewImpl extends Composite implements Provenanc
 	}
 
 	@Override
-	public void addRow(Widget newRow) {
+	public void addRow(IsWidget newRow) {
 		itemList.add(newRow);
+	}
+	
+	@Override
+	public void removeRow(IsWidget toRemove) {
+		itemList.remove(toRemove);
+	}
+
+	@Override
+	public void setEntityFinder(IsWidget entityFinder) {
+		entityFinderPanel.setWidget(entityFinder);
+	}
+
+	@Override
+	public void setURLDialog(IsWidget urlDialog) {
+		urlDialogPanel.setWidget(urlDialog);
+	}
+
+	@Override
+	public void clear() {
+		itemList.clear();
 	}
 
 }

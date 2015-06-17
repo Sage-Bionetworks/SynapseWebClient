@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.List;
+
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView.Presenter;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface ProvenanceListWidgetView {
@@ -15,12 +19,19 @@ public interface ProvenanceListWidgetView {
 
 		void addURLRow();
 
-		void loadEntityRow(String entityId);
-
-		void loadURLRow(String title, String address);
+		void configure(List<ProvenanceEntry> provEntries);
 	}
-
-	void addRow(Widget newRow);
+	
+	void removeRow(IsWidget toRemove);
+	
+	void addRow(IsWidget newRow);
 
 	void setPresenter(Presenter presenter);
+
+	void setEntityFinder(IsWidget entityFinder);
+
+	void setURLDialog(IsWidget urlDialog);
+
+	void clear();
+
 }

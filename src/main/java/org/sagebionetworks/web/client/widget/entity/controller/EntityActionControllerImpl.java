@@ -152,9 +152,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureProvenance() {
-		actionMenu.setActionVisible(Action.EDIT_PROVENANCE, true);
-		actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, true);
-		actionMenu.addActionListener(Action.EDIT_PROVENANCE, this);
+		if(entityBundle.getEntity() instanceof FileEntity ){
+			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.EDIT_PROVENANCE, this);
+		} else {
+			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
+			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, false);
+		}
 	}
 	
 	private void configureFileUpload() {
@@ -374,8 +379,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onEditProvenance() {
-		provenanceEditor.configure(this.entityBundle);
-		provenanceEditor.setVisible(true);
+		provenanceEditor.configure(this.entityBundle, entityUpdateHandler);
+		provenanceEditor.show();
 	}
 	
 	private void onUploadFile() {

@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -34,11 +38,36 @@ public class ProvenanceEditorWidgetViewImpl extends Composite implements Provena
 	@UiField
 	SimplePanel executedListPanel;
 	
+	@UiField
+	Button saveButton;
+	
+	@UiField
+	Button cancelButton;
+	
+	@UiField
+	SimplePanel entityFinderPanel;
+	
+	@UiField
+	SimplePanel urlDialogPanel;
+	
 	Widget widget;
+	Presenter presenter;
 	
 	@Inject
 	public ProvenanceEditorWidgetViewImpl(ProvenanceEditorWidgetViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
+		saveButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onSave();
+			}
+		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				modal.hide();
+			}
+		});
 	}
 	
 	@Override
@@ -55,13 +84,18 @@ public class ProvenanceEditorWidgetViewImpl extends Composite implements Provena
 	}
 
 	@Override
-	public void setSynAlertWidget(Widget synAlert) {
+	public void setSynAlertWidget(IsWidget synAlert) {
 		synAlertPanel.setWidget(synAlert);
 	}
 
 	@Override
 	public void setName(String name) {
 		editNameField.setText(name);
+	}
+	
+	@Override
+	public String getName() {
+		return editNameField.getValue();
 	}
 
 	@Override
@@ -70,13 +104,49 @@ public class ProvenanceEditorWidgetViewImpl extends Composite implements Provena
 	}
 	
 	@Override
-	public void setUsedProvenanceList(Widget usedProvenanceList) {
+	public String getDescription() {
+		return editDescriptionField.getValue();		
+	}
+	
+	@Override
+	public void setUsedProvenanceList(IsWidget usedProvenanceList) {
 		usedListPanel.setWidget(usedProvenanceList);
 	}
 
 	@Override
-	public void setExecutedProvenanceList(Widget executedProvenanceList) {
+	public void setExecutedProvenanceList(IsWidget executedProvenanceList) {
 		executedListPanel.setWidget(executedProvenanceList);
+	}
+	
+	@Override
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
+	}
+	
+	@Override
+	public void clear() {
+		editNameField.setText("");
+		editDescriptionField.setText("");
+	}
+
+	@Override
+	public void hide() {
+		modal.hide();
+	}
+
+	@Override
+	public void show() {
+		modal.show();
+	}
+
+	@Override
+	public void setEntityFinder(IsWidget entityFinder) {
+		this.entityFinderPanel.setWidget(entityFinder);
+	}
+
+	@Override
+	public void setURLDialog(IsWidget urlDialog) {
+		this.urlDialogPanel.setWidget(urlDialog);
 	}
 
 }

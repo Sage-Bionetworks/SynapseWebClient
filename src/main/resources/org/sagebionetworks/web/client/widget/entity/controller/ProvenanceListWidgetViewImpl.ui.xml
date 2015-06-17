@@ -7,7 +7,9 @@
 	
     <g:HTMLPanel>
         <g:FlowPanel ui:field="itemList"/>
-        <b:Button text="Add Entity" icon="PLUS" ui:field="addEntityButton"/>
-        <b:Button text="Add URL" icon="PLUS" ui:field="addURLButton"/>
+        <b:Button text="Add Synapse Reference" icon="PLUS" ui:field="addEntityButton"/>
+        <b:Button text="Add External URL Reference" icon="PLUS" ui:field="addURLButton"/>
+    	<g:SimplePanel ui:field="entityFinderPanel"/>
+    	<g:SimplePanel ui:field="urlDialogPanel"/>
     </g:HTMLPanel>
 </ui:UiBinder>  

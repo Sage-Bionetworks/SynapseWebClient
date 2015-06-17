@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface ProvenanceEditorWidgetView {
@@ -10,21 +13,40 @@ public interface ProvenanceEditorWidgetView {
 
 		Widget asWidget();
 
-		void configure(EntityBundle entityBundle);
+		void onSave();
+
+		void clear();
+
+		void configure(EntityBundle entityBundle,
+				EntityUpdatedHandler entityUpdateHandler);
 		
 	}
 
 	Widget asWidget();
 
-	void setVisible(boolean isVisible);
-
-	void setSynAlertWidget(Widget asWidget);
+	void setSynAlertWidget(IsWidget asWidget);
 
 	void setName(String name);
 
 	void setDescription(String description);
 
-	void setUsedProvenanceList(Widget widget);
+	void setUsedProvenanceList(IsWidget widget);
 
-	void setExecutedProvenanceList(Widget executedProvenanceList);
+	void setExecutedProvenanceList(IsWidget executedProvenanceList);
+
+	void setPresenter(Presenter presenter);
+
+	void clear();
+
+	void hide();
+
+	void show();
+
+	String getDescription();
+
+	String getName();
+
+	void setEntityFinder(IsWidget entityFinder);
+
+	void setURLDialog(IsWidget urlDialog);
 }
