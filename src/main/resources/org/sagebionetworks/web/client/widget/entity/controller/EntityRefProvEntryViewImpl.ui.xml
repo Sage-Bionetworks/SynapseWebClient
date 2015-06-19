@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<b:Panel addStyleNames="padding-5">
+	<b:Panel addStyleNames="padding-5 margin-bottom-5-imp">
 		<b:Row>
 	        <b:Column size="XS_6">
 	            <bh:Strong addStyleNames="left">
