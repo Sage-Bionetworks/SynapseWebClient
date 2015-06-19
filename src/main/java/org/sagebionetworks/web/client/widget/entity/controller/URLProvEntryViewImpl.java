@@ -13,10 +13,10 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class URLProvEntry extends Composite implements ProvenanceEntry {
+public class URLProvEntryViewImpl extends Composite implements URLProvEntryView {
 
 	public interface URLProvEntryUIBinder
-			extends UiBinder<Widget, URLProvEntry> {}
+			extends UiBinder<Widget, URLProvEntryViewImpl> {}
 	
 	@UiField
 	Text urlNameField;
@@ -33,7 +33,7 @@ public class URLProvEntry extends Composite implements ProvenanceEntry {
 	Callback removalCallback;
 	
 	@Inject
-	public URLProvEntry(URLProvEntryUIBinder binder) {
+	public URLProvEntryViewImpl(URLProvEntryUIBinder binder) {
 		this.widget = binder.createAndBindUi(this);
 		removeButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -44,6 +44,7 @@ public class URLProvEntry extends Composite implements ProvenanceEntry {
 		});
 	}
 	
+	@Override
 	public void configure(String title, String url) {
 		this.title = title;
 		this.url = url;
@@ -56,10 +57,12 @@ public class URLProvEntry extends Composite implements ProvenanceEntry {
 		return widget;
 	}
 	
+	@Override
 	public String getTitle() {
 		return title;
 	}
 	
+	@Override
 	public String getURL() {
 		return url;
 	}

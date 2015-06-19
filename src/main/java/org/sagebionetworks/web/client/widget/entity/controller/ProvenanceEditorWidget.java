@@ -73,8 +73,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!(caught instanceof NotFoundException)) 
-					synAlert.handleException(caught);
+				synAlert.handleException(caught);
 			}
 			
 			@Override
@@ -92,14 +91,14 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 						toAdd = ginInjector.getEntityRefEntry();
 						String entityId = ref.getTargetId();
 						Long version = ref.getTargetVersionNumber();
-						((EntityRefProvEntry)toAdd).configure(ref.getTargetId(), version != null ? version.toString() : null);
+						((EntityRefProvEntryView)toAdd).configure(entityId, version != null ? version.toString() : null);
 						toAdd.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(entityId, version));
 					} else {
 						UsedURL usedURL = (UsedURL) provEntry;
 						toAdd = ginInjector.getURLEntry();
 						String name = usedURL.getName();
 						String url = usedURL.getUrl();
-						((URLProvEntry)toAdd).configure(name != null && !name.trim().isEmpty() ? name : usedURL.getUrl(), url);
+						((URLProvEntryView)toAdd).configure(name != null && !name.trim().isEmpty() ? name : usedURL.getUrl(), url);
 						toAdd.setAnchorTarget(url);
 					}
 					
@@ -145,15 +144,15 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		List<ProvenanceEntry> executedEntries = executedProvenanceList.getEntries();
 		Set<Used> usedSet = new HashSet<Used>();
 		for (ProvenanceEntry used: usedEntries) {
-			if (used instanceof URLProvEntry) {
-				URLProvEntry urlEntry = (URLProvEntry) used;
+			if (used instanceof URLProvEntryViewImpl) {
+				URLProvEntryViewImpl urlEntry = (URLProvEntryViewImpl) used;
 				UsedURL activityURL = new UsedURL();
 				activityURL.setUrl(urlEntry.getURL());
 				activityURL.setName(urlEntry.getTitle());
 				activityURL.setWasExecuted(false);
 				usedSet.add(activityURL);
 			} else {
-				EntityRefProvEntry entityEntry = (EntityRefProvEntry) used;
+				EntityRefProvEntryViewImpl entityEntry = (EntityRefProvEntryViewImpl) used;
 				UsedEntity activityEntity = new UsedEntity();
 				Reference ref = new Reference();
 				ref.setTargetId(entityEntry.getEntryId());
@@ -168,15 +167,15 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			}
 		}
 		for (ProvenanceEntry executed: executedEntries) {
-			if (executed instanceof URLProvEntry) {
-				URLProvEntry urlEntry = (URLProvEntry) executed;
+			if (executed instanceof URLProvEntryViewImpl) {
+				URLProvEntryViewImpl urlEntry = (URLProvEntryViewImpl) executed;
 				UsedURL activityURL = new UsedURL();
 				activityURL.setUrl(urlEntry.getURL());
 				activityURL.setName(urlEntry.getTitle());
 				activityURL.setWasExecuted(true);
 				usedSet.add(activityURL);
 			} else {
-				EntityRefProvEntry entityEntry = (EntityRefProvEntry) executed;
+				EntityRefProvEntryViewImpl entityEntry = (EntityRefProvEntryViewImpl) executed;
 				UsedEntity activityEntity = new UsedEntity();
 				Reference ref = new Reference();
 				ref.setTargetId(entityEntry.getEntryId());

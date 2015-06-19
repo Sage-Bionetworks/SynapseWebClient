@@ -58,11 +58,11 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 			@Override
 			public void onSelected(Reference ref) {
 				if (ref.getTargetId() != null) {
-					final EntityRefProvEntry newEntry = ginInjector.getEntityRefEntry();
+					final EntityRefProvEntryView newEntry = ginInjector.getEntityRefEntry();
 					rows.add(newEntry);
 					String targetId = ref.getTargetId();
 					Long version = ref.getTargetVersionNumber();
-					newEntry.configure(ref.getTargetId(), version != null ? version.toString() : "Current");
+					newEntry.configure(targetId, version != null ? version.toString() : "Current");
 					newEntry.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(targetId, version));
 					newEntry.setRemoveCallback(new Callback() {
 						@Override
@@ -85,7 +85,7 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 		urlDialog.configure(new Callback() {
 			@Override
 			public void invoke() {
-				final URLProvEntry newEntry = ginInjector.getURLEntry();
+				final URLProvEntryView newEntry = ginInjector.getURLEntry();
 				rows.add(newEntry);
 				String name = urlDialog.getURLName();
 				String address = urlDialog.getURLAddress();

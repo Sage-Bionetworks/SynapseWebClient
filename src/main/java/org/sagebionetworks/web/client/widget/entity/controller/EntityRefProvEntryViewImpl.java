@@ -14,10 +14,10 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityRefProvEntry extends Composite implements ProvenanceEntry {
+public class EntityRefProvEntryViewImpl extends Composite implements EntityRefProvEntryView {
 
 	public interface EntityRefProvEntryUIBinder
-			extends UiBinder<Widget, EntityRefProvEntry> {}
+			extends UiBinder<Widget, EntityRefProvEntryViewImpl> {}
 	
 	@UiField
 	Anchor synIdField;
@@ -32,7 +32,7 @@ public class EntityRefProvEntry extends Composite implements ProvenanceEntry {
 	Callback removalCallback;
 	
 	@Inject
-	public EntityRefProvEntry(EntityRefProvEntryUIBinder binder) {
+	public EntityRefProvEntryViewImpl(EntityRefProvEntryUIBinder binder) {
 		this.widget = binder.createAndBindUi(this);
 		removeButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -43,6 +43,7 @@ public class EntityRefProvEntry extends Composite implements ProvenanceEntry {
 		});
 	}
 	
+	@Override
 	public void configure(String synId, String versionNumber) {
 		synIdField.setText(synId);
 		synVersionField.setText(versionNumber);
@@ -53,6 +54,7 @@ public class EntityRefProvEntry extends Composite implements ProvenanceEntry {
 		return widget;
 	}
 	
+	@Override
 	public String getEntryId() {
 		return synIdField.getText();
 	}
@@ -62,6 +64,7 @@ public class EntityRefProvEntry extends Composite implements ProvenanceEntry {
 		this.removalCallback = removalCallback;
 	}
 
+	@Override
 	public String getEntryVersion() {
 		return synVersionField.getText();
 	}
