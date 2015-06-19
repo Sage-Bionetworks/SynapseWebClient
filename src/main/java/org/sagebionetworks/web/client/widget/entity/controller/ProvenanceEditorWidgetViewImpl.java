@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -17,6 +18,8 @@ import com.google.inject.Inject;
 
 public class ProvenanceEditorWidgetViewImpl extends Composite implements ProvenanceEditorWidgetView {
 
+	String PROV_LINK = "https://www.synapse.org/#!Wiki:syn2305384/ENTITY/62865";
+	
 	public interface ProvenanceEditorWidgetViewImplUiBinder 
 			extends UiBinder<Widget, ProvenanceEditorWidgetViewImpl> {}
 	
@@ -50,6 +53,11 @@ public class ProvenanceEditorWidgetViewImpl extends Composite implements Provena
 	@UiField
 	SimplePanel urlDialogPanel;
 	
+	@UiField
+	Button helpButton;
+
+	
+	
 	Widget widget;
 	Presenter presenter;
 	
@@ -66,6 +74,14 @@ public class ProvenanceEditorWidgetViewImpl extends Composite implements Provena
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
+			}
+		});
+		
+		helpButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(PROV_LINK, "", "");
 			}
 		});
 	}

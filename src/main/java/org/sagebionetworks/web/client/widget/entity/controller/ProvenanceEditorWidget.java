@@ -18,9 +18,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -144,15 +142,15 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		List<ProvenanceEntry> executedEntries = executedProvenanceList.getEntries();
 		Set<Used> usedSet = new HashSet<Used>();
 		for (ProvenanceEntry used: usedEntries) {
-			if (used instanceof URLProvEntryViewImpl) {
-				URLProvEntryViewImpl urlEntry = (URLProvEntryViewImpl) used;
+			if (used instanceof URLProvEntryView) {
+				URLProvEntryView urlEntry = (URLProvEntryView) used;
 				UsedURL activityURL = new UsedURL();
 				activityURL.setUrl(urlEntry.getURL());
 				activityURL.setName(urlEntry.getTitle());
 				activityURL.setWasExecuted(false);
 				usedSet.add(activityURL);
 			} else {
-				EntityRefProvEntryViewImpl entityEntry = (EntityRefProvEntryViewImpl) used;
+				EntityRefProvEntryView entityEntry = (EntityRefProvEntryView) used;
 				UsedEntity activityEntity = new UsedEntity();
 				Reference ref = new Reference();
 				ref.setTargetId(entityEntry.getEntryId());
@@ -167,15 +165,15 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			}
 		}
 		for (ProvenanceEntry executed: executedEntries) {
-			if (executed instanceof URLProvEntryViewImpl) {
-				URLProvEntryViewImpl urlEntry = (URLProvEntryViewImpl) executed;
+			if (executed instanceof URLProvEntryView) {
+				URLProvEntryView urlEntry = (URLProvEntryView) executed;
 				UsedURL activityURL = new UsedURL();
 				activityURL.setUrl(urlEntry.getURL());
 				activityURL.setName(urlEntry.getTitle());
 				activityURL.setWasExecuted(true);
 				usedSet.add(activityURL);
 			} else {
-				EntityRefProvEntryViewImpl entityEntry = (EntityRefProvEntryViewImpl) executed;
+				EntityRefProvEntryView entityEntry = (EntityRefProvEntryView) executed;
 				UsedEntity activityEntity = new UsedEntity();
 				Reference ref = new Reference();
 				ref.setTargetId(entityEntry.getEntryId());
@@ -203,5 +201,16 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			}
 		});
 		
+	}
+	
+	/*
+	 * Testing purposes only
+	 */
+	public void setActivty(Activity act) {
+		this.activity = act;
+	}
+	
+	public void setEntityUpdatedHandler(EntityUpdatedHandler updatedHandler) {
+		this.entityUpdatedHandler = updatedHandler;
 	}
 }

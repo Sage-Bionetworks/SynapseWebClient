@@ -35,4 +35,6 @@ public interface ProvenanceURLDialogWidgetView extends IsWidget {
 
 	String getURLName();
 
+	void setSynAlertWidget(IsWidget synAlert);
+
 }

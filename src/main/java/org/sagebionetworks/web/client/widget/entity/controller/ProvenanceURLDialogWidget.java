@@ -15,8 +15,9 @@ public class ProvenanceURLDialogWidget implements ProvenanceURLDialogWidgetView.
 	@Inject
 	public ProvenanceURLDialogWidget(ProvenanceURLDialogWidgetView view, SynapseAlert synAlert) {
 		this.view = view;
-		this.view.setPresenter(this);
 		this.synAlert = synAlert;
+		this.view.setPresenter(this);
+		this.view.setSynAlertWidget(synAlert);
 	}
 	
 	@Override

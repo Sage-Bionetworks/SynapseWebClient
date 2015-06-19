@@ -6,4 +6,6 @@ public interface URLProvEntryView extends ProvenanceEntry {
 
 	void configure(String title, String url);
 
+	String getTitle();
+
 }

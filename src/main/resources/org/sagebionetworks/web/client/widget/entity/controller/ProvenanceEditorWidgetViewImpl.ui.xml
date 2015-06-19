@@ -5,8 +5,12 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-	    <b:Modal ui:field="modal" title="Edit Provenance (Activity)" closable="true" fade="true"
+	    <b:Modal ui:field="modal" closable="true" fade="true"
 			dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
+			<b:ModalHeader>
+			    <b:Heading size="H3" text="Edit Provenance (Activity)" addStyleNames="displayInline"/>
+			    <b:Button ui:field="helpButton" icon="QUESTION_CIRCLE" type="LINK"/>
+			</b:ModalHeader>
 			<b:ModalBody>
 			     <b:FormGroup>
 			     	<b:FormLabel for="editName">Name</b:FormLabel>
@@ -20,7 +24,7 @@
 			        <b:PanelHeader>
 			            <b:Heading size="H3" text="Used"/>
 			        </b:PanelHeader>
-			        <b:PanelBody>
+			        <b:PanelBody addStyleNames="margin-bottom-5-imp">
 			            <g:SimplePanel ui:field="usedListPanel"/>
 			        </b:PanelBody>
 			    </b:Panel>
@@ -28,7 +32,7 @@
 			        <b:PanelHeader>
 			            <b:Heading size="H3" text="Executed"/>
 			        </b:PanelHeader>
-			        <b:PanelBody>
+			        <b:PanelBody addStyleNames="margin-bottom-5-imp">
 			            <g:SimplePanel ui:field="executedListPanel"/>
 			        </b:PanelBody>
 			    </b:Panel>

@@ -10,6 +10,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -32,6 +33,9 @@ public class ProvenanceURLDialogWidgetViewImpl extends Composite implements Prov
 	
 	@UiField
 	Button cancelButton;
+	
+	@UiField
+	SimplePanel synAlertPanel;
 	
 	Widget widget;
 	Presenter presenter;
@@ -87,6 +91,11 @@ public class ProvenanceURLDialogWidgetViewImpl extends Composite implements Prov
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+
+	@Override
+	public void setSynAlertWidget(IsWidget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}
 	
 }

@@ -103,6 +103,7 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
@@ -183,10 +184,12 @@ public class SynapseClientImplTest {
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
 	PaginatedResults mockPaginatedMembershipRequest;
+	Activity mockActivity;
 
 	MessageToUser sentMessage;
 	Long storageLocationId = 9090L;
 	UserProfile testUserProfile;
+	Long version = 1L;
 	
 	//Token testing
 	NotificationSettingsSignedToken notificationSettingsToken;
@@ -211,6 +214,7 @@ public class SynapseClientImplTest {
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 		mockPaginatedMembershipRequest = Mockito.mock(PaginatedResults.class);
+		mockActivity = Mockito.mock(Activity.class);
 		when(mockPaginatedMembershipRequest.getTotalNumberOfResults()).thenReturn(3L);
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
@@ -467,7 +471,7 @@ public class SynapseClientImplTest {
 		notificationSettingsToken.setHmac("987654");
 		notificationSettingsToken.setSettings(new Settings());
 		notificationSettingsToken.setUserId("4");
-		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);
+		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);		
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1977,5 +1981,28 @@ public class SynapseClientImplTest {
 	public void testHandleSignedTokenNotificationSettingsWrongToken() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.Settings.name();
 		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+	}
+	
+	@Test
+	public void testGetOrCreateActivityForEntityVersionGet() throws SynapseException, RestServiceException {
+		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenReturn(new Activity());
+		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
+	}
+	
+	@Test
+	public void testGetOrCreateActivityForEntityVersionCreate() throws SynapseException, RestServiceException {
+		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new SynapseNotFoundException());
+		when(mockSynapse.createActivity(any(Activity.class))).thenReturn(mockActivity);
+		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
+		verify(mockSynapse).createActivity(any(Activity.class));
+		verify(mockSynapse).putEntity(mockSynapse.getEntityById(entityId), mockActivity.getId());
+	}
+	
+	@Test(expected = Exception.class)
+	public void testGetOrCreateActivityForEntityVersionFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new Exception());
+		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
 	}
 }
