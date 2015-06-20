@@ -214,13 +214,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					getUserProfile(initialTab);
 				}
 			});
+			tabClicked(initialTab);
 		} else {
 			if (initialTab == ProfileArea.SETTINGS) 
 				getUserProfile(ProfileArea.PROJECTS);
 			else
 				getUserProfile(initialTab);
+			tabClicked(initialTab == ProfileArea.SETTINGS ? ProfileArea.PROJECTS : initialTab);
 		}
-		tabClicked(initialTab == ProfileArea.SETTINGS ? ProfileArea.PROJECTS : initialTab);
 	}
 	
 	private void getUserProfile(final ProfileArea initialTab) {
