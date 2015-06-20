@@ -293,6 +293,10 @@
 	margin-right: 0px;
 }
 
+.btn.btn-v-align-top {
+	vertical-align: top;
+}
+
 /* Search boxes */
 .homesearchbox {
 	width: 645px;
@@ -1024,6 +1028,10 @@ h1, h2, h3, h4, h5, h6 {
 	word-wrap: break-word;	
 }
 
+.word-break-all {
+	word-break: break-all;	
+}
+
 .boldText {
 	font-weight: bold;	
 }
@@ -1687,10 +1695,6 @@ ol.lowerroman {
 }
 
 .vertical-align-top {
-	vertical-align: top;
-}
-
-.vertical-align-top-imp {
 	vertical-align: top;
 }
 

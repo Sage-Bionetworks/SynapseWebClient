@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.google.gwt.core.client.GWT;
@@ -20,7 +21,7 @@ public class ProvenanceListWidgetViewImpl extends Composite implements Provenanc
 	public interface ProvenanceListWidgetViewImplUiBinder extends UiBinder<Widget, ProvenanceListWidgetViewImpl> {}
 	
 	@UiField
-	FlowPanel itemList;
+	TBody provTableBody;
 	
 	@UiField
 	Button addEntityButton;
@@ -66,12 +67,12 @@ public class ProvenanceListWidgetViewImpl extends Composite implements Provenanc
 
 	@Override
 	public void addRow(IsWidget newRow) {
-		itemList.add(newRow);
+		provTableBody.add(newRow);
 	}
 	
 	@Override
 	public void removeRow(IsWidget toRemove) {
-		itemList.remove(toRemove);
+		provTableBody.remove(toRemove);
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class ProvenanceListWidgetViewImpl extends Composite implements Provenanc
 
 	@Override
 	public void clear() {
-		itemList.clear();
+		provTableBody.clear();
 	}
 
 }
