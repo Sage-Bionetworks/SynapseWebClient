@@ -17,7 +17,7 @@
 			<g:SimplePanel ui:field="synAlertPanel"/>
 		</b:ModalBody>
 		<b:ModalFooter>
-		    <b:Button ui:field="saveButton" text="Save" type="PRIMARY"/>
+		    <b:Button ui:field="saveButton" text="Add" type="PRIMARY"/>
 		    <b:Button text="Cancel" ui:field="cancelButton" addStyleNames="right margin-right-5"/>
 		</b:ModalFooter>
 	</b:Modal>
