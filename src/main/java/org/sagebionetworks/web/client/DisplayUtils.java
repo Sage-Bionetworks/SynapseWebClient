@@ -12,6 +12,7 @@ import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ANNOTATION_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ENTITY_NAME;
 import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
+import static org.sagebionetworks.web.client.ClientProperties.TABLE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.TB;
 import static org.sagebionetworks.web.client.ClientProperties.WHITE_SPACE;
 import static org.sagebionetworks.web.client.ClientProperties.WIKI_URL;
@@ -1079,7 +1080,7 @@ public class DisplayUtils {
 		builder.append(baseURl);
 		builder.append("?"+WebConstants.USER_PROFILE_USER_ID+"=");
 		builder.append(userId);
-		builder.append("&"+WebConstants.USER_PROFILE_IMIAGE_ID+"=");
+		builder.append("&"+WebConstants.USER_PROFILE_IMAGE_ID+"=");
 		builder.append(fileHandleId);
 		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
 		builder.append(preview);
@@ -1491,6 +1492,11 @@ public class DisplayUtils {
 		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 	
+	public static boolean isRecognizedTableContentType(String contentType) {
+		String lowerContentType = contentType.toLowerCase();
+		return TABLE_CONTENT_TYPES_SET.contains(lowerContentType);
+	}
+	
 	public static boolean isTextType(String contentType) {
 		return contentType.toLowerCase().startsWith("text/");
 	}
@@ -1799,8 +1805,7 @@ public class DisplayUtils {
 	}
 
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
-		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Settings:0";
-		//alternatively, could use the gwt I18n Messages class client side
+		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n";
 	}
 	
 	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){
@@ -1864,7 +1869,7 @@ public class DisplayUtils {
 			str += "/rowversion/" + version;
 		return str;
 	}
-	
+
 	public static String getStackTrace(Throwable t) {
 		StringBuilder stackTrace = new StringBuilder();
 		if (t != null) {
@@ -1914,5 +1919,4 @@ public class DisplayUtils {
 			return "";
 		else return s;
 	 }
-
 }

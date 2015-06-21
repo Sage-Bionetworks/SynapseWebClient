@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.server.servlet;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,8 +29,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.entity.ContentType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +59,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
@@ -63,8 +71,10 @@ import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -74,6 +84,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
@@ -92,6 +103,7 @@ import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
@@ -127,10 +139,13 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
+import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -156,15 +171,17 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.gwt.core.server.StackTraceDeobfuscator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
-
-@SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
-	
+	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
+	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
+			.create("text/html", MESSAGE_CHARSET);
+
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	// This will be appended to the User-Agent header.
 	public static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
@@ -174,6 +191,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseMarkdownProcessor.getInstance();
 	}
 
+	private static StackTraceDeobfuscator deobfuscator = null;
+	
 	private Cache<MarkdownCacheRequest, WikiPage> wiki2Markdown = CacheBuilder
 			.newBuilder().maximumSize(35).expireAfterAccess(1, TimeUnit.HOURS)
 			.build(new CacheLoader<MarkdownCacheRequest, WikiPage>() {
@@ -451,15 +470,48 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		log.error(message);
 	}
 
+	
+	public StackTraceDeobfuscator getDeobfuscator() {
+		//lazy init deobfuscator
+		if (deobfuscator == null) {
+			String path = getServletContext().getRealPath("/WEB-INF/");
+			deobfuscator = StackTraceDeobfuscator.fromFileSystem(path);
+		}
+		return deobfuscator;
+	}
+	
+	/**
+	 * Deobfuscate a client stack trace
+	 * @param exceptionType
+	 * @param exceptionMessage
+	 * @param t 
+	 * @return
+	 */
+	public String deobfuscateException(String exceptionType, String exceptionMessage, StackTraceElement[] t, String permutationStrongName) {
+		StackTraceDeobfuscator deobfuscator = getDeobfuscator();
+		RuntimeException th = new RuntimeException(exceptionType + ":" + exceptionMessage);
+		th.setStackTrace(t);
+		deobfuscator.deobfuscateStackTrace(th, permutationStrongName);
+		return ExceptionUtils.getStackTrace(th).substring("java.lang.RuntimeException: ".length());
+	}
+	
 	@Override
-	public void logErrorToRepositoryServices(String message, String label) throws RestServiceException {
+	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t) throws RestServiceException {
+			logErrorToRepositoryServices(message, exceptionType, exceptionMessage, t, getPermutationStrongName());
+	}
+	
+	//(tested)
+	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, String strongName) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			LogEntry entry = new LogEntry();
+			String exceptionString = "";
 			String outputLabel = "";
-			if (label != null) {
-				outputLabel = label.substring(0, Math.min(label.length(), MAX_LOG_ENTRY_LABEL_SIZE));
+			if (t != null) {
+				exceptionString = deobfuscateException(exceptionType, exceptionMessage, t, strongName);
+				outputLabel = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
 			}
+			
+			LogEntry entry = new LogEntry();
 			new PortalVersionHolder();
 			entry.setLabel("SWC/" + PortalVersionHolder.getVersionInfo() + "/" + outputLabel);
 			String userId = "";
@@ -467,12 +519,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (profile != null) {
 				userId = "userId="+profile.getOwnerId()+" ";
 			}
-			entry.setMessage(userId+message);
+			String entryMessage = userId+message+"\n"+exceptionString;
+			entry.setMessage(entryMessage);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
 	
 	@Override
 	public void logInfo(String message) {
@@ -1019,8 +1073,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public Entity updateExternalFile(String entityId,
-			String externalUrl, String name) throws RestServiceException {
+	public Entity updateExternalFile(String entityId, String externalUrl,
+			String name, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isManuallySettingName = isManuallySettingExternalName(name);
@@ -1032,6 +1086,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 			ExternalFileHandle efh = new ExternalFileHandle();
 			efh.setExternalURL(externalUrl);
+			efh.setStorageLocationId(storageLocationId);
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
@@ -1054,8 +1109,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public Entity createExternalFile(String parentEntityId,
-			String externalUrl, String name) throws RestServiceException {
+	public Entity createExternalFile(String parentEntityId, String externalUrl,
+			String name, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isManuallySettingName = isManuallySettingExternalName(name);
@@ -1064,6 +1119,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			efh.setExternalURL(externalUrl);
 			if (isManuallySettingName)
 				efh.setFileName(name);
+			efh.setStorageLocationId(storageLocationId);
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			newEntity.setDataFileHandleId(clone.getId());
@@ -1775,9 +1831,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
+	
 	@Override
-	public List<Team> getTeamsForUser(String userId)
+	public List<TeamRequestBundle> getTeamsForUser(String userId, boolean includeOpenRequests)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1790,7 +1846,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		        	return o1.getName().compareToIgnoreCase(o2.getName());
 		        }
 			});
-			return teamList;
+			List<TeamRequestBundle> bundle = new ArrayList<TeamRequestBundle>(teamList.size());
+			for (Team team: teamList) {
+				if (includeOpenRequests) {
+					Long openRequestCount = getOpenRequestCount(userId, team.getId());
+					bundle.add(new TeamRequestBundle(team, openRequestCount == null ? 0L : openRequestCount));
+				} else {
+					bundle.add(new TeamRequestBundle(team, 0L));
+				}
+			}
+			return bundle;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
@@ -1836,7 +1901,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	@Override
 	public void requestMembership(String currentUserId, String teamId,
-			String message) throws RestServiceException {
+			String message, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
@@ -1844,8 +1909,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			// if we can join the team without creating the request (like if we
 			// are a team admin, or there is an open invitation), then just do
 			// that!
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, currentUserId);
+				synapseClient.addTeamMember(teamId, currentUserId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (!membershipStatus.getHasOpenRequest()) {
 				// otherwise, create the request
 				MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
@@ -1854,7 +1920,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				membershipRequest.setUserId(currentUserId);
 
 				// make new Synapse call
-				synapseClient.createMembershipRequest(membershipRequest);
+				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
+				synapseClient.createMembershipRequest(membershipRequest, joinTeamEndpoint, settingsEndpoint);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1862,17 +1929,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void inviteMember(String userGroupId, String teamId, String message)
+	public void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, userGroupId);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			// if we can join the team without creating the invite (like if we
 			// are a team admin, or there is an open membership request), then
 			// just do that!
 			if (membershipStatus.getCanJoin()) {
-				synapseClient.addTeamMember(teamId, userGroupId);
+				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (!membershipStatus.getHasOpenInvitation()) {
 				// check to see if there is already an open invite
 				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
@@ -1881,7 +1949,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				membershipInvite.setInviteeId(userGroupId);
 
 				// make new Synapse call
-				synapseClient.createMembershipInvitation(membershipInvite);
+				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
+				synapseClient.createMembershipInvitation(membershipInvite, joinTeamEndpoint, settingsEndpoint);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2011,6 +2080,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		TeamMember member = synapseClient.getTeamMember(teamId, currentUserId);
 		return member.getIsAdmin();
 	}
+	
 	
 	@Override
 	public Long getOpenRequestCount(String currentUserId, String teamId)
@@ -2418,6 +2488,72 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		
+		try {
+			if (signedToken instanceof JoinTeamSignedToken) {
+				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
+				String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+				return synapseClient.addTeamMember(joinTeamSignedToken, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
+			} else if (signedToken instanceof NotificationSettingsSignedToken) {
+				NotificationSettingsSignedToken notificationSignedToken = (NotificationSettingsSignedToken) signedToken;
+				return synapseClient.updateNotificationSettings(notificationSignedToken);
+			} else if (signedToken instanceof NewUserSignedToken) {
+				//TODO
+				throw new BadRequestException("Not yet implemented");
+			} else {
+				throw new BadRequestException("token not supported: " + signedToken.getClass().getName());
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public SignedTokenInterface hexDecodeAndSerialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
+		if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
+			//error interpreting the token type, respond with a bad request
+			throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
+		}
+		NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
+		SignedTokenInterface signedToken = null;
+		try {
+			signedToken = SerializationUtils.hexDecodeAndDeserialize(signedTokenString, tokenType.classType);
+		} catch (Exception e) {
+			//error decoding, respond with a bad request
+			throw new BadRequestException(e.getMessage());
+		}
+		return signedToken;
+	}
+	
+	public static <E extends Enum<E>> boolean isValidEnum(Class<E> enumClass,
+			String enumName) {
+		if (enumName == null) {
+			return false;
+		}
+		try {
+			Enum.valueOf(enumClass, enumName);
+			return true;
+		} catch (IllegalArgumentException ex) {
+			return false;
+		}
+	}
+	
+	public static String getTeamEndpoint(String hostPageBaseURL) {
+		return hostPageBaseURL + "#!Team:";
+	}
+	
+	public static String getNotificationEndpoint(NotificationTokenType type, String hostPageBaseURL) {
+		return hostPageBaseURL + "#!SignedToken:"+ type.toString() + "/";
+	}
+	
+	public static String getChallengeEndpoint(String hostPageBaseURL) {
+		return hostPageBaseURL + "#!Synapse:";
+	}
+	
+	
+	@Override
 	public String getAPIKey() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -2464,15 +2600,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String sendMessage(Set<String> recipients, String subject,
-			String messageBody) throws RestServiceException {
+	public String sendMessage(
+			Set<String> recipients, 
+			String subject,
+			String messageBody,
+			String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			MessageToUser message = new MessageToUser();
 			message.setRecipients(recipients);
 			message.setSubject(subject);
-			MessageToUser sentMessage = synapseClient.sendStringMessage(
-					message, messageBody);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
+			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
+			String fileHandleId = synapseClient.uploadToFileHandle(
+					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
+					HTML_MESSAGE_CONTENT_TYPE);
+			message.setFileHandleId(fileHandleId);
+			MessageToUser sentMessage = synapseClient.sendMessage(message);
 			JSONObjectAdapter sentMessageJson = sentMessage
 					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
@@ -2894,5 +3039,23 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		// This method does nothing?
 		
 	}
-
+	
+	@Override
+	public EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			//first, get the entity bundle with all information that we want
+			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID;
+			EntityBundle bundle = synapseClient.getEntityBundle(entityId, partsMask);
+			//now get the profile for the last modified by
+			UserProfile modifiedByProfile = synapseClient.getUserProfile(bundle.getEntity().getModifiedBy());
+			EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
+			entityBundlePlus.setEntityBundle(bundle);
+			entityBundlePlus.setProfile(modifiedByProfile);
+			return entityBundlePlus;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
 }

@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,7 +28,6 @@ import com.google.inject.Inject;
  *
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
-	
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
 	private static final Long ALL_PARTS_MASK = new Long(255);
@@ -41,17 +41,23 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	boolean isEditable;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
+	SynapseAlert synapseAlert;
 	
 	@Inject
-	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector){
+	public TableQueryResultWidget(TableQueryResultView view, 
+			SynapseClientAsync synapseClient, 
+			PortalGinInjector ginInjector, 
+			SynapseAlert synapseAlert) {
 		this.synapseClient = synapseClient;
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
+		this.synapseAlert = synapseAlert;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
+		this.view.setSynapseAlertWidget(synapseAlert.asWidget());
 	}
 	
 	/**
@@ -64,7 +70,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.isEditable = isEditable;
 		this.startingQuery = query;
 		this.queryListener = listener;
-		runQuery();
+		if (!synapseAlert.isUserLoggedIn()) {
+			setupErrorState();
+			synapseAlert.showMustLogin();
+		} else {
+			runQuery();
+		}
 	}
 
 	private void runQuery() {
@@ -174,8 +185,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param caught
 	 */
 	private void showError(Throwable caught){
-		String message = caught.getMessage();
-		showError(message);
+		setupErrorState();
+		synapseAlert.handleException(caught);
 	}
 	
 	/**
@@ -183,8 +194,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param message
 	 */
 	private void showError(String message){
+		setupErrorState();
+		synapseAlert.showError(message);
+	}
+	
+	private void setupErrorState() {
 		this.view.setTableVisible(false);
-		this.view.showError(message);
 		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent(false, false);
 		this.view.setErrorVisible(true);

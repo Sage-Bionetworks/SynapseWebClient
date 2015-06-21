@@ -70,12 +70,14 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@UiField
 	SpanElement loadingUI;
 	
+	@UiField
+	SimplePanel synAlertPanel;
+	
 	private Presenter presenter;
 	private CertificateWidget certificateWidget;
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
-	boolean isSubmitInitialized;
 	
 	@Inject
 	public QuizViewImpl(Binder uiBinder,
@@ -93,8 +95,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		successContainer.setWidget(certificateWidget.asWidget());
-		
-		isSubmitInitialized = false;
 		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -109,6 +109,13 @@ public class QuizViewImpl extends Composite implements QuizView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz(WebConstants.CERTIFICATION));
+			}
+		});
+		
+		submitButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.submitClicked();
 			}
 		});
 	}
@@ -151,6 +158,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public void clear() {
 		hideAll();
 		testContainer.clear();
+		
 		hideLoading();
 	}
 	
@@ -160,13 +168,13 @@ public class QuizViewImpl extends Composite implements QuizView {
 	}
 	
 	@Override
-	public void addQuestionContainerWidget(Widget widget) {
-		testContainer.add(widget);
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}
 	
 	@Override
-	public void addSubmitHandler(ClickHandler handler) { 
-		submitButton.addClickHandler(handler);
+	public void addQuestionContainerWidget(Widget widget) {
+		testContainer.add(widget);
 	}
 	
 	@Override

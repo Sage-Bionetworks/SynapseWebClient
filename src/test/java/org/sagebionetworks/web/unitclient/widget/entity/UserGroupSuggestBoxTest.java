@@ -64,6 +64,27 @@ public class UserGroupSuggestBoxTest {
 		verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 		verify(mockView).updateFieldStateForSuggestions(any(UserGroupHeaderResponsePage.class), anyInt());
 		verify(mockCallback).onSuggestionsReady(any(SuggestOracle.Request.class), any(SuggestOracle.Response.class));
+		
+		//calling again causes another request (since this completed successfully)
+		suggestBox.getSuggestions(mockRequest, mockCallback);
+		verify(mockSynapseClient, times(2)).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testGetSuggestionsFailure() throws RestServiceException {
+		String errorMessage = "an error message";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		SuggestOracle.Request mockRequest = mock(SuggestOracle.Request.class);
+		SuggestOracle.Callback mockCallback = mock(SuggestOracle.Callback.class);
+		suggestBox.getSuggestions(mockRequest, mockCallback);
+		
+		verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(errorMessage);
+		verify(mockCallback, never()).onSuggestionsReady(any(SuggestOracle.Request.class), any(SuggestOracle.Response.class));
+		
+		//calling again causes another request (since this completed successfully)
+		suggestBox.getSuggestions(mockRequest, mockCallback);
+		verify(mockSynapseClient, times(2)).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 	}
 	
 	private UserGroupHeaderResponsePage getResponsePage() {
@@ -115,5 +136,18 @@ public class UserGroupSuggestBoxTest {
 		UserGroupSuggestion suggestion = mock(UserGroupSuggestion.class);
 		suggestBox.setSelectedSuggestion(suggestion);
 		//no error
+	}
+	
+	@Test
+	public void testGetSuggestionsDelayResponse() throws RestServiceException {
+		SuggestOracle.Request mockRequest = mock(SuggestOracle.Request.class);
+		SuggestOracle.Callback mockCallback = mock(SuggestOracle.Callback.class);
+		suggestBox.getSuggestions(mockRequest, mockCallback);
+		//called once
+		verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		verify(mockCallback, never()).onSuggestionsReady(any(SuggestOracle.Request.class), any(SuggestOracle.Response.class));
+		suggestBox.getSuggestions(mockRequest, mockCallback);
+		//still, has called just once (from the first time, since it did not return).
+		verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 	}
 }

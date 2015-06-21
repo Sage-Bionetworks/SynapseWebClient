@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -25,18 +26,20 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	private Callback teamUpdatedCallback;
 	private SynapseClientAsync synapseClient;
 	private String teamId;
-	
+	private GWTWrapper gwt;
 	
 	@Inject
 	public OpenMembershipRequestsWidget(OpenMembershipRequestsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			GWTWrapper gwt) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.gwt = gwt;
 	}
 
 	public void configure(String teamId, Callback teamUpdatedCallback) {
@@ -69,6 +72,10 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 		});
 	};
 
+	@Override
+	public void clear() {
+		view.clear();
+	}
 	
 	@Override
 	public void goTo(Place place) {
@@ -78,7 +85,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	@Override
 	public void acceptRequest(String userId) {
 		//invite user id to team (to complete handshake), then update open membership request list
-		synapseClient.inviteMember(userId, teamId, "", new AsyncCallback<Void>() {
+		synapseClient.inviteMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Accepted Request","");

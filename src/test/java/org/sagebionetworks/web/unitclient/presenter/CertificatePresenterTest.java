@@ -4,10 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +39,7 @@ import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.CertificateView;
 import org.sagebionetworks.web.client.view.QuizView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -55,6 +54,7 @@ public class CertificatePresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	ClientCache mockCache;
+	SynapseAlert mockSynAlert;
 	Certificate place;
 	UserProfile profile;
 	PassingRecord passingRecord;
@@ -67,7 +67,8 @@ public class CertificatePresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockCache = mock(ClientCache.class);
-		presenter = new CertificatePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory,mockCache);
+		mockSynAlert = mock(SynapseAlert.class);
+		presenter = new CertificatePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory,mockCache, mockSynAlert);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
 		profile = new UserProfile();
@@ -89,7 +90,7 @@ public class CertificatePresenterTest {
 		//on init with place, it should ask for the user profile and passing record, and send that to the view.
 		when(place.toToken()).thenReturn(principalId);
 		presenter.setPlace(place);
-		
+		verify(mockSynAlert).clear();
 		verify(mockView, times(2)).setPresenter(presenter);
 		verify(mockView).clear();
 		verify(mockView).showLoading();
@@ -101,9 +102,10 @@ public class CertificatePresenterTest {
 	@Test
 	public void testProfileRequestError() {
 		String error = "An error";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		Exception caught = new Exception(error);
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		presenter.initStep1(principalId);
-		verify(mockView).showErrorMessage(error);
+		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test
@@ -117,9 +119,11 @@ public class CertificatePresenterTest {
 	@Test
 	public void testPassingRecordRequestError() {
 		String error = "passing record error";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		Exception caught = new Exception(error);
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		presenter.initStep2(principalId, profile);
-		verify(mockView).showErrorMessage(error);
+		verify(mockView, never()).showNotCertified(any(UserProfile.class));
+		verify(mockSynAlert).handleException(caught);
 	}
 
 	

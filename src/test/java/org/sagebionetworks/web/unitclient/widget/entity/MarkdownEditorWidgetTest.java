@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -40,6 +42,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorAction;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -48,6 +51,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class MarkdownEditorWidgetTest {
@@ -61,8 +65,10 @@ public class MarkdownEditorWidgetTest {
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
 	ResourceLoader mockResourceLoader;
+	PortalGinInjector mockInjector;
 	GWTWrapper mockGwt;
 	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
+	MarkdownWidget mockMarkdownWidget;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
 	CallbackP<WikiPage> mockDescriptorUpdatedHandler;
@@ -70,7 +76,8 @@ public class MarkdownEditorWidgetTest {
 	WikiPage testPage;
 	String fileHandleId1 = "44";
 	String fileHandleId2 = "45";
-
+	int EDITOR_BOTTOM_MARGIN, MIN_EDITOR_HEIGHT;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -84,18 +91,23 @@ public class MarkdownEditorWidgetTest {
 		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockInjector = mock(PortalGinInjector.class);
+		mockMarkdownWidget = mock(MarkdownWidget.class);
+		when(mockInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState);
-		
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockGlobalApplicationState, mockInjector);
+		MIN_EDITOR_HEIGHT = presenter.MIN_EDITOR_HEIGHT;
+		EDITOR_BOTTOM_MARGIN = presenter.EDITOR_BOTTOM_MARGIN;
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
 		presenter.configure(wikiPageKey, mockDescriptorUpdatedHandler);
 		
-		
+		String testPageMarkdownText = "my test markdown";
 		testPage = new WikiPage();
 		testPage.setId("wikiPageId");
-		testPage.setMarkdown("my test markdown");
+		testPage.setMarkdown(testPageMarkdownText);
+		when(mockView.getMarkdown()).thenReturn(testPageMarkdownText);
 		testPage.setTitle("My Test Wiki Title");
 		List<String> fileHandleIds = new ArrayList<String>();
 		//our page has two file handles already
@@ -119,7 +131,6 @@ public class MarkdownEditorWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
-		
 	}
 	
 	@Test
@@ -173,27 +184,48 @@ public class MarkdownEditorWidgetTest {
 		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showPreviewHTML(htmlReturned, wikiPageKey, mockWidgetRegistrar);
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockView).showPreviewModal();
 	}
 	
 	@Test
 	public void testPreviewFailure() throws Exception {
-		AsyncMockStubber
-				.callFailureWith(new Exception())
-				.when(mockSynapseClient)
-				.markdown2Html(anyString(), anyBoolean(), anyBoolean(),anyString(),
-						any(AsyncCallback.class));
-		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockView).showPreviewModal();
+	}
+	
+	@Test
+	public void testDeleteConfirmedCallback() {
+		boolean isConfirmed = true;
+
+		ClickHandler deleteClickHandler = presenter.getDeleteClickHandler();
+		deleteClickHandler.onClick(null);
+		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		verify(mockView).confirm(anyString(), captor.capture());
+		//confirm deletion
+		captor.getValue().callback(isConfirmed);
+		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testDeleteCancelCallback() {
+		boolean isConfirmed = false;
+		
+		ClickHandler deleteClickHandler = presenter.getDeleteClickHandler();
+		deleteClickHandler.onClick(null);
+		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		verify(mockView).confirm(anyString(), captor.capture());
+		//confirm deletion cancelled
+		captor.getValue().callback(isConfirmed);
+		verify(mockSynapseClient, Mockito.never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testSave() {
 		presenter.configure(testPage);
+		verify(mockView).setDeleteClickHandler(any(ClickHandler.class));
 		reset(mockView);
 		presenter.handleCommand(MarkdownEditorAction.SAVE);
 		verify(mockView).setSaving(true);
@@ -211,6 +243,7 @@ public class MarkdownEditorWidgetTest {
 	@Test
 	public void testDelete() {
 		presenter.configure(testPage);
+		verify(mockView).setDeleteClickHandler(any(ClickHandler.class));
 		//tests setActionHandler as well
 		reset(mockView);
 		presenter.handleCommand(MarkdownEditorAction.DELETE);
@@ -247,6 +280,48 @@ public class MarkdownEditorWidgetTest {
 		when(mockView.getCursorPos()).thenReturn(-1);
 		presenter.insertMarkdown(newText);
 		verify(mockView).setMarkdown(eq(markdown + newText));
+	}
+	
+	@Test
+	public void testResizeMarkdownEmpty() {
+		String markdown = "";
+		String minSize = (MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px";
+		when(mockView.getMarkdown()).thenReturn(markdown);
+		when(mockView.getScrollHeight(anyString())).thenReturn(0);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView).setMarkdownHeight(minSize);
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT / 2);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView, Mockito.times(2)).setMarkdownHeight(minSize);
+		//should resize after minEditorLines line threshold
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 2);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView).setMarkdownHeight((MIN_EDITOR_HEIGHT * 2 + EDITOR_BOTTOM_MARGIN) + "px");
+	}
+		
+	@Test
+	public void testResizeMarkdownOnDelete() {
+		String minSize = (MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px";
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 50);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView).setMarkdownHeight((50*MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px");
+		
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT * 25);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView).setMarkdownHeight((25*MIN_EDITOR_HEIGHT + EDITOR_BOTTOM_MARGIN) + "px");
+		
+		when(mockView.getScrollHeight(anyString())).thenReturn(MIN_EDITOR_HEIGHT / 2);
+		presenter.resizeMarkdownTextArea();
+		verify(mockView).setMarkdownHeight(minSize);
+
+	}
+	
+	public String getMultilineText(int numLines) {
+		String text = "";
+		for (int i = 0; i < numLines; i++) {
+			text += String.valueOf(i) + "\n";
+		}
+		return text;
 	}
 	
 	@Test
@@ -617,5 +692,6 @@ public class MarkdownEditorWidgetTest {
 		assertTrue(currentFileHandleIds.size() == 1);
 		assertTrue(currentFileHandleIds.contains(fileHandleId1));
 	}
+	
 	
 }

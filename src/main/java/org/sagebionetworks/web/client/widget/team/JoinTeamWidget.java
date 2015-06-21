@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -51,7 +50,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
 	private String message, isMemberMessage, successMessage, buttonText, requestOpenInfoText;
-	private boolean isAcceptingInvite, canPublicJoin, isSimpleRequestButton;
+	private boolean isAcceptingInvite, isSimpleRequestButton;
 	private Callback widgetRefreshRequired;
 	private List<AccessRequirement> accessRequirements;
 	private int currentPage;
@@ -85,17 +84,32 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		wikiPageWidget.showWikiHistory(false);
 	}
 	
-	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText, String requestOpenInfoText, boolean isSimpleRequestButton) {
+	/**
+	 * Simple join button configuration.  Give a team to join, it will invoke the callback when the user successfully joins the team. 
+	 * @param teamId
+	 * @param callback
+	 */
+	public void configure(String teamId, Callback callback) {
+		this.teamId = teamId;
+		this.isChallengeSignup = false;
+		this.isSimpleRequestButton = true;
+		this.successMessage = null;
+		this.buttonText = null;
+		this.requestOpenInfoText = null;
+		this.widgetRefreshRequired = callback;
+		refresh();
+	}
+	
+	public void configure(String teamId, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText, String requestOpenInfoText, boolean isSimpleRequestButton) {
 		//set team id
 		this.teamId = teamId;
-		this.canPublicJoin = canPublicJoin;
 		this.isChallengeSignup = isChallengeSignup;
 		this.isSimpleRequestButton = isSimpleRequestButton;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
 		this.buttonText = buttonText;
-		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
+		view.configure(authenticationController.isLoggedIn(), teamMembershipStatus, isMemberMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
 	};
 
 	@Override
@@ -138,7 +152,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					TeamMembershipStatus teamMembershipStatus = null;
 					if (result.getTeamMembershipStatus() != null)
 						teamMembershipStatus = result.getTeamMembershipStatus();
-					configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
+					configure(team.getId(), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
 
 				}
 				@Override
@@ -147,7 +161,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 			});
 		} else {
-			configure(teamId, canPublicJoin, isChallengeSignup, null, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
+			configure(teamId, isChallengeSignup, null, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
 		}
 	}
 	
@@ -349,7 +363,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	}
 	
 	public void sendJoinRequestStep3() {
-		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, new AsyncCallback<Void>() {
+		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;

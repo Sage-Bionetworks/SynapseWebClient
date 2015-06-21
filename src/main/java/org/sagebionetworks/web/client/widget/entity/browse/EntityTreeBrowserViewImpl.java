@@ -3,10 +3,12 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
@@ -51,6 +53,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	
 	@UiField(provided=true)
 	Tree entityTree;
+	@UiField
+	Table entityTreeHeader;
 	
 	private Widget widget;
 
@@ -78,11 +82,13 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@Override
 	public void hideEmptyUI() {
 		emptyUI.setVisible(false);
+		entityTreeHeader.setVisible(true);
 	}
 
 	@Override
 	public void showEmptyUI() {
 		emptyUI.setVisible(true);
+		entityTreeHeader.setVisible(false);
 	}
 
 	@Override

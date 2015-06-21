@@ -18,13 +18,15 @@ public class PythonClientModalWidgetViewImpl extends com.google.gwt.user.client.
 	@UiField(provided=true)
 	PythonClientInstallWidgetViewImpl install;
 	
+	Widget widget;
+	
 	@Inject
 	public PythonClientModalWidgetViewImpl(Binder uiBinder,
 			PythonClientEntityGetterUIWidgetViewImpl getEntity,
 			PythonClientInstallWidgetViewImpl install) {
 		this.getEntity = getEntity;
 		this.install = install;
-		uiBinder.createAndBindUi(this);
+		widget = uiBinder.createAndBindUi(this);
 	}
 	
 	public void configure(String id) {
@@ -32,6 +34,6 @@ public class PythonClientModalWidgetViewImpl extends com.google.gwt.user.client.
 	}
 	
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 }

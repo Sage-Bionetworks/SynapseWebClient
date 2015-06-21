@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ChangeUsernameView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
@@ -37,6 +38,7 @@ public class ChangeUsernamePresenterTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
+	SynapseAlert mockSynAlert;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	PlaceChanger mockPlaceChanger;
@@ -54,6 +56,7 @@ public class ChangeUsernamePresenterTest {
 		mockPanel = mock(AcceptsOneWidget.class);
 		mockEventBus = mock(EventBus.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockSynAlert = mock(SynapseAlert.class);
 		usd = new UserSessionData();
 		Session session = new Session();
 		usd.setSession(session);
@@ -65,7 +68,7 @@ public class ChangeUsernamePresenterTest {
 		
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new ChangeUsernamePresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, jsonObjectAdapter);
+		presenter = new ChangeUsernamePresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, jsonObjectAdapter, mockSynAlert);
 		presenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(presenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -75,6 +78,7 @@ public class ChangeUsernamePresenterTest {
 	private void setPlace() {
 		ChangeUsername place = Mockito.mock(ChangeUsername.class);
 		presenter.setPlace(place);
+		verify(mockView).setSynapseAlertWidget(mockSynAlert.asWidget());
 	}
 	
 	@Test
@@ -116,6 +120,6 @@ public class ChangeUsernamePresenterTest {
 		Exception t = new Exception(exceptionMessage);
 		AsyncMockStubber.callFailureWith(t).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		presenter.setUsername("newname");
-		verify(mockView).showSetUsernameError(eq(t));
+		verify(mockSynAlert).handleException(eq(t));
 	}
 }

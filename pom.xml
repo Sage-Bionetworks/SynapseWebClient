@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2015-04-24-1713-d247c9f</synapse.version>
+ 		<synapse.version>94.0-2-g8f9492a</synapse.version>
 		<gwtVersion>2.7.0</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
@@ -227,7 +227,30 @@
 					<attachClasses>true</attachClasses>
 				</configuration>
 			</plugin>
-
+			
+			<!-- This next section is to copy the source maps into the WEB-INF directory (during the package phase, from junit output) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>exploded</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>${webappDirectory}/Portal/.junit_symbolMaps/</directory>
+							<targetPath>WEB-INF</targetPath>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			
 			<!-- We use this assembly to package the GWT RPC dependencies so they 
 				are aviablible fore integration testing. -->
 			<plugin>
@@ -332,7 +355,7 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>2014-11-06-918e7d7-14</version>
+			<version>2015-06-04-987164c-15</version>
 		</dependency>
 		
 		

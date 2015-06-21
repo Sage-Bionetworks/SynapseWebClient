@@ -23,6 +23,8 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -58,7 +60,9 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -162,7 +166,7 @@ public interface SynapseClient extends RemoteService {
 	 * **NOTE** This should only be called if Synapse repository services was not involved, an error that could effect other clients.
 	 * @param message
 	 */
-	public void logErrorToRepositoryServices(String message, String stacktrace) throws RestServiceException;
+	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t) throws RestServiceException;
 
 	/**
 	 * Log an info message in the server-side log.
@@ -331,7 +335,8 @@ public interface SynapseClient extends RemoteService {
 	public String createTeam(String teamName) throws RestServiceException;
 	public void deleteTeam(String teamId) throws RestServiceException;
 	public PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
-	public List<Team> getTeamsForUser(String userId) throws RestServiceException;
+	public List<TeamRequestBundle> getTeamsForUser(String userId,
+			boolean includeOpenRequests) throws RestServiceException;
 	public PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
 	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
@@ -344,8 +349,8 @@ public interface SynapseClient extends RemoteService {
 	public Team updateTeam(Team team) throws RestServiceException;
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
-	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
-	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
+	public void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
+	public void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
 	
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
 	public String getCertificationQuiz() throws RestServiceException;
@@ -371,11 +376,15 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getAPIKey() throws RestServiceException;
 	
+	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;
+	
+	public SignedTokenInterface hexDecodeAndSerialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
+	
 	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	
 	public String createColumnModel(String columnModelJson) throws RestServiceException;
 
-	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
+	public String sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
 	
@@ -508,9 +517,9 @@ public interface SynapseClient extends RemoteService {
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
-	Entity updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException;
+	Entity updateExternalFile(String entityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
 
-	Entity createExternalFile(String parentEntityId, String externalUrl,
-			String name) throws RestServiceException;
-	
+	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
+
+	EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException;
 }

@@ -65,6 +65,8 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
+import org.sagebionetworks.web.client.view.SignedTokenView;
+import org.sagebionetworks.web.client.view.SignedTokenViewImpl;
 import org.sagebionetworks.web.client.view.SynapseWikiView;
 import org.sagebionetworks.web.client.view.SynapseWikiViewImpl;
 import org.sagebionetworks.web.client.view.TeamSearchView;
@@ -129,6 +131,8 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -181,6 +185,10 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
@@ -467,6 +475,12 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetView;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidgetView;
+import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetView;
+import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetView;
+import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -541,7 +555,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//GWT utility methods
 		bind(GWTWrapperImpl.class).in(Singleton.class);
-		bind(GWTWrapper.class).to(GWTWrapperImpl.class);
+		bind(GWTWrapper.class).to(GWTWrapperImpl.class);		
 		
 		//RequestBuilder
 		bind(RequestBuilderWrapperImpl.class).in(Singleton.class);
@@ -651,6 +665,10 @@ public class PortalGinModule extends AbstractGinModule {
 		//ChangeUsername
 		bind(ChangeUsernameViewImpl.class).in(Singleton.class);
 		bind(ChangeUsernameView.class).to(ChangeUsernameViewImpl.class);
+		
+		//SignedToken
+		bind(SignedTokenViewImpl.class).in(Singleton.class);
+		bind(SignedTokenView.class).to(SignedTokenViewImpl.class);
 		
 		// Trash
 		bind(TrashViewImpl.class).in(Singleton.class);
@@ -878,6 +896,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
 		
+		// MarkdownWidget
+		bind(MarkdownWidgetView.class).to(MarkdownWidgetViewImpl.class);
+		
 		// MarkdownEditorWidget
 		bind(MarkdownEditorWidgetView.class).to(MarkdownEditorWidgetViewImpl.class);
 		
@@ -981,7 +1002,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// Team Page
 		bind(TeamViewImpl.class).in(Singleton.class);
 		bind(TeamView.class).to(TeamViewImpl.class);
-
+		
 		// Team Search Page
 		bind(TeamSearchViewImpl.class).in(Singleton.class);
 		bind(TeamSearchView.class).to(TeamSearchViewImpl.class);
@@ -993,6 +1014,12 @@ public class PortalGinModule extends AbstractGinModule {
 		/*
 		 * Teams Widgets
 		 */
+		
+		// Team Action Menu Items
+		bind(TeamEditModalWidgetView.class).to(TeamEditModalWidgetViewImpl.class);
+		bind(TeamLeaveModalWidgetView.class).to(TeamLeaveModalWidgetViewImpl.class);
+		bind(TeamDeleteModalWidgetView.class).to(TeamDeleteModalWidgetViewImpl.class);
+		
 		// Open Team Invitations widget
 		bind(OpenTeamInvitationsWidgetView.class).to(OpenTeamInvitationsWidgetViewImpl.class);
 		
@@ -1057,5 +1084,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(FileHistoryRowView.class).to(FileHistoryRowViewImpl.class);
 		
+		bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
+		bind(SynapseAlert.class).to(SynapseAlertImpl.class);
 	}
 }

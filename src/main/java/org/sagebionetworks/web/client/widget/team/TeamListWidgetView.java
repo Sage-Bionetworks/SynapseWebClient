@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
@@ -16,8 +14,9 @@ public interface TeamListWidgetView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void setRequestCount(String teamId, Long count);
-	public void configure(List<Team> teams, boolean isBig);
+	public void configure(boolean isBig);
+	public void showEmpty();
+	public void addTeam(Team team, Long notificationCount);
 	void showLoading();
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);

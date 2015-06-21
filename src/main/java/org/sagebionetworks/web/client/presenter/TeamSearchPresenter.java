@@ -10,11 +10,13 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.TeamSearchView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,18 +34,21 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	private int offset;
 	private String searchTerm;
 	private PaginatedResults<Team> teamList;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public TeamSearchPresenter(TeamSearchView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			CookieProvider cookieProvider) {
+			CookieProvider cookieProvider,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		
+		this.synAlert = synAlert;
+		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
 	}
 
@@ -75,25 +80,30 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	
 	@Override
 	public void search(final String searchTerm, final Integer offset) {
+		synAlert.clear();
+		view.setMainContainerVisible(true);
 		this.searchTerm = searchTerm;
 		if (offset == null)
 			this.offset = 0;
 		else
 			this.offset = offset;
 		//execute search, and update view with the results
-		synapseClient.getTeamsBySearch(searchTerm, SEARCH_TEAM_LIMIT, offset, new AsyncCallback<PaginatedResults<Team>>() {
+		AsyncCallback<PaginatedResults<Team>> callback = new AsyncCallback<PaginatedResults<Team>>() {
 			@Override
 			public void onSuccess(PaginatedResults<Team> result) {
 				teamList = result;
 				view.configure(teamList.getResults(), searchTerm);
+				if (teamList.getResults().isEmpty()) {
+					view.showEmptyTeams();
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				view.setMainContainerVisible(false);
+				synAlert.handleException(caught);
 			}
-		});
+		};
+		synapseClient.getTeamsBySearch(searchTerm, SEARCH_TEAM_LIMIT, offset, callback);
 	}
 	
 	@Override

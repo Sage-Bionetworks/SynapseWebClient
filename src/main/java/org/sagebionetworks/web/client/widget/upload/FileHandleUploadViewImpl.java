@@ -6,15 +6,16 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.dom.client.InputElement;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -45,6 +46,8 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	ProgressBar progressBar;
 	@UiField
 	Alert alert;
+	@UiField
+	Span uploadedFileNameField;
 	
 	@Inject
 	public FileHandleUploadViewImpl(Binder binder){
@@ -78,7 +81,11 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 		
 	}
 
-
+	@Override
+	public void setUploadedFileText(String text) {
+		uploadedFileNameField.setText(text);
+	}
+	
 	@Override
 	public String getInputId() {
 		return fileInput.getElement().getId();
@@ -98,6 +105,7 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	@Override
 	public void resetForm() {
 		this.form.reset();
+		setUploadedFileText("");
 	}
 
 	@Override
@@ -120,6 +128,8 @@ public class FileHandleUploadViewImpl implements FileHandleUploadView {
 	public void setButtonText(String buttonText) {
 		this.uploadbutton.setText(buttonText);
 	}
+	
+
 
 
 }

@@ -14,9 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -78,7 +80,7 @@ public class UserProfileAttachmentServletTest {
 	public void testGetUserProfilePreview() throws ServletException, IOException{
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		// call under test
@@ -92,7 +94,7 @@ public class UserProfileAttachmentServletTest {
 		preview = "false";
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		// call under test
@@ -101,12 +103,29 @@ public class UserProfileAttachmentServletTest {
 		verify(mockResponse).sendRedirect(userImageUrl.toString());
 	}
 	
+
+	@Test
+	public void testGetUserProfileSynapseException() throws ServletException, IOException, SynapseException{
+		int statusCode = 404;
+		String errorMessage = "a custom error";
+		when(mockClient.getUserProfilePictureUrl(Matchers.anyString())).thenThrow(new SynapseServerException(statusCode, errorMessage));
+		preview = "false";
+		// setup the parameters
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockClient).setSessionToken(sessionCookie.getValue());
+		verify(mockResponse).setStatus(statusCode);
+	}
+	
 	@Test
 	public void testGetUserProfileNotApplied() throws ServletException, IOException{
 		applied = "false";
 		// setup the parameters
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMIAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		// call under test

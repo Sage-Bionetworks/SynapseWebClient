@@ -27,19 +27,20 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 			String wikiPageId);
 
 	/**
+	 * Reconfigure project action menu when navigating to a different wiki.
+	 * 
+	 * @param bundle
+	 * @param wikiPageId
+	 */
+	void configureProjectActionMenu(EntityBundle bundle, String wikiPageId);
+
+	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 
 		void refresh();
 
-		/**
-		 * Refreshes a given area
-		 * @param area
-		 * @param areaToken
-		 */
-		void refreshArea(Synapse.EntityArea area, String areaToken);
-		
 		/**
 		 * Changes places to the specified are of the Parent Project
 		 * @param area
@@ -71,7 +72,11 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		Query getTableQuery();
 
-				
-	}
+		/**
+		 * Handle what needs to change/reconfigure when a sub wiki is chosen.
+		 * @param wikiPageId
+		 */
+		void handleWikiReload(String wikiPageId);
 
+	}
 }

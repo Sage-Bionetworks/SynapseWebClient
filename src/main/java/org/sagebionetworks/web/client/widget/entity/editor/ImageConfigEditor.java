@@ -6,12 +6,18 @@ import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
+import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -22,13 +28,14 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	
 	private ImageConfigView view;
 	private Map<String, String> descriptor;
-	private List<String> fileHandleIds;
-	private FileInputWidget fileInputWidget;
+	private FileUpload file;
+	private FileHandleUploadWidget fileInputWidget;
 	private DialogCallback dialogCallback;
 	private WikiAttachments wikiAttachments;
+	private List<String> fileHandleIds;
 	
 	@Inject
-	public ImageConfigEditor(ImageConfigView view, FileInputWidget fileInputWidget, WikiAttachments wikiAttachments) {
+	public ImageConfigEditor(ImageConfigView view, FileHandleUploadWidget fileInputWidget, WikiAttachments wikiAttachments) {
 		this.view = view;
 		view.setPresenter(this);
 		this.fileInputWidget = fileInputWidget;
@@ -38,12 +45,31 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, final DialogCallback dialogCallback) {
+		fileHandleIds = new ArrayList<String>();
 		descriptor = widgetDescriptor;
 		this.dialogCallback = dialogCallback;
-		fileHandleIds = new ArrayList<String>();
+		this.file = null;
 		view.initView();
 		fileInputWidget.reset();
+		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
+			@Override
+			public void invoke(FileUpload fileUpload) {
+				view.showUploadSuccessUI();
+				//enable the ok button
+				dialogCallback.setPrimaryEnabled(true);
+				file = fileUpload;
+				fileHandleIds.add(file.getFileHandleId());
+			}
+		});	
+		ImageFileValidator validator = new ImageFileValidator();
+		validator.setInvalidFileCallback(new Callback() {
+			@Override
+			public void invoke() {
+				view.showErrorMessage(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
+			}
+		});
+		fileInputWidget.setValidation(validator);
 		view.configure(wikiKey, dialogCallback);
 		wikiAttachments.configure(wikiKey);
 		//and try to prepopulate with values from the map.  if it fails, ignore
@@ -79,57 +105,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				}
 				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
 			} else {
-				if (fileHandleIds.isEmpty()) {
+				if (file == null) {
 					throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_UPLOAD_FIRST_MESSAGE);
 				}
-				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, getFileName());	
+				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, file.getFileMeta().getFileName());	
 			}
 				
 			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
-		}
-	}
-	
-	private String getFileName() {
-		if (validateSelectedFile())
-			return fileInputWidget.getSelectedFileMetadata()[0].getFileName();
-		else return null;
-	}
-	
-	public boolean validateSelectedFile() {
-		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
-		if(meta == null || meta.length != 1){
-			view.showErrorMessage("Please select a file and try again");
-			return false;
-		} else {
-			String fileName = fileInputWidget.getSelectedFileMetadata()[0].getFileName();
-			String extension = fileName.substring(fileName.lastIndexOf(".")+1);
-			 if (!DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
-				 view.showErrorMessage(DisplayConstants.IMAGE_CONFIG_FILE_TYPE_MESSAGE);
-				 return false;
-			 }
-		}
-		return true;
-	}
-	
-	@Override
-	public void uploadFileClicked() {
-		if (validateSelectedFile()) {
-			view.setUploadButtonEnabled(false);
-			fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
-				@Override
-				public void uploadSuccess(String fileHandleId) {
-					view.showUploadSuccessUI();
-					//enable the ok button
-					dialogCallback.setPrimaryEnabled(true);
-					addFileHandleId(fileHandleId);
-				}
-				
-				@Override
-				public void uploadFailed(String error) {
-					view.setUploadButtonEnabled(true);
-					view.showUploadFailureUI(error);
-				}
-			});
 		}
 	}
 	
@@ -139,16 +121,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			return "!["+view.getAltText()+"]("+view.getImageUrl()+")";
 		else return null;
 	}
-	
-	@Override
-	public void addFileHandleId(String fileHandleId) {
-		fileHandleIds.add(fileHandleId);
-	}
 
-	@Override
-	public List<String> getNewFileHandleIds() {
-		return fileHandleIds;
-	}
 	@Override
 	public List<String> getDeletedFileHandleIds() {
 		if (view.isFromAttachments()) {
@@ -160,4 +133,10 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	/*
 	 * Private Methods
 	 */
+
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return fileHandleIds;
+	}
+
 }

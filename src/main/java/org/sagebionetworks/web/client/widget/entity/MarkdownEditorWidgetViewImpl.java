@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -21,17 +20,14 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -49,7 +45,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private IconsImageBundle iconsImageBundle;
 	private ResourceLoader resourceLoader;
-	private MarkdownWidget markdownWidget;
 	private Presenter presenter;
 	
 	@UiField
@@ -61,10 +56,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public Div mdCommands;
 	
 	@UiField
-	public TextArea markdownTextArea;
+	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
+	@UiField 
+	public com.google.gwt.user.client.ui.TextArea resizingTextArea;
 	
 	@UiField
-	public FlowPanel formattingGuideContainer;
+	public SimplePanel formattingGuideContainer;
 	
 	/**
 	 * List of toolbar commands
@@ -175,7 +172,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	//preview
 	@UiField
-	public FlowPanel previewHtmlContainer;
+	public SimplePanel previewHtmlContainer;
 	@UiField
 	public Modal previewModal;
 	@UiField
@@ -199,16 +196,13 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			SynapseClientAsync synapseClient,
 			SynapseJSNIUtils synapseJSNIUtils,
 			IconsImageBundle iconsImageBundle,
-			ResourceLoader resourceLoader, 
-			MarkdownWidget markdownWidget) {
+			ResourceLoader resourceLoader) {
 		super();
 		this.widget = binder.createAndBindUi(this);
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.iconsImageBundle = iconsImageBundle;
 		this.resourceLoader = resourceLoader;
-		this.markdownWidget = markdownWidget;
-		markdownWidget.addStyleName("margin-10");
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
 		buttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BUTTON_LINK));
@@ -251,7 +245,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		imageButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewButton.addClickHandler(getClickHandler(MarkdownEditorAction.PREVIEW));
-		deleteButton.addClickHandler(getDeleteClickHandler());
 		saveButton.addClickHandler(getClickHandler(MarkdownEditorAction.SAVE));
 		cancelButton.addClickHandler(getClickHandler(MarkdownEditorAction.CANCEL));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
@@ -274,26 +267,26 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 				formattingGuideModal.show();
 			}
 		});
-		
-		markdownTextArea.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.markdownEditorClicked();
-			}
-		});
-		
-		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				presenter.markdownEditorClicked();
-			}
-		});
-		markdownTextArea.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				resizeMarkdownTextArea(0);
-			}
-		});
+	}
+	
+	@Override 
+	public void confirm(String text, ConfirmCallback callback) {
+		Bootbox.confirm(text, callback);
+	}
+	
+	@Override
+	public void setDeleteClickHandler(ClickHandler handler) {
+		deleteButton.addClickHandler(handler);
+	}
+	
+	@Override
+	public void addTextAreaKeyUpHandler(KeyUpHandler handler) {
+		markdownTextArea.addKeyUpHandler(handler);
+	}
+	
+	@Override
+	public void addTextAreaClickHandler(ClickHandler handler) {
+		markdownTextArea.addClickHandler(handler);
 	}
 	
 	private ClickHandler getClickHandler(final MarkdownEditorAction action) {
@@ -301,21 +294,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.handleCommand(action);		
-			}
-		};
-	}
-	
-	private ClickHandler getDeleteClickHandler() {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
-					@Override
-					public void callback(boolean isConfirmed) {
-						if (isConfirmed)
-							presenter.handleCommand(MarkdownEditorAction.DELETE);
-					}
-				});
 			}
 		};
 	}
@@ -333,41 +311,15 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.presenter = presenter;
 	}
 	
-	/**
-	 * 
-	 * @param ownerId
-	 * @param ownerType
-	 * @param markdownTextArea
-	 * @param formPanel
-	 * @param callback
-	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
-	 */
-	public void configure( 
-			WikiPageKey formattingGuideWikiPageKey,
-			String markdown) {
-		markdownTextArea.setText(markdown);
-		if (formattingGuideWikiPageKey != null)
-			initFormattingGuide(formattingGuideWikiPageKey);
-		
+	@Override
+	public void configure(String markdown) {
+		markdownTextArea.setText(markdown);		
 		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 			@Override
 			public void execute() {
 				Window.scrollTo(0, mdCommands.getAbsoluteTop());
 			}
 		});
-		
-		//init markdown text area height
-		Timer t = new Timer() {
-	      @Override
-	      public void run() {
-	    	  if (markdownTextArea.getElement().getScrollHeight() > 0) {
-	    		  resizeMarkdownTextArea(120);
-	    	  } else {
-	    		  this.schedule(100);
-	    	  }
-	      }
-	    };
-	    t.schedule(100);
 	}
 	
 	
@@ -377,19 +329,14 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		attachmentButton.setVisible(visible);
 	}
 	
-	public void initFormattingGuide(WikiPageKey formattingGuideWikiPageKey) {
-		markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
-		formattingGuideContainer.clear();
-		formattingGuideContainer.add(markdownWidget);
-	}
-
-	private void resizeMarkdownTextArea(int extra) {
-		markdownTextArea.setHeight((markdownTextArea.getElement().getScrollHeight()+ 2 + extra) + "px");
-	}
-	
 	@Override
 	public void setAlphaCommandsVisible(boolean visible) {
 		alphaInsertButton.setVisible(visible);
+	}
+	
+	@Override
+	public boolean isEditorModalAttachedAndVisible() {
+		return editorDialog.isAttached() && editorDialog.isVisible();
 	}
 	
 	@Override
@@ -406,24 +353,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setEditButtonEnabled(boolean enabled) {
 		editWidgetButton.setEnabled(enabled);
 	}
-
-	@Override
-	public void showPreviewHTML(String result, WikiPageKey wikiKey, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
-		HTMLPanel panel;
-		if(result == null || "".equals(result)) {
-	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>"));
-		}
-		else{
-			panel = new HTMLPanel(result);
-		}
-		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
-		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
-		MarkdownWidget.loadWidgets(panel, wikiKey, widgetRegistrar, synapseClient, iconsImageBundle, true, null, null);
-		
-		previewHtmlContainer.clear();
-		previewHtmlContainer.add(panel);
-		previewModal.show();
-	}
+	
+	
 	
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -473,6 +404,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public void setMarkdownFocus() {
 		markdownTextArea.setFocus(true);
 	}
+	
+	@Override
+	public void setMarkdownHeight(String height) {
+		markdownTextArea.setHeight(height);
+	}
+	
 	@Override
 	public int getSelectionLength() {
 		return markdownTextArea.getSelectionLength();
@@ -489,6 +426,14 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
+	public int getScrollHeight(String text) {
+		resizingTextArea.setText("");
+		resizingTextArea.setText(text);
+		return resizingTextArea.getElement().getScrollHeight();
+	}
+
+	
+	@Override
 	public String getTitle() {
 		return titleField.getValue();
 	}
@@ -496,5 +441,20 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@Override
 	public void setTitle(String title) {
 		titleField.setValue(title);
+	}
+
+	@Override
+	public void setMarkdownPreviewWidget(Widget markdownPreviewWidget) {
+		previewHtmlContainer.setWidget(markdownPreviewWidget);
+	}
+
+	@Override
+	public void setFormattingGuideWidget(Widget formattingGuideWidget) {
+		formattingGuideContainer.setWidget(formattingGuideWidget);
+	}
+
+	@Override
+	public void showPreviewModal() {
+		previewModal.show();
 	}
 }

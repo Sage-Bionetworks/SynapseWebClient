@@ -21,6 +21,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.io.File;
@@ -33,6 +34,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +66,7 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
@@ -74,6 +80,7 @@ import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -97,6 +104,8 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
+import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
@@ -113,12 +122,16 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.util.SerializationUtils;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
+import org.sagebionetworks.web.server.servlet.NotificationTokenType;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -141,8 +154,9 @@ import com.google.common.cache.Cache;
  * 
  */
 public class SynapseClientImplTest {
-
+	public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
 	public static final String MY_USER_PROFILE_OWNER_ID = "MyOwnerID";
+	
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	ServiceUrlProvider mockUrlProvider;
@@ -172,8 +186,18 @@ public class SynapseClientImplTest {
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
+	PaginatedResults mockPaginatedMembershipRequest;
+
 	MessageToUser sentMessage;
 	Long storageLocationId = 9090L;
+	UserProfile testUserProfile;
+	
+	//Token testing
+	NotificationSettingsSignedToken notificationSettingsToken;
+	JoinTeamSignedToken joinTeamToken;
+	String encodedJoinTeamToken, encodedNotificationSettingsToken;
+	
+	private static final String testUserId = "myUserId";
 
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -190,7 +214,8 @@ public class SynapseClientImplTest {
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
-
+		mockPaginatedMembershipRequest = Mockito.mock(PaginatedResults.class);
+		when(mockPaginatedMembershipRequest.getTotalNumberOfResults()).thenReturn(3L);
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
@@ -200,6 +225,7 @@ public class SynapseClientImplTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
+		entity.setModifiedBy(testUserId);
 		// the mock synapse should return this object
 		when(mockSynapse.getEntityById(entityId)).thenReturn(entity);
 		// Setup the annotations
@@ -311,6 +337,8 @@ public class SynapseClientImplTest {
 		bundle.setUnmetAccessRequirements(accessRequirements);
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
 				.thenReturn(bundle);
+		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID)))
+				.thenReturn(bundle);
 
 		EntityBundle emptyBundle = new EntityBundle();
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(emptyMask)))
@@ -402,8 +430,7 @@ public class SynapseClientImplTest {
 		sentMessage = new MessageToUser();
 		sentMessage.setId("987");
 		when(
-				mockSynapse.sendStringMessage(any(MessageToUser.class),
-						anyString())).thenReturn(sentMessage);
+				mockSynapse.sendMessage(any(MessageToUser.class))).thenReturn(sentMessage);
 
 		// getMyProjects getUserProjects
 		PaginatedResults headers = new PaginatedResults<ProjectHeader>();
@@ -427,6 +454,24 @@ public class SynapseClientImplTest {
 						any(ProjectListSortColumn.class),
 						any(SortDirection.class), anyInt(), anyInt()))
 				.thenReturn(headers);
+		
+		testUserProfile = new UserProfile();
+		testUserProfile.setUserName("Test User");
+		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(
+				testUserProfile);
+		
+		joinTeamToken = new JoinTeamSignedToken();
+		joinTeamToken.setHmac("98765");
+		joinTeamToken.setMemberId("1");
+		joinTeamToken.setTeamId("2");
+		joinTeamToken.setUserId("3");
+		encodedJoinTeamToken = SerializationUtils.serializeAndHexEncode(joinTeamToken);
+		
+		notificationSettingsToken = new NotificationSettingsSignedToken();
+		notificationSettingsToken.setHmac("987654");
+		notificationSettingsToken.setSettings(new Settings());
+		notificationSettingsToken.setUserId("4");
+		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -647,13 +692,8 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetUserProfile() throws Exception {
 		// verify call is directly calling the synapse client provider
-		UserProfile testUserProfile = new UserProfile();
-		testUserProfile.setUserName("Test User");
 		String testRepoUrl = "http://mytestrepourl";
-		String testUserId = "myUserId";
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
-		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(
-				testUserProfile);
 		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
 		assertEquals(userProfile, testUserProfile);
 	}
@@ -970,7 +1010,7 @@ public class SynapseClientImplTest {
 		ArgumentCaptor<FileEntity> arg = ArgumentCaptor
 				.forClass(FileEntity.class);
 
-		synapseClient.updateExternalFile(testId, testUrl, null);
+		synapseClient.updateExternalFile(testId, testUrl, null, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
 		verify(mockSynapse).createExternalFileHandle(
@@ -991,7 +1031,7 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, "");
+		synapseClient.updateExternalFile(testId, testUrl, "", storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
@@ -1004,11 +1044,9 @@ public class SynapseClientImplTest {
 		// and (finally) verify the correct name if it is explicitly set
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
 		String newName = "a new name";
-		synapseClient.updateExternalFile(testId, testUrl, newName);
+		synapseClient.updateExternalFile(testId, testUrl, newName, storageLocationId);
 		file.setName(newName);
-		verify(mockSynapse).putEntity(eq(file)); // should equal the previous
-													// file but with the new
-													// name
+		verify(mockSynapse).putEntity(eq(file)); // should equal the previous file but with the new name
 	}
 
 	@Test
@@ -1023,7 +1061,7 @@ public class SynapseClientImplTest {
 				.thenReturn(new ExternalFileHandle());
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -1031,6 +1069,7 @@ public class SynapseClientImplTest {
 		// verify name is set
 		assertEquals(fileName, handle.getFileName());
 		assertEquals(externalUrl, handle.getExternalURL());
+		assertEquals(storageLocationId, handle.getStorageLocationId());
 	}
 
 	@Test
@@ -1256,11 +1295,11 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenInvitation(true);
 		// verify it does not create a new invitation since one is already open
-		synapseClient.inviteMember("123", "a team", "");
+		synapseClient.inviteMember("123", "a team", "", "");
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
-				anyString());
+				anyString(), anyString(), anyString());
 		verify(mockSynapse, Mockito.times(0)).createMembershipInvitation(
-				any(MembershipInvtnSubmission.class));
+				any(MembershipInvtnSubmission.class), anyString(), anyString());
 
 	}
 
@@ -1269,43 +1308,43 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setHasOpenRequest(true);
 		// verify it does not create a new request since one is already open
-		synapseClient.requestMembership("123", "a team", "");
+		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
-				anyString());
+				anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
-				any(MembershipRqstSubmission.class));
+				any(MembershipRqstSubmission.class), anyString(), anyString());
 	}
 
 	@Test
 	public void testInviteMemberCanJoin() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
-		synapseClient.inviteMember("123", "a team", "");
-		verify(mockSynapse).addTeamMember(anyString(), anyString());
+		synapseClient.inviteMember("123", "a team", "", TEST_HOME_PAGE_BASE);
+		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 	}
 
 	@Test
 	public void testRequestMembershipCanJoin() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		membershipStatus.setCanJoin(true);
-		synapseClient.requestMembership("123", "a team", "");
-		verify(mockSynapse).addTeamMember(anyString(), anyString());
+		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
+		verify(mockSynapse).addTeamMember(anyString(), anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 	}
 
 	@Test
 	public void testInviteMember() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		synapseClient.inviteMember("123", "a team", "");
+		synapseClient.inviteMember("123", "a team", "", TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).createMembershipInvitation(
-				any(MembershipInvtnSubmission.class));
+				any(MembershipInvtnSubmission.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 	}
 
 	@Test
 	public void testRequestMembership() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		synapseClient.requestMembership("123", "a team", "");
+		synapseClient.requestMembership("123", "a team", "", TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).createMembershipRequest(
-				any(MembershipRqstSubmission.class));
+				any(MembershipRqstSubmission.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 	}
 
 	@Test
@@ -1383,7 +1422,7 @@ public class SynapseClientImplTest {
 		Team team = new Team();
 		team.setId("test team id");
 		when(mockSynapse.getTeam(anyString())).thenReturn(team);
-
+		
 		// is member
 		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
 		membershipStatus.setIsMember(true);
@@ -1479,18 +1518,20 @@ public class SynapseClientImplTest {
 	@Test
 	public void testSendMessage() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		// essentially a pass through to sendStringMessage
 		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor
 				.forClass(MessageToUser.class);
 		Set<String> recipients = new HashSet<String>();
 		recipients.add("333");
 		String subject = "The Mathematics of Quantum Neutrino Fields";
 		String messageBody = "Atoms are not to be trusted, they make up everything";
-		synapseClient.sendMessage(recipients, subject, messageBody);
-		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
+		String hostPageBaseURL = "http://localhost/Portal.html";
+		synapseClient.sendMessage(recipients, subject, messageBody, hostPageBaseURL);
+		verify(mockSynapse).uploadToFileHandle(any(byte[].class), eq(SynapseClientImpl.HTML_MESSAGE_CONTENT_TYPE));
+		verify(mockSynapse).sendMessage(arg.capture());
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertEquals(recipients, toSendMessage.getRecipients());
+		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
 	}
 
 	@Test
@@ -1683,7 +1724,8 @@ public class SynapseClientImplTest {
 	public void testLogErrorToRepositoryServices() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		String errorMessage = "error has occurred";
-		synapseClient.logErrorToRepositoryServices(errorMessage, null);
+		String permutationStrongName="Chrome";
+		synapseClient.logErrorToRepositoryServices(errorMessage, null, null, null, permutationStrongName);
 		verify(mockSynapse).getMyProfile();
 		verify(mockSynapse).logError(any(LogEntry.class));
 	}
@@ -1691,15 +1733,16 @@ public class SynapseClientImplTest {
 	@Test
 	public void testLogErrorToRepositoryServicesTruncation()
 			throws SynapseException, RestServiceException,
-			JSONObjectAdapterException {
-		StringBuilder stackTrace = new StringBuilder();
-		for (int i = 0; i < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE + 100; i++) {
-			stackTrace.append('a');
-		}
-
+			JSONObjectAdapterException, ServletException {
+		String exceptionMessage = "This exception brought to you by Sage Bionetworks";
+		Exception e = new Exception(exceptionMessage, new IllegalArgumentException(new NullPointerException()));
+		ServletContext mockServletContext = Mockito.mock(ServletContext.class);
+		ServletConfig mockServletConfig = Mockito.mock(ServletConfig.class);
+		when(mockServletConfig.getServletContext()).thenReturn(mockServletContext);
+		synapseClient.init(mockServletConfig);
 		String errorMessage = "error has occurred";
-		synapseClient.logErrorToRepositoryServices(errorMessage,
-				stackTrace.toString());
+		String permutationStrongName="FF";
+		synapseClient.logErrorToRepositoryServices(errorMessage, e.getClass().getSimpleName(), e.getMessage(), e.getStackTrace(), permutationStrongName);
 		ArgumentCaptor<LogEntry> captor = ArgumentCaptor
 				.forClass(LogEntry.class);
 		verify(mockSynapse).logError(captor.capture());
@@ -1707,6 +1750,8 @@ public class SynapseClientImplTest {
 		assertTrue(logEntry.getLabel().length() < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE + 100);
 		assertTrue(logEntry.getMessage().contains(errorMessage));
 		assertTrue(logEntry.getMessage().contains(MY_USER_PROFILE_OWNER_ID));
+		assertTrue(logEntry.getMessage().contains(e.getClass().getSimpleName()));
+		assertTrue(logEntry.getMessage().contains(exceptionMessage));
 	}
 
 	@Test
@@ -1845,14 +1890,100 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetTeamsForUser() throws RestServiceException,
-			JSONObjectAdapterException, SynapseException {
+	public void testGetTeamBundlesNotOwner() throws RestServiceException, SynapseException {
 		// the paginated results were set up to return {teamZ, teamA}, but
 		// servlet side we sort by name.
-		List<Team> results = synapseClient.getTeamsForUser("abba");
+		List<TeamRequestBundle> results = synapseClient.getTeamsForUser("abba", false);
 		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
 		assertEquals(2, results.size());
-		assertEquals(teamA, results.get(0));
-		assertEquals(teamZ, results.get(1));
+		assertEquals(teamA, results.get(0).getTeam());
+		assertEquals(teamZ, results.get(1).getTeam());
+		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(anyString(), anyString(),
+				anyLong(), anyLong());
+	}
+	
+	@Test
+	public void testGetTeamBundlesOwner() throws RestServiceException, SynapseException {
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(true);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(
+				testTeamMember);
+		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(mockPaginatedMembershipRequest);
+		
+		List<TeamRequestBundle> results = synapseClient.getTeamsForUser("abba", true);
+		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
+		assertEquals(2, results.size());
+		assertEquals(teamA, results.get(0).getTeam());
+		assertEquals(teamZ, results.get(1).getTeam());
+		Long reqCount1 = results.get(0).getRequestCount();
+		Long reqCount2 = results.get(1).getRequestCount();
+		assertEquals(new Long(3L), results.get(0).getRequestCount());
+		assertEquals(new Long(3L), results.get(1).getRequestCount());
+
+	}
+	
+	@Test
+	public void testGetEntityInfo() throws RestServiceException,
+	JSONObjectAdapterException, SynapseException{
+		EntityBundlePlus entityBundlePlus = synapseClient.getEntityInfo(entityId);
+		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
+		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
+		assertEquals(testUserProfile, entityBundlePlus.getProfile());
+	}
+	
+	@Test(expected = BadRequestException.class)
+	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
+		String tokenTypeName = null;
+		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+	}
+	
+	@Test(expected = BadRequestException.class)
+	public void testHandleSignedTokenEmpty() throws RestServiceException, SynapseException{
+		String tokenTypeName = "";
+		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+	}
+	
+	@Test(expected = BadRequestException.class)
+	public void testHandleSignedTokenUnrecognized() throws RestServiceException, SynapseException{
+		String tokenTypeName = "InvalidTokenType";
+		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+	}
+	
+	@Test
+	public void testHandleSignedTokenJoinTeam() throws RestServiceException, SynapseException{
+		String tokenTypeName = NotificationTokenType.JoinTeam.name();
+		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		synapseClient.handleSignedToken(token,TEST_HOME_PAGE_BASE);
+		verify(mockSynapse).addTeamMember(joinTeamToken, TEST_HOME_PAGE_BASE+"#!Team:", TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/");
+	}
+	
+	@Test(expected = BadRequestException.class)
+	public void testHandleSignedTokenInvalidJoinTeam() throws RestServiceException, SynapseException{
+		String tokenTypeName = NotificationTokenType.JoinTeam.name();
+		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
+	}
+	@Test(expected = BadRequestException.class)
+	public void testHandleSignedTokenJoinTeamWrongToken() throws RestServiceException, SynapseException{
+		String tokenTypeName = NotificationTokenType.JoinTeam.name();
+		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedNotificationSettingsToken);
+	}
+	
+	@Test
+	public void testHandleSignedTokenNotificationSettings() throws RestServiceException, SynapseException{
+		String tokenTypeName = NotificationTokenType.Settings.name();
+		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedNotificationSettingsToken);
+		synapseClient.handleSignedToken(token, TEST_HOME_PAGE_BASE);
+		verify(mockSynapse).updateNotificationSettings(notificationSettingsToken);
+	}
+	
+	@Test(expected = BadRequestException.class)
+	public void testHandleSignedTokenInvalidNotificationSettings() throws RestServiceException, SynapseException{
+		String tokenTypeName = NotificationTokenType.Settings.name();
+		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
+	}
+	@Test(expected = BadRequestException.class)
+	public void testHandleSignedTokenNotificationSettingsWrongToken() throws RestServiceException, SynapseException{
+		String tokenTypeName = NotificationTokenType.Settings.name();
+		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
 	}
 }

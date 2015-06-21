@@ -12,12 +12,12 @@ import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
@@ -230,7 +230,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	private final static native double _getFileSize(String fileFieldId, int index) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileSize = ('files' in fileToUploadElement) ? fileToUploadElement.files[index].size : 0;
+		var fileSize = 0;
+		if (fileToUploadElement && ('files' in fileToUploadElement))
+			fileSize = fileToUploadElement.files[index].size;
 		return fileSize;
 	}-*/;
 	
@@ -245,11 +247,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native String _getFilesSelected(String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 	    var out = "";
-	
-	    for (i = 0; i < fileToUploadElement.files.length; i++) {
-	        var file = fileToUploadElement.files[i];
-	        out += file.name + ';';
-	    }
+		if (fileToUploadElement) {
+		    for (i = 0; i < fileToUploadElement.files.length; i++) {
+		        var file = fileToUploadElement.files[i];
+		        out += file.name + ';';
+		    }
+		}
 	    return out;
 	}-*/;
 	
@@ -418,7 +421,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	/**
 	 * provides a callback mechanism for when CSS resources that have been added to the dom are fully loaded
 	 * @param cssUrl
-	 * @param callback
+	 * @param finishedUploadingCallback
 	 */
 	private static native void _addCssLoadHandler(String cssUrl, Command command) /*-{
 		// Use Image load error callback to detect loading as no reliable/cross-browser callback exists for Link element
@@ -439,7 +442,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private static native void _replaceHistoryState(String token)/*-{
-		$wnd.history.replaceState( {} , '', '#'+token );
+		var stateObj = { source: 'replaceState' };
+		$wnd.history.replaceState( stateObj , '', '#'+token );
 	}-*/;
 
 	@Override
@@ -448,7 +452,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _pushHistoryState(String token)/*-{
-		$wnd.history.pushState( {} , '', '#'+token );
+		var stateObj = { source: 'pushState' };
+		$wnd.history.pushState( stateObj , '', '#'+token );
 	}-*/;
 
 	@Override
@@ -458,8 +463,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private static native void _initOnPopStateHandler()/*-{
 		// reload the page on pop state
+		//we set the source property of the state if we used pushState or replaceState
 		$wnd.addEventListener("popstate", function(event) {
-			$wnd.location.reload(false);
+			var stateObj = event.state;
+			if (typeof stateObj !== "undefined" && stateObj !== null && typeof stateObj.source !== "undefined"){
+				$wnd.location.reload(false);
+			}
 		});
 	}-*/;
 }

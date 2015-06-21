@@ -9,12 +9,11 @@
 		<!-- Tabs -->
 		<b:NavTabs>
 			<b:TabListItem ui:field="uploadTabListItem" active="true" dataTarget="#tab1" text="Upload"/>
-			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab2" text="From Attachments"/>
+			<b:TabListItem ui:field="existingAttachmentListItem" dataTarget="#tab2" text="Previously Uploaded"/>
 		</b:NavTabs>
 		<b:TabContent>
 			<b:TabPane active="true" b:id="tab1" addStyleNames="panel margin-top-15">
 				<g:SimplePanel ui:field="fileInputWidgetContainer" />
-				<b:Button ui:field="uploadButton" text="Upload" type="INFO" />
 				<g:FlowPanel ui:field="uploadSuccessUI">
 					<g:Image resource='{iconsImageBundle.checkGreen16}' addStyleNames="margin-right-5" />
 					<bh:Text>Uploaded successfully</bh:Text>

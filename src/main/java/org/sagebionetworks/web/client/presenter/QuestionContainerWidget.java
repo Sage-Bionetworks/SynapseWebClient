@@ -6,6 +6,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.Question;
 import org.sagebionetworks.web.client.view.QuestionContainerWidgetView;
 
@@ -33,7 +34,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 	}
 	
 	@Override
-	public void configure(Long questionNumber, Question question) {
+	public void configure(Long questionNumber, Question question, MultichoiceResponse response ) {
 		answers = new HashSet<Long>();
 		view.configure(questionNumber, question.getPrompt());
 		final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion) question;
@@ -47,7 +48,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 							answers.clear();
 							answers.add(answer.getAnswerIndex());
 						}
-					});
+					}, wasSelected(response, answer.getAnswerIndex()));
 				}
 			} else {
 				//checkbox
@@ -63,7 +64,7 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 								answers.remove(answer.getAnswerIndex());
 							}
 						}
-					});
+					}, wasSelected(response, answer.getAnswerIndex()));
 				}
 			}
 			final WikiPageKey moreInfoKey = question.getReference();
@@ -72,6 +73,10 @@ public class QuestionContainerWidget implements QuestionContainerWidgetView.Pres
 			}
 		}
 
+	}
+	
+	private boolean wasSelected(MultichoiceResponse response, Long answerIndex) {
+		return response != null && response.getAnswerIndex().contains(answerIndex);
 	}
 	
 	@Override 

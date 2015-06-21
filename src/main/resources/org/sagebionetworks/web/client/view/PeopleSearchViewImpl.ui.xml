@@ -18,6 +18,9 @@
 				</b:InputGroup>
 			</b:Row>
 			<b:Row>
+			     <g:SimplePanel ui:field="synAlertPanel" addStyleNames="margin-top-10" visible="false"/>
+	  		</b:Row>	
+			<b:Row>
 	       		<g:SimplePanel ui:field="peopleListPanel" addStyleNames="margin-top-15"/>
 	       	</b:Row>
 	       	<b:Row>

@@ -1,21 +1,51 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
 	    <div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator separator-header-page"></div>
 	    <div class="margin-top-left-10 margin-right-15">
-	        <div class="row">
-	            <g:SimplePanel ui:field="mediaObjectContainer" styleName="col-md-9"/>
-	    		<g:FlowPanel ui:field="commandsContainer" styleName="col-md-3"/>
-	        </div>
+	        <b:Row>
+	            <b:Column size="MD_9">
+	                <g:SimplePanel ui:field="mediaObjectContainer"/>
+	            </b:Column>    
+	    		<b:Column ui:field="commandsContainer" size="MD_3">
+	    		    <b:ButtonGroup pull="RIGHT">
+	    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
+		    		    <b:DropDownMenu>
+		    		        <b:AnchorListItem icon="PLUS" ui:field="inviteMemberItem" visible="false">Invite User</b:AnchorListItem>
+					        <b:AnchorListItem icon="EDIT" ui:field="editTeamItem" visible="false">Edit Team</b:AnchorListItem>
+					        <b:AnchorListItem icon="REMOVE" ui:field="deleteTeamItem" visible="false">Delete Team</b:AnchorListItem>
+					        <b:AnchorListItem ui:field="leaveTeamItem" visible="false">Leave Team</b:AnchorListItem>
+			    		</b:DropDownMenu>
+	    		    </b:ButtonGroup>
+		    		<g:SimplePanel ui:field="teamEditPanel"/>
+	    			<g:SimplePanel ui:field="teamDeletePanel"/>
+	    			<g:SimplePanel ui:field="teamLeavePanel"/>
+	    			<g:SimplePanel ui:field="inviteMemberPanel"/>
+	    		</b:Column>
+		    		
+	        </b:Row>
+	        <g:SimplePanel ui:field="synAlertPanel"/>
 	    	<div class="row">
-		    	<g:FlowPanel ui:field="mainContainer" styleName="col-md-12"/>
+		    	<g:HTMLPanel ui:field="mainContainer" styleName="col-md-12">
+		    	    <bh:Span addStyleNames="boldText margin-right-5">Total members: </bh:Span>
+		    	    <bh:Span ui:field="totalMemberCountField"/>
+		    	    <br/>
+		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
+		    		<g:SimplePanel ui:field="joinTeamPanel"/>
+		    		<g:SimplePanel ui:field="openMembershipRequestsPanel"/>
+		    		<g:SimplePanel ui:field="openUserInvitationsPanel"/>
+		    		<g:SimplePanel ui:field="memberListPanel"/>
+		    	</g:HTMLPanel>
 		   	</div>
-	    	
+		   	<div>
+		   	</div>
 		    <div class="clear"></div>
         </div>
 		<g:SimplePanel ui:field="footer" />

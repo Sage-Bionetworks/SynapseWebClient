@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -52,6 +53,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
+	private SynapseAlert synAlert;
 	private String entityId;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
@@ -64,8 +66,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
-			SynapseJSNIUtils synapseJsniUtils) {
+			SynapseJSNIUtils synapseJsniUtils,
+			SynapseAlert synAlert) {
 		this.view = view;
+		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
@@ -84,6 +88,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public void setPlace(Synapse place) {
 		this.place = place;
 		this.view.setPresenter(this);		
+		this.view.setSynAlertWidget(synAlert.asWidget());
 		
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
@@ -119,6 +124,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void refresh() {
+		synAlert.clear();
 		view.setBackgroundImageVisible(false);
 		// Hide the view panel contents until async callback completes
 		view.showLoading();
@@ -163,8 +169,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					view.show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
 					view.show403();
-				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + ": " + caught.getMessage());
+				} else {
+					view.clear();
+					synAlert.handleException(caught);
 				}
 			}			
 		};

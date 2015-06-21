@@ -30,6 +30,12 @@ public class WebConstants {
 	
 	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
 	
+	public static final String INVALID_IMAGE_FILETYPE_MESSAGE = "The file selected is not recognized as an image file type. Please convert to PNG or JPEG and try again.";
+	
+	public static final String INVALID_TABLE_FILETYPE_MESSAGE = "The file selected is not recognized as an table file type. Please convert to TXT or CSV and try again.";
+	
+	public static final String DEFAULT_FILE_HANDLE_WIDGET_TEXT = "Browse...";
+	
 	/**
 	 * Regex defining a valid annotation name. Characters are selected to ensure
 	 * compatibility across services and clients.
@@ -118,7 +124,7 @@ public class WebConstants {
 
 	public static final String USER_PROFILE_USER_ID = "userId";
 	
-	public static final String USER_PROFILE_IMIAGE_ID = "imageId";
+	public static final String USER_PROFILE_IMAGE_ID = "imageId";
 	
 	public static final String USER_PROFILE_PREVIEW = "preview";
 	
@@ -170,6 +176,7 @@ public class WebConstants {
 	
 	
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
+	
 
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
@@ -230,7 +237,7 @@ public class WebConstants {
 	public static final String TABLE_ROW_ID = "rowId";
 	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
 
-
+	public static final String RAW_FILE_HANDLE_PARAM = "rawFileHandleId";
 	public static final String NOCACHE_PARAM = "&nocache=";
 	
 	//servlet response header keys/values to instruct caching behavior

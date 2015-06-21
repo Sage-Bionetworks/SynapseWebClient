@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -31,7 +32,9 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 			AuthenticationController authenticationController);
 
 	void setLoginInstructions(String instructions);
-	
+
+	void setFileLocation(String location);
+
 	/**
 	 * Presenter interface
 	 */
@@ -43,6 +46,12 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		
 		
 		void queryForSftpLoginInstructions(String directDownloadUrl);
-	}
 
+		/**
+		 * A file that is stored in S3 could be in Synapse Storage or in a private S3 bucket.
+		 * This method is used to set the correct location of a file in S3. 
+		 * Therefore, this method should only be called for an entity that is in S3.
+		 */
+		void setS3Description();
+	}
 }

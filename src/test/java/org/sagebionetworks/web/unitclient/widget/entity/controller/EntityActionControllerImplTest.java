@@ -7,10 +7,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
@@ -21,6 +21,7 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -142,7 +143,9 @@ public class EntityActionControllerImplTest {
 		permissions.setCanDelete(true);
 		permissions.setCanPublicRead(true);
 		permissions.setCanUpload(true);
+		permissions.setCanAddChild(true);
 		permissions.setCanEdit(true);
+		permissions.setCanCertifiedUserEdit(true);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
@@ -205,7 +208,6 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
-		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI);
 		verify(mockActionMenu).addActionListener(Action.EDIT_WIKI_PAGE, controller);
 	}
 	
@@ -216,7 +218,17 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
-		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI);
+		verify(mockActionMenu).addActionListener(Action.EDIT_WIKI_PAGE, controller);
+	}
+	
+	@Test
+	public void testConfigureWikiCannotEdit(){
+		entityBundle.setEntity(new Folder());
+		entityBundle.setRootWikiId("7890");
+		permissions.setCanEdit(false);
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
 		verify(mockActionMenu).addActionListener(Action.EDIT_WIKI_PAGE, controller);
 	}
 	
@@ -227,6 +239,37 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
+	}
+	
+
+	@Test
+	public void testConfigureViewWikiSource(){
+		entityBundle.setEntity(new Folder());
+		entityBundle.setRootWikiId("7890");
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
+		verify(mockActionMenu).addActionListener(Action.VIEW_WIKI_SOURCE, controller);
+	}
+	
+	@Test
+	public void testConfigureViewWikiSourceCannotEdit(){
+		entityBundle.setEntity(new Folder());
+		entityBundle.setRootWikiId("7890");
+		permissions.setCanEdit(false);
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
+		verify(mockActionMenu).addActionListener(Action.VIEW_WIKI_SOURCE, controller);
+	}
+	
+	@Test
+	public void testConfigureViewWikiSourceWikiTable(){
+		entityBundle.setEntity(new TableEntity());
+		entityBundle.setRootWikiId("22");
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
+		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
 	}
 	
 	@Test
@@ -258,7 +301,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureUploadNewFileNoUpload(){
-		entityBundle.getPermissions().setCanUpload(false);
+		entityBundle.getPermissions().setCanCertifiedUserEdit(false);
 		entityBundle.setEntity(new FileEntity());
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
@@ -450,6 +493,27 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, null,mockEntityUpdatedHandler);
 		controller.onAction(Action.EDIT_WIKI_PAGE);
 		verify(mockMarkdownEditorWidget).configure(any(WikiPageKey.class), any(CallbackP.class));
+	}
+	
+	@Test
+	public void testOnViewWikiSource(){
+		WikiPage page = new WikiPage();
+		String markdown = "hello markdown";
+		page.setMarkdown(markdown);
+		AsyncMockStubber.callSuccessWith(page).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId("111");
+		controller.configure(mockActionMenu, entityBundle, null,mockEntityUpdatedHandler);
+		controller.onAction(Action.VIEW_WIKI_SOURCE);
+		verify(mockView).showInfoDialog(anyString(), eq(markdown));
+	}
+	
+	@Test
+	public void testOnViewWikiSourceError(){
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId("111");
+		controller.configure(mockActionMenu, entityBundle, null,mockEntityUpdatedHandler);
+		controller.onAction(Action.VIEW_WIKI_SOURCE);
+		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
@@ -647,5 +711,95 @@ public class EntityActionControllerImplTest {
 	public void testToolsButtonVisibilityForLogin() {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setToolsButtonVisible(true);
+	}
+	
+	@Test
+	public void testConfigureNoWikiSubpageProject(){
+		entityBundle.setEntity(new Project());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, true);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
+		verify(mockActionMenu).addActionListener(Action.ADD_WIKI_SUBPAGE, controller);
+	}
+	
+	@Test
+	public void testConfigureWikiSubpageFolder(){
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
+	}
+	
+	@Test
+	public void testConfigureWikiSubpageTable(){
+		entityBundle.setEntity(new TableEntity());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
+	}
+	
+	@Test
+	public void testOnAddWikiSubpageNoUpdate(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_SUBPAGE);
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnRootAddWikiSubpageCanUpdate(){
+		//Edge case.  User attempts to add a subpage on a project that does not yet have a wiki.  Verify a root page is created (and page refreshed)...
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId(null);
+		controller.configure(mockActionMenu, entityBundle, null,mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_SUBPAGE);
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testOnAddWikiSubpageCanUpdate(){
+		//Set up so that we are on the root wiki page, and we run the add subpage command.
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(new WikiPage()).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId("123");
+		controller.configure(mockActionMenu, entityBundle, "123",mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_WIKI_SUBPAGE);
+		//verify that it has not yet created the wiki page
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		//it prompts the user for a wiki page name
+		ArgumentCaptor<PromptCallback> callbackCaptor = ArgumentCaptor.forClass(PromptCallback.class);
+		verify(mockView).showPromptDialog(anyString(), callbackCaptor.capture());
+		PromptCallback capturedCallback = callbackCaptor.getValue();
+		//if called back with an undefined value, a wiki page is still not created
+		capturedCallback.callback("");
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		
+		capturedCallback.callback(null);
+		verify(mockSynapseClient, never()).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		
+		capturedCallback.callback("a valid name");
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testCreateWikiPageFailure(){
+		//Set up so that we are on the root wiki page, and we run the add subpage command.
+		String error = "goodnight";
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		entityBundle.setRootWikiId("123");
+		controller.configure(mockActionMenu, entityBundle, "123",mockEntityUpdatedHandler);
+		controller.createWikiPage("foo");
+		
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
 	}
 }

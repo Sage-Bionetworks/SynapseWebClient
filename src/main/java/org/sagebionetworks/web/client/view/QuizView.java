@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,7 +16,6 @@ public interface QuizView extends IsWidget, SynapseView {
 	void hideLoading();
 	void setQuizHeader(String quizHeader);
 	void addQuestionContainerWidget(Widget widget);
-	void addSubmitHandler(ClickHandler handler);
 	void setSubmitEnabled(boolean isEnabled);
 	void reset();
 	void setSubmitVisible(boolean isVisible);
@@ -25,7 +23,7 @@ public interface QuizView extends IsWidget, SynapseView {
 	void hideAll();
 	void showSuccess(UserProfile profile, PassingRecord passingRecord);
 	void showFailure(PassingRecord passingRecord);
-	
+
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
 		void goToLastPlace();	
@@ -33,5 +31,9 @@ public interface QuizView extends IsWidget, SynapseView {
 		void submitAnswers();
 		void showSuccess(UserProfile profile, PassingRecord passingRecord);
 		void showFailure(PassingRecord passingRecord);
+		void submitClicked();
+		void showQuizFromPassingRecord(PassingRecord passingRecord);
     }
+
+	void setSynAlertWidget(Widget synAlert);
 }

@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -28,7 +29,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord);
+	void setProfile(UserProfile profile, boolean isOwner);
 	void refreshHeader();
 	void setProjectsError(String string);
 	void addProjectWidget(Widget widget);
@@ -37,21 +38,17 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
-	void showTeamsLoading();
-	void setTeams(List<Team> teams, boolean isOwner);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
 	void clearProjects();
 	void setSortText(String text);
 	void setIsMoreProjectsVisible(boolean isVisible);
 	void clearTeamNotificationCount();
-	void refreshTeamInvites();
 	void setTabSelected(ProfileArea areaTab);
 	void showConfirmDialog(String title, String message, Callback yesCallback);
 	void showProjectsLoading(boolean isLoading);
 	void showProjectFiltersUI();
 	void hideLoading();
-	void setTeamsFilterTeams(List<Team> teams);
 	void setTeamsFilterVisible(boolean isVisible);
 	void setTeamsFilterSelected();
 	void setMyProjectsFilterSelected();
@@ -91,5 +88,25 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void onImportLinkedIn();
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
+		void refreshTeamInvites();
 	}
+
+	void addMyTeamProjectsFilter();
+
+	void addTeamsFilterTeam(Team team);
+
+	void addMyTeamsWidget(TeamListWidget myTeamsWidget);
+
+	void addOpenInvitesWidget(OpenTeamInvitationsWidget openInvitesWidget);
+
+	void setProfileSynAlertWidget(Widget profileSynAlert);
+
+	void setProjectSynAlertWidget(Widget profileSynAlert);
+
+	void setTeamSynAlertWidget(Widget profileSynAlert);
+
+	void addCertifiedBadge();
+
+	void showTabs(boolean isOwner);
+
 }

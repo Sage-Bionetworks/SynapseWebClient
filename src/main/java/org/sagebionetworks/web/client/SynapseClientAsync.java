@@ -21,6 +21,8 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -56,7 +58,9 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -102,11 +106,12 @@ public interface SynapseClientAsync {
 	
 	/**
 	 * 
-	 * @param message 
-	 * @param label If a stack trace, should not contain the stack trace message (as it would be too specific)
+	 * @param message
+	 * @param exceptionType TODO
+	 * @param t
 	 * @param callback
 	 */
-	void logErrorToRepositoryServices(String message, String label, AsyncCallback<Void> callback);
+	void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, AsyncCallback<Void> callback);
 	
 	void logInfo(String message, AsyncCallback<Void> callback);
 
@@ -181,9 +186,9 @@ public interface SynapseClientAsync {
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
 	
-	public void updateExternalFile(String entityId, String externalUrl, String name, AsyncCallback<Entity> callback) throws RestServiceException;
+	public void updateExternalFile(String entityId, String externalUrl, String name, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 	
-	public void createExternalFile(String parentEntityId, String externalUrl, String name, AsyncCallback<Entity> callback) throws RestServiceException;
+	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
 	
@@ -251,12 +256,12 @@ public interface SynapseClientAsync {
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeams(String userId, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
-	void getTeamsForUser(String userId, AsyncCallback<List<Team>> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
 	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
-
+	void getTeamsForUser(String userId, boolean includeRequestCount,
+			AsyncCallback<List<TeamRequestBundle>> asyncCallback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
@@ -265,10 +270,10 @@ public interface SynapseClientAsync {
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
-	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
+	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
-	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
+	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	/////////////////
 	
 	/**
@@ -301,13 +306,17 @@ public interface SynapseClientAsync {
 
 	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
 
+	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
+	
+	void hexDecodeAndSerialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
+	
 	void getAPIKey(AsyncCallback<String> callback);
 
 	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<String>> asyncCallback);
 
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	
-	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
+	void sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL, AsyncCallback<String> callback);
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
@@ -413,4 +422,6 @@ public interface SynapseClientAsync {
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
 
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
+
+	void getEntityInfo(String entityId, AsyncCallback<EntityBundlePlus> callback);
 }

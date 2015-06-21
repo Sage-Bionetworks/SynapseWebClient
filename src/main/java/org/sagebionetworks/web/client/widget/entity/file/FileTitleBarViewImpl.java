@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
@@ -66,6 +67,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	SpanElement fileName;
 	@UiField
 	SpanElement fileSize;
+	@UiField
+	SpanElement fileLocation;
 	@UiField
 	SimplePanel favoritePanel;
 	
@@ -136,10 +139,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5Link.clear();
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
-		
+
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 		synapseIconForEntity.applyTo(entityIcon);
-		//fileHandle is null if user can't access the filehandle associated with this fileentity
+		//fileHandle is null if user can't access the filehandle associated with this file entity
 		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 		boolean isFilenamePanelVisible = fileHandle != null;
 		fileNameContainer.setVisible(isFilenamePanelVisible);
@@ -147,14 +150,16 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			//don't ask for the size if it's external, just display that this is external data
 			if (fileHandle instanceof ExternalFileHandle) {
 				fileName.setInnerText(((ExternalFileHandle) fileHandle).getExternalURL());
-				fileSize.setInnerText("(External Storage)");
+				fileSize.setInnerText("");
+				fileLocation.setInnerText("| External Storage");
 			}
 			else if (fileHandle instanceof S3FileHandleInterface){
 				fileName.setInnerText(fileHandle.getFileName());
-				
-				S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-				
-				fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
+
+				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
+				presenter.setS3Description();
+				fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true));
+
 				final String md5 = s3FileHandle.getContentMd5();
 				if (md5 != null) {
 					md5Link.configure(md5);
@@ -221,5 +226,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 	@Override
 	public void clear() {
+	}
+
+	@Override
+	public void setFileLocation(String location) {
+		fileLocation.setInnerText(location);
 	}
 }

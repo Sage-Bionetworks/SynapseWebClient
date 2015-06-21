@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.shared.event.AlertClosedEvent;
 import org.gwtbootstrap3.client.shared.event.AlertClosedHandler;
 import org.gwtbootstrap3.client.ui.Alert;
@@ -16,7 +14,6 @@ import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -28,18 +25,12 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-
-
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -208,8 +199,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement challengesLoadingUI;
 	@UiField 
 	Row profilePictureLoadingUI;
-	@UiField 
-	Row profileInfoLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -219,6 +208,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button hideProfileButton;
 	@UiField
 	Alert getCertifiedAlert;
+	
+	@UiField
+	SimplePanel profileSynAlertPanel;
+	@UiField
+	FlowPanel projectSynAlertPanel;
+	@UiField
+	SimplePanel teamSynAlertPanel;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -230,7 +226,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private OpenTeamInvitationsWidget openInvitesWidget;
-	private TeamListWidget myTeamsWidget;
 	private SettingsPresenter settingsPresenter;
 	
 	@Inject
@@ -240,7 +235,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SageImageBundle sageImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
-			TeamListWidget myTeamsWidget,
 			SettingsPresenter settingsPresenter) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
@@ -248,7 +242,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.openInvitesWidget = openInvitesWidget;
-		this.myTeamsWidget = myTeamsWidget;
 		this.settingsPresenter = settingsPresenter;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -379,6 +372,34 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		});
 	}
 	
+	@Override
+	public void addMyTeamsWidget(TeamListWidget myTeamsWidget) {
+		teamsTabContent.clear();
+		teamsTabContent.add(myTeamsWidget.asWidget());
+	}
+	
+	@Override
+	public void addOpenInvitesWidget(OpenTeamInvitationsWidget openInvitesWidget) {
+		openInvitesContainer.clear();
+		openInvitesContainer.add(openInvitesWidget.asWidget());
+	}
+	
+	@Override
+	public void setProfileSynAlertWidget(Widget profileSynAlert) {
+		profileSynAlertPanel.setWidget(profileSynAlert);
+	}
+	
+	@Override
+	public void setProjectSynAlertWidget(Widget projectSynAlert) {
+		projectSynAlertPanel.clear();
+		projectSynAlertPanel.add(projectSynAlert);
+	}
+	
+	@Override
+	public void setTeamSynAlertWidget(Widget teamSynAlert) {
+		teamSynAlertPanel.setWidget(teamSynAlert);
+	}
+	
 	public void clearSortOptions() {
 		sortProjectsDropDownMenu.clear();
 	}
@@ -446,31 +467,33 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord) {
-		clear();
-		DisplayUtils.hide(settingsListItem);
-		if (passingRecord != null) {
-			viewProfilePanel.add(certifiedUserBadgePanel);
-		}
-			
+	public void setProfile(UserProfile profile, boolean isOwner) {
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
-		
+		if (!isOwner) {
+			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
+		}
+	}
+	
+	@Override
+	public void showTabs(boolean isOwner) {
+		DisplayUtils.hide(settingsListItem);
+		openInvitesContainer.setVisible(isOwner);
 		if (isOwner) {
 			resetHighlightBoxes();
 			DisplayUtils.show(settingsListItem);
-			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
-		} else {
-			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
-		}
-		
+		}		
 		//Teams
-		teamsTabContent.add(myTeamsWidget.asWidget());
 		DisplayUtils.show(navtabContainer);
+	}
+	
+	@Override
+	public void addCertifiedBadge() {
+		viewProfilePanel.add(certifiedUserBadgePanel);
 	}
 	
 	private void resetHighlightBoxes() {
@@ -492,34 +515,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeamsFilterTeams(List<Team> teams) {
-		teamFiltersDropDownMenu.clear();
-		//also create a link for each team in the project filters
-		addMyTeamProjectsFilter();
-		teamFiltersDropDownMenu.add(new Divider());
-		for (final Team team : teams) {
-			AnchorListItem teamFilter = new AnchorListItem(team.getName());
-			teamFilter.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.applyFilterClicked(ProjectFilterEnum.TEAM, team);
-				}
-			});
-			teamFiltersDropDownMenu.add(teamFilter);
-		}
+	public void addTeamsFilterTeam(final Team team) {
+		AnchorListItem teamFilter = new AnchorListItem(team.getName());
+		teamFilter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.applyFilterClicked(ProjectFilterEnum.TEAM, team);
+			}
+		});
+		teamFiltersDropDownMenu.add(teamFilter);
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams, boolean isOwner) {
-		myTeamsWidget.configure(teams, false, isOwner, new TeamListWidget.RequestCountCallback() {
-			@Override
-			public void invoke(String teamId, Long requestCount) {
-				presenter.addMembershipRequests(requestCount.intValue());
-			}
-		});
-	}
-	
-	private void addMyTeamProjectsFilter() {
+	public void addMyTeamProjectsFilter() {
+		teamFiltersDropDownMenu.clear();
 		AnchorListItem teamFilter = new AnchorListItem("All of my teams");
 		teamFilter.addClickHandler(new ClickHandler() {
 			@Override
@@ -528,28 +537,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		teamFiltersDropDownMenu.add(teamFilter);
+		teamFiltersDropDownMenu.add(new Divider());
+		
 	}
 	
 	@Override
 	public void setTeamsFilterVisible(boolean isVisible) {
 		teamFilters.setVisible(isVisible);	
-	}
-	
-	@Override
-	public void refreshTeamInvites(){
-		CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
-			@Override
-			public void invoke(List<OpenUserInvitationBundle> invites) {
-				presenter.updateTeamInvites(invites);
-			}
-		};
-		openInvitesWidget.configure(new Callback() {
-			@Override
-			public void invoke() {
-				//refresh the teams and invites
-				presenter.refreshTeams();
-			}
-		}, openTeamInvitationsCallback);
 	}
 	
 	@Override
@@ -698,13 +692,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showLoading() {
 		profilePictureLoadingUI.setVisible(true);
-		profileInfoLoadingUI.setVisible(true);
 	}
 
 	@Override
 	public void hideLoading() {
 		profilePictureLoadingUI.setVisible(false);
-		profileInfoLoadingUI.setVisible(false);
 	}
 	
 	@Override
@@ -736,9 +728,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(challengesListItem);
 		createTeamTextBox.setValue("");
 		createProjectTextBox.setValue("");
-		
-		teamsTabContent.clear();
-		openInvitesContainer.clear();
 		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
@@ -900,11 +889,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
 		this.editUserProfilePanel.clear();
 		this.editUserProfilePanel.add(userProfileModalWidget);
-	}
-	
-	@Override
-	public void showTeamsLoading() {
-		myTeamsWidget.showLoading();
 	}
 	
 	@Override

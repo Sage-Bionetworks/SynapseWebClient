@@ -19,7 +19,11 @@
 			 	<g:SimplePanel ui:field="favoritePanel"/>
 			</h2>
 			<g:HTMLPanel ui:field="fileNameContainer">
-				<span class="boldText">File:</span> <span ui:field="fileName"/><span style="margin-left: 5px;" class="file-size" ui:field="fileSize" /><g:SimplePanel ui:field="md5LinkContainer" styleName="inline-block margin-left-5"/>
+				<span class="boldText">File:</span>
+				<span ui:field="fileName"/>
+				<span style="margin-left: 5px;" class="file-size" ui:field="fileSize" />
+				<span style="margin-left: 5px;" class="file-size" ui:field="fileLocation" />
+				<g:SimplePanel ui:field="md5LinkContainer" styleName="inline-block margin-left-5"/>
 			</g:HTMLPanel>
 		</g:HTMLPanel>
 	</g:HTMLPanel>

@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface WikiPageWidgetView extends IsWidget, SynapseView {
 
@@ -21,7 +22,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage);
-		public void createPage(String name);
 		public void previewClicked(final Long versionToPreview, Long currentVersion);
 		public void restoreClicked(final Long wikiVersion);
 		public WikiPage getWikiPage();
@@ -30,7 +30,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	}
 	
 	public void configure(String markdown, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);
-	public void showWarningMessageInPage(String message);
+	public void showNoteInPage(String message);
 	public void show404();
 	public void show403();
 	
@@ -39,4 +39,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void showModifiedBy(boolean isVisible);
 	public void resetWikiMarkdown(String markdown, final WikiPageKey wikiKey,
 			boolean isRootWiki, boolean isCurrentVersion, final Long versionInView);
+	public void setSynapseAlertWidget(Widget asWidget);
+	public void showSynapseAlertWidget();
 }

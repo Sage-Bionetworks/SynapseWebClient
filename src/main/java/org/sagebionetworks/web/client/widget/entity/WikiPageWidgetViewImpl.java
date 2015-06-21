@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -48,15 +49,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	private MarkdownWidget markdownWidget;
 	private SageImageBundle sageImageBundle;
-	private FlowPanel commandBar;
-	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiPageKey wikiKey;
 	WikiPageWidgetView.Presenter presenter;
-	private boolean isDescription = false;
 	private WikiHistoryWidget historyWidget;
 	PortalGinInjector ginInjector;
 	private boolean isHistoryOpen;
@@ -67,6 +65,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private boolean isEmbeddedInOwnerPage;
 	private HorizontalPanel modifiedPanel, createdPanel;
 	private SimplePanel historyPanel;
+	private SimplePanel synapseAlertPanel;
 
 	public interface OwnerObjectNameCallback{
 		public void ownerObjectNameInitialized();
@@ -89,6 +88,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		modifiedPanel = new HorizontalPanel();
 		createdPanel = new HorizontalPanel();
 		historyPanel = new SimplePanel();
+		synapseAlertPanel = new SimplePanel();
+		this.wikiPagePanel = new FlowPanel();
+		addStyleName("min-height-200");
 	}
 
 	@Override
@@ -104,9 +106,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void showWarningMessageInPage(String message) {
+	public void showNoteInPage(String message) {
 		clear();
-		add(new Alert(message, AlertType.WARNING));
+		add(new Italic(message));
 	}
 
 	@Override
@@ -116,7 +118,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.ownerObjectName = ownerObjectName;
 		this.canEdit = canEdit;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
-		this.wikiPagePanel = new FlowPanel();
 		resetWikiMarkdown(markdown, wikiKey, isRootWiki, isCurrentVersion, versionInView);
 		showDefaultViewWithWiki();
 	}
@@ -182,9 +183,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.isCurrentVersion = isCurrentVersion;
 		this.versionInView = versionInView;
 		if(!isCurrentVersion) {
-			markdownWidget.setMarkdown(markdown, wikiKey, false, versionInView);
+			markdownWidget.configure(markdown, wikiKey, false, versionInView);
 		} else {
-			markdownWidget.setMarkdown(markdown, wikiKey, false, null);
+			markdownWidget.configure(markdown, wikiKey, false, null);
 		}
 		resetWikiPagePanel();
 	}
@@ -200,13 +201,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
 		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
-		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
+		Heading h2 = new Heading(HeadingSize.H2);
+		h2.setText(titleString);
+		h2.addStyleName("margin-bottom-0-imp");
+		topBarWrapper.add(h2);
 		wikiPagePanel.add(topBarWrapper);
 
 		FlowPanel mainPanel = new FlowPanel();
-		if(isCurrentVersion) {
-			mainPanel.add(getCommands(canEdit));
-		}
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		wikiPagePanel.add(mainPanel);
 
@@ -238,7 +239,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	 */
 	private void showDefaultViewWithWiki() {
 		clear();
-
 		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
 		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
@@ -358,26 +358,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return breadcrumbsWrapper;
 	}
 
-	private SimplePanel getCommands(Boolean canEdit) {
-		if (commandBarWrapper == null) {
-			commandBarWrapper = new SimplePanel();
-			commandBarWrapper.addStyleName("margin-bottom-20 margin-top-10");
-			commandBar = new FlowPanel();
-			commandBarWrapper.add(commandBar);
-		} else {
-			commandBar.clear();
-		}
-
-		if(!isDescription) {
-			Button addPageButton = createAddPageButton();
-			commandBar.add(addPageButton);
-			addPageButton.addStyleName("margin-left-5");
-		}
-
-		commandBarWrapper.setVisible(canEdit);
-		return commandBarWrapper;
-	}
-
 	private Button createHistoryButton() {
 		final Button btn = DisplayUtils.createIconButton(DisplayConstants.SHOW_WIKI_HISTORY, DisplayUtils.ButtonType.DEFAULT, null);			
 		btn.setStyleName("wikiHistoryButton", true);
@@ -441,20 +421,14 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return btn;
 	}
 
-	private Button createAddPageButton() {
-		Button btn = DisplayUtils.createIconButton(DisplayConstants.ADD_PAGE, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
-		btn.addStyleName("display-inline");
-		btn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Bootbox.prompt(DisplayConstants.ENTER_PAGE_TITLE, new PromptCallback() {
-					@Override
-					public void callback(String name) {
-						presenter.createPage(name);
-					}
-				});
-			}
-		});
-		return btn;
+	@Override
+	public void setSynapseAlertWidget(Widget synapseAlert) {
+		synapseAlertPanel.setWidget(synapseAlert);
+	}
+	
+	@Override
+	public void showSynapseAlertWidget() {
+		clear();
+		add(synapseAlertPanel);
 	}
 }

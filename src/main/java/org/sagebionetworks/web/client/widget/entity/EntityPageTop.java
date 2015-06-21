@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.Query;
@@ -177,16 +178,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.areaToken = areaToken;
 		if(areaChangedHandler != null) areaChangedHandler.areaChanged(area, areaToken);
 	}
-	
+
 	public void replaceArea(EntityArea area, String areaToken){
 		this.area = area;
 		this.areaToken = areaToken;
 		if(areaChangedHandler != null) areaChangedHandler.replaceArea(area, areaToken);
-	}
-
-	@Override
-	public void refreshArea(Synapse.EntityArea area, String areaToken) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, area, areaToken));
 	}
 
 	@Override
@@ -326,13 +322,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return null;
 	}
 
-	
+	@Override
+	public void handleWikiReload(String wikiPageId) {
+		if (bundle.getEntity() instanceof Project) {
+			setArea(EntityArea.WIKI, wikiPageId);
+			view.configureProjectActionMenu(bundle, wikiPageId);
+		} else {
+			DisplayUtils.showErrorMessage("Failed to handle Wiki reload.");
+		}
+	}
+
 	/*
 	 * Private Methods
 	 */
 	private void sendDetailsToView(Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
+		if (area == null && bundle.getEntity() instanceof Project) {
+			globalApplicationState.replaceCurrentPlace(new Synapse(bundle.getEntity().getId(), versionNumber, EntityArea.WIKI, null));	
+		}
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
 	}
 	
@@ -347,5 +355,4 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
-
 }

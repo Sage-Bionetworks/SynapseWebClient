@@ -46,8 +46,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	Button findEntitiesButton;
 	
 	@UiField
-	Button uploadButton;
-	@UiField
 	SimplePanel fileInputWidgetContainer;
 	@UiField
 	SimplePanel uploadParamsPanelContainer;
@@ -97,12 +95,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	}
 	
 	private void initClickHandlers() {
-		uploadButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.uploadFileClicked();				
-			}
-		});
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -124,7 +116,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	@Override
 	public void initView() {
-		uploadButton.setEnabled(true);
 		uploadSuccessUI.setVisible(false);
 		uploadFailureUI.setVisible(false);
 		entityField.setValue("");
@@ -158,7 +149,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public void configure(WikiPageKey wikiKey, DialogCallback dialogCallback) {
 		fileInputWidgetContainer.setVisible(true);
-		uploadButton.setVisible(true);
 	}
 	
 	@Override
@@ -171,7 +161,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public void showUploadSuccessUI() {
 		fileInputWidgetContainer.setVisible(false);
-		uploadButton.setVisible(false);
 
 		uploadFailureUI.setVisible(false);
 		uploadSuccessUI.setVisible(true);
@@ -186,10 +175,6 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public void setWikiAttachmentsWidget(Widget widget) {
 		wikiAttachmentsContainer.clear();
 		wikiAttachmentsContainer.add(widget);
-	}
-	@Override
-	public void setUploadButtonEnabled(boolean enabled) {
-		uploadButton.setEnabled(enabled);
 	}
 	
 	

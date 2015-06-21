@@ -48,6 +48,8 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	TextBox searchField;
 	@UiField
 	Button searchButton;
+	@UiField
+	SimplePanel synAlertPanel;
 	
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -77,6 +79,11 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	
 	@Override
 	public void clear() {
+	}
+	
+	@Override
+	public void setMainContainerVisible(boolean isVisible) {
+		mainContainer.setVisible(isVisible);
 	}
 	
 	@Override
@@ -112,13 +119,23 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	public void configure(List<Team> teams, String searchTerm) {
 		mainContainer.clear();
 		searchField.setValue(searchTerm);
-		teamListWidget.configure(teams, true, false);
+		teamListWidget.clear();
+		teamListWidget.configure(true);
+		for (Team team: teams) {
+			teamListWidget.addTeam(team, null);
+		}
+		
 		int start = presenter.getOffset();
 		String pageTitleStartNumber = start > 0 ? " (from result " + (start+1) + ")" : ""; 
 		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? " '"+searchTerm + "' " : "";
 		synapseJsniUtils.setPageTitle("Team Search" + pageTitleSearchTerm + pageTitleStartNumber);
 		mainContainer.add(teamListWidget.asWidget());
 		createPagination(searchTerm);
+	}
+	
+	@Override
+	public void showEmptyTeams() {
+		teamListWidget.showEmpty();
 	}
 	
 	private void configureSearchBox() {
@@ -163,6 +180,11 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 		a.setHTML(anchorName);
 		a.setHref(DisplayUtils.getTeamSearchHistoryToken(searchTerm, newStart));
 		return a;
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
 	}	
 
 }

@@ -1,122 +1,106 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView {
 	
+	public interface InviteWidgetViewImplUiBinder extends UiBinder<Widget, InviteWidgetViewImpl> {}
+	
+	@UiField
+	Button sendInviteButton;
+	
+	@UiField
+	Modal inviteUIModal;
+	
+	@UiField
+	TextArea inviteTextArea;
+	
+	@UiField
+	SimplePanel suggestBoxPanel;
+	
+	@UiField
+	SimplePanel synAlertPanel;
+	
+	@UiField
+	Button cancelButton;
+	
 	private static final int FIELD_WIDTH = 500;
 	
-	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	private InviteWidgetView.Presenter presenter;
-	private FlowPanel inviteUIPanel;
-	private Button inviteButton;
 	private TextArea messageArea;
-	private UserGroupSuggestBox peopleSuggestBox;
+	
+	private Widget widget;
 	
 	@Inject
-	public InviteWidgetViewImpl(SageImageBundle sageImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils,
-			UserGroupSuggestBox peopleSuggestBox) {
-		this.sageImageBundle = sageImageBundle;
+	public InviteWidgetViewImpl(InviteWidgetViewImplUiBinder binder) {
+		this.widget = binder.createAndBindUi(this);
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.peopleSuggestBox = peopleSuggestBox;
+		sendInviteButton.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sendInvite(inviteTextArea.getValue());
+			}
+		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				inviteUIModal.hide();
+			}
+		});
 	}
 	
 	@Override
-	public void configure() {
-		initView();
-		clear();
-		add(inviteButton);
-		add(inviteUIPanel);
-		peopleSuggestBox.clear();
-		inviteUIPanel.setVisible(false);
-	}
-	
-	private void initView() {
-		if (inviteUIPanel == null) {
-			inviteUIPanel = new FlowPanel();
-			inviteUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
-			inviteButton = DisplayUtils.createIconButton("Invite Members", ButtonType.DEFAULT, "glyphicon-plus");
-			inviteButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					inviteUIPanel.setVisible(!inviteUIPanel.isVisible());
-				}
-			});
-			
-			// user/group Suggest Box
-			peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
-			peopleSuggestBox.setPlaceholderText("Enter a user name...");
-			peopleSuggestBox.setWidth(FIELD_WIDTH + "px");
-			inviteUIPanel.add(peopleSuggestBox.asWidget());
-			
-			messageArea = new TextArea();
-			messageArea.setPlaceholder("Enter invitation message... (optional)");
-			messageArea.setWidth(FIELD_WIDTH + "px");
-			messageArea.addStyleName("margin-top-5");
-			inviteUIPanel.add(messageArea);
-			
-			Button sendInviteButton = DisplayUtils.createButton("Send Invitation");
-			sendInviteButton.addStyleName("margin-top-5");
-			sendInviteButton.addClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					if(peopleSuggestBox.getSelectedSuggestion() != null) {
-						UserGroupHeader header = peopleSuggestBox.getSelectedSuggestion().getHeader();
-						String principalIdStr = header.getOwnerId();
-						String firstName = header.getFirstName();
-						String lastName = header.getLastName();
-						String userName = header.getUserName();
-						
-						presenter.sendInvitation(principalIdStr, messageArea.getValue(), DisplayUtils.getDisplayName(firstName, lastName, userName));
-						//do not clear message, but do clear the target user
-						peopleSuggestBox.clear();
-					}
-					else {
-						showErrorMessage("Please select a user to send an invite to.");
-					}
-	
-					
-				}
-			});
-			inviteUIPanel.add(sendInviteButton);
-		}
+	public void setSuggestWidget(Widget suggestWidget) {
+		suggestBoxPanel.setWidget(suggestWidget);
 	}
 	
 	@Override
-	public void showLoading() {
-		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+	public void clear() {
+		inviteTextArea.setText("");
 	}
 
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return widget;
+	}
+
+	@Override
+	public void setSynAlertWidget(Widget synAlert) {
+		synAlertPanel.setWidget(synAlert);
+	}
+	
+	@Override
+	public void show() {
+		inviteUIModal.show();
+	}
+	
+	@Override
+	public void hide() {
+		inviteUIModal.hide();
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
 	}
 }
