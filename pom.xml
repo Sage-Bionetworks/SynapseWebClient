@@ -355,7 +355,7 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>2015-06-04-987164c-15</version>
+			<version>2015-06-22-6486f39-16</version>
 		</dependency>
 		
 		
@@ -659,5 +659,4 @@
 		</snapshotRepository>
 
 	</distributionManagement>
-
 </project>
