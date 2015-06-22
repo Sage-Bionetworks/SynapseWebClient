@@ -35,6 +35,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1720,7 +1724,8 @@ public class SynapseClientImplTest {
 	public void testLogErrorToRepositoryServices() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		String errorMessage = "error has occurred";
-		synapseClient.logErrorToRepositoryServices(errorMessage, null);
+		String permutationStrongName="Chrome";
+		synapseClient.logErrorToRepositoryServices(errorMessage, null, null, null, permutationStrongName);
 		verify(mockSynapse).getMyProfile();
 		verify(mockSynapse).logError(any(LogEntry.class));
 	}
@@ -1728,15 +1733,16 @@ public class SynapseClientImplTest {
 	@Test
 	public void testLogErrorToRepositoryServicesTruncation()
 			throws SynapseException, RestServiceException,
-			JSONObjectAdapterException {
-		StringBuilder stackTrace = new StringBuilder();
-		for (int i = 0; i < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE + 100; i++) {
-			stackTrace.append('a');
-		}
-
+			JSONObjectAdapterException, ServletException {
+		String exceptionMessage = "This exception brought to you by Sage Bionetworks";
+		Exception e = new Exception(exceptionMessage, new IllegalArgumentException(new NullPointerException()));
+		ServletContext mockServletContext = Mockito.mock(ServletContext.class);
+		ServletConfig mockServletConfig = Mockito.mock(ServletConfig.class);
+		when(mockServletConfig.getServletContext()).thenReturn(mockServletContext);
+		synapseClient.init(mockServletConfig);
 		String errorMessage = "error has occurred";
-		synapseClient.logErrorToRepositoryServices(errorMessage,
-				stackTrace.toString());
+		String permutationStrongName="FF";
+		synapseClient.logErrorToRepositoryServices(errorMessage, e.getClass().getSimpleName(), e.getMessage(), e.getStackTrace(), permutationStrongName);
 		ArgumentCaptor<LogEntry> captor = ArgumentCaptor
 				.forClass(LogEntry.class);
 		verify(mockSynapse).logError(captor.capture());
@@ -1744,6 +1750,8 @@ public class SynapseClientImplTest {
 		assertTrue(logEntry.getLabel().length() < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE + 100);
 		assertTrue(logEntry.getMessage().contains(errorMessage));
 		assertTrue(logEntry.getMessage().contains(MY_USER_PROFILE_OWNER_ID));
+		assertTrue(logEntry.getMessage().contains(e.getClass().getSimpleName()));
+		assertTrue(logEntry.getMessage().contains(exceptionMessage));
 	}
 
 	@Test
