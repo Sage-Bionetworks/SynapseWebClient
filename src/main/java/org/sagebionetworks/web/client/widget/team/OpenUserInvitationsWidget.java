@@ -42,6 +42,11 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 	}
+	
+	@Override
+	public void clear() {
+		view.clear();
+	}
 
 	@Override
 	public void removeInvitation(String invitationId) {

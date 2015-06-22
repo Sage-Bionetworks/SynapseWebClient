@@ -478,6 +478,12 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetView;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidgetView;
+import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetView;
+import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetView;
+import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -999,7 +1005,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// Team Page
 		bind(TeamViewImpl.class).in(Singleton.class);
 		bind(TeamView.class).to(TeamViewImpl.class);
-
+		
 		// Team Search Page
 		bind(TeamSearchViewImpl.class).in(Singleton.class);
 		bind(TeamSearchView.class).to(TeamSearchViewImpl.class);
@@ -1011,6 +1017,12 @@ public class PortalGinModule extends AbstractGinModule {
 		/*
 		 * Teams Widgets
 		 */
+		
+		// Team Action Menu Items
+		bind(TeamEditModalWidgetView.class).to(TeamEditModalWidgetViewImpl.class);
+		bind(TeamLeaveModalWidgetView.class).to(TeamLeaveModalWidgetViewImpl.class);
+		bind(TeamDeleteModalWidgetView.class).to(TeamDeleteModalWidgetViewImpl.class);
+		
 		// Open Team Invitations widget
 		bind(OpenTeamInvitationsWidgetView.class).to(OpenTeamInvitationsWidgetViewImpl.class);
 		

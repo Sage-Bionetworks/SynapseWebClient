@@ -1073,7 +1073,7 @@ public class DisplayUtils {
 		builder.append(baseURl);
 		builder.append("?"+WebConstants.USER_PROFILE_USER_ID+"=");
 		builder.append(userId);
-		builder.append("&"+WebConstants.USER_PROFILE_IMIAGE_ID+"=");
+		builder.append("&"+WebConstants.USER_PROFILE_IMAGE_ID+"=");
 		builder.append(fileHandleId);
 		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
 		builder.append(preview);

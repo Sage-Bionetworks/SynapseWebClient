@@ -96,7 +96,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	 * @param ownerType
 	 * @param markdownTextArea
 	 * @param formPanel
-	 * @param callback
+	 * @param finishedUploadingCallback
 	 * @param closeHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
 	public void configure(final WikiPageKey wikiKey, CallbackP<WikiPage> wikiPageUpdatedHandler) {

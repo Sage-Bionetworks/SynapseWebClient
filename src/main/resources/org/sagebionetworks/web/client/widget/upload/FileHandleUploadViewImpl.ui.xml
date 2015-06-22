@@ -8,7 +8,8 @@
 		<b:Form visible="false" ui:field="form">
 			<b:Input ui:field="fileInput" b:id="fileInputWidget" type="FILE" />
 		</b:Form>
-		<b:Button ui:field="uploadbutton" icon="UPLOAD">Upload</b:Button>
+		<b:Button addStyleNames="margin-right-5" ui:field="uploadbutton" icon="UPLOAD">Upload</b:Button>
+		<bh:Span ui:field="uploadedFileNameField"/>
 		<bh:Div styleName="margin-top-15" />
 		<b:Progress ui:field="progressContainer" visible="false">
 			<b:ProgressBar ui:field="progressBar" type="INFO"

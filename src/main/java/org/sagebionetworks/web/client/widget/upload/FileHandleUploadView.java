@@ -41,4 +41,6 @@ public interface FileHandleUploadView extends IsWidget {
 	 */
 	public void setButtonText(String buttonText);
 
+	void setUploadedFileText(String text);
+
 }

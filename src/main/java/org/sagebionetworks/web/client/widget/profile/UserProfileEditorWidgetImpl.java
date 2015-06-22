@@ -24,7 +24,8 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	String fileHandleId;
 	
 	@Inject
-	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view, ProfileImageWidget imageWidget, FileHandleUploadWidget fileHandleUploadWidget) {
+	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view,
+			ProfileImageWidget imageWidget, FileHandleUploadWidget fileHandleUploadWidget) {
 		super();
 		this.view = view;
 		this.imageWidget = imageWidget;
