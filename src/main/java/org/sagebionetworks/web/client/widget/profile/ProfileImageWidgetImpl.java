@@ -45,7 +45,7 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	private String buildUrl(String userId, String fileHandleId, boolean preview, boolean applied){
 		StringBuilder builder = new StringBuilder();
 		builder.append(baseUrl);
-		builder.append("?"+WebConstants.USER_PROFILE_IMIAGE_ID+"=");
+		builder.append("?"+WebConstants.USER_PROFILE_IMAGE_ID+"=");
 		builder.append(fileHandleId);
 		builder.append("&"+WebConstants.USER_PROFILE_USER_ID+"=");
 		builder.append(userId);

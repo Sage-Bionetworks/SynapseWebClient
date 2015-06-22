@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -90,7 +91,9 @@ public class MarkdownWidgetTest {
 		when(mockView.getElementById(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + "-preview")).thenReturn(mockElementWrapper);
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 		presenter.configure(testMarkdown, mockWikiPageKey, isPreview, null);
-		
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
 		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
 		verify(mockView).setMarkdown(sampleHTML);
 		
@@ -134,11 +137,14 @@ public class MarkdownWidgetTest {
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 		
 		presenter.loadMarkdownFromWikiPage(mockWikiPageKey, isPreview, true);
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
 		verify(mockWikiPageKey).setWikiPageId(anyString());
 		
 		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
 		verify(mockView).setEmptyVisible(true);
-		verify(mockView).setMarkdown("");
+		verify(mockView).clearMarkdown();
 		verify(mockView).setEmptyVisible(false);
 		verify(mockView).setMarkdown(sampleHTML);
 		// Called three times between tablesorter, loadMath, and loadWidgets, 
@@ -167,9 +173,13 @@ public class MarkdownWidgetTest {
 		String markdown="input markdown that is transformed into empty html";
 		presenter.configure(markdown, mockWikiPageKey, isPreview, 1L);
 		
+		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		
 		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
 		verify(mockView).setEmptyVisible(true);
-		verify(mockView).setMarkdown("");
+		verify(mockView).clearMarkdown();
 		verify(mockView, Mockito.never()).setEmptyVisible(false);
 	}
 	

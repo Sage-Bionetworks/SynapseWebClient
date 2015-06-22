@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
@@ -170,6 +171,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.gwt.core.server.StackTraceDeobfuscator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -189,6 +191,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseMarkdownProcessor.getInstance();
 	}
 
+	private static StackTraceDeobfuscator deobfuscator = null;
+	
 	private Cache<MarkdownCacheRequest, WikiPage> wiki2Markdown = CacheBuilder
 			.newBuilder().maximumSize(35).expireAfterAccess(1, TimeUnit.HOURS)
 			.build(new CacheLoader<MarkdownCacheRequest, WikiPage>() {
@@ -461,15 +465,48 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		log.error(message);
 	}
 
+	
+	public StackTraceDeobfuscator getDeobfuscator() {
+		//lazy init deobfuscator
+		if (deobfuscator == null) {
+			String path = getServletContext().getRealPath("/WEB-INF/");
+			deobfuscator = StackTraceDeobfuscator.fromFileSystem(path);
+		}
+		return deobfuscator;
+	}
+	
+	/**
+	 * Deobfuscate a client stack trace
+	 * @param exceptionType
+	 * @param exceptionMessage
+	 * @param t 
+	 * @return
+	 */
+	public String deobfuscateException(String exceptionType, String exceptionMessage, StackTraceElement[] t, String permutationStrongName) {
+		StackTraceDeobfuscator deobfuscator = getDeobfuscator();
+		RuntimeException th = new RuntimeException(exceptionType + ":" + exceptionMessage);
+		th.setStackTrace(t);
+		deobfuscator.deobfuscateStackTrace(th, permutationStrongName);
+		return ExceptionUtils.getStackTrace(th).substring("java.lang.RuntimeException: ".length());
+	}
+	
 	@Override
-	public void logErrorToRepositoryServices(String message, String label) throws RestServiceException {
+	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t) throws RestServiceException {
+			logErrorToRepositoryServices(message, exceptionType, exceptionMessage, t, getPermutationStrongName());
+	}
+	
+	//(tested)
+	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, String strongName) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			LogEntry entry = new LogEntry();
+			String exceptionString = "";
 			String outputLabel = "";
-			if (label != null) {
-				outputLabel = label.substring(0, Math.min(label.length(), MAX_LOG_ENTRY_LABEL_SIZE));
+			if (t != null) {
+				exceptionString = deobfuscateException(exceptionType, exceptionMessage, t, strongName);
+				outputLabel = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
 			}
+			
+			LogEntry entry = new LogEntry();
 			new PortalVersionHolder();
 			entry.setLabel("SWC/" + PortalVersionHolder.getVersionInfo() + "/" + outputLabel);
 			String userId = "";
@@ -477,12 +514,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (profile != null) {
 				userId = "userId="+profile.getOwnerId()+" ";
 			}
-			entry.setMessage(userId+message);
+			String entryMessage = userId+message+"\n"+exceptionString;
+			entry.setMessage(entryMessage);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
 	
 	@Override
 	public void logInfo(String message) {
@@ -2982,4 +3021,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
 }

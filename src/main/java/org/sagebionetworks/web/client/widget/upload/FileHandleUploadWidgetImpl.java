@@ -47,6 +47,11 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	}
 	
 	@Override
+	public void setUploadedFileText(String text) {
+		view.setUploadedFileText(text);
+	}
+	
+	@Override
 	public void setValidation(FileValidator validator) {
 		this.validator = validator;
 	}

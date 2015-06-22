@@ -25,5 +25,6 @@ public interface OpenMembershipRequestsWidgetView extends IsWidget, SynapseView 
 		//use to go to user profile page
 		void goTo(Place place);
 		void acceptRequest(String userId);
+		void clear();
 	}
 }

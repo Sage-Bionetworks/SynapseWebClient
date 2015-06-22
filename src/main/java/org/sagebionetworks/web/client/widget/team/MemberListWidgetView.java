@@ -29,5 +29,6 @@ public interface MemberListWidgetView extends IsWidget, SynapseView {
 		void jumpToOffset(int offset);
 		void search(String searchTerm);
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
+		void clear();
 	}
 }

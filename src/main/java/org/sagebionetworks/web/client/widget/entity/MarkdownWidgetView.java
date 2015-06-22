@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,6 +27,7 @@ public interface MarkdownWidgetView extends IsWidget {
 
 	Widget asWidget();
 
+	void callbackWhenAttached(final Callback callback);
 
 	void clearMarkdown();
 
