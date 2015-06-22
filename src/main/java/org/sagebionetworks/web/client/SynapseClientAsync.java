@@ -106,11 +106,12 @@ public interface SynapseClientAsync {
 	
 	/**
 	 * 
-	 * @param message 
-	 * @param label If a stack trace, should not contain the stack trace message (as it would be too specific)
+	 * @param message
+	 * @param exceptionType TODO
+	 * @param t
 	 * @param callback
 	 */
-	void logErrorToRepositoryServices(String message, String label, AsyncCallback<Void> callback);
+	void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, AsyncCallback<Void> callback);
 	
 	void logInfo(String message, AsyncCallback<Void> callback);
 
