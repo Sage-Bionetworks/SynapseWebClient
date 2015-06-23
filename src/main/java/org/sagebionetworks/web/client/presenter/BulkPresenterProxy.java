@@ -6,8 +6,11 @@ import java.util.logging.Logger;
 import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
@@ -34,6 +37,7 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
@@ -59,15 +63,17 @@ public class BulkPresenterProxy extends AbstractActivity {
 	PortalGinInjector ginjector;
 	AppLoadingView loading;
 	GlobalApplicationState globalApplicationState;
-
+	GWTWrapper gwt;
+	SynapseJSNIUtils jsniUtils;
+	
 	@Inject
-	public BulkPresenterProxy(GlobalApplicationState globalApplicationState) {
+	public BulkPresenterProxy(GlobalApplicationState globalApplicationState,
+			GWTWrapper gwt,
+			SynapseJSNIUtils jsniUtils) {
 		this.globalApplicationState = globalApplicationState;
+		this.gwt = gwt;
+		this.jsniUtils = jsniUtils;
 	}
-
-	public final static native void _consoleError(String message) /*-{
-		console.error(message);
-	}-*/;
 	
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
@@ -196,8 +202,13 @@ public class BulkPresenterProxy extends AbstractActivity {
 			@Override
 			public void onFailure(Throwable caught) {
 				//SWC-2444: if there is a problem getting the code, try to reload the app
-				_consoleError(caught.getMessage());
-				Window.Location.reload();
+				jsniUtils.consoleError(caught.getMessage());
+				gwt.scheduleExecution(new Callback() {
+					@Override
+					public void invoke() {
+						Window.Location.reload();		
+					}
+				}, Portal.CODE_LOAD_DELAY);
 			}
 
 		});

@@ -13,6 +13,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -23,11 +24,17 @@ import com.google.gwt.user.client.ui.SimplePanel;
  */
 public class Portal implements EntryPoint {
 	
+	//If there's a failure to load the code from the server, how long (in ms) should we wait before trying again...
+	public static final int CODE_LOAD_DELAY = 5000;
 	//  We are using gin to create all of our objects
 	private final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
 	private final AppLoadingView loading = GWT.create(AppLoadingView.class);
 
 	private SimplePanel appWidget = new SimplePanel();
+
+	public final static native void _consoleError(String message) /*-{
+		console.error(message);
+	}-*/;
 
 	/**
 	 * This is the entry point method.
@@ -47,9 +54,9 @@ public class Portal implements EntryPoint {
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
 				public void onFailure(Throwable reason) {
-					// Not sure what to do here.
-					loading.hide();
-					DisplayUtils.showErrorMessage(reason.getMessage());
+					//SWC-2444: if there is a problem getting the code, try to reload the app after some time
+					_consoleError(reason.getMessage());
+					reloadApp(CODE_LOAD_DELAY);
 				}
 
 				@Override
@@ -118,6 +125,16 @@ public class Portal implements EntryPoint {
 			
 		}
 	}
+	
+	public void reloadApp(int delay) {
+		Timer timer = new Timer() { 
+		    public void run() { 
+		    	Window.Location.reload();
+		    } 
+		};
+		timer.schedule(delay);
+	}
+
 	
 	private void registerWindowClosingHandler(final GlobalApplicationState globalApplicationState) {
 		Window.addWindowClosingHandler(new Window.ClosingHandler() {
