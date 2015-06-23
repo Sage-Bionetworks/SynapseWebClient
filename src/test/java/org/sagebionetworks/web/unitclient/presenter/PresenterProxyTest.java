@@ -7,6 +7,8 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
@@ -30,6 +32,8 @@ public class PresenterProxyTest {
 	PresenterProxy<HomePresenter, Home> presenterProxy;
 	AcceptsOneWidget mockPanel;
 	EventBus mockEventBus;
+	GWTWrapper mockGWT;
+	SynapseJSNIUtils mockJsniUtils;
 	
 	@Before
 	public void before(){
@@ -38,7 +42,9 @@ public class PresenterProxyTest {
 		mockProvider = Mockito.mock(AsyncProvider.class);
 		mockPanel = Mockito.mock(AcceptsOneWidget.class);
 		mockEventBus = Mockito.mock(EventBus.class);
-		presenterProxy = new PresenterProxy<HomePresenter, Home>(mockProvider);
+		mockGWT = Mockito.mock(GWTWrapper.class);
+		mockJsniUtils = Mockito.mock(SynapseJSNIUtils.class);
+		presenterProxy = new PresenterProxy<HomePresenter, Home>(mockProvider, mockGWT, mockJsniUtils);
 
 	}
 	
