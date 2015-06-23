@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Account;
@@ -41,6 +40,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
@@ -65,6 +65,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 		this.globalApplicationState = globalApplicationState;
 	}
 
+	public final static native void _consoleError(String message) /*-{
+		console.error(message);
+	}-*/;
+	
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
 		globalApplicationState.setIsEditing(false);
@@ -191,13 +195,14 @@ public class BulkPresenterProxy extends AbstractActivity {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				// Not sure what to do here.
-				DisplayUtils.showErrorMessage(caught.getMessage());
+				//SWC-2444: if there is a problem getting the code, try to reload the app
+				_consoleError(caught.getMessage());
+				Window.Location.reload();
 			}
 
 		});
 	}
-
+	
 	public void setPlace(Place place) {
 		// This will get forwarded to the presenter when we get it in start()
 		this.place = place;
