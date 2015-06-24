@@ -6,9 +6,11 @@ import java.util.logging.Logger;
 import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
@@ -35,12 +37,16 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
@@ -59,14 +65,35 @@ public class BulkPresenterProxy extends AbstractActivity {
 	PortalGinInjector ginjector;
 	AppLoadingView loading;
 	GlobalApplicationState globalApplicationState;
-
+	GWTWrapper gwt;
+	SynapseJSNIUtils jsniUtils;
+	AsyncCallback<VersionState> versionCheckCallback;
 	@Inject
-	public BulkPresenterProxy(GlobalApplicationState globalApplicationState) {
+	public BulkPresenterProxy(GlobalApplicationState globalApplicationState,
+			GWTWrapper gwt,
+			SynapseJSNIUtils jsniUtils) {
 		this.globalApplicationState = globalApplicationState;
+		this.gwt = gwt;
+		this.jsniUtils = jsniUtils;
+		versionCheckCallback = new AsyncCallback<VersionState>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				//do nothing
+			}
+			@Override
+			public void onSuccess(VersionState result) {
+				if (result.isVersionChange()) {
+					//Going to a new place but the version is not up to date.
+					//Update the app version first.
+					Window.Location.reload();
+				}
+			}
+		};
 	}
-
+	
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
+		globalApplicationState.checkVersionCompatibility(versionCheckCallback);
 		globalApplicationState.setIsEditing(false);
 		GWT.runAsync(new RunAsyncCallback() {
 			@Override
@@ -191,13 +218,19 @@ public class BulkPresenterProxy extends AbstractActivity {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				// Not sure what to do here.
-				DisplayUtils.showErrorMessage(caught.getMessage());
+				//SWC-2444: if there is a problem getting the code, try to reload the app
+				jsniUtils.consoleError(caught.getMessage());
+				gwt.scheduleExecution(new Callback() {
+					@Override
+					public void invoke() {
+						Window.Location.reload();		
+					}
+				}, Portal.CODE_LOAD_DELAY);
 			}
 
 		});
 	}
-
+	
 	public void setPlace(Place place) {
 		// This will get forwarded to the presenter when we get it in start()
 		this.place = place;
