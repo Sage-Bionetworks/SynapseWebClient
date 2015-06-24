@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -25,7 +26,8 @@ public class FooterTest {
 		mockView = Mockito.mock(FooterView.class);
 		mockSynapseClient = Mockito.mock(GlobalApplicationState.class);
 		footer = new Footer(mockView, mockSynapseClient);
-		AsyncMockStubber.callSuccessWith("v,v").when(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
+		VersionState versionState = new VersionState("v,v", true);
+		AsyncMockStubber.callSuccessWith(versionState).when(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
 		verify(mockView).setPresenter(footer);
 	}
 	
