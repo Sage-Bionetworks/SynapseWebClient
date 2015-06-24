@@ -108,6 +108,7 @@ import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
@@ -3094,5 +3095,41 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public Long getOrCreateStorageLocationSetting(StorageLocationSetting setting) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			//first, try to find a matching storage location setting for this user, and reuse
+			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
+			for (StorageLocationSetting storageLocationSetting : existingStorageLocations) {
+				Long locationId = storageLocationSetting.getStorageLocationId();
+				storageLocationSetting.setCreatedOn(null);
+				storageLocationSetting.setEtag(null);
+				storageLocationSetting.setStorageLocationId(null);
+				if (setting.equals(storageLocationSetting)) {
+					return locationId;
+				}
+			}
+			
+			//not found, create a new one
+			StorageLocationSetting newStorageLocationSetting = synapseClient.createStorageLocationSetting(setting); 
+			return newStorageLocationSetting.getStorageLocationId(); 
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public List<StorageLocationSetting> createOrUpdateProjectSetting() throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			return synapseClient.getMyStorageLocationSettings();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	
 	
 }
