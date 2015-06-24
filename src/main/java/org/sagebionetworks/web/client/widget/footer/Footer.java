@@ -22,7 +22,7 @@ public class Footer implements FooterView.Presenter {
 	public Widget asWidget() {
 		view.setPresenter(this);
 		if (!isInitialized) {
-			isInitialized = true; 
+			isInitialized = true;
 			globalAppState.checkVersionCompatibility(new AsyncCallback<VersionState>() {
 				@Override
 				public void onSuccess(VersionState state) {
