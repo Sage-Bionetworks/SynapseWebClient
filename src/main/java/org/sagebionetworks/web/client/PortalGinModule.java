@@ -183,12 +183,22 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
@@ -1086,5 +1096,11 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
 		bind(SynapseAlert.class).to(SynapseAlertImpl.class);
+		
+		bind(ProvenanceEditorWidgetView.class).to(ProvenanceEditorWidgetViewImpl.class);
+		bind(ProvenanceListWidgetView.class).to(ProvenanceListWidgetViewImpl.class);
+		bind(ProvenanceURLDialogWidgetView.class).to(ProvenanceURLDialogWidgetViewImpl.class);
+		bind(EntityRefProvEntryView.class).to(EntityRefProvEntryViewImpl.class);
+		bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
 	}
 }

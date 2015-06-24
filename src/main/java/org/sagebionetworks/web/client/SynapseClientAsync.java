@@ -424,4 +424,9 @@ public interface SynapseClientAsync {
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
 	void getEntityInfo(String entityId, AsyncCallback<EntityBundlePlus> callback);
+
+	void getOrCreateActivityForEntityVersion(String entityId,
+			Long versionNumber, AsyncCallback<Activity> callback);
+
+	void putActivity(Activity update, AsyncCallback<Void> callback);
 }

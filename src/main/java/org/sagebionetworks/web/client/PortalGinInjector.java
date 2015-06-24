@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
-import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
@@ -46,7 +45,12 @@ import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -265,6 +269,9 @@ public interface PortalGinInjector extends Ginjector {
 	public Md5Link getMd5Link();
 	public QuestionContainerWidget getQuestionContainerWidget();
 	public SynapseAlert getSynapseAlertWidget();
+	public EntityRefProvEntryView getEntityRefEntry();
+	public URLProvEntryView getURLEntry();
+	public ProvenanceListWidget getProvenanceListWidget();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();

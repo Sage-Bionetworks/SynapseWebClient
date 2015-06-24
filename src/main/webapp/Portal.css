@@ -293,6 +293,10 @@
 	margin-right: 0px;
 }
 
+.btn.btn-v-align-top {
+	vertical-align: top;
+}
+
 /* Search boxes */
 .homesearchbox {
 	width: 645px;
@@ -710,6 +714,7 @@ a.shortBtn {
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
+
 .margin-bottom-5 {
 	margin-bottom: 5px;
 }
@@ -1016,6 +1021,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .break-word {
 	word-wrap: break-word;	
+}
+
+.word-break-all {
+	word-break: break-all;	
 }
 
 .boldText {
@@ -1683,7 +1692,6 @@ ol.lowerroman {
 .vertical-align-top {
 	vertical-align: top;
 }
-
 
 .member-search-button {
 	font-size: 12px !important;

@@ -1198,6 +1198,38 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public Activity getOrCreateActivityForEntityVersion(String entityId,
+			Long versionNumber) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getActivityForEntityVersion(
+					entityId, versionNumber);
+		} catch (SynapseNotFoundException ex) {
+			// not found, so create
+				Activity newActivity;
+				try {
+					newActivity = synapseClient.createActivity(new Activity());
+					synapseClient.putEntity(synapseClient.getEntityById(entityId), newActivity.getId());
+				} catch (SynapseException e) {
+					throw ExceptionUtil.convertSynapseException(e);
+				}
+				return newActivity;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void putActivity(Activity update) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.putActivity(update);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit,
@@ -2717,7 +2749,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 							getSynapseProperty(WebConstants.GOVERNANCE_ENTITY_ID_PROPERTY),
 							ObjectType.ENTITY.toString(),
 							getSynapseProperty(WebConstants.GOVERNANCE_WIKI_ID_PROPERTY)));
-			
+			tempMap.put(
+					WebConstants.PROVENANCE,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.PROVENANCE_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.PROVENANCE_WIKI_ID_PROPERTY)));
 			//Workshop
 			addHelpPageMapping(tempMap, WebConstants.COLLABORATORIUM, WebConstants.COLLABORATORIUM_ENTITY_ID_PROPERTY, null);
 			addHelpPageMapping(tempMap, WebConstants.STAGE_I, WebConstants.STAGE_I_ENTITY_ID_PROPERTY, null);
