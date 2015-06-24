@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class URLProvEntryViewImpl extends Composite implements URLProvEntryView {
+public class URLProvEntryViewImpl implements URLProvEntryView {
 
 	public interface URLProvEntryUIBinder
 			extends UiBinder<Widget, URLProvEntryViewImpl> {}

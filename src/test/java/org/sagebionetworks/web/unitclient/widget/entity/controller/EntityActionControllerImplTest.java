@@ -96,7 +96,6 @@ public class EntityActionControllerImplTest {
 	EntityActionControllerImpl controller;
 	String parentId;
 	String entityId;
-//	String entityDispalyType;
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
 	MarkdownEditorWidget mockMarkdownEditorWidget;
@@ -310,6 +309,45 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
 		verify(mockActionMenu).addActionListener(Action.UPLOAD_NEW_FILE, controller);
 	}
+	
+	@Test
+	public void testConfigureProvenanceFileCanEdit(){
+		boolean canEdit = true;
+		entityBundle.getPermissions().setCanEdit(canEdit);
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).addActionListener(Action.EDIT_PROVENANCE, controller);
+	}
+	
+	@Test
+	public void testConfigureProvenanceFileCannotEdit(){
+		boolean canEdit = false;
+		entityBundle.getPermissions().setCanEdit(canEdit);
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).addActionListener(Action.EDIT_PROVENANCE, controller);
+	}
+	
+	@Test
+	public void testConfigureProvenanceNonFile(){
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
+	}
+	
+	@Test
+	public void testOnEditProvenance(){
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.EDIT_PROVENANCE);
+		verify(mockProvenanceEditorWidget).configure(entityBundle, mockEntityUpdatedHandler);
+		verify(mockProvenanceEditorWidget).show();
+	}
+	
 	
 	@Test
 	public void testOnDeleteConfirmCancel(){

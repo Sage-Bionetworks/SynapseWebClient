@@ -110,7 +110,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				modal.setRemoveOnHide(true);
 				modal.hide();
 			}
 		});

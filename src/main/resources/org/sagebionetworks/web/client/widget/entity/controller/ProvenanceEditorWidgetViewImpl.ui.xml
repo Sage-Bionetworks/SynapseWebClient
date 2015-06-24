@@ -9,7 +9,7 @@
 			dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 			<b:ModalHeader>
 			    <b:Heading size="H3" text="Edit Provenance (Activity)" addStyleNames="displayInline"/>
-			    <b:Button ui:field="helpButton" icon="QUESTION_CIRCLE" type="LINK" addStyleNames="btn btn-v-align-top"/>
+			    <b:Anchor href="#!Help:Provenance" icon="QUESTION_CIRCLE" target="_blank" addStyleNames="btn btn-v-align-top"/>
 			</b:ModalHeader>
 			<b:ModalBody>
 			     <b:FormGroup>

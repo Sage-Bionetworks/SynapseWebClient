@@ -49,10 +49,11 @@ public class ProvenanceURLDialogWidget implements ProvenanceURLDialogWidgetView.
 	
 	@Override
 	public void onSave() {
-		if (view.getURLAddress().isEmpty())
+		if (view.getURLAddress().isEmpty()) {
 			synAlert.showError("External URL must not be empty!");
-		else if (confirmCallback != null)
+		} else if (confirmCallback != null) {
 			confirmCallback.invoke();
+		}
 	}
 
 	@Override

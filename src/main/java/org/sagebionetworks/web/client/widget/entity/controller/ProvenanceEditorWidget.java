@@ -89,14 +89,21 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 						toAdd = ginInjector.getEntityRefEntry();
 						String entityId = ref.getTargetId();
 						Long version = ref.getTargetVersionNumber();
-						((EntityRefProvEntryView)toAdd).configure(entityId, version != null ? version.toString() : null);
+						String versionString = null;
+						if (version != null) {
+							versionString = version.toString();
+						}
+						((EntityRefProvEntryView)toAdd).configure(entityId, versionString);
 						toAdd.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(entityId, version));
 					} else {
 						UsedURL usedURL = (UsedURL) provEntry;
 						toAdd = ginInjector.getURLEntry();
 						String name = usedURL.getName();
 						String url = usedURL.getUrl();
-						((URLProvEntryView)toAdd).configure(name != null && !name.trim().isEmpty() ? name : usedURL.getUrl(), url);
+						if (name == null || name.trim().isEmpty()) {
+							name = usedURL.getUrl();
+						}
+						((URLProvEntryView)toAdd).configure(name, url);
 						toAdd.setAnchorTarget(url);
 					}
 					
@@ -141,52 +148,8 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		List<ProvenanceEntry> usedEntries = usedProvenanceList.getEntries();
 		List<ProvenanceEntry> executedEntries = executedProvenanceList.getEntries();
 		Set<Used> usedSet = new HashSet<Used>();
-		for (ProvenanceEntry used: usedEntries) {
-			if (used instanceof URLProvEntryView) {
-				URLProvEntryView urlEntry = (URLProvEntryView) used;
-				UsedURL activityURL = new UsedURL();
-				activityURL.setUrl(urlEntry.getURL());
-				activityURL.setName(urlEntry.getTitle());
-				activityURL.setWasExecuted(false);
-				usedSet.add(activityURL);
-			} else {
-				EntityRefProvEntryView entityEntry = (EntityRefProvEntryView) used;
-				UsedEntity activityEntity = new UsedEntity();
-				Reference ref = new Reference();
-				ref.setTargetId(entityEntry.getEntryId());
-				String version = entityEntry.getEntryVersion();
-				// Null version is displayed as "Current"
-				if (version != null && !version.equals("Current")) {
-					ref.setTargetVersionNumber(Long.valueOf(version));
-				}
-				activityEntity.setReference(ref);
-				activityEntity.setWasExecuted(false);
-				usedSet.add(activityEntity);
-			}
-		}
-		for (ProvenanceEntry executed: executedEntries) {
-			if (executed instanceof URLProvEntryView) {
-				URLProvEntryView urlEntry = (URLProvEntryView) executed;
-				UsedURL activityURL = new UsedURL();
-				activityURL.setUrl(urlEntry.getURL());
-				activityURL.setName(urlEntry.getTitle());
-				activityURL.setWasExecuted(true);
-				usedSet.add(activityURL);
-			} else {
-				EntityRefProvEntryView entityEntry = (EntityRefProvEntryView) executed;
-				UsedEntity activityEntity = new UsedEntity();
-				Reference ref = new Reference();
-				ref.setTargetId(entityEntry.getEntryId());
-				String version = entityEntry.getEntryVersion();
-				// Null version is displayed as "Current"
-				if (version != null && !version.equals("Current")) {
-					ref.setTargetVersionNumber(Long.valueOf(version));
-				}
-				activityEntity.setReference(ref);
-				activityEntity.setWasExecuted(true);
-				usedSet.add(activityEntity);
-			}
-		}
+		usedSet.addAll(provEntryListToUsedSet(usedEntries, false));
+		usedSet.addAll(provEntryListToUsedSet(executedEntries, true));
 		activity.setUsed(usedSet);
 		synapseClient.putActivity(activity, new AsyncCallback<Void>() {
 			@Override
@@ -201,6 +164,34 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			}
 		});
 		
+	}
+	
+	private Set<Used> provEntryListToUsedSet(List<ProvenanceEntry> entries, boolean wasExecuted) {
+		Set<Used> usedSet = new HashSet<Used>();
+		for (ProvenanceEntry used: entries) {
+			if (used instanceof URLProvEntryView) {
+				URLProvEntryView urlEntry = (URLProvEntryView) used;
+				UsedURL activityURL = new UsedURL();
+				activityURL.setUrl(urlEntry.getURL());
+				activityURL.setName(urlEntry.getTitle());
+				activityURL.setWasExecuted(wasExecuted);
+				usedSet.add(activityURL);
+			} else {
+				EntityRefProvEntryView entityEntry = (EntityRefProvEntryView) used;
+				UsedEntity activityEntity = new UsedEntity();
+				Reference ref = new Reference();
+				ref.setTargetId(entityEntry.getEntryId());
+				String version = entityEntry.getEntryVersion();
+				// Null version is displayed as "Current"
+				if (version != null && !version.equals("Current")) {
+					ref.setTargetVersionNumber(Long.valueOf(version));
+				}
+				activityEntity.setReference(ref);
+				activityEntity.setWasExecuted(wasExecuted);
+				usedSet.add(activityEntity);
+			}
+		}
+		return usedSet;
 	}
 	
 	/*

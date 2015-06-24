@@ -159,6 +159,8 @@ public class WebConstants {
 	public static final String AUTHENTICATED_ACL_PRINCIPAL_ID = "org.sagebionetworks.portal.authenticated_acl_principal_id";
 	public static final String PUBLIC_ACL_PRINCIPAL_ID = "org.sagebionetworks.portal.public_acl_principal_id";
 	public static final String ANONYMOUS_USER_PRINCIPAL_ID = "org.sagebionetworks.portal.anonymous_user_principal_id";
+	public static final String PROVENANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.provenance_synapse_id";
+	public static final String PROVENANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.provenance_wiki_id";
 	
 	
 	//Workshop
@@ -201,6 +203,7 @@ public class WebConstants {
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
 	public static final String GOVERNANCE = "Governance";
+	public static final String PROVENANCE = "Provenance";
 	
 	public static final String COLLABORATORIUM = "Collaboratorium";
 	public static final String STAGE_I = "StageI";

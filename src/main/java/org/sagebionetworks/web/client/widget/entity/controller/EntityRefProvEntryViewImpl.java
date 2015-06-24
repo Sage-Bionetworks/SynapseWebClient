@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityRefProvEntryViewImpl extends Composite implements EntityRefProvEntryView {
+public class EntityRefProvEntryViewImpl implements EntityRefProvEntryView {
 
 	public interface EntityRefProvEntryUIBinder
 			extends UiBinder<Widget, EntityRefProvEntryViewImpl> {}

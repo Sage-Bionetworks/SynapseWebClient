@@ -16,9 +16,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProvenanceEditorWidgetViewImpl extends Composite implements ProvenanceEditorWidgetView {
-
-	String PROV_LINK = "https://www.synapse.org/#!Wiki:syn2305384/ENTITY/62865";
+public class ProvenanceEditorWidgetViewImpl implements ProvenanceEditorWidgetView {
 	
 	public interface ProvenanceEditorWidgetViewImplUiBinder 
 			extends UiBinder<Widget, ProvenanceEditorWidgetViewImpl> {}
@@ -52,9 +50,6 @@ public class ProvenanceEditorWidgetViewImpl extends Composite implements Provena
 	
 	@UiField
 	SimplePanel urlDialogPanel;
-	
-	@UiField
-	Button helpButton;
 
 	
 	
@@ -76,27 +71,11 @@ public class ProvenanceEditorWidgetViewImpl extends Composite implements Provena
 				modal.hide();
 			}
 		});
-		
-		helpButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(PROV_LINK, "", "");
-			}
-		});
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}
-	
-	@Override
-	public void setVisible(boolean isVisible) {
-		if (isVisible)
-			modal.show();
-		else
-			modal.hide();
 	}
 
 	@Override

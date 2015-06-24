@@ -89,7 +89,10 @@ public class ProvenanceListWidget implements ProvenanceListWidgetView.Presenter,
 				rows.add(newEntry);
 				String name = urlDialog.getURLName();
 				String address = urlDialog.getURLAddress();
-				newEntry.configure(!name.trim().isEmpty() ? name : address, address);
+				if (name.trim().isEmpty()) {
+					name = address;
+				}
+				newEntry.configure(name, address);
 				newEntry.setAnchorTarget(address);
 				newEntry.setRemoveCallback(new Callback() {
 					@Override

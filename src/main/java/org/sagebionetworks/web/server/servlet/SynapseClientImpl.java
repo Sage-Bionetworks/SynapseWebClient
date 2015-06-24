@@ -2710,7 +2710,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 							getSynapseProperty(WebConstants.GOVERNANCE_ENTITY_ID_PROPERTY),
 							ObjectType.ENTITY.toString(),
 							getSynapseProperty(WebConstants.GOVERNANCE_WIKI_ID_PROPERTY)));
-			
+			tempMap.put(
+					WebConstants.PROVENANCE,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.PROVENANCE_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.PROVENANCE_WIKI_ID_PROPERTY)));
 			//Workshop
 			addHelpPageMapping(tempMap, WebConstants.COLLABORATORIUM, WebConstants.COLLABORATORIUM_ENTITY_ID_PROPERTY, null);
 			addHelpPageMapping(tempMap, WebConstants.STAGE_I, WebConstants.STAGE_I_ENTITY_ID_PROPERTY, null);
