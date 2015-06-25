@@ -15,12 +15,15 @@
 			     	<b:Radio ui:field="synapseStorageButton" name="storageLocationRadio" formValue="value1" text="Synapse Storage"/>
 			     	
 			     	<b:Radio ui:field="externalS3Button" name="storageLocationRadio" formValue="value1" text="Amazon S3 Bucket"/>
-			     	<b:FormLabel for="bucketField">Bucket</b:FormLabel>
-			     	<b:TextBox ui:field="bucketField" addStyleNames="margin-left-10 margin-bottom-10 hide-resize"/>
-			        
-			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" formValue="value1" text="SFTP"/>
-			     	<b:FormLabel for="sftpUrlField">URL</b:FormLabel>
-			     	<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-left-10 margin-bottom-10 hide-resize"/>
+			     	<bh:Div addStyleNames="margin-left-20">
+				     	<b:FormLabel for="bucketField" >Bucket</b:FormLabel>
+				     	<b:TextBox ui:field="bucketField" addStyleNames="margin-bottom-10 hide-resize "/>
+			        </bh:Div>
+			        <b:Radio ui:field="sftpButton" name="storageLocationRadio" formValue="value1" text="SFTP Server"/>
+			        <bh:Div addStyleNames="margin-left-20">
+				     	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
+				     	<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-bottom-10 hide-resize"/>
+				     </bh:Div>
 			    </b:FormGroup>
 			   <g:SimplePanel ui:field="synAlertPanel"/>
 			</b:ModalBody>

@@ -62,6 +62,27 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 				modal.hide();
 			}
 		});
+		synapseStorageButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				bucketField.setEnabled(false);
+				sftpUrlField.setEnabled(false);
+			}
+		});
+		externalS3Button.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				bucketField.setEnabled(true);
+				sftpUrlField.setEnabled(false);
+			}
+		});
+		sftpButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				bucketField.setEnabled(false);
+				sftpUrlField.setEnabled(true);
+			}
+		});
 	}
 	
 	@Override
@@ -97,7 +118,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectSynapseStorage() {
-		synapseStorageButton.setValue(true);
+		synapseStorageButton.setValue(true, true);
 	}
 
 	@Override
@@ -107,7 +128,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectExternalS3Storage() {
-		externalS3Button.setValue(true);
+		externalS3Button.setValue(true, true);
 	}
 
 	@Override
@@ -122,7 +143,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectSFTPStorage() {
-		sftpButton.setValue(true);
+		sftpButton.setValue(true, true);
 	}
 
 	@Override
