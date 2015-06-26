@@ -12,8 +12,8 @@
 			</b:ModalHeader>
 			<b:ModalBody>
 			     <b:FormGroup>
-			     	<b:Radio ui:field="synapseStorageButton" name="storageLocationRadio" text="Synapse Storage"/>
-			     	<b:Radio ui:field="externalS3Button" name="storageLocationRadio" text="Amazon S3 Bucket"/>
+			     	<b:Radio ui:field="synapseStorageButton" name="storageLocationRadio" text="Synapse Storage" addStyleNames="font-size-18"/>
+			     	<b:Radio ui:field="externalS3Button" name="storageLocationRadio" text="Amazon S3 Bucket" addStyleNames="font-size-18"/>
 			     	<bh:Div addStyleNames="margin-left-20" ui:field="s3Collapse">
 						<b:FormLabel for="bucketField" >Bucket</b:FormLabel>
 				     	<b:TextBox ui:field="bucketField" addStyleNames="margin-bottom-10 hide-resize "/>
@@ -22,7 +22,7 @@
 				     	<b:FormLabel for="externalS3BannerField" >Banner</b:FormLabel>
 				     	<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize "/>
 					</bh:Div>
-			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" text="SFTP Server"/>
+			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" text="SFTP Server" addStyleNames="font-size-18"/>
 			     	<bh:Div addStyleNames="margin-left-20" ui:field="sftpCollapse">
 			         	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
 				     	<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-bottom-10 hide-resize"/>

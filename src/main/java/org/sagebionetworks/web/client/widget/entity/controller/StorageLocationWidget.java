@@ -65,6 +65,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
+						//TODO: add basic url validation here
 						view.setSFTPUrl(setting.getUrl());
 						view.setSFTPBanner(setting.getBanner());
 						view.selectSFTPStorage();
