@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
@@ -114,6 +115,7 @@ import org.sagebionetworks.repo.model.project.ProjectSettingsType;
 import org.sagebionetworks.repo.model.project.S3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
+import org.sagebionetworks.repo.model.project.UploadDestinationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
@@ -3106,13 +3108,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException{
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			UploadDestinationLocation[] locations = synapseClient.getUploadDestinationLocations(parentEntityId);
-			if (locations == null || locations.length == 0) {
+			UploadDestinationListSetting setting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
+			if (setting == null) {
+				//default storage location
 				return null;
-			} else {
-				return synapseClient.getMyStorageLocationSetting(locations[0].getStorageLocationId());
 			}
+			if (CollectionUtils.isEmpty(setting.getLocations())) {
+				//default storage location
+				return null;
+			}
+			//else
+			return synapseClient.getMyStorageLocationSetting(setting.getLocations().get(0));
 		} catch (SynapseException e) {
+			//TODO: handle unauthorized exception well in the client-side
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}

@@ -104,6 +104,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	public void clear() {
 		bucketField.setText("");
 		sftpUrlField.setText("");
+		selectSynapseStorage();
 	}
 
 	@Override

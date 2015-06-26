@@ -530,9 +530,7 @@ public interface SynapseClient extends RemoteService {
 	Activity getOrCreateActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException;
 
-	UploadDestinationLocation getUploadDestinationLocation(String parentEntityId) throws RestServiceException;
+	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting) throws RestServiceException;
 
-	Long getOrCreateStorageLocationSetting(StorageLocationSetting setting) throws RestServiceException;
-
-	List<StorageLocationSetting> createOrUpdateProjectSetting() throws RestServiceException;
+	StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException;
 }

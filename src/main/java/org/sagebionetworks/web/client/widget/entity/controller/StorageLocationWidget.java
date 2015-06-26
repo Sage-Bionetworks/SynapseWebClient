@@ -9,6 +9,9 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.UploadDestinationLocation;
+import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
@@ -30,6 +33,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
 	EntityUpdatedHandler entityUpdatedHandler;
+	EntityBundle entityBundle;
 	
 	@Inject
 	public StorageLocationWidget(StorageLocationWidgetView view,
@@ -43,10 +47,11 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	
 	@Override
 	public void configure(EntityBundle entityBundle, EntityUpdatedHandler entityUpdatedHandler) {
+		this.entityBundle = entityBundle;
 		this.entityUpdatedHandler = entityUpdatedHandler;
 		clear();
 		Entity entity = entityBundle.getEntity();
-		synapseClient.getStorageLocation(entity.getId(), new AsyncCallback<UploadDestinationLocation>() {
+		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -54,8 +59,11 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			}
 			
 			@Override
-			public void onSuccess(UploadDestinationLocation location) {
-				location.
+			public void onSuccess(StorageLocationSetting location) {
+				//if null, then still show the default UI
+				if (location != null) {
+					
+				}
 			}
 		});
 	}
@@ -95,14 +103,26 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 		};
+		StorageLocationSetting setting = getStorageLocationSettingFromView();
 		
-		if (isNew) {
-			synapseClient.createStorageLocation(entityId, callback);	
-		} else {
-			synapseClient.setStorageLocation(entityId, oldStorageLocationId, callback);
-		}
+		synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);	
 	}
 	
+	public StorageLocationSetting getStorageLocationSettingFromView() {
+		if (view.isExternalS3StorageSelected()) {
+			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
+			setting.setBanner(view.getExternalS3Banner());
+			setting.setBucket(view.getBucket());
+			
+			return setting;
+		} else if (view.isSFTPStorageSelected()) {
+			ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
+		} else {
+			//default synapse storage
+			return null;
+		}
+	}
+
 	public void setEntityUpdatedHandler(EntityUpdatedHandler updatedHandler) {
 		this.entityUpdatedHandler = updatedHandler;
 	}

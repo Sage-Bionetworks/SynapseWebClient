@@ -39,8 +39,10 @@ public interface StorageLocationWidgetView {
 	void selectExternalS3Storage();
 	boolean isExternalS3StorageSelected();
 	String getBucket();
+	String getExternalS3Banner();
 	
 	void selectSFTPStorage();
 	boolean isSFTPStorageSelected();
 	String getSFTPUrl();
+	String getSFTPBanner();
 }

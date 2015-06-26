@@ -432,12 +432,7 @@ public interface SynapseClientAsync {
 
 	void putActivity(Activity update, AsyncCallback<Void> callback);
 
-	void getUploadDestinationLocation(String parentEntityId,
-			AsyncCallback<UploadDestinationLocation> callback);
+	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting, AsyncCallback<Void> callback);
 
-	void getOrCreateStorageLocationSetting(StorageLocationSetting setting,
-			AsyncCallback<Long> callback);
-
-	void createOrUpdateProjectSetting(
-			AsyncCallback<List<StorageLocationSetting>> callback);
+	void getStorageLocationSetting(String parentEntityId, AsyncCallback<StorageLocationSetting> callback);
 }
