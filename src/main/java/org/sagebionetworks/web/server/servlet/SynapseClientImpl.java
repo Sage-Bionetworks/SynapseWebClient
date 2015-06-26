@@ -110,7 +110,10 @@ import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.ProjectSettingsType;
+import org.sagebionetworks.repo.model.project.S3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
@@ -175,6 +178,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
+import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -3099,14 +3103,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public UploadDestinationLocation getUploadDestinationLocation(String parentEntityId) throws RestServiceException{
+	public StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException{
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			UploadDestinationLocation[] locations = synapseClient.getUploadDestinationLocations(parentEntityId);
 			if (locations == null || locations.length == 0) {
 				return null;
 			} else {
-				return locations[0];
+				return synapseClient.getMyStorageLocationSetting(locations[0].getStorageLocationId());
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -3114,39 +3118,47 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public Long getOrCreateStorageLocationSetting(StorageLocationSetting setting) throws RestServiceException{
+	public void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting) throws RestServiceException{
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			//first, try to find a matching storage location setting for this user, and reuse
 			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
-			for (StorageLocationSetting storageLocationSetting : existingStorageLocations) {
-				Long locationId = storageLocationSetting.getStorageLocationId();
-				storageLocationSetting.setCreatedOn(null);
-				storageLocationSetting.setEtag(null);
-				storageLocationSetting.setStorageLocationId(null);
-				if (setting.equals(storageLocationSetting)) {
-					return locationId;
+			Long locationId = null;
+			for (StorageLocationSetting existingStorageLocationSetting : existingStorageLocations) {
+				existingStorageLocationSetting.setCreatedOn(null);
+				existingStorageLocationSetting.setEtag(null);
+				existingStorageLocationSetting.setStorageLocationId(null);
+				existingStorageLocationSetting.setCreatedBy(null);
+				existingStorageLocationSetting.setDescription(null);
+				if (setting != null && setting.equals(existingStorageLocationSetting)) {
+					//found matching storage location setting
+					locationId = existingStorageLocationSetting.getStorageLocationId();
+					break;
 				}
 			}
+			if (locationId == null) {
+				//not found, create a new one
+				locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId(); 
+			}
 			
-			//not found, create a new one
-			StorageLocationSetting newStorageLocationSetting = synapseClient.createStorageLocationSetting(setting); 
-			return newStorageLocationSetting.getStorageLocationId(); 
+			UploadDestinationListSetting projectSetting;
+			try {
+				//update existing upload destination project/folder setting
+				projectSetting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
+				projectSetting.setLocations(Lists.newArrayList(locationId));
+				synapseClient.updateProjectSetting(projectSetting);
+			} catch(SynapseNotFoundException nfe) {
+				//create new upload destination project/folder setting
+				projectSetting = new UploadDestinationListSetting();
+				projectSetting.setProjectId(parentEntityId);
+				projectSetting.setSettingsType(ProjectSettingsType.upload);
+				projectSetting.setLocations(Lists.newArrayList(locationId));
+				synapseClient.createProjectSetting(projectSetting);
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public List<StorageLocationSetting> createOrUpdateProjectSetting() throws RestServiceException{
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getMyStorageLocationSettings();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
 	
 	
 }

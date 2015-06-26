@@ -41,6 +41,8 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestinationLocation;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
@@ -429,4 +431,13 @@ public interface SynapseClientAsync {
 			Long versionNumber, AsyncCallback<Activity> callback);
 
 	void putActivity(Activity update, AsyncCallback<Void> callback);
+
+	void getUploadDestinationLocation(String parentEntityId,
+			AsyncCallback<UploadDestinationLocation> callback);
+
+	void getOrCreateStorageLocationSetting(StorageLocationSetting setting,
+			AsyncCallback<Long> callback);
+
+	void createOrUpdateProjectSetting(
+			AsyncCallback<List<StorageLocationSetting>> callback);
 }

@@ -43,6 +43,8 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestinationLocation;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
@@ -527,4 +529,10 @@ public interface SynapseClient extends RemoteService {
 
 	Activity getOrCreateActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException;
+
+	UploadDestinationLocation getUploadDestinationLocation(String parentEntityId) throws RestServiceException;
+
+	Long getOrCreateStorageLocationSetting(StorageLocationSetting setting) throws RestServiceException;
+
+	List<StorageLocationSetting> createOrUpdateProjectSetting() throws RestServiceException;
 }

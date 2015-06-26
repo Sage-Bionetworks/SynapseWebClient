@@ -46,7 +46,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		this.entityUpdatedHandler = entityUpdatedHandler;
 		clear();
 		Entity entity = entityBundle.getEntity();
-		synapseClient.getUploadDestinationLocation(entity.getId(), new AsyncCallback<UploadDestinationLocation>() {
+		synapseClient.getStorageLocation(entity.getId(), new AsyncCallback<UploadDestinationLocation>() {
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -54,8 +54,8 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			}
 			
 			@Override
-			public void onSuccess(UploadDestinationLocation result) {
-
+			public void onSuccess(UploadDestinationLocation location) {
+				location.
 			}
 		});
 	}
