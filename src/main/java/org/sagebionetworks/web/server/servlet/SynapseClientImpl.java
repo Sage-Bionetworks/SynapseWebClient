@@ -3132,23 +3132,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			//first, try to find a matching storage location setting for this user, and reuse
 			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
 			Long locationId = null;
-			for (StorageLocationSetting existingStorageLocationSetting : existingStorageLocations) {
-				existingStorageLocationSetting.setCreatedOn(null);
-				existingStorageLocationSetting.setEtag(null);
-				existingStorageLocationSetting.setStorageLocationId(null);
-				existingStorageLocationSetting.setCreatedBy(null);
-				existingStorageLocationSetting.setDescription(null);
-				if (setting != null && setting.equals(existingStorageLocationSetting)) {
-					//found matching storage location setting
-					locationId = existingStorageLocationSetting.getStorageLocationId();
-					break;
+			if (setting != null) {
+				for (StorageLocationSetting existingStorageLocationSetting : existingStorageLocations) {
+					existingStorageLocationSetting.setCreatedOn(null);
+					existingStorageLocationSetting.setEtag(null);
+					existingStorageLocationSetting.setStorageLocationId(null);
+					existingStorageLocationSetting.setCreatedBy(null);
+					existingStorageLocationSetting.setDescription(null);
+					if (setting.equals(existingStorageLocationSetting)) {
+						//found matching storage location setting
+						locationId = existingStorageLocationSetting.getStorageLocationId();
+						break;
+					}
+				}
+				if (locationId == null) {
+					//not found, create a new one
+					locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId(); 
 				}
 			}
-			if (locationId == null) {
-				//not found, create a new one
-				locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId(); 
-			}
-			
 			UploadDestinationListSetting projectSetting;
 			try {
 				//update existing upload destination project/folder setting
