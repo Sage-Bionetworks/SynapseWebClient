@@ -18,11 +18,13 @@
 			     	<b:Collapse b:id="s3ParamsCollapse" addStyleNames="margin-left-20">
 						<b:FormLabel for="bucketField" >Bucket</b:FormLabel>
 				     	<b:TextBox ui:field="bucketField" addStyleNames="margin-bottom-10 hide-resize "/>
+				     	<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize "/>
 					</b:Collapse>
 			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" formValue="value1" text="SFTP Server"/>
 			        <bh:Div addStyleNames="margin-left-20">
 				     	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
 				     	<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-bottom-10 hide-resize"/>
+				     	<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize "/>
 				     </bh:Div>
 			    </b:FormGroup>
 			   <g:SimplePanel ui:field="synAlertPanel"/>

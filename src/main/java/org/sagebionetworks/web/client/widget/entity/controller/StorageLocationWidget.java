@@ -113,10 +113,12 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
 			setting.setBanner(view.getExternalS3Banner());
 			setting.setBucket(view.getBucket());
-			
 			return setting;
 		} else if (view.isSFTPStorageSelected()) {
 			ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
+			setting.setUrl(view.getSFTPUrl());
+			setting.setBanner(view.getSFTPBanner());
+			return setting;
 		} else {
 			//default synapse storage
 			return null;

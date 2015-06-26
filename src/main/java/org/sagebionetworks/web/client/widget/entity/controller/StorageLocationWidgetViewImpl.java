@@ -27,9 +27,13 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	
 	@UiField
 	TextBox bucketField;
+	@UiField
+	TextBox externalS3BannerField;
 	
 	@UiField
 	TextBox sftpUrlField;
+	@UiField
+	TextBox sftpBannerField;
 	
 	@UiField
 	Radio synapseStorageButton;
@@ -62,27 +66,6 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 				modal.hide();
 			}
 		});
-		synapseStorageButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				bucketField.setEnabled(false);
-				sftpUrlField.setEnabled(false);
-			}
-		});
-		externalS3Button.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				bucketField.setEnabled(true);
-				sftpUrlField.setEnabled(false);
-			}
-		});
-		sftpButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				bucketField.setEnabled(false);
-				sftpUrlField.setEnabled(true);
-			}
-		});
 	}
 	
 	@Override
@@ -104,6 +87,8 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	public void clear() {
 		bucketField.setText("");
 		sftpUrlField.setText("");
+		externalS3BannerField.setText("");
+		sftpBannerField.setText("");
 		selectSynapseStorage();
 	}
 
@@ -155,5 +140,13 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@Override
 	public String getSFTPUrl() {
 		return sftpUrlField.getValue();
+	}
+	@Override
+	public String getExternalS3Banner() {
+		return externalS3BannerField.getValue();
+	}
+	@Override
+	public String getSFTPBanner() {
+		return sftpBannerField.getValue();
 	}
 }
