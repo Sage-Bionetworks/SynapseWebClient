@@ -150,6 +150,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 							view.setLoadingVisible(false);
 							if (view.getRootCount() == 0) {
 								view.showEmptyUI();
+							} else {
+								view.hideEmptyUI();
 							}
 						} else {
 							parent.showTypeIcon();
