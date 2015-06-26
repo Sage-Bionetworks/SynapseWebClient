@@ -219,7 +219,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 				childToCreate.setVisible(false);
 			}
 		});
-		parent.asTreeItem().insertItem((int) offset, childToCreate.asTreeItem());
+		parent.asTreeItem().addItem(childToCreate.asTreeItem());
 	}
 
 	/*
