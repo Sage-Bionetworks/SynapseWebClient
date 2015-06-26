@@ -356,7 +356,6 @@ public interface SynapseClient extends RemoteService {
 	public String getCertificationQuiz() throws RestServiceException;
 	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
 	
-	public EntityIdList getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
 	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType, String contentMD5, Long storageLocationId) throws RestServiceException;
 	public String getChunkedPresignedUrl(ChunkRequest chunkRequest) throws RestServiceException;

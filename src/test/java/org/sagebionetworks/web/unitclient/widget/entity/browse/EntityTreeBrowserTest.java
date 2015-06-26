@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -82,9 +83,9 @@ public class EntityTreeBrowserTest {
 		searchResults.setEntities(entities);
 		when(mockInjector.getEntityTreeItemWidget()).thenReturn(
 				mockEntityTreeItem);
-		mockMoreTreeItem.type = MoreTreeItem.MORE_TYPE.FOLDER;
 		EntityQueryResult header = new EntityQueryResult();
 		header.setId(parentId);
+		header.setEntityType("folder");
 		when(mockEntityTreeItem.getHeader()).thenReturn(header);
 //		when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
 //		when(mockView.insertLoading(any(EntityTreeItem.class), Mockito.anyInt())).thenReturn(mockLoadingItem);
@@ -96,33 +97,32 @@ public class EntityTreeBrowserTest {
 						any(AsyncCallback.class));
 	}
 
-	@Test
-	public void testGetFolderChildren() {
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-		entityTreeBrowser.getFolderChildren("123", null, 0);
-		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor
-				.forClass(EntityQuery.class);
-		verify(mockSynapseClient, times(3)).executeEntityQuery(
-				captor.capture(), any(AsyncCallback.class));
-		List<EntityQuery> queries = captor.getAllValues();
-		assertEquals(EntityType.folder, queries.get(0).getFilterByType());
-		assertEquals(EntityType.link, queries.get(1).getFilterByType());
-		assertEquals(EntityType.file, queries.get(2).getFilterByType());
-	}
+//	@Test
+//	public void testGetFolderChildren() {
+//		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+//		entityTreeBrowser.getChildren("123", null, 0);
+//		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor
+//				.forClass(EntityQuery.class);
+//		verify(mockSynapseClient).executeEntityQuery(
+//				captor.capture(), any(AsyncCallback.class));
+//		List<EntityQuery> queries = captor.getAllValues();
+//		assertEquals(EntityType.folder, queries.get(0).getFilterByType());
+//		assertEquals(EntityType.link, queries.get(1).getFilterByType());
+//		assertEquals(EntityType.file, queries.get(2).getFilterByType());
+//	}
 
 	@Test
 	public void testCreateGetChildrenQuery() {
 		String parentId = "9";
 		EntityQuery query = entityTreeBrowser.createGetChildrenQuery(parentId,
-				0, EntityType.folder);
+				0);
 
 		// verify sort
 		assertEquals(EntityFieldName.name.name(), query.getSort()
 				.getColumnName());
 		assertEquals(SortDirection.ASC, query.getSort().getDirection());
 		List<Condition> conditions = query.getConditions();
-		assertEquals(1, conditions.size());
-		assertEquals(EntityType.folder, query.getFilterByType());
+		assertEquals(2, conditions.size());
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class EntityTreeBrowserTest {
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
 				mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
-		entityTreeBrowser.getFolderChildren("123", null, 0);
+		entityTreeBrowser.getChildren("123", null, 0);
 		// capture the servlet call
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor
 				.forClass(AsyncCallback.class);
@@ -149,14 +149,12 @@ public class EntityTreeBrowserTest {
 	public void testMoreButtonRootLevel() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
 		setQueryResults(4 * maxLim, 0, maxLim);
-		entityTreeBrowser.getFolderChildren(parentId, null, 0);
+		entityTreeBrowser.getChildren(parentId, null, 0);
 		// Creates the limited number of entity items
 		// 100 links, and 100 files
 		verify(mockView, times((int) entityTreeBrowser.getMaxLimit()))
-				.insertRootEntityTreeItem(any(EntityTreeItem.class),
-						Mockito.anyLong());
-		// Calls once for folders, once for files.
-		verify(mockView, times(2)).placeRootMoreFoldersTreeItem(
+				.appendRootEntityTreeItem(any(EntityTreeItem.class));
+		verify(mockView).placeRootMoreTreeItem(
 				any(MoreTreeItem.class), Mockito.eq(parentId),
 				Mockito.eq(maxLim));
 	}
@@ -166,14 +164,12 @@ public class EntityTreeBrowserTest {
 	public void testMoreButtonChildLevel() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
 		setQueryResults(4 * maxLim, 0, maxLim);
-		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem, 0);
+		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem, 0);
 		// Creates the limited number of entity items
-		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
-				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.anyLong());
+		verify(mockView, times((int) maxLim)).appendChildEntityTreeItem(
+				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem));
 		// Calls once for folders, once for files.
-		verify(mockView, times(2)).placeChildMoreFoldersTreeItem(
-				any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
+		verify(mockView).placeChildMoreTreeItem(any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
 				Mockito.eq(maxLim));
 	}
 
@@ -181,28 +177,26 @@ public class EntityTreeBrowserTest {
 	public void testGetMoreButtonRequery() {
 		long maxLim = entityTreeBrowser.getMaxLimit();
 		setQueryResults(4 * maxLim, 0, maxLim);
-		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem, 0);
+		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem, 0);
 		// Adds the limited number of entity items
-		verify(mockView, times((int) maxLim)).insertChildEntityTreeItem(
-				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.anyLong());
+		verify(mockView, times((int) maxLim)).appendChildEntityTreeItem(
+				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem));
 		// Calls once for folders, once for files.
-		verify(mockView, times(2)).placeChildMoreFoldersTreeItem(
+		verify(mockView).placeChildMoreTreeItem(
 				any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
 				Mockito.eq(maxLim));
 		setQueryResults(2 * maxLim, maxLim, 2 * maxLim);
 		// Verified that the more button is created with offset maxLim, so
 		// directly the moreButton should call getFolderChildren with that
 		// offset
-		entityTreeBrowser.getFolderChildren(parentId, mockEntityTreeItem,
+		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem,
 				maxLim);
 		// Adds the rest of the entity items
-		verify(mockView, times((int) (2 * maxLim))).insertChildEntityTreeItem(
-				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.anyLong());
+		verify(mockView, times((int) (2 * maxLim))).appendChildEntityTreeItem(
+				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem));
 		// Does not create any more "More (Entity)" buttons, which still should
 		// be at 2 times.
-		verify(mockView, times(2)).placeChildMoreFoldersTreeItem(
+		verify(mockView).placeChildMoreTreeItem(
 				any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
 				Mockito.eq(maxLim));
 	}
@@ -215,6 +209,7 @@ public class EntityTreeBrowserTest {
 			EntityQueryResult res = new EntityQueryResult();
 			res.setParentId(parentId);
 			res.setId("testResultId" + i);
+			res.setEntityType("folder");
 			entities.add(res);
 		}
 		searchResults.setEntities(entities.subList((int) startIndex,

@@ -2235,17 +2235,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@Override
-	public EntityIdList getDescendants(String nodeId, int pageSize,
-			String lastDescIdExcl) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getDescendants(nodeId,
-					pageSize, lastDescIdExcl);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 
 	@Override
 	public Doi getEntityDoi(String entityId, Long versionNumber)

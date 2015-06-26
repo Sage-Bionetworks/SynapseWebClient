@@ -133,6 +133,8 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItemView;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItemViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -917,6 +919,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Entity Finder
 		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);		
+		
+		// MoreTreeItem
+		bind(MoreTreeItemView.class).to(MoreTreeItemViewImpl.class);
 
 		bind(EvaluationSubmitterView.class).to(EvaluationSubmitterViewImpl.class);
 		

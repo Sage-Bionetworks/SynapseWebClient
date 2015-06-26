@@ -1162,9 +1162,9 @@ public class SynapseClientImplTest {
 		// parent entity has no immediate children
 		EntityIdList childEntities = new EntityIdList();
 		childEntities.setIdList(new ArrayList());
-		when(
-				mockSynapse.getDescendants(anyString(), anyInt(), anyInt(),
-						anyString())).thenReturn(childEntities);
+//		when(
+//				mockSynapse.getDescendants(anyString(), anyInt(), anyInt(),
+//						anyString())).thenReturn(childEntities);
 
 		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId");
 
