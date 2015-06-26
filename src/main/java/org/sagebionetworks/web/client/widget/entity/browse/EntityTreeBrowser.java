@@ -47,7 +47,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
-	private final int MAX_FOLDER_LIMIT = 3;
+	private final int MAX_FOLDER_LIMIT = 100;
 	EntitySelectedHandler entitySelectedHandler;
 	
 	@Inject
@@ -178,79 +178,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			view.placeChildMoreTreeItem(moreItem, parent, offset + MAX_FOLDER_LIMIT);
 		}
 	}
-
-//	@Override
-//	public void getChildrenFiles(final String parentId,
-//			final EntityTreeItem parent, final long offset) {
-//		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset,
-//				org.sagebionetworks.repo.model.entity.query.EntityType.file);
-//		synapseClient.executeEntityQuery(childrenQuery,
-//				new AsyncCallback<EntityQueryResults>() {
-//					@Override
-//					public void onSuccess(EntityQueryResults results) {
-//						if (!results.getEntities().isEmpty()) {
-//							addResultsToParent(
-//									parent,
-//									results,
-//									org.sagebionetworks.repo.model.entity.query.EntityType.file,
-//									offset, false);
-//							// More total entities than able to be displayed, so
-//							// must add a "More Files" button
-//							if (results.getTotalEntityCount() > offset
-//									+ results.getEntities().size()) {
-//								final MoreTreeItem moreItem = ginInjector
-//										.getMoreTreeWidget();
-//								moreItem.configure(MoreTreeItem.MORE_TYPE.FILE);
-//								addMoreButton(moreItem, parentId, parent,
-//										offset);
-//							}
-//						}
-//						
-//					}
-//
-//					@Override
-//					public void onFailure(Throwable caught) {
-//						DisplayUtils.handleServiceException(caught,
-//								globalApplicationState,
-//								authenticationController.isLoggedIn(), view);
-//					}
-//				});
-//
-//	}
-	
-	/**
-	 * Links are asked for once for a folder, and does not currently support pagination.
-	 * After link query response returns, it queries for files.
-	 * @param parentId
-	 * @param parent
-	 */
-//	public void getChildrenLinks(
-//			final String parentId,
-//			final EntityTreeItem parent) {
-//		EntityQuery childrenQuery = createGetChildrenQuery(parentId, 0,
-//				org.sagebionetworks.repo.model.entity.query.EntityType.link);
-//		synapseClient.executeEntityQuery(childrenQuery,
-//				new AsyncCallback<EntityQueryResults>() {
-//					@Override
-//					public void onSuccess(EntityQueryResults results) {
-//						if (!results.getEntities().isEmpty()) {
-//							addResultsToParent(
-//									parent,
-//									results,
-//									org.sagebionetworks.repo.model.entity.query.EntityType.link,
-//									0, false);
-//						}
-//						getChildrenFiles(parentId, parent, 0);
-//					}
-//
-//					@Override
-//					public void onFailure(Throwable caught) {
-//						DisplayUtils.handleServiceException(caught,
-//								globalApplicationState,
-//								authenticationController.isLoggedIn(), view);
-//					}
-//				});
-//	}
 
 	@Override
 	public void setSelection(String id) {

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -20,11 +21,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -97,19 +99,23 @@ public class EntityTreeBrowserTest {
 						any(AsyncCallback.class));
 	}
 
-//	@Test
-//	public void testGetFolderChildren() {
-//		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-//		entityTreeBrowser.getChildren("123", null, 0);
-//		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor
-//				.forClass(EntityQuery.class);
-//		verify(mockSynapseClient).executeEntityQuery(
-//				captor.capture(), any(AsyncCallback.class));
-//		List<EntityQuery> queries = captor.getAllValues();
-//		assertEquals(EntityType.folder, queries.get(0).getFilterByType());
-//		assertEquals(EntityType.link, queries.get(1).getFilterByType());
-//		assertEquals(EntityType.file, queries.get(2).getFilterByType());
-//	}
+	@Test
+	public void testGetChildren() {
+		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
+		entityTreeBrowser.getChildren("123", null, 0);
+		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor
+				.forClass(EntityQuery.class);
+		verify(mockSynapseClient).executeEntityQuery(
+				captor.capture(), any(AsyncCallback.class));
+		List<EntityQuery> queries = captor.getAllValues();
+		assertTrue(queries.size() == 1);
+		List<Condition> conditions = queries.get(0).getConditions();
+		assertTrue(conditions.size() == 2);
+		EntityFieldCondition parentCondition = (EntityFieldCondition)conditions.get(0);
+		EntityFieldCondition typeCondition = (EntityFieldCondition)conditions.get(1);
+		assertTrue(parentCondition.getLeftHandSide().equals(EntityFieldName.parentId));
+		assertTrue(typeCondition.getLeftHandSide().equals(EntityFieldName.nodeType));
+	}
 
 	@Test
 	public void testCreateGetChildrenQuery() {
