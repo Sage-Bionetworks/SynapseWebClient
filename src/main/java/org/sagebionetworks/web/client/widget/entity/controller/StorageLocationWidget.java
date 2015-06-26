@@ -1,27 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import org.gwtbootstrap3.client.shared.event.ShowEvent;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.file.UploadDestinationLocation;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
-import org.sagebionetworks.repo.model.provenance.Activity;
-import org.sagebionetworks.repo.model.provenance.Used;
-import org.sagebionetworks.repo.model.provenance.UsedEntity;
-import org.sagebionetworks.repo.model.provenance.UsedURL;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -52,17 +41,34 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		clear();
 		Entity entity = entityBundle.getEntity();
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
-			
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				if (caught instanceof ForbiddenException) {
+					hide();
+					view.showErrorMessage(caught.getMessage());
+				} else {
+					synAlert.handleException(caught);	
+				}
 			}
 			
 			@Override
 			public void onSuccess(StorageLocationSetting location) {
 				//if null, then still show the default UI
 				if (location != null) {
-					
+					//set up the view
+					if (location instanceof ExternalS3StorageLocationSetting) {
+						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
+						view.selectExternalS3Storage();
+						view.setBaseKey(setting.getBaseKey());
+						view.setBucket(setting.getBucket());
+						view.setExternalS3Banner(setting.getBanner());
+						view.selectExternalS3Storage();
+					} else if (location instanceof ExternalStorageLocationSetting) {
+						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
+						view.setSFTPUrl(setting.getUrl());
+						view.setSFTPBanner(setting.getBanner());
+						view.selectSFTPStorage();
+					}
 				}
 			}
 		});
@@ -74,8 +80,8 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	}
 	
 	public void show() {
-		clear();
 		view.show();
+		clear();
 	}
 	
 	public void hide() {
@@ -113,11 +119,14 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
 			setting.setBanner(view.getExternalS3Banner());
 			setting.setBucket(view.getBucket());
+			setting.setBaseKey(view.getBaseKey());
+			setting.setUploadType(UploadType.S3);
 			return setting;
 		} else if (view.isSFTPStorageSelected()) {
 			ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
 			setting.setUrl(view.getSFTPUrl());
 			setting.setBanner(view.getSFTPBanner());
+			setting.setUploadType(UploadType.SFTP);
 			return setting;
 		} else {
 			//default synapse storage

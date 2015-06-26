@@ -12,20 +12,23 @@
 			</b:ModalHeader>
 			<b:ModalBody>
 			     <b:FormGroup>
-			     	<b:Radio ui:field="synapseStorageButton" name="storageLocationRadio" formValue="value1" text="Synapse Storage"/>
-			     	
-			     	<b:Radio ui:field="externalS3Button" name="storageLocationRadio" formValue="value1" dataToggle="COLLAPSE" dataTarget="#s3ParamsCollapse" text="Amazon S3 Bucket"/>
-			     	<b:Collapse b:id="s3ParamsCollapse" addStyleNames="margin-left-20">
+			     	<b:Radio ui:field="synapseStorageButton" name="storageLocationRadio" text="Synapse Storage"/>
+			     	<b:Radio ui:field="externalS3Button" name="storageLocationRadio" text="Amazon S3 Bucket"/>
+			     	<bh:Div addStyleNames="margin-left-20" ui:field="s3Collapse">
 						<b:FormLabel for="bucketField" >Bucket</b:FormLabel>
 				     	<b:TextBox ui:field="bucketField" addStyleNames="margin-bottom-10 hide-resize "/>
+				     	<b:FormLabel for="baseKeyField" >Base Key</b:FormLabel>
+				     	<b:TextBox ui:field="baseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
+				     	<b:FormLabel for="externalS3BannerField" >Banner</b:FormLabel>
 				     	<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize "/>
-					</b:Collapse>
-			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" formValue="value1" text="SFTP Server"/>
-			        <bh:Div addStyleNames="margin-left-20">
-				     	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
+					</bh:Div>
+			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" text="SFTP Server"/>
+			     	<bh:Div addStyleNames="margin-left-20" ui:field="sftpCollapse">
+			         	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
 				     	<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-bottom-10 hide-resize"/>
+				     	<b:FormLabel for="sftpBannerField" >Banner</b:FormLabel>
 				     	<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize "/>
-				     </bh:Div>
+				    </bh:Div>
 			    </b:FormGroup>
 			   <g:SimplePanel ui:field="synAlertPanel"/>
 			</b:ModalBody>

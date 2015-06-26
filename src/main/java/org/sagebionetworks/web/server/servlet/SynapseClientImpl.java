@@ -176,7 +176,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
-import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 public class SynapseClientImpl extends RemoteServiceServlet implements
@@ -3105,18 +3104,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			UploadDestinationListSetting setting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
-			if (setting == null) {
+			if (setting == null || 
+					CollectionUtils.isEmpty(setting.getLocations()) || 
+					setting.getLocations().get(0) == null) {
 				//default storage location
 				return null;
 			}
-			if (CollectionUtils.isEmpty(setting.getLocations())) {
-				//default storage location
-				return null;
-			}
+			
 			//else
 			return synapseClient.getMyStorageLocationSetting(setting.getLocations().get(0));
 		} catch (SynapseException e) {
-			//TODO: handle unauthorized exception well in the client-side
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
@@ -3143,21 +3140,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				}
 				if (locationId == null) {
 					//not found, create a new one
-					locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId(); 
+					locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId();
 				}
 			}
-			UploadDestinationListSetting projectSetting;
-			try {
-				//update existing upload destination project/folder setting
-				projectSetting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
-				projectSetting.setLocations(Lists.newArrayList(locationId));
-				synapseClient.updateProjectSetting(projectSetting);
-			} catch(SynapseNotFoundException nfe) {
+			
+			ArrayList<Long> locationIds = new ArrayList<Long>();
+			locationIds.add(locationId);
+			
+			//update existing upload destination project/folder setting
+			UploadDestinationListSetting projectSetting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
+			if (projectSetting != null) {
+				projectSetting.setLocations(locationIds);
+				synapseClient.updateProjectSetting(projectSetting);	
+			} else {
 				//create new upload destination project/folder setting
 				projectSetting = new UploadDestinationListSetting();
 				projectSetting.setProjectId(parentEntityId);
 				projectSetting.setSettingsType(ProjectSettingsType.upload);
-				projectSetting.setLocations(Lists.newArrayList(locationId));
+				projectSetting.setLocations(locationIds);
 				synapseClient.createProjectSetting(projectSetting);
 			}
 		} catch (SynapseException e) {

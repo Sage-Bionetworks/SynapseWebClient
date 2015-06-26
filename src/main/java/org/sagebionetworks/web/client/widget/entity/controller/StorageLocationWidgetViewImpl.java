@@ -4,6 +4,8 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,6 +31,8 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	TextBox bucketField;
 	@UiField
 	TextBox externalS3BannerField;
+	@UiField
+	TextBox baseKeyField;
 	
 	@UiField
 	TextBox sftpUrlField;
@@ -48,6 +52,11 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@UiField
 	Button cancelButton;
 	
+	@UiField
+	Div s3Collapse;
+	@UiField
+	Div sftpCollapse;
+	
 	Widget widget;
 	Presenter presenter;
 	
@@ -64,6 +73,28 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
+			}
+		});
+		
+		synapseStorageButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				s3Collapse.setVisible(false);
+				sftpCollapse.setVisible(false);
+			}
+		});
+		externalS3Button.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				s3Collapse.setVisible(true);
+				sftpCollapse.setVisible(false);
+			}
+		});
+		sftpButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				s3Collapse.setVisible(false);
+				sftpCollapse.setVisible(true);
 			}
 		});
 	}
@@ -86,10 +117,13 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@Override
 	public void clear() {
 		bucketField.setText("");
+		baseKeyField.setText("");
 		sftpUrlField.setText("");
 		externalS3BannerField.setText("");
 		sftpBannerField.setText("");
 		selectSynapseStorage();
+		s3Collapse.setVisible(false);
+		sftpCollapse.setVisible(false);
 	}
 
 	@Override
@@ -104,7 +138,9 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectSynapseStorage() {
-		synapseStorageButton.setValue(true, true);
+		synapseStorageButton.setValue(true);
+		s3Collapse.setVisible(false);
+		sftpCollapse.setVisible(false);
 	}
 
 	@Override
@@ -114,7 +150,9 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectExternalS3Storage() {
-		externalS3Button.setValue(true, true);
+		externalS3Button.setValue(true);
+		s3Collapse.setVisible(true);
+		sftpCollapse.setVisible(false);
 	}
 
 	@Override
@@ -129,7 +167,9 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectSFTPStorage() {
-		sftpButton.setValue(true, true);
+		sftpButton.setValue(true);
+		s3Collapse.setVisible(false);
+		sftpCollapse.setVisible(true);
 	}
 
 	@Override
@@ -148,5 +188,34 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@Override
 	public String getSFTPBanner() {
 		return sftpBannerField.getValue();
+	}
+	@Override
+	public String getBaseKey() {
+		return baseKeyField.getValue();
+	}
+	
+	@Override
+	public void setBaseKey(String baseKey) {
+		baseKeyField.setValue(baseKey);
+	}
+	@Override
+	public void setBucket(String bucket) {
+		bucketField.setValue(bucket);
+	}
+	@Override
+	public void setExternalS3Banner(String banner) {
+		externalS3BannerField.setValue(banner);
+	}
+	@Override
+	public void setSFTPBanner(String banner) {
+		sftpBannerField.setValue(banner);
+	}
+	@Override
+	public void setSFTPUrl(String url) {
+		sftpUrlField.setValue(url);
+	}
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }

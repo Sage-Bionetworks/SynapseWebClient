@@ -39,10 +39,17 @@ public interface StorageLocationWidgetView {
 	void selectExternalS3Storage();
 	boolean isExternalS3StorageSelected();
 	String getBucket();
+	void setBucket(String bucket);
+	String getBaseKey();
+	void setBaseKey(String baseKey);
 	String getExternalS3Banner();
+	void setExternalS3Banner(String banner);
 	
 	void selectSFTPStorage();
 	boolean isSFTPStorageSelected();
 	String getSFTPUrl();
+	void setSFTPUrl(String url);
 	String getSFTPBanner();
+	void setSFTPBanner(String banner);
+	void showErrorMessage(String message);
 }
