@@ -32,7 +32,8 @@
 		                    <bh:Div ui:field="iconContainer">
 		                        <b:Icon ui:field="defaultIcon" type="USER"
 								addStyleNames="font-size-150 lightGreyText" visible="true"/>
-		                        <bh:Span ui:field="previewImageContainer" width="150px" visible="false"/>		                    </bh:Div>
+								<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+		                    </bh:Div>
 							<bh:Div ui:field="teamImageLoading" visible="false">
 								<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
 								<bh:Text>&nbsp;Loading...</bh:Text>

@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.Image;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ImageType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
@@ -56,7 +55,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	Icon defaultIcon;
 	
 	@UiField
-	Span previewImageContainer;
+	Image previewImage;
 	
 	@UiField
 	Div teamImageLoading;
@@ -177,19 +176,15 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	@Override
 	public void setImageURL(String url) {
 		defaultIcon.setVisible(false);
-		previewImageContainer.setVisible(true);
+		previewImage.setVisible(true);
 		teamImageLoading.setVisible(false);
-		Image toAdd = new Image(url);
-		toAdd.setWidth("150px");
-		toAdd.setType(ImageType.ROUNDED);
-		previewImageContainer.clear();
-		previewImageContainer.add(toAdd);
+		previewImage.setUrl(url);
 	}	
 	
 	@Override
 	public void setDefaultIconVisible() {
 		defaultIcon.setVisible(true);
-		previewImageContainer.setVisible(false);
+		previewImage.setVisible(false);
 		teamImageLoading.setVisible(false);
 	}
 	

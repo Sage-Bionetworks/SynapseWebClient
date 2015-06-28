@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
@@ -151,13 +152,28 @@ public class FileHandleServletTest {
 
 	@Test
 	public void testDoGetLoggedInFileEntityPreview() throws Exception {
+		String sessionToken = "fake";
+
+		//set up general synapse client configuration test
+		String authBaseUrl = "authbase";
+		String repoServiceUrl = "repourl";
+		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
+		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
+		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
+		
 		setupFileEntity();
 		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
-		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getFileEntityPreviewTemporaryUrlForVersion(anyString(), anyLong());
 		verify(mockResponse).sendRedirect(anyString());
+		
+		//as an additional test, verify that synapse client is set up
+		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
+		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
+		verify(mockSynapse).setFileEndpoint(anyString());
+		verify(mockSynapse).setSessionToken(sessionToken);
 	}
 	
 	@Test
