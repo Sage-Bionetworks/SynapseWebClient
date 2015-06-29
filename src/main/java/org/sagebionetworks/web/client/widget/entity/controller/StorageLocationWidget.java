@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.gwtbootstrap3.client.shared.event.ShowEvent;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.file.UploadType;
@@ -10,8 +9,11 @@ import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -58,16 +60,14 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 					//set up the view
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
-						view.selectExternalS3Storage();
-						view.setBaseKey(setting.getBaseKey());
-						view.setBucket(setting.getBucket());
-						view.setExternalS3Banner(setting.getBanner());
+						view.setBaseKey(setting.getBaseKey().trim());
+						view.setBucket(setting.getBucket().trim());
+						view.setExternalS3Banner(setting.getBanner().trim());
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
-						//TODO: add basic url validation here
-						view.setSFTPUrl(setting.getUrl());
-						view.setSFTPBanner(setting.getBanner());
+						view.setSFTPUrl(setting.getUrl().trim());
+						view.setSFTPBanner(setting.getBanner().trim());
 						view.selectSFTPStorage();
 					}
 				}
@@ -97,36 +97,42 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 
 	@Override
 	public void onSave() {
-		//look for duplicate storage location in existing settings
-		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-
-			@Override
-			public void onSuccess(Void result) {
-				view.hide();
-				entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
-			}
-		};
+		synAlert.clear();
 		StorageLocationSetting setting = getStorageLocationSettingFromView();
-		
-		synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);	
+		String error = validate(setting);
+		if (error != null) {
+			synAlert.showError(error);
+		} else {
+			//look for duplicate storage location in existing settings
+			AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+
+				@Override
+				public void onSuccess(Void result) {
+					view.hide();
+					entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
+				}
+			};
+			synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);	
+		}
+			
 	}
 	
 	public StorageLocationSetting getStorageLocationSettingFromView() {
 		if (view.isExternalS3StorageSelected()) {
 			ExternalS3StorageLocationSetting setting = new ExternalS3StorageLocationSetting();
-			setting.setBanner(view.getExternalS3Banner());
-			setting.setBucket(view.getBucket());
-			setting.setBaseKey(view.getBaseKey());
+			setting.setBanner(view.getExternalS3Banner().trim());
+			setting.setBucket(view.getBucket().trim());
+			setting.setBaseKey(view.getBaseKey().trim());
 			setting.setUploadType(UploadType.S3);
 			return setting;
 		} else if (view.isSFTPStorageSelected()) {
 			ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
-			setting.setUrl(view.getSFTPUrl());
-			setting.setBanner(view.getSFTPBanner());
+			setting.setUrl(view.getSFTPUrl().trim());
+			setting.setBanner(view.getSFTPBanner().trim());
 			setting.setUploadType(UploadType.SFTP);
 			return setting;
 		} else {
@@ -134,7 +140,39 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			return null;
 		}
 	}
+	
+	/**
+	 * Up front validation of storage setting parameters.
+	 * @param setting
+	 * @return Returns true if no problems are detected with the input, false otherwise.  Note, returns true if setting object is null (default synapse storage).  
+	 */
+	public String validate(StorageLocationSetting setting) {
+		if (setting != null) {
+			if (setting instanceof ExternalS3StorageLocationSetting) {
+				ExternalS3StorageLocationSetting externalS3StorageLocationSetting = (ExternalS3StorageLocationSetting)setting;
+				if (externalS3StorageLocationSetting.getBucket().isEmpty()) {
+					return "Bucket is required.";
+				}
+			} else if (setting instanceof ExternalStorageLocationSetting) {
+				ExternalStorageLocationSetting externalStorageLocationSetting = (ExternalStorageLocationSetting) setting;
+				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl())) {
+					return "A valid SFTP URL is required.";
+				}
+			}
+		}
+		return null;
+	}
 
+
+	public static boolean isValidSftpUrl(String url) {
+		if (url == null || url.trim().length() == 0) {
+			//url is undefined
+			return false;
+		}
+		RegExp regEx = RegExp.compile(WebConstants.VALID_SFTP_URL_REGEX, "gmi");
+		MatchResult matchResult = regEx.exec(url);
+		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
+	}
 	public void setEntityUpdatedHandler(EntityUpdatedHandler updatedHandler) {
 		this.entityUpdatedHandler = updatedHandler;
 	}
