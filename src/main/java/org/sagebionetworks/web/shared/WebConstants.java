@@ -162,7 +162,6 @@ public class WebConstants {
 	public static final String PROVENANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.provenance_synapse_id";
 	public static final String PROVENANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.provenance_wiki_id";
 	
-	
 	//Workshop
 	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.collaboratorium_synapse_id";
 	public static final String STAGE_I_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageI_synapse_id";
@@ -176,10 +175,7 @@ public class WebConstants {
 	public static final String STAGE_IX_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIX_synapse_id";
 	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
 	
-	
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
-	
-
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
 	public static final String CONFLUENCE_ENDPOINT = "org.sagebionetworks.portal.confluence_endpoint";
@@ -197,15 +193,13 @@ public class WebConstants {
 	
 	
 	public static final String GETTING_STARTED = "GettingStarted";
-	public static final String CREATE_PROJECT = "CreateProject";
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
-	public static final String GOVERNANCE = "Governance";
-	public static final String PROVENANCE = "Provenance";
 	
+	public static final String WIKI_PROPERTIES_PACKAGE="org.sagebionetworks.portal.wikis.";
 	public static final String COLLABORATORIUM = "Collaboratorium";
 	public static final String STAGE_I = "StageI";
 	public static final String STAGE_II = "StageII";
