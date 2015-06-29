@@ -533,4 +533,6 @@ public interface SynapseClient extends RemoteService {
 	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting) throws RestServiceException;
 
 	StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException;
+
+	List<String> getMyLocationSettingBanners() throws RestServiceException;
 }

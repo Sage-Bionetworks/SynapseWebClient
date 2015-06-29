@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.file.UploadType;
@@ -41,6 +43,25 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		this.entityBundle = entityBundle;
 		this.entityUpdatedHandler = entityUpdatedHandler;
 		clear();
+		getMyLocationSettingBanners();
+	}
+	
+	public void getMyLocationSettingBanners() {
+		synapseClient.getMyLocationSettingBanners(new AsyncCallback<List<String>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				hide();
+				view.showErrorMessage(caught.getMessage());
+			}
+			public void onSuccess(List<String> banners) {
+				view.setBannerDropdownVisible(!banners.isEmpty());
+				view.setBannerSuggestions(banners);
+				getStorageLocationSetting();
+			};
+		});
+	}
+	
+	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			@Override
@@ -82,7 +103,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	
 	public void show() {
 		view.show();
-		clear();
 	}
 	
 	public void hide() {
@@ -118,7 +138,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			};
 			synapseClient.createStorageLocationSetting(entityBundle.getEntity().getId(), setting, callback);	
 		}
-			
 	}
 	
 	public StorageLocationSetting getStorageLocationSettingFromView() {

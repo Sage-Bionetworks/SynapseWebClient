@@ -3063,6 +3063,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+
+	@Override
+	public List<String> getMyLocationSettingBanners() throws RestServiceException{
+		try {
+			Set<String> banners = new HashSet<String>();
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
+			for (StorageLocationSetting storageLocationSetting : existingStorageLocations) {
+				banners.add(storageLocationSetting.getBanner());
+			}
+			List<String> sortedBanners = new ArrayList<String>(banners);
+			Collections.sort(sortedBanners, String.CASE_INSENSITIVE_ORDER);
+			return sortedBanners;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
 	@Override
 	public StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException{
 		try {
@@ -3091,6 +3109,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Long locationId = null;
 			if (setting != null) {
 				for (StorageLocationSetting existingStorageLocationSetting : existingStorageLocations) {
+					Long existingLocationId = existingStorageLocationSetting.getStorageLocationId();
 					existingStorageLocationSetting.setCreatedOn(null);
 					existingStorageLocationSetting.setEtag(null);
 					existingStorageLocationSetting.setStorageLocationId(null);
@@ -3098,7 +3117,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					existingStorageLocationSetting.setDescription(null);
 					if (setting.equals(existingStorageLocationSetting)) {
 						//found matching storage location setting
-						locationId = existingStorageLocationSetting.getStorageLocationId();
+						locationId = existingLocationId;
 						break;
 					}
 				}

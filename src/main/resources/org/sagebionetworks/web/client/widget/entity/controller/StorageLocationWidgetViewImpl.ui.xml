@@ -20,14 +20,32 @@
 				     	<b:FormLabel for="baseKeyField" >Base Key</b:FormLabel>
 				     	<b:TextBox ui:field="baseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
 				     	<b:FormLabel for="externalS3BannerField" >Banner</b:FormLabel>
-				     	<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize "/>
+
+						<b:InputGroup width="100%">
+							<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize " />
+							<b:InputGroupButton>
+								<b:Button ui:field="externalS3BannerDropdownButton"
+									dataToggle="DROPDOWN" height="34px" />
+								<b:DropDownMenu ui:field="externalS3BannerOptions">
+								</b:DropDownMenu>
+							</b:InputGroupButton>
+						</b:InputGroup>
+				     	
 					</bh:Div>
 			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" text="SFTP Server" addStyleNames="font-size-18"/>
 			     	<bh:Div addStyleNames="margin-left-20" ui:field="sftpCollapse">
 			         	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
 				     	<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-bottom-10 hide-resize"/>
 				     	<b:FormLabel for="sftpBannerField" >Banner</b:FormLabel>
-				     	<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize "/>
+						<b:InputGroup width="100%">
+							<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize " />
+							<b:InputGroupButton>
+								<b:Button ui:field="sftpBannerDropdownButton" dataToggle="DROPDOWN"
+									height="34px" />
+								<b:DropDownMenu ui:field="sftpBannerOptions">
+								</b:DropDownMenu>
+							</b:InputGroupButton>
+						</b:InputGroup>
 				    </bh:Div>
 			    </b:FormGroup>
 			   <g:SimplePanel ui:field="synAlertPanel"/>

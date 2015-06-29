@@ -1,8 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.SuggestBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -12,6 +17,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,12 +38,21 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@UiField
 	TextBox externalS3BannerField;
 	@UiField
+	DropDownMenu externalS3BannerOptions;
+	@UiField
+	Button externalS3BannerDropdownButton;
+	@UiField
 	TextBox baseKeyField;
 	
 	@UiField
 	TextBox sftpUrlField;
+	
 	@UiField
 	TextBox sftpBannerField;
+	@UiField
+	DropDownMenu sftpBannerOptions;
+	@UiField
+	Button sftpBannerDropdownButton;
 	
 	@UiField
 	Radio synapseStorageButton;
@@ -124,6 +139,8 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 		selectSynapseStorage();
 		s3Collapse.setVisible(false);
 		sftpCollapse.setVisible(false);
+		externalS3BannerOptions.clear();
+		sftpBannerOptions.clear();
 	}
 
 	@Override
@@ -217,5 +234,32 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	@Override
+	public void setBannerSuggestions(List<String> banners) {
+		addBannerOptions(sftpBannerField, sftpBannerOptions, banners);
+		addBannerOptions(externalS3BannerField, externalS3BannerOptions, banners);
+	}
+	
+	private void addBannerOptions(final TextBox field, DropDownMenu menu, List<String> banners) {
+		menu.clear();
+		for (final String banner : banners) {
+			AnchorListItem item = new AnchorListItem();
+			item.setText(banner);
+			item.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					field.setText(banner);
+				}
+			});
+			menu.add(item);
+		}
+	}
+	@Override
+	public void setBannerDropdownVisible(boolean isVisible) {
+		externalS3BannerDropdownButton.setVisible(isVisible);
+		sftpBannerDropdownButton.setVisible(isVisible);
 	}
 }

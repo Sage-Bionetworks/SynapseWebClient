@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 
@@ -52,4 +54,6 @@ public interface StorageLocationWidgetView {
 	String getSFTPBanner();
 	void setSFTPBanner(String banner);
 	void showErrorMessage(String message);
+	void setBannerSuggestions(List<String> banners);
+	void setBannerDropdownVisible(boolean isVisible);
 }
