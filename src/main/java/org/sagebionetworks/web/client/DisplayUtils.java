@@ -96,6 +96,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
@@ -1241,6 +1242,24 @@ public class DisplayUtils {
 		return html;
 	}
 	
+	public static String getVimeoVideoId(String videoUrl) {
+		GWT.debugger();
+		String videoId = null;
+		//parse out the video id from the urlS
+		int start = videoUrl.lastIndexOf("/");
+		if (start > -1) {
+			videoId = videoUrl.substring(start + 1);
+		}
+		if (videoId == null || videoId.trim().length() == 0) {
+			throw new IllegalArgumentException("Could not determine the Vimeo video ID from the given URL.");
+		}
+		return videoId;
+	}
+	
+	public static String getVimeoVideoUrl(String videoId) {
+		return "https://player.vimeo.com/video/" + videoId;
+	}
+	
 	public static String getYouTubeVideoUrl(String videoId) {
 		return "http://www.youtube.com/watch?v=" + videoId;
 	}
@@ -1256,7 +1275,7 @@ public class DisplayUtils {
 			videoId = videoUrl.substring(start + "v=".length(), end);
 		}
 		if (videoId == null || videoId.trim().length() == 0) {
-			throw new IllegalArgumentException("Could not determine the video ID from the given URL.");
+			throw new IllegalArgumentException("Could not determine the YouTube video ID from the given URL.");
 		}
 		return videoId;
 	}

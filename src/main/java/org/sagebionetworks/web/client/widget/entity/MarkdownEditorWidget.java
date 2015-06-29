@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -334,6 +333,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_VIDEO:
 			insertNewWidget(WidgetConstants.VIDEO_CONTENT_TYPE);
 			break;
+		case INSERT_VIMEO:
+			insertNewWidget(WidgetConstants.VIMEO_CONTENT_TYPE);
 		case INSERT_YOU_TUBE:
 			insertNewWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE);
 			break;

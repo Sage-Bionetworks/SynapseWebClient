@@ -12,19 +12,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class YouTubeConfigEditorTest {
 		
 	YouTubeConfigEditor editor;
-	YouTubeConfigView mockView;
+	IFrameConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
 	public void setup(){
-		mockView = mock(YouTubeConfigView.class);
+		mockView = mock(IFrameConfigView.class);
 		editor = new YouTubeConfigEditor(mockView);
 	}
 	

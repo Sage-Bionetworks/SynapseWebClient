@@ -11,57 +11,52 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEditorPresenter {
-	
+
+public class VimeoConfigEditor implements IFrameConfigView.Presenter, WidgetEditorPresenter {
+
 	private IFrameConfigView view;
 	private Map<String, String> descriptor;
 	
 	@Inject
-	public YouTubeConfigEditor(IFrameConfigView view) {
+	public VimeoConfigEditor(IFrameConfigView view) {
 		this.view = view;
 		view.setPresenter(this);
 		view.initView();
-	}
-	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
-		descriptor = widgetDescriptor;
-		String videoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
-		if (videoId != null)
-			view.setVideoUrl(DisplayUtils.getYouTubeVideoUrl(videoId));
-	}
+	}	
 	
-	@SuppressWarnings("unchecked")
-	public void clearState() {
-		view.clear();
-	}
-
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 
 	@Override
-	public void updateDescriptorFromView() {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback window) {
+		descriptor = widgetDescriptor;
+		String videoId = descriptor.get(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY);
+		if (videoId != null)
+			view.setVideoUrl(DisplayUtils.getVimeoVideoUrl(videoId));
+	}
+
+	@Override
+	public void updateDescriptorFromView() throws IllegalArgumentException {
 		//update widget descriptor from the view
 		view.checkParams();
-		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, DisplayUtils.getYouTubeVideoId(view.getVideoUrl()));
+		descriptor.put(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY, DisplayUtils.getVimeoVideoId(view.getVideoUrl()));
 	}
-	
-	
+
 	@Override
 	public String getTextToInsert() {
 		return null;
 	}
-	
+
 	@Override
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
+
 	@Override
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-	/*
-	 * Private Methods
-	 */
+
 }

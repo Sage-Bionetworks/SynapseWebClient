@@ -9,21 +9,14 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class YouTubeWidget implements IFrameWidgetView.Presenter {
-	
+public class VimeoWidget implements IFrameWidgetView.Presenter {
+
 	private IFrameWidgetView view;
 	private Map<String, String> descriptor;
 	
 	@Inject
-	public YouTubeWidget(IFrameWidgetView view) {
+	public VimeoWidget(IFrameWidgetView view) {
 		this.view = view;
-	}
-	
-	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		//set up view based on descriptor parameters
-		descriptor = widgetDescriptor;
-		view.configure("https://www.youtube.com/embed/" + descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));
 	}
 
 	@Override
@@ -31,4 +24,12 @@ public class YouTubeWidget implements IFrameWidgetView.Presenter {
 		return view.asWidget();
 	}
 
+	@Override
+	public void configure(WikiPageKey wikiKey,
+			Map<String, String> widgetDescriptor,
+			Callback widgetRefreshRequired, Long wikiVersionInView) {
+		//set up view based on descriptor parameters
+		descriptor = widgetDescriptor;
+		view.configure("https://player.vimeo.com/video/" + descriptor.get(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY));
+	}
 }

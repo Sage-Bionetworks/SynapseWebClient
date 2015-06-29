@@ -243,8 +243,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -269,6 +269,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
@@ -714,6 +716,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// QuestionContainerWidget
 		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetViewImpl.class);
 		
+		// IFrameWidget
+		bind(IFrameWidgetView.class).to(IFrameWidgetViewImpl.class);
+		
 		// DoiWidget
 		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
 		
@@ -871,7 +876,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BookmarkConfigView.class).to(BookmarkConfigViewImpl.class);
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
-		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
+		bind(IFrameConfigView.class).to(IFrameConfigViewImpl.class);
 		bind(ImageConfigViewImpl.class).in(Singleton.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
 		bind(AttachmentConfigViewImpl.class).in(Singleton.class);

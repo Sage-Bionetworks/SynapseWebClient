@@ -32,6 +32,7 @@
 					    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="videoLink">Video</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="vimeoLink" iconPosition="RIGHT">Vimeo Video</b:AnchorListItem>
 					  </b:DropDownMenu>
 					</b:ButtonGroup>
 			        <b:ButtonGroup>

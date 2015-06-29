@@ -12,6 +12,9 @@ public class WidgetConstants {
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
 	
+	public static final String VIMEO_CONTENT_TYPE = "vimeo";
+	public static final String VIMEO_FRIENDLY_NAME = "Vimeo";
+	
 	public static final String TUTORIAL_WIZARD_CONTENT_TYPE = "tutorial";
 	public static final String TUTORIAL_WIZARD_FRIENDLY_NAME = "Tutorial Wizard";
 	
@@ -125,6 +128,7 @@ public class WidgetConstants {
 	public static final String PROV_WIDGET_DISPLAY_HEIGHT_KEY = "displayHeightPx";
 	public static final int PROV_WIDGET_HEIGHT_DEFAULT = 275;
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
+	public static final String VIMEO_WIDGET_VIDEO_ID_KEY = "vimeoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
 	public static final String API_TABLE_WIDGET_QUERY_TABLE_RESULTS = "queryTableResults";

@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 
 public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescriptorView.Presenter {
@@ -92,6 +93,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
 		widgetDescriptor = descriptor;
+		GWT.debugger();
 		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor);
 		view.show();
 	}
