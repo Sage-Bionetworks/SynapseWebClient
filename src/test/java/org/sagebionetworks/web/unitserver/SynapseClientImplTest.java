@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -107,6 +108,11 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
+import org.sagebionetworks.repo.model.project.ProjectSettingsType;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
@@ -2013,4 +2019,66 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new Exception());
 		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
 	}
+	
+	
+	@Test
+	public void testGetMyLocationSettingBanners() throws SynapseException, RestServiceException {
+		List<StorageLocationSetting> existingStorageLocations = new ArrayList<StorageLocationSetting>();
+		StorageLocationSetting storageLocation = new ExternalS3StorageLocationSetting();
+		storageLocation.setBanner("Banner 1");
+		existingStorageLocations.add(storageLocation);
+		
+		storageLocation = new ExternalStorageLocationSetting();
+		storageLocation.setBanner("Another Banner");
+		existingStorageLocations.add(storageLocation);
+		
+		storageLocation = new ExternalStorageLocationSetting();
+		storageLocation.setBanner("Banner 1");
+		existingStorageLocations.add(storageLocation);
+		
+		when(mockSynapse.getMyStorageLocationSettings()).thenReturn(existingStorageLocations);
+		List<String> banners = synapseClient.getMyLocationSettingBanners();
+		verify(mockSynapse).getMyStorageLocationSettings();
+		//should be 2 (only returns unique values)
+		assertEquals(2, banners.size());
+		//and alphabetically sorted
+		assertEquals(Arrays.asList("Another Banner", "Banner 1"), banners);
+	}
+	
+	@Test(expected = Exception.class)
+	public void testGetMyLocationSettingBannersFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getMyStorageLocationSettings()).thenThrow(new Exception());
+		synapseClient.getMyLocationSettingBanners();
+	}
+	
+	@Test
+	public void testGetStorageLocationSettingNullSetting() throws SynapseException, RestServiceException {
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(null);
+		assertNull(synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test
+	public void testGetStorageLocationSettingEmptyLocations() throws SynapseException, RestServiceException {
+		UploadDestinationListSetting setting = new UploadDestinationListSetting();
+		setting.setLocations(Collections.EMPTY_LIST);
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+		assertNull(synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test
+	public void testGetStorageLocationSetting() throws SynapseException, RestServiceException {
+		UploadDestinationListSetting setting = new UploadDestinationListSetting();
+		setting.setLocations(Collections.singletonList(42L));
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
+		assertEquals(mockStorageLocationSetting, synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test(expected = Exception.class)
+	public void testGetStorageLocationSettingFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenThrow(new Exception());
+		synapseClient.getStorageLocationSetting(entityId);
+	}
+	
 }
