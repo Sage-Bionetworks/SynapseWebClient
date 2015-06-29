@@ -144,7 +144,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	/**
 	 * Up front validation of storage setting parameters.
 	 * @param setting
-	 * @return Returns true if no problems are detected with the input, false otherwise.  Note, returns true if setting object is null (default synapse storage).  
+	 * @return Returns an error string if problems are detected with the input, null otherwise.  Note, returns null if settings object is null (default synapse storage).  
 	 */
 	public String validate(StorageLocationSetting setting) {
 		if (setting != null) {
