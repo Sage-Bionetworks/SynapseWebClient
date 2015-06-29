@@ -1241,45 +1241,7 @@ public class DisplayUtils {
 		}
 		return html;
 	}
-	
-	public static String getVimeoVideoId(String videoUrl) {
-		GWT.debugger();
-		String videoId = null;
-		//parse out the video id from the urlS
-		int start = videoUrl.lastIndexOf("/");
-		if (start > -1) {
-			videoId = videoUrl.substring(start + 1);
-		}
-		if (videoId == null || videoId.trim().length() == 0) {
-			throw new IllegalArgumentException("Could not determine the Vimeo video ID from the given URL.");
-		}
-		return videoId;
-	}
-	
-	public static String getVimeoVideoUrl(String videoId) {
-		return "https://player.vimeo.com/video/" + videoId;
-	}
-	
-	public static String getYouTubeVideoUrl(String videoId) {
-		return "http://www.youtube.com/watch?v=" + videoId;
-	}
-	
-	public static String getYouTubeVideoId(String videoUrl) {
-		String videoId = null;
-		//parse out the video id from the url
-		int start = videoUrl.indexOf("v=");
-		if (start > -1) {
-			int end = videoUrl.indexOf("&", start);
-			if (end == -1)
-				end = videoUrl.length();
-			videoId = videoUrl.substring(start + "v=".length(), end);
-		}
-		if (videoId == null || videoId.trim().length() == 0) {
-			throw new IllegalArgumentException("Could not determine the YouTube video ID from the given URL.");
-		}
-		return videoId;
-	}
-	
+
 	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
 		Anchor anchor = new Anchor();
 		anchor.setHTML(icon.getHTML());

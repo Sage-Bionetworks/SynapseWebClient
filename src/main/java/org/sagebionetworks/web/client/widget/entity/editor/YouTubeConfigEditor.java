@@ -27,7 +27,7 @@ public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEd
 		descriptor = widgetDescriptor;
 		String videoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
 		if (videoId != null)
-			view.setVideoUrl(DisplayUtils.getYouTubeVideoUrl(videoId));
+			view.setVideoUrl("http://www.youtube.com/watch?v=" + videoId);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -44,7 +44,23 @@ public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEd
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, DisplayUtils.getYouTubeVideoId(view.getVideoUrl()));
+		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, getYouTubeVideoId(view.getVideoUrl()));
+	}
+	
+	public String getYouTubeVideoId(String videoUrl) {
+		String videoId = null;
+		//parse out the video id from the url
+		int start = videoUrl.indexOf("v=");
+		if (start > -1) {
+			int end = videoUrl.indexOf("&", start);
+			if (end == -1)
+				end = videoUrl.length();
+			videoId = videoUrl.substring(start + "v=".length(), end);
+		}
+		if (videoId == null || videoId.trim().length() == 0) {
+			throw new IllegalArgumentException("Could not determine the YouTube video ID from the given URL.");
+		}
+		return videoId;
 	}
 	
 	

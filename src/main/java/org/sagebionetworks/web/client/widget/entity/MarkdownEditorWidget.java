@@ -335,6 +335,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case INSERT_VIMEO:
 			insertNewWidget(WidgetConstants.VIMEO_CONTENT_TYPE);
+			break;
 		case INSERT_YOU_TUBE:
 			insertNewWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE);
 			break;

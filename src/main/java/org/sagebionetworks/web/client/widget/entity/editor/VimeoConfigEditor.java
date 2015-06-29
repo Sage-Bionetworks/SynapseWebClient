@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -34,14 +35,27 @@ public class VimeoConfigEditor implements IFrameConfigView.Presenter, WidgetEdit
 		descriptor = widgetDescriptor;
 		String videoId = descriptor.get(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY);
 		if (videoId != null)
-			view.setVideoUrl(DisplayUtils.getVimeoVideoUrl(videoId));
+			view.setVideoUrl("https://player.vimeo.com/video/" + videoId);
 	}
 
 	@Override
 	public void updateDescriptorFromView() throws IllegalArgumentException {
 		//update widget descriptor from the view
 		view.checkParams();
-		descriptor.put(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY, DisplayUtils.getVimeoVideoId(view.getVideoUrl()));
+		descriptor.put(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY, getVimeoVideoId(view.getVideoUrl()));
+	}
+	
+	public String getVimeoVideoId(String videoUrl) {
+		String videoId = null;
+		//parse out the video id from the urlS
+		int start = videoUrl.lastIndexOf("/");
+		if (start > -1) {
+			videoId = videoUrl.substring(start + 1);
+		}
+		if (videoId == null || videoId.trim().length() == 0) {
+			throw new IllegalArgumentException("Could not determine the Vimeo video ID from the given URL.");
+		}
+		return videoId;
 	}
 
 	@Override
