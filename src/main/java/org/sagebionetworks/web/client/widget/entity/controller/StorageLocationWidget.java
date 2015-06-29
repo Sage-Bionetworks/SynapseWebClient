@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
@@ -66,12 +65,8 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				if (caught instanceof ForbiddenException) {
-					hide();
-					view.showErrorMessage(caught.getMessage());
-				} else {
-					synAlert.handleException(caught);	
-				}
+				hide();
+				view.showErrorMessage(caught.getMessage());
 			}
 			
 			@Override
@@ -169,12 +164,12 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		if (setting != null) {
 			if (setting instanceof ExternalS3StorageLocationSetting) {
 				ExternalS3StorageLocationSetting externalS3StorageLocationSetting = (ExternalS3StorageLocationSetting)setting;
-				if (externalS3StorageLocationSetting.getBucket().isEmpty()) {
+				if (externalS3StorageLocationSetting.getBucket().trim().isEmpty()) {
 					return "Bucket is required.";
 				}
 			} else if (setting instanceof ExternalStorageLocationSetting) {
 				ExternalStorageLocationSetting externalStorageLocationSetting = (ExternalStorageLocationSetting) setting;
-				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl())) {
+				if (!isValidSftpUrl(externalStorageLocationSetting.getUrl().trim())) {
 					return "A valid SFTP URL is required.";
 				}
 			}

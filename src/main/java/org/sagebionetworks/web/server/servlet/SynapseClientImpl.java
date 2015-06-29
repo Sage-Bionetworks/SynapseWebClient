@@ -3063,7 +3063,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-
 	@Override
 	public List<String> getMyLocationSettingBanners() throws RestServiceException{
 		try {
