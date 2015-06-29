@@ -10,20 +10,20 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class YouTubeWidgetTest {
 		
 	YouTubeWidget widget;
-	YouTubeWidgetView mockView;
+	IFrameWidgetView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	
 	@Before
 	public void setup(){
-		mockView = mock(YouTubeWidgetView.class);
+		mockView = mock(IFrameWidgetView.class);
 		widget = new YouTubeWidget(mockView);
 	}
 	
@@ -39,6 +39,6 @@ public class YouTubeWidgetTest {
 		String videoId = "my test video id";
 		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(videoId));
+		verify(mockView).configure(eq("https://www.youtube.com/embed/" + videoId));
 	}
 }

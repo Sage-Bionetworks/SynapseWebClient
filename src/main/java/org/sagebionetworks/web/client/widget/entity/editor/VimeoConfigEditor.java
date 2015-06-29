@@ -9,75 +9,68 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEditorPresenter {
-	
+
+public class VimeoConfigEditor implements IFrameConfigView.Presenter, WidgetEditorPresenter {
+
 	private IFrameConfigView view;
 	private Map<String, String> descriptor;
 	
 	@Inject
-	public YouTubeConfigEditor(IFrameConfigView view) {
+	public VimeoConfigEditor(IFrameConfigView view) {
 		this.view = view;
 		view.setPresenter(this);
 		view.initView();
-	}
-	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
-		descriptor = widgetDescriptor;
-		String videoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
-		if (videoId != null)
-			view.setVideoUrl("http://www.youtube.com/watch?v=" + videoId);
-	}
+	}	
 	
-	@SuppressWarnings("unchecked")
-	public void clearState() {
-		view.clear();
-	}
-
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 
 	@Override
-	public void updateDescriptorFromView() {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback window) {
+		descriptor = widgetDescriptor;
+		String videoId = descriptor.get(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY);
+		if (videoId != null)
+			view.setVideoUrl("https://player.vimeo.com/video/" + videoId);
+	}
+
+	@Override
+	public void updateDescriptorFromView() throws IllegalArgumentException {
 		//update widget descriptor from the view
 		view.checkParams();
-		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, getYouTubeVideoId(view.getVideoUrl()));
+		descriptor.put(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY, getVimeoVideoId(view.getVideoUrl()));
 	}
 	
-	public String getYouTubeVideoId(String videoUrl) {
+	public String getVimeoVideoId(String videoUrl) {
 		String videoId = null;
-		//parse out the video id from the url
-		int start = videoUrl.indexOf("v=");
+		//parse out the video id from the urlS
+		int start = videoUrl.lastIndexOf("/");
 		if (start > -1) {
-			int end = videoUrl.indexOf("&", start);
-			if (end == -1)
-				end = videoUrl.length();
-			videoId = videoUrl.substring(start + "v=".length(), end);
+			videoId = videoUrl.substring(start + 1);
 		}
 		if (videoId == null || videoId.trim().length() == 0) {
-			throw new IllegalArgumentException("Could not determine the YouTube video ID from the given URL.");
+			throw new IllegalArgumentException("Could not determine the Vimeo video ID from the given URL.");
 		}
 		return videoId;
 	}
-	
-	
+
 	@Override
 	public String getTextToInsert() {
 		return null;
 	}
-	
+
 	@Override
 	public List<String> getNewFileHandleIds() {
 		return null;
 	}
+
 	@Override
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-	/*
-	 * Private Methods
-	 */
+
 }

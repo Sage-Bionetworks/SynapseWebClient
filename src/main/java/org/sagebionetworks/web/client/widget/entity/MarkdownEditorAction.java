@@ -24,6 +24,7 @@ public enum MarkdownEditorAction {
 	INSERT_TOC,
 	INSERT_USER_TEAM_BADGE,
 	INSERT_VIDEO,
+	INSERT_VIMEO,
 	INSERT_YOU_TUBE,
 	//alpha
 	INSERT_BOOKMARK,
