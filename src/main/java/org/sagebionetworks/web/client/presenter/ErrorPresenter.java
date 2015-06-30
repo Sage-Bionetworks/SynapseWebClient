@@ -39,12 +39,16 @@ public class ErrorPresenter extends AbstractActivity implements ErrorView.Presen
 	
 	@Override
 	public void setPlace(final org.sagebionetworks.web.client.place.ErrorPlace place) {
+		String token = place.toToken();
+		showLogEntry(token);
+	}
+	
+	public void showLogEntry(String encodedLogEntry) {
 		view.clear();
 		view.setPresenter(this);
 		synAlert.clear();
-		String token = place.toToken();
 		//decode log entry
-		synapseClient.hexDecodeLogEntry(token, new AsyncCallback<LogEntry>() {
+		synapseClient.hexDecodeLogEntry(encodedLogEntry, new AsyncCallback<LogEntry>() {
 			@Override
 			public void onSuccess(LogEntry result) {
 				view.setEntry(result);
