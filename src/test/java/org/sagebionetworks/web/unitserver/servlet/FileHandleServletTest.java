@@ -19,10 +19,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -293,6 +295,25 @@ public class FileHandleServletTest {
 		verify(mockResponse).setDateHeader(eq(WebConstants.EXPIRES_KEY), eq(0L));
 	}
 
+	
+	@Test
+	public void testDoGetError() throws Exception {
+		String errorMessage = "An error from the service call";
+		setupFileEntity();
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		when(mockSynapse.getFileEntityTemporaryUrlForVersion(anyString(), anyLong())).thenThrow(new SynapseForbiddenException(errorMessage));
+		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://www.synapse.org/"));
+		when(mockRequest.getRequestURI()).thenReturn("");
+		when(mockRequest.getContextPath()).thenReturn("");
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getFileEntityTemporaryUrlForVersion(anyString(), anyLong());
+		//now redirects to an error place
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockResponse).sendRedirect(captor.capture());
+		String v = captor.getValue();
+		assertTrue(v.contains("#!Error:"));
+	}
 
 	
 }	
