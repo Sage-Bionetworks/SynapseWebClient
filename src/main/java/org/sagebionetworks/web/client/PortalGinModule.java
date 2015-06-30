@@ -43,6 +43,8 @@ import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
+import org.sagebionetworks.web.client.view.ErrorView;
+import org.sagebionetworks.web.client.view.ErrorViewImpl;
 import org.sagebionetworks.web.client.view.HelpView;
 import org.sagebionetworks.web.client.view.HelpViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -1112,5 +1114,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProvenanceURLDialogWidgetView.class).to(ProvenanceURLDialogWidgetViewImpl.class);
 		bind(EntityRefProvEntryView.class).to(EntityRefProvEntryViewImpl.class);
 		bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
+		bind(ErrorView.class).to(ErrorViewImpl.class);
 	}
 }
