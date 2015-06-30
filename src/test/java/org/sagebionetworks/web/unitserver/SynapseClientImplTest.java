@@ -2143,4 +2143,9 @@ public class SynapseClientImplTest {
 		assertEquals(entityId, updatedProjectSetting.getProjectId());
 	}
 	
+	@Test(expected = Exception.class)
+	public void testCreateStorageLocationSettingFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenThrow(new Exception());
+		synapseClient.createStorageLocationSetting(entityId, new ExternalStorageLocationSetting());
+	}
 }
