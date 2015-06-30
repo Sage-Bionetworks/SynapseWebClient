@@ -1271,15 +1271,6 @@ public class DisplayUtils {
 		return version;		
 	}
 	
-	public static SafeHtml get404Html() {
-		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">404</p><h1 class=\"margin-top-60-imp\">"
-						+ DisplayConstants.PAGE_NOT_FOUND
-						+ "</h1>"
-						+ "<p>"
-						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div></div>");
-	}
-	
 	public static String getWidgetMD(String attachmentName) {
 		if (attachmentName == null)
 			return null;
@@ -1288,15 +1279,6 @@ public class DisplayUtils {
 		sb.append(attachmentName);
 		sb.append("}");
 		return sb.toString();
-	}
-	
-	public static SafeHtml get403Html() {
-		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">403</p><h1 class=\"margin-top-60-imp\">"
-						+ DisplayConstants.FORBIDDEN
-						+ "</h1>"
-						+ "<p>"
-						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div></div>");
 	}
 	
 	/**
