@@ -543,6 +543,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void enableMultipleFileUploads() {
 		view.enableMultipleFileUploads(true);
 	}
+	
+	public void setUploaderLinkNameVisible(boolean visible) {
+		view.setUploaderLinkNameVisible(visible);
+	}
 
 	
 	@Override
