@@ -134,7 +134,7 @@ public class UploaderTest {
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
-		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyLong(), any(AsyncCallback.class));
 		//by default, there is no name conflict
@@ -182,7 +182,7 @@ public class UploaderTest {
 	public void testSetExternalFileEntityPathWithFileEntity() throws Exception {
 		uploader.asWidget(testEntity);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
-		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), eq(storageLocationId), any(AsyncCallback.class));
+		verify(synapseClient).updateExternalFile(anyString(), anyString(),eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 
