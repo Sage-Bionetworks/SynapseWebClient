@@ -39,6 +39,7 @@ public interface EntityView extends IsWidget, SynapseView {
 		 * @param areaToken
 		 */
 		void replaceArea(EntityArea area, String areaToken);
+		void clear();
 	}
 
 	/**
@@ -57,5 +58,13 @@ public interface EntityView extends IsWidget, SynapseView {
 	void setBackgroundImageUrl(String url);
 
 	void setSynAlertWidget(Widget synAlert);
+
+	void setFooterWidget(IsWidget footerWidget);
+
+	void setHeaderWidget(IsWidget headerWidget);
+
+	void setEntityPageTopWidget(IsWidget entityPageTopWidget);
+
+	void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
 	
 }

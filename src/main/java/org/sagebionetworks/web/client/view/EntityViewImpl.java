@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -45,15 +46,13 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@UiField
 	SimplePanel entityPageTopPanel;
 	@UiField
+	FlowPanel openInvitesPanel;
+	@UiField
 	SimplePanel synAlertContainer;
 	@UiField
 	Image entityBackgroundImage;
 	
 	private Presenter presenter;
-	private Header headerWidget;
-	private EntityPageTop entityPageTop;
-	private Footer footerWidget;
-	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	
 	@Inject
 	public EntityViewImpl(
@@ -77,36 +76,29 @@ public class EntityViewImpl extends Composite implements EntityView {
 		// TODO : need to dynamically set the header widget
 		//headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 	}
+	
+	@Override
+	public void setHeaderWidget(IsWidget headerWidget) {
+		header.setWidget(headerWidget);
+	}
+	
+	@Override
+	public void setFooterWidget(IsWidget footerWidget) {
+		footer.setWidget(footerWidget);
+	}
+	
+	@Override
+	public void setEntityPageTopWidget(IsWidget entityPageTopWidget) {
+		entityPageTopPanel.setWidget(entityPageTopWidget);
+	}
+	
+	@Override
+	public void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidget) {
+		openInvitesPanel.setWidget(openTeamInvitesWidget);
+	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
-		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.refresh();
-			}
-		});
-		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
-			@Override
-			public void areaChanged(EntityArea area, String areaToken) {
-				presenter.updateArea(area, areaToken);
-			}
-
-			@Override
-			public void replaceArea(EntityArea area, String areaToken) {
-				presenter.replaceArea(area, areaToken);
-			}
-		});
-		
-		header.clear();
-		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
-		headerWidget.refresh();
-
-		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
 	@Override

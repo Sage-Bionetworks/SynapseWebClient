@@ -29,21 +29,36 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
+import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse> {
@@ -60,14 +75,25 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String areaToken;
 	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private Header headerWidget;
+	private EntityPageTop entityPageTop;
+	private Footer footerWidget;
+	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	
 	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
+	
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
-			SynapseJSNIUtils synapseJsniUtils,
-			SynapseAlert synAlert) {
+			SynapseJSNIUtils synapseJsniUtils, SynapseAlert synAlert,
+			EntityPageTop entityPageTop, Header headerWidget,
+			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
+		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
+		this.entityPageTop = entityPageTop;
+		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
 		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
@@ -75,6 +101,27 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
 		this.synapseJsniUtils = synapseJsniUtils;
+		
+		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				refresh();
+			}
+		});
+		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
+			@Override
+			public void areaChanged(EntityArea area, String areaToken) {
+				updateArea(area, areaToken);
+			}
+
+			@Override
+			public void replaceArea(EntityArea area, String areaToken) {
+				replaceArea(area, areaToken);
+			}
+		});
+		headerWidget.configure(false);
+		headerWidget.refresh();
+		Window.scrollTo(0, 0); // scroll user to top of page
 		view.setPresenter(this);
 	}
 
@@ -116,6 +163,12 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		globalApplicationState.replaceCurrentPlace(place);
 	}
 
+	@Override
+	public void clear() {
+		entityPageTop.clearState();
+		synAlert.clear();
+	}
+	
 	@Override
     public String mayStop() {
         view.clear();
@@ -180,6 +233,44 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		} else {
 			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
 		}
+	}
+	
+	public void show404() {
+		clear();
+		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get404Html()));
+	}
+	
+	public void show403() {
+		clear();
+		
+		panel.add(new HTML(DisplayUtils.get403Html()));
+		final SimplePanel invitesPanel = new SimplePanel();
+		panel.add(invitesPanel);
+		//also add the open team invitations widget (accepting may gain access to this project)
+		Callback callback = new Callback() {
+			@Override
+			public void invoke() {
+				//when team is updated, refresh to see if we can now access
+				refresh();
+			}
+		};
+		CallbackP<List<OpenUserInvitationBundle>> teamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
+			
+			@Override
+			public void invoke(List<OpenUserInvitationBundle> invites) {
+				//if there are any, then also add the title text to the panel
+				if (invites != null && invites.size() > 0) {
+					HTML message = new HTML("<h4>"+DisplayConstants.ACCESS_DEPENDENT_ON_TEAM+"</h4>");
+					message.addStyleName("margin-top-100 margin-left-15");
+					invitesPanel.setWidget(message);
+				}
+			}
+		};
+		openTeamInvitesWidget.configure(callback, teamInvitationsCallback);
+		Widget openTeamInvites = openTeamInvitesWidget.asWidget();
+		openTeamInvites.addStyleName("margin-left-10 margin-bottom-10 margin-right-10");
+		panel.add(openTeamInvites);
+		entityPageTopPanel.setWidget(panel);
 	}
 	
 	public void loadBackgroundImage(final String projectEntityId) {
