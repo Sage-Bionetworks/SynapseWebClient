@@ -149,14 +149,12 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@Override
 	public void show404() {
 		entityPageTop.clearState();
-		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get404Html()));
 	}
 
 	@Override
 	public void show403() {
 		entityPageTop.clearState();
 		FlowPanel panel = new FlowPanel();
-		panel.add(new HTML(DisplayUtils.get403Html()));
 		final SimplePanel invitesPanel = new SimplePanel();
 		panel.add(invitesPanel);
 		//also add the open team invitations widget (accepting may gain access to this project)
