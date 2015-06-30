@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -427,4 +428,9 @@ public interface SynapseClientAsync {
 			Long versionNumber, AsyncCallback<Activity> callback);
 
 	void putActivity(Activity update, AsyncCallback<Void> callback);
+
+	void hexDecodeLogEntry(String encodedLogEntry,
+			AsyncCallback<LogEntry> callback);
+
+	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 }
