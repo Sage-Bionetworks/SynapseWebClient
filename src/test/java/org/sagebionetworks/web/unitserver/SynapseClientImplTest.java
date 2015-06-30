@@ -1011,19 +1011,12 @@ public class SynapseClientImplTest {
 		handle.setExternalURL(testUrl);
 
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		ArgumentCaptor<FileEntity> arg = ArgumentCaptor
-				.forClass(FileEntity.class);
-
-		synapseClient.updateExternalFile(testId, testUrl, null, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
 		verify(mockSynapse).createExternalFileHandle(
 				any(ExternalFileHandle.class));
-		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
-
-		// verify rename
-		FileEntity fileEntityArg = arg.getValue(); // last value captured
-		assertEquals(myFileName, fileEntityArg.getName());
+		verify(mockSynapse).putEntity(any(FileEntity.class));
 
 		// and if rename fails, verify all is well (but the FileEntity name is
 		// not updated)
@@ -1035,22 +1028,13 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, "", storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
 				any(ExternalFileHandle.class));
-		// and it should have called putEntity 2 additional times
-		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
-		fileEntityArg = arg.getValue(); // last value captured
-		assertEquals(originalFileEntityName, fileEntityArg.getName());
-
-		// and (finally) verify the correct name if it is explicitly set
-		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		String newName = "a new name";
-		synapseClient.updateExternalFile(testId, testUrl, newName, storageLocationId);
-		file.setName(newName);
-		verify(mockSynapse).putEntity(eq(file)); // should equal the previous file but with the new name
+		// and it should have called putEntity again
+		verify(mockSynapse).putEntity(any(FileEntity.class));
 	}
 
 	@Test
