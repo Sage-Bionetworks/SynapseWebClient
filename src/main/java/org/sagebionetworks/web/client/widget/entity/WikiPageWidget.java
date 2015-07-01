@@ -141,7 +141,6 @@ SynapseWidgetPresenter {
 				public void noWikiFound() {
 				}
 			};
-		final boolean isRootWiki = currentPage.getParentWikiId() == null;
 		setOwnerObjectName(new CallbackP<String>() {
 			@Override
 			public void invoke(final String ownerObjectName) {
@@ -150,14 +149,10 @@ SynapseWidgetPresenter {
 					@Override
 					public void onSuccess(WikiPage result) {
 						try {
+							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							currentPage = result;
 							wikiKey.setWikiPageId(currentPage.getId());							
-							String markdown = currentPage.getMarkdown();
-							if(!isCurrentVersion) {
-								markdownWidget.configure(markdown, wikiKey, false, versionInView);
-							} else {
-								markdownWidget.configure(markdown, wikiKey, false, null);
-							}
+							resetWikiMarkdown(currentPage.getMarkdown());
 							configureBreadcrumbs(wikiKey, isRootWiki, ownerObjectName);
 							configureHistoryWidget(wikiKey, canEdit);
 							configureWikiSubpagesWidget(wikiKey, isEmbeddedInOwnerPage);							
@@ -175,13 +170,21 @@ SynapseWidgetPresenter {
 	}
 	
 	@Override
+	public void resetWikiMarkdown(String markdown) {
+		if(!isCurrentVersion) {
+			markdownWidget.configure(markdown, wikiKey, false, versionInView);
+		} else {
+			markdownWidget.configure(markdown, wikiKey, false, null);
+		}
+	}
+	
+	@Override
 	public void configureWikiSubpagesWidget(WikiPageKey wikiKey, boolean isEmbeddedInOwnerPage) {
 		//check configuration of wikiKey
 		wikiSubpages.configure(wikiKey, null, isEmbeddedInOwnerPage, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
-//				wikiKey = param;
-				reloadWikiPage(param);
+				reloadWikiPage();
 			}});
 		view.setWikiSubpagesContainers(wikiSubpages);
 	}
@@ -302,7 +305,7 @@ SynapseWidgetPresenter {
 							currentPage = result;
 							wikiKey.setWikiPageId(currentPage.getId());
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.resetWikiMarkdown(currentPage.getMarkdown(), wikiKey, isRootWiki, isCurrentVersion, versionInView);
+							resetWikiMarkdown(currentPage.getMarkdown());
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -357,9 +360,8 @@ SynapseWidgetPresenter {
 		return this.reloadWikiPageCallback;
 	}
 
-	// is this enough to reload?
 	@Override
-	public void reloadWikiPage(final WikiPageKey wikiKey) {
+	public void reloadWikiPage() {
 		synapseAlert.clear();
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
@@ -368,7 +370,7 @@ SynapseWidgetPresenter {
 					currentPage = result;
 					boolean isRootWiki = currentPage.getParentWikiId() == null;
 					wikiKey.setWikiPageId(currentPage.getId());
-					view.resetWikiMarkdown(currentPage.getMarkdown(), wikiKey, isRootWiki, true, null);
+					resetWikiMarkdown(currentPage.getMarkdown());
 					if (wikiReloadHandler != null) {
 						wikiReloadHandler.invoke(currentPage.getId());
 					}
@@ -400,7 +402,6 @@ SynapseWidgetPresenter {
 				}
 			} else {
 				synapseAlert.handleException(caught);
-				view.showSynapseAlertWidget();	
 			}
 		} else {
 			if (caught instanceof NotFoundException) {
@@ -409,7 +410,6 @@ SynapseWidgetPresenter {
 				view.show403();
 			} else {
 				synapseAlert.handleException(caught);
-				view.showSynapseAlertWidget();
 			}
 		}
 	}

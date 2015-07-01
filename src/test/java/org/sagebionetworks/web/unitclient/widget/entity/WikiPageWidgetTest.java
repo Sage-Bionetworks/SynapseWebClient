@@ -25,9 +25,13 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -49,6 +53,10 @@ public class WikiPageWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	SynapseAlert mockSynapseAlert;
+	WikiHistoryWidget mockHistoryWidget;
+	MarkdownWidget mockMarkdownWidget;
+	Breadcrumb mockBreadcrumb;
+	WikiSubpagesWidget mockSubpages;
 
 	WikiPage testPage;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
@@ -60,8 +68,12 @@ public class WikiPageWidgetTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseAlert = mock(SynapseAlert.class);
-		presenter = new WikiPageWidget(mockView, mockSynapseClient,
-				mockGlobalApplicationState, mockAuthenticationController, mockSynapseAlert);
+		mockHistoryWidget = mock(WikiHistoryWidget.class);
+		mockBreadcrumb = mock(Breadcrumb.class);
+		mockSubpages = mock(WikiSubpagesWidget.class);
+		mockMarkdownWidget = mock(MarkdownWidget.class);
+		presenter = new WikiPageWidget(mockView, mockSynapseClient,	mockGlobalApplicationState, mockAuthenticationController,
+				mockSynapseAlert, mockHistoryWidget, mockMarkdownWidget, mockBreadcrumb, mockSubpages);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
 		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
@@ -119,7 +131,6 @@ public class WikiPageWidgetTest {
 		boolean canEdit = false;
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, true);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
-		verify(mockView).showSynapseAlertWidget();
 	}
 	
 	@Test
@@ -138,7 +149,6 @@ public class WikiPageWidgetTest {
 		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, mockCallback, true);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
-		verify(mockView).showSynapseAlertWidget();
 	}
 	
 	@Test
@@ -166,7 +176,6 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
-		verify(mockView).showSynapseAlertWidget();
 	}
 	
 	@Test
@@ -197,7 +206,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.reloadWikiPage();
-		verify(mockView).resetWikiMarkdown(anyString(), eq(wikiPageKey), anyBoolean(), anyBoolean(), any(Long.class));
+		verify(mockMarkdownWidget).configure(eq(wikiPage.getMarkdown()), any(WikiPageKey.class), eq(false), any(Long.class));
 		verify(mockWikiReloadHandler).invoke(anyString());
 	}
 
@@ -208,6 +217,5 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.reloadWikiPage();
 		verify(mockSynapseAlert).handleException(any(Exception.class));
-		verify(mockView).showSynapseAlertWidget();
 	}
 }
