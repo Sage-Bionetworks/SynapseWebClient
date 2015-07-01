@@ -32,6 +32,7 @@ import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -41,6 +42,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -172,7 +174,13 @@ public class FileHandleServlet extends HttpServlet {
 				}				
 			}			
 		} catch (SynapseException e) {
-			throw new ServletException(e);
+			//redirect to error place with an entry
+			LogEntry entry = new LogEntry();
+			entry.setLabel("Download");
+			entry.setMessage(e.getMessage());
+//			entry.setStacktrace(ExceptionUtils.getStackTrace(e));
+			String entryString = SerializationUtils.serializeAndHexEncode(entry);
+			doRedirect(request, response, isProxy, new URL(getBaseUrl(request) + "#!Error:"+entryString));
 		}
 	}
 

@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -526,4 +527,8 @@ public interface SynapseClient extends RemoteService {
 
 	Activity getOrCreateActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException;
+
+	LogEntry hexDecodeLogEntry(String encodedLogEntry);
+
+	String hexEncodeLogEntry(LogEntry logEntry);
 }

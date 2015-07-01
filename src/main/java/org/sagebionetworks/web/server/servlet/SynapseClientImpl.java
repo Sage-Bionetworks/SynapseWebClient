@@ -2573,6 +2573,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return hostPageBaseURL + "#!Synapse:";
 	}
 	
+	@Override
+	public LogEntry hexDecodeLogEntry(String encodedLogEntry) {
+		return SerializationUtils.hexDecodeAndDeserialize(encodedLogEntry, LogEntry.class);
+	}
+	
+	@Override
+	public String hexEncodeLogEntry(LogEntry logEntry) {
+		return SerializationUtils.serializeAndHexEncode(logEntry);
+	}
 	
 	@Override
 	public String getAPIKey() throws RestServiceException {
