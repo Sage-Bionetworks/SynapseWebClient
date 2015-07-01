@@ -55,4 +55,5 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 
 
 	void addProvenanceEditorModalWidget(Widget asWidget);
+	void addStorageLocationModalWidget(Widget asWidget);
 }
