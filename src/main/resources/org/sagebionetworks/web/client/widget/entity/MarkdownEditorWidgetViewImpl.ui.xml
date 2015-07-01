@@ -31,6 +31,7 @@
 					    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="videoLink">Video</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT">Vimeo Video</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>
 					  </b:DropDownMenu>
 					</b:ButtonGroup>

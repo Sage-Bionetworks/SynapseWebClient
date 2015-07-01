@@ -13,9 +13,11 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityFinder implements EntityFinderView.Presenter {
+public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	
 	private EntityFinderView view;	
 	private SynapseClientAsync synapseClient;
@@ -112,5 +114,10 @@ public class EntityFinder implements EntityFinderView.Presenter {
 	@Override
 	public void hide() {
 		view.hide();
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }

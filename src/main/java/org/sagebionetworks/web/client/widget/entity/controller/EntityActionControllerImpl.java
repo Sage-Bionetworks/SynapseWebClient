@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -84,7 +85,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
 	MarkdownEditorWidget wikiEditor;
-
+	ProvenanceEditorWidget provenanceEditor;
+	StorageLocationWidget storageLocationEditor;
+	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
@@ -96,7 +99,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
 			UploadDialogWidget uploader,
-			MarkdownEditorWidget wikiEditor) {
+			MarkdownEditorWidget wikiEditor,
+			ProvenanceEditorWidget provenanceEditor,
+			StorageLocationWidget storageLocationEditor) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -110,7 +115,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.submitter = submitter;
 		this.uploader = uploader;
 		this.wikiEditor = wikiEditor;
+		this.provenanceEditor = provenanceEditor;
+		this.storageLocationEditor = storageLocationEditor;
 		this.view.addMarkdownEditorModalWidget(wikiEditor.asWidget());
+		this.view.addProvenanceEditorModalWidget(provenanceEditor.asWidget());
+		this.view.addStorageLocationModalWidget(storageLocationEditor.asWidget());
 	}
 
 	@Override
@@ -143,6 +152,30 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureSubmit();
 			configureAnnotations();
 			configureFileUpload();
+			configureProvenance();
+			configureChangeStorageLocation();
+		}
+	}
+	
+	private void configureProvenance() {
+		if(entityBundle.getEntity() instanceof FileEntity ){
+			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.EDIT_PROVENANCE, this);
+		} else {
+			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
+			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, false);
+		}
+	}
+	
+	private void configureChangeStorageLocation() {
+		if(entityBundle.getEntity() instanceof Folder || entityBundle.getEntity() instanceof Project){
+			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.CHANGE_STORAGE_LOCATION, this);
+		} else {
+			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, false);
+			actionMenu.setActionEnabled(Action.CHANGE_STORAGE_LOCATION, false);
 		}
 	}
 	
@@ -353,10 +386,27 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case UPLOAD_NEW_FILE:
 			onUploadFile();
-			break;	
+			break;
+		case EDIT_PROVENANCE:
+			onEditProvenance();
+			break;
+		case CHANGE_STORAGE_LOCATION:
+			onChangeStorageLocation();
+			break;
 		default:
 			break;
 		}
+	}
+	
+
+	private void onChangeStorageLocation() {
+		storageLocationEditor.configure(this.entityBundle, entityUpdateHandler);
+		storageLocationEditor.show();
+	}
+	
+	private void onEditProvenance() {
+		provenanceEditor.configure(this.entityBundle, entityUpdateHandler);
+		provenanceEditor.show();
 	}
 	
 	private void onUploadFile() {
@@ -372,6 +422,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckUploadFile(){
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
 		uploader.disableMultipleFileUploads();
+		uploader.setUploaderLinkNameVisible(false);
 		uploader.show();
 	}
 

@@ -1,0 +1,59 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	<g:HTMLPanel>
+	    <b:Modal ui:field="modal" closable="true" fade="true"
+			dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
+			<b:ModalHeader>
+			    <b:Heading size="H3" text="Storage Location" addStyleNames="displayInline"/>
+			</b:ModalHeader>
+			<b:ModalBody>
+			     <b:FormGroup>
+			     	<b:Radio ui:field="synapseStorageButton" name="storageLocationRadio" text="Synapse Storage" addStyleNames="font-size-18"/>
+			     	<b:Radio ui:field="externalS3Button" name="storageLocationRadio" text="Amazon S3 Bucket" addStyleNames="font-size-18"/>
+			     	<bh:Div addStyleNames="margin-left-20" ui:field="s3Collapse">
+						<b:FormLabel for="bucketField" >Bucket</b:FormLabel>
+				     	<b:TextBox ui:field="bucketField" addStyleNames="margin-bottom-10 hide-resize "/>
+				     	<b:FormLabel for="baseKeyField" >Base Key</b:FormLabel>
+				     	<b:TextBox ui:field="baseKeyField" addStyleNames="margin-bottom-10 hide-resize "/>
+				     	<b:FormLabel for="externalS3BannerField" >Banner</b:FormLabel>
+
+						<b:InputGroup width="100%">
+							<b:InputGroupButton>
+								<b:Button ui:field="externalS3BannerDropdownButton"
+									dataToggle="DROPDOWN" height="28px" />
+								<b:DropDownMenu ui:field="externalS3BannerOptions">
+								</b:DropDownMenu>
+							</b:InputGroupButton>
+							<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
+						</b:InputGroup>
+				     	
+					</bh:Div>
+			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" text="SFTP Server" addStyleNames="font-size-18"/>
+			     	<bh:Div addStyleNames="margin-left-20" ui:field="sftpCollapse">
+			         	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>
+				     	<b:TextBox ui:field="sftpUrlField" addStyleNames="margin-bottom-10 hide-resize"/>
+				     	<b:FormLabel for="sftpBannerField" >Banner</b:FormLabel>
+						<b:InputGroup width="100%">
+							<b:InputGroupButton>
+								<b:Button ui:field="sftpBannerDropdownButton" dataToggle="DROPDOWN"
+									height="28px" />
+								<b:DropDownMenu ui:field="sftpBannerOptions">
+								</b:DropDownMenu>
+							</b:InputGroupButton>
+							<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
+						</b:InputGroup>
+				    </bh:Div>
+			    </b:FormGroup>
+			   <g:SimplePanel ui:field="synAlertPanel"/>
+			</b:ModalBody>
+			<b:ModalFooter>
+			    <b:Button ui:field="saveButton" text="Save" type="PRIMARY"/>
+			    <b:Button text="Cancel" ui:field="cancelButton" addStyleNames="right margin-right-5"/>
+			</b:ModalFooter>
+		</b:Modal>
+	</g:HTMLPanel>
+</ui:UiBinder>  
