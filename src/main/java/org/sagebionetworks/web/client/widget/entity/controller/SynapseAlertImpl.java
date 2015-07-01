@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
@@ -19,7 +18,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter {
+public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter  {
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authController;
 	SynapseAlertView view;
@@ -131,6 +130,17 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	public void clear() {
 		view.clearState();
 		ex = null;
-		
+	}
+	
+	@Override
+	public void show403() {
+		clear();
+		view.show403();
+	}
+	
+	@Override
+	public void show404() {
+		clear();
+		view.show404();
 	}
 }
