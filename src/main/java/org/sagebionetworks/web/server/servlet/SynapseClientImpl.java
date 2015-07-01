@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -3062,19 +3063,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public List<String> getMyLocationSettingBanners() throws RestServiceException{
 		try {
-			Set<String> banners = new HashSet<String>();
+			Comparator<String> caseInsensitiveComparator = new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {              
+					return o1.compareToIgnoreCase(o2);
+				}
+			};
+			Set<String> banners = new TreeSet<String>(caseInsensitiveComparator);
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
 			for (StorageLocationSetting storageLocationSetting : existingStorageLocations) {
 				banners.add(storageLocationSetting.getBanner());
 			}
-			List<String> sortedBanners = new ArrayList<String>(banners);
-			Collections.sort(sortedBanners, String.CASE_INSENSITIVE_ORDER);
-			return sortedBanners;
+			
+			return new ArrayList<String>(banners);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
