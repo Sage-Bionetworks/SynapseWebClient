@@ -95,7 +95,7 @@ public class BreadcrumbTest {
 		LinkData homeLink = new LinkData("MyHomeLink", new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
 		links.add(homeLink);
 		String currentPageName  = "CurrentPage";
-		breadcrumb.asWidget(links, currentPageName);
+		breadcrumb.configure(links, currentPageName);
 		verify(mockView).setLinksList(links, currentPageName);
 	}
 	

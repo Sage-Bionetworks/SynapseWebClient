@@ -23,10 +23,11 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
+public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget {
 	
 	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
@@ -53,11 +54,11 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 		view.setPresenter(this);
 	}
 
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
+	@Override
+	public void configure(final WikiPageKey wikiKey, Callback widgetRefreshRequired, 
+			boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
 		canEdit = false;
 		this.reloadWikiPageCallback = reloadWikiPageCallback;
-		this.wikiPageContainer = wikiPageContainer;
-		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiKey = wikiKey;
 		this.isEmbeddedInOwnerPage = embeddedInOwnerPage;
 		view.clear();
@@ -80,6 +81,12 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter {
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void setContainers(FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+		this.wikiPageContainer = wikiPageContainer;
+		this.wikiSubpagesContainer = wikiSubpagesContainer;
 	}
 	
 	public static Place getLinkPlace(String entityId, Long entityVersion, String wikiId, boolean isEmbeddedInOwnerPage) {

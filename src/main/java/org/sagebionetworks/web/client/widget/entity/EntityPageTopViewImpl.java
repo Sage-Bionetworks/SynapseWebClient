@@ -429,7 +429,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for file
 		
 		// add breadcrumbs
-		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES));
+		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
+		fileBreadcrumbContainer.add(breadcrumb.asWidget());
 		// File Title Bar
 		if (bundle.getEntity() instanceof FileEntity) {
 			fileTitleBar.configure(bundle);
@@ -510,7 +511,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private void renderFolderEntity(EntityBundle bundle,
 			String entityTypeDisplay, String wikiPageId, EntityHeader projectHeader) {		
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
-		fileBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES));
+		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
+		fileBreadcrumbContainer.add(breadcrumb.asWidget());
 		// ActionMenu
 		fileActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
@@ -652,7 +654,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.TABLES, false); 
 		
 		// add breadcrumbs
-		tableBreadcrumbContainer.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.TABLES));		
+		breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
+		tableBreadcrumbContainer.add(breadcrumb.asWidget());		
 		// TODO: Add table name?
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);

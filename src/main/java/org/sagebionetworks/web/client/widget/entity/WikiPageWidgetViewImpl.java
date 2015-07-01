@@ -1,40 +1,27 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Italic;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.web.client.ClientProperties;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
-import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,10 +34,11 @@ import com.google.inject.Inject;
  */
 public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetView {
 
+	public interface Binder extends UiBinder<Widget, WikiPageWidgetViewImpl> {}
+	
 	private MarkdownWidget markdownWidget;
 	private SageImageBundle sageImageBundle;
 	private Boolean canEdit;
-	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiPageKey wikiKey;
@@ -61,11 +49,37 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private boolean isHistoryWidgetBuilt;
 	private boolean isCurrentVersion;
 	private Long versionInView;
-	private FlowPanel wikiPagePanel;
+//	private FlowPanel wikiPagePanel;
 	private boolean isEmbeddedInOwnerPage;
 	private HorizontalPanel modifiedPanel, createdPanel;
 	private SimplePanel historyPanel;
 	private SimplePanel synapseAlertPanel;
+	
+	@UiField
+	FlowPanel wikiPagePanel;
+	
+	@UiField
+	Alert diffVersionAlert;
+	
+	@UiField
+	Span modifiedByField;
+	
+	@UiField
+	Span createdByField;
+	
+	@UiField
+	Button wikiHistoryButton;
+	
+	@UiField
+	Button restoreButton;
+	
+	@UiField
+	SimplePanel wikiHistoryPanel;
+	
+	@UiField
+	FlowPanel wikiSubpagesPanel;
+	
+	Widget widget;
 
 	public interface OwnerObjectNameCallback{
 		public void ownerObjectNameInitialized();
@@ -77,12 +91,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
-			WikiHistoryWidget historyWidget, PortalGinInjector ginInjector, SageImageBundle sageImageBundle) {
+	public WikiPageWidgetViewImpl(Binder binder) {
 		super();
+		widget = binder.createAndBindUi(this);
 		this.markdownWidget = markdownWidget;
 		this.sageImageBundle = sageImageBundle;
-		this.breadcrumb = breadcrumb;
 		this.historyWidget = historyWidget;
 		this.ginInjector = ginInjector;
 		modifiedPanel = new HorizontalPanel();
@@ -90,7 +103,33 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		historyPanel = new SimplePanel();
 		synapseAlertPanel = new SimplePanel();
 		this.wikiPagePanel = new FlowPanel();
-		addStyleName("min-height-200");
+		
+		wikiHistoryButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.toggleHistory();
+			}
+		});
+		restoreButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.restoreClicked();
+				// If this button is used when viewing the current version for any reason, don't do anything
+				// Otherwise, raise warning to user for confirmation before restoring
+				if(!isCurrentVersion) {
+					// versionInView should be set if !isCurrentVersion
+					if(versionInView != null) {
+						showRestorationWarning(versionInView);
+					}
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void showPopup(String title, String message, MessagePopup popupType, Callback okCallback, Callback cancelCallback) {
+		DisplayUtils.showPopup(message, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
+				popupType, okCallback, cancelCallback);
 	}
 
 	@Override
@@ -109,6 +148,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void showNoteInPage(String message) {
 		clear();
 		add(new Italic(message));
+	}
+	
+	@Override
+	public void setWikiSubpagesWidget(IsWidget wikiSubpages) {
+		wikiSubpagesPanel.clear();
+		wikiSubpagesPanel.add(wikiSubpages);
 	}
 
 	@Override
@@ -130,7 +175,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
 			@Override
 			public void invoke() {
-				presenter.restoreClicked(wikiVersion);
+				presenter.restoreClicked();
 			}	
 		};
 		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
@@ -191,28 +236,28 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	private void resetWikiPagePanel() {
-		wikiPagePanel.clear();
-		if(!isCurrentVersion) {
-			// Create warning that user is viewing a different version
-			Alert notice = createDifferentVersionNotice();
-			wikiPagePanel.add(notice);
-		}
-
-		wikiPagePanel.add(getBreadCrumbs());
-		SimplePanel topBarWrapper = new SimplePanel();
-		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
-		Heading h2 = new Heading(HeadingSize.H2);
-		h2.setText(titleString);
-		h2.addStyleName("margin-bottom-0-imp");
-		topBarWrapper.add(h2);
-		wikiPagePanel.add(topBarWrapper);
-
-		FlowPanel mainPanel = new FlowPanel();
-		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
-		wikiPagePanel.add(mainPanel);
-
-		FlowPanel modifiedCreatedSection = createdModifiedCreatedSection();
-		wikiPagePanel.add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
+//		wikiPagePanel.clear();
+//		if(!isCurrentVersion) {
+//			// Create warning that user is viewing a different version
+//			Alert notice = createDifferentVersionNotice();
+//			wikiPagePanel.add(notice);
+//		}
+//
+//		wikiPagePanel.add(getBreadCrumbs());
+//		SimplePanel topBarWrapper = new SimplePanel();
+//		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
+//		Heading h2 = new Heading(HeadingSize.H2);
+//		h2.setText(titleString);
+//		h2.addStyleName("margin-bottom-0-imp");
+//		topBarWrapper.add(h2);
+//		wikiPagePanel.add(topBarWrapper);
+//
+//		FlowPanel mainPanel = new FlowPanel();
+//		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
+//		wikiPagePanel.add(mainPanel);
+//
+//		FlowPanel modifiedCreatedSection = createdModifiedCreatedSection();
+//		wikiPagePanel.add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
 	}
 
 	/*
@@ -238,99 +283,109 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	 * 3 - wikiPagePanel
 	 */
 	private void showDefaultViewWithWiki() {
-		clear();
-		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
-		FlowPanel wikiSubpagesPanel = new FlowPanel();
-		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
-		//subpages widget is special in that it applies styles to the markdown html panel (if there are subpages)
-		wikiSubpagesPanel.add(widget.asWidget());
-		add(wikiSubpagesPanel);
-		add(wikiPagePanel);
-		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
+//		clear();
+//		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
+//		FlowPanel wikiSubpagesPanel = new FlowPanel();
+//		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
+//		//subpages widget is special in that it applies styles to the markdown html panel (if there are subpages)
+//		wikiSubpagesPanel.add(widget.asWidget());
+//		add(wikiSubpagesPanel);
+//		add(wikiPagePanel);
+//		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage, presenter.getReloadWikiPageCallback());
+	}
+	
+	@Override
+	public void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages) {
+		wikiSubpages.setContainers(wikiSubpagesPanel, wikiPagePanel);
 	}
 
 	private FlowPanel createdModifiedCreatedSection() {
 		// Add created/modified information at the end
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " ");
-		HTML modifiedText = new HTML(shb.toSafeHtml());
-
-		shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(presenter.getWikiPage().getModifiedOn()));
-		HTML modifiedOnText = new HTML(shb.toSafeHtml());
-
-		shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(DisplayConstants.CREATED_BY + " ");
-		HTML createdText = new HTML(shb.toSafeHtml());
-
-		shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(presenter.getWikiPage().getCreatedOn()));		
-		HTML createdOnText = new HTML(shb.toSafeHtml());
-
-		UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
-		modifiedBy.configure(presenter.getWikiPage().getModifiedBy());
-
-		UserBadge createdBy = ginInjector.getUserBadgeWidget();
-		createdBy.configure(presenter.getWikiPage().getCreatedBy());
-
-		modifiedPanel.clear();
-		modifiedPanel.add(modifiedText);
-		modifiedPanel.add(modifiedBy.asWidget());
-		modifiedPanel.add(modifiedOnText);
-
-		createdPanel.clear();
-		createdPanel.add(createdText);
-		createdPanel.add(createdBy.asWidget());
-		createdPanel.add(createdOnText);
+//		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+//		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " ");
+//		HTML modifiedText = new HTML(shb.toSafeHtml());
+//
+//		shb = new SafeHtmlBuilder();
+//		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(presenter.getWikiPage().getModifiedOn()));
+//		HTML modifiedOnText = new HTML(shb.toSafeHtml());
+//
+//		shb = new SafeHtmlBuilder();
+//		shb.appendHtmlConstant(DisplayConstants.CREATED_BY + " ");
+//		HTML createdText = new HTML(shb.toSafeHtml());
+//
+//		shb = new SafeHtmlBuilder();
+//		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(presenter.getWikiPage().getCreatedOn()));		
+//		HTML createdOnText = new HTML(shb.toSafeHtml());
+//
+//		UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
+//		modifiedBy.configure(presenter.getWikiPage().getModifiedBy());
+//
+//		UserBadge createdBy = ginInjector.getUserBadgeWidget();
+//		createdBy.configure(presenter.getWikiPage().getCreatedBy());
+//
+//		modifiedPanel.clear();
+//		modifiedPanel.add(modifiedText);
+//		modifiedPanel.add(modifiedBy.asWidget());
+//		modifiedPanel.add(modifiedOnText);
+//
+//		createdPanel.clear();
+//		createdPanel.add(createdText);
+//		createdPanel.add(createdBy.asWidget());
+//		createdPanel.add(createdOnText);
 
 		FlowPanel modifiedAndCreatedSection = new FlowPanel();
-		modifiedAndCreatedSection.add(modifiedPanel);
-		modifiedAndCreatedSection.add(createdPanel);
-
-		historyPanel.clear();
-		historyPanel.add(wrapWidget(createHistoryButton(), "margin-top-5"));
-		modifiedAndCreatedSection.add(historyPanel);
+//		modifiedAndCreatedSection.add(modifiedPanel);
+//		modifiedAndCreatedSection.add(createdPanel);
+//
+//		historyPanel.clear();
+//		historyPanel.add(wrapWidget(createHistoryButton(), "margin-top-5"));
+//		modifiedAndCreatedSection.add(historyPanel);
 		return modifiedAndCreatedSection;
 	}
 
-	private Alert createDifferentVersionNotice() {
-		Alert notice = new Alert();
-		HorizontalPanel noticeWithLink = new HorizontalPanel();
-		HTML startMessage = createStartMessage();
-		Anchor linkToCurrent = createLinkToCurrentVerion();
+//	private Alert createDifferentVersionNotice() {
+//		Alert notice = new Alert();
+//		HorizontalPanel noticeWithLink = new HorizontalPanel();
+//		HTML startMessage = createStartMessage();
+//		Anchor linkToCurrent = createLinkToCurrentVerion();
+//
+//		noticeWithLink.add(wrapWidget(startMessage, "margin-left-5"));
+//		noticeWithLink.add(linkToCurrent);
+//		notice.add(noticeWithLink);
+//
+//		if(canEdit) {
+//			Button restoreButton = createRestoreButton();
+//			notice.add(restoreButton);
+//		}
+//		return notice;
+//	}
 
-		noticeWithLink.add(wrapWidget(startMessage, "margin-left-5"));
-		noticeWithLink.add(linkToCurrent);
-		notice.add(noticeWithLink);
-
-		if(canEdit) {
-			Button restoreButton = createRestoreButton();
-			notice.add(restoreButton);
-		}
-		return notice;
-	}
-
-	private HTML createStartMessage() {
-		SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		String noticeStart = "You are viewing an old version of this page. View the ";
-		builder = new SafeHtmlBuilder();
-		builder.appendHtmlConstant(noticeStart);
-		HTML startMessage = new HTML(builder.toSafeHtml());
-		return startMessage;
-	}
-
-	private Anchor createLinkToCurrentVerion() {
-		Anchor linkToCurrent = new Anchor();
-		linkToCurrent.setHTML("current version.");
-		linkToCurrent.setStyleName("link", true);
-		linkToCurrent.setStyleName("margin-left-5", true);
-		linkToCurrent.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.reloadWikiPage();
-			}
-		});
-		return linkToCurrent;
+//	private HTML createStartMessage() {
+//		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+//		String noticeStart = "You are viewing an old version of this page. View the ";
+//		builder = new SafeHtmlBuilder();
+//		builder.appendHtmlConstant(noticeStart);
+//		HTML startMessage = new HTML(builder.toSafeHtml());
+//		return startMessage;
+//	}
+//
+//	private Anchor createLinkToCurrentVerion() {
+//		Anchor linkToCurrent = new Anchor();
+//		linkToCurrent.setHTML("current version.");
+//		linkToCurrent.setStyleName("link", true);
+//		linkToCurrent.setStyleName("margin-left-5", true);
+//		linkToCurrent.addClickHandler(new ClickHandler() {
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				presenter.reloadWikiPage();
+//			}
+//		});
+//		return linkToCurrent;
+//	}
+	
+	@Override
+	public void setHistoryToggleButtonText(String text) {
+		this.wikiHistoryButton.setText(text);
 	}
 
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {
@@ -340,64 +395,69 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return widgetWrapper;
 	}
 
-	private Widget getBreadCrumbs() {
-		final SimplePanel breadcrumbsWrapper = new SimplePanel();
-		if (!isRootWiki) {
-			List<LinkData> links = new ArrayList<LinkData>();
-			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
-				//point to Home
-				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
-				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
-			} else {
-				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
-				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
-				breadcrumbsWrapper.add(breadcrumb.asWidget(links, presenter.getWikiPage().getTitle()));
-			}
-			//TODO: support other object types.
-		}
-		return breadcrumbsWrapper;
-	}
+//	private Widget getBreadCrumbs() {
+//		final SimplePanel breadcrumbsWrapper = new SimplePanel();
+//		if (!isRootWiki) {
+//			List<LinkData> links = new ArrayList<LinkData>();
+//			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
+//				//point to Home
+//				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
+//				breadcrumbsWrapper.add(breadcrumb.configure(links, null));
+//			} else {
+//				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
+//				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+//				breadcrumbsWrapper.add(breadcrumb.configure(links, presenter.getWikiPage().getTitle()));
+//			}
+//			//TODO: support other object types.
+//		}
+//		return breadcrumbsWrapper;
+//	}
 
-	private Button createHistoryButton() {
-		final Button btn = DisplayUtils.createIconButton(DisplayConstants.SHOW_WIKI_HISTORY, DisplayUtils.ButtonType.DEFAULT, null);			
-		btn.setStyleName("wikiHistoryButton", true);
-		btn.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				if(!isHistoryOpen) {
-					// If history widget is already built, make it show
-					if(isHistoryWidgetBuilt) {
-						historyWidget.showHistoryWidget();
-					} else {
-						// Configure the history widget and built the history table
-						ActionHandler actionHandler = new ActionHandler() {
-							@Override
-							public void previewClicked(Long versionToPreview,
-									Long currentVersion) {
-								presenter.previewClicked(versionToPreview, currentVersion);
-							}
-							@Override
-							public void restoreClicked(Long versionToRestore) {
-								presenter.restoreClicked(versionToRestore);
-							}
-						};
-						historyWidget.configure(wikiKey, canEdit, actionHandler);
-						isHistoryWidgetBuilt = true;
-						Widget historyWidgetPanel = historyWidget.asWidget();
-						historyWidgetPanel.addStyleName("margin-top-10");
-						wikiPagePanel.add(historyWidgetPanel);
-						btn.setText(DisplayConstants.HIDE_WIKI_HISTORY);
-					}
-				} else {
-					// hide history
-					historyWidget.hideHistoryWidget();
-					btn.setText(DisplayConstants.SHOW_WIKI_HISTORY);
-				}
-				isHistoryOpen = !isHistoryOpen;
-			}
-		});
-		return btn;
+//	private Button createHistoryButton() {
+//		final Button btn = DisplayUtils.createIconButton(DisplayConstants.SHOW_WIKI_HISTORY, DisplayUtils.ButtonType.DEFAULT, null);			
+//		btn.setStyleName("wikiHistoryButton", true);
+//		btn.addClickHandler(new ClickHandler() {
+//
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				if(!isHistoryOpen) {
+//					// If history widget is already built, make it show
+//					if(isHistoryWidgetBuilt) {
+//						historyWidget.showHistoryWidget();
+//					} else {
+//						// Configure the history widget and built the history table
+//						ActionHandler actionHandler = new ActionHandler() {
+//							@Override
+//							public void previewClicked(Long versionToPreview,
+//									Long currentVersion) {
+//								presenter.previewClicked(versionToPreview, currentVersion);
+//							}
+//							@Override
+//							public void restoreClicked(Long versionToRestore) {
+//								presenter.restoreClicked(versionToRestore);
+//							}
+//						};
+//						historyWidget.configure(wikiKey, canEdit, actionHandler);
+//						isHistoryWidgetBuilt = true;
+//						Widget historyWidgetPanel = historyWidget.asWidget();
+//						historyWidgetPanel.addStyleName("margin-top-10");
+//						wikiPagePanel.add(historyWidgetPanel);
+//						btn.setText(DisplayConstants.HIDE_WIKI_HISTORY);
+//					}
+//				} else {
+//					// hide history
+//					historyWidget.hideHistoryWidget();
+//					btn.setText(DisplayConstants.SHOW_WIKI_HISTORY);
+//				}
+//				isHistoryOpen = !isHistoryOpen;
+//			}
+//		});
+//		return btn;
+//	}
+	
+	@Override
+	public void setWikiHistoryWidget(IsWidget historyWidget) {
+		wikiHistoryPanel.setWidget(historyWidget);
 	}
 
 	private Button createRestoreButton() {
