@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -35,6 +34,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -89,20 +89,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		createdPanel = new HorizontalPanel();
 		historyPanel = new SimplePanel();
 		synapseAlertPanel = new SimplePanel();
-		this.wikiPagePanel = new FlowPanel();
+		wikiPagePanel = new FlowPanel();
+		wikiPagePanel.add(synapseAlertPanel);
 		addStyleName("min-height-200");
-	}
-
-	@Override
-	public void show404() {
-		clear();
-		add(new HTML(DisplayUtils.get404Html()));
-	}
-
-	@Override
-	public void show403() {
-		clear();
-		add(new HTML(DisplayUtils.get403Html()));
 	}
 
 	@Override
@@ -422,7 +411,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void setSynapseAlertWidget(Widget synapseAlert) {
+	public void setSynapseAlertWidget(IsWidget synapseAlert) {
 		synapseAlertPanel.setWidget(synapseAlert);
 	}
 	

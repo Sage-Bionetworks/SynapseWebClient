@@ -68,7 +68,7 @@ SynapseWidgetPresenter {
 		this.authenticationController = authenticationController;
 		this.synapseAlert = synapseAlert;
 		view.setPresenter(this);
-		view.setSynapseAlertWidget(synapseAlert.asWidget());
+		view.setSynapseAlertWidget(synapseAlert);
 	}
 
 	@Override
@@ -159,7 +159,7 @@ SynapseWidgetPresenter {
 						String ownerObjectName = theHeader.getName();
 						callback.invoke(ownerObjectName);
 					} else {
-						view.show404();
+						show404();
 					}
 				}
 				
@@ -198,7 +198,7 @@ SynapseWidgetPresenter {
 								callback.noWikiFound();
 						}
 						else if (caught instanceof ForbiddenException) {
-							view.show403();
+							show403();
 						}
 						else {
 							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
@@ -293,9 +293,9 @@ SynapseWidgetPresenter {
 			}
 		} else {
 			if (caught instanceof NotFoundException) {
-				view.show404();
+				show404();
 			} else if (caught instanceof ForbiddenException) {
-				view.show403();
+				show403();
 			} else {
 				synapseAlert.handleException(caught);
 				view.showSynapseAlertWidget();
@@ -305,5 +305,15 @@ SynapseWidgetPresenter {
 
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
 		this.wikiReloadHandler = wikiReloadHandler;
+	}
+	
+	public void show404() {
+		view.clear();
+		synapseAlert.show404();
+	}
+	
+	public void show403() {
+		view.clear();
+		synapseAlert.show403();
 	}
 }
