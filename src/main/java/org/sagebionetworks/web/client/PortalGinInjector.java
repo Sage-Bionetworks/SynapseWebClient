@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.ErrorPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -188,6 +189,8 @@ public interface PortalGinInjector extends Ginjector {
 	public NewAccountPresenter getNewAccountPresenter();
 	
 	public SignedTokenPresenter getSignedTokenPresenter();
+	
+	public ErrorPresenter getErrorPresenter();
 	
 	public ChangeUsernamePresenter getChangeUsernamePresenter();
 	
