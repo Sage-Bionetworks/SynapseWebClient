@@ -18,11 +18,12 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
-	SynapseWidgetPresenter{
+	SynapseWidgetPresenter, IsWidget {
 	private GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	private WikiHistoryWidgetView view;

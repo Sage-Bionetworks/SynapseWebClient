@@ -48,9 +48,8 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	 * Create Breadcrumbs for an Entity
 	 * 
 	 * @param entity
-	 * @return
 	 */
-	public Widget asWidget(EntityPath entityPath, EntityArea optionalArea) {
+	public void configure(EntityPath entityPath, EntityArea optionalArea) {
 		view.setPresenter(this);
 		List<LinkData> links = new ArrayList<LinkData>();
 		if (entityPath != null) {
@@ -77,19 +76,16 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 			}
 		}
 		view.setLinksList(links);
-		return view.asWidget();
 	}
 	
 	/**
 	 * Create Breadcrumbs for an arbitrary set of link data, ending in the current page name
 	 * @param links
 	 * @param currentPageName
-	 * @return
 	 */
-	public Widget asWidget(List<LinkData> links, String currentPageName){
+	public void configure(List<LinkData> links, String currentPageName){
 		view.setPresenter(this);
 		view.setLinksList(links, currentPageName);
-		return view.asWidget();
 	}
 	
 	/**
@@ -97,8 +93,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	 */
 	@Override
 	public Widget asWidget() {
-		// TODO Auto-generated method stub
-		return null;
+		return view.asWidget();
 	}
 
 	@Override
