@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 /**
  * Abstraction for the view 
  * @author John
@@ -51,4 +52,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param callback
 	 */
 	void showPromptDialog(String prompt, PromptCallback callback);
+
+
+	void addProvenanceEditorModalWidget(Widget asWidget);
 }

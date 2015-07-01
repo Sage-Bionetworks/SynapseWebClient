@@ -107,6 +107,7 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
@@ -187,10 +188,12 @@ public class SynapseClientImplTest {
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
 	PaginatedResults mockPaginatedMembershipRequest;
+	Activity mockActivity;
 
 	MessageToUser sentMessage;
 	Long storageLocationId = 9090L;
 	UserProfile testUserProfile;
+	Long version = 1L;
 	
 	//Token testing
 	NotificationSettingsSignedToken notificationSettingsToken;
@@ -215,6 +218,7 @@ public class SynapseClientImplTest {
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 		mockPaginatedMembershipRequest = Mockito.mock(PaginatedResults.class);
+		mockActivity = Mockito.mock(Activity.class);
 		when(mockPaginatedMembershipRequest.getTotalNumberOfResults()).thenReturn(3L);
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
@@ -471,7 +475,7 @@ public class SynapseClientImplTest {
 		notificationSettingsToken.setHmac("987654");
 		notificationSettingsToken.setSettings(new Settings());
 		notificationSettingsToken.setUserId("4");
-		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);
+		encodedNotificationSettingsToken = SerializationUtils.serializeAndHexEncode(notificationSettingsToken);		
 	}
 
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -1007,19 +1011,12 @@ public class SynapseClientImplTest {
 		handle.setExternalURL(testUrl);
 
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		ArgumentCaptor<FileEntity> arg = ArgumentCaptor
-				.forClass(FileEntity.class);
-
-		synapseClient.updateExternalFile(testId, testUrl, null, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
 		verify(mockSynapse).createExternalFileHandle(
 				any(ExternalFileHandle.class));
-		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
-
-		// verify rename
-		FileEntity fileEntityArg = arg.getValue(); // last value captured
-		assertEquals(myFileName, fileEntityArg.getName());
+		verify(mockSynapse).putEntity(any(FileEntity.class));
 
 		// and if rename fails, verify all is well (but the FileEntity name is
 		// not updated)
@@ -1031,22 +1028,13 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, "", storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
 				any(ExternalFileHandle.class));
-		// and it should have called putEntity 2 additional times
-		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
-		fileEntityArg = arg.getValue(); // last value captured
-		assertEquals(originalFileEntityName, fileEntityArg.getName());
-
-		// and (finally) verify the correct name if it is explicitly set
-		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		String newName = "a new name";
-		synapseClient.updateExternalFile(testId, testUrl, newName, storageLocationId);
-		file.setName(newName);
-		verify(mockSynapse).putEntity(eq(file)); // should equal the previous file but with the new name
+		// and it should have called putEntity again
+		verify(mockSynapse).putEntity(any(FileEntity.class));
 	}
 
 	@Test
@@ -1158,9 +1146,6 @@ public class SynapseClientImplTest {
 		// parent entity has no immediate children
 		EntityIdList childEntities = new EntityIdList();
 		childEntities.setIdList(new ArrayList());
-		when(
-				mockSynapse.getDescendants(anyString(), anyInt(), anyInt(),
-						anyString())).thenReturn(childEntities);
 
 		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId");
 
@@ -1985,5 +1970,28 @@ public class SynapseClientImplTest {
 	public void testHandleSignedTokenNotificationSettingsWrongToken() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.Settings.name();
 		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+	}
+	
+	@Test
+	public void testGetOrCreateActivityForEntityVersionGet() throws SynapseException, RestServiceException {
+		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenReturn(new Activity());
+		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
+	}
+	
+	@Test
+	public void testGetOrCreateActivityForEntityVersionCreate() throws SynapseException, RestServiceException {
+		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new SynapseNotFoundException());
+		when(mockSynapse.createActivity(any(Activity.class))).thenReturn(mockActivity);
+		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+		verify(mockSynapse).getActivityForEntityVersion(entityId, version);
+		verify(mockSynapse).createActivity(any(Activity.class));
+		verify(mockSynapse).putEntity(mockSynapse.getEntityById(entityId), mockActivity.getId());
+	}
+	
+	@Test(expected = Exception.class)
+	public void testGetOrCreateActivityForEntityVersionFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new Exception());
+		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
 	}
 }

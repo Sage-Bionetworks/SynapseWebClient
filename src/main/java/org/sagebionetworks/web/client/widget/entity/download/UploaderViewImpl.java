@@ -108,7 +108,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	PortalGinInjector ginInjector;
 	
 	private HandlerRegistration messageHandler;
-	
+	FormGroup externalNameFormGroup;
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
@@ -577,12 +577,12 @@ public class UploaderViewImpl extends FlowPanel implements
 		externalUrlFormGroup.add(pathField);
 		set.add(externalUrlFormGroup);
 		
-		FormGroup fg = new FormGroup();
+		externalNameFormGroup = new FormGroup();
 		l = new FormLabel();
 		l.setText("Name (Optional)");
-		fg.add(l);
-		fg.add(nameField);
-		set.add(fg);
+		externalNameFormGroup.add(l);
+		externalNameFormGroup.add(nameField);
+		set.add(externalNameFormGroup);
 		
 		externalLinkFormPanel.add(set);
 		pathField.addKeyPressHandler(new KeyPressHandler() {
@@ -601,6 +601,11 @@ public class UploaderViewImpl extends FlowPanel implements
 	private void configureUploadButtonForExternal() {
 		isExternal = true;
 		uploadBtn.setText("Save");
+	}
+	
+	@Override
+	public void setUploaderLinkNameVisible(boolean visible) {
+		externalNameFormGroup.setVisible(visible);
 	}
 
 }

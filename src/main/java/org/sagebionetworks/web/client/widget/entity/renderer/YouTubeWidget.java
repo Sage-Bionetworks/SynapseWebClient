@@ -3,33 +3,27 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class YouTubeWidget implements YouTubeWidgetView.Presenter, WidgetRendererPresenter {
+public class YouTubeWidget implements IFrameWidgetView.Presenter {
 	
-	private YouTubeWidgetView view;
+	private IFrameWidgetView view;
 	private Map<String, String> descriptor;
 	
 	@Inject
-	public YouTubeWidget(YouTubeWidgetView view) {
+	public YouTubeWidget(IFrameWidgetView view) {
 		this.view = view;
-		view.setPresenter(this);
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
-		view.configure(descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void clearState() {
+		view.configure("https://www.youtube.com/embed/" + descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));
 	}
 
 	@Override
@@ -37,7 +31,4 @@ public class YouTubeWidget implements YouTubeWidgetView.Presenter, WidgetRendere
 		return view.asWidget();
 	}
 
-		/*
-	 * Private Methods
-	 */
 }

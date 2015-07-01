@@ -84,6 +84,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
 	MarkdownEditorWidget wikiEditor;
+	ProvenanceEditorWidget provenanceEditor;
 
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -96,7 +97,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
 			UploadDialogWidget uploader,
-			MarkdownEditorWidget wikiEditor) {
+			MarkdownEditorWidget wikiEditor,
+			ProvenanceEditorWidget provenanceEditor) {
 		super();
 		this.view = view;
 		this.accessControlListModalWidget = accessControlListModalWidget;
@@ -110,7 +112,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.submitter = submitter;
 		this.uploader = uploader;
 		this.wikiEditor = wikiEditor;
+		this.provenanceEditor = provenanceEditor;
 		this.view.addMarkdownEditorModalWidget(wikiEditor.asWidget());
+		this.view.addProvenanceEditorModalWidget(provenanceEditor.asWidget());
 	}
 
 	@Override
@@ -143,6 +147,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureSubmit();
 			configureAnnotations();
 			configureFileUpload();
+			configureProvenance();
+		}
+	}
+	
+	private void configureProvenance() {
+		if(entityBundle.getEntity() instanceof FileEntity ){
+			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.EDIT_PROVENANCE, this);
+		} else {
+			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
+			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, false);
 		}
 	}
 	
@@ -353,10 +369,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case UPLOAD_NEW_FILE:
 			onUploadFile();
-			break;	
+			break;
+		case EDIT_PROVENANCE:
+			onEditProvenance();
+			break;
 		default:
 			break;
 		}
+	}
+	
+	private void onEditProvenance() {
+		provenanceEditor.configure(this.entityBundle, entityUpdateHandler);
+		provenanceEditor.show();
 	}
 	
 	private void onUploadFile() {
@@ -372,6 +396,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckUploadFile(){
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
 		uploader.disableMultipleFileUploads();
+		uploader.setUploaderLinkNameVisible(false);
 		uploader.show();
 	}
 

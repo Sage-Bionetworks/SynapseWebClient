@@ -8,7 +8,7 @@
  	
  	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	
+ 	
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="header"/>

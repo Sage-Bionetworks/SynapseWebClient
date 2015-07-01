@@ -488,7 +488,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		boolean isUpdating = entityId != null || entity != null;
 		if (isUpdating) {
 			//existing entity
-			updateExternalFileEntity(entityId, path, name, storageLocationId);
+			updateExternalFileEntity(entityId, path, storageLocationId);
 		} else {
 			//new data, use the appropriate synapse call
 			createNewExternalFileEntity(path, name, storageLocationId);
@@ -501,9 +501,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		entityUpdated();	
 	}
 	
-	public void updateExternalFileEntity(String entityId, String path, String name, Long storageLocationId) {
+	public void updateExternalFileEntity(String entityId, String path, Long storageLocationId) {
 		try {
-			synapseClient.updateExternalFile(entityId, path, name, storageLocationId, new AsyncCallback<Entity>() {
+			synapseClient.updateExternalFile(entityId, path, storageLocationId, new AsyncCallback<Entity>() {
 				@Override
 				public void onSuccess(Entity result) {
 					externalLinkUpdated(result, FileEntity.class);
@@ -542,6 +542,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void enableMultipleFileUploads() {
 		view.enableMultipleFileUploads(true);
+	}
+	
+	public void setUploaderLinkNameVisible(boolean visible) {
+		view.setUploaderLinkNameVisible(visible);
 	}
 
 	

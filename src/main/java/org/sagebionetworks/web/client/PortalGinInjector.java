@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.ErrorPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -34,7 +35,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
-import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
@@ -47,7 +47,10 @@ import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -65,6 +68,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEdit
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.VimeoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -89,6 +93,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
@@ -186,6 +191,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public SignedTokenPresenter getSignedTokenPresenter();
 	
+	public ErrorPresenter getErrorPresenter();
+	
 	public ChangeUsernamePresenter getChangeUsernamePresenter();
 	
 	public TrashPresenter getTrashPresenter();
@@ -211,6 +218,7 @@ public interface PortalGinInjector extends Ginjector {
 	public BookmarkConfigEditor getBookmarkConfigEditor();
 	public ReferenceConfigEditor getReferenceConfigEditor();
 	public YouTubeConfigEditor getYouTubeConfigEditor();
+	public VimeoConfigEditor getVimeoConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
 	public AttachmentConfigEditor getAttachmentConfigEditor();
@@ -231,6 +239,7 @@ public interface PortalGinInjector extends Ginjector {
 	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
 	public YouTubeWidget getYouTubeRenderer();
+	public VimeoWidget getVimeoRenderer();
 	public TutorialWizard getTutorialWidgetRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
 	public AdministerEvaluationsList getAdministerEvaluationsList();
@@ -266,6 +275,9 @@ public interface PortalGinInjector extends Ginjector {
 	public Md5Link getMd5Link();
 	public QuestionContainerWidget getQuestionContainerWidget();
 	public SynapseAlert getSynapseAlertWidget();
+	public EntityRefProvEntryView getEntityRefEntry();
+	public URLProvEntryView getURLEntry();
+	public ProvenanceListWidget getProvenanceListWidget();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();

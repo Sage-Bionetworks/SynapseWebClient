@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -186,7 +187,7 @@ public interface SynapseClientAsync {
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
 	
-	public void updateExternalFile(String entityId, String externalUrl, String name, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+	public void updateExternalFile(String entityId, String externalUrl, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
@@ -286,8 +287,6 @@ public interface SynapseClientAsync {
 	void submitCertificationQuizResponse(QuizResponse response,
 			AsyncCallback<PassingRecord> callback);
 	
-	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl,
-			AsyncCallback<EntityIdList> callback);
 	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, Long storageLocationId, AsyncCallback<ChunkedFileToken> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(ChunkRequest request, AsyncCallback<String> callback) throws RestServiceException;
 	void combineChunkedFileUpload(List<ChunkRequest> requests, AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
@@ -424,4 +423,14 @@ public interface SynapseClientAsync {
 	void updateAnnotations(String entityId, Annotations annotations, AsyncCallback<Void> callback);
 
 	void getEntityInfo(String entityId, AsyncCallback<EntityBundlePlus> callback);
+
+	void getOrCreateActivityForEntityVersion(String entityId,
+			Long versionNumber, AsyncCallback<Activity> callback);
+
+	void putActivity(Activity update, AsyncCallback<Void> callback);
+
+	void hexDecodeLogEntry(String encodedLogEntry,
+			AsyncCallback<LogEntry> callback);
+
+	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 }

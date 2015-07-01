@@ -56,7 +56,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
@@ -1068,11 +1067,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public Entity updateExternalFile(String entityId, String externalUrl,
-			String name, Long storageLocationId) throws RestServiceException {
+	public Entity updateExternalFile(String entityId, String externalUrl, Long storageLocationId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			Entity entity = synapseClient.getEntityById(entityId);
 			if (!(entity instanceof FileEntity)) {
 				throw new RuntimeException("Upload failed. Entity id: "
@@ -1085,12 +1082,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			ExternalFileHandle clone = synapseClient
 					.createExternalFileHandle(efh);
 			((FileEntity) entity).setDataFileHandleId(clone.getId());
-			if (isManuallySettingName)
-				entity.setName(name);
 			Entity updatedEntity = synapseClient.putEntity(entity);
-			if (!isManuallySettingName)
-				updatedEntity = updateExternalFileName(updatedEntity,
-						externalUrl, synapseClient);
 			return updatedEntity;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1189,6 +1181,38 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getActivity(activityId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public Activity getOrCreateActivityForEntityVersion(String entityId,
+			Long versionNumber) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getActivityForEntityVersion(
+					entityId, versionNumber);
+		} catch (SynapseNotFoundException ex) {
+			// not found, so create
+				Activity newActivity;
+				try {
+					newActivity = synapseClient.createActivity(new Activity());
+					synapseClient.putEntity(synapseClient.getEntityById(entityId), newActivity.getId());
+				} catch (SynapseException e) {
+					throw ExceptionUtil.convertSynapseException(e);
+				}
+				return newActivity;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void putActivity(Activity update) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.putActivity(update);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -2198,17 +2222,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	@Override
-	public EntityIdList getDescendants(String nodeId, int pageSize,
-			String lastDescIdExcl) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getDescendants(nodeId,
-					pageSize, lastDescIdExcl);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 
 	@Override
 	public Doi getEntityDoi(String entityId, Long versionNumber)
@@ -2547,6 +2560,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return hostPageBaseURL + "#!Synapse:";
 	}
 	
+	@Override
+	public LogEntry hexDecodeLogEntry(String encodedLogEntry) {
+		return SerializationUtils.hexDecodeAndDeserialize(encodedLogEntry, LogEntry.class);
+	}
+	
+	@Override
+	public String hexEncodeLogEntry(LogEntry logEntry) {
+		return SerializationUtils.serializeAndHexEncode(logEntry);
+	}
 	
 	@Override
 	public String getAPIKey() throws RestServiceException {
