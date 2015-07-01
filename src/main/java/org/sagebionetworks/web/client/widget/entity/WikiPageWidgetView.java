@@ -33,23 +33,18 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 				boolean isEmbeddedInOwnerPage);
 		void configureBreadcrumbs(WikiPageKey wikiKey, boolean isRootWiki,
 				String ownerObjectName);
-		void reloadWikiPage(WikiPageKey wikiKey);
 		void restoreConfirmed();
 		void restoreClicked();
+		void reloadWikiPage();
+		void resetWikiMarkdown(String markdown);
 	}
 	
 	public void configure(String markdown, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);
 	public void showNoteInPage(String message);
 	public void show404();
 	public void show403();
-	
-	public void showWikiHistory(boolean isVisible);
-	public void showCreatedBy(boolean isVisible);
-	public void showModifiedBy(boolean isVisible);
-	public void resetWikiMarkdown(String markdown, final WikiPageKey wikiKey,
-			boolean isRootWiki, boolean isCurrentVersion, final Long versionInView);
+
 	public void setSynapseAlertWidget(Widget asWidget);
-	public void showSynapseAlertWidget();
 	void setWikiHistoryWidget(IsWidget historyWidget);
 	void setWikiSubpagesWidget(IsWidget historyWidget);
 	void setHistoryToggleButtonText(String text);
@@ -57,4 +52,8 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	void showPopup(String title, String message, MessagePopup popupType,
 			org.sagebionetworks.web.client.utils.Callback okCallback,
 			org.sagebionetworks.web.client.utils.Callback cancelCallback);
+	void hideLoading();
+	void showCreatedBy(boolean isVisible);
+	void showModifiedBy(boolean isVisible);
+	void showWikiHistory(boolean isVisible);
 }
