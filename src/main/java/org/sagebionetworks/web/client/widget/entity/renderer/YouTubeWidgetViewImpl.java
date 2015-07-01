@@ -7,7 +7,6 @@ import com.google.inject.Inject;
 
 public class YouTubeWidgetViewImpl extends FlowPanel implements YouTubeWidgetView {
 
-	private Presenter presenter;
 	
 	@Inject
 	public YouTubeWidgetViewImpl() {
@@ -32,11 +31,6 @@ public class YouTubeWidgetViewImpl extends FlowPanel implements YouTubeWidgetVie
 	@Override
 	public Widget asWidget() {
 		return this;
-	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 		
 	

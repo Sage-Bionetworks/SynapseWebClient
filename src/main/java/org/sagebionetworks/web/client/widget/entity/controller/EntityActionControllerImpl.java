@@ -422,6 +422,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void postCheckUploadFile(){
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
 		uploader.disableMultipleFileUploads();
+		uploader.setUploaderLinkNameVisible(false);
 		uploader.show();
 	}
 

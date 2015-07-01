@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -358,7 +359,6 @@ public interface SynapseClient extends RemoteService {
 	public String getCertificationQuiz() throws RestServiceException;
 	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
 	
-	public EntityIdList getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
 	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType, String contentMD5, Long storageLocationId) throws RestServiceException;
 	public String getChunkedPresignedUrl(ChunkRequest chunkRequest) throws RestServiceException;
@@ -519,7 +519,7 @@ public interface SynapseClient extends RemoteService {
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
-	Entity updateExternalFile(String entityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
+	Entity updateExternalFile(String entityId, String externalUrl, Long storageLocationId) throws RestServiceException;
 
 	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
 
@@ -535,4 +535,8 @@ public interface SynapseClient extends RemoteService {
 	StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException;
 
 	List<String> getMyLocationSettingBanners() throws RestServiceException;
+
+	LogEntry hexDecodeLogEntry(String encodedLogEntry);
+
+	String hexEncodeLogEntry(LogEntry logEntry);
 }

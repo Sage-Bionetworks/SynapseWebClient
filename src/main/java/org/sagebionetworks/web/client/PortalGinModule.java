@@ -43,6 +43,8 @@ import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
+import org.sagebionetworks.web.client.view.ErrorView;
+import org.sagebionetworks.web.client.view.ErrorViewImpl;
 import org.sagebionetworks.web.client.view.HelpView;
 import org.sagebionetworks.web.client.view.HelpViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -133,6 +135,8 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItemView;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItemViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -245,8 +249,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -271,6 +275,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
@@ -716,6 +722,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// QuestionContainerWidget
 		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetViewImpl.class);
 		
+		// IFrameWidget
+		bind(IFrameWidgetView.class).to(IFrameWidgetViewImpl.class);
+		
 		// DoiWidget
 		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
 		
@@ -873,7 +882,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BookmarkConfigView.class).to(BookmarkConfigViewImpl.class);
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
-		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
+		bind(IFrameConfigView.class).to(IFrameConfigViewImpl.class);
 		bind(ImageConfigViewImpl.class).in(Singleton.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
 		bind(AttachmentConfigViewImpl.class).in(Singleton.class);
@@ -919,6 +928,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Entity Finder
 		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);		
+		
+		// MoreTreeItem
+		bind(MoreTreeItemView.class).to(MoreTreeItemViewImpl.class);
 
 		bind(EvaluationSubmitterView.class).to(EvaluationSubmitterViewImpl.class);
 		
@@ -1105,5 +1117,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityRefProvEntryView.class).to(EntityRefProvEntryViewImpl.class);
 		bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
 		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
+		bind(ErrorView.class).to(ErrorViewImpl.class);
 	}
 }

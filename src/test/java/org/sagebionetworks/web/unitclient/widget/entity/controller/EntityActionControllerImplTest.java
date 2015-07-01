@@ -740,6 +740,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.UPLOAD_NEW_FILE);
 		verify(mockUploader).show();
+		verify(mockUploader).setUploaderLinkNameVisible(false);
 	}
 
 	@Test

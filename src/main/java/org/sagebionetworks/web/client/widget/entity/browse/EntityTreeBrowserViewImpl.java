@@ -147,15 +147,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	}
 
 	@Override
-	public void insertRootEntityTreeItem(final EntityTreeItem childToAdd,
-			long offset) {
-		configureEntityTreeItem(childToAdd);
-		// Place the created child in the tree as the child of the given parent
-		// entity.
-		entityTree.insertItem((int) offset, childToAdd.asTreeItem());
-	}
-
-	@Override
 	public void configureEntityTreeItem(final EntityTreeItem childToAdd) {
 		if (isSelectable) {
 			// Add select functionality.
@@ -187,15 +178,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		parent.asTreeItem().addItem(childToAdd);
 	}
 
-	@Override
-	public void insertChildEntityTreeItem(final EntityTreeItem childToAdd,
-			EntityTreeItem parent, long offset) {
-		configureEntityTreeItem(childToAdd);
-		// Place the created child in the tree as the child of the given parent
-		// entity.
-		parent.asTreeItem().insertItem((int) offset, childToAdd.asTreeItem());
-	}
-
 	/**
 	 * 
 	 * @param childToCreate
@@ -205,35 +187,13 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	 *            parentId to conduct searches.
 	 */
 	@Override
-	public void placeRootMoreFoldersTreeItem(final MoreTreeItem childToCreate,
+	public void placeRootMoreTreeItem(final MoreTreeItem childToCreate,
 			final String parentId, final long offset) {
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				setLoadingVisible(true);
-				presenter.getFolderChildren(parentId, null, offset);
-				childToCreate.setVisible(false);
-			}
-		});
-		entityTree.insertItem((int) offset, childToCreate.asTreeItem());
-	}
-
-	/**
-	 * 
-	 * @param childToCreate
-	 *            - the button to place into the current root-level tree.
-	 * @param parentId
-	 *            - when not adding to the parent tree item, still need the
-	 *            parentId to conduct searches.
-	 */
-	@Override
-	public void placeRootMoreFilesTreeItem(final MoreTreeItem childToCreate,
-			final String parentId, final long offset) {
-		childToCreate.setClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setLoadingVisible(true);
-				presenter.getChildrenFiles(parentId, null, offset);
+				presenter.getChildren(parentId, null, offset);
 				childToCreate.setVisible(false);
 			}
 		});
@@ -249,35 +209,13 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	 *            ascertained from the header.
 	 */
 	@Override
-	public void placeChildMoreFoldersTreeItem(final MoreTreeItem childToCreate,
+	public void placeChildMoreTreeItem(final MoreTreeItem childToCreate,
 			final EntityTreeItem parent, final long offset) {
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				parent.showLoadingIcon();
-				presenter.getFolderChildren(parent.getHeader().getId(), parent, offset);
-				childToCreate.setVisible(false);
-			}
-		});
-		parent.asTreeItem().insertItem((int) offset, childToCreate.asTreeItem());
-	}
-
-	/**
-	 * 
-	 * @param childToCreate
-	 *            - the button to place under the passed parent.
-	 * @param parent
-	 *            - where to place the new child, where the id can be
-	 *            ascertained from the header.
-	 */
-	@Override
-	public void placeChildMoreFilesTreeItem(final MoreTreeItem childToCreate,
-			final EntityTreeItem parent, final long offset) {
-		childToCreate.setClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				parent.showLoadingIcon();
-				presenter.getChildrenFiles(parent.getHeader().getId(), parent, offset);
+				presenter.getChildren(parent.getHeader().getId(), parent, offset);
 				childToCreate.setVisible(false);
 			}
 		});
