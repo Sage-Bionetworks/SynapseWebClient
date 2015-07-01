@@ -25,9 +25,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
@@ -107,6 +109,9 @@ import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.project.ProjectSettingsType;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
@@ -3043,5 +3048,95 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+
+	@Override
+	public List<String> getMyLocationSettingBanners() throws RestServiceException{
+		try {
+			Comparator<String> caseInsensitiveComparator = new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {              
+					return o1.compareToIgnoreCase(o2);
+				}
+			};
+			Set<String> banners = new TreeSet<String>(caseInsensitiveComparator);
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
+			for (StorageLocationSetting storageLocationSetting : existingStorageLocations) {
+				banners.add(storageLocationSetting.getBanner());
+			}
+			
+			return new ArrayList<String>(banners);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			UploadDestinationListSetting setting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
+			if (setting == null || 
+					CollectionUtils.isEmpty(setting.getLocations()) || 
+					setting.getLocations().get(0) == null) {
+				//default storage location
+				return null;
+			}
+			
+			//else
+			return synapseClient.getMyStorageLocationSetting(setting.getLocations().get(0));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting) throws RestServiceException{
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			//first, try to find a matching storage location setting for this user, and reuse
+			List<StorageLocationSetting> existingStorageLocations = synapseClient.getMyStorageLocationSettings();
+			Long locationId = null;
+			if (setting != null) {
+				for (StorageLocationSetting existingStorageLocationSetting : existingStorageLocations) {
+					Long existingLocationId = existingStorageLocationSetting.getStorageLocationId();
+					existingStorageLocationSetting.setCreatedOn(null);
+					existingStorageLocationSetting.setEtag(null);
+					existingStorageLocationSetting.setStorageLocationId(null);
+					existingStorageLocationSetting.setCreatedBy(null);
+					existingStorageLocationSetting.setDescription(null);
+					if (setting.equals(existingStorageLocationSetting)) {
+						//found matching storage location setting
+						locationId = existingLocationId;
+						break;
+					}
+				}
+				if (locationId == null) {
+					//not found, create a new one
+					locationId = synapseClient.createStorageLocationSetting(setting).getStorageLocationId();
+				}
+			}
+			
+			ArrayList<Long> locationIds = new ArrayList<Long>();
+			locationIds.add(locationId);
+			
+			//update existing upload destination project/folder setting
+			UploadDestinationListSetting projectSetting = (UploadDestinationListSetting)synapseClient.getProjectSetting(parentEntityId, ProjectSettingsType.upload);
+			if (projectSetting != null) {
+				projectSetting.setLocations(locationIds);
+				synapseClient.updateProjectSetting(projectSetting);	
+			} else {
+				//create new upload destination project/folder setting
+				projectSetting = new UploadDestinationListSetting();
+				projectSetting.setProjectId(parentEntityId);
+				projectSetting.setSettingsType(ProjectSettingsType.upload);
+				projectSetting.setLocations(locationIds);
+				synapseClient.createProjectSetting(projectSetting);
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
 	
 }

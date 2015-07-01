@@ -200,6 +200,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWid
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
@@ -1118,6 +1120,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProvenanceURLDialogWidgetView.class).to(ProvenanceURLDialogWidgetViewImpl.class);
 		bind(EntityRefProvEntryView.class).to(EntityRefProvEntryViewImpl.class);
 		bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
+		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
 		bind(ErrorView.class).to(ErrorViewImpl.class);
 	}
 }

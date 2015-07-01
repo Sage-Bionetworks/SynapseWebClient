@@ -221,7 +221,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		termsOfUseBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GOVERNANCE));
+				globalApplicationState.getPlaceChanger().goTo(new Help("Governance"));
 			}
 		});
 		
