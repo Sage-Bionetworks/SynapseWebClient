@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
@@ -19,6 +18,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -488,48 +488,56 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		boolean isUpdating = entityId != null || entity != null;
 		if (isUpdating) {
 			//existing entity
-			updateExternalFileEntity(entityId, path, storageLocationId);
+			updateExternalFileEntity(entityId, path, null, null, storageLocationId);
 		} else {
 			//new data, use the appropriate synapse call
-			createNewExternalFileEntity(path, name, storageLocationId);
-		}
+			createNewExternalFileEntity(path, name, null, null, storageLocationId);
+		}		
 	}
 	
-	public void externalLinkUpdated(Entity result, Class<? extends Entity> entityClass) {
-		entity = result;
-		view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
-		entityUpdated();	
+	public void setSftpExternalFilePath(final String path, final Long storageLocationId) {
+		synapseJsniUtils.getFileMd5(UploaderViewImpl.FILE_FIELD_ID, currIndex, new MD5Callback() {
+			@Override
+			public void setMD5(String hexValue) {
+				boolean isUpdating = entityId != null || entity != null;
+				long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID, currIndex);
+				if (isUpdating) {
+					//existing entity
+					updateExternalFileEntity(entityId, path, fileSize, hexValue, storageLocationId);
+				} else {
+					//new data, use the appropriate synapse call
+					String fileName = fileNames[currIndex];
+					createNewExternalFileEntity(path, fileName, fileSize, hexValue, storageLocationId);
+				}		
+			}
+		});
 	}
 	
-	public void updateExternalFileEntity(String entityId, String path, Long storageLocationId) {
+	public AsyncCallback<Entity> getExternalFileUpdatedCallback() {
+		return new AsyncCallback<Entity>() {
+			@Override
+			public void onSuccess(Entity result) {
+				entity = result;
+				view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+				entityUpdated();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
+			}
+		};
+	}
+	
+	public void updateExternalFileEntity(String entityId, String path, Long fileSize, String md5, Long storageLocationId) {
 		try {
-			synapseClient.updateExternalFile(entityId, path, storageLocationId, new AsyncCallback<Entity>() {
-				@Override
-				public void onSuccess(Entity result) {
-					externalLinkUpdated(result, FileEntity.class);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
-				}
-			});
+			synapseClient.updateExternalFile(entityId, path, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (Throwable t) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 		}
 	}
-	public void createNewExternalFileEntity(final String path, final String name, final Long storageLocationId) {
+	public void createNewExternalFileEntity(final String path, final String name, Long fileSize, String md5, final Long storageLocationId) {
 		try {
-			synapseClient.createExternalFile(parentEntityId, path, name, storageLocationId, new AsyncCallback<Entity>() {
-				@Override
-				public void onSuccess(Entity result) {
-					externalLinkUpdated(result, FileEntity.class);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
-				}			
-			});
+			synapseClient.createExternalFile(parentEntityId, path, name, fileSize, md5, storageLocationId, getExternalFileUpdatedCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
 		}
@@ -602,8 +610,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			} else if (UploadType.SFTP.equals(currentUploadType)) {
 				//should respond with the new path
 				String path = uploadResult.getMessage();
-				String fileName = fileNames[currIndex];
-				setExternalFilePath(path, fileName, storageLocationId);
+				setSftpExternalFilePath(path, storageLocationId);
 			}
 		}else {
 			if (isJschAuthorizationError(uploadResult.getMessage())) {

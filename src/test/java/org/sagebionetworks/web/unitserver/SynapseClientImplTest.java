@@ -1009,6 +1009,8 @@ public class SynapseClientImplTest {
 		String myFileName = "testFileName.csv";
 		String testUrl = "http://mytesturl/" + myFileName;
 		String testId = "myTestId";
+		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		Long fileSize=2048L;
 		FileEntity file = new FileEntity();
 		String originalFileEntityName = "syn1223";
 		file.setName(originalFileEntityName);
@@ -1018,11 +1020,17 @@ public class SynapseClientImplTest {
 		handle.setExternalURL(testUrl);
 
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		synapseClient.updateExternalFile(testId, testUrl, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, fileSize, md5, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
-		verify(mockSynapse).createExternalFileHandle(
-				any(ExternalFileHandle.class));
+		
+		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
+		verify(mockSynapse).createExternalFileHandle(captor.capture());
+		ExternalFileHandle capturedValue = captor.getValue();
+		assertEquals(testUrl, capturedValue.getExternalURL());
+		assertEquals(md5, capturedValue.getContentMd5());
+//		assertEquals(fileSize, capturedValue.getContentSize());
+		
 		verify(mockSynapse).putEntity(any(FileEntity.class));
 
 		// and if rename fails, verify all is well (but the FileEntity name is
@@ -1035,7 +1043,7 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, fileSize, md5, storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
@@ -1050,13 +1058,15 @@ public class SynapseClientImplTest {
 		String parentEntityId = "syn123333";
 		String externalUrl = "sftp://foobar.edu/b/test.txt";
 		String fileName = "testing.txt";
+		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		Long fileSize = 1024L;
 		when(
 				mockSynapse
 						.createExternalFileHandle(any(ExternalFileHandle.class)))
 				.thenReturn(new ExternalFileHandle());
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, storageLocationId);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, fileSize, md5, storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -1065,6 +1075,8 @@ public class SynapseClientImplTest {
 		assertEquals(fileName, handle.getFileName());
 		assertEquals(externalUrl, handle.getExternalURL());
 		assertEquals(storageLocationId, handle.getStorageLocationId());
+		assertEquals(md5, handle.getContentMd5());
+//		assertEquals(fileSize, handle.getContentSize());
 	}
 
 	@Test

@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
@@ -149,9 +148,20 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		if (isFilenamePanelVisible) {
 			//don't ask for the size if it's external, just display that this is external data
 			if (fileHandle instanceof ExternalFileHandle) {
-				fileName.setInnerText(((ExternalFileHandle) fileHandle).getExternalURL());
-				fileSize.setInnerText("");
+				ExternalFileHandle externalFileHandle = (ExternalFileHandle)fileHandle;
+				fileName.setInnerText(externalFileHandle.getExternalURL());
+
+//				if (externalFileHandle.getContentSize() != null) {
+//					fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(externalFileHandle.getContentSize().doubleValue(), true));
+//				} else {
+					fileSize.setInnerText("");	
+//				}
+				
 				fileLocation.setInnerText("| External Storage");
+				String md5 = externalFileHandle.getContentMd5();
+				if (md5 != null) {
+					md5Link.configure(md5);
+				}
 			}
 			else if (fileHandle instanceof S3FileHandleInterface){
 				fileName.setInnerText(fileHandle.getFileName());
