@@ -129,55 +129,66 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			view.addSynapseAlertWidget(synapseAlert.asWidget());
 			synapseAlert.showMustLogin();
 		} else if (bundle != null) {
-			PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
-			FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
-			final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
-			if (previewType != PreviewFileType.NONE) {
-				FileEntity fileEntity = (FileEntity)bundle.getEntity();
-				if (previewType == PreviewFileType.IMAGE) {
-					//add a html panel that contains the image src from the attachments server (to pull asynchronously)
-					//create img
-					view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false), 
-										DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
-				}
-				else { //must be a text type of some kind
-					//try to load the text of the preview, if available
-					//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
-					requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true));
-					try {
-						requestBuilder.sendRequest(null, new RequestCallback() {
-							public void onError(final Request request, final Throwable e) {
-								view.addSynapseAlertWidget(synapseAlert.asWidget());
-								synapseAlert.handleException(e);
-							}
-							public void onResponseReceived(final Request request, final Response response) {
-								//add the response text
-							int statusCode = response.getStatusCode();
-								if (statusCode == Response.SC_OK) {
-									String responseText = response.getText();
-									if (responseText != null && responseText.length() > 0) {
-										if (PreviewFileType.CODE == previewType) {
-											view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-										} 
-										else if (PreviewFileType.CSV == previewType)
-											view.setTablePreview(responseText, ",");
-										else if (PreviewFileType.TAB == previewType)
-											view.setTablePreview(responseText, "\\t");
-										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
-											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-										}
+			if (!(bundle.getEntity() instanceof FileEntity)) {
+				//not a file!
+				view.addSynapseAlertWidget(synapseAlert.asWidget());
+				synapseAlert.showError("Preview unavailable for \"" + bundle.getEntity().getName() + "\" ("+bundle.getEntity().getId()+")");
+			} else {
+				renderFilePreview(bundle);
+			}
+		}
+	}
+	
+	private void renderFilePreview(EntityBundle bundle) {
+		PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
+		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
+		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
+		if (previewType != PreviewFileType.NONE) {
+			FileEntity fileEntity = (FileEntity)bundle.getEntity();
+			if (previewType == PreviewFileType.IMAGE) {
+				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
+				//create img
+				view.setImagePreview(DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false), 
+									DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true));
+			}
+			else { //must be a text type of some kind
+				//try to load the text of the preview, if available
+				//must have file handle servlet proxy the request to the endpoint (because of cross-domain access restrictions)
+				requestBuilder.configure(RequestBuilder.GET,DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), true, true));
+				try {
+					requestBuilder.sendRequest(null, new RequestCallback() {
+						public void onError(final Request request, final Throwable e) {
+							view.addSynapseAlertWidget(synapseAlert.asWidget());
+							synapseAlert.handleException(e);
+						}
+						public void onResponseReceived(final Request request, final Response response) {
+							//add the response text
+						int statusCode = response.getStatusCode();
+							if (statusCode == Response.SC_OK) {
+								String responseText = response.getText();
+								if (responseText != null && responseText.length() > 0) {
+									if (PreviewFileType.CODE == previewType) {
+										view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+									} 
+									else if (PreviewFileType.CSV == previewType)
+										view.setTablePreview(responseText, ",");
+									else if (PreviewFileType.TAB == previewType)
+										view.setTablePreview(responseText, "\\t");
+									else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType){
+										view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
 									}
 								}
 							}
-						});
-					} catch (final Exception e) {
-						view.addSynapseAlertWidget(synapseAlert.asWidget());
-						synapseAlert.handleException(e);
-					}
+						}
+					});
+				} catch (final Exception e) {
+					view.addSynapseAlertWidget(synapseAlert.asWidget());
+					synapseAlert.handleException(e);
 				}
 			}
 		}
 	}
+	
 	
 	public Widget asWidget() {
 		return view.asWidget();

@@ -97,7 +97,20 @@ public class PreviewWidgetTest {
 		// create empty wiki descriptor
 		descriptor = new HashMap<String, String>();
 	}
+	@Test
+	public void testWrongEntityType(){
+		Project project = new Project();
+		project.setName("Test only");
+		project.setId("99");
+		testBundle.setEntity(project);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		
+		verify(mockView).addSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).showError(anyString());
+	}
 	
+	@Test
 	public void testNoPreviewFileHandleAvailable(){
 		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
