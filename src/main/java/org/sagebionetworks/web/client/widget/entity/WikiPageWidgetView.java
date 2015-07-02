@@ -27,7 +27,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void previewClicked(final Long versionToPreview, Long currentVersion);
 		public WikiPage getWikiPage();
 		public CallbackP<WikiPageKey> getReloadWikiPageCallback();
-		public void toggleHistory();
 		void configureHistoryWidget(WikiPageKey wikiKey, boolean canEdit);
 		void configureWikiSubpagesWidget(WikiPageKey wikiKey,
 				boolean isEmbeddedInOwnerPage);
@@ -35,19 +34,17 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 				String ownerObjectName);
 		void restoreConfirmed();
 		void restoreClicked();
-		void reloadWikiPage();
 		void resetWikiMarkdown(String markdown);
+		void configureCreatedModifiedBy();
+		void reloadWikiPage(WikiPageKey wikiPageToReload);
+		public void reloadCurrentWikiPage();
 	}
 	
-	public void configure(String markdown, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);
 	public void showNoteInPage(String message);
 	public void show404();
 	public void show403();
-
-	public void setSynapseAlertWidget(Widget asWidget);
 	void setWikiHistoryWidget(IsWidget historyWidget);
 	void setWikiSubpagesWidget(IsWidget historyWidget);
-	void setHistoryToggleButtonText(String text);
 	void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages);
 	void showPopup(String title, String message, MessagePopup popupType,
 			org.sagebionetworks.web.client.utils.Callback okCallback,
@@ -56,4 +53,13 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	void showCreatedBy(boolean isVisible);
 	void showModifiedBy(boolean isVisible);
 	void showWikiHistory(boolean isVisible);
+	void setMarkdownWidget(IsWidget markdownWidget);
+	void setBreadcrumbWidget(IsWidget breadcrumb);
+	void setSynapseAlertWidget(IsWidget synapseAlert);
+	void showDiffVersionAlert();
+	public void showRestoreButton();
+	void setModifiedByBadge(IsWidget modifiedByUserBadge);
+	void setModifiedByText(String modifiedByText);
+	void setCreatedByBadge(IsWidget createdByUserBadge);
+	void setCreatedByText(String createdByText);
 }

@@ -47,9 +47,7 @@ public class BreadcrumbTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 						
-		breadcrumb = new Breadcrumb(mockView, mockSynapseClient,
-				mockGlobalApplicationState, mockAuthenticationController,
-				mockIconsImageBundle);
+		breadcrumb = new Breadcrumb(mockView, mockGlobalApplicationState);
 		
 		
 		verify(mockView).setPresenter(breadcrumb);

@@ -4,7 +4,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -37,7 +36,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
 	private V2WikiOrderHint subpageOrderHint;
-	private AuthenticationController authenticationController;
 	private boolean canEdit;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
@@ -49,8 +47,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 							AuthenticationController authenticationController) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
-		this.authenticationController = authenticationController;
-		
 		view.setPresenter(this);
 	}
 
@@ -65,7 +61,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
-			int mask = ENTITY | PERMISSIONS ;
+			int mask = ENTITY | PERMISSIONS;
 			synapseClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {

@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -8,13 +12,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -33,13 +35,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	public interface Binder extends UiBinder<Widget, WikiPageWidgetViewImpl> {}
 	
-	private Boolean canEdit;
-	private boolean isRootWiki;
-	private String ownerObjectName; //used for linking back to the owner object
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isCurrentVersion;
 	private Long versionInView;
-	private boolean isEmbeddedInOwnerPage;
 	
 	@UiField
 	FlowPanel wikiPagePanel;
@@ -48,10 +46,16 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Alert diffVersionAlert;
 	
 	@UiField
-	Span modifiedByField;
+	Span modifiedOnField;
 	
 	@UiField
-	Span createdByField;
+	Span createdOnField;
+	
+	@UiField
+	SimplePanel	modifiedByBadgePanel;
+	
+	@UiField
+	SimplePanel	createdByBadgePanel;
 	
 	@UiField
 	Button wikiHistoryButton;
@@ -77,6 +81,17 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@UiField
 	HTMLPanel createdByPanel;
 	
+	@UiField
+	SimplePanel breadcrumbPanel;
+	
+	@UiField
+	SimplePanel markdownPanel;
+	
+	@UiField
+	Anchor anchorToCurrentVersion;
+	
+	@UiField
+	Collapse historyCollapse;
 	
 	Widget widget;
 
@@ -91,15 +106,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	@Inject
 	public WikiPageWidgetViewImpl(Binder binder) {
-		super();
 		widget = binder.createAndBindUi(this);
-		
-		wikiHistoryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.toggleHistory();
-			}
-		});
 		restoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -114,6 +121,35 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				}
 			}
 		});
+		anchorToCurrentVersion.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.reloadCurrentWikiPage();
+			}
+		});
+		wikiHistoryButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (!historyCollapse.isCollapsing()) {
+					if (wikiHistoryButton.getIcon() == IconType.CARET_DOWN) {
+						wikiHistoryButton.setIcon(IconType.CARET_UP);
+					} else {
+						wikiHistoryButton.setIcon(IconType.CARET_DOWN);
+					}
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void clear() {
+		diffVersionAlert.setVisible(false);
+		//rest of clearing UI state?
+	}
+	
+	@Override
+	public void showDiffVersionAlert() {
+		diffVersionAlert.setVisible(true);
 	}
 	
 	@Override
@@ -146,17 +182,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiSubpagesPanel.add(wikiSubpages);
 	}
 
-	@Override
-	public void configure(String markdown, final WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki,
-			boolean isCurrentVersion, final Long versionInView, boolean isEmbeddedInOwnerPage) {
-//		this.ownerObjectName = ownerObjectName;
-//		this.canEdit = canEdit;
-//		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
-//		resetWikiMarkdown(markdown, wikiKey, isRootWiki, isCurrentVersion, versionInView);
-//		showDefaultViewWithWiki();
-	}
-
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
@@ -184,7 +209,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	@Override
 	public Widget asWidget() {
-		return this;
+		return widget;
 	}
 
 	@Override
@@ -326,7 +351,30 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 //		modifiedAndCreatedSection.add(historyPanel);
 //		return modifiedAndCreatedSection;
 //	}
-
+	
+	@Override
+	public void setModifiedByBadge(IsWidget modifiedByUserBadge) {
+		modifiedByBadgePanel.setWidget(modifiedByUserBadge);
+	}
+	
+	@Override
+	public void setModifiedByText(String modifiedByText) {
+		modifiedOnField.setText(modifiedByText);
+	}
+	
+	@Override
+	public void setCreatedByBadge(IsWidget createdByUserBadge) {
+		createdByBadgePanel.setWidget(createdByUserBadge);
+	}
+	
+	@Override
+	public void setCreatedByText(String createdByText) {
+		createdOnField.setText(createdByText);
+	}
+	
+	
+	
+	
 //	private Alert createDifferentVersionNotice() {
 //		Alert notice = new Alert();
 //		HorizontalPanel noticeWithLink = new HorizontalPanel();
@@ -366,18 +414,14 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 //		});
 //		return linkToCurrent;
 //	}
-	
-	@Override
-	public void setHistoryToggleButtonText(String text) {
-		this.wikiHistoryButton.setText(text);
-	}
 
-	private SimplePanel wrapWidget(Widget widget, String styleNames) {
-		SimplePanel widgetWrapper = new SimplePanel();
-		widgetWrapper.addStyleName(styleNames);
-		widgetWrapper.add(widget);
-		return widgetWrapper;
-	}
+
+//	private SimplePanel wrapWidget(Widget widget, String styleNames) {
+//		SimplePanel widgetWrapper = new SimplePanel();
+//		widgetWrapper.addStyleName(styleNames);
+//		widgetWrapper.add(widget);
+//		return widgetWrapper;
+//	}
 
 //	private Widget getBreadCrumbs() {
 //		final SimplePanel breadcrumbsWrapper = new SimplePanel();
@@ -443,30 +487,35 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void setWikiHistoryWidget(IsWidget historyWidget) {
 		wikiHistoryPanel.setWidget(historyWidget);
 	}
-
-	private Button createRestoreButton() {
-		Button btn = DisplayUtils.createIconButton("Restore", DisplayUtils.ButtonType.DEFAULT, null);
-		btn.setStyleName("wikiHistoryButton", true);
-		btn.setStyleName("margin-top-10", true);
-		btn.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				// If this button is used when viewing the current version for any reason, don't do anything
-				// Otherwise, raise warning to user for confirmation before restoring
-				if(!isCurrentVersion) {
-					// versionInView should be set if !isCurrentVersion
-					if(versionInView != null) {
-						showRestorationWarning(versionInView);
-					}
-				}
-			}
-		});
-		return btn;
+	
+	@Override
+	public void showRestoreButton() {
+		restoreButton.setVisible(true);
 	}
 
+//	private Button createRestoreButton() {
+//		Button btn = DisplayUtils.createIconButton("Restore", DisplayUtils.ButtonType.DEFAULT, null);
+//		btn.setStyleName("wikiHistoryButton", true);
+//		btn.setStyleName("margin-top-10", true);
+//		btn.addClickHandler(new ClickHandler() {
+//
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				// If this button is used when viewing the current version for any reason, don't do anything
+//				// Otherwise, raise warning to user for confirmation before restoring
+//				if(!isCurrentVersion) {
+//					// versionInView should be set if !isCurrentVersion
+//					if(versionInView != null) {
+//						showRestorationWarning(versionInView);
+//					}
+//				}
+//			}
+//		});
+//		return btn;
+//	}
+
 	@Override
-	public void setSynapseAlertWidget(Widget synapseAlert) {
+	public void setSynapseAlertWidget(IsWidget synapseAlert) {
 		synAlertPanel.setWidget(synapseAlert);
 	}
 	
@@ -478,6 +527,16 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void hideLoading() {
 		loadingPanel.setVisible(false);
+	}
+
+	@Override
+	public void setMarkdownWidget(IsWidget markdownWidget) {
+		markdownPanel.setWidget(markdownWidget);
+	}
+
+	@Override
+	public void setBreadcrumbWidget(IsWidget breadcrumb) {
+		breadcrumbPanel.setWidget(breadcrumb);
 	}
 	
 }
