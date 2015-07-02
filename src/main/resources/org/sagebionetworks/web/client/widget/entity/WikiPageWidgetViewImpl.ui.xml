@@ -15,11 +15,11 @@
 	    <g:SimplePanel ui:field="synAlertPanel"/>
 	    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
 	    <g:FlowPanel ui:field="wikiPagePanel">
-	        <b:Alert ui:field="diffVersionAlert">
+	        <b:Alert ui:field="diffVersionAlert" visible="false">
 	            <g:HTMLPanel>
 	                <bh:Span addStyleNames="margin-left-5" 
 	                    text="You are viewing an old version of this page. View the"/>
-	                <b:Anchor ui:field="anchorToCurrentVersion" addStyleNames="link margin-left-5" text="current version."/>
+	                <b:Anchor ui:field="anchorToCurrentVersion" addStyleNames="link" text="current version."/>
 	            	<b:Button ui:field="restoreButton" addStyleNames="wikiHistoryButton margin-top-10" visible="false"/>
 	            </g:HTMLPanel>
 	        </b:Alert>
@@ -28,13 +28,19 @@
 	    	<g:SimplePanel ui:field="markdownPanel"/>
 	    	<g:FlowPanel addStyleNames="margin-top-10 clearleft" ui:field="createdModifiedHistoryPanel">
 			    <g:HTMLPanel ui:field="modifiedByPanel">
-			        Modified by <bh:Span ui:field="modifiedByField"/>
+   			        <g:SimplePanel ui:field="modifiedByBadgePanel"/>
+			        Modified by <bh:Span ui:field="modifiedOnField"/>
 			    </g:HTMLPanel>
 			    <g:HTMLPanel ui:field="createdByPanel">
-			        Created by <bh:Span ui:field="createdByField"/>
+			        Created by 
+			        <g:SimplePanel ui:field="createdByBadgePanel"/>
+			        <bh:Span ui:field="createdOnField"/>
 			    </g:HTMLPanel>
-			    <b:Button ui:field="wikiHistoryButton" addStyleNames="wikiHistoryButton" text="Show Wiki History"/>
-			    <g:SimplePanel addStyleNames="margin-top-10" ui:field="wikiHistoryPanel"/>
+			    <b:Button ui:field="wikiHistoryButton" dataToggle="COLLAPSE" iconPosition="RIGHT" 
+			        icon="CARET_DOWN" dataTarget="#historyCollapse" text="Wiki History"/>
+			    <b:Collapse b:id="historyCollapse" ui:field="historyCollapse" toggle="false">
+       			    <g:SimplePanel addStyleNames="margin-top-10" ui:field="wikiHistoryPanel"/>
+			    </b:Collapse>
 			</g:FlowPanel>
 	    </g:FlowPanel>
 	</g:FlowPanel>
