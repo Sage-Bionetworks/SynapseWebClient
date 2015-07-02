@@ -1,15 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.util.Map;
 
@@ -106,12 +98,14 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			Callback widgetRefreshRequired, 
 			Long wikiVersionInView) {
 		//get the entity id and version from the wiki widget parameters
+		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
 		int mask = ENTITY  | FILE_HANDLES;
 		AsyncCallback<EntityBundle> entityBundleCallback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				view.addSynapseAlertWidget(synapseAlert.asWidget());
 				synapseAlert.handleException(caught);
 			}
 			@Override
