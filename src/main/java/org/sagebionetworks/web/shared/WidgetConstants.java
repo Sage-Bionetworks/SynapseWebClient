@@ -145,6 +145,7 @@ public class WidgetConstants {
 	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
 	
 	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
+	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	
 	public static final String SHINYSITE_INCLUDE_PRINCIPAL_ID_KEY = "includePrincipalId";
@@ -159,7 +160,8 @@ public class WidgetConstants {
 	public static final String CHALLENGE_PARTICIPANTS_CONTENT_TYPE = "challengeParticipants";
 	public static final String CHALLENGE_ID_KEY = "challengeId";
 	public static final String IS_IN_CHALLENGE_TEAM_KEY = "isInTeam";
-	
+	public static final String PREVIEW_CONTENT_TYPE = "preview";
+	public static final String PREVIEW_FRIENDLY_NAME ="Preview";
 	public static final String BOOKMARK_KEY = "bookmarkID";
 	public static final String REFERENCE_FOOTNOTE_KEY = "footnoteId";
 	public static final String INLINE_WIDGET_KEY = "inlineWidget";	/**

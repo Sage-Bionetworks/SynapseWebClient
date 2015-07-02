@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.factory;
 
+import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
@@ -30,7 +31,7 @@ public interface RendererFactory {
 	public TableOfContentsWidget getTableOfContentsRenderer();
 	public WikiFilesPreviewWidget getWikiFilesPreviewRenderer();
 	public EntityListWidget getEntityListRenderer();
-	public ShinySiteWidget getShinySiteRenderer(); 
+	public ShinySiteWidget getShinySiteRenderer();
 	
 	// Other widgets
 	public UserBadge getUserBadgeWidget();

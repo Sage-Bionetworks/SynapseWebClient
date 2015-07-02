@@ -1,5 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+
+import java.util.Map;
+
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
@@ -8,8 +21,13 @@ import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
@@ -17,10 +35,11 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class PreviewWidget implements PreviewWidgetView.Presenter{
+public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendererPresenter {
 	public static final String APPLICATION_ZIP = "application/zip";	
 	
 	public enum PreviewFileType {
@@ -31,18 +50,20 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 	PreviewWidgetView view;
 	RequestBuilderWrapper requestBuilder;
 	SynapseJSNIUtils synapseJSNIUtils;
-	EntityBundle bundle;
 	SynapseAlert synapseAlert;
+	SynapseClientAsync synapseClient;
 	
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
 			SynapseJSNIUtils synapseJSNIUtils,
-			SynapseAlert synapseAlert) {
+			SynapseAlert synapseAlert,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseAlert = synapseAlert;
+		this.synapseClient = synapseClient;
 	}
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
@@ -78,11 +99,35 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 		}
 		return previewFileType;
 	}
-	public void configure(EntityBundle bundle) {
-		this.bundle = bundle;
+	
+	@Override
+	public void configure(WikiPageKey wikiKey,
+			Map<String, String> widgetDescriptor,
+			Callback widgetRefreshRequired, 
+			Long wikiVersionInView) {
+		//get the entity id and version from the wiki widget parameters
+		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
+		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
+		int mask = ENTITY  | FILE_HANDLES;
+		AsyncCallback<EntityBundle> entityBundleCallback = new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synapseAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(EntityBundle bundle) {
+				configure(bundle);
+			}
+		};
+		
+		if (version == null) {
+			synapseClient.getEntityBundle(entityId, mask, entityBundleCallback);
+		} else {
+			synapseClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
+		}
 	}
 	
-	public Widget asWidget() {
+	public void configure(EntityBundle bundle) {
 		view.clear();
 		
 		//if not logged in, don't even try to load the preview.  Just direct user to log in.
@@ -138,7 +183,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter{
 				}
 			}
 		}
-		
+	}
+	
+	public Widget asWidget() {
 		return view.asWidget();
 	}
 	

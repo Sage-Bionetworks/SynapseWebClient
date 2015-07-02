@@ -22,6 +22,7 @@
 					    <b:AnchorListItem ui:field="imageLink">Image</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="joinTeamLink">Join Team Button</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="linkLink">Link</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="previewLink">Preview</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="provenanceGraphLink">Provenance Graph</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="referenceLink">Reference</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="submitToEvaluationLink">Submit to Evaluation</b:AnchorListItem>
