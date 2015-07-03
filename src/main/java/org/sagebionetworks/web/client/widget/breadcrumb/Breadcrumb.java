@@ -75,6 +75,11 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 		view.setLinksList(links, currentPageName);
 	}
 	
+	
+	@Override
+	public void clear() {
+		view.clear();
+	}
 	/**
 	 * Not used
 	 */

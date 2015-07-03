@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface WikiPageWidgetView extends IsWidget, SynapseView {
 
@@ -24,7 +23,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage);
-		public void previewClicked(final Long versionToPreview, Long currentVersion);
+		public void showPreview(final Long versionToPreview, Long currentVersion);
 		public WikiPage getWikiPage();
 		public CallbackP<WikiPageKey> getReloadWikiPageCallback();
 		void configureHistoryWidget(WikiPageKey wikiKey, boolean canEdit);
@@ -33,11 +32,11 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		void configureBreadcrumbs(WikiPageKey wikiKey, boolean isRootWiki,
 				String ownerObjectName);
 		void restoreConfirmed();
-		void restoreClicked();
 		void resetWikiMarkdown(String markdown);
 		void configureCreatedModifiedBy();
-		void reloadWikiPage(WikiPageKey wikiPageToReload);
-		public void reloadCurrentWikiPage();
+		void reloadWikiPage();
+		void showRestoreWarning(Long versionToRestore);
+		public void restoreClicked();
 	}
 	
 	public void showNoteInPage(String message);
@@ -62,4 +61,5 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	void setModifiedByText(String modifiedByText);
 	void setCreatedByBadge(IsWidget createdByUserBadge);
 	void setCreatedByText(String createdByText);
+	void hideDiffVersionAlert();
 }

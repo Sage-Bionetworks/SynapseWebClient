@@ -31,5 +31,7 @@ public interface BreadcrumbView extends IsWidget, SynapseView {
 		 */
 		public void goTo(Place place);
 
+		void clear();
+
 	}
 }

@@ -110,21 +110,15 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		restoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				//state held in presenter
 				presenter.restoreClicked();
-				// If this button is used when viewing the current version for any reason, don't do anything
-				// Otherwise, raise warning to user for confirmation before restoring
-				if(!isCurrentVersion) {
-					// versionInView should be set if !isCurrentVersion
-					if(versionInView != null) {
-						showRestorationWarning(versionInView);
-					}
-				}
 			}
 		});
 		anchorToCurrentVersion.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.reloadCurrentWikiPage();
+				presenter.reloadWikiPage();
+				hideDiffVersionAlert();
 			}
 		});
 		wikiHistoryButton.addClickHandler(new ClickHandler() {
@@ -150,6 +144,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void showDiffVersionAlert() {
 		diffVersionAlert.setVisible(true);
+	}
+	
+	@Override
+	public void hideDiffVersionAlert() {
+		diffVersionAlert.setVisible(false);
 	}
 	
 	@Override
@@ -190,7 +189,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
 			@Override
 			public void invoke() {
-				presenter.restoreClicked();
+				presenter.restoreConfirmed();
 			}	
 		};
 		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {

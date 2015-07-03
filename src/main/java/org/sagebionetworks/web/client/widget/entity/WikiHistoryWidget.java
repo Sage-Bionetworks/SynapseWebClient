@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -78,9 +79,10 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 				// Prepare ids that are not mapped to a display name in the map
 				final ArrayList<String> idsToSearch = new ArrayList<String>();
 				for(int i = 0; i < historyAsListOfHeaders.size(); i++) {
+					GWT.debugger();
 					String modifiedById = historyAsListOfHeaders.get(i).getModifiedBy();
 					// Only add unique ids to the list being built
-					if(mapIdToName != null && !mapIdToName.containsKey(modifiedById) && !idsToSearch.contains(modifiedById)) {
+					if(mapIdToName != null && !idsToSearch.contains(modifiedById) && !modifiedById.trim().isEmpty()) {
 						idsToSearch.add(modifiedById);
 					}
 				}

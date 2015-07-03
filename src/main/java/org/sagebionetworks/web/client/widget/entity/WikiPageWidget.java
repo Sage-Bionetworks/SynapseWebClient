@@ -95,16 +95,24 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
+		this.breadcrumb = breadcrumb;
 		view.setPresenter(this);
 		view.setSynapseAlertWidget(synapseAlert);
 		view.setWikiHistoryWidget(historyWidget);
-//		view.setWikiSubpagesWidget(wikiSubpages);
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
 		createdByBadge = ginInjector.getUserBadgeWidget();
 		modifiedByBadge = ginInjector.getUserBadgeWidget();
 		view.setModifiedByBadge(modifiedByBadge);
 		view.setCreatedByBadge(createdByBadge);
+	}
+	
+	public void clear(){
+		view.clear();
+		view.hideLoading();
+		markdownWidget.clear();
+		breadcrumb.clear();
+		wikiSubpages.clearState();
 	}
 
 	@Override
@@ -124,6 +132,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
 			final Callback callback, final boolean isEmbeddedInOwnerPage) {
+		clear();
 		view.showLoading();
 		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
@@ -133,7 +142,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.isHistoryOpen = false;
 		this.versionInView = null;
 		this.synapseAlert.clear();
-
 		// set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -161,7 +169,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 							resetWikiMarkdown(currentPage.getMarkdown());
 							configureBreadcrumbs(wikiKey, isRootWiki, ownerObjectName);
 							configureHistoryWidget(wikiKey, canEdit);
-							configureWikiSubpagesWidget(wikiKey, isEmbeddedInOwnerPage);							
+							configureWikiSubpagesWidget(wikiKey, isEmbeddedInOwnerPage);	
+							configureCreatedModifiedBy();
 							view.hideLoading();
 						} catch (Exception e) {
 							onFailure(e);
@@ -196,7 +205,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		wikiSubpages.configure(wikiKey, null, isEmbeddedInOwnerPage, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
-				reloadWikiPage(param);
+				reloadWikiPage();
 			}});
 		view.setWikiSubpagesWidget(wikiSubpages);
 	}
@@ -208,14 +217,15 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			@Override
 			public void previewClicked(Long versionToPreview,
 					Long currentVersion) {
-				previewClicked(versionToPreview, currentVersion);
+				showPreview(versionToPreview, currentVersion);
 			}
 			@Override
 			public void restoreClicked(Long versionToRestore) {
-				restoreClicked(versionToRestore);
+				showRestoreWarning(versionToRestore);
 			}
 		};
 		historyWidget.configure(wikiKey, canEdit, actionHandler);
+		view.setWikiHistoryWidget(historyWidget);
 	}
 	
 	@Override
@@ -276,15 +286,13 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		} 
 	}
 
-	public void clear(){
-		view.clear();
-	}
+	
 	private void refresh() {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
 	}
 
 	@Override
-	public void previewClicked(final Long versionToPreview, Long currentVersion) {
+	public void showPreview(final Long versionToPreview, Long currentVersion) {
 		isCurrentVersion = versionToPreview.equals(currentVersion);
 		versionInView = versionToPreview;
 		setOwnerObjectName(new CallbackP<String>() {
@@ -329,11 +337,12 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 
 	@Override
-	public void restoreClicked() {
+	public void showRestoreWarning(final Long versionToRestore) {
 		if (!isCurrentVersion && versionInView != null) {
 			org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
 				@Override
 				public void invoke() {
+					versionInView = versionToRestore;
 					restoreConfirmed();
 				}	
 			};
@@ -354,6 +363,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			@Override
 			public void onSuccess(V2WikiPage result) {
 				refresh();
+				view.hideDiffVersionAlert();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -369,37 +379,14 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	@Override
-	public void reloadCurrentWikiPage() {
+	public void reloadWikiPage() {
 		synapseAlert.clear();
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage result) {
 				try {
-					currentPage = result;
-					boolean isRootWiki = currentPage.getParentWikiId() == null;
-					wikiKey.setWikiPageId(currentPage.getId());
-					resetWikiMarkdown(currentPage.getMarkdown());
-					if (wikiReloadHandler != null) {
-						wikiReloadHandler.invoke(currentPage.getId());
-					}
-				} catch (Exception e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				handleGetV2WikiPageAsV1Failure(caught);
-			}
-		});
-	}
-
-	@Override
-	public void reloadWikiPage(WikiPageKey wikiPageToReload) {
-		synapseAlert.clear();
-		synapseClient.getV2WikiPageAsV1(wikiPageToReload, new AsyncCallback<WikiPage>() {
-			@Override
-			public void onSuccess(WikiPage result) {
-				try {
+					view.hideDiffVersionAlert();
+					isCurrentVersion = true;
 					currentPage = result;
 					boolean isRootWiki = currentPage.getParentWikiId() == null;
 					wikiKey.setWikiPageId(currentPage.getId());
@@ -449,5 +436,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
 		this.wikiReloadHandler = wikiReloadHandler;
+	}
+
+	@Override
+	public void restoreClicked() {
+		showRestoreWarning(versionInView);
 	}
 }
