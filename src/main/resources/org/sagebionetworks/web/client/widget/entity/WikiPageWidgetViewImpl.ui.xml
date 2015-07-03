@@ -20,7 +20,7 @@
 	                <bh:Span addStyleNames="margin-left-5" 
 	                    text="You are viewing an old version of this page. View the"/>
 	                <b:Anchor ui:field="anchorToCurrentVersion" addStyleNames="link" text="current version."/>
-	            	<b:Button ui:field="restoreButton" addStyleNames="wikiHistoryButton margin-top-10" visible="false"/>
+	            	<b:Button ui:field="restoreButton" addStyleNames="wikiHistoryButton margin-top-10" text="Restore" visible="false"/>
 	            </g:HTMLPanel>
 	        </b:Alert>
 	        <g:SimplePanel ui:field="breadcrumbPanel"/>
@@ -28,8 +28,9 @@
 	    	<g:SimplePanel ui:field="markdownPanel"/>
 	    	<g:FlowPanel addStyleNames="margin-top-10 clearleft" ui:field="createdModifiedHistoryPanel">
 			    <g:HTMLPanel ui:field="modifiedByPanel">
+   			        Modified by
    			        <g:SimplePanel ui:field="modifiedByBadgePanel"/>
-			        Modified by <bh:Span ui:field="modifiedOnField"/>
+			        <bh:Span ui:field="modifiedOnField"/>
 			    </g:HTMLPanel>
 			    <g:HTMLPanel ui:field="createdByPanel">
 			        Created by 

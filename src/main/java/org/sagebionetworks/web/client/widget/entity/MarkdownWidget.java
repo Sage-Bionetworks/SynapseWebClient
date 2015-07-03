@@ -77,7 +77,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	@Override
 	public void configure(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
-		synAlert.clear();
+		clear();
 		view.setEmptyVisible(true);
 		this.md = md;
 		this.wikiKey = wikiKey;
@@ -89,7 +89,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 				view.callbackWhenAttached(new Callback() {
 					@Override
 					public void invoke() {
-						view.clearMarkdown();
 						if(result != null && !result.isEmpty()) {
 							view.setEmptyVisible(false);
 							view.setMarkdown(result);
@@ -105,6 +104,12 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void clear() {
+		synAlert.clear();
+		view.clearMarkdown();
 	}
 	
 	
