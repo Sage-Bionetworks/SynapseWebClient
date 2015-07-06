@@ -12,6 +12,8 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -40,6 +42,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -63,16 +66,29 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel header;
 	@UiField
 	SimplePanel footer;
+	
 	@UiField
-	FlowPanel viewProfilePanel;
+	 Div viewProfilePanel;
+	 @UiField
+	 Image certificationBadge;
+	 @UiField
+	 Heading displayNameField;
+	 @UiField
+	 Heading headlineField;
+	 @UiField
+	 Paragraph industryLocationField;
+	 @UiField
+	 Paragraph summaryField;
+	 @UiField
+	 org.gwtbootstrap3.client.ui.Anchor urlField;
+	 @UiField
+	 TextBox synapseEmailField;
 	@UiField
 	Button editProfileButton;
 	@UiField
 	Button importLinkedIn;
 	@UiField
 	SimplePanel editUserProfilePanel;
-	
-	SimplePanel certifiedUserBadgePanel;
 	
 	@UiField
 	SimplePanel picturePanel;
@@ -370,6 +386,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.setGetCertifiedDismissed();
 			}
 		});
+		synapseEmailField.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				synapseEmailField.selectAll();
+			}
+		});
+
 	}
 	
 	@Override
@@ -420,23 +443,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void initCertificationBadge() {
-		certifiedUserBadgePanel = new SimplePanel();
-		certifiedUserBadgePanel.addStyleName("displayInline");
-		Image certifiedUserImage = new Image(sageImageBundle.certificate().getSafeUri());
-		certifiedUserImage.setHeight("32px");
-		certifiedUserImage.setWidth("25px");
-		certifiedUserImage.setPixelSize(25, 32);
-		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10");
-		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
-		certifiedUserImage.addClickHandler(new ClickHandler() {
+		certificationBadge.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				clear();
-				tooltip.hide();
 				presenter.certificationBadgeClicked();
 			}
 		});
-		certifiedUserBadgePanel.add(certifiedUserImage);
 	}
 	
 	@Override
@@ -468,7 +481,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setProfile(UserProfile profile, boolean isOwner) {
-		fillInProfileView(profile, viewProfilePanel);
+		viewProfilePanel.setVisible(true);
+		fillInProfileView(profile);
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
 		if (!isOwner) {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
@@ -493,7 +507,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void addCertifiedBadge() {
-		viewProfilePanel.add(certifiedUserBadgePanel);
+		certificationBadge.setVisible(true);
 	}
 	
 	private void resetHighlightBoxes() {
@@ -620,11 +634,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 return profilePicture;
 	 }
 	 
-	 public static void fillInProfileView(UserProfile profile, FlowPanel viewProfilePanel) {
-		 fillInProfileView(profile.getFirstName(), profile.getLastName(), profile.getUserName(), profile.getIndustry(), profile.getLocation(), profile.getSummary(), profile.getCompany(), profile.getPosition(), profile.getUrl(), viewProfilePanel);
+	 public void fillInProfileView(UserProfile profile) {
+		 fillInProfileView(profile.getFirstName(), profile.getLastName(), profile.getUserName(), profile.getIndustry(), profile.getLocation(), profile.getSummary(), profile.getCompany(), profile.getPosition(), profile.getUrl());
 	 }
 	 
-	 public static void fillInProfileView(String fName, String lName, String userName, String industry, String location, String summary, String company, String position, String url, FlowPanel viewProfilePanel) {
+	 public void fillInProfileView(String fName, String lName, String userName, String industry, String location, String summary, String company, String position, String url) {
 		 String name = DisplayUtils.getDisplayName(fName, lName, userName);
 		 url = DisplayUtils.replaceWithEmptyStringIfNull(url);
 		 company = DisplayUtils.replaceWithEmptyStringIfNull(company);
@@ -634,49 +648,24 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 summary = DisplayUtils.replaceWithEmptyStringIfNull(summary);
 		 
 		 //build profile html
+		 displayNameField.setText(name);
+		 String atString = position.length()>0 && company.length()>0 ? " at " : "";
+		 headlineField.setText(position + atString + company);
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		 builder.appendHtmlConstant("<h2 class=\"displayInline\">");
-		 builder.appendEscapedLines(name);
-		 builder.appendHtmlConstant("</h2>");
-		 
-		 HTML headlineHtml = new HTML(builder.toSafeHtml());
-		 headlineHtml.addStyleName("displayInline");
-		 viewProfilePanel.add(headlineHtml);
-		 
-		 builder = new SafeHtmlBuilder();
-		 
-		 if (position.length()>0 || company.length()>0) {
-			 builder.appendHtmlConstant("<h4 class=\"user-profile-headline\">");
-			 String atString = position.length()>0 && company.length()>0 ? " at " : "";
-			 builder.appendEscapedLines(position + atString + company);
-			 builder.appendHtmlConstant("</h4>");
-		 }
-		 
-		 builder.appendHtmlConstant("<p class=\"user-profile-industry-location\">");
-		 
-		 if (industry.length()>0) {
-			 builder.appendEscapedLines(industry);
-			 if (location.length()>0) 
-				 builder.appendHtmlConstant(" | ");
-		 }
+		 builder.appendEscapedLines(industry);
+		 if (location.length()>0) { 
+			 builder.appendHtmlConstant(" | ");
+	 	 }
 		 if (location.length()>0) {
 			 builder.appendEscapedLines(location);
 		 }
-		 builder.appendHtmlConstant("</p>");
-			
-		 
-		 if (summary.length()>0) {
-			 builder.appendHtmlConstant("<p class=\"user-profile-summary\">");
-			 builder.appendEscapedLines(summary);
-			 builder.appendHtmlConstant("</p>");
-		 }
-		 
-		 if (url.length() > 0) {
-			 builder.appendHtmlConstant("<p><a href=\""+url+"\" class=\"link\" target=\"_blank\">" + url + "</a></p>");
-		 }
-		 
-		 HTML profileHtml = new HTML(builder.toSafeHtml());
-		 viewProfilePanel.add(profileHtml);
+		 industryLocationField.setHTML(builder.toSafeHtml().asString());
+		 builder = new SafeHtmlBuilder();
+		 builder.appendEscapedLines(summary);
+		 summaryField.setHTML(builder.toSafeHtml().asString());
+		 urlField.setText(url);
+		 urlField.setHref(url);
+		 synapseEmailField.setText(userName+"@synapse.org");
 	}
 		 
 			@Override
@@ -711,7 +700,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void clear() {
-		viewProfilePanel.clear();
+		certificationBadge.setVisible(false);
+		viewProfilePanel.setVisible(false);
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
 		clearProjects();
