@@ -75,7 +75,7 @@ public class ProvViewUtil {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
 			badge.setMaxNameLength(MAX_DISPLAY_NAME_CHAR);
 			badge.configure(node.getModifiedBy());
-			HTML time = new HTML(DisplayUtils.converDataToPrettyString(node.getModifiedOn()));
+			HTML time = new HTML(DisplayUtils.convertDataToPrettyString(node.getModifiedOn()));
 			time.addStyleName(PROV_ACTIVITY_TIME_STYLE);
 
 			FlowPanel content = new FlowPanel();

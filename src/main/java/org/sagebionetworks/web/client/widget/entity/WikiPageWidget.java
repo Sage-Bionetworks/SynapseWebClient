@@ -53,11 +53,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	// callback
 	private Callback callback;
-	private CallbackP<WikiPageKey> reloadWikiPageCallback;
 	private CallbackP<String> wikiReloadHandler;
 
 	// state
-	private boolean isHistoryOpen;
 	private boolean isCurrentVersion;
 	private Long versionInView;
 	private WikiPageKey wikiKey;
@@ -139,7 +137,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.wikiKey = wikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.isCurrentVersion = true;
-		this.isHistoryOpen = false;
 		this.versionInView = null;
 		this.synapseAlert.clear();
 		// set up callback
@@ -237,9 +234,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
 				breadcrumb.configure(links, null);
 			} else {
-				breadcrumb.configure(links, getWikiPage().getTitle());
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
 				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+				breadcrumb.configure(links, currentPage.getTitle());
 			}
 			//TODO: support other object types.
 		}
@@ -249,8 +246,11 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void configureCreatedModifiedBy() {
 		modifiedByBadge.configure(currentPage.getModifiedBy());
 		createdByBadge.configure(currentPage.getCreatedBy());
-		view.setModifiedByText(" on " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()));
-		view.setCreatedByText(" on " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));
+		// added check for testing, as Date is not instantiable/mockable
+		if (currentPage.getModifiedOn() != null) {
+			view.setModifiedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getModifiedOn()));
+			view.setCreatedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getCreatedOn()));
+		}
 	}
 
 	public void setOwnerObjectName(final CallbackP<String> callback) {
@@ -320,7 +320,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 						try {
 							currentPage = result;
 							wikiKey.setWikiPageId(currentPage.getId());
-							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							resetWikiMarkdown(currentPage.getMarkdown());
 						} catch (Exception e) {
 							onFailure(e);
@@ -329,11 +328,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 				});
 			}
 		});
-	}
-
-	@Override
-	public WikiPage getWikiPage() {
-		return currentPage;
 	}
 
 	@Override
@@ -372,11 +366,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			}
 		});
 	}
-
-	@Override
-	public CallbackP<WikiPageKey> getReloadWikiPageCallback() {
-		return this.reloadWikiPageCallback;
-	}
 	
 	@Override
 	public void reloadWikiPage() {
@@ -388,7 +377,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					view.hideDiffVersionAlert();
 					isCurrentVersion = true;
 					currentPage = result;
-					boolean isRootWiki = currentPage.getParentWikiId() == null;
 					wikiKey.setWikiPageId(currentPage.getId());
 					resetWikiMarkdown(currentPage.getMarkdown());
 					if (wikiReloadHandler != null) {
@@ -441,5 +429,14 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	@Override
 	public void restoreClicked() {
 		showRestoreWarning(versionInView);
+	}
+	
+	// For testing only
+	public void setWikiPageKey(WikiPageKey wikiKey) {
+		this.wikiKey = wikiKey;
+	}
+	
+	public void setCurrentPage(WikiPage currentPage) {
+		this.currentPage = currentPage;
 	}
 }

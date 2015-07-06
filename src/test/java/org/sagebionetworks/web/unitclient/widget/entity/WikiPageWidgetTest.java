@@ -1,16 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -22,14 +28,21 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -38,6 +51,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * Unit test for the preview widget.
@@ -45,6 +59,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public class WikiPageWidgetTest {
+		
 	WikiPageWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
 	WikiPageWidget presenter;
@@ -55,9 +70,12 @@ public class WikiPageWidgetTest {
 	MarkdownWidget mockMarkdownWidget;
 	Breadcrumb mockBreadcrumb;
 	WikiSubpagesWidget mockSubpages;
+	UserBadge mockUserBadge;
 	PortalGinInjector mockInjector;
 
+	CallbackP<String> mockCallbackP;
 	WikiPage testPage;
+	WikiPageKey testPageKey;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
 	
 	@Before
@@ -72,6 +90,10 @@ public class WikiPageWidgetTest {
 		mockSubpages = mock(WikiSubpagesWidget.class);
 		mockMarkdownWidget = mock(MarkdownWidget.class);
 		mockInjector = mock(PortalGinInjector.class);
+		mockUserBadge = mock(UserBadge.class);
+		mockCallbackP = mock(CallbackP.class);
+
+		when(mockInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient,	mockGlobalApplicationState, mockAuthenticationController,
 				mockSynapseAlert, mockHistoryWidget, mockMarkdownWidget, mockBreadcrumb, mockSubpages, mockInjector);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
@@ -83,12 +105,10 @@ public class WikiPageWidgetTest {
 		resultHeaderList.add(testEntityHeader);
 		headers.setResults(resultHeaderList);
 		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-		
 		testPage = new WikiPage();
 		testPage.setId("wikiPageId");
 		testPage.setMarkdown("my test markdown");
 		testPage.setTitle("My Test Wiki Title");
-		
 		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		WikiPage fakeWiki = new WikiPage();
 		fakeWiki.setMarkdown("Fake wiki");
@@ -104,7 +124,18 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-//		verify(mockView).configure(anyString(), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), eq(true), any(Long.class), eq(true));
+		verify(mockView).showLoading();
+		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockBreadcrumb, never()).configure(anyList(), anyString());
+		verify(mockHistoryWidget).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
+		verify(mockView, times(2)).setWikiHistoryWidget(any(IsWidget.class));
+		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
+		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class));
+		verify(mockView).setWikiSubpagesWidget(mockSubpages);
+		verify(mockUserBadge, times(2)).configure(anyString());
+		// once to clear, once after loading shown
+		verify(mockView, times(2)).hideLoading();
 	}
 	
 	@Test
@@ -161,8 +192,11 @@ public class WikiPageWidgetTest {
 	//also show a 404 if we get an empty entity list
 	@Test
 	public void testEmptyEntityList() throws JSONObjectAdapterException {
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
-//		headers.setTotalNumberOfResults(0);ing(), null, null), false, null, true);
+		headers.setTotalNumberOfResults(0);
+		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
+		presenter.setOwnerObjectName(mockCallbackP);
 		verify(mockView).show404();
 	}
 	
@@ -193,21 +227,18 @@ public class WikiPageWidgetTest {
 
 	@Test
 	public void testReloadWikiPageSuccess() {
-//		CallbackP<String> mockWikiReloadHandler = mock(CallbackP.class);
-//		presenter.setWikiReloadHandler(mockWikiReloadHandler);
-//		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null);
-//		WikiPage wikiPage = new WikiPage();
-//		wikiPage.setId(wikiPageKey.getWikiPageId());
-//		EntityHeader testEntityHeader = new EntityHeader();
-//		testEntityHeader.setName(MY_TEST_ENTITY_OWNER_NAME);
-//		headers.setResults(new ArrayList());
-//		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-//		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toStr
-//		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-//		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-//		presenter.reloadCurrentWikiPage();
-//		verify(mockMarkdownWidget).configure(eq(wikiPage.getMarkdown()), any(WikiPageKey.class), eq(false), any(Long.class));
-//		verify(mockWikiReloadHandler).invoke(anyString());
+		presenter.setWikiReloadHandler(mockCallbackP);
+		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null);
+		WikiPage wikiPage = new WikiPage();
+		wikiPage.setId(wikiPageKey.getWikiPageId());
+		presenter.setWikiPageKey(wikiPageKey);
+		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.setWikiReloadHandler(mockCallbackP);
+		presenter.reloadWikiPage();
+		verify(mockSynapseAlert).clear();
+		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockView).hideDiffVersionAlert();
+		verify(mockCallbackP).invoke(anyString());
 	}
 
 	@Test
@@ -215,7 +246,40 @@ public class WikiPageWidgetTest {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
 		// fail to reload wiki page
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-//		presenter.reloadCurrentWikiPage();
+		presenter.reloadWikiPage();
 		verify(mockSynapseAlert).handleException(any(Exception.class));
+	}
+	
+	@Test
+	public void testConfigureCreatedModifiedBy() {
+		WikiPage wikiPage = new WikiPage();
+		presenter.setCurrentPage(wikiPage);
+		presenter.configureCreatedModifiedBy();
+		verify(mockUserBadge, times(2)).configure(anyString());
+	}
+	
+	@Test
+	public void testConfigureBreadcrumbsEntityObjectType() {
+		WikiPage wikiPage = new WikiPage();
+		wikiPage.setTitle("testTitle");
+		presenter.setCurrentPage(wikiPage);
+		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null);
+		presenter.configureBreadcrumbs(wikiPageKey, false, ObjectType.ENTITY.toString());
+		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+		verify(mockBreadcrumb).configure(captor.capture(), Mockito.eq("testTitle"));
+		LinkData data = (LinkData)captor.getValue().get(0);
+		assertTrue(data.getPlace() instanceof Synapse);
+	}
+	@Test
+	public void testConfigureBreadcrumbsEvaluationObjectType() {
+		WikiPage wikiPage = new WikiPage();
+		wikiPage.setTitle("testTitle");
+		presenter.setCurrentPage(wikiPage);
+		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.EVALUATION.toString(), null, null);
+		presenter.configureBreadcrumbs(wikiPageKey, false, ObjectType.EVALUATION.toString());
+		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+		verify(mockBreadcrumb).configure(captor.capture(), anyString());
+		LinkData data = (LinkData)captor.getValue().get(0);
+		assertTrue(data.getPlace() instanceof Home);
 	}
 }

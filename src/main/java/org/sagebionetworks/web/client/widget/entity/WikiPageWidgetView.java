@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -24,8 +22,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public interface Presenter {
 		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage);
 		public void showPreview(final Long versionToPreview, Long currentVersion);
-		public WikiPage getWikiPage();
-		public CallbackP<WikiPageKey> getReloadWikiPageCallback();
 		void configureHistoryWidget(WikiPageKey wikiKey, boolean canEdit);
 		void configureWikiSubpagesWidget(WikiPageKey wikiKey,
 				boolean isEmbeddedInOwnerPage);
