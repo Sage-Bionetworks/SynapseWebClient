@@ -1,12 +1,17 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.AsyncProvider;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -25,10 +30,16 @@ public class PresenterProxy<P extends Presenter<T>,T extends Place> extends Abst
 	T place;
 	PortalGinInjector ginjector;
 	private static boolean prefetchedBulk = false;
+	GWTWrapper gwt;
+	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
-	public PresenterProxy(AsyncProvider<P> provider){
+	public PresenterProxy(AsyncProvider<P> provider,
+			GWTWrapper gwt,
+			SynapseJSNIUtils jsniUtils){
 		this.provider = provider;
+		this.gwt = gwt;
+		this.jsniUtils = jsniUtils;
 	}
 
 	@Override
@@ -37,8 +48,14 @@ public class PresenterProxy<P extends Presenter<T>,T extends Place> extends Abst
 
 			@Override
 			public void onFailure(Throwable caught) {
-				// Not sure what to do here.
-				DisplayUtils.showErrorMessage(caught.getMessage());
+				//SWC-2444: if there is a problem getting the code, try to reload the app
+				jsniUtils.consoleError(caught.getMessage());
+				gwt.scheduleExecution(new Callback() {
+					@Override
+					public void invoke() {
+						Window.Location.reload();		
+					}
+				}, Portal.CODE_LOAD_DELAY);
 			}
 
 			@Override

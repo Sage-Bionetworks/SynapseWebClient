@@ -48,8 +48,8 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -114,7 +114,7 @@ public class EntityPageTopTest {
 		entity = new ExampleEntity();
 		entity.setId(entityId);
 		entity.setEntityType(ExampleEntity.class.getName());
-		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
+		testWidgetRenderer = new YouTubeWidget(mock(IFrameWidgetView.class));
 		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), any(Callback.class), any(Long.class))).thenReturn(testWidgetRenderer);
 
 		

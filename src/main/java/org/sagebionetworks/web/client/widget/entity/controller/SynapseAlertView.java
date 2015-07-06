@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.sagebionetworks.web.client.ShowsErrors;
-
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction for the view 
@@ -52,4 +50,7 @@ public interface SynapseAlertView extends IsWidget {
 		void onCreateJiraIssue(String userReport);
 		void onLoginClicked();
 	}
+
+	void show403();
+	void show404();
 }

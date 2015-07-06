@@ -25,7 +25,10 @@ public class EntityActionControllerViewImpl implements
 	SimplePanel aclPanel;
 	@UiField
 	SimplePanel markdownEditorPanel;
-	
+	@UiField
+	SimplePanel provenanceEditorPanel;
+	@UiField
+	SimplePanel storageLocationEditorPanel;
 	@UiField
 	Modal infoDialog;
 	@UiField
@@ -81,4 +84,13 @@ public class EntityActionControllerViewImpl implements
 		infoDialog.show();
 	}
 
+	@Override
+	public void addProvenanceEditorModalWidget(Widget provWidget) {
+		provenanceEditorPanel.setWidget(provWidget);
+	}
+
+	@Override
+	public void addStorageLocationModalWidget(Widget w) {
+		storageLocationEditorPanel.setWidget(w);
+	}
 }

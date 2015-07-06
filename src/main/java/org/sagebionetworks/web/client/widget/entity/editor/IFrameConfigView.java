@@ -4,7 +4,7 @@ import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface YouTubeConfigView extends IsWidget, WidgetEditorView {
+public interface IFrameConfigView extends IsWidget, WidgetEditorView {
 
 	/**
 	 * Set the presenter.

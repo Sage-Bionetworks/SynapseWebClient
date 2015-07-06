@@ -13,7 +13,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 import org.gwtbootstrap3.client.ui.ModalFooter;
-import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -35,10 +34,6 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -135,8 +130,9 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		this.filledPopoverIds = new HashMap<String,String>();
 		blockCloseFullscreen = false;
 		prov = new FlowPanel();
-		prov.addStyleName("position-relative margin-5");		
-		prov.setHeight(height+"px");				
+		prov.addStyleName("position-relative margin-5");
+		refreshProvHeight();
+						
 		if(graph != null) {
 			container.clear();			
 			if(!inFullScreen) addFullScreenAnchor();			
@@ -332,16 +328,15 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 				window.setTitle(DisplayConstants.PROVENANCE);
 				final ModalBody body = new ModalBody();
 				body.add(container);
-				prov.setHeight(new Double(com.google.gwt.user.client.Window.getClientHeight() * .97).intValue() + "px");
 				ClickHandler closeHandler = new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
 						addFullScreenAnchor();
 			        	container.removeStyleName("scroll-auto");
-			        	prov.setHeight(height + "px");
 			        	body.remove(container);
 			        	thisLayoutContainer.add(container);
 			        	inFullScreen = false;
+			        	refreshProvHeight();
 			        	window.hide();
 					}
 				};
@@ -353,11 +348,20 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 				
 				window.add(footer);
 				inFullScreen = true;
+				refreshProvHeight();
 				window.show();
 			}
 		});
 	}
-		
+	public void refreshProvHeight() {
+		if (prov != null) {
+			if (inFullScreen) {
+				prov.setHeight(new Double(com.google.gwt.user.client.Window.getClientHeight() * .97).intValue() + "px");
+			} else {
+				prov.setHeight(height + "px");
+			}
+		}
+	}
 	private void addFullScreenAnchor() {
 		fullScreenAnchor.addStyleName("margin-top-1 margin-left-1");
 		container.insert(fullScreenAnchor, 0);

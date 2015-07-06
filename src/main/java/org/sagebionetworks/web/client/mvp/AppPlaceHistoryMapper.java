@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.ErrorPlace;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
@@ -47,6 +48,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		NewAccount.Tokenizer.class,
 		ChangeUsername.Tokenizer.class, Trash.Tokenizer.class, PeopleSearch.Tokenizer.class,
 		StandaloneWiki.Tokenizer.class,
-		SignedToken.Tokenizer.class})
+		SignedToken.Tokenizer.class, ErrorPlace.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

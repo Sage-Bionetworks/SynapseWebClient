@@ -13,7 +13,7 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("resource/images/icon-genotypes-16.gif")
 	ImageResource iconGenotype16();
-	
+		
 	@Source("resource/images/loading-16.gif")
 	ImageResource loading16();	
 	
