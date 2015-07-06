@@ -768,7 +768,7 @@ public class DisplayUtils {
 	 * @param toFormat
 	 * @return
 	 */
-	public static String converDataToPrettyString(Date toFormat) {
+	public static String convertDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		if (prettyFormat == null) {
 			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");

@@ -482,13 +482,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		createdByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(createdByBadgeWidget);
 		
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDataToPrettyString(entity.getCreatedOn()) + "<br>" + DisplayConstants.MODIFIED_BY);
+		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getCreatedOn()) + "<br>" + DisplayConstants.MODIFIED_BY);
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
 		modifiedByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(modifiedByBadgeWidget);
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
+		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getModifiedOn()));
 		
 		attributionPanel.add(inlineHtml);
 		

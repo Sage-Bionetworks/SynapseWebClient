@@ -203,7 +203,7 @@ public class ProvUtils {
 		order.add("Modified On");
 
 		if (entity.getModifiedOn() != null)
-			map.put("Modified On", DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
+			map.put("Modified On", DisplayUtils.convertDataToPrettyString(entity.getModifiedOn()));
 		
 		order.add("Description");
 		map.put("Description", entity.getDescription());		
@@ -225,7 +225,7 @@ public class ProvUtils {
 		map.put("Modified By", modifiedBy);
 		
 		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
+		map.put("Modified On", DisplayUtils.convertDataToPrettyString(activity.getModifiedOn()));		
 		
 		order.add("Description");
 		map.put("Description", activity.getDescription());				
