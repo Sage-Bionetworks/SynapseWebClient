@@ -22,20 +22,17 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public interface Presenter {
 		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage);
 		public void showPreview(final Long versionToPreview, Long currentVersion);
-		void configureHistoryWidget(WikiPageKey wikiKey, boolean canEdit);
-		void configureWikiSubpagesWidget(WikiPageKey wikiKey,
-				boolean isEmbeddedInOwnerPage);
-		void configureBreadcrumbs(WikiPageKey wikiKey, boolean isRootWiki,
-				String ownerObjectName);
 		void restoreConfirmed();
 		void resetWikiMarkdown(String markdown);
 		void configureCreatedModifiedBy();
 		void reloadWikiPage();
 		void showRestoreWarning(Long versionToRestore);
 		public void restoreClicked();
+		void configureWikiSubpagesWidget(boolean isEmbeddedInOwnerPage);
+		void configureHistoryWidget(boolean canEdit);
+		void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName);
 	}
 	
-	public void showNoteInPage(String message);
 	public void show404();
 	public void show403();
 	void setWikiHistoryWidget(IsWidget historyWidget);
@@ -58,4 +55,15 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	void setCreatedByBadge(IsWidget createdByUserBadge);
 	void setCreatedByText(String createdByText);
 	void hideDiffVersionAlert();
+	public void showBreadcrumbs();
+	public void hideBreadcrumbs();
+	void setWikiHeadingText(String title);
+	void hideHistory();
+	void showHistory();
+	void hideCreatedModified();
+	void showCreatedModified();
+	void showNoWikiCanEditMessage();
+	void showNoWikiCannotEditMessage();
+	public void hideMarkdown();
+	public void showMarkdown();
 }
