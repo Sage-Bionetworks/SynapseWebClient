@@ -210,7 +210,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	@Override
 	public void configureHistoryWidget(boolean canEdit) {
-		view.showHistory();
 		// Configure the history widget and built the history table
 		ActionHandler actionHandler = new ActionHandler() {
 			@Override
