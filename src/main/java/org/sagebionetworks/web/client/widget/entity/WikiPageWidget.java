@@ -9,14 +9,12 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -164,9 +162,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							wikiKey.setWikiPageId(currentPage.getId());							
 							resetWikiMarkdown(currentPage.getMarkdown());
-							configureBreadcrumbs(wikiKey, isRootWiki, ownerObjectName);
-							configureHistoryWidget(wikiKey, canEdit);
-							configureWikiSubpagesWidget(wikiKey, isEmbeddedInOwnerPage);	
+							configureWikiTitle(isRootWiki, currentPage.getTitle());
+							configureHistoryWidget(canEdit);
+							configureBreadcrumbs(isRootWiki, ownerObjectName);
+							configureWikiSubpagesWidget(isEmbeddedInOwnerPage);	
 							configureCreatedModifiedBy();
 							view.hideLoading();
 						} catch (Exception e) {
@@ -184,6 +183,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	@Override
 	public void resetWikiMarkdown(String markdown) {
+		view.showMarkdown();
 		if(!isCurrentVersion) {
 			markdownWidget.configure(markdown, wikiKey, false, versionInView);
 			view.showDiffVersionAlert();
@@ -196,19 +196,21 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	@Override
-	public void configureWikiSubpagesWidget(WikiPageKey wikiKey, boolean isEmbeddedInOwnerPage) {
+	public void configureWikiSubpagesWidget(boolean isEmbeddedInOwnerPage) {
 		//check configuration of wikiKey
 		view.setWikiSubpagesContainers(wikiSubpages);
 		wikiSubpages.configure(wikiKey, null, isEmbeddedInOwnerPage, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
+				wikiKey = param;
 				reloadWikiPage();
 			}});
 		view.setWikiSubpagesWidget(wikiSubpages);
 	}
 	
 	@Override
-	public void configureHistoryWidget(WikiPageKey wikiKey, boolean canEdit) {
+	public void configureHistoryWidget(boolean canEdit) {
+		view.showHistory();
 		// Configure the history widget and built the history table
 		ActionHandler actionHandler = new ActionHandler() {
 			@Override
@@ -226,24 +228,29 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	@Override
-	public void configureBreadcrumbs(WikiPageKey wikiKey, boolean isRootWiki, String ownerObjectName) {
+	public void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName) {
 		if (!isRootWiki) {
 			List<LinkData> links = new ArrayList<LinkData>();
-			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
-				//point to Home
-				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
-				breadcrumb.configure(links, null);
-			} else {
-				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
-				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
-				breadcrumb.configure(links, currentPage.getTitle());
-			}
-			//TODO: support other object types.
+			Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
+			links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+			breadcrumb.configure(links, currentPage.getTitle());
+			view.showBreadcrumbs();
+		} else {
+			view.hideBreadcrumbs();
 		}
 	}
 	
+	public void configureWikiTitle(boolean isRootWiki, String title) {
+		if (!isRootWiki) {
+			view.setWikiHeadingText(title);
+		} else {
+			view.setWikiHeadingText("");
+		}
+	}	
+	
 	@Override
 	public void configureCreatedModifiedBy() {
+		view.showCreatedModified();
 		modifiedByBadge.configure(currentPage.getModifiedBy());
 		createdByBadge.configure(currentPage.getCreatedBy());
 		// added check for testing, as Date is not instantiable/mockable
@@ -332,22 +339,20 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	@Override
 	public void showRestoreWarning(final Long versionToRestore) {
-		if (!isCurrentVersion && versionInView != null) {
-			org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
-				@Override
-				public void invoke() {
-					versionInView = versionToRestore;
-					restoreConfirmed();
-				}	
-			};
-			org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
-				@Override
-				public void invoke() {
-				}	
-			};
-			view.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
-					MessagePopup.WARNING, okCallback, cancelCallback);
-		}		
+		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+				versionInView = versionToRestore;
+				restoreConfirmed();
+			}	
+		};
+		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+		view.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
+				MessagePopup.WARNING, okCallback, cancelCallback);
 	}
 	
 	@Override
@@ -372,13 +377,22 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		synapseAlert.clear();
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
-			public void onSuccess(WikiPage result) {
+			public void onSuccess(final WikiPage result) {
 				try {
 					view.hideDiffVersionAlert();
 					isCurrentVersion = true;
+					final boolean isRootWiki = result.getParentWikiId() == null;
 					currentPage = result;
-					wikiKey.setWikiPageId(currentPage.getId());
-					resetWikiMarkdown(currentPage.getMarkdown());
+					wikiKey.setWikiPageId(result.getId());
+					resetWikiMarkdown(result.getMarkdown());
+					configureWikiTitle(isRootWiki, result.getTitle());
+					configureHistoryWidget(canEdit);
+					setOwnerObjectName(new CallbackP<String>() {
+						@Override
+						public void invoke(String param) {
+							configureBreadcrumbs(isRootWiki, param);
+						}
+					});
 					if (wikiReloadHandler != null) {
 						wikiReloadHandler.invoke(currentPage.getId());
 					}
@@ -396,17 +410,21 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	/* private methods */
 
 	private void handleGetV2WikiPageAsV1Failure(Throwable caught) {
+		view.hideLoading();
 		// if it is because of a missing root (and we have edit permission),
 		// then the pages browser should have a Create Wiki button
-		if (caught instanceof NotFoundException && callback!= null) {
+		if (caught instanceof NotFoundException && callback != null) {
 			callback.noWikiFound();
 		}
 		if (isEmbeddedInOwnerPage) {
+			view.hideMarkdown();
+			view.hideHistory();
+			view.hideCreatedModified();
 			if (caught instanceof NotFoundException) {
 				if (canEdit) {
-					view.showNoteInPage(DisplayConstants.LABEL_NO_MARKDOWN);
+					view.showNoWikiCanEditMessage();
 				}else {
-					view.showNoteInPage(DisplayConstants.NO_WIKI_FOUND);
+					view.showNoWikiCannotEditMessage();
 				}
 			} else {
 				synapseAlert.handleException(caught);
@@ -438,5 +456,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	public void setCurrentPage(WikiPage currentPage) {
 		this.currentPage = currentPage;
+	}
+	
+	public void setCanEdit(boolean canEdit) {
+		this.canEdit = canEdit;
 	}
 }

@@ -15,6 +15,8 @@
 	    <g:SimplePanel ui:field="synAlertPanel"/>
 	    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
 	    <g:FlowPanel ui:field="wikiPagePanel">
+	        <g:SimplePanel ui:field="breadcrumbPanel"/>
+	        <b:Heading size="H2" ui:field="wikiHeading" addStyleNames="margin-bottom-0-imp"/>
 	        <b:Alert ui:field="diffVersionAlert" visible="false">
 	            <g:HTMLPanel>
 	                <bh:Span addStyleNames="margin-left-5" 
@@ -23,18 +25,18 @@
 	            	<b:Button ui:field="restoreButton" addStyleNames="wikiHistoryButton margin-top-10" text="Restore" visible="false"/>
 	            </g:HTMLPanel>
 	        </b:Alert>
-	        <g:SimplePanel ui:field="breadcrumbPanel"/>
-	        <b:Heading size="H2" addStyleNames="margin-bottom-0-imp"/>
+	        <bh:Italic ui:field="noWikiCanEditMessage" text="There is no content. Please click Edit Wiki from the Tools menu." visible="false"/>
+	        <bh:Italic ui:field="noWikiCannotEditMessage" text="A Wiki has not been created." visible="false"/>
 	    	<g:SimplePanel ui:field="markdownPanel"/>
 	    	<g:FlowPanel addStyleNames="margin-top-10 clearleft" ui:field="createdModifiedHistoryPanel">
 			    <g:HTMLPanel ui:field="modifiedByPanel">
    			        Modified by
-   			        <g:SimplePanel ui:field="modifiedByBadgePanel"/>
+   			        <g:SimplePanel ui:field="modifiedByBadgePanel" addStyleNames="displayInline"/>
 			        <bh:Span ui:field="modifiedOnField"/>
 			    </g:HTMLPanel>
 			    <g:HTMLPanel ui:field="createdByPanel">
 			        Created by 
-			        <g:SimplePanel ui:field="createdByBadgePanel"/>
+			        <g:SimplePanel ui:field="createdByBadgePanel" addStyleNames="displayInline"/>
 			        <bh:Span ui:field="createdOnField"/>
 			    </g:HTMLPanel>
 			    <b:Button ui:field="wikiHistoryButton" dataToggle="COLLAPSE" iconPosition="RIGHT" 

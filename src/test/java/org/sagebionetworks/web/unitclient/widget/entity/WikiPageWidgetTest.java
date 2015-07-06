@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -144,7 +144,10 @@ public class WikiPageWidgetTest {
 		boolean canEdit = false;
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, true);
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
-		verify(mockView).showNoteInPage(DisplayConstants.NO_WIKI_FOUND);
+		verify(mockView).hideMarkdown();
+		verify(mockView).hideHistory();
+		verify(mockView).hideCreatedModified();
+		verify(mockView).showNoWikiCannotEditMessage();
 	}
 	
 	@Test
@@ -153,7 +156,10 @@ public class WikiPageWidgetTest {
 		boolean canEdit = true;
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, true);
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
-		verify(mockView).showNoteInPage(DisplayConstants.LABEL_NO_MARKDOWN);
+		verify(mockView).hideMarkdown();
+		verify(mockView).hideHistory();
+		verify(mockView).hideCreatedModified();
+		verify(mockView).showNoWikiCanEditMessage();
 	}
 
 	@Test
@@ -228,7 +234,8 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testReloadWikiPageSuccess() {
 		presenter.setWikiReloadHandler(mockCallbackP);
-		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null);
+		presenter.setCanEdit(true);
+		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), "123", 1L);
 		WikiPage wikiPage = new WikiPage();
 		wikiPage.setId(wikiPageKey.getWikiPageId());
 		presenter.setWikiPageKey(wikiPageKey);
@@ -262,24 +269,15 @@ public class WikiPageWidgetTest {
 	public void testConfigureBreadcrumbsEntityObjectType() {
 		WikiPage wikiPage = new WikiPage();
 		wikiPage.setTitle("testTitle");
-		presenter.setCurrentPage(wikiPage);
 		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null);
-		presenter.configureBreadcrumbs(wikiPageKey, false, ObjectType.ENTITY.toString());
+		wikiPage.setId(wikiPageKey.getWikiPageId());
+		presenter.setWikiPageKey(wikiPageKey);
+		presenter.setCurrentPage(wikiPage);
+		presenter.configureBreadcrumbs(false, ObjectType.ENTITY.toString());
 		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
 		verify(mockBreadcrumb).configure(captor.capture(), Mockito.eq("testTitle"));
 		LinkData data = (LinkData)captor.getValue().get(0);
 		assertTrue(data.getPlace() instanceof Synapse);
 	}
-	@Test
-	public void testConfigureBreadcrumbsEvaluationObjectType() {
-		WikiPage wikiPage = new WikiPage();
-		wikiPage.setTitle("testTitle");
-		presenter.setCurrentPage(wikiPage);
-		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.EVALUATION.toString(), null, null);
-		presenter.configureBreadcrumbs(wikiPageKey, false, ObjectType.EVALUATION.toString());
-		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-		verify(mockBreadcrumb).configure(captor.capture(), anyString());
-		LinkData data = (LinkData)captor.getValue().get(0);
-		assertTrue(data.getPlace() instanceof Home);
-	}
+
 }
