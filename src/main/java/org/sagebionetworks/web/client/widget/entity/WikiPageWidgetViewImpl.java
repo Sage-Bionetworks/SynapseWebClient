@@ -154,7 +154,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void clear() {
 		diffVersionAlert.setVisible(false);
-		historyCollapse.hide();
 		noWikiCanEditMessage.setVisible(false);
 		noWikiCannotEditMessage.setVisible(false);
 	}
