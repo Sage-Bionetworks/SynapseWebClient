@@ -180,7 +180,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void showPopup(String title, String message, MessagePopup popupType, Callback okCallback, Callback cancelCallback) {
-		DisplayUtils.showPopup(message, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
+		DisplayUtils.showPopup(title, message, 
 				popupType, okCallback, cancelCallback);
 	}
 
@@ -204,22 +204,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
-	}
-
-	public void showRestorationWarning(final Long wikiVersion) {
-		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
-			@Override
-			public void invoke() {
-				presenter.restoreConfirmed();
-			}	
-		};
-		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
-			@Override
-			public void invoke() {
-			}	
-		};
-		DisplayUtils.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
-				MessagePopup.WARNING, okCallback, cancelCallback);
 	}
 
 	@Override
