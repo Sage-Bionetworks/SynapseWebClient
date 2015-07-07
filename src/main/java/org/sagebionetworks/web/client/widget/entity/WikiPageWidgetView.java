@@ -33,8 +33,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName);
 	}
 	
-	public void show404();
-	public void show403();
 	void setWikiHistoryWidget(IsWidget historyWidget);
 	void setWikiSubpagesWidget(IsWidget historyWidget);
 	void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages);

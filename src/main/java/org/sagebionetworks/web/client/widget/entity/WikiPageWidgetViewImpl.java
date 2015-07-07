@@ -183,18 +183,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		DisplayUtils.showPopup(title, message, 
 				popupType, okCallback, cancelCallback);
 	}
-
-	@Override
-	public void show404() {
-		clear();
-		add(new HTML(DisplayUtils.get404Html()));
-	}
-
-	@Override
-	public void show403() {
-		clear();
-		add(new HTML(DisplayUtils.get403Html()));
-	}
 	
 	@Override
 	public void setWikiSubpagesWidget(IsWidget wikiSubpages) {

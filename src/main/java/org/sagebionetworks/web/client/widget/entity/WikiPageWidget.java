@@ -276,7 +276,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 						String ownerObjectName = theHeader.getName();
 						callback.invoke(ownerObjectName);
 					} else {
-						view.show404();
+						show404();
 					}
 				}
 				
@@ -313,7 +313,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 								callback.noWikiFound();
 						}
 						else if (caught instanceof ForbiddenException) {
-							view.show403();
+							show403();
 						}
 						else {
 							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
@@ -430,13 +430,23 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			}
 		} else {
 			if (caught instanceof NotFoundException) {
-				view.show404();
+				show404();
 			} else if (caught instanceof ForbiddenException) {
-				view.show403();
+				show403();
 			} else {
 				synapseAlert.handleException(caught);
 			}
 		}
+	}
+
+	private void show403() {
+		clear();
+		synapseAlert.show403();
+	}
+
+	private void show404() {
+		clear();
+		synapseAlert.show404();
 	}
 
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
