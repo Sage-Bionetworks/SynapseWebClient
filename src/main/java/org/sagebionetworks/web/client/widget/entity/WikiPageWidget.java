@@ -219,7 +219,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			}
 			@Override
 			public void restoreClicked(Long versionToRestore) {
-				showRestoreWarning(versionToRestore);
+				versionInView = versionToRestore;
+				restoreConfirmed();
 			}
 		};
 		historyWidget.configure(wikiKey, canEdit, actionHandler);
