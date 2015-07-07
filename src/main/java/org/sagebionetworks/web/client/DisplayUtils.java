@@ -97,6 +97,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
@@ -768,7 +769,7 @@ public class DisplayUtils {
 	 * @param toFormat
 	 * @return
 	 */
-	public static String converDataToPrettyString(Date toFormat) {
+	public static String convertDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
 		if (prettyFormat == null) {
 			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
@@ -1230,27 +1231,7 @@ public class DisplayUtils {
 		}
 		return html;
 	}
-	
-	public static String getYouTubeVideoUrl(String videoId) {
-		return "http://www.youtube.com/watch?v=" + videoId;
-	}
-	
-	public static String getYouTubeVideoId(String videoUrl) {
-		String videoId = null;
-		//parse out the video id from the url
-		int start = videoUrl.indexOf("v=");
-		if (start > -1) {
-			int end = videoUrl.indexOf("&", start);
-			if (end == -1)
-				end = videoUrl.length();
-			videoId = videoUrl.substring(start + "v=".length(), end);
-		}
-		if (videoId == null || videoId.trim().length() == 0) {
-			throw new IllegalArgumentException("Could not determine the video ID from the given URL.");
-		}
-		return videoId;
-	}
-	
+
 	public static Anchor createIconLink(AbstractImagePrototype icon, ClickHandler clickHandler) {
 		Anchor anchor = new Anchor();
 		anchor.setHTML(icon.getHTML());
@@ -1271,15 +1252,6 @@ public class DisplayUtils {
 		return version;		
 	}
 	
-	public static SafeHtml get404Html() {
-		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">404</p><h1 class=\"margin-top-60-imp\">"
-						+ DisplayConstants.PAGE_NOT_FOUND
-						+ "</h1>"
-						+ "<p>"
-						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div></div>");
-	}
-	
 	public static String getWidgetMD(String attachmentName) {
 		if (attachmentName == null)
 			return null;
@@ -1288,15 +1260,6 @@ public class DisplayUtils {
 		sb.append(attachmentName);
 		sb.append("}");
 		return sb.toString();
-	}
-	
-	public static SafeHtml get403Html() {
-		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">403</p><h1 class=\"margin-top-60-imp\">"
-						+ DisplayConstants.FORBIDDEN
-						+ "</h1>"
-						+ "<p>"
-						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div></div>");
 	}
 	
 	/**

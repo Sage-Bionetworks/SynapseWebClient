@@ -141,6 +141,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		};
 		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
 				entityId, handler, null, true);
+		uploader.setUploaderLinkNameVisible(true);
 		uploader.show();
 	}
 

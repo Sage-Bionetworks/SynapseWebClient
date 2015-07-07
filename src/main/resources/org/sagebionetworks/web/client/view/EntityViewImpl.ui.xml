@@ -15,12 +15,12 @@
 
 	<g:HTMLPanel>
 		<!-- HEADER -->
-		<g:SimplePanel ui:field="header" />
+		<g:SimplePanel ui:field="headerPanel" />
 		<g:Image ui:field="entityBackgroundImage" addStyleNames="entityBackgroundImage" />
+		<g:SimplePanel ui:field="synAlertContainer" addStyleNames="margin-10 overflow-auto"/>
 		<g:SimplePanel ui:field="entityPageTopPanel"/>
-		<g:FlowPanel ui:field="openInvitesPanel"/>
-        <g:SimplePanel ui:field="synAlertContainer" addStyleNames="margin-10"/>
+		<g:SimplePanel ui:field="openInvitesPanel"/>
         <div class="clear"></div>
-		<g:SimplePanel ui:field="footer" />
+		<g:SimplePanel ui:field="footerPanel"/>
 	</g:HTMLPanel>
 </ui:UiBinder> 

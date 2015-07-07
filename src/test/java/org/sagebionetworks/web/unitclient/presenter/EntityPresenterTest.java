@@ -41,7 +41,11 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -60,6 +64,10 @@ public class EntityPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	SynapseAlert mockSynAlert;
+	OpenTeamInvitationsWidget mockOpenInviteWidget;
+	Header mockHeaderWidget;
+	EntityPageTop mockEntityPageTop;
+	Footer mockFooterWidget;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
 	Entity EntityModel1;
@@ -82,7 +90,12 @@ public class EntityPresenterTest {
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockCookies, mockSynapseJSNIUtils, mockSynAlert);
+		mockOpenInviteWidget = mock(OpenTeamInvitationsWidget.class);
+		mockHeaderWidget = mock(Header.class);
+		mockEntityPageTop = mock(EntityPageTop.class);
+		mockFooterWidget = mock(Footer.class);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
+				mockCookies, mockSynapseJSNIUtils, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);

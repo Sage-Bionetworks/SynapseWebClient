@@ -15,10 +15,11 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class Header implements HeaderView.Presenter {
+public class Header implements HeaderView.Presenter, IsWidget {
 
 	public static enum MenuItems {
 		DATASETS, TOOLS, NETWORKS, PEOPLE, PROJECTS

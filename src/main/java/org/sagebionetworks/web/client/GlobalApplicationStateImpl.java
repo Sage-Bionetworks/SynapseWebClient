@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
@@ -198,19 +199,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Override
-	public void checkVersionCompatibility(final AsyncCallback<String> callback) {
+	public void checkVersionCompatibility(final AsyncCallback<VersionState> callback) {
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
+				boolean isVersionChange = false;
 				if(synapseVersion == null) {
 					synapseVersion = versions;
 				} else {
 					if(!synapseVersion.equals(versions)) {
 						view.showVersionOutOfDateGlobalMessage();
+						isVersionChange = true;
 					}
 				}
 				if (callback != null) {
-					callback.onSuccess(versions);
+					callback.onSuccess(new VersionState(versions, isVersionChange));
 				}
 			}
 			

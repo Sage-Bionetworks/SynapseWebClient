@@ -10,36 +10,24 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class Breadcrumb implements BreadcrumbView.Presenter,
-		SynapseWidgetPresenter {
+public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresenter, IsWidget {
 
 	private BreadcrumbView view;
-	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
-	private IconsImageBundle iconsImageBundle;
 
 	@Inject
-	public Breadcrumb(BreadcrumbView view, SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			IconsImageBundle iconsImageBundle) {
+	public Breadcrumb(BreadcrumbView view, GlobalApplicationState globalApplicationState) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
-		this.iconsImageBundle = iconsImageBundle;
 		view.setPresenter(this);
 	}
 
@@ -47,9 +35,8 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	 * Create Breadcrumbs for an Entity
 	 * 
 	 * @param entity
-	 * @return
 	 */
-	public Widget asWidget(EntityPath entityPath, EntityArea optionalArea) {
+	public void configure(EntityPath entityPath, EntityArea optionalArea) {
 		view.setPresenter(this);
 		List<LinkData> links = new ArrayList<LinkData>();
 		if (entityPath != null) {
@@ -76,28 +63,29 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 			}
 		}
 		view.setLinksList(links);
-		return view.asWidget();
 	}
 	
 	/**
 	 * Create Breadcrumbs for an arbitrary set of link data, ending in the current page name
 	 * @param links
 	 * @param currentPageName
-	 * @return
 	 */
-	public Widget asWidget(List<LinkData> links, String currentPageName){
+	public void configure(List<LinkData> links, String currentPageName){
 		view.setPresenter(this);
 		view.setLinksList(links, currentPageName);
-		return view.asWidget();
 	}
 	
+	
+	@Override
+	public void clear() {
+		view.clear();
+	}
 	/**
 	 * Not used
 	 */
 	@Override
 	public Widget asWidget() {
-		// TODO Auto-generated method stub
-		return null;
+		return view.asWidget();
 	}
 
 	@Override

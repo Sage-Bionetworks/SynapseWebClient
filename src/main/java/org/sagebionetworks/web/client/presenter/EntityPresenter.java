@@ -35,8 +35,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -45,7 +43,6 @@ import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -55,13 +52,11 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse> {
+public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse>, IsWidget {
 		
 	private Synapse place;
 	private EntityView view;
@@ -123,6 +118,12 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 		view.setPresenter(this);
+		
+		//place widgets
+		view.setEntityPageTopWidget(entityPageTop);
+		view.setFooterWidget(footerWidget);
+		view.setHeaderWidget(headerWidget);
+		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
 	}
 
 	@Override
@@ -187,7 +188,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundle bundle) {				
+			public void onSuccess(EntityBundle bundle) {		
 				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}
@@ -212,16 +213,16 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 						if (projectHeader != null)
 							loadBackgroundImage(projectHeader.getId());
 						EntityPresenter.filterToDownloadARs(bundle);
-						view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
+						setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof NotFoundException) {
-					view.show404();
+					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
-					view.show403();
+					show403();
 				} else {
 					view.clear();
 					synAlert.handleException(caught);
@@ -235,42 +236,48 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		}
 	}
 	
+	@Override
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
+		entityPageTop.clearState();
+		entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
+		entityPageTop.refresh();
+	}
+	
 	public void show404() {
 		clear();
-		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get404Html()));
+		synAlert.show404();
 	}
 	
 	public void show403() {
 		clear();
-		
-		panel.add(new HTML(DisplayUtils.get403Html()));
-		final SimplePanel invitesPanel = new SimplePanel();
-		panel.add(invitesPanel);
-		//also add the open team invitations widget (accepting may gain access to this project)
-		Callback callback = new Callback() {
-			@Override
-			public void invoke() {
-				//when team is updated, refresh to see if we can now access
-				refresh();
-			}
-		};
-		CallbackP<List<OpenUserInvitationBundle>> teamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
-			
-			@Override
-			public void invoke(List<OpenUserInvitationBundle> invites) {
-				//if there are any, then also add the title text to the panel
-				if (invites != null && invites.size() > 0) {
-					HTML message = new HTML("<h4>"+DisplayConstants.ACCESS_DEPENDENT_ON_TEAM+"</h4>");
-					message.addStyleName("margin-top-100 margin-left-15");
-					invitesPanel.setWidget(message);
-				}
-			}
-		};
-		openTeamInvitesWidget.configure(callback, teamInvitationsCallback);
-		Widget openTeamInvites = openTeamInvitesWidget.asWidget();
-		openTeamInvites.addStyleName("margin-left-10 margin-bottom-10 margin-right-10");
-		panel.add(openTeamInvites);
-		entityPageTopPanel.setWidget(panel);
+		synAlert.show403();
+//		final SimplePanel invitesPanel = new SimplePanel();
+//		panel.add(invitesPanel);
+//		//also add the open team invitations widget (accepting may gain access to this project)
+//		Callback callback = new Callback() {
+//			@Override
+//			public void invoke() {
+//				//when team is updated, refresh to see if we can now access
+//				refresh();
+//			}
+//		};
+//		CallbackP<List<OpenUserInvitationBundle>> teamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
+//			
+//			@Override
+//			public void invoke(List<OpenUserInvitationBundle> invites) {
+//				//if there are any, then also add the title text to the panel
+//				if (invites != null && invites.size() > 0) {
+//					HTML message = new HTML("<h4>"+DisplayConstants.ACCESS_DEPENDENT_ON_TEAM+"</h4>");
+//					message.addStyleName("margin-top-100 margin-left-15");
+//					invitesPanel.setWidget(message);
+//				}
+//			}
+//		};
+//		openTeamInvitesWidget.configure(callback, teamInvitationsCallback);
+//		Widget openTeamInvites = openTeamInvitesWidget.asWidget();
+//		openTeamInvites.addStyleName("margin-left-10 margin-bottom-10 margin-right-10");
+//		panel.add(openTeamInvites);
+//		entityPageTopPanel.setWidget(panel);
 	}
 	
 	public void loadBackgroundImage(final String projectEntityId) {
@@ -328,5 +335,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
 		bundle.setUnmetAccessRequirements(filteredList);
+	}
+
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }

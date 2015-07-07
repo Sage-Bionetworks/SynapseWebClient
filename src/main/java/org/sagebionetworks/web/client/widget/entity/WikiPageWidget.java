@@ -11,17 +11,26 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
+import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,23 +41,34 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class WikiPageWidget implements WikiPageWidgetView.Presenter,
-SynapseWidgetPresenter {
+public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidgetPresenter {
 
+	// utility
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
+	private WikiPageWidgetView view; 
+	private AuthenticationController authenticationController;
+
+	// callback
 	private Callback callback;
+	private CallbackP<String> wikiReloadHandler;
+
+	// state
+	private boolean isCurrentVersion;
+	private Long versionInView;
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
 	private WikiPage currentPage;
 	private boolean isEmbeddedInOwnerPage;
-	private WikiPageWidgetView view; 
-	private AuthenticationController authenticationController;
-	private boolean isCurrentVersion;
-	private Long versionInView;
-	private CallbackP<WikiPageKey> reloadWikiPageCallback;
-	private CallbackP<String> wikiReloadHandler;
+	
+	// widgets
 	private SynapseAlert synapseAlert;
+	private WikiHistoryWidget historyWidget;
+	private MarkdownWidget markdownWidget;
+	private Breadcrumb breadcrumb;
+	private WikiSubpagesWidget wikiSubpages;
+	private UserBadge createdByBadge;
+	private UserBadge modifiedByBadge;	
 
 	public interface Callback{
 		public void pageUpdated();
@@ -60,15 +80,35 @@ SynapseWidgetPresenter {
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			SynapseAlert synapseAlert) {
-		super();
+			SynapseAlert synapseAlert, WikiHistoryWidget historyWidget,
+			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
+			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseAlert = synapseAlert;
+		this.historyWidget = historyWidget;
+		this.markdownWidget = markdownWidget;
+		this.wikiSubpages = wikiSubpages;
+		this.breadcrumb = breadcrumb;
 		view.setPresenter(this);
-		view.setSynapseAlertWidget(synapseAlert.asWidget());
+		view.setSynapseAlertWidget(synapseAlert);
+		view.setWikiHistoryWidget(historyWidget);
+		view.setMarkdownWidget(markdownWidget);
+		view.setBreadcrumbWidget(breadcrumb);
+		createdByBadge = ginInjector.getUserBadgeWidget();
+		modifiedByBadge = ginInjector.getUserBadgeWidget();
+		view.setModifiedByBadge(modifiedByBadge);
+		view.setCreatedByBadge(createdByBadge);
+	}
+	
+	public void clear(){
+		view.clear();
+		view.hideLoading();
+		markdownWidget.clear();
+		breadcrumb.clear();
+		wikiSubpages.clearState();
 	}
 
 	@Override
@@ -86,16 +126,17 @@ SynapseWidgetPresenter {
 		view.showModifiedBy(isVisible);
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit,
+	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
 			final Callback callback, final boolean isEmbeddedInOwnerPage) {
+		clear();
 		view.showLoading();
+		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
-		this.wikiKey = inWikiKey;
+		this.wikiKey = wikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
 		this.synapseAlert.clear();
-
 		// set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -108,15 +149,7 @@ SynapseWidgetPresenter {
 				public void noWikiFound() {
 				}
 			};
-		// this callback is used to reload the wiki markdown without reloading the entire page
-		reloadWikiPageCallback = new CallbackP<WikiPageKey>() {
-			@Override
-			public void invoke(WikiPageKey param) {
-				wikiKey = param;
-				reloadWikiPage();
-			}
-		};
-
+			
 		setOwnerObjectName(new CallbackP<String>() {
 			@Override
 			public void invoke(final String ownerObjectName) {
@@ -126,9 +159,15 @@ SynapseWidgetPresenter {
 					public void onSuccess(WikiPage result) {
 						try {
 							currentPage = result;
-							wikiKey.setWikiPageId(currentPage.getId());
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
+							wikiKey.setWikiPageId(currentPage.getId());							
+							resetWikiMarkdown(currentPage.getMarkdown());
+							configureWikiTitle(isRootWiki, currentPage.getTitle());
+							configureHistoryWidget(canEdit);
+							configureBreadcrumbs(isRootWiki, ownerObjectName);
+							configureWikiSubpagesWidget(isEmbeddedInOwnerPage);	
+							configureCreatedModifiedBy();
+							view.hideLoading();
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -139,7 +178,86 @@ SynapseWidgetPresenter {
 					}
 				});
 			}
-		});
+		});		
+	}
+	
+	@Override
+	public void resetWikiMarkdown(String markdown) {
+		view.showMarkdown();
+		if(!isCurrentVersion) {
+			markdownWidget.configure(markdown, wikiKey, false, versionInView);
+			view.showDiffVersionAlert();
+			if (canEdit) {
+				view.showRestoreButton();
+			}
+		} else {
+			markdownWidget.configure(markdown, wikiKey, false, null);
+		}
+	}
+	
+	@Override
+	public void configureWikiSubpagesWidget(boolean isEmbeddedInOwnerPage) {
+		//check configuration of wikiKey
+		view.setWikiSubpagesContainers(wikiSubpages);
+		wikiSubpages.configure(wikiKey, null, isEmbeddedInOwnerPage, new CallbackP<WikiPageKey>() {
+			@Override
+			public void invoke(WikiPageKey param) {
+				wikiKey = param;
+				reloadWikiPage();
+			}});
+		view.setWikiSubpagesWidget(wikiSubpages);
+	}
+	
+	@Override
+	public void configureHistoryWidget(boolean canEdit) {
+		// Configure the history widget and built the history table
+		ActionHandler actionHandler = new ActionHandler() {
+			@Override
+			public void previewClicked(Long versionToPreview,
+					Long currentVersion) {
+				showPreview(versionToPreview, currentVersion);
+			}
+			@Override
+			public void restoreClicked(Long versionToRestore) {
+				versionInView = versionToRestore;
+				restoreConfirmed();
+			}
+		};
+		historyWidget.configure(wikiKey, canEdit, actionHandler);
+		view.setWikiHistoryWidget(historyWidget);
+	}
+	
+	@Override
+	public void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName) {
+		if (!isRootWiki) {
+			List<LinkData> links = new ArrayList<LinkData>();
+			Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
+			links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+			breadcrumb.configure(links, currentPage.getTitle());
+			view.showBreadcrumbs();
+		} else {
+			view.hideBreadcrumbs();
+		}
+	}
+	
+	public void configureWikiTitle(boolean isRootWiki, String title) {
+		if (!isRootWiki) {
+			view.setWikiHeadingText(title);
+		} else {
+			view.setWikiHeadingText("");
+		}
+	}	
+	
+	@Override
+	public void configureCreatedModifiedBy() {
+		view.showCreatedModified();
+		modifiedByBadge.configure(currentPage.getModifiedBy());
+		createdByBadge.configure(currentPage.getCreatedBy());
+		// added check for testing, as Date is not instantiable/mockable
+		if (currentPage.getModifiedOn() != null) {
+			view.setModifiedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getModifiedOn()));
+			view.setCreatedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getCreatedOn()));
+		}
 	}
 
 	public void setOwnerObjectName(final CallbackP<String> callback) {
@@ -159,7 +277,7 @@ SynapseWidgetPresenter {
 						String ownerObjectName = theHeader.getName();
 						callback.invoke(ownerObjectName);
 					} else {
-						view.show404();
+						show404();
 					}
 				}
 				
@@ -175,15 +293,13 @@ SynapseWidgetPresenter {
 		} 
 	}
 
-	public void clear(){
-		view.clear();
-	}
+	
 	private void refresh() {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
 	}
 
 	@Override
-	public void previewClicked(final Long versionToPreview, Long currentVersion) {
+	public void showPreview(final Long versionToPreview, Long currentVersion) {
 		isCurrentVersion = versionToPreview.equals(currentVersion);
 		versionInView = versionToPreview;
 		setOwnerObjectName(new CallbackP<String>() {
@@ -198,7 +314,7 @@ SynapseWidgetPresenter {
 								callback.noWikiFound();
 						}
 						else if (caught instanceof ForbiddenException) {
-							view.show403();
+							show403();
 						}
 						else {
 							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
@@ -211,8 +327,7 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = result;
 							wikiKey.setWikiPageId(currentPage.getId());
-							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.resetWikiMarkdown(currentPage.getMarkdown(), wikiKey, isRootWiki, isCurrentVersion, versionInView);
+							resetWikiMarkdown(currentPage.getMarkdown());
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -223,17 +338,31 @@ SynapseWidgetPresenter {
 	}
 
 	@Override
-	public WikiPage getWikiPage() {
-		return currentPage;
+	public void showRestoreWarning(final Long versionToRestore) {
+		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+				versionInView = versionToRestore;
+				restoreConfirmed();
+			}	
+		};
+		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+		view.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
+				MessagePopup.WARNING, okCallback, cancelCallback);
 	}
-
+	
 	@Override
-	public void restoreClicked(final Long wikiVersion) {
+	public void restoreConfirmed() {
 		// User has confirmed. Restore and refresh the page to see the update.
-		synapseClient.restoreV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiKey.getWikiPageId(), wikiVersion, new AsyncCallback<V2WikiPage>() {
+		synapseClient.restoreV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiKey.getWikiPageId(), versionInView, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage result) {
 				refresh();
+				view.hideDiffVersionAlert();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -242,22 +371,28 @@ SynapseWidgetPresenter {
 			}
 		});
 	}
-
+	
 	@Override
-	public CallbackP<WikiPageKey> getReloadWikiPageCallback() {
-		return this.reloadWikiPageCallback;
-	}
-
 	public void reloadWikiPage() {
 		synapseAlert.clear();
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
-			public void onSuccess(WikiPage result) {
+			public void onSuccess(final WikiPage result) {
 				try {
+					view.hideDiffVersionAlert();
+					isCurrentVersion = true;
+					final boolean isRootWiki = result.getParentWikiId() == null;
 					currentPage = result;
-					boolean isRootWiki = currentPage.getParentWikiId() == null;
-					wikiKey.setWikiPageId(currentPage.getId());
-					view.resetWikiMarkdown(currentPage.getMarkdown(), wikiKey, isRootWiki, true, null);
+					wikiKey.setWikiPageId(result.getId());
+					resetWikiMarkdown(result.getMarkdown());
+					configureWikiTitle(isRootWiki, result.getTitle());
+					configureHistoryWidget(canEdit);
+					setOwnerObjectName(new CallbackP<String>() {
+						@Override
+						public void invoke(String param) {
+							configureBreadcrumbs(isRootWiki, param);
+						}
+					});
 					if (wikiReloadHandler != null) {
 						wikiReloadHandler.invoke(currentPage.getId());
 					}
@@ -275,35 +410,65 @@ SynapseWidgetPresenter {
 	/* private methods */
 
 	private void handleGetV2WikiPageAsV1Failure(Throwable caught) {
+		view.hideLoading();
 		// if it is because of a missing root (and we have edit permission),
 		// then the pages browser should have a Create Wiki button
-		if (caught instanceof NotFoundException && callback!= null) {
+		if (caught instanceof NotFoundException && callback != null) {
 			callback.noWikiFound();
 		}
 		if (isEmbeddedInOwnerPage) {
+			view.hideMarkdown();
+			view.hideHistory();
+			view.hideCreatedModified();
 			if (caught instanceof NotFoundException) {
 				if (canEdit) {
-					view.showNoteInPage(DisplayConstants.LABEL_NO_MARKDOWN);
+					view.showNoWikiCanEditMessage();
 				}else {
-					view.showNoteInPage(DisplayConstants.NO_WIKI_FOUND);
+					view.showNoWikiCannotEditMessage();
 				}
 			} else {
 				synapseAlert.handleException(caught);
-				view.showSynapseAlertWidget();	
 			}
 		} else {
 			if (caught instanceof NotFoundException) {
-				view.show404();
+				show404();
 			} else if (caught instanceof ForbiddenException) {
-				view.show403();
+				show403();
 			} else {
 				synapseAlert.handleException(caught);
-				view.showSynapseAlertWidget();
 			}
 		}
 	}
 
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
 		this.wikiReloadHandler = wikiReloadHandler;
+	}
+
+	@Override
+	public void restoreClicked() {
+		showRestoreWarning(versionInView);
+	}
+	
+	// For testing only
+	public void setWikiPageKey(WikiPageKey wikiKey) {
+		this.wikiKey = wikiKey;
+	}
+	
+	public void setCurrentPage(WikiPage currentPage) {
+		this.currentPage = currentPage;
+	}
+	
+	public void setCanEdit(boolean canEdit) {
+		this.canEdit = canEdit;
+	}
+	
+	public void show404() {
+		view.clear();
+		synapseAlert.show404();
+	}
+	
+	public void show403() {
+		view.clear();
+		synapseAlert.show403();
 	}
 }

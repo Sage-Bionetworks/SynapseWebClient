@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface EntityFinderView extends SynapseView {
 
@@ -39,6 +40,9 @@ public interface EntityFinderView extends SynapseView {
 		
 		void show();
 		void hide();
+
+		Widget asWidget();
 	}
+	Widget asWidget();
 
 }

@@ -33,8 +33,10 @@
 						<a:ActionMenuItem icon="NEWSPAPER_O" action="EDIT_WIKI_PAGE">Edit Wiki</a:ActionMenuItem>
 						<a:ActionMenuItem icon="NEWSPAPER_O" action="VIEW_WIKI_SOURCE">View Wiki Source</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS" action="ADD_WIKI_SUBPAGE">Add Wiki Subpage</a:ActionMenuItem>
+						<a:ActionMenuItem icon="CODE_FORK" action="EDIT_PROVENANCE">Edit Provenance</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TROPHY" action="SUBMIT_TO_CHALLENGE">Submit To Challenge</a:ActionMenuItem>
 						<a:ActionMenuItem icon="ARROWS" action="MOVE_ENTITY">Move</a:ActionMenuItem>
+						<a:ActionMenuItem icon="DATABASE" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
 						<a:ActionMenuItem icon="LINK" action="CREATE_LINK">Save Link to This Page</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TRASH_O" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
 					</b:DropDownMenu>

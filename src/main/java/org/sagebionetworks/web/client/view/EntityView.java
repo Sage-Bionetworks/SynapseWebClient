@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -40,31 +39,20 @@ public interface EntityView extends IsWidget, SynapseView {
 		 */
 		void replaceArea(EntityArea area, String areaToken);
 		void clear();
+		void setEntityBundle(EntityBundle bundle, Long versionNumber,
+				EntityHeader projectHeader, EntityArea area, String areaToken);
 	}
-
 	/**
 	 * Set entity to display
 	 * @param versionNumber to highlight
 	 * @param entity
 	 * @param entityMetadata 
 	 */
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken);
-
-	public void show404();
-	
-	public void show403();
-	
 	void setBackgroundImageVisible(boolean isVisible);
 	void setBackgroundImageUrl(String url);
-
 	void setSynAlertWidget(Widget synAlert);
-
 	void setFooterWidget(IsWidget footerWidget);
-
 	void setHeaderWidget(IsWidget headerWidget);
-
 	void setEntityPageTopWidget(IsWidget entityPageTopWidget);
-
 	void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
-	
 }

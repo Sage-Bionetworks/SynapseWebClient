@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -370,6 +371,11 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@Override
 	public void hide() {
 		modal.hide();
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return modal;
 	}
 }
 
