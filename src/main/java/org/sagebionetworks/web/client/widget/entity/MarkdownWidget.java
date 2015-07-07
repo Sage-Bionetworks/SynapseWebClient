@@ -25,6 +25,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -34,7 +35,7 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class MarkdownWidget implements MarkdownWidgetView.Presenter {
+public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -76,7 +77,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 	
 	@Override
 	public void configure(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
-		synAlert.clear();
+		clear();
 		view.setEmptyVisible(true);
 		this.md = md;
 		this.wikiKey = wikiKey;
@@ -88,7 +89,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 				view.callbackWhenAttached(new Callback() {
 					@Override
 					public void invoke() {
-						view.clearMarkdown();
 						if(result != null && !result.isEmpty()) {
 							view.setEmptyVisible(false);
 							view.setMarkdown(result);
@@ -104,6 +104,12 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter {
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void clear() {
+		synAlert.clear();
+		view.clearMarkdown();
 	}
 	
 	

@@ -47,9 +47,7 @@ public class BreadcrumbTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 						
-		breadcrumb = new Breadcrumb(mockView, mockSynapseClient,
-				mockGlobalApplicationState, mockAuthenticationController,
-				mockIconsImageBundle);
+		breadcrumb = new Breadcrumb(mockView, mockGlobalApplicationState);
 		
 		
 		verify(mockView).setPresenter(breadcrumb);
@@ -95,7 +93,7 @@ public class BreadcrumbTest {
 		LinkData homeLink = new LinkData("MyHomeLink", new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
 		links.add(homeLink);
 		String currentPageName  = "CurrentPage";
-		breadcrumb.asWidget(links, currentPageName);
+		breadcrumb.configure(links, currentPageName);
 		verify(mockView).setLinksList(links, currentPageName);
 	}
 	
