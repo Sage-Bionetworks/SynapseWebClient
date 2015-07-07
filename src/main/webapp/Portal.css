@@ -8,8 +8,8 @@
 	text-align: center;
 } */
 
-.overflow-y-auto-imp {
-	overflow-y: auto !important;
+.overflow-y-auto {
+	overflow-y: auto;
 }
 
 .sf-j-menu {
@@ -636,6 +636,9 @@ a.shortBtn {
 }
 .margin-left-15 {
 	margin-left: 15px;
+}
+.margin-left-20 {
+	margin-left: 20px;
 }
 
 .margin-right-15 {
@@ -1933,6 +1936,13 @@ a.projectTitle:hover {
 Looks for any child element under .modal-fullscreen that has a class that contains modal-dialog.*/
 .modal-fullscreen [class*="modal-dialog"] {
 	width: 95%;
+}
+
+/* Prevent body from scrolling when modal is open
+http://stackoverflow.com/questions/9538868/prevent-body-from-scrolling-when-a-modal-is-opened
+*/
+body.modal-open {
+    overflow: hidden;
 }
 
 .my-dashboard-header-button [class*="user-badge"] {

@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -43,6 +44,8 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestinationLocation;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
@@ -516,9 +519,9 @@ public interface SynapseClient extends RemoteService {
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
-	Entity updateExternalFile(String entityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
+	Entity updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
-	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId) throws RestServiceException;
+	Entity createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId) throws RestServiceException;
 
 	EntityBundlePlus getEntityInfo(String entityId) throws RestServiceException;
 
@@ -526,4 +529,14 @@ public interface SynapseClient extends RemoteService {
 
 	Activity getOrCreateActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException;
+
+	void createStorageLocationSetting(String parentEntityId, StorageLocationSetting setting) throws RestServiceException;
+
+	StorageLocationSetting getStorageLocationSetting(String parentEntityId) throws RestServiceException;
+
+	List<String> getMyLocationSettingBanners() throws RestServiceException;
+
+	LogEntry hexDecodeLogEntry(String encodedLogEntry);
+
+	String hexEncodeLogEntry(LogEntry logEntry);
 }

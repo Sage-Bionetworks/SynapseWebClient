@@ -60,6 +60,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -100,6 +101,7 @@ public class EntityActionControllerImplTest {
 	String wikiPageId = "999";
 	MarkdownEditorWidget mockMarkdownEditorWidget;
 	ProvenanceEditorWidget mockProvenanceEditorWidget;
+	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
 
 	@Before
@@ -121,7 +123,7 @@ public class EntityActionControllerImplTest {
 		mockEntityFinder = Mockito.mock(EntityFinder.class);
 		mockSubmitter = Mockito.mock(EvaluationSubmitter.class);
 		mockUploader = Mockito.mock(UploadDialogWidget.class);
-		
+		mockStorageLocationWidget = Mockito.mock(StorageLocationWidget.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -132,7 +134,7 @@ public class EntityActionControllerImplTest {
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
 				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget, mockProvenanceEditorWidget);
+				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -738,6 +740,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.UPLOAD_NEW_FILE);
 		verify(mockUploader).show();
+		verify(mockUploader).setUploaderLinkNameVisible(false);
 	}
 
 	@Test

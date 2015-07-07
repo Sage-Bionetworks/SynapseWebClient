@@ -34,4 +34,6 @@ public interface SynapseAlert extends IsWidget {
 	 * Hide all errors that were previously shown.
 	 */
 	void clear();
+	void show403();
+	void show404();
 }

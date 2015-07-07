@@ -43,6 +43,8 @@ import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
+import org.sagebionetworks.web.client.view.ErrorView;
+import org.sagebionetworks.web.client.view.ErrorViewImpl;
 import org.sagebionetworks.web.client.view.HelpView;
 import org.sagebionetworks.web.client.view.HelpViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -195,6 +197,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWid
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
@@ -229,6 +233,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
@@ -774,7 +780,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
 		
 		// Preview
-		bind(PreviewWidgetViewImpl.class).in(Singleton.class);
 		bind(PreviewWidgetView.class).to(PreviewWidgetViewImpl.class);
 		
 		// ActionMenu V2
@@ -1112,5 +1117,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ProvenanceURLDialogWidgetView.class).to(ProvenanceURLDialogWidgetViewImpl.class);
 		bind(EntityRefProvEntryView.class).to(EntityRefProvEntryViewImpl.class);
 		bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
+		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
+		bind(ErrorView.class).to(ErrorViewImpl.class);
+		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
 	}
 }

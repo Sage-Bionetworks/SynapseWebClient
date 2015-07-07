@@ -176,7 +176,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, mockCallback, false);
-		verify(mockView).show404();
+		verify(mockSynapseAlert).show404();
 		verify(mockCallback).noWikiFound();
 	}
 	
@@ -192,7 +192,7 @@ public class WikiPageWidgetTest {
 	public void testConfigureWikiForbiddenNotEmbedded(){
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false);
-		verify(mockView).show403();
+		verify(mockSynapseAlert).show403();
 	}
 	
 	//also show a 404 if we get an empty entity list
@@ -202,8 +202,8 @@ public class WikiPageWidgetTest {
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(0);
 		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-		presenter.setOwnerObjectName(mockCallbackP);
-		verify(mockView).show404();
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
+		verify(mockSynapseAlert).show404();
 	}
 	
 	@Test

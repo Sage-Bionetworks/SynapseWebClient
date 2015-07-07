@@ -19,6 +19,7 @@
 					    <b:AnchorListItem ui:field="attachmentLink">Attachment</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="buttonLink">Button Link</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="entityListLink">Entity List</b:AnchorListItem>
+					    <b:AnchorListItem ui:field="previewLink">File Preview</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="imageLink">Image</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="joinTeamLink">Join Team Button</b:AnchorListItem>
 					    <b:AnchorListItem ui:field="linkLink">Link</b:AnchorListItem>

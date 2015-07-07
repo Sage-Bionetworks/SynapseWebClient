@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
+import org.sagebionetworks.web.client.presenter.ErrorPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -39,6 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
+import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
@@ -57,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
@@ -189,6 +192,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public SignedTokenPresenter getSignedTokenPresenter();
 	
+	public ErrorPresenter getErrorPresenter();
+	
 	public ChangeUsernamePresenter getChangeUsernamePresenter();
 	
 	public TrashPresenter getTrashPresenter();
@@ -230,6 +235,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VideoConfigEditor getVideoConfigEditor();
 	public TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
 	public ProjectBackgroundConfigEditor getProjectBackgroundConfigEditor();
+	public PreviewConfigEditor getPreviewConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -274,6 +280,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityRefProvEntryView getEntityRefEntry();
 	public URLProvEntryView getURLEntry();
 	public ProvenanceListWidget getProvenanceListWidget();
+	public PreviewWidget getPreviewWidget();
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();

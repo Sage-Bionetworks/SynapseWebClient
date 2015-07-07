@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -107,6 +108,12 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
+import org.sagebionetworks.repo.model.project.ProjectSetting;
+import org.sagebionetworks.repo.model.project.ProjectSettingsType;
+import org.sagebionetworks.repo.model.project.StorageLocationSetting;
+import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
@@ -1002,6 +1009,8 @@ public class SynapseClientImplTest {
 		String myFileName = "testFileName.csv";
 		String testUrl = "http://mytesturl/" + myFileName;
 		String testId = "myTestId";
+		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		Long fileSize=2048L;
 		FileEntity file = new FileEntity();
 		String originalFileEntityName = "syn1223";
 		file.setName(originalFileEntityName);
@@ -1011,19 +1020,18 @@ public class SynapseClientImplTest {
 		handle.setExternalURL(testUrl);
 
 		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		ArgumentCaptor<FileEntity> arg = ArgumentCaptor
-				.forClass(FileEntity.class);
-
-		synapseClient.updateExternalFile(testId, testUrl, null, storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, fileSize, md5, storageLocationId);
 
 		verify(mockSynapse).getEntityById(testId);
-		verify(mockSynapse).createExternalFileHandle(
-				any(ExternalFileHandle.class));
-		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
-
-		// verify rename
-		FileEntity fileEntityArg = arg.getValue(); // last value captured
-		assertEquals(myFileName, fileEntityArg.getName());
+		
+		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor.forClass(ExternalFileHandle.class);
+		verify(mockSynapse).createExternalFileHandle(captor.capture());
+		ExternalFileHandle capturedValue = captor.getValue();
+		assertEquals(testUrl, capturedValue.getExternalURL());
+		assertEquals(md5, capturedValue.getContentMd5());
+//		assertEquals(fileSize, capturedValue.getContentSize());
+		
+		verify(mockSynapse).putEntity(any(FileEntity.class));
 
 		// and if rename fails, verify all is well (but the FileEntity name is
 		// not updated)
@@ -1035,22 +1043,13 @@ public class SynapseClientImplTest {
 				.thenThrow(
 						new IllegalArgumentException(
 								"invalid name for some reason"));
-		synapseClient.updateExternalFile(testId, testUrl, "", storageLocationId);
+		synapseClient.updateExternalFile(testId, testUrl, fileSize, md5, storageLocationId);
 
 		// called createExternalFileHandle
 		verify(mockSynapse).createExternalFileHandle(
 				any(ExternalFileHandle.class));
-		// and it should have called putEntity 2 additional times
-		verify(mockSynapse, Mockito.times(2)).putEntity(arg.capture());
-		fileEntityArg = arg.getValue(); // last value captured
-		assertEquals(originalFileEntityName, fileEntityArg.getName());
-
-		// and (finally) verify the correct name if it is explicitly set
-		resetUpdateExternalFileHandleMocks(testId, file, handle);
-		String newName = "a new name";
-		synapseClient.updateExternalFile(testId, testUrl, newName, storageLocationId);
-		file.setName(newName);
-		verify(mockSynapse).putEntity(eq(file)); // should equal the previous file but with the new name
+		// and it should have called putEntity again
+		verify(mockSynapse).putEntity(any(FileEntity.class));
 	}
 
 	@Test
@@ -1059,13 +1058,15 @@ public class SynapseClientImplTest {
 		String parentEntityId = "syn123333";
 		String externalUrl = "sftp://foobar.edu/b/test.txt";
 		String fileName = "testing.txt";
+		String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+		Long fileSize = 1024L;
 		when(
 				mockSynapse
 						.createExternalFileHandle(any(ExternalFileHandle.class)))
 				.thenReturn(new ExternalFileHandle());
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(
 				new FileEntity());
-		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, storageLocationId);
+		synapseClient.createExternalFile(parentEntityId, externalUrl, fileName, fileSize, md5, storageLocationId);
 		ArgumentCaptor<ExternalFileHandle> captor = ArgumentCaptor
 				.forClass(ExternalFileHandle.class);
 		verify(mockSynapse).createExternalFileHandle(captor.capture());
@@ -1074,6 +1075,8 @@ public class SynapseClientImplTest {
 		assertEquals(fileName, handle.getFileName());
 		assertEquals(externalUrl, handle.getExternalURL());
 		assertEquals(storageLocationId, handle.getStorageLocationId());
+		assertEquals(md5, handle.getContentMd5());
+//		assertEquals(fileSize, handle.getContentSize());
 	}
 
 	@Test
@@ -2009,5 +2012,133 @@ public class SynapseClientImplTest {
 	public void testGetOrCreateActivityForEntityVersionFailure() throws SynapseException, RestServiceException {
 		when(mockSynapse.getActivityForEntityVersion(anyString(), anyLong())).thenThrow(new Exception());
 		synapseClient.getOrCreateActivityForEntityVersion(entityId, version);
+	}
+	
+	private void setupGetMyLocationSettings() throws SynapseException, RestServiceException{
+		List<StorageLocationSetting> existingStorageLocations = new ArrayList<StorageLocationSetting>();
+		StorageLocationSetting storageLocation = new ExternalS3StorageLocationSetting();
+		storageLocation.setStorageLocationId(1L);
+		storageLocation.setBanner("Banner 1");
+		existingStorageLocations.add(storageLocation);
+		
+		storageLocation = new ExternalStorageLocationSetting();
+		storageLocation.setStorageLocationId(2L);
+		storageLocation.setBanner("Another Banner");
+		((ExternalStorageLocationSetting)storageLocation).setUrl("sftp://www.jayhodgson.com");
+		existingStorageLocations.add(storageLocation);
+		
+		storageLocation = new ExternalStorageLocationSetting();
+		storageLocation.setStorageLocationId(3L);
+		storageLocation.setBanner("Banner 1");
+		existingStorageLocations.add(storageLocation);
+		
+		when(mockSynapse.getMyStorageLocationSettings()).thenReturn(existingStorageLocations);
+	}
+	
+	@Test
+	public void testGetMyLocationSettingBanners() throws SynapseException, RestServiceException {
+		setupGetMyLocationSettings();
+		List<String> banners = synapseClient.getMyLocationSettingBanners();
+		verify(mockSynapse).getMyStorageLocationSettings();
+		//should be 2 (only returns unique values)
+		assertEquals(2, banners.size());
+		//and alphabetically sorted
+		assertEquals(Arrays.asList("Another Banner", "Banner 1"), banners);
+	}
+	
+	@Test(expected = Exception.class)
+	public void testGetMyLocationSettingBannersFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getMyStorageLocationSettings()).thenThrow(new Exception());
+		synapseClient.getMyLocationSettingBanners();
+	}
+	
+	@Test
+	public void testGetStorageLocationSettingNullSetting() throws SynapseException, RestServiceException {
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(null);
+		assertNull(synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test
+	public void testGetStorageLocationSettingEmptyLocations() throws SynapseException, RestServiceException {
+		UploadDestinationListSetting setting = new UploadDestinationListSetting();
+		setting.setLocations(Collections.EMPTY_LIST);
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+		assertNull(synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test
+	public void testGetStorageLocationSetting() throws SynapseException, RestServiceException {
+		UploadDestinationListSetting setting = new UploadDestinationListSetting();
+		setting.setLocations(Collections.singletonList(42L));
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(setting);
+		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
+		assertEquals(mockStorageLocationSetting, synapseClient.getStorageLocationSetting(entityId));
+	}
+	
+	@Test(expected = Exception.class)
+	public void testGetStorageLocationSettingFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenThrow(new Exception());
+		synapseClient.getStorageLocationSetting(entityId);
+	}
+	
+	@Test
+	public void testCreateStorageLocationSettingFoundStorageAndProjectSetting() throws SynapseException, RestServiceException {
+		setupGetMyLocationSettings();
+		
+		UploadDestinationListSetting projectSetting = new UploadDestinationListSetting();
+		projectSetting.setLocations(Collections.EMPTY_LIST);
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(projectSetting);
+		
+		//test the case when it finds a duplicate storage location.
+		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
+		setting.setBanner("Another Banner");
+		setting.setUrl("sftp://www.jayhodgson.com");
+		
+		synapseClient.createStorageLocationSetting(entityId, setting);
+		//should have found the duplicate storage location, so this is never called
+		verify(mockSynapse, Mockito.never()).createStorageLocationSetting(any(StorageLocationSetting.class));
+		//verify updates project setting, and the new location list is a single value (id of existing storage location)
+		ArgumentCaptor<ProjectSetting> captor = ArgumentCaptor.forClass(ProjectSetting.class);
+		verify(mockSynapse).updateProjectSetting(captor.capture());
+		UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting)captor.getValue();
+		List<Long> locations = updatedProjectSetting.getLocations();
+		assertEquals(new Long(2), locations.get(0));
+	}
+	
+
+	@Test
+	public void testCreateStorageLocationSettingNewStorageAndProjectSetting() throws SynapseException, RestServiceException {
+		setupGetMyLocationSettings();
+		when(mockSynapse.getProjectSetting(entityId, ProjectSettingsType.upload)).thenReturn(null);
+		
+		//test the case when it does not find duplicate storage location setting.
+		ExternalStorageLocationSetting setting = new ExternalStorageLocationSetting();
+		setting.setBanner("Another Banner");
+		setting.setUrl("sftp://www.google.com");
+		
+		Long newStorageLocationId = 1007L;
+		ExternalStorageLocationSetting createdSetting = new ExternalStorageLocationSetting();
+		createdSetting.setStorageLocationId(newStorageLocationId);
+		
+		when(mockSynapse.createStorageLocationSetting(any(StorageLocationSetting.class))).thenReturn(createdSetting);
+		
+		synapseClient.createStorageLocationSetting(entityId, setting);
+		//should not have found a duplicate storage location, so this should be called
+		verify(mockSynapse).createStorageLocationSetting(any(StorageLocationSetting.class));
+		//verify creates new project setting, and the new location list is a single value (id of the new storage location)
+		ArgumentCaptor<ProjectSetting> captor = ArgumentCaptor.forClass(ProjectSetting.class);
+		verify(mockSynapse).createProjectSetting(captor.capture());
+		UploadDestinationListSetting updatedProjectSetting = (UploadDestinationListSetting)captor.getValue();
+		List<Long> locations = updatedProjectSetting.getLocations();
+		assertEquals(newStorageLocationId, locations.get(0));
+		assertEquals(ProjectSettingsType.upload, updatedProjectSetting.getSettingsType());
+		assertEquals(entityId, updatedProjectSetting.getProjectId());
+	}
+	
+	@Test(expected = Exception.class)
+	public void testCreateStorageLocationSettingFailure() throws SynapseException, RestServiceException {
+		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenThrow(new Exception());
+		synapseClient.createStorageLocationSetting(entityId, new ExternalStorageLocationSetting());
 	}
 }
