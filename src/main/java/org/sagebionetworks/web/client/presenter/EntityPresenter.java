@@ -52,7 +52,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -115,12 +114,12 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
 			@Override
 			public void areaChanged(EntityArea area, String areaToken) {
-				updateArea(area, areaToken);
+				updateEntityArea(area, areaToken);
 			}
 
 			@Override
 			public void replaceArea(EntityArea area, String areaToken) {
-				replaceArea(area, areaToken);
+				replaceEntityArea(area, areaToken);
 			}
 		});
 		headerWidget.configure(false);
@@ -144,7 +143,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		refresh();
 	}
 	
-	public void updateArea(EntityArea area, String areaToken) {
+	public void updateEntityArea(EntityArea area, String areaToken) {
 		clear();
 		this.area = area;
 		this.areaToken = areaToken;
@@ -155,7 +154,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	}
 	
 	@Override
-	public void replaceArea(EntityArea area, String areaToken) {
+	public void replaceEntityArea(EntityArea area, String areaToken) {
 		clear();
 		this.area = area;
 		this.areaToken = areaToken;
@@ -167,7 +166,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 
 	@Override
 	public void clear() {
-		entityPageTop.clearState();
 		synAlert.clear();
 		openTeamInvitesWidget.clear();
 		view.clear();
@@ -182,41 +180,41 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	@Override
 	public void refresh() {
 		clear();
-		view.setBackgroundImageVisible(false);
 		// Hide the view panel contents until async callback completes
+		view.setBackgroundImageVisible(false);
 		view.showLoading();
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundle bundle) {	
+			public void onSuccess(EntityBundle bundle) {
 				view.hideLoading();
 				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}
 				else {
-						// Redirect if Entity is a Link
-						if(bundle.getEntity() instanceof Link) {
-							Reference ref = ((Link)bundle.getEntity()).getLinksTo();
-							entityId = null;
-							if(ref != null){
-								// redefine where the page is and refresh
-								entityId = ref.getTargetId();
-								versionNumber = ref.getTargetVersionNumber();
-								refresh();
-								return;
-							} else {
-								// show error and then allow entity bundle to go to view
-								view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
-							}
+					// Redirect if Entity is a Link
+					if(bundle.getEntity() instanceof Link) {
+						Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+						entityId = null;
+						if(ref != null){
+							// redefine where the page is and refresh
+							entityId = ref.getTargetId();
+							versionNumber = ref.getTargetVersionNumber();
+							refresh();
+							return;
+						} else {
+							// show error and then allow entity bundle to go to view
+							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
-						EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
-						if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-						if (projectHeader != null)
-							loadBackgroundImage(projectHeader.getId());
-						EntityPresenter.filterToDownloadARs(bundle);
-						setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
+					}
+					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
+					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					if (projectHeader != null)
+						loadBackgroundImage(projectHeader.getId());
+					EntityPresenter.filterToDownloadARs(bundle);
+					setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
 				}
 			}
 			

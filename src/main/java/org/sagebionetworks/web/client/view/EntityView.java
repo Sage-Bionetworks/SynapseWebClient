@@ -21,7 +21,7 @@ public interface EntityView extends IsWidget, SynapseView {
 		 * @param area
 		 * @param areaToken
 		 */
-		void updateArea(EntityArea area, String areaToken);
+		void updateEntityArea(EntityArea area, String areaToken);
 		/**
 		 * Replace the current area without adding a change to the navigation history.
 		 * Instead the current history token is replaced. The URL in the browser will
@@ -30,7 +30,7 @@ public interface EntityView extends IsWidget, SynapseView {
 		 * @param area
 		 * @param areaToken
 		 */
-		void replaceArea(EntityArea area, String areaToken);
+		void replaceEntityArea(EntityArea area, String areaToken);
 		void clear();
 		void setEntityBundle(EntityBundle bundle, Long versionNumber,
 				EntityHeader projectHeader, EntityArea area, String areaToken);
