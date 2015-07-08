@@ -7,12 +7,17 @@
 	
 	<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg">
 		<bh:Div>
-		    <bh:Div ui:field="headerImageDiv" addStyleNames="left margin-left-35">
-		        <g:Image ui:field="synapseLogo" resource="{sageImages.synapseLogo}" addStyleNames="imageButton"/>
-		    </bh:Div>
+	        <bh:Div ui:field="projectHeading" addStyleNames="margin-left-15">
+	        	<g:Image ui:field="synapseLogo" resource="{sageImages.logo}" 
+	        	    addStyleNames="imageButton margin-bottom-15 margin-right-5" width="25px" height="25px"/>
+	            <b:Heading size="H2" addStyleNames="displayInline">
+	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white" text="Synapse"/>
+	        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline"/>
+	        	</b:Heading>
+		  	</bh:Div>
 			<b:Tooltip placement="BOTTOM" title="Log out">
 				<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="26px" />	
-			</b:Tooltip>
+			</b:Tooltip> 
 			<b:Tooltip placement="BOTTOM" title="Favorites">
 				<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
 					<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px"></b:Button>

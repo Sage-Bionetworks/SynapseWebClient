@@ -52,5 +52,17 @@ public interface HeaderView extends IsWidget {
 
 	void setUser(UserSessionData userData);
 
+	void hideSynapseLogo();
+
+	void hideProjectHeaderWidget();
+
+	void showProjectHeaderWidget();
+
+	void setProjectHeaderText(String text);
+
+	void setProjectHeaderAnchorTarget(String href);
+
+	void setProjectFavoriteWidget(IsWidget favWidget);
+
 
 }

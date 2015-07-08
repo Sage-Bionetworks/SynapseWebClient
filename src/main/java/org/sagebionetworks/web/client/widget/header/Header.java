@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -29,13 +30,18 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private FavoriteWidget favWidget;
 	
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient) {
+	public Header(HeaderView view, AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
+			FavoriteWidget favWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		this.favWidget = favWidget;
+		view.setProjectFavoriteWidget(favWidget);
 		view.setPresenter(this);
 	}
 	
@@ -48,11 +54,25 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 	
 	public void configure(boolean largeLogo) {
+		view.hideProjectHeaderWidget();
 		if (largeLogo) {
 			view.showLargeLogo();
 		} else {
 			view.showSmallLogo();
 		}
+	}
+	
+	public void setProjectHeader(EntityHeader projectHeader) {
+		String projectId = projectHeader.getId();
+		favWidget.configure(projectId);
+		view.setProjectHeaderAnchorTarget("#!Synapse:" + projectId);
+		view.setProjectHeaderText(projectHeader.getName());
+		view.hideSynapseLogo();
+		view.showProjectHeaderWidget();
+	}
+
+	public void hideSynapseLogo() {
+		view.hideSynapseLogo();
 	}
 
 	public Widget asWidget() {

@@ -31,6 +31,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,7 +45,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Div headerDiv;
 	@UiField
-	Div headerImageDiv;
+	Anchor projectHeadingAnchor;
+	@UiField
+	Div projectHeading;
 
 	@UiField
 	Button dashboardButton;
@@ -66,6 +69,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	AnchorListItem restAPILink;
 
+	@UiField
+	SimplePanel projectFavoritePanel;
 	@UiField
 	SimplePanel registerLinkUI;
 	@UiField
@@ -122,9 +127,40 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
+	public void setProjectHeaderText(String text) {
+		projectHeadingAnchor.setText(text);
+	}
+	
+	@Override
+	public void setProjectHeaderAnchorTarget(String href) {
+		projectHeadingAnchor.setHref(href);
+	}
+	
+	@Override
+	public void hideProjectHeaderWidget() {
+		projectHeading.setVisible(false);
+	}
+	
+	@Override
+	public void showProjectHeaderWidget() {
+		projectHeading.setVisible(true);
+	}
+	
+	@Override
+	public void setProjectFavoriteWidget(IsWidget favWidget) {
+		projectFavoritePanel.setWidget(favWidget);
+	}
+	
+	@Override
+	public void hideSynapseLogo() {
+		synapseLogo.setVisible(false);
+	}
+	
+	@Override
 	public void showLargeLogo() {
 		synapseLogo.setHeight("66px");
 		synapseLogo.setWidth("332px");
+		synapseLogo.setVisible(true);
 		headerDiv.setHeight("100px");
 		headerDiv.setPaddingTop(16);
 	}
@@ -133,6 +169,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void showSmallLogo() {
 		synapseLogo.setHeight("25px");
 		synapseLogo.setWidth("126px");
+		synapseLogo.setVisible(true);
 		headerDiv.setHeight("50px");
 		headerDiv.setPaddingTop(9);
 	}

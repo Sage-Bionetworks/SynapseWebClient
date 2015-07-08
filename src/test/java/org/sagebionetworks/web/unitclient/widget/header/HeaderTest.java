@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -44,6 +45,7 @@ public class HeaderTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
 	PlaceChanger mockPlaceChanger;
+	FavoriteWidget mockFavWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
 
@@ -54,8 +56,9 @@ public class HeaderTest {
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		mockFavWidget = mock(FavoriteWidget.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);

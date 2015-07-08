@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -72,6 +71,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@UiField
+	Row projectMetaContainer;
+	@UiField
 	Anchor wikiLink;
 	@UiField
 	Anchor fileLink;
@@ -89,22 +90,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	LIElement tablesListItem;
 	@UiField
 	LIElement adminListItem;
-	
 	@UiField
 	Button tableLearnMoreButton;
 	@UiField
 	Button tableAPIDocsButton;
 	
-	@UiField
-	Div projectTitleUI;
-	@UiField
-	Anchor projectHeaderAnchor;
-	
 	private Presenter presenter;
-	
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
-	
 	private Breadcrumb breadcrumb;
 	
 	//project level info
@@ -233,7 +226,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
-
 		initProjectLayout();
 
 		initClickHandlers();
@@ -259,14 +251,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
 	}
 	
-	private void initClickHandlers() {
-		projectHeaderAnchor.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(currentProjectAnchorTargetId, null, null, null));
-			}
-		});
-		
+	private void initClickHandlers() {		
 		tableLearnMoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -305,11 +290,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.currentArea = area;
 		DisplayUtils.hide(adminListItem);
 		clearContent();
-		
 		hideTabContent();
-		
-		// project header
-		showProjectLink(projectHeader);
 	
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder;
@@ -366,12 +347,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableWidgetContainer.clear();
 		tableModifiedAndCreatedContainer.clear();
 		tableListWidgetContainer.setVisible(false);
-	}
-	
-	private void showProjectLink(final EntityHeader projectHeader) {
-		currentProjectAnchorTargetId = projectHeader.getId();
-		projectTitleUI.setVisible(true);
-		projectHeaderAnchor.setText(projectHeader.getName());
 	}
 	
 	@Override
@@ -538,7 +513,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// tab container
 		setTabSelected(area, false);
 
-		projectTitleUI.setVisible(false);
 		// Project header: Metadata & Description
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
 		projectMetadataContainer.add(entityMetadata.asWidget());
@@ -786,4 +760,5 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		});
 		return actionMenu;
 	}
+
 }

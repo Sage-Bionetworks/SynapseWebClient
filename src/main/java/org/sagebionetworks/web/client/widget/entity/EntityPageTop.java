@@ -356,4 +356,5 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
+
 }
