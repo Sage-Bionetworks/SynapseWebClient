@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -12,9 +14,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityViewImpl implements EntityView {
-	
-	private SageImageBundle sageImageBundle;
-	private Widget loadingPanel;
 
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
@@ -30,13 +29,17 @@ public class EntityViewImpl implements EntityView {
 	SimplePanel synAlertContainer;
 	@UiField
 	Image entityBackgroundImage;
+	@UiField
+	HTMLPanel loadingUI;
+	@UiField
+	Heading accessDependentMessage;
 	
-	private Presenter presenter;
 	private Widget widget;
 	
 	@Inject
 	public EntityViewImpl(EntityViewImplUiBinder binder) {		
 		widget = binder.createAndBindUi(this);
+		Window.scrollTo(0, 0); // scroll user to top of page
 		// TODO : need to dynamically set the header widget
 		//headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 	}
@@ -62,10 +65,6 @@ public class EntityViewImpl implements EntityView {
 	}
 
 	@Override
-	public void setPresenter(final Presenter presenter) {
-	}
-
-	@Override
 	public Widget asWidget() {
 		return widget;
 	}
@@ -77,9 +76,12 @@ public class EntityViewImpl implements EntityView {
 
 	@Override
 	public void showLoading() {
-		if (loadingPanel == null)
-			loadingPanel = DisplayUtils.createFullWidthLoadingPanel(sageImageBundle);
-		entityPageTopPanel.setWidget(loadingPanel);
+		loadingUI.setVisible(true);
+	}
+	
+	@Override
+	public void hideLoading() {
+		loadingUI.setVisible(false);
 	}
 
 	@Override
@@ -88,14 +90,16 @@ public class EntityViewImpl implements EntityView {
 	}
 	
 	@Override
-	public void setSynAlertWidget(Widget synAlert) {
+	public void setSynAlertWidget(IsWidget synAlert) {
 		synAlertContainer.setWidget(synAlert);
 	}
 	
 
 	@Override
 	public void clear() {
-		
+		openInvitesPanel.setVisible(false);
+		accessDependentMessage.setVisible(false);
+		loadingUI.setVisible(false);
 	}
 
 	
@@ -107,5 +111,35 @@ public class EntityViewImpl implements EntityView {
 	@Override
 	public void setBackgroundImageUrl(String url) {
 		entityBackgroundImage.setUrl(url);
+	}
+
+	@Override
+	public void showAccessDependentMessage() {
+		accessDependentMessage.setVisible(true);
+	}
+
+	@Override
+	public void showOpenTeamInvites() {
+		openInvitesPanel.setVisible(true);
+	}
+
+	@Override
+	public void showEntityPageTop() {
+		entityPageTopPanel.setVisible(true);
+	}
+
+	@Override
+	public void hideAccessDependentMessage() {
+		accessDependentMessage.setVisible(false);
+	}
+
+	@Override
+	public void hideOpenTeamInvites() {
+		openInvitesPanel.setVisible(false);		
+	}
+
+	@Override
+	public void hideEntityPageTop() {
+		entityPageTopPanel.setVisible(false);
 	}
 }

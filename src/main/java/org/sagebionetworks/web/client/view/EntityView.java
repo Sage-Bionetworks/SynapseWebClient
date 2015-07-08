@@ -6,15 +6,8 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface EntityView extends IsWidget, SynapseView {
-	
-	/**
-	 * Set this view's presenter
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
 		
 	public interface Presenter {
 
@@ -50,9 +43,16 @@ public interface EntityView extends IsWidget, SynapseView {
 	 */
 	void setBackgroundImageVisible(boolean isVisible);
 	void setBackgroundImageUrl(String url);
-	void setSynAlertWidget(Widget synAlert);
 	void setFooterWidget(IsWidget footerWidget);
 	void setHeaderWidget(IsWidget headerWidget);
 	void setEntityPageTopWidget(IsWidget entityPageTopWidget);
 	void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
+	void hideLoading();
+	void setSynAlertWidget(IsWidget synAlert);
+	void showAccessDependentMessage();
+	void showOpenTeamInvites();
+	void showEntityPageTop();
+	void hideAccessDependentMessage();
+	void hideOpenTeamInvites();
+	void hideEntityPageTop();
 }
