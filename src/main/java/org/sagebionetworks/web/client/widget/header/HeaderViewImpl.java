@@ -142,7 +142,21 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
+	public void showProjectFavoriteWidget() {
+		projectFavoritePanel.setVisible(true);
+	}
+	
+	@Override
+	public void hideProjectFavoriteWidget() {
+		projectFavoritePanel.setVisible(false);
+	}
+	
+	@Override
 	public void showLargeLogo() {
+		projectHeadingAnchor.addStyleName("font-size-70");
+		projectHeadingAnchor.addStyleName("font-size-70");
+		synapseLogo.removeStyleName("margin-bottom-15");
+		synapseLogo.addStyleName("margin-bottom-40");
 		synapseLogo.setHeight("66px");
 		synapseLogo.setWidth("66px");
 		headerDiv.setHeight("100px");
@@ -151,6 +165,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void showSmallLogo() {
+		projectHeadingAnchor.removeStyleName("font-size-70");
+		synapseLogo.removeStyleName("margin-bottom-40");
+		synapseLogo.addStyleName("margin-bottom-15");
 		synapseLogo.setHeight("25px");
 		synapseLogo.setWidth("25px");
 		headerDiv.setHeight("50px");

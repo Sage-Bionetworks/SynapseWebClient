@@ -44,4 +44,6 @@ public interface HeaderView extends IsWidget {
 	void setProjectHeaderText(String text);
 	void setProjectHeaderAnchorTarget(String href);
 	void setProjectFavoriteWidget(IsWidget favWidget);
+	void showProjectFavoriteWidget();
+	void hideProjectFavoriteWidget();
 }
