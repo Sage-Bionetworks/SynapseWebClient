@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
+import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -17,8 +13,8 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -68,7 +64,19 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());	
-		
+		entityView.addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					String id = "cy1";
+					entityView.getElement().setId(id);
+					//{"elements":{"nodes":[{"data":{"id":"foo"},"position":{"x":120,"y":120}},{"data":{"id":"bar"},"position":{"x":110,"y":110}},{"data":{"weight":100},"group":"nodes","position":{"x":100,"y":100},"selected":true,"selectable":true,"locked":true,"grabbable":true}],"edges":[{"data":{"id":"baz","source":"foo","target":"bar"}}]},"style":[{"selector":"node","style":{"content":"data(id)"}}]}
+					String cytoscapeGraphJson = "{\"elements\":{\"nodes\":[{\"data\":{\"id\":\"foo\"},\"position\":{\"x\":120,\"y\":120}},{\"data\":{\"id\":\"bar\"},\"position\":{\"x\":110,\"y\":110}},{\"data\":{\"weight\":100},\"group\":\"nodes\",\"position\":{\"x\":100,\"y\":100},\"selected\":true,\"selectable\":true,\"locked\":true,\"grabbable\":true}],\"edges\":[{\"data\":{\"id\":\"baz\",\"source\":\"foo\",\"target\":\"bar\"}}]},\"style\":[{\"selector\":\"node\",\"style\":{\"content\":\"data(id)\"}}]}";
+					new CytoscapeGraph().show(id,  cytoscapeGraphJson);
+				};
+			}
+		});
+
 	}
 
 	@Override
@@ -84,10 +92,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
-		
-		//test error reporting
-	    Throwable t = new SynapseBadRequestException("This was a bad request");
-	    DisplayUtils.showErrorMessage(t, jiraErrorHelper, authenticationController.isLoggedIn(), "Error loading the Coming Soon test place");
 	}
 
 	@Override
@@ -106,22 +110,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 
 	@Override
 	public void clear() {		
-	}
-
-	@Override
-	public void setEntity(Entity entity) {
-		Long version = null;
-		if(entity instanceof Versionable) 
-			version = ((Versionable)entity).getVersionNumber();			
-		Map<String,String> configMap = new HashMap<String,String>();
-		String entityList = DisplayUtils.createEntityVersionString(entity.getId(), null) +","+"syn114241";
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityList);
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(false));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
-	    provenanceWidget.configure(null, configMap, null, null);
-	    provenanceWidget.setHeight(800);	
-	    entityView.setWidget(provenanceWidget.asWidget());
 	}
 	
 }
