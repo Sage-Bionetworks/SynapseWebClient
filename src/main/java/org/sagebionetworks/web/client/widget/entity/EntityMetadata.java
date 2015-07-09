@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -33,14 +32,8 @@ public class EntityMetadata implements Presenter {
 
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		view.setEntityBundle(bundle, bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber != null);
-		boolean showDetailedMetadata = true;
-		boolean showEntityName = true;
-		if (bundle.getEntity() instanceof FileEntity) {
-			showEntityName = false;
-		}
-		
+		boolean showDetailedMetadata = true;		
 		view.setDetailedMetadataVisible(showDetailedMetadata);
-		view.setEntityNameVisible(showEntityName);
 	}
 	
 	private UserProfile getUserProfile() {

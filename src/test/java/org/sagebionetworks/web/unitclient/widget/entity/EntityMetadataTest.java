@@ -42,7 +42,6 @@ public class EntityMetadataTest {
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setEntityBundle(bundle, canChangePermissions, canCertifiedUserEdit, true);
 		verify(mockView).setDetailedMetadataVisible(true);
-		verify(mockView).setEntityNameVisible(true);
 	}
 	@Test
 	public void testSetEntityBundleFileEntity() {
@@ -59,7 +58,6 @@ public class EntityMetadataTest {
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setEntityBundle(bundle, canChangePermissions, canCertifiedUserEdit, false);
 		verify(mockView).setDetailedMetadataVisible(true);
-		verify(mockView).setEntityNameVisible(false);
 	}
 	
 }

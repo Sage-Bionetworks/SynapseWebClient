@@ -47,7 +47,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Anchor projectHeadingAnchor;
 	@UiField
-	Div projectHeading;
+	Div headingPanel;
 
 	@UiField
 	Button dashboardButton;
@@ -137,30 +137,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
-	public void hideProjectHeaderWidget() {
-		projectHeading.setVisible(false);
-	}
-	
-	@Override
-	public void showProjectHeaderWidget() {
-		projectHeading.setVisible(true);
-	}
-	
-	@Override
 	public void setProjectFavoriteWidget(IsWidget favWidget) {
 		projectFavoritePanel.setWidget(favWidget);
 	}
 	
 	@Override
-	public void hideSynapseLogo() {
-		synapseLogo.setVisible(false);
-	}
-	
-	@Override
 	public void showLargeLogo() {
 		synapseLogo.setHeight("66px");
-		synapseLogo.setWidth("332px");
-		synapseLogo.setVisible(true);
+		synapseLogo.setWidth("66px");
 		headerDiv.setHeight("100px");
 		headerDiv.setPaddingTop(16);
 	}
@@ -168,8 +152,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void showSmallLogo() {
 		synapseLogo.setHeight("25px");
-		synapseLogo.setWidth("126px");
-		synapseLogo.setVisible(true);
+		synapseLogo.setWidth("25px");
 		headerDiv.setHeight("50px");
 		headerDiv.setPaddingTop(9);
 	}

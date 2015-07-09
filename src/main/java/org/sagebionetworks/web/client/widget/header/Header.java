@@ -54,7 +54,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 	
 	public void configure(boolean largeLogo) {
-		view.hideProjectHeaderWidget();
+		view.setProjectHeaderText("Synapse");
+		view.setProjectHeaderAnchorTarget("#");
 		if (largeLogo) {
 			view.showLargeLogo();
 		} else {
@@ -67,12 +68,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		favWidget.configure(projectId);
 		view.setProjectHeaderAnchorTarget("#!Synapse:" + projectId);
 		view.setProjectHeaderText(projectHeader.getName());
-		view.hideSynapseLogo();
-		view.showProjectHeaderWidget();
-	}
-
-	public void hideSynapseLogo() {
-		view.hideSynapseLogo();
 	}
 
 	public Widget asWidget() {

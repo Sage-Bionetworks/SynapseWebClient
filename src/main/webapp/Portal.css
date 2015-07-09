@@ -911,7 +911,7 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
-.color-white, .color-white:hover, .color-white:visited {
+.color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
 }
 
@@ -1331,6 +1331,11 @@ strong {
 .underline {
 	text-decoration: underline;
 }
+
+.textDecorationNone, .textDecorationNone:visited, .textDecorationNone:hover, .textDecorationNone:focus, .textDecorationNone:active {
+	text-decoration: none;
+}
+
 ol.decimal {	
 	list-style: decimal outside;
 	padding: 0 0 0 30px;

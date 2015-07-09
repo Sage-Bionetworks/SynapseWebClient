@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Versionable;
@@ -13,7 +12,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -37,20 +35,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT
 			.create(EntityMetadataViewImplUiBinder.class);
 
-	@UiField
-	HTMLPanel entityNamePanel;
+
 	@UiField
 	HTMLPanel detailedMetadata;
 	@UiField
 	HTMLPanel dataUseContainer;
 	@UiField
-	Icon entityIcon;
-	@UiField
-	SpanElement entityName;
-	@UiField
 	TextBox idField;
-	@UiField
-	SimplePanel favoritePanel;
 	@UiField
 	SimplePanel doiPanel;
 	@UiField
@@ -78,11 +69,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
 		this.restrictionWidget = restrictionWidget;
-		initWidget(uiBinder.createAndBindUi(this));
-				
-		favoritePanel.addStyleName("inline-block");
-		favoritePanel.setWidget(favoriteWidget.asWidget());
-		
+		initWidget(uiBinder.createAndBindUi(this));		
 		doiPanel.addStyleName("inline-block");
 		doiPanel.setWidget(doiWidget.asWidget());
 		annotationsContainer.setWidget(annotationsWidget.asWidget());
@@ -115,9 +102,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		entityIcon.setType(DisplayUtils.getIconTypeForEntity(e));
-		
-		setEntityName(e.getName());
 		setEntityId(e.getId());
 					
 		dataUseContainer.clear();
@@ -167,19 +151,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		detailedMetadata.setVisible(visible);
 	}
 	
-	@Override
-	public void setEntityNameVisible(boolean visible) {
-		this.entityNamePanel.setVisible(visible);
-	}
-	
 	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	public void setEntityName(String text) {
-		entityName.setInnerText(text);
 	}
 
 	public void setEntityId(String text) {

@@ -8,11 +8,6 @@
   <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
  
 	<g:HTMLPanel>
-		<h2 style="margin-bottom: 0px;">	
-			<g:HTMLPanel ui:field="entityNamePanel">			
-				 <b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE" />&nbsp;<span ui:field="entityName"/>&nbsp;<g:SimplePanel ui:field="favoritePanel"/>			
-			</g:HTMLPanel>
-		</h2>
 		<g:HTMLPanel ui:field="detailedMetadata">
 		    <bh:Div>
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />

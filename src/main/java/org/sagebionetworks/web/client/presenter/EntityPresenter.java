@@ -244,7 +244,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		entityPageTop.clearState();
 		entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 		entityPageTop.refresh();
-		headerWidget.hideSynapseLogo();
 		headerWidget.setProjectHeader(projectHeader);
 		view.setEntityPageTopWidget(entityPageTop);
 	}
