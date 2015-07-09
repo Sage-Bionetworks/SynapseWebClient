@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -85,6 +86,7 @@ public class TeamPresenterTest {
 		mockOpenUserInvitationsWidget = mock(OpenUserInvitationsWidget.class);
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, mockSynClient, mockJSONAdapter, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, mockInviteModal, mockJoinWidget, mockMemberListWidget, mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget);
 		mockTeam = mock(Team.class);
+		when(mockTeam.getName()).thenReturn(teamName);
 		mockTeamBundle = mock(TeamBundle.class);
 		mockTeamMembershipStatus = mock(TeamMembershipStatus.class);
 		AsyncMockStubber.callSuccessWith(mockTeamBundle).when(mockSynClient)
@@ -125,7 +127,7 @@ public class TeamPresenterTest {
 		verify(mockOpenMembershipRequestsWidget).configure(eq(teamId), any(Callback.class));
 		verify(mockOpenUserInvitationsWidget).configure(eq(teamId), any(Callback.class));
 		verify(mockView).showAdminMenuItems();
-		
+		verify(mockView).setTeamEmailAddress(anyString());
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
@@ -175,4 +177,11 @@ public class TeamPresenterTest {
 		verify(mockView, never()).showAdminMenuItems();
 	}
 
+	@Test
+	public void testGetTeamEmail() {
+		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic"));
+		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here"));
+		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail("  unlikely\t case "));
+	}
+	
 }
