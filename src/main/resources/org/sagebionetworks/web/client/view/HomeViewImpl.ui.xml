@@ -105,6 +105,7 @@
 					<li data-target="#myCarousel" data-slide-to="5"></li>
 					<li data-target="#myCarousel" data-slide-to="6"></li>
 					<li data-target="#myCarousel" data-slide-to="7"></li>
+					<li data-target="#myCarousel" data-slide-to="8"></li>
 				  </ol>
 			      <div class="carousel-inner">
 			        <div class="item active">
@@ -112,6 +113,15 @@
 			        </div>
 			        <div class="item">
 			          <a href="#!Synapse:syn2580853"><g:Image resource='{sageImageBundle.ampAd}' /></a>
+			        </div>
+			        
+			        <div class="item">
+			          <a href="#!Synapse:syn3157598"><g:Image resource='{sageImageBundle.dreamU4C}' /></a>
+			          <div class="container">
+			            <div class="carousel-caption">
+			              <p><a class="btn btn-large btn-primary" style="position: relative; top: 20px; " href="#!Synapse:syn3157598">Challenge Details &amp; Sign Up</a></p>
+			            </div>
+			          </div>
 			        </div>
 			        <!-- <div class="item">
 			          <a href="#!Synapse:syn2813589"><g:Image resource='{sageImageBundle.dreamSMCRNA}' /></a>
