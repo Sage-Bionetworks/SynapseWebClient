@@ -181,7 +181,7 @@ public class TeamPresenterTest {
 	public void testGetTeamEmail() {
 		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic"));
 		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here"));
-		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail("  unlikely\t case "));
+		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail(" \n\r unlikely\t case "));
 	}
 	
 }
