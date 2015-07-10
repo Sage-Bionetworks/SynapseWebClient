@@ -181,7 +181,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	}
 	
 	public String getTeamEmail(String teamName) {
-		return teamName.replaceAll("\\s", "") + "@synapse.org";
+		//strip out any non-word character.  Not a (letter, number, underscore)
+		return teamName.replaceAll("\\W", "") + "@synapse.org";
 	}
 	
 	private void showView(org.sagebionetworks.web.client.place.Team place) {
