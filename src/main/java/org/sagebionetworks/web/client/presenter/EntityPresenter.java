@@ -134,7 +134,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundle bundle) {		
+			public void onSuccess(EntityBundle bundle) {
 				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}

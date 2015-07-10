@@ -129,6 +129,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
 			final Callback callback, final boolean isEmbeddedInOwnerPage) {
 		clear();
+		view.showMainPanel();
 		view.showLoading();
 		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
@@ -271,7 +272,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			list.setReferences(allRefs);
 			synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
-				public void onSuccess(PaginatedResults<EntityHeader> headers) {	
+				public void onSuccess(PaginatedResults<EntityHeader> headers) {
 					if (headers.getTotalNumberOfResults() == 1) {
 						EntityHeader theHeader = headers.getResults().get(0);
 						String ownerObjectName = theHeader.getName();
@@ -295,6 +296,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	
 	private void refresh() {
+		view.showMainPanel();
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
 	}
 
@@ -463,12 +465,12 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void show404() {
-		view.clear();
+		view.hideMainPanel();
 		synapseAlert.show404();
 	}
 	
 	public void show403() {
-		view.clear();
+		view.hideMainPanel();
 		synapseAlert.show403();
 	}
 }

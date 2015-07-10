@@ -8,7 +8,6 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -37,6 +36,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	WikiPageWidgetView.Presenter presenter;
 
+	@UiField
+	FlowPanel mainPanel;
+	
 	@UiField
 	Italic noWikiCanEditMessage;
 	
@@ -152,6 +154,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void clear() {
+		loadingPanel.setVisible(false);
 		diffVersionAlert.setVisible(false);
 		noWikiCanEditMessage.setVisible(false);
 		noWikiCannotEditMessage.setVisible(false);
@@ -340,6 +343,16 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void showMarkdown() {
 		markdownPanel.setVisible(true);		
+	}
+
+	@Override
+	public void showMainPanel() {
+		mainPanel.setVisible(true);
+	}
+
+	@Override
+	public void hideMainPanel() {
+		mainPanel.setVisible(false);
 	}
 	
 }
