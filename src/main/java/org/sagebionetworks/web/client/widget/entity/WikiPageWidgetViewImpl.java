@@ -36,6 +36,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	WikiPageWidgetView.Presenter presenter;
 
 	@UiField
+	FlowPanel mainPanel;
+	
+	@UiField
 	Italic noWikiCanEditMessage;
 	
 	@UiField
@@ -150,6 +153,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void clear() {
+		loadingPanel.setVisible(false);
 		diffVersionAlert.setVisible(false);
 		noWikiCanEditMessage.setVisible(false);
 		noWikiCannotEditMessage.setVisible(false);
@@ -338,6 +342,16 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void showMarkdown() {
 		markdownPanel.setVisible(true);		
+	}
+
+	@Override
+	public void showMainPanel() {
+		mainPanel.setVisible(true);
+	}
+
+	@Override
+	public void hideMainPanel() {
+		mainPanel.setVisible(false);
 	}
 	
 }
