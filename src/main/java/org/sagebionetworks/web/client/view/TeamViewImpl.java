@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -71,6 +72,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	AnchorListItem deleteTeamItem;
 	@UiField
 	AnchorListItem inviteMemberItem;
+	@UiField
+	TextBox synapseEmailField;
 	
 	private Team team;
 	private DropdownButton toolsButton;
@@ -123,6 +126,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 				presenter.showLeaveModal();
 			}
 		});
+		synapseEmailField.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				synapseEmailField.selectAll();
+			}
+		});
 	}
 	
 	@Override
@@ -134,6 +143,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		deleteTeamItem.setVisible(false);
 		leaveTeamItem.setVisible(false);
 		publicJoinField.setVisible(false);
+		synapseEmailField.setValue("");
 	}
 	
 	@Override
@@ -243,4 +253,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 		totalMemberCountField.setText(memberCount);
 	}
 
+	@Override
+	public void setTeamEmailAddress(String teamEmail) {
+		synapseEmailField.setValue(teamEmail);
+	}
 }
