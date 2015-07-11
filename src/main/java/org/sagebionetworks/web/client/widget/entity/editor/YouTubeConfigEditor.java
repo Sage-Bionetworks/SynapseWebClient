@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -19,7 +18,6 @@ public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEd
 	@Inject
 	public YouTubeConfigEditor(IFrameConfigView view) {
 		this.view = view;
-		view.setPresenter(this);
 		view.initView();
 	}
 	@Override
@@ -30,7 +28,6 @@ public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEd
 			view.setVideoUrl("http://www.youtube.com/watch?v=" + videoId);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}
@@ -77,7 +74,5 @@ public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEd
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-	/*
-	 * Private Methods
-	 */
+
 }

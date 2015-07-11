@@ -479,6 +479,8 @@ import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditorView;
+import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditorViewImpl;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
@@ -1068,6 +1070,10 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//Request Team membership widget
 		bind(JoinTeamWidgetView.class).to(JoinTeamWidgetViewImpl.class);
+		
+		//Join Team Button Config widget
+		bind(JoinTeamConfigEditorView.class).to(JoinTeamConfigEditorViewImpl.class);
+		
 		//Submit to evaluation widget
 		bind(SubmitToEvaluationWidgetView.class).to(SubmitToEvaluationWidgetViewImpl.class);
 		//Team renderer

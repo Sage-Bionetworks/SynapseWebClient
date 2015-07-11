@@ -12,7 +12,6 @@ import com.google.inject.Inject;
 public class IFrameConfigViewImpl implements IFrameConfigView {
 	public interface IFrameConfigViewImplUiBinder extends UiBinder<Widget, IFrameConfigViewImpl> {}
 	private Widget widget;
-	private Presenter presenter;
 	@UiField
 	TextBox urlField;
 	
@@ -45,11 +44,6 @@ public class IFrameConfigViewImpl implements IFrameConfigView {
 	public Widget asWidget() {
 		return widget;
 	}	
-	
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {

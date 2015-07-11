@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 
 
@@ -55,6 +56,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getYouTubeConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.VIMEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVimeoConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.JOIN_TEAM_CONTENT_TYPE)) {
+			presenter = ginInjector.getJoinTeamConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
@@ -86,7 +89,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getPreviewConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
-		
 		if (presenter != null)
 			presenter.configure(wikiKey, model, dialogCallback);
 		return presenter;
@@ -242,6 +244,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PREVIEW_CONTENT_TYPE, WidgetConstants.PREVIEW_FRIENDLY_NAME);
+//		registerWidget(WidgetConstants., WidgetConstants.IMAGE_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

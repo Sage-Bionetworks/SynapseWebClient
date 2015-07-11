@@ -304,7 +304,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			insertNewWidget(WidgetConstants.IMAGE_CONTENT_TYPE);
 			break;
 		case INSERT_JOIN_TEAM:
-			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_TEAM_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY + "=42&" + WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY + "=false&" +WidgetConstants.IS_MEMBER_MESSAGE + "=You have successfully joined the team&" + WidgetConstants.JOIN_TEAM_BUTTON_TEXT + "="+WidgetConstants.JOIN_TEAM_DEFAULT_BUTTON_TEXT+"&" + WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON + "=false&" + WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT + "="+WidgetConstants.JOIN_TEAM_DEFAULT_OPEN_REQUEST_TEXT+"&"+WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE + "="+WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE + WidgetConstants.WIDGET_END_MARKDOWN);
+			insertNewWidget(WidgetConstants.JOIN_TEAM_CONTENT_TYPE);
+//			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_TEAM_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY + "=42&" + WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY + "=false&" +WidgetConstants.IS_MEMBER_MESSAGE + "=You have successfully joined the team&" + WidgetConstants.JOIN_TEAM_BUTTON_TEXT + "="+WidgetConstants.JOIN_TEAM_DEFAULT_BUTTON_TEXT+"&" + WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON + "=false&" + WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT + "="+WidgetConstants.JOIN_TEAM_DEFAULT_OPEN_REQUEST_TEXT+"&"+WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE + "="+WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE + WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
 		case INSERT_LINK:
 			insertNewWidget(WidgetConstants.LINK_CONTENT_TYPE);
