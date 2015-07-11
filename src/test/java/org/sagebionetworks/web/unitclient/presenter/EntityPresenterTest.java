@@ -137,7 +137,7 @@ public class EntityPresenterTest {
 		verify(mockView).hideLoading();
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).showEntityPageTop();
-		verify(mockEntityPageTop, times(3)).clearState();
+		verify(mockEntityPageTop).clearState();
 		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockEntityPageTop).refresh();
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
@@ -157,7 +157,7 @@ public class EntityPresenterTest {
 		verify(mockView).hideLoading();
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).showEntityPageTop();
-		verify(mockEntityPageTop, times(3)).clearState();
+		verify(mockEntityPageTop).clearState();
 		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockEntityPageTop).refresh();
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
