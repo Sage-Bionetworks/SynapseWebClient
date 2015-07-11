@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph;
+import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph242;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -72,7 +72,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 					entityView.getElement().setId(id);
 					//{"elements":{"nodes":[{"data":{"id":"foo"},"position":{"x":120,"y":120}},{"data":{"id":"bar"},"position":{"x":110,"y":110}},{"data":{"weight":100},"group":"nodes","position":{"x":100,"y":100},"selected":true,"selectable":true,"locked":true,"grabbable":true}],"edges":[{"data":{"id":"baz","source":"foo","target":"bar"}}]},"style":[{"selector":"node","style":{"content":"data(id)"}}]}
 					String cytoscapeGraphJson = "{\"elements\":{\"nodes\":[{\"data\":{\"id\":\"foo\"},\"position\":{\"x\":120,\"y\":120}},{\"data\":{\"id\":\"bar\"},\"position\":{\"x\":110,\"y\":110}},{\"data\":{\"weight\":100},\"group\":\"nodes\",\"position\":{\"x\":100,\"y\":100},\"selected\":true,\"selectable\":true,\"locked\":true,\"grabbable\":true}],\"edges\":[{\"data\":{\"id\":\"baz\",\"source\":\"foo\",\"target\":\"bar\"}}]},\"style\":[{\"selector\":\"node\",\"style\":{\"content\":\"data(id)\"}}]}";
-					new CytoscapeGraph().show(id,  cytoscapeGraphJson);
+					new CytoscapeGraph242().show(id,  cytoscapeGraphJson);
 				};
 			}
 		});
