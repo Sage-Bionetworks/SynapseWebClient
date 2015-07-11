@@ -911,7 +911,7 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
-.color-white, .color-white:hover, .color-white:visited {
+.color-white, .color-white:hover, .color-white:visited, .color-white:focus {
 	color: white;
 }
 
@@ -964,6 +964,10 @@ i.font-size-150 {
 
 .font-size-90 {
 	font-size: 90px;
+}
+
+.font-size-70 {
+	font-size: 70px;
 }
 
 .font-size-58 {
@@ -1331,6 +1335,11 @@ strong {
 .underline {
 	text-decoration: underline;
 }
+
+.textDecorationNone, .textDecorationNone:visited, .textDecorationNone:hover, .textDecorationNone:focus, .textDecorationNone:active {
+	text-decoration: none;
+}
+
 ol.decimal {	
 	list-style: decimal outside;
 	padding: 0 0 0 30px;

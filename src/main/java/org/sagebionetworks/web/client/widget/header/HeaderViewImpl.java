@@ -31,6 +31,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,7 +45,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Div headerDiv;
 	@UiField
-	Div headerImageDiv;
+	Anchor projectHeadingAnchor;
+	@UiField
+	Div headingPanel;
 
 	@UiField
 	Button dashboardButton;
@@ -66,6 +69,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	AnchorListItem restAPILink;
 
+	@UiField
+	SimplePanel projectFavoritePanel;
 	@UiField
 	SimplePanel registerLinkUI;
 	@UiField
@@ -122,17 +127,49 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	@Override
+	public void setProjectHeaderText(String text) {
+		projectHeadingAnchor.setText(text);
+	}
+	
+	@Override
+	public void setProjectHeaderAnchorTarget(String href) {
+		projectHeadingAnchor.setHref(href);
+	}
+	
+	@Override
+	public void setProjectFavoriteWidget(IsWidget favWidget) {
+		projectFavoritePanel.setWidget(favWidget);
+	}
+	
+	@Override
+	public void showProjectFavoriteWidget() {
+		projectFavoritePanel.setVisible(true);
+	}
+	
+	@Override
+	public void hideProjectFavoriteWidget() {
+		projectFavoritePanel.setVisible(false);
+	}
+	
+	@Override
 	public void showLargeLogo() {
+		projectHeadingAnchor.addStyleName("font-size-70");
+		projectHeadingAnchor.addStyleName("font-size-70");
+		synapseLogo.removeStyleName("margin-bottom-15");
+		synapseLogo.addStyleName("margin-bottom-40");
 		synapseLogo.setHeight("66px");
-		synapseLogo.setWidth("332px");
+		synapseLogo.setWidth("66px");
 		headerDiv.setHeight("100px");
 		headerDiv.setPaddingTop(16);
 	}
 	
 	@Override
 	public void showSmallLogo() {
+		projectHeadingAnchor.removeStyleName("font-size-70");
+		synapseLogo.removeStyleName("margin-bottom-40");
+		synapseLogo.addStyleName("margin-bottom-15");
 		synapseLogo.setHeight("25px");
-		synapseLogo.setWidth("126px");
+		synapseLogo.setWidth("25px");
 		headerDiv.setHeight("50px");
 		headerDiv.setPaddingTop(9);
 	}
