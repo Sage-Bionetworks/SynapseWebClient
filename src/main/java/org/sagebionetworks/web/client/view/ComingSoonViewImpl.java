@@ -70,7 +70,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 				if (event.isAttached()) {
 					String id = "cy1";
 					entityView.getElement().setId(id);
-					//{"elements":{"nodes":[{"data":{"id":"foo"},"position":{"x":120,"y":120}},{"data":{"id":"bar"},"position":{"x":110,"y":110}},{"data":{"weight":100},"group":"nodes","position":{"x":100,"y":100},"selected":true,"selectable":true,"locked":true,"grabbable":true}],"edges":[{"data":{"id":"baz","source":"foo","target":"bar"}}]},"style":[{"selector":"node","style":{"content":"data(id)"}}]}
 					//cyjs is exported from Cytoscape via File->Export->Network->Cytoscape.js JSON (.cyjs)
 					String cyjs = CYJS;
 					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
