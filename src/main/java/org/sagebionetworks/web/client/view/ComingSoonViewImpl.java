@@ -71,8 +71,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 					String id = "cy1";
 					entityView.getElement().setId(id);
 					//{"elements":{"nodes":[{"data":{"id":"foo"},"position":{"x":120,"y":120}},{"data":{"id":"bar"},"position":{"x":110,"y":110}},{"data":{"weight":100},"group":"nodes","position":{"x":100,"y":100},"selected":true,"selectable":true,"locked":true,"grabbable":true}],"edges":[{"data":{"id":"baz","source":"foo","target":"bar"}}]},"style":[{"selector":"node","style":{"content":"data(id)"}}]}
-					String cytoscapeGraphJson = "{\"elements\":{\"nodes\":[{\"data\":{\"id\":\"foo\"},\"position\":{\"x\":120,\"y\":120}},{\"data\":{\"id\":\"bar\"},\"position\":{\"x\":110,\"y\":110}},{\"data\":{\"weight\":100},\"group\":\"nodes\",\"position\":{\"x\":100,\"y\":100},\"selected\":true,\"selectable\":true,\"locked\":true,\"grabbable\":true}],\"edges\":[{\"data\":{\"id\":\"baz\",\"source\":\"foo\",\"target\":\"bar\"}}]},\"style\":[{\"selector\":\"node\",\"style\":{\"content\":\"data(id)\"}}]}";
-					new CytoscapeGraph242().show(id,  cytoscapeGraphJson);
+					//cyjs is exported from Cytoscape via File->Export->Network->Cytoscape.js JSON (.cyjs)
+					String cyjs = CYJS;
+					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
+					String styleJson = null; //set to null to avoid checking in large test constant
+					new CytoscapeGraph242().show(id,  cyjs, styleJson);
 				};
 			}
 		});
@@ -112,4 +115,152 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	public void clear() {		
 	}
 	
+	private static final String CYJS="{\r\n" + 
+			"  \"format_version\" : \"1.0\",\r\n" + 
+			"  \"generated_by\" : \"cytoscape-3.2.1\",\r\n" + 
+			"  \"target_cytoscapejs_version\" : \"~2.1\",\r\n" + 
+			"  \"data\" : {\r\n" + 
+			"    \"selected\" : true,\r\n" + 
+			"    \"__Annotations\" : [ ],\r\n" + 
+			"    \"shared_name\" : \"TeamExample-UACC812-Network-Prior.sif\",\r\n" + 
+			"    \"SUID\" : 52,\r\n" + 
+			"    \"name\" : \"TeamExample-UACC812-Network-Prior.sif\"\r\n" + 
+			"  },\r\n" + 
+			"  \"elements\" : {\r\n" + 
+			"    \"nodes\" : [ {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"128\",\r\n" + 
+			"        \"shared_name\" : \"GSK3-alpha-beta_pS21_S9\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 128,\r\n" + 
+			"        \"name\" : \"GSK3-alpha-beta_pS21_S9\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"115\",\r\n" + 
+			"        \"shared_name\" : \"Src_pY527\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 115,\r\n" + 
+			"        \"name\" : \"Src_pY527\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"113\",\r\n" + 
+			"        \"shared_name\" : \"Src_pY416\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 113,\r\n" + 
+			"        \"name\" : \"Src_pY416\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"111\",\r\n" + 
+			"        \"shared_name\" : \"S6_pS240_S244\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 111,\r\n" + 
+			"        \"name\" : \"S6_pS240_S244\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"107\",\r\n" + 
+			"        \"shared_name\" : \"Rb_pS807_S811\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 107,\r\n" + 
+			"        \"name\" : \"Rb_pS807_S811\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"106\",\r\n" + 
+			"        \"shared_name\" : \"PRAS40_pT246\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 106,\r\n" + 
+			"        \"name\" : \"PRAS40_pT246\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"92\",\r\n" + 
+			"        \"shared_name\" : \"STAT3_pY705\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 92,\r\n" + 
+			"        \"name\" : \"STAT3_pY705\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"90\",\r\n" + 
+			"        \"shared_name\" : \"GSK3-alpha-beta_pS9\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 90,\r\n" + 
+			"        \"name\" : \"GSK3-alpha-beta_pS9\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"83\",\r\n" + 
+			"        \"shared_name\" : \"CHK1_pS345\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 83,\r\n" + 
+			"        \"name\" : \"CHK1_pS345\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"76\",\r\n" + 
+			"        \"shared_name\" : \"MAPK_pT202_Y204\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 76,\r\n" + 
+			"        \"name\" : \"MAPK_pT202_Y204\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"67\",\r\n" + 
+			"        \"shared_name\" : \"ACC_pS79\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 67,\r\n" + 
+			"        \"name\" : \"ACC_pS79\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"63\",\r\n" + 
+			"        \"shared_name\" : \"BAD_pS112\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"SUID\" : 63,\r\n" + 
+			"        \"name\" : \"BAD_pS112\"\r\n" + 
+			"      }\r\n" + 
+			"    } ],\r\n" + 
+			"    \"edges\" : [ {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"116\",\r\n" + 
+			"        \"source\" : \"115\",\r\n" + 
+			"        \"target\" : \"92\",\r\n" + 
+			"        \"interaction\" : \"1\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"shared_interaction\" : \"1\",\r\n" + 
+			"        \"shared_name\" : \"Src_pY527 (1) STAT3_pY705\",\r\n" + 
+			"        \"SUID\" : 116,\r\n" + 
+			"        \"name\" : \"Src_pY527 (1) STAT3_pY705\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"114\",\r\n" + 
+			"        \"source\" : \"111\",\r\n" + 
+			"        \"target\" : \"113\",\r\n" + 
+			"        \"interaction\" : \"1\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"shared_interaction\" : \"1\",\r\n" + 
+			"        \"shared_name\" : \"S6_pS240_S244 (1) Src_pY416\",\r\n" + 
+			"        \"SUID\" : 114,\r\n" + 
+			"        \"name\" : \"S6_pS240_S244 (1) Src_pY416\"\r\n" + 
+			"      }\r\n" + 
+			"    }, {\r\n" + 
+			"      \"data\" : {\r\n" + 
+			"        \"id\" : \"108\",\r\n" + 
+			"        \"source\" : \"106\",\r\n" + 
+			"        \"target\" : \"107\",\r\n" + 
+			"        \"interaction\" : \"1\",\r\n" + 
+			"        \"selected\" : false,\r\n" + 
+			"        \"shared_interaction\" : \"1\",\r\n" + 
+			"        \"shared_name\" : \"PRAS40_pT246 (1) Rb_pS807_S811\",\r\n" + 
+			"        \"SUID\" : 108,\r\n" + 
+			"        \"name\" : \"PRAS40_pT246 (1) Rb_pS807_S811\"\r\n" + 
+			"      }\r\n" + 
+			"    } ]\r\n" + 
+			"  }\r\n" + 
+			"}";
 }
