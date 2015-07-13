@@ -1,22 +1,14 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,9 +18,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	private UserGroupSuggestBoxView view;
 	private UserGroupSuggestOracle oracle;
-	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
 	
 	private String baseFileHandleUrl;
 	private String baseProfileAttachmentUrl;
@@ -36,24 +25,26 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	private UserGroupSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
 	private CallbackP<UserGroupSuggestion> callback;
-	boolean isLoading;
+	
+	
 	@Inject
 	public UserGroupSuggestBox(UserGroupSuggestBoxView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			SageImageBundle sageImageBundle) {
-		this.view = view;
-		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
-		
-		oracle = view.getUserGroupSuggestOracle();
+		this.view = view;		
+//		oracle = view.getUserGroupSuggestOracle();
 		view.setPresenter(this);
 	}
 	
+	public void setOracle(UserGroupSuggestOracle oracle) {
+		this.view.configure(oracle);
+		this.oracle = oracle;
+		oracle.configure(this, PAGE_SIZE);
+	}
+	
 	public void configureURLs(String baseFileHandleUrl, String baseProfileAttachmentUrl) {
-		isLoading = false;
 		this.baseFileHandleUrl = baseFileHandleUrl;
 		this.baseProfileAttachmentUrl = baseProfileAttachmentUrl;
 	}
@@ -86,53 +77,15 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	@Override
 	public void getPrevSuggestions() {
 		offset -= PAGE_SIZE;
-		getSuggestions(oracle.getRequest(), oracle.getCallback());
+		oracle.getSuggestions(offset, view.getText());
 	}
 
 	@Override
 	public void getNextSuggestions() {
 		offset += PAGE_SIZE;
-		getSuggestions(oracle.getRequest(), oracle.getCallback());
+		oracle.getSuggestions(offset, view.getText());
 	}
-	
-	public void getSuggestions(final SuggestOracle.Request request, final SuggestOracle.Callback callback) {
-		if (!isLoading) {
-			isLoading = true;
-			view.showLoading();
-			
-			String prefix = request.getQuery();
-			final List<Suggestion> suggestions = new LinkedList<Suggestion>();
-			synapseClient.getUserGroupHeadersByPrefix(prefix, PAGE_SIZE, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
-				@Override
-				public void onSuccess(UserGroupHeaderResponsePage result) {
-					// Update view fields.
-					view.updateFieldStateForSuggestions(result, offset);
-					
-					// Load suggestions.
-					for (UserGroupHeader header : result.getChildren()) {
-						suggestions.add(oracle.makeUserGroupSuggestion(header, view.getText()));
-					}
-	
-					// Set up response
-					SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
-					callback.onSuggestionsReady(request, response);
-					
-					view.hideLoading();
-					isLoading = false;
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
-						view.showErrorMessage(caught.getMessage());
-					}
-					isLoading = false;
-				}
-	
-			});
-		}
-	}
-	
+
 	@Override
 	public UserGroupSuggestion getSelectedSuggestion() {
 		return selectedSuggestion;
@@ -154,17 +107,35 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		view.clear();
 	}
 	
-	/**
-	 * For testing. This would break the suggest box, as it does
-	 * not update the view's oracle.
-	 * @param oracle
-	 */
-	public void setOracle(UserGroupSuggestOracle oracle) {
-		this.oracle = oracle;
-	}
-	
 	@Override
 	public void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback) {
 		this.callback = callback;
+	}
+
+	@Override
+	public void showLoading() {
+		view.showLoading();
+	}
+
+	@Override
+	public void hideLoading() {
+		view.hideLoading();
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		view.showErrorMessage(message);
+	}
+
+	// Is this the correct passthrough?
+	@Override
+	public void updateFieldStateForSuggestions(
+			UserGroupHeaderResponsePage result, int offset) {
+		view.updateFieldStateForSuggestions(result, offset);
+	}
+
+	@Override
+	public void handleOracleException(Throwable caught) {
+		// show errors
 	}
 }

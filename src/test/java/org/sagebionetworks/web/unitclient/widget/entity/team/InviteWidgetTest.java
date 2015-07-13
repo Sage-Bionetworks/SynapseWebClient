@@ -20,7 +20,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -43,6 +45,7 @@ public class InviteWidgetTest {
 	UserGroupHeader mockHeader;
 	UserGroupSuggestion mockSuggestion;
 	AuthenticationController mockAuthenticationController;
+	UserGroupSuggestOracleImpl mockOracle;
 	Callback mockRefreshCallback;
 	GWTWrapper mockGWTWrapper;
 	
@@ -59,8 +62,9 @@ public class InviteWidgetTest {
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockHeader = mock(UserGroupHeader.class);
 		mockTeam = mock(Team.class);
+		mockOracle = mock(UserGroupSuggestOracleImpl.class);
 		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockAuthenticationController,
-				mockGlobalApplicationState, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockJSNIUtils);
+				mockGlobalApplicationState, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockJSNIUtils, mockOracle);
 		mockRefreshCallback = mock(Callback.class);
 		inviteWidget.configure(mockTeam);
 		inviteWidget.setRefreshCallback(mockRefreshCallback);

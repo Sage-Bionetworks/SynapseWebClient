@@ -6,7 +6,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,9 +25,15 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 	private Presenter presenter;
 	SuggestBox suggestBox;
 	TextBox selectedItem;
+	SageImageBundle sageImageBundle;
 	
 	@Inject
-	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracle oracle, SageImageBundle sageImageBundle) {
+	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracleImpl oracle, SageImageBundle sageImageBundle) {
+		this.sageImageBundle = sageImageBundle;
+	}
+	
+	@Override
+	public void configure(UserGroupSuggestOracle oracle) {
 		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		suggestBox.getValueBox().addStyleName("form-control");
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
@@ -76,6 +82,7 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 		});
 		this.add(suggestBox);
 		this.add(selectedItem);
+//		getUserGroupSuggestOracle().configure((UserGroupSuggestBox) presenter, 5);
 	}
 	
 	@Override
@@ -153,13 +160,13 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		getUserGroupSuggestOracle().configure((UserGroupSuggestBox) presenter);
 	}
 	
 	@Override
-	public UserGroupSuggestOracle getUserGroupSuggestOracle() {
-		return (UserGroupSuggestOracle) suggestBox.getSuggestOracle();
+	public UserGroupSuggestOracleImpl getUserGroupSuggestOracle() {
+		return (UserGroupSuggestOracleImpl) suggestBox.getSuggestOracle();
 	}
+	
 	@Override
 	public String getText() {
 		return suggestBox.getText();

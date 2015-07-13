@@ -101,6 +101,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
@@ -322,6 +323,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityTreeItem getEntityTreeItemWidget();
 	public MoreTreeItem getMoreTreeWidget();
 	public UserGroupListWidget getUserGroupListWidget();
+	public UserGroupSuggestOracleImpl getUserGroupSuggestOracleImpl();
 	
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();

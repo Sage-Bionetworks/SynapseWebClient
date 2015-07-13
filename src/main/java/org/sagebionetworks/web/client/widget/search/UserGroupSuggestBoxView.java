@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.search;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -15,7 +15,7 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 	 * @return The text of the currently contained in the suggest box.
 	 */
 	String getText();
-	UserGroupSuggestOracle getUserGroupSuggestOracle();
+	UserGroupSuggestOracleImpl getUserGroupSuggestOracle();
 	void hideLoading();
 	void clear();
 	void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset);
@@ -47,5 +47,13 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 		void getNextSuggestions();
 		
 		void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
+		void showLoading();
+		void hideLoading();
+		void showErrorMessage(String message);
+		void updateFieldStateForSuggestions(UserGroupHeaderResponsePage result,
+				int offset);
+		void handleOracleException(Throwable caught);
 	}
+
+	void configure(UserGroupSuggestOracle oracle);
 }

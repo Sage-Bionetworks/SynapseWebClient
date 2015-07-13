@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
 
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,19 +16,21 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	UrlCache urlCache;
 	SynapseJSNIUtils synapseJSNIUtils;
 	UserGroupSuggestBox suggestBox;
+	UserGroupSuggestOracleImpl oracle;
 	
 	@Inject
-	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, UserGroupSuggestBox suggestBox) {
+	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, UserGroupSuggestBox suggestBox, UserGroupSuggestOracleImpl oracle) {
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.suggestBox = suggestBox;
+		this.oracle = oracle;
 	}
 	
 	@Override
 	public void initView() {
 		clear();
-		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
-		suggestBox.setPlaceholderText("Enter name...");
+		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());		suggestBox.setPlaceholderText("Enter name...");
+		suggestBox.setOracle(oracle);
 		SimplePanel panel = new SimplePanel();
 		panel.setWidget(suggestBox.asWidget());
 		panel.addStyleName("margin-10");

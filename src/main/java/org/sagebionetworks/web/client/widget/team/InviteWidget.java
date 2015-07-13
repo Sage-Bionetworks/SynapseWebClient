@@ -11,7 +11,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,6 +29,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private SynapseAlert synAlert;
 	private UserGroupSuggestBox peopleSuggestWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private UserGroupSuggestOracleImpl oracle;
 	
 	@Inject
 	public InviteWidget(InviteWidgetView view, 
@@ -36,7 +38,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 			GlobalApplicationState globalApplicationState,
 			GWTWrapper gwt, SynapseAlert synAlert,
 			UserGroupSuggestBox peopleSuggestBox,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, UserGroupSuggestOracleImpl oracle) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
@@ -45,6 +47,8 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.oracle = oracle;
+		peopleSuggestWidget.setOracle(oracle);
 		view.setSuggestWidget(peopleSuggestBox.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
