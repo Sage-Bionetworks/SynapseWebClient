@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013;
 import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph242;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,6 +15,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -71,10 +73,12 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 					String id = "cy1";
 					entityView.getElement().setId(id);
 					//cyjs is exported from Cytoscape via File->Export->Network->Cytoscape.js JSON (.cyjs)
-					String cyjs = CYJS;
-					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
-					String styleJson = null; //set to null to avoid checking in large test constant
-					new CytoscapeGraph242().show(id,  cyjs, styleJson);
+//					String cyjs = CYJS;
+//					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
+//					String styleJson = null; //set to null to avoid checking in large test constant
+//					new CytoscapeGraph242().show(id,  cyjs, styleJson);
+					GWT.debugger();
+					new Biodalliance013().show(id);
 				};
 			}
 		});

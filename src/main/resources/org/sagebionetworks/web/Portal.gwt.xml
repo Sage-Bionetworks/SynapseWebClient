@@ -34,6 +34,7 @@
     <inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
     <inherits name="org.gwtbootstrap3.extras.growl.Growl"/>
     <inherits name="org.gwtvisualizationwrappers.CytoscapeJs"/>
+    <inherits name="org.gwtvisualizationwrappers.Biodalliance"/>
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='org.sagebionetworks.web.client.Portal' />
