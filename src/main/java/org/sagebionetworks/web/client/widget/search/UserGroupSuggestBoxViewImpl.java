@@ -3,12 +3,9 @@ package org.sagebionetworks.web.client.widget.search;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.SuggestBox;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -28,19 +25,19 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 	SageImageBundle sageImageBundle;
 	
 	@Inject
-	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracleImpl oracle, SageImageBundle sageImageBundle) {
+	public UserGroupSuggestBoxViewImpl(UserGroupSuggestionProvider oracle, SageImageBundle sageImageBundle) {
 		this.sageImageBundle = sageImageBundle;
 	}
 	
 	@Override
-	public void configure(UserGroupSuggestOracle oracle) {
+	public void configure(SynapseSuggestOracle oracle) {
 		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		suggestBox.getValueBox().addStyleName("form-control");
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
-				selectSuggestion((UserGroupSuggestion) event.getSelectedItem());
+				selectSuggestion((SynapseSuggestion)event.getSelectedItem());
 			}
 			
 		});
@@ -55,7 +52,9 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 				selectedItem.setVisible(false);
 				selectedItem.setText("");
 				if (presenter.getSelectedSuggestion() != null) {
-					suggestBox.setText(presenter.getSelectedSuggestion().getPrefix());
+					// is this the same text that weas being filled in before?
+					suggestBox.setText(selectedItem.getText());
+					//suggestBox.setText(presenter.getSelectedSuggestion().getPrefix());
 				}
 				suggestBox.showSuggestionList();
 			}
@@ -91,18 +90,18 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 	}
 	
 	@Override
-	public void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset) {
+	public void updateFieldStateForSuggestions(int numResults, int offset) {
 		Button prevBtn = ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getPrevButton();
 		Button nextBtn = ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getNextButton();
 		Label resultsLbl = ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getResultsLabel();
 		
 		prevBtn.setEnabled(offset != 0);
-		boolean moreResults = offset + UserGroupSuggestBox.PAGE_SIZE < responsePage.getTotalNumberOfResults();
+		boolean moreResults = offset + UserGroupSuggestBox.PAGE_SIZE < numResults;
 		nextBtn.setEnabled(moreResults);
 		
 		String resultsLabel = "Displaying " + (offset + 1) + " - "
-								+ (moreResults ? offset + UserGroupSuggestBox.PAGE_SIZE : responsePage.getTotalNumberOfResults())
-								+ " of " + responsePage.getTotalNumberOfResults();
+								+ (moreResults ? offset + UserGroupSuggestBox.PAGE_SIZE : numResults)
+								+ " of " + numResults;
 		resultsLbl.setText(resultsLabel);
 	}
 	
@@ -114,7 +113,7 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 		selectedItem.setText("");
 	}
 	
-	public void selectSuggestion(UserGroupSuggestion suggestion) {
+	public void selectSuggestion(SynapseSuggestion suggestion) {
 		// Update the SuggestBox's selected suggestion.
 		presenter.setSelectedSuggestion(suggestion);
 		selectedItem.setText(suggestion.getReplacementString());
@@ -163,8 +162,8 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 	}
 	
 	@Override
-	public UserGroupSuggestOracleImpl getUserGroupSuggestOracle() {
-		return (UserGroupSuggestOracleImpl) suggestBox.getSuggestOracle();
+	public SynapseSuggestOracle getUserGroupSuggestOracle() {
+		return (SynapseSuggestOracle) suggestBox.getSuggestOracle();
 	}
 	
 	@Override

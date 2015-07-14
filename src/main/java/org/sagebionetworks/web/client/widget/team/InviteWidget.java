@@ -4,15 +4,13 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -20,35 +18,28 @@ import com.google.inject.Inject;
 
 public class InviteWidget implements InviteWidgetView.Presenter {
 	private InviteWidgetView view;
-	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private AuthenticationController authenticationController;
 	private Team team;
 	private Callback teamUpdatedCallback;
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private UserGroupSuggestBox peopleSuggestWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private UserGroupSuggestOracleImpl oracle;
 	
 	@Inject
 	public InviteWidget(InviteWidgetView view, 
 			SynapseClientAsync synapseClient, 
-			AuthenticationController authenticationController, 
-			GlobalApplicationState globalApplicationState,
 			GWTWrapper gwt, SynapseAlert synAlert,
 			UserGroupSuggestBox peopleSuggestBox,
-			SynapseJSNIUtils synapseJSNIUtils, UserGroupSuggestOracleImpl oracle) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.gwt = gwt;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.oracle = oracle;
-		peopleSuggestWidget.setOracle(oracle);
+		peopleSuggestWidget.setSuggestionProvider(provider);
 		view.setSuggestWidget(peopleSuggestBox.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
@@ -78,7 +69,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	
 	@Override
 	public void sendInvite(String invitationMessage) {
-		UserGroupSuggestion suggestion = peopleSuggestWidget.getSelectedSuggestion();
+		UserGroupSuggestion suggestion = (UserGroupSuggestion)peopleSuggestWidget.getSelectedSuggestion();
 		if(suggestion != null) {
 			UserGroupHeader header = suggestion.getHeader();
 			String principalId = header.getOwnerId();

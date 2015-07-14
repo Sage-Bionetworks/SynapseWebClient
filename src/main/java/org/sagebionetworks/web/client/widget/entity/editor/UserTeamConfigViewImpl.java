@@ -4,7 +4,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -12,25 +12,25 @@ import com.google.inject.Inject;
 
 public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfigView {
 
-	private Presenter presenter;
 	UrlCache urlCache;
 	SynapseJSNIUtils synapseJSNIUtils;
 	UserGroupSuggestBox suggestBox;
-	UserGroupSuggestOracleImpl oracle;
+	UserGroupSuggestionProvider oracle;
 	
 	@Inject
-	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, UserGroupSuggestBox suggestBox, UserGroupSuggestOracleImpl oracle) {
+	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+			UserGroupSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.suggestBox = suggestBox;
-		this.oracle = oracle;
+		this.suggestBox.setSuggestionProvider(provider);
 	}
 	
 	@Override
 	public void initView() {
 		clear();
 		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());		suggestBox.setPlaceholderText("Enter name...");
-		suggestBox.setOracle(oracle);
+		suggestBox.setPlaceholderText("Enter name...");
 		SimplePanel panel = new SimplePanel();
 		panel.setWidget(suggestBox.asWidget());
 		panel.addStyleName("margin-10");
@@ -43,7 +43,7 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	}
 	@Override
 	public String getId() {
-		return suggestBox.getSelectedSuggestion().getHeader().getOwnerId();
+		return suggestBox.getSelectedSuggestion().getId();
 	}
 	
 	@Override
@@ -53,17 +53,12 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	
 	@Override
 	public String isIndividual() {
-		return suggestBox.getSelectedSuggestion().getHeader().getIsIndividual().toString();
+		return suggestBox.getSelectedSuggestion().isIndividual();
 	}
 	@Override
 	public Widget asWidget() {
 		return this;
 	}	
-	
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {

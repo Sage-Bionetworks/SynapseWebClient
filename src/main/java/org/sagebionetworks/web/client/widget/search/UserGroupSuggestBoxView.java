@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
@@ -15,10 +11,10 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 	 * @return The text of the currently contained in the suggest box.
 	 */
 	String getText();
-	UserGroupSuggestOracleImpl getUserGroupSuggestOracle();
+	SynapseSuggestOracle getUserGroupSuggestOracle();
 	void hideLoading();
 	void clear();
-	void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset);
+	void updateFieldStateForSuggestions(int numResults, int offset);
 	void setPlaceholderText(String text);
 	int getWidth();
 	
@@ -40,20 +36,20 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		UserGroupSuggestion getSelectedSuggestion();
-		void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion);
+		SynapseSuggestion getSelectedSuggestion();
+		void setSelectedSuggestion(SynapseSuggestion selectedSuggestion);
 		
 		void getPrevSuggestions();
 		void getNextSuggestions();
 		
-		void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
+		void addItemSelectedHandler(CallbackP<SynapseSuggestion> callback);
 		void showLoading();
 		void hideLoading();
 		void showErrorMessage(String message);
-		void updateFieldStateForSuggestions(UserGroupHeaderResponsePage result,
+		void updateFieldStateForSuggestions(int numResults,
 				int offset);
 		void handleOracleException(Throwable caught);
 	}
 
-	void configure(UserGroupSuggestOracle oracle);
+	void configure(SynapseSuggestOracle oracle);
 }

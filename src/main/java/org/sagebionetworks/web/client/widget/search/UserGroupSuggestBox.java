@@ -1,30 +1,28 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, SynapseWidgetPresenter {
+public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget {
 	public static final int DELAY = 750;	// milliseconds
 	public static final int PAGE_SIZE = 10;
 	
 	private UserGroupSuggestBoxView view;
-	private UserGroupSuggestOracle oracle;
+	private SynapseSuggestOracle oracle;
 	
 	private String baseFileHandleUrl;
 	private String baseProfileAttachmentUrl;
-	
-	private UserGroupSuggestion selectedSuggestion;
+	private SynapseSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
-	private CallbackP<UserGroupSuggestion> callback;
+	private CallbackP<SynapseSuggestion> callback;
 	
 	
 	@Inject
@@ -32,16 +30,15 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			SageImageBundle sageImageBundle) {
-		this.view = view;		
-//		oracle = view.getUserGroupSuggestOracle();
+			SageImageBundle sageImageBundle, SynapseSuggestOracle oracle) {
+		this.oracle = oracle;
+		this.view = view;
+		this.view.configure(oracle);
 		view.setPresenter(this);
 	}
 	
-	public void setOracle(UserGroupSuggestOracle oracle) {
-		this.view.configure(oracle);
-		this.oracle = oracle;
-		oracle.configure(this, PAGE_SIZE);
+	public void setSuggestionProvider(SuggestionProvider provider) {
+		oracle.configure(this, PAGE_SIZE, provider);
 	}
 	
 	public void configureURLs(String baseFileHandleUrl, String baseProfileAttachmentUrl) {
@@ -54,7 +51,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	@Override
 	public Widget asWidget() {
-		//view.setPresenter(this);
 		return view.asWidget();
 	}
 	
@@ -87,12 +83,12 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	}
 
 	@Override
-	public UserGroupSuggestion getSelectedSuggestion() {
+	public SynapseSuggestion getSelectedSuggestion() {
 		return selectedSuggestion;
 	}
 
 	@Override
-	public void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion) {
+	public void setSelectedSuggestion(SynapseSuggestion selectedSuggestion) {
 		this.selectedSuggestion = selectedSuggestion;
 		if(callback != null && selectedSuggestion != null) {
 			callback.invoke(selectedSuggestion);
@@ -108,7 +104,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	}
 	
 	@Override
-	public void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback) {
+	public void addItemSelectedHandler(CallbackP<SynapseSuggestion> callback) {
 		this.callback = callback;
 	}
 
@@ -130,8 +126,8 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	// Is this the correct passthrough?
 	@Override
 	public void updateFieldStateForSuggestions(
-			UserGroupHeaderResponsePage result, int offset) {
-		view.updateFieldStateForSuggestions(result, offset);
+			int numResults, int offset) {
+		view.updateFieldStateForSuggestions(numResults, offset);
 	}
 
 	@Override

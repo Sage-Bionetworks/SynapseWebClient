@@ -19,16 +19,16 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.search.SuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.EvaluationSubmitterTest;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 public class InviteWidgetTest {
 
@@ -43,9 +43,9 @@ public class InviteWidgetTest {
 	String userId = "testId";
 	InviteWidget inviteWidget;
 	UserGroupHeader mockHeader;
-	UserGroupSuggestion mockSuggestion;
+	UserGroupSuggestionProvider mockSuggestionProvider;
+	Suggestion mockSuggestion;
 	AuthenticationController mockAuthenticationController;
-	UserGroupSuggestOracleImpl mockOracle;
 	Callback mockRefreshCallback;
 	GWTWrapper mockGWTWrapper;
 	
@@ -58,13 +58,12 @@ public class InviteWidgetTest {
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockSynAlert = mock(SynapseAlert.class);
 		mockSuggestBox = mock(UserGroupSuggestBox.class);
-		mockSuggestion = mock(UserGroupSuggestion.class);
+		mockSuggestion = mock(Suggestion.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockHeader = mock(UserGroupHeader.class);
 		mockTeam = mock(Team.class);
-		mockOracle = mock(UserGroupSuggestOracleImpl.class);
-		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockAuthenticationController,
-				mockGlobalApplicationState, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockJSNIUtils, mockOracle);
+		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
+		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockJSNIUtils, mockSuggestionProvider);
 		mockRefreshCallback = mock(Callback.class);
 		inviteWidget.configure(mockTeam);
 		inviteWidget.setRefreshCallback(mockRefreshCallback);

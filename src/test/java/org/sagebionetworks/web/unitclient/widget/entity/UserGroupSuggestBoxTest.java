@@ -1,6 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +24,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -33,7 +41,7 @@ public class UserGroupSuggestBoxTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	
 	UserGroupSuggestBox suggestBox;
-	UserGroupSuggestOracleImpl mockOracle;
+	UserGroupSuggestionProvider mockOracle;
 	
 	
 	@Before
@@ -43,7 +51,7 @@ public class UserGroupSuggestBoxTest {
 		mockSageImageBundle = mock(SageImageBundle.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockOracle = mock(UserGroupSuggestOracleImpl.class);
+		mockOracle = mock(UserGroupSuggestionProvider.class);
 		suggestBox = new UserGroupSuggestBox(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockSageImageBundle);
 		suggestBox.setOracle(mockOracle);
 	}

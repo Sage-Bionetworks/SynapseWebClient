@@ -10,8 +10,9 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracleImpl.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,6 +21,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -42,11 +44,12 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 	private HandlerRegistration makePublicReg;
 	
 	@Inject
-	public AclAddPeoplePanel(AclAddPeoplePanelUiBinder uiBinder, UserGroupSuggestBox suggestBox) {
+	public AclAddPeoplePanel(AclAddPeoplePanelUiBinder uiBinder,
+			UserGroupSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.suggestBox = suggestBox;
-		
-		suggestBoxPanel.add(suggestBox.asWidget());
+		this.suggestBox.setSuggestionProvider(provider);
+		suggestBoxPanel.add(suggestBox);
 		notifyTooltip.setTitle(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 	}
 	
@@ -58,7 +61,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 		return notifyPeopleCheckBox;
 	}
 	
-	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, final CallbackP<UserGroupSuggestion> addPersonCallback,
+	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, final CallbackP<SynapseSuggestion> addPersonCallback,
 						final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
 		clear();
 		
