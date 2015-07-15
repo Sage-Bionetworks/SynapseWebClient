@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
@@ -20,6 +22,9 @@ import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditorView;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class JoinTeamConfigEditorTest {
 
@@ -29,6 +34,7 @@ public class JoinTeamConfigEditorTest {
 	GroupSuggestionProvider mockProvider;
 	DialogCallback mockCallback;
 	GroupSuggestion mockSuggestion;
+	SynapseClientAsync mockSynClient;
 	
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
@@ -39,6 +45,8 @@ public class JoinTeamConfigEditorTest {
 	String successMessage = "Joined the team successfully!";
 	String joinTeamButtonText = "Join this team!";
 	String openRequestText = "Request to join team sent!";
+	Team testTeam;
+	String teamName = "testName";
 	
 	// challenge params
 	boolean isChallenge = true; // current
@@ -53,6 +61,7 @@ public class JoinTeamConfigEditorTest {
 		mockSuggestBox = mock(SynapseSuggestBox.class);
 		mockProvider = mock(GroupSuggestionProvider.class);
 		mockCallback = mock(DialogCallback.class);
+		mockSynClient = mock(SynapseClientAsync.class);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamID);
 		descriptor.put(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY, String.valueOf(isChallenge));
@@ -62,9 +71,13 @@ public class JoinTeamConfigEditorTest {
 		descriptor.put(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE, successMessage);
 		descriptor.put(WidgetConstants.JOIN_TEAM_BUTTON_TEXT, joinTeamButtonText);
 		descriptor.put(WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT, openRequestText);
-		presenter = new JoinTeamConfigEditor(mockView, mockSuggestBox, mockProvider);
+		testTeam = new Team();
+		testTeam.setId(teamID);
+		testTeam.setName(teamName);
+		presenter = new JoinTeamConfigEditor(mockView, mockSuggestBox, mockProvider, mockSynClient);
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getId()).thenReturn(suggestionID);
+		AsyncMockStubber.callSuccessWith(testTeam).when(mockSynClient).getTeam(Mockito.anyString(), Mockito.any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -82,7 +95,7 @@ public class JoinTeamConfigEditorTest {
 	@Test
 	public void testConfigure() {
 		presenter.configure(wikiKey, descriptor, mockCallback);
-		verify(mockSuggestBox).setPlaceholderText("Search for a team..." + " (Current team's ID: " + teamID + ")");
+		verify(mockSuggestBox).setText(teamName);
 		verify(mockView).setIsChallenge(isChallenge);
 		verify(mockView).setIsSimpleRequest(isSimpleRequest);
 		verify(mockView).setIsMemberMessage(isMemberMessage);
@@ -107,6 +120,7 @@ public class JoinTeamConfigEditorTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void updateDescriptorFromViewNoTeamSelected() {
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
 		descriptor = new HashMap<String, String>();
 		presenter.setDescriptor(descriptor);
 		presenter.updateDescriptorFromView();

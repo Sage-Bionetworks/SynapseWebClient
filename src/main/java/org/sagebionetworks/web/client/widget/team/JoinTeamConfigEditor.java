@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
@@ -12,6 +14,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -20,11 +23,15 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	private JoinTeamConfigEditorView view;
 	private Map<String, String> descriptor;
 	private SynapseSuggestBox teamSuggestBox;
+	private SynapseClientAsync synClient;
+	private GroupSuggestionProvider provider;
 
 	@Inject
 	public JoinTeamConfigEditor(JoinTeamConfigEditorView view,
 			SynapseSuggestBox teamSuggestBox,
-			GroupSuggestionProvider provider) {
+			GroupSuggestionProvider provider, SynapseClientAsync synClient) {
+		this.provider = provider;
+		this.synClient = synClient;
 		this.teamSuggestBox = teamSuggestBox;
 		teamSuggestBox.setSuggestionProvider(provider);
 		this.view = view;
@@ -35,16 +42,27 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
 
 	@Override
 	public void configure(WikiPageKey wikiKey,
 			Map<String, String> widgetDescriptor, DialogCallback window) {
 		this.descriptor = widgetDescriptor;
-		String placeholderText = "Search for a team...";
 		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) {
-			placeholderText += " (Current team's ID: " + descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY) + ")";
+			synClient.getTeam(descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY), new AsyncCallback<Team>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					// Fail silently, leaving the name blank. The descriptor will be set, so users won't save
+					// over their old team.
+				}
+				@Override
+				public void onSuccess(Team team) {
+					teamSuggestBox.setSelectedSuggestion(provider.new GroupSuggestion(team, team.getName()));
+					teamSuggestBox.setText(team.getName());
+				}
+				
+			});
 		}
-		teamSuggestBox.setPlaceholderText(placeholderText);
 		//is the team associated with joining a challenge?
 		boolean isChallengeSignup = false;
 		if (descriptor.containsKey(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY)) {
@@ -60,7 +78,7 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 			isSimpleRequest = Boolean.parseBoolean(descriptor.get(WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON));
 		}
 		view.setIsSimpleRequest(isSimpleRequest);
-		String isMemberMessage = "Successfully joined";
+		String isMemberMessage = "Already a member";
 		if (descriptor.containsKey(WidgetConstants.IS_MEMBER_MESSAGE)) {
 			isMemberMessage = descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
 		}

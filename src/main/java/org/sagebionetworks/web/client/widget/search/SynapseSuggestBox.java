@@ -88,6 +88,10 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 		return view.getText();
 	}
 	
+	public void setText(String text) {
+		view.setText(text);
+	}
+	
 	public void clear() {
 		view.clear();
 	}

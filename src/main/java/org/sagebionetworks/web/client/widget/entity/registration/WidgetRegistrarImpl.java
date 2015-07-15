@@ -243,6 +243,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PREVIEW_CONTENT_TYPE, WidgetConstants.PREVIEW_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.JOIN_TEAM_CONTENT_TYPE, WidgetConstants.JOIN_TEAM_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

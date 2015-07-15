@@ -41,7 +41,6 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 			}
 			
 		});
-		
 		selectedItem = new TextBox();
 		selectedItem.setVisible(false);
 		
@@ -143,6 +142,11 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	@Override
 	public void setPlaceholderText(String text) {
 		selectedItem.getElement().setAttribute("placeholder", text);
+	}
+	
+	@Override
+	public void setText(String text) {
+		suggestBox.setText(text);;
 	}
 	
 	@Override

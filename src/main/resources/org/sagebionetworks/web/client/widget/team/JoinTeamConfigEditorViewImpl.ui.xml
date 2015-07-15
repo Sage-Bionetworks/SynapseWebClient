@@ -7,27 +7,32 @@
 	<bh:Div>
 		<b:FieldSet>
 			<b:FormGroup>
-			    
-				<b:FormLabel>Team ID</b:FormLabel>
-				<g:SimplePanel ui:field="suggestBoxPanel"/>
-				
-				<b:FormLabel for="challengeCheckbox">Is this a Challenge Sign-up?</b:FormLabel>
-				<b:CheckBox ui:field="isChallengeCheckbox" name="challengeCheckbox" b:id="challengeCheckbox" />
-				
-				<b:FormLabel for="memberMessageField">Member Message</b:FormLabel>
-				<b:TextBox ui:field="memberMessageField" name="memberMessageField" b:id="memberMessageField" />
-				
-				<b:FormLabel for="joinButtonText">Button Text</b:FormLabel>
-				<b:TextBox ui:field="joinButtonField" name="joinButtonText" b:id="joinButtonText" />
-				
-				<b:FormLabel for="joinSuccessText">Successfully Joined Message</b:FormLabel>
-				<b:TextBox ui:field="joinSuccessField" name="joinSuccessText" b:id="joinSuccessText" />
-				
-				<b:FormLabel for="requestOpenInfoText">Request Open Info Text</b:FormLabel>
-				<b:TextBox ui:field="requestOpenInfoField" name="requestOpenInfoText" b:id="requestOpenInfoText" />
-				
-				<b:FormLabel for="simpleRequestCheckbox">Is this a simple request?</b:FormLabel>
-				<b:CheckBox ui:field="isSimpleRequestCheckbox" name="simpleRequestCheckbox" b:id="simpleRequestCheckbox" />
+				<b:FormGroup>
+				    <b:FormLabel>Team</b:FormLabel>
+					<g:SimplePanel ui:field="suggestBoxPanel"/>
+				</b:FormGroup>
+				<b:FormGroup>
+				    <b:FormLabel for="joinButtonText">Non-Member Button Text</b:FormLabel>
+					<b:TextBox ui:field="joinButtonField" name="joinButtonText" b:id="joinButtonText"/>
+				</b:FormGroup>	
+				<b:FormGroup>
+				    <b:FormLabel for="memberMessageField">Member Button Text</b:FormLabel>
+					<b:TextBox ui:field="memberMessageField" name="memberMessageField" b:id="memberMessageField"/>
+				</b:FormGroup>	
+				<b:FormGroup>
+				    <b:FormLabel for="joinSuccessText">Successfully joined Button Text</b:FormLabel>
+					<b:TextBox ui:field="joinSuccessField" name="joinSuccessText" b:id="joinSuccessText" />
+				</b:FormGroup>	
+				<b:FormGroup>
+				    <b:FormLabel for="requestOpenInfoText">Team Request Open Button Text</b:FormLabel>
+					<b:TextBox ui:field="requestOpenInfoField" name="requestOpenInfoText" b:id="requestOpenInfoText" />
+				</b:FormGroup>	
+				<b:FormGroup>
+				    <b:CheckBox ui:field="isChallengeCheckbox" text="Is this a Challenge Sign-up?" />
+				</b:FormGroup>	
+				<b:FormGroup>
+				<b:CheckBox ui:field="isSimpleRequestCheckbox" text="Prompt joining User for Team Request Message?"/>
+				</b:FormGroup>
 			</b:FormGroup>
 		</b:FieldSet>
 	</bh:Div>

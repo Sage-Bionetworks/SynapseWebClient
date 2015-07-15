@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.search;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface SynapseSuggestBoxView extends IsWidget, SynapseView {
@@ -52,4 +53,5 @@ public interface SynapseSuggestBoxView extends IsWidget, SynapseView {
 	}
 
 	void configure(SynapseSuggestOracle oracle);
+	void setText(String text);
 }
