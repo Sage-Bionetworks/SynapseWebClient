@@ -12,14 +12,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget {
+	
 	public static final int DELAY = 750;	// milliseconds
 	public static final int PAGE_SIZE = 10;
-	
 	private UserGroupSuggestBoxView view;
 	private SynapseSuggestOracle oracle;
-	
-	private String baseFileHandleUrl;
-	private String baseProfileAttachmentUrl;
 	private SynapseSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
 	private CallbackP<SynapseSuggestion> callback;
@@ -40,14 +37,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	public void setSuggestionProvider(SuggestionProvider provider) {
 		oracle.configure(this, PAGE_SIZE, provider);
 	}
-	
-	public void configureURLs(String baseFileHandleUrl, String baseProfileAttachmentUrl) {
-		this.baseFileHandleUrl = baseFileHandleUrl;
-		this.baseProfileAttachmentUrl = baseProfileAttachmentUrl;
-	}
-	
-	public String getBaseFileHandleUrl()		{	return baseFileHandleUrl;		}
-	public String getBaseProfileAttachmentUrl() {	return baseProfileAttachmentUrl;	}
 	
 	@Override
 	public Widget asWidget() {

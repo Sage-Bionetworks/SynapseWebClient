@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -16,26 +17,28 @@ import com.google.inject.Inject;
 public class GroupSuggestionProvider implements SuggestionProvider {
 
 	private SynapseClientAsync synapseClient;
+	private SynapseJSNIUtils jsniUtils;
 	// for rendering
 	private String width;
-	private String baseFileHandleUrl;
-	private String baseProfileAttachmentUrl;
 	
 	@Inject
-	public GroupSuggestionProvider(SynapseClientAsync synapseClient) {
+	public GroupSuggestionProvider(SynapseClientAsync synapseClient, SynapseJSNIUtils jsniUtils) {
 		this.synapseClient = synapseClient;
+		this.jsniUtils = jsniUtils;
 	}
 	
 	@Override
-	public void getSuggestions(final int offset, final int pageSize, final String prefix, final CallbackP<List<SynapseSuggestion>> callback) {
+	public void getSuggestions(final int offset, final int pageSize, int width, final String prefix, final CallbackP<SynapseSuggestionBundle> callback) {
+		this.width = String.valueOf(width);
 		synapseClient.getTeamsBySearch(prefix, pageSize, offset, new AsyncCallback<PaginatedResults<Team>>() {
 			@Override
 			public void onSuccess(PaginatedResults<Team> result) {
 				List<SynapseSuggestion> suggestions = new LinkedList<SynapseSuggestion>();
 				for (Team team: result.getResults()) {
-					suggestions.add(makeTeamSuggestion(team, prefix));
+					suggestions.add(new GroupSuggestion(team, prefix));
 				}
-				callback.invoke(suggestions);
+				SynapseSuggestionBundle suggestionBundle = new SynapseSuggestionBundle(suggestions, result.getTotalNumberOfResults());
+				callback.invoke(suggestionBundle);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -44,17 +47,7 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 		});
 	}
 	
-	private SynapseSuggestion makeTeamSuggestion(Team team, String prefix) {
-		return null;
-	}
 
-	@Override
-	public void configure(String width, String baseFileHandleUrl,
-			String baseProfileAttachmentUrl) {
-		this.width = width;
-		this.baseFileHandleUrl = baseFileHandleUrl;
-		this.baseProfileAttachmentUrl = baseProfileAttachmentUrl;
-	}
 	
 	/*
 	 * Suggestion
@@ -79,7 +72,7 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 			StringBuilder result = new StringBuilder();
 			result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
 			result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
-			result.append(baseFileHandleUrl);
+			result.append(jsniUtils.getBaseFileHandleUrl());
 			result.append("?teamId=" + team.getId() + "\" />");
 			result.append("<span class=\"search-item movedown-1 margin-right-5\">");
 			result.append("<span>" + team.getName() + "</span> ");

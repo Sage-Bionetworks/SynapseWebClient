@@ -532,6 +532,13 @@ public class MarkdownEditorWidgetTest {
 		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
+	@Test
+	public void testHandleCommandJoinTeam(){
+		String contentType = WidgetConstants.JOIN_TEAM_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_JOIN_TEAM);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
+	}
+	
 	private String surroundTextMarkdown = "this";
 	
 	private String getNewMarkdown() {
@@ -628,12 +635,6 @@ public class MarkdownEditorWidgetTest {
 	}
 	
 	//insert markdown commands
-	@Test
-	public void testHandleCommandJoinTeam(){
-		setupSurroundText();
-		presenter.handleCommand(MarkdownEditorAction.INSERT_JOIN_TEAM);
-		assertTrue(getNewMarkdown().contains(WidgetConstants.JOIN_TEAM_CONTENT_TYPE));
-	}
 	
 	@Test
 	public void testHandleCommandSubmitToEvaluation(){

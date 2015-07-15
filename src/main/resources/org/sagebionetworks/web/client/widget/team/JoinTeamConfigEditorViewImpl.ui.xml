@@ -8,8 +8,8 @@
 		<b:FieldSet>
 			<b:FormGroup>
 			    
-				<b:FormLabel for="teamId">Team ID</b:FormLabel>
-				<b:TextBox ui:field="teamIdField" name="teamId" b:id="teamId"/>
+				<b:FormLabel>Team ID</b:FormLabel>
+				<g:SimplePanel ui:field="suggestBoxPanel"/>
 				
 				<b:FormLabel for="challengeCheckbox">Is this a Challenge Sign-up?</b:FormLabel>
 				<b:CheckBox ui:field="isChallengeCheckbox" name="challengeCheckbox" b:id="challengeCheckbox" />

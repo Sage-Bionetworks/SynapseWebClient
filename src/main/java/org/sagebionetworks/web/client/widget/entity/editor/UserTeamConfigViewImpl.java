@@ -29,7 +29,6 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	@Override
 	public void initView() {
 		clear();
-		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());		suggestBox.setPlaceholderText("Enter name...");
 		suggestBox.setPlaceholderText("Enter name...");
 		SimplePanel panel = new SimplePanel();
 		panel.setWidget(suggestBox.asWidget());

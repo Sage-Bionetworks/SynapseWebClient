@@ -2,9 +2,12 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -13,7 +16,7 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 	public interface JoinTeamConfigWidgetViewImplUiBinder extends UiBinder<Widget, JoinTeamConfigEditorViewImpl> {}
 	
 	@UiField
-	TextBox teamIdField;
+	SimplePanel suggestBoxPanel;
 	
 	@UiField
 	CheckBox isChallengeCheckbox;
@@ -47,11 +50,6 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 	}
 
 	@Override
-	public void setTeamId(String teamId) {
-		teamIdField.setText(teamId);
-	}
-
-	@Override
 	public void setIsChallenge(boolean isChallengeSignup) {
 		isChallengeCheckbox.setValue(isChallengeSignup);
 	}
@@ -79,11 +77,6 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 	@Override
 	public void setRequestOpenInfotext(String requestOpenInfoText) {
 		requestOpenInfoField.setText(requestOpenInfoText);
-	}
-	
-	@Override
-	public String getTeamId() {
-		return teamIdField.getText();
 	}
 
 	@Override
@@ -114,6 +107,11 @@ public class JoinTeamConfigEditorViewImpl implements JoinTeamConfigEditorView {
 	@Override
 	public String getRequestOpenInfotext() {
 		return requestOpenInfoField.getText();
+	}
+
+	@Override
+	public void setSuggestWidget(IsWidget teamSuggestBox) {
+		suggestBoxPanel.setWidget(teamSuggestBox);
 	}
 
 }

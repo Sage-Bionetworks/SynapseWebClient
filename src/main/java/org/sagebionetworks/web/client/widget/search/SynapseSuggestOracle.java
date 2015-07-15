@@ -1,11 +1,8 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import java.util.List;
-
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.SuggestOracle;
 
@@ -20,14 +17,13 @@ public class SynapseSuggestOracle extends SuggestOracle {
 	public UserGroupSuggestBox suggestBox;
 	public SuggestionProvider provider;
 	public String searchTerm;
+	public String width;
 
 	public void configure(final UserGroupSuggestBox suggestBox, int pageSize, SuggestionProvider provider) {
 		this.isLoading = false;
 		this.suggestBox = suggestBox;
 		this.pageSize = pageSize;
 		this.provider = provider;
-		this.provider.configure(String.valueOf(suggestBox.getWidth()), suggestBox.getBaseFileHandleUrl(),
-				suggestBox.getBaseProfileAttachmentUrl());
 	}
 	
 	private Timer timer = new Timer() {
@@ -36,7 +32,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 			// If you backspace quickly the contents of the field are emptied but a
 			// query for a single character is still executed. Workaround for this
 			// is to check for an empty string field here.
-			if (!request.getQuery().trim().isEmpty()) {
+			if (!suggestBox.getText().trim().isEmpty()) {
 				offset = 0;
 				suggestBox.setOffset(offset);
 				getSuggestions(offset, searchTerm);
@@ -52,13 +48,13 @@ public class SynapseSuggestOracle extends SuggestOracle {
 		if (!isLoading) {
 			suggestBox.showLoading();
 			try {
-				provider.getSuggestions(offset, pageSize, request.getQuery(), new CallbackP<List<SynapseSuggestion>>() {
+				provider.getSuggestions(offset, pageSize, suggestBox.getWidth(), request.getQuery(), new CallbackP<SynapseSuggestionBundle>() {
 					@Override
-					public void invoke(List<SynapseSuggestion> suggestions) {
+					public void invoke(SynapseSuggestionBundle suggestionBundle) {
 						suggestBox.hideLoading();
 						// Update view fields.
 						if (suggestBox != null) {
-							suggestBox.updateFieldStateForSuggestions(suggestions.size(), offset);
+							suggestBox.updateFieldStateForSuggestions((int)suggestionBundle.getTotalNumberOfResults(), offset);
 						}
 						// Load suggestions.
 //						
@@ -66,7 +62,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 //							suggestions.add(makeUserGroupSuggestion(header, searchTerm));
 //						}
 						// Set up response
-						SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
+						SuggestOracle.Response response = new SuggestOracle.Response(suggestionBundle.getSuggestionBundle());
 						callback.onSuggestionsReady(request, response);
 						suggestBox.hideLoading();
 						isLoading = false;
@@ -92,6 +88,10 @@ public class SynapseSuggestOracle extends SuggestOracle {
 	@Override
 	public boolean isDisplayStringHTML() {
 		return true;
+	}
+	
+	public void setWidth(String width) {
+		this.width = width;
 	}
 	
 }

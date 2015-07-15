@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
@@ -24,21 +23,18 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private UserGroupSuggestBox peopleSuggestWidget;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public InviteWidget(InviteWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GWTWrapper gwt, SynapseAlert synAlert,
 			UserGroupSuggestBox peopleSuggestBox,
-			SynapseJSNIUtils synapseJSNIUtils,
 			UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		view.setSuggestWidget(peopleSuggestBox.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
@@ -49,7 +45,6 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public void configure(Team team) {
 		clear();
 		this.team = team;
-		peopleSuggestWidget.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
 	}
 	

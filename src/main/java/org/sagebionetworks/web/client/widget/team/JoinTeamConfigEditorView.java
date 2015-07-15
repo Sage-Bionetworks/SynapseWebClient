@@ -10,8 +10,6 @@ public interface JoinTeamConfigEditorView extends IsWidget {
 		
 	}
 
-	void setTeamId(String teamId);
-
 	void setIsChallenge(boolean isChallengeSignup);
 
 	void setIsSimpleRequest(boolean isSimpleRequest);
@@ -24,8 +22,6 @@ public interface JoinTeamConfigEditorView extends IsWidget {
 
 	void setRequestOpenInfotext(String requestOpenInfoText);
 
-	String getTeamId();
-
 	boolean getIsChallenge();
 
 	boolean getIsSimpleRequest();
@@ -37,4 +33,6 @@ public interface JoinTeamConfigEditorView extends IsWidget {
 	String getButtonText();
 
 	String getRequestOpenInfotext();
+
+	void setSuggestWidget(IsWidget teamSuggestBox);
 }
