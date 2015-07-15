@@ -81,7 +81,6 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 		});
 		this.add(suggestBox);
 		this.add(selectedItem);
-//		getUserGroupSuggestOracle().configure((UserGroupSuggestBox) presenter, 5);
 	}
 	
 	@Override

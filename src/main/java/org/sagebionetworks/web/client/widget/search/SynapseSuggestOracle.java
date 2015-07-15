@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.inject.Inject;
 
 public class SynapseSuggestOracle extends SuggestOracle {
 
@@ -18,63 +20,62 @@ public class SynapseSuggestOracle extends SuggestOracle {
 	public SuggestionProvider provider;
 	public String searchTerm;
 	public String width;
-
-	public void configure(final UserGroupSuggestBox suggestBox, int pageSize, SuggestionProvider provider) {
+	private GWTTimer timer;
+	
+	@Inject
+	public SynapseSuggestOracle(GWTTimer timer) {
+		this.timer = timer;
+	}
+	
+	public void configure(final UserGroupSuggestBox suggestBox,
+			int pageSize,
+			SuggestionProvider provider) {
 		this.isLoading = false;
 		this.suggestBox = suggestBox;
 		this.pageSize = pageSize;
 		this.provider = provider;
-	}
-	
-	private Timer timer = new Timer() {
-		@Override
-		public void run() {
-			// If you backspace quickly the contents of the field are emptied but a
-			// query for a single character is still executed. Workaround for this
-			// is to check for an empty string field here.
-			if (!suggestBox.getText().trim().isEmpty()) {
-				offset = 0;
-				suggestBox.setOffset(offset);
-				getSuggestions(offset, searchTerm);
+		this.timer.configure(new Runnable() {
+			@Override
+			public void run() {
+				// If you backspace quickly the contents of the field are emptied but a
+				// query for a single character is still executed. Workaround for this
+				// is to check for an empty string field here.
+				if (!suggestBox.getText().trim().isEmpty()) {
+					offset = 0;
+					suggestBox.setOffset(offset);
+					getSuggestions(offset);
+				}
 			}
-		}
-		
-	};
-	
+		});
+	}
+ 	
 	public SuggestOracle.Request getRequest()	{	return request;		}
 	public SuggestOracle.Callback getCallback()	{	return callback;	}
 
-	public void getSuggestions(final int offset, final String searchTerm) {
+	public void getSuggestions(final int offset) {
+		GWT.debugger();
 		if (!isLoading) {
 			suggestBox.showLoading();
-			try {
-				provider.getSuggestions(offset, pageSize, suggestBox.getWidth(), request.getQuery(), new CallbackP<SynapseSuggestionBundle>() {
-					@Override
-					public void invoke(SynapseSuggestionBundle suggestionBundle) {
-						suggestBox.hideLoading();
-						// Update view fields.
-						if (suggestBox != null) {
-							suggestBox.updateFieldStateForSuggestions((int)suggestionBundle.getTotalNumberOfResults(), offset);
-						}
-						// Load suggestions.
-//						
-//						for (UserGroupHeader header : result.getChildren()) {
-//							suggestions.add(makeUserGroupSuggestion(header, searchTerm));
-//						}
-						// Set up response
-						SuggestOracle.Response response = new SuggestOracle.Response(suggestionBundle.getSuggestionBundle());
-						callback.onSuggestionsReady(request, response);
-						suggestBox.hideLoading();
-						isLoading = false;
-					}	
-				});
-			} catch (Throwable caught) {
-				suggestBox.handleOracleException(caught);
-				suggestBox.hideLoading();
-				isLoading = false;
-			}
+			//seachTerm or request.getQuery?
+			provider.getSuggestions(offset, pageSize, suggestBox.getWidth(), request.getQuery(), new AsyncCallback<SynapseSuggestionBundle>() {
+				@Override
+				public void onSuccess(SynapseSuggestionBundle suggestionBundle) {
+					suggestBox.hideLoading();
+					if (suggestBox != null) {
+						suggestBox.updateFieldStateForSuggestions((int)suggestionBundle.getTotalNumberOfResults(), offset);
+					}
+					SuggestOracle.Response response = new SuggestOracle.Response(suggestionBundle.getSuggestionBundle());
+					callback.onSuggestionsReady(request, response);
+					isLoading = false;
+				}
+
+				@Override
+				public void onFailure(Throwable caught) {
+					suggestBox.hideLoading();
+					suggestBox.handleOracleException(caught);
+				}	
+			});
 		}
-		
 	}
 	
 	@Override

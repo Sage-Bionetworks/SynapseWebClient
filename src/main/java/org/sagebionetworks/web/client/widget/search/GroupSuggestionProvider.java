@@ -6,12 +6,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
 public class GroupSuggestionProvider implements SuggestionProvider {
@@ -28,7 +26,7 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 	}
 	
 	@Override
-	public void getSuggestions(final int offset, final int pageSize, int width, final String prefix, final CallbackP<SynapseSuggestionBundle> callback) {
+	public void getSuggestions(final int offset, final int pageSize, int width, final String prefix, final AsyncCallback<SynapseSuggestionBundle> callback) {
 		this.width = String.valueOf(width);
 		synapseClient.getTeamsBySearch(prefix, pageSize, offset, new AsyncCallback<PaginatedResults<Team>>() {
 			@Override
@@ -38,16 +36,14 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 					suggestions.add(new GroupSuggestion(team, prefix));
 				}
 				SynapseSuggestionBundle suggestionBundle = new SynapseSuggestionBundle(suggestions, result.getTotalNumberOfResults());
-				callback.invoke(suggestionBundle);
+				callback.onSuccess(suggestionBundle);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				// how to invoke the outer block?	
+				callback.onFailure(caught);
 			}
 		});
 	}
-	
-
 	
 	/*
 	 * Suggestion
@@ -61,14 +57,12 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 			this.prefix = prefix;
 		}
 		
-		public Team getHeader()		{	return team;			}
+		public Team getTeam()		{	return team;			}
 		public String getPrefix() 				{	return prefix;			}
 		public void setPrefix(String prefix)	{	this.prefix = prefix;	}
 		
 		@Override
 		public String getDisplayString() {
-//			return DisplayUtils.getUserGroupDisplaySuggestionHtml(header, width + "px",
-//					baseFileHandleUrl, baseProfileAttachmentUrl);
 			StringBuilder result = new StringBuilder();
 			result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
 			result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");

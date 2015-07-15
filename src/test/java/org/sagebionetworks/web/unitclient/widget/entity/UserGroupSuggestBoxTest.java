@@ -1,14 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +23,6 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.SuggestOracle;
 
 public class UserGroupSuggestBoxTest {
 
@@ -96,28 +86,7 @@ public class UserGroupSuggestBoxTest {
 //		verify(mockSynapseClient, times(2)).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 //	}
 	
-	private UserGroupHeaderResponsePage getResponsePage() {
-		UserGroupHeaderResponsePage testPage = new UserGroupHeaderResponsePage();
-		testPage.setPrefixFilter("test");
-		
-		UserGroupHeader head1 = new UserGroupHeader();
-		head1.setFirstName("Test");
-		head1.setLastName("One");
-		
-		UserGroupHeader head2 = new UserGroupHeader();
-		head1.setFirstName("Test");
-		head1.setLastName("Two");
-		
-		List<UserGroupHeader> children = new ArrayList<UserGroupHeader>();
-		children.add(head1);
-		children.add(head2);
-		
-		testPage.setChildren(children);
-		
-		testPage.setTotalNumberOfResults((long) 6);
-		
-		return testPage;
-	}
+
 	
 	@Test
 	public void testSelectedSuggestionCallback() {

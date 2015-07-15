@@ -62,13 +62,13 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	@Override
 	public void getPrevSuggestions() {
 		offset -= PAGE_SIZE;
-		oracle.getSuggestions(offset, view.getText());
+		oracle.getSuggestions(offset);
 	}
 
 	@Override
 	public void getNextSuggestions() {
 		offset += PAGE_SIZE;
-		oracle.getSuggestions(offset, view.getText());
+		oracle.getSuggestions(offset);
 	}
 
 	@Override
@@ -112,7 +112,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		view.showErrorMessage(message);
 	}
 
-	// Is this the correct passthrough?
 	@Override
 	public void updateFieldStateForSuggestions(
 			int numResults, int offset) {
@@ -121,6 +120,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 
 	@Override
 	public void handleOracleException(Throwable caught) {
-		// show errors
+		view.showErrorMessage(caught.getMessage());
 	}
 }

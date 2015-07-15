@@ -8,9 +8,7 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.inject.Inject;
@@ -29,7 +27,7 @@ public class UserGroupSuggestionProvider implements SuggestionProvider {
 	}
 	
 	@Override
-	public void getSuggestions(final int offset, final int pageSize, final int width, final String prefix, final CallbackP<SynapseSuggestionBundle> callback) {
+	public void getSuggestions(final int offset, final int pageSize, final int width, final String prefix, final AsyncCallback<SynapseSuggestionBundle> callback) {
 		this.width = String.valueOf(width);
 		synapseClient.getUserGroupHeadersByPrefix(prefix, pageSize, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
@@ -39,11 +37,11 @@ public class UserGroupSuggestionProvider implements SuggestionProvider {
 					suggestions.add(new UserGroupSuggestion(header, prefix));
 				}
 				SynapseSuggestionBundle suggestionBundle = new SynapseSuggestionBundle(suggestions, result.getTotalNumberOfResults());
-				callback.invoke(suggestionBundle);
+				callback.onSuccess(suggestionBundle);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				// how to invoke the outer block?	
+				callback.onFailure(caught);
 			}
 		});
 	}
