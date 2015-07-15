@@ -20,6 +20,7 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
+import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
@@ -153,9 +154,12 @@ public class PortalServletModule extends ServletModule {
 		bind(ProjectSearchRedirectFilter.class).in(Singleton.class);
 		filter(ProjectSearchRedirectFilter.PROJECT+"*").through(ProjectSearchRedirectFilter.class);
 		
-		
-		
 		handleGWTPlaces();
+		
+		// Catch-all.  Note that "/*" would override all other servlet binding.  
+		// This is also where project aliases are handled.
+		bind(ProjectAliasServlet.class).in(Singleton.class);
+		serve("/").with(ProjectAliasServlet.class);
 	}
 	
 	public void handleGWTPlaces() {
