@@ -3,7 +3,6 @@ package org.sagebionetworks.web.server.servlet;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -15,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
@@ -37,7 +37,6 @@ import com.google.inject.Inject;
  */
 public class ProjectAliasServlet extends HttpServlet {
 
-	private static Logger logger = Logger.getLogger(ProjectAliasServlet.class.getName());
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
@@ -113,23 +112,21 @@ public class ProjectAliasServlet extends HttpServlet {
 		}
 		
 		try {
-			
 			SynapseClient client = createNewClient(token);
-			
-			//TODO: get path, and try to find project with name
 			HttpServletRequest httpRqst = (HttpServletRequest)request;
 			perThreadRequest.set(httpRqst);
 			
 			URL requestURL = new URL(httpRqst.getRequestURL().toString());
-			String path = requestURL.getPath();
-			//now try to find the project alias
-			//do the search
+			String path = requestURL.getPath().substring(1);
+			//TODO: REPLACE CODE BELOW WITH CODE TO FIND PROJECT USING ALIAS
 			EntityQuery query = getEntityQuery(path);
 			EntityQueryResults results = client.entityQuery(query);
 			String newPath = "/";
 			if (results.getTotalEntityCount() == 1) {
 				EntityQueryResult result = results.getEntities().get(0);
 				newPath = "/#!Synapse:" + result.getId();
+			} else {
+				throw new SynapseNotFoundException("The requested URL " + requestURL.getPath() + " was not found on this server.");
 			}
 			URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), newPath);
 			response.sendRedirect(response.encodeRedirectURL(redirectURL.toString()));

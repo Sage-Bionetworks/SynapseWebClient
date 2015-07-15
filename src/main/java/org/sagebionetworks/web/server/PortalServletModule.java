@@ -156,10 +156,11 @@ public class PortalServletModule extends ServletModule {
 		
 		handleGWTPlaces();
 		
-		// Catch-all.  Note that "/*" would override all other servlet binding.  
+		// Catch-all.  Note that "/*" would override all other servlet binding, and "/" overrides the default handler 
+		//(which we need for GWT place handling).
 		// This is also where project aliases are handled.
 		bind(ProjectAliasServlet.class).in(Singleton.class);
-		serve("/").with(ProjectAliasServlet.class);
+		serveRegex("\\/\\w+").with(ProjectAliasServlet.class);
 	}
 	
 	public void handleGWTPlaces() {
