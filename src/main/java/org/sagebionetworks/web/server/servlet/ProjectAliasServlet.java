@@ -118,6 +118,7 @@ public class ProjectAliasServlet extends HttpServlet {
 			
 			URL requestURL = new URL(httpRqst.getRequestURL().toString());
 			String path = requestURL.getPath().substring(1);
+
 			//TODO: REPLACE CODE BELOW WITH CODE TO FIND PROJECT USING ALIAS
 			EntityQuery query = getEntityQuery(path);
 			EntityQueryResults results = client.entityQuery(query);
@@ -165,7 +166,7 @@ public class ProjectAliasServlet extends HttpServlet {
 		return client;
 	}
 
-	private String getBaseUrl(HttpServletRequest request) {
+	public String getBaseUrl(HttpServletRequest request) {
 		StringBuffer url = request.getRequestURL();
 		String uri = request.getRequestURI();
 		String ctx = request.getContextPath();
@@ -173,7 +174,11 @@ public class ProjectAliasServlet extends HttpServlet {
 		return base;
 	}
 	
-
+	/**
+	 * TODO: depending on the design of the Project Alias feature, this method will need to be either removed or modified.
+	 * @param searchString
+	 * @return
+	 */
 	public EntityQuery getEntityQuery(String searchString) {
 		EntityQuery query = new EntityQuery();
 		Condition condition = EntityQueryUtils.buildCondition(
