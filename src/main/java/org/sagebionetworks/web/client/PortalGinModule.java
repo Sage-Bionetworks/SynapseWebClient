@@ -347,8 +347,8 @@ import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxViewImpl;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
@@ -808,7 +808,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class);
 		
 		// User Suggest Box
-		bind(UserGroupSuggestBoxView.class).to(UserGroupSuggestBoxViewImpl.class);
+		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
 
 		// Home Search Box
 		bind(HomeSearchBoxViewImpl.class).in(Singleton.class);

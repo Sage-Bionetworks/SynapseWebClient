@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -19,15 +19,13 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 
 	private JoinTeamConfigEditorView view;
 	private Map<String, String> descriptor;
-	private UserGroupSuggestBox teamSuggestBox;
-	private GroupSuggestionProvider suggestionProvider;
+	private SynapseSuggestBox teamSuggestBox;
 
 	@Inject
 	public JoinTeamConfigEditor(JoinTeamConfigEditorView view,
-			UserGroupSuggestBox teamSuggestBox,
+			SynapseSuggestBox teamSuggestBox,
 			GroupSuggestionProvider provider) {
 		this.teamSuggestBox = teamSuggestBox;
-		this.suggestionProvider = provider;
 		teamSuggestBox.setSuggestionProvider(provider);
 		this.view = view;
 		this.view.setSuggestWidget(teamSuggestBox);
@@ -42,10 +40,11 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	public void configure(WikiPageKey wikiKey,
 			Map<String, String> widgetDescriptor, DialogCallback window) {
 		this.descriptor = widgetDescriptor;
-		teamSuggestBox.setPlaceholderText("Enter a team name...");
-//		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) {
-//			teamId = descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY);
-//		}
+		String placeholderText = "Search for a team...";
+		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) {
+			placeholderText += " (Current team's ID: " + descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY) + ")";
+		}
+		teamSuggestBox.setPlaceholderText(placeholderText);
 		//is the team associated with joining a challenge?
 		boolean isChallengeSignup = false;
 		if (descriptor.containsKey(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY)) {
@@ -63,7 +62,7 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 		view.setIsSimpleRequest(isSimpleRequest);
 		String isMemberMessage = "Successfully joined";
 		if (descriptor.containsKey(WidgetConstants.IS_MEMBER_MESSAGE)) {
-			isMemberMessage =descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
+			isMemberMessage = descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
 		}
 		view.setIsMemberMessage(isMemberMessage);
 		String successMessage = WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE;
@@ -82,18 +81,14 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 		}
 		view.setRequestOpenInfotext(requestOpenInfoText);			
 	}
-	
-	@Override
-	public void checkParams() {
-		// validate team with synapseClient.isTeam or something 
-		// validate button text to be non-empty
-	}
 
 	@Override
 	public void updateDescriptorFromView() throws IllegalArgumentException {
 		GroupSuggestion suggestion = (GroupSuggestion)teamSuggestBox.getSelectedSuggestion();
 		if (suggestion != null) {
 			descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, suggestion.getId());
+		}
+		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) {
 			descriptor.put(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY, String.valueOf(view.getIsChallenge()));
 			descriptor.put(WidgetConstants.JOIN_TEAM_IS_SIMPLE_REQUEST_BUTTON, String.valueOf(view.getIsSimpleRequest()));
 			descriptor.put(WidgetConstants.IS_MEMBER_MESSAGE, view.getIsMemberMessage());
@@ -119,6 +114,11 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	@Override
 	public List<String> getDeletedFileHandleIds() {
 		return null;
+	}
+	
+	//for testing only
+	public void setDescriptor(Map<String, String> widgetDescriptor) {
+		this.descriptor = widgetDescriptor;
 	}
 
 }

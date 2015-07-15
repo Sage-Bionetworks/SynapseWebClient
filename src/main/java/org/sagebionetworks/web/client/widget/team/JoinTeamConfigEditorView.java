@@ -5,8 +5,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface JoinTeamConfigEditorView extends IsWidget {
 	
 	public interface Presenter extends IsWidget {
-
-		void checkParams();
 		
 	}
 

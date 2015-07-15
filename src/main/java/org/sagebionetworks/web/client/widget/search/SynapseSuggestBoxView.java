@@ -4,7 +4,7 @@ import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
+public interface SynapseSuggestBoxView extends IsWidget, SynapseView {
 	
 	/**
 	 * Gets the string of text in the suggest box.

@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 
 
@@ -244,7 +243,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PREVIEW_CONTENT_TYPE, WidgetConstants.PREVIEW_FRIENDLY_NAME);
-//		registerWidget(WidgetConstants., WidgetConstants.IMAGE_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

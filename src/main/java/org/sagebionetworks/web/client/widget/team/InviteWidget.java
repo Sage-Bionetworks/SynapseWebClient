@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
@@ -22,13 +22,13 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private Callback teamUpdatedCallback;
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
-	private UserGroupSuggestBox peopleSuggestWidget;
+	private SynapseSuggestBox peopleSuggestWidget;
 	
 	@Inject
 	public InviteWidget(InviteWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GWTWrapper gwt, SynapseAlert synAlert,
-			UserGroupSuggestBox peopleSuggestBox,
+			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;

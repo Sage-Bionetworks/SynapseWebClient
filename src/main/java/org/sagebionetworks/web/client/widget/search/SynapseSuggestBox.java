@@ -11,11 +11,11 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget {
+public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget {
 	
 	public static final int DELAY = 750;	// milliseconds
 	public static final int PAGE_SIZE = 10;
-	private UserGroupSuggestBoxView view;
+	private SynapseSuggestBoxView view;
 	private SynapseSuggestOracle oracle;
 	private SynapseSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
@@ -23,7 +23,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	
 	@Inject
-	public UserGroupSuggestBox(UserGroupSuggestBoxView view,
+	public SynapseSuggestBox(SynapseSuggestBoxView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,

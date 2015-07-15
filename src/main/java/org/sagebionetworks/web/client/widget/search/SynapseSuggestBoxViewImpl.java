@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupSuggestBoxView {
+public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSuggestBoxView {
 	
 	private Presenter presenter;
 	SuggestBox suggestBox;
@@ -25,7 +25,7 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 	SageImageBundle sageImageBundle;
 	
 	@Inject
-	public UserGroupSuggestBoxViewImpl(UserGroupSuggestionProvider oracle, SageImageBundle sageImageBundle) {
+	public SynapseSuggestBoxViewImpl(UserGroupSuggestionProvider oracle, SageImageBundle sageImageBundle) {
 		this.sageImageBundle = sageImageBundle;
 	}
 	
@@ -95,11 +95,11 @@ public class UserGroupSuggestBoxViewImpl extends FlowPanel implements UserGroupS
 		Label resultsLbl = ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getResultsLabel();
 		
 		prevBtn.setEnabled(offset != 0);
-		boolean moreResults = offset + UserGroupSuggestBox.PAGE_SIZE < numResults;
+		boolean moreResults = offset + SynapseSuggestBox.PAGE_SIZE < numResults;
 		nextBtn.setEnabled(moreResults);
 		
 		String resultsLabel = "Displaying " + (offset + 1) + " - "
-								+ (moreResults ? offset + UserGroupSuggestBox.PAGE_SIZE : numResults)
+								+ (moreResults ? offset + SynapseSuggestBox.PAGE_SIZE : numResults)
 								+ " of " + numResults;
 		resultsLbl.setText(resultsLabel);
 	}

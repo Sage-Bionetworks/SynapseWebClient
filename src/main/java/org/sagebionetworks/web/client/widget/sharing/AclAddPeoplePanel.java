@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -39,13 +39,13 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 	@UiField
 	Tooltip notifyTooltip;
 	
-	private UserGroupSuggestBox suggestBox;
+	private SynapseSuggestBox suggestBox;
 	
 	private HandlerRegistration makePublicReg;
 	
 	@Inject
 	public AclAddPeoplePanel(AclAddPeoplePanelUiBinder uiBinder,
-			UserGroupSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
+			SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.suggestBox = suggestBox;
 		this.suggestBox.setSuggestionProvider(provider);
@@ -53,7 +53,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 		notifyTooltip.setTitle(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 	}
 	
-	public UserGroupSuggestBox getSuggestBox() {
+	public SynapseSuggestBox getSuggestBox() {
 		return suggestBox;
 	}
 	

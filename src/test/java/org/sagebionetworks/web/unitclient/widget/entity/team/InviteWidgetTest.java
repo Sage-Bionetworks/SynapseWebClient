@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -35,7 +35,7 @@ public class InviteWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	InviteWidgetView mockView;
 	SynapseAlert mockSynAlert;
-	UserGroupSuggestBox mockSuggestBox;
+	SynapseSuggestBox mockSuggestBox;
 	SynapseJSNIUtils mockJSNIUtils;
 	Team mockTeam;
 	String teamId = "123";
@@ -56,7 +56,7 @@ public class InviteWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		mockSuggestBox = mock(UserGroupSuggestBox.class);
+		mockSuggestBox = mock(SynapseSuggestBox.class);
 		mockSuggestion = mock(UserGroupSuggestion.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockHeader = mock(UserGroupHeader.class);

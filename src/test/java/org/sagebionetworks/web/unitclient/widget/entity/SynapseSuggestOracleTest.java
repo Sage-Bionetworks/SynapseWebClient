@@ -15,10 +15,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.widget.search.SuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestionBundle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.SuggestOracle.Response;
 
 public class SynapseSuggestOracleTest {
 
-	UserGroupSuggestBox mockSuggestBox;
+	SynapseSuggestBox mockSuggestBox;
 	SuggestionProvider mockSuggestionProvider;
 	SynapseSuggestOracle presenter;
 	SynapseSuggestion mockSuggestion;
@@ -42,7 +42,7 @@ public class SynapseSuggestOracleTest {
 	
 	@Before
 	public void setup() {
-		mockSuggestBox = mock(UserGroupSuggestBox.class);
+		mockSuggestBox = mock(SynapseSuggestBox.class);
 		mockSuggestionProvider = mock(SuggestionProvider.class);
 		mockSuggestion = mock(SynapseSuggestion.class);
 		mockCallback = mock(SuggestOracle.Callback.class);
@@ -58,6 +58,12 @@ public class SynapseSuggestOracleTest {
 		}
 		int totalResults = 42;
 		suggBundle = new SynapseSuggestionBundle(suggList, totalResults);
+	}
+	
+	@Test
+	public void testConfigure() {
+		presenter.configure(mockSuggestBox, pageSize, mockSuggestionProvider);
+		mockTimer.configure(any(Runnable.class));
 	}
 	
 	@Test

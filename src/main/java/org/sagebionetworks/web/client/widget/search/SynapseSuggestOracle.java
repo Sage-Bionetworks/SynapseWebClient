@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.search;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
@@ -16,7 +15,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 	public int pageSize;
 	public int offset;
 	public boolean isLoading;
-	public UserGroupSuggestBox suggestBox;
+	public SynapseSuggestBox suggestBox;
 	public SuggestionProvider provider;
 	public String searchTerm;
 	public String width;
@@ -27,7 +26,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 		this.timer = timer;
 	}
 	
-	public void configure(final UserGroupSuggestBox suggestBox,
+	public void configure(final SynapseSuggestBox suggestBox,
 			int pageSize,
 			SuggestionProvider provider) {
 		this.isLoading = false;
@@ -53,7 +52,6 @@ public class SynapseSuggestOracle extends SuggestOracle {
 	public SuggestOracle.Callback getCallback()	{	return callback;	}
 
 	public void getSuggestions(final int offset) {
-		GWT.debugger();
 		if (!isLoading) {
 			suggestBox.showLoading();
 			//seachTerm or request.getQuery?
@@ -83,7 +81,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 		this.request = request;
 		this.callback = callback;
 		timer.cancel();
-		timer.schedule(UserGroupSuggestBox.DELAY);
+		timer.schedule(SynapseSuggestBox.DELAY);
 	}	
 	
 	@Override
