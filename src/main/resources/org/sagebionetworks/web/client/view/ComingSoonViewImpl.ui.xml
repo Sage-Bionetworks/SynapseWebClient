@@ -20,7 +20,10 @@
 		<div class="separator separator-header-page"></div>
 		<h2>Coming Soon</h2>
 		<div style="margin: 15px;">
-			<g:SimplePanel ui:field="entityView" addStyleNames="cytoscape-container" />
+			<g:SimplePanel ui:field="cytoscapeView" addStyleNames="cytoscape-container" />
+		</div>
+		<div style="margin: 15px;">
+			<g:SimplePanel ui:field="biodallianceView" addStyleNames="cytoscape-container" />
 		</div>
 		<g:FlexTable ui:field="flextTable1"></g:FlexTable>
 		This page is coming soon.

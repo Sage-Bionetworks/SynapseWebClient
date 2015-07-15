@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
 import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013;
 import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph242;
 import org.sagebionetworks.repo.model.Entity;
@@ -34,8 +36,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel entityView;
-		
+	SimplePanel biodallianceView;
+	
+	@UiField
+	SimplePanel cytoscapeView;
+	
 	private Presenter presenter;
 	private IconsImageBundle icons;
 	private Header headerWidget;
@@ -66,25 +71,34 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());	
-		entityView.addAttachHandler(new AttachEvent.Handler() {
+		cytoscapeView.addAttachHandler(new AttachEvent.Handler() {
 			@Override
 			public void onAttachOrDetach(AttachEvent event) {
 				if (event.isAttached()) {
 					String id = "cy1";
-					entityView.getElement().setId(id);
+					cytoscapeView.getElement().setId(id);
 					//cyjs is exported from Cytoscape via File->Export->Network->Cytoscape.js JSON (.cyjs)
-//					String cyjs = CYJS;
-//					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
-//					String styleJson = null; //set to null to avoid checking in large test constant
-//					new CytoscapeGraph242().show(id,  cyjs, styleJson);
-					GWT.debugger();
-					new Biodalliance013().show(id);
+					String cyjs = CYJS;
+					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
+					String styleJson = null; //set to null to avoid checking in large test constant
+					new CytoscapeGraph242().show(id,  cyjs, styleJson);
 				};
 			}
 		});
 
+		biodallianceView.addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					String id = "biodallianceId";
+					biodallianceView.getElement().setId(id);
+					new Biodalliance013().show(id);
+				};
+			}
+		});
+		
 	}
-
+	
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
