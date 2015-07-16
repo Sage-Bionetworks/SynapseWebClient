@@ -226,6 +226,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		};
 		historyWidget.configure(wikiKey, canEdit, actionHandler);
 		view.setWikiHistoryWidget(historyWidget);
+		view.showWikiHistory(true);
 	}
 	
 	@Override
