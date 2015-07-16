@@ -136,10 +136,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			@Override
 			public void onClick(ClickEvent event) {
 				if (!historyCollapse.isCollapsing()) {
-					if (wikiHistoryButton.getIcon() == IconType.CARET_DOWN) {
-						wikiHistoryButton.setIcon(IconType.CARET_UP);
+					if (wikiHistoryButton.getIcon() == IconType.CARET_SQUARE_O_RIGHT) {
+						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
 					} else {
-						wikiHistoryButton.setIcon(IconType.CARET_DOWN);
+						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
 					}
 				}
 			}
