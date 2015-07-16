@@ -73,6 +73,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem referenceLink;
 	@UiField
+	public AnchorListItem previewLink;
+	@UiField
 	public AnchorListItem submitToEvaluationLink;
 	@UiField
 	public AnchorListItem tableLink;
@@ -198,6 +200,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		youTubeLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_YOU_TUBE));
 		vimeoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIMEO));
+		previewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PREVIEW));
 		bookmarkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BOOKMARK));
 		synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));
 		externalWebsiteLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE));

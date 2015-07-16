@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityViewImpl implements EntityView {
-
+	
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
 	@UiField
@@ -43,22 +43,22 @@ public class EntityViewImpl implements EntityView {
 		// TODO : need to dynamically set the header widget
 		//headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 	}
-	
+
 	@Override
 	public void setHeaderWidget(IsWidget headerWidget) {
 		headerPanel.setWidget(headerWidget);
-	}
+			}
 	
-	@Override
+			@Override
 	public void setFooterWidget(IsWidget footerWidget) {
 		footerPanel.setWidget(footerWidget);
-	}
-	
-	@Override
+			}
+
+			@Override
 	public void setEntityPageTopWidget(IsWidget entityPageTopWidget) {
 		entityPageTopPanel.setWidget(entityPageTopWidget);
-	}
-	
+			}
+		
 	@Override
 	public void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidget) {
 		openInvitesPanel.setWidget(openTeamInvitesWidget);
@@ -78,7 +78,7 @@ public class EntityViewImpl implements EntityView {
 	public void showLoading() {
 		loadingUI.setVisible(true);
 	}
-	
+
 	@Override
 	public void hideLoading() {
 		loadingUI.setVisible(false);
@@ -113,26 +113,26 @@ public class EntityViewImpl implements EntityView {
 		entityBackgroundImage.setUrl(url);
 	}
 
-	@Override
+			@Override
 	public void showAccessDependentMessage() {
 		accessDependentMessage.setVisible(true);
-	}
-
-	@Override
+			}
+			
+			@Override
 	public void showOpenTeamInvites() {
 		openInvitesPanel.setVisible(true);
-	}
+				}
 
 	@Override
 	public void showEntityPageTop() {
 		entityPageTopPanel.setVisible(true);
-	}
+			}
 
 	@Override
 	public void hideAccessDependentMessage() {
 		accessDependentMessage.setVisible(false);
 	}
-
+	
 	@Override
 	public void hideOpenTeamInvites() {
 		openInvitesPanel.setVisible(false);		

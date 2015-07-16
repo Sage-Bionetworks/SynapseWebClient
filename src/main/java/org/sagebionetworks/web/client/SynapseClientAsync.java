@@ -189,9 +189,9 @@ public interface SynapseClientAsync {
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
 	
-	public void updateExternalFile(String entityId, String externalUrl, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+	public void updateExternalFile(String entityId, String externalUrl, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 	
-	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
 	

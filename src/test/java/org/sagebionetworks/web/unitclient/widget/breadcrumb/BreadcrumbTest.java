@@ -46,7 +46,7 @@ public class BreadcrumbTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
-						
+		
 		breadcrumb = new Breadcrumb(mockView, mockGlobalApplicationState);
 		
 		

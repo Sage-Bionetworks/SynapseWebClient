@@ -73,7 +73,7 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("resource/images/NIMH_logo.jpg")
 	ImageResource nimhLogo();
-
+	
 	@Source("resource/images/certificate.png")
 	ImageResource certificate();
 
