@@ -213,18 +213,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onCreateDOI() {
-		  synapseClient.createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
-			    @Override
-			    public void onSuccess(Void v) {
-			      view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
-			      entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-			    }
-			    @Override
-			    public void onFailure(Throwable caught) {
-			      if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-			        view.showErrorMessage(caught.getMessage());
-			    }
-			  });
+		synapseClient.createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void v) {
+				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 
 	
