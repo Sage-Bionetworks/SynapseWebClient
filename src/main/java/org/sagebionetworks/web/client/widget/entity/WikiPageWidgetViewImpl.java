@@ -136,7 +136,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			@Override
 			public void onClick(ClickEvent event) {
 				if (!historyCollapse.isCollapsing()) {
-					if (wikiHistoryButton.getIcon() == IconType.CARET_SQUARE_O_RIGHT) {
+					if (historyCollapse.isShown()) {
 						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
 					} else {
 						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
@@ -354,4 +354,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		mainPanel.setVisible(false);
 	}
 	
+	@Override
+	public void showHistoryCollapse() {
+		historyCollapse.show();
+	}
+	
+	@Override
+	public void hideHistoryCollapse() {
+		historyCollapse.hide();
+	}
 }

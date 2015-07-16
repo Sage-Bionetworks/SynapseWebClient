@@ -41,7 +41,7 @@
 				    </g:HTMLPanel>
 				    <b:Button ui:field="wikiHistoryButton" dataToggle="COLLAPSE" iconPosition="LEFT" 
 				        icon="CARET_SQUARE_O_RIGHT" dataTarget="#historyCollapse" text="Wiki History"/>
-				    <b:Collapse b:id="historyCollapse" ui:field="historyCollapse" toggle="false">
+				    <b:Collapse b:id="historyCollapse" ui:field="historyCollapse">
 	       			    <g:SimplePanel addStyleNames="margin-top-10" ui:field="wikiHistoryPanel"/>
 					</b:Collapse>
 				</g:FlowPanel>

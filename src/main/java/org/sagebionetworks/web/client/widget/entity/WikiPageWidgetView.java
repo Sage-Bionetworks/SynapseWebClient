@@ -66,4 +66,6 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void showMarkdown();
 	public void showMainPanel();
 	public void hideMainPanel();
+	void showHistoryCollapse();
+	void hideHistoryCollapse();
 }
