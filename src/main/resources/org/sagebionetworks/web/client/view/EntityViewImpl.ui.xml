@@ -5,7 +5,7 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	
+
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="headerPanel"/>

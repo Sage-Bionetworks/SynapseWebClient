@@ -32,7 +32,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		void configureHistoryWidget(boolean canEdit);
 		void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName);
 	}
-
+	
 	void setWikiHistoryWidget(IsWidget historyWidget);
 	void setWikiSubpagesWidget(IsWidget historyWidget);
 	void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages);

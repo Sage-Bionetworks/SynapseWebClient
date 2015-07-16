@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -182,12 +181,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void showPopup(String title, String message, MessagePopup popupType, Callback okCallback, Callback cancelCallback) {
-		DisplayUtils.showPopup(title, message, 
-				popupType, okCallback, cancelCallback);
+		DisplayUtils.showPopup(title, message, popupType, okCallback, cancelCallback); 
 	}
-
+	
 	@Override
 	public void setWikiSubpagesWidget(IsWidget wikiSubpages) {
+		wikiSubpagesPanel.clear();
+		wikiSubpagesPanel.add(wikiSubpages);
 		wikiSubpagesPanel.clear();
 		wikiSubpagesPanel.add(wikiSubpages);
 	}
@@ -315,7 +315,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		breadcrumbPanel.setVisible(false);
 	}
 	
-	@Override
 	public void hideHistory() {
 		wikiHistoryPanel.setVisible(false);
 	}

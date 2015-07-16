@@ -236,6 +236,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
@@ -783,7 +785,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
 		
 		// Preview
-		bind(PreviewWidgetViewImpl.class).in(Singleton.class);
 		bind(PreviewWidgetView.class).to(PreviewWidgetViewImpl.class);
 		
 		// ActionMenu V2
@@ -1122,5 +1123,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
 		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
 		bind(ErrorView.class).to(ErrorViewImpl.class);
+		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
 	}
 }

@@ -1935,6 +1935,12 @@ iframe[seamless] {
     overflow-y: auto !important;
 }
 
+.form-group>textarea.form-control {
+	border: 1px solid #dddddd;
+	padding: 5px;
+	border-radius: .2em;
+}
+
 .dropdown-menu>li>a, 
 .x-menu-list-item>a:visited,
 .x-menu-list-item>a:visited>* {

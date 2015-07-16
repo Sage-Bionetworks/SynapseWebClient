@@ -1,33 +1,50 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Unit test for the preview widget.
@@ -39,6 +56,7 @@ public class PreviewWidgetTest {
 	PreviewWidgetView mockView; 
 	RequestBuilderWrapper mockRequestBuilder;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	SynapseClientAsync mockSynapseClient;
 	EntityBundle testBundle;
 	FileEntity testEntity;
 	List<FileHandle> testFileHandleList;
@@ -46,6 +64,7 @@ public class PreviewWidgetTest {
 	SynapseAlert mockSynapseAlert;
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
+	Map<String, String> descriptor;
 	
 	@Before
 	public void before() throws Exception{
@@ -53,7 +72,8 @@ public class PreviewWidgetTest {
 		mockRequestBuilder = mock(RequestBuilderWrapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockSynapseAlert = mock(SynapseAlert.class);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert);
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
@@ -70,8 +90,27 @@ public class PreviewWidgetTest {
 		when(mockResponse.getText()).thenReturn(zipTestString);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
+		
+		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		
+		// create empty wiki descriptor
+		descriptor = new HashMap<String, String>();
+	}
+	@Test
+	public void testWrongEntityType(){
+		Project project = new Project();
+		project.setName("Test only");
+		project.setId("99");
+		testBundle.setEntity(project);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		
+		verify(mockView).addSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).showError(anyString());
 	}
 	
+	@Test
 	public void testNoPreviewFileHandleAvailable(){
 		S3FileHandle fh = new S3FileHandle();
 		fh.setId("previewFileId");
@@ -130,5 +169,37 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setTextPreview(anyString());
+	}
+	
+	@Test
+	public void testWikiConfigure() {		
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		previewWidget.configure(null, descriptor, null, null);
+		
+		//verify that it tries to get the entity bundle (without version)
+		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testWikiConfigureWithVersion() {		
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, "1");
+		previewWidget.configure(null, descriptor, null, null);
+		
+		//verify that it tries to get the entity bundle (without version)
+		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testWikiConfigureFailure() {
+		String exceptionMessage= "my test error message";
+		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
+		previewWidget.configure(null, descriptor, null, null);
+		
+		//verify that it tries to get the entity bundle (without version)
+		verify(mockView).addSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 }
