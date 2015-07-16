@@ -18,14 +18,11 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
+public class DoiWidgetViewImpl implements DoiWidgetView {
 	
 	private Presenter presenter;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
-	
-	@UiField	
-	Anchor createDoiLink;
 	
 	@UiField
 	Alert errorCreatingDoi;
@@ -47,37 +44,25 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		widget = uiBinder.createAndBindUi(this);
-		createDoiLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.createDoi();
-			}
-		});
 	}
 	
 	private void hideAllChildren() {
 		errorCreatingDoi.setVisible(false);
-		createDoiLink.setVisible(false);
 		doiProcessing.setVisible(false);
 		doiHTML.getElement().setInnerHTML("");
 	}
 	
 	@Override
-	public void showCreateDoi() {
-		hideAllChildren();
-	    createDoiLink.setVisible(true);
-	} 
-
-	@Override
 	public void showDoiError() {
+		widget.setVisible(true);
 		hideAllChildren();
 		//show error UI
-		createDoiLink.setVisible(true);
 		errorCreatingDoi.setVisible(true);
 	}
 	
 	@Override
 	public void showDoiInProgress() {
+		widget.setVisible(true);
 		hideAllChildren();
 		//show in process UI
 		doiProcessing.setVisible(true);
@@ -85,6 +70,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 	
 	@Override
 	public void showDoiCreated(String doiText) {
+		widget.setVisible(true);
 		hideAllChildren();
 		//ask for the doi prefix from the presenter, and show a link to that!
 		//first clear old handler, if there is one
@@ -121,5 +107,9 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 		DisplayUtils.showErrorMessage(message);
 	}
 	
+	@Override
+	public void setVisible(boolean visible) {
+		widget.setVisible(visible);
+	}
 
 }
