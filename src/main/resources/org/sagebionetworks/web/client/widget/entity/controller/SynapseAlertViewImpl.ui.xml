@@ -18,7 +18,7 @@
   		        404
   		    </p>
   		    <h1 class="margin-top-60-imp">
-				Forbidden
+				Page not found
 			</h1>
 			<p>
 				The page you requested was not found, that's all we know.
@@ -29,7 +29,7 @@
   		        403
   		    </p>
   		    <h1 class="margin-top-60-imp">
-				Page not found
+				Forbidden
 			</h1>
 			<p>
 				You are not authorized to access the page requested.
