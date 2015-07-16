@@ -64,7 +64,7 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 		@Override
 		public String getDisplayString() {
 			StringBuilder result = new StringBuilder();
-			result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
+			result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + "px;\">");
 			result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
 			result.append(jsniUtils.getBaseFileHandleUrl());
 			result.append("?teamId=" + team.getId() + "\" />");
@@ -81,7 +81,7 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 		public String getReplacementString() {
 			// Example output:
 			// Team Sage  |  114085
-			return team.getName() + "  |  " + team.getId();
+			return team.getName();
 		}
 
 		@Override

@@ -12,19 +12,19 @@
 					<g:SimplePanel ui:field="suggestBoxPanel"/>
 				</b:FormGroup>
 				<b:FormGroup>
-				    <b:FormLabel for="joinButtonText">Non-Member Button Text</b:FormLabel>
+				    <b:FormLabel for="joinButtonText">Message for Non-Members</b:FormLabel>
 					<b:TextBox ui:field="joinButtonField" name="joinButtonText" b:id="joinButtonText"/>
 				</b:FormGroup>	
 				<b:FormGroup>
-				    <b:FormLabel for="memberMessageField">Member Button Text</b:FormLabel>
+				    <b:FormLabel for="memberMessageField">Message for Members</b:FormLabel>
 					<b:TextBox ui:field="memberMessageField" name="memberMessageField" b:id="memberMessageField"/>
 				</b:FormGroup>	
 				<b:FormGroup>
-				    <b:FormLabel for="joinSuccessText">Successfully joined Button Text</b:FormLabel>
+				    <b:FormLabel for="joinSuccessText">Successfully joined Notification Message</b:FormLabel>
 					<b:TextBox ui:field="joinSuccessField" name="joinSuccessText" b:id="joinSuccessText" />
 				</b:FormGroup>	
 				<b:FormGroup>
-				    <b:FormLabel for="requestOpenInfoText">Team Request Open Button Text</b:FormLabel>
+				    <b:FormLabel for="requestOpenInfoText">Team Request Pending Message</b:FormLabel>
 					<b:TextBox ui:field="requestOpenInfoField" name="requestOpenInfoText" b:id="requestOpenInfoText" />
 				</b:FormGroup>	
 				<b:FormGroup>

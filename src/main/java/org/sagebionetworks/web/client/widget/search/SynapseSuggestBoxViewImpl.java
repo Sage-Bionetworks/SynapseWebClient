@@ -52,8 +52,8 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 				selectedItem.setText("");
 				if (presenter.getSelectedSuggestion() != null) {
 					// is this the same text that weas being filled in before?
-					suggestBox.setText(selectedItem.getText());
-					//suggestBox.setText(presenter.getSelectedSuggestion().getPrefix());
+//					suggestBox.setText(selectedItem.getText());
+					suggestBox.setText(presenter.getSelectedSuggestion().getPrefix());
 				}
 				suggestBox.showSuggestionList();
 			}
