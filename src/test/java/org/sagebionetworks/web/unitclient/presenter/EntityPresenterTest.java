@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -119,7 +118,7 @@ public class EntityPresenterTest {
 		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
 		verify(mockEntityPageTop).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockEntityPageTop).setAreaChangeHandler(any(AreaChangeHandler.class));
-		verify(mockHeaderWidget).configure(false);
+		verify(mockHeaderWidget, never()).configure(false); // waits to configure for entity header
 		verify(mockHeaderWidget).refresh();
 	}	
 	
@@ -141,6 +140,20 @@ public class EntityPresenterTest {
 		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockEntityPageTop).refresh();
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
+		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
+	}
+	
+	@Test
+	public void testSetEntityBundle() {
+		EntityHeader entityHeader = new EntityHeader();
+		Long versionNumber = 1L;
+		entityPresenter.setEntityBundle(eb, versionNumber, entityHeader, area, areaToken);
+		verify(mockView).showEntityPageTop();
+		verify(mockEntityPageTop).clearState();
+		verify(mockEntityPageTop).configure(eb, versionNumber, entityHeader, area, areaToken);
+		verify(mockEntityPageTop).refresh();
+		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
+		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop); // needs to be replaced after config
 	}
 	
 	@Test
