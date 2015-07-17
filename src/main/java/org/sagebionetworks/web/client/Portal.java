@@ -12,6 +12,8 @@ import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
+import com.google.gwt.resources.client.CssResource;
+import com.google.gwt.resources.client.ClientBundle.Source;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -93,7 +95,7 @@ public class Portal implements EntryPoint {
 								
 								// start version timer
 								ginjector.getVersionTimer().start();
-								
+								loadCss();
 								AsyncCallback<UserSessionData> sessionLoadedCallback = new AsyncCallback<UserSessionData>() {
 									@Override
 									public void onSuccess(UserSessionData result) {
@@ -124,6 +126,13 @@ public class Portal implements EntryPoint {
 			});
 			
 		}
+	}
+	
+	public void loadCss() {
+		SageCssBundle.INSTANCE.portalCss().ensureInjected();
+		SageCssBundle.INSTANCE.codeHighlightingCss().ensureInjected();
+		SageCssBundle.INSTANCE.provCss().ensureInjected();
+		SageCssBundle.INSTANCE.jqueryThemeCss().ensureInjected();
 	}
 	
 	public void reloadApp(int delay) {
