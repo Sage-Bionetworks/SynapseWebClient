@@ -107,8 +107,18 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("resource/images/spotlight/SMC-RNA_banner.jpg")
 	ImageResource dreamSMCRNA();
 	
+	@Source("resource/images/spotlight/U4C-banner.jpg")
+	ImageResource dreamU4C();
+	
+	
 	@Source("resource/images/spotlight/TcgaPancancer.jpg")
 	ImageResource tcgaPancancer();
+	
+	@Source("resource/images/spotlight/Astrazeneca_Sanger_banner.jpg")
+	ImageResource astrazenecaSanger();
+	
+	@Source("resource/images/spotlight/ALS2_banner.jpg")
+	ImageResource als2();
 	
 	@Source("resource/images/certificate.png")
 	ImageResource certificate();

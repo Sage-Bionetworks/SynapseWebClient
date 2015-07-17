@@ -53,6 +53,10 @@ public class UploadDialogWidget implements UploadDialogWidgetView.Presenter, Syn
 		uploader.disableMultipleFileUploads();
 	}
 	
+	public void setUploaderLinkNameVisible(boolean visible) {
+		uploader.setUploaderLinkNameVisible(visible);
+	}
+	
 	public void show() {
 		view.showDialog();
 	}

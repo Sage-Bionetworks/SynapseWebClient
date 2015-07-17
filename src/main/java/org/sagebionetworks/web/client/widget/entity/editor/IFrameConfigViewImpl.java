@@ -9,15 +9,15 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class YouTubeConfigViewImpl implements YouTubeConfigView {
-	public interface YouTubeConfigViewImplUiBinder extends UiBinder<Widget, YouTubeConfigViewImpl> {}
+public class IFrameConfigViewImpl implements IFrameConfigView {
+	public interface IFrameConfigViewImplUiBinder extends UiBinder<Widget, IFrameConfigViewImpl> {}
 	private Widget widget;
 	private Presenter presenter;
 	@UiField
 	TextBox urlField;
 	
 	@Inject
-	public YouTubeConfigViewImpl(YouTubeConfigViewImplUiBinder binder) {
+	public IFrameConfigViewImpl(IFrameConfigViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 	}
 	

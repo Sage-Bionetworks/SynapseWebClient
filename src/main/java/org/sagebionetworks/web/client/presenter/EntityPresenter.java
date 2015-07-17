@@ -134,7 +134,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
-			public void onSuccess(EntityBundle bundle) {				
+			public void onSuccess(EntityBundle bundle) {
 				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}
@@ -166,9 +166,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof NotFoundException) {
-					view.show404();
+					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
-					view.show403();
+					show403();
 				} else {
 					view.clear();
 					synAlert.handleException(caught);
@@ -180,6 +180,16 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		} else {
 			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
 		}
+	}
+	
+	public void show403() {
+		synAlert.show403();
+		view.show403();
+	}
+	
+	public void show404() {
+		synAlert.show404();
+		view.show404();
 	}
 	
 	public void loadBackgroundImage(final String projectEntityId) {

@@ -8,14 +8,13 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface DoiWidgetView extends IsWidget, SynapseView {
 
 	void setPresenter(Presenter presenter);
-	void showCreateDoi(); 
 	public interface Presenter {
-		public void createDoi();
 		public void getDoiPrefix(AsyncCallback<String> callback);
 		public String getDoiHtml(String prefix, boolean isReady);
 	}
 	void showDoiCreated(String doiText);
 	void showDoiInProgress();
 	void showDoiError();
+	void setVisible(boolean visible);
 
 }

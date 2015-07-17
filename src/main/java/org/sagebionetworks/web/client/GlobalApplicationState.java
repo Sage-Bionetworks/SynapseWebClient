@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
@@ -98,7 +99,7 @@ public interface GlobalApplicationState {
 	
 	public void setFavorites(List<EntityHeader> favorites);
 	
-	public void checkVersionCompatibility(AsyncCallback<String> callback);
+	public void checkVersionCompatibility(AsyncCallback<VersionState> callback);
 	public boolean isEditing();
 	public void setIsEditing(boolean isEditing);
 	

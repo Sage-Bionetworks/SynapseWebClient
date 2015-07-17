@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -11,6 +12,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -36,6 +38,10 @@ public class SynapseAlertViewImpl implements
 	Strong alertText;
 	@UiField
 	Alert alert;
+	@UiField
+	HTMLPanel httpCode403;
+	@UiField
+	HTMLPanel httpCode404;
 	
 	@UiField
 	Alert loginAlert;
@@ -99,6 +105,8 @@ public class SynapseAlertViewImpl implements
 		alertText.setText("");
 		loginAlert.setVisible(false);
 		widget.setVisible(false);
+		httpCode403.setVisible(false);
+		httpCode404.setVisible(false);
 	}
 	
 	@Override
@@ -112,6 +120,18 @@ public class SynapseAlertViewImpl implements
 		widget.setVisible(true);
 		alert.setText(error);
 		alert.setVisible(true);
+	}
+	
+	@Override
+	public void show403() {
+		widget.setVisible(true);
+		httpCode403.setVisible(true);
+	}
+	
+	@Override
+	public void show404() {
+		widget.setVisible(true);
+		httpCode404.setVisible(true);
 	}
 	
 }

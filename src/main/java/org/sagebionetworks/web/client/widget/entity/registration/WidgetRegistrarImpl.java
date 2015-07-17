@@ -53,6 +53,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getReferenceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
 			presenter = ginInjector.getYouTubeConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.VIMEO_CONTENT_TYPE)) {
+			presenter = ginInjector.getVimeoConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
@@ -81,6 +83,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getSynapseTableQueryResultEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE)) {
 			presenter = ginInjector.getProjectBackgroundConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getPreviewConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -108,6 +112,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getReferenceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.YOUTUBE_CONTENT_TYPE)) {
 			presenter = ginInjector.getYouTubeRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.VIMEO_CONTENT_TYPE)) {
+			presenter = ginInjector.getVimeoRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.IMAGE_CONTENT_TYPE)) {
@@ -148,7 +154,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getChallengeTeamsWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
 			presenter = ginInjector.getChallengeParticipantsWidget();
-		}	 
+		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getPreviewWidget();
+		}
 		//TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -219,6 +227,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.BOOKMARK_CONTENT_TYPE, WidgetConstants.BOOKMARK_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.REFERENCE_CONTENT_TYPE, WidgetConstants.REFERENCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE, WidgetConstants.YOUTUBE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.VIMEO_CONTENT_TYPE, WidgetConstants.VIMEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PROVENANCE_CONTENT_TYPE, WidgetConstants.PROVENANCE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.IMAGE_CONTENT_TYPE, WidgetConstants.IMAGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, WidgetConstants.ATTACHMENT_PREVIEW_FRIENDLY_NAME);
@@ -232,6 +241,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE, WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.PREVIEW_CONTENT_TYPE, WidgetConstants.PREVIEW_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

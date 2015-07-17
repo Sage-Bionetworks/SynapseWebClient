@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
-
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.HasDirection.Direction;
-import com.google.gwt.safehtml.shared.SafeHtml;
 
 
 public class DisplayConstants {

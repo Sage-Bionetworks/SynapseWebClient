@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -334,6 +333,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_VIDEO:
 			insertNewWidget(WidgetConstants.VIDEO_CONTENT_TYPE);
 			break;
+		case INSERT_VIMEO:
+			insertNewWidget(WidgetConstants.VIMEO_CONTENT_TYPE);
+			break;
 		case INSERT_YOU_TUBE:
 			insertNewWidget(WidgetConstants.YOUTUBE_CONTENT_TYPE);
 			break;
@@ -364,7 +366,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_CHALLENGE_PARTICIPANTS:
 			insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.CHALLENGE_PARTICIPANTS_CONTENT_TYPE + "?"+WidgetConstants.CHALLENGE_ID_KEY + "=123&"+ WidgetConstants.IS_IN_CHALLENGE_TEAM_KEY +"=false" + WidgetConstants.WIDGET_END_MARKDOWN);
 			break;
-			
+		case INSERT_PREVIEW:
+			insertNewWidget(WidgetConstants.PREVIEW_CONTENT_TYPE);
+			break;
 		case BOLD:
 			surroundWithTag("**");
 			break;

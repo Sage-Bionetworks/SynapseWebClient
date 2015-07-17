@@ -43,6 +43,8 @@ import org.sagebionetworks.web.client.view.DownView;
 import org.sagebionetworks.web.client.view.DownViewImpl;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.view.EntityViewImpl;
+import org.sagebionetworks.web.client.view.ErrorView;
+import org.sagebionetworks.web.client.view.ErrorViewImpl;
 import org.sagebionetworks.web.client.view.HelpView;
 import org.sagebionetworks.web.client.view.HelpViewImpl;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -133,6 +135,8 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItemView;
+import org.sagebionetworks.web.client.widget.entity.MoreTreeItemViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -183,12 +187,24 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityRefProvEntryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceURLDialogWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlertViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
@@ -217,6 +233,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigView;
@@ -233,8 +251,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -259,6 +277,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
@@ -704,6 +724,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// QuestionContainerWidget
 		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetViewImpl.class);
 		
+		// IFrameWidget
+		bind(IFrameWidgetView.class).to(IFrameWidgetViewImpl.class);
+		
 		// DoiWidget
 		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
 		
@@ -757,7 +780,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
 		
 		// Preview
-		bind(PreviewWidgetViewImpl.class).in(Singleton.class);
 		bind(PreviewWidgetView.class).to(PreviewWidgetViewImpl.class);
 		
 		// ActionMenu V2
@@ -861,7 +883,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BookmarkConfigView.class).to(BookmarkConfigViewImpl.class);
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
-		bind(YouTubeConfigView.class).to(YouTubeConfigViewImpl.class);
+		bind(IFrameConfigView.class).to(IFrameConfigViewImpl.class);
 		bind(ImageConfigViewImpl.class).in(Singleton.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
 		bind(AttachmentConfigViewImpl.class).in(Singleton.class);
@@ -907,6 +929,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Entity Finder
 		bind(EntityFinderView.class).to(EntityFinderViewImpl.class);		
+		
+		// MoreTreeItem
+		bind(MoreTreeItemView.class).to(MoreTreeItemViewImpl.class);
 
 		bind(EvaluationSubmitterView.class).to(EvaluationSubmitterViewImpl.class);
 		
@@ -1086,5 +1111,14 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
 		bind(SynapseAlert.class).to(SynapseAlertImpl.class);
+		
+		bind(ProvenanceEditorWidgetView.class).to(ProvenanceEditorWidgetViewImpl.class);
+		bind(ProvenanceListWidgetView.class).to(ProvenanceListWidgetViewImpl.class);
+		bind(ProvenanceURLDialogWidgetView.class).to(ProvenanceURLDialogWidgetViewImpl.class);
+		bind(EntityRefProvEntryView.class).to(EntityRefProvEntryViewImpl.class);
+		bind(URLProvEntryView.class).to(URLProvEntryViewImpl.class);
+		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
+		bind(ErrorView.class).to(ErrorViewImpl.class);
+		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
 	}
 }

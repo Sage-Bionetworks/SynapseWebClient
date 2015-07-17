@@ -36,11 +36,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		void addMoreButton(MoreTreeItem moreItem, String parentId,
 				EntityTreeItem parent, long offset);
 
-		void getFolderChildren(String parentId, EntityTreeItem parent,
-				long offset);
-
-		void getChildrenFiles(String parentId, EntityTreeItem parent,
-				long offset);
+		void getChildren(String parentId, EntityTreeItem parent, long offset);
 
 	}
 
@@ -48,25 +44,15 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 
 	void appendChildEntityTreeItem(EntityTreeItem childToAdd,
 			EntityTreeItem parent);
-	
-	void insertRootEntityTreeItem(EntityTreeItem childToAdd, long offset);
-
-	void insertChildEntityTreeItem(EntityTreeItem childToAdd,
-			EntityTreeItem parent, long offset);
 
 	void configureEntityTreeItem(EntityTreeItem childToAdd);
 
-	void placeChildMoreFilesTreeItem(MoreTreeItem childToCreate,
+	void placeChildMoreTreeItem(MoreTreeItem childToCreate,
 			EntityTreeItem parent, long offset);
 
-	void placeChildMoreFoldersTreeItem(MoreTreeItem childToCreate,
-			EntityTreeItem parent, long offset);
-
-	void placeRootMoreFilesTreeItem(MoreTreeItem childToCreate,
+	void placeRootMoreTreeItem(MoreTreeItem childToCreate,
 			String parentId, long offset);
 
-	void placeRootMoreFoldersTreeItem(MoreTreeItem childToCreate,
-			String parentId, long offset);
 
 	void showEmptyUI();
 
@@ -75,5 +61,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void hideEmptyUI();
 	
 	void setLoadingVisible(boolean isShown);
+
 
 }

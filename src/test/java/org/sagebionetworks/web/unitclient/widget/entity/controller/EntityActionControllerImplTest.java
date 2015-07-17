@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -37,6 +38,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -59,6 +61,8 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -95,10 +99,11 @@ public class EntityActionControllerImplTest {
 	EntityActionControllerImpl controller;
 	String parentId;
 	String entityId;
-//	String entityDispalyType;
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
 	MarkdownEditorWidget mockMarkdownEditorWidget;
+	ProvenanceEditorWidget mockProvenanceEditorWidget;
+	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
 
 	@Before
@@ -114,13 +119,13 @@ public class EntityActionControllerImplTest {
 		mockMarkdownEditorWidget = Mockito.mock(MarkdownEditorWidget.class);
 		mockAccessControlListModalWidget = Mockito
 				.mock(AccessControlListModalWidget.class);
-		
+		mockProvenanceEditorWidget = Mockito.mock(ProvenanceEditorWidget.class);
 		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
 		mockEntityUpdatedHandler = Mockito.mock(EntityUpdatedHandler.class);
 		mockEntityFinder = Mockito.mock(EntityFinder.class);
 		mockSubmitter = Mockito.mock(EvaluationSubmitter.class);
 		mockUploader = Mockito.mock(UploadDialogWidget.class);
-		
+		mockStorageLocationWidget = Mockito.mock(StorageLocationWidget.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -131,7 +136,7 @@ public class EntityActionControllerImplTest {
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
 				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockUploader,
-				mockMarkdownEditorWidget);
+				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -308,6 +313,45 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
 		verify(mockActionMenu).addActionListener(Action.UPLOAD_NEW_FILE, controller);
 	}
+	
+	@Test
+	public void testConfigureProvenanceFileCanEdit(){
+		boolean canEdit = true;
+		entityBundle.getPermissions().setCanEdit(canEdit);
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).addActionListener(Action.EDIT_PROVENANCE, controller);
+	}
+	
+	@Test
+	public void testConfigureProvenanceFileCannotEdit(){
+		boolean canEdit = false;
+		entityBundle.getPermissions().setCanEdit(canEdit);
+		entityBundle.setEntity(new FileEntity());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
+		verify(mockActionMenu).addActionListener(Action.EDIT_PROVENANCE, controller);
+	}
+	
+	@Test
+	public void testConfigureProvenanceNonFile(){
+		entityBundle.setEntity(new Folder());
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, false);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
+	}
+	
+	@Test
+	public void testOnEditProvenance(){
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.EDIT_PROVENANCE);
+		verify(mockProvenanceEditorWidget).configure(entityBundle, mockEntityUpdatedHandler);
+		verify(mockProvenanceEditorWidget).show();
+	}
+	
 	
 	@Test
 	public void testOnDeleteConfirmCancel(){
@@ -698,6 +742,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.UPLOAD_NEW_FILE);
 		verify(mockUploader).show();
+		verify(mockUploader).setUploaderLinkNameVisible(false);
 	}
 
 	@Test
@@ -802,4 +847,63 @@ public class EntityActionControllerImplTest {
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testCreateDoi() throws Exception {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_DOI);
+		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+		//refresh page
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testCreateDoiFail() throws Exception {
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_DOI);
+		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testConfigureDoiNotFound() throws Exception {
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		//initially hide, then show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, true);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, true);
+	}
+	
+	
+	@Test
+	public void testConfigureDoiNotFoundNonEditable() throws Exception {
+		permissions.setCanEdit(false);
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		//initially hide, never show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionEnabled(Action.CREATE_DOI, true);
+	}
+	
+	@Test
+	public void testConfigureDoiFound() throws Exception {
+		Doi mockDoi = Mockito.mock(Doi.class);
+		AsyncMockStubber.callSuccessWith(mockDoi).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		//initially hide, never show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionEnabled(Action.CREATE_DOI, true);
+
+	}
+
+	
 }

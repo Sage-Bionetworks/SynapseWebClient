@@ -13,6 +13,8 @@ public interface MarkdownWidgetView extends IsWidget {
 		void configure(String md, WikiPageKey wikiKey, boolean isPreview,
 				Long wikiVersionInView);
 
+		void clear();
+
 	}
 
 	void setSynAlertWidget(Widget synAlert);
