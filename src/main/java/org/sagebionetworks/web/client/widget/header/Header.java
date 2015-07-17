@@ -41,6 +41,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.favWidget = favWidget;
+		view.clear();
 		view.setProjectFavoriteWidget(favWidget);
 		view.setPresenter(this);
 	}
@@ -57,6 +58,10 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setProjectHeaderText("Synapse");
 		view.setProjectHeaderAnchorTarget("#");
 		view.hideProjectFavoriteWidget();
+		setLogo(largeLogo);
+	}
+	
+	public void setLogo(boolean largeLogo) {
 		if (largeLogo) {
 			view.showLargeLogo();
 		} else {
@@ -64,12 +69,13 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		}
 	}
 	
-	public void configure(EntityHeader projectHeader) {
+	public void configure(boolean largeLogo, EntityHeader projectHeader) {
 		String projectId = projectHeader.getId();
 		favWidget.configure(projectId);
 		view.setProjectHeaderAnchorTarget("#!Synapse:" + projectId);
 		view.setProjectHeaderText(projectHeader.getName());
 		view.showProjectFavoriteWidget();
+		setLogo(largeLogo);
 	}
 
 	public Widget asWidget() {
