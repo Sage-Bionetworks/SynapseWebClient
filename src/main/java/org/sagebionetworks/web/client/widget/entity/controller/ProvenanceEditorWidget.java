@@ -80,41 +80,43 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 				view.setName(result.getName());
 				view.setDescription(result.getDescription());
 				Set<Used> allProvenance = result.getUsed();
-				List<ProvenanceEntry> usedEntries = new LinkedList<ProvenanceEntry>();
-				List<ProvenanceEntry> executedEntries = new LinkedList<ProvenanceEntry>();
-				for (Used provEntry: allProvenance) {    
-					ProvenanceEntry toAdd;
-					if (provEntry instanceof UsedEntity) {
-						Reference ref = ((UsedEntity)provEntry).getReference();
-						toAdd = ginInjector.getEntityRefEntry();
-						String entityId = ref.getTargetId();
-						Long version = ref.getTargetVersionNumber();
-						String versionString = null;
-						if (version != null) {
-							versionString = version.toString();
+				if (allProvenance != null) {
+					List<ProvenanceEntry> usedEntries = new LinkedList<ProvenanceEntry>();
+					List<ProvenanceEntry> executedEntries = new LinkedList<ProvenanceEntry>();
+					for (Used provEntry: allProvenance) {    
+						ProvenanceEntry toAdd;
+						if (provEntry instanceof UsedEntity) {
+							Reference ref = ((UsedEntity)provEntry).getReference();
+							toAdd = ginInjector.getEntityRefEntry();
+							String entityId = ref.getTargetId();
+							Long version = ref.getTargetVersionNumber();
+							String versionString = null;
+							if (version != null) {
+								versionString = version.toString();
+							}
+							((EntityRefProvEntryView)toAdd).configure(entityId, versionString);
+							toAdd.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(entityId, version));
+						} else {
+							UsedURL usedURL = (UsedURL) provEntry;
+							toAdd = ginInjector.getURLEntry();
+							String name = usedURL.getName();
+							String url = usedURL.getUrl();
+							if (name == null || name.trim().isEmpty()) {
+								name = usedURL.getUrl();
+							}
+							((URLProvEntryView)toAdd).configure(name, url);
+							toAdd.setAnchorTarget(url);
 						}
-						((EntityRefProvEntryView)toAdd).configure(entityId, versionString);
-						toAdd.setAnchorTarget(DisplayUtils.getSynapseHistoryToken(entityId, version));
-					} else {
-						UsedURL usedURL = (UsedURL) provEntry;
-						toAdd = ginInjector.getURLEntry();
-						String name = usedURL.getName();
-						String url = usedURL.getUrl();
-						if (name == null || name.trim().isEmpty()) {
-							name = usedURL.getUrl();
+						
+						if (provEntry.getWasExecuted()) {
+							executedEntries.add(toAdd);
+						} else {
+							usedEntries.add(toAdd);
 						}
-						((URLProvEntryView)toAdd).configure(name, url);
-						toAdd.setAnchorTarget(url);
 					}
-					
-					if (provEntry.getWasExecuted()) {
-						executedEntries.add(toAdd);
-					} else {
-						usedEntries.add(toAdd);
-					}
+					usedProvenanceList.configure(usedEntries);
+					executedProvenanceList.configure(executedEntries);
 				}
-				usedProvenanceList.configure(usedEntries);
-				executedProvenanceList.configure(executedEntries);
 			}
 		});
 	}
