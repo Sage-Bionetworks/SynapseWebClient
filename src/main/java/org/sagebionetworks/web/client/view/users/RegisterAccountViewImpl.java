@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.view.users;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -79,7 +79,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	
 	private boolean checkEmailFormat(){
 		DisplayUtils.hideFormError(emailAddress, emailAddressError);
-		if (LoginPresenter.isValidEmail(emailAddressField.getValue())) {
+		if (ValidationUtils.isValidEmail(emailAddressField.getValue())) {
 			return true;
 		}
 		else {

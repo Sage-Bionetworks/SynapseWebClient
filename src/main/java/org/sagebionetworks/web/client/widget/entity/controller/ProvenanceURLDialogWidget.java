@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -49,8 +50,11 @@ public class ProvenanceURLDialogWidget implements ProvenanceURLDialogWidgetView.
 	
 	@Override
 	public void onSave() {
-		if (view.getURLAddress().isEmpty()) {
-			synAlert.showError("External URL must not be empty!");
+		String url = view.getURLAddress();
+		if (url == null || url.isEmpty()) {
+			synAlert.showError("External URL must not be empty.");
+		} else if (!ValidationUtils.isValidUrl(url, false)) {
+			synAlert.showError("External URL is malformed. Please enter a valid URL.");
 		} else if (confirmCallback != null) {
 			confirmCallback.invoke();
 		}
