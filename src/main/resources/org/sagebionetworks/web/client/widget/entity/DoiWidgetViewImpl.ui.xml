@@ -12,7 +12,6 @@
 	        <bh:Strong text="Error creating DOI"/>
 	    </b:Alert>
 	    <g:HTMLPanel ui:field="doiHTML" addStyleNames="inline-block" visible="false"/>
-	    <b:Anchor text="create DOI" ui:field="createDoiLink" visible="false" addStyleNames="link"/>
 	    <g:SimplePanel ui:field="doiProcessing" addStyleNames="inline-block">
 	        <bh:Text text="DOI processing"/>
 	    </g:SimplePanel>
