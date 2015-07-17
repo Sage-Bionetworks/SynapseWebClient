@@ -46,4 +46,5 @@ public interface HeaderView extends IsWidget {
 	void setProjectFavoriteWidget(IsWidget favWidget);
 	void showProjectFavoriteWidget();
 	void hideProjectFavoriteWidget();
+	void clear();
 }

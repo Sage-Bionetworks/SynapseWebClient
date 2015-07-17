@@ -122,7 +122,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				replaceEntityArea(area, areaToken);
 			}
 		});
-		headerWidget.configure(false);
 		headerWidget.refresh();
 	}
 
@@ -244,7 +243,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		entityPageTop.clearState();
 		entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 		entityPageTop.refresh();
-		headerWidget.configure(projectHeader);
+		headerWidget.configure(false, projectHeader);
 		view.setEntityPageTopWidget(entityPageTop);
 	}
 	

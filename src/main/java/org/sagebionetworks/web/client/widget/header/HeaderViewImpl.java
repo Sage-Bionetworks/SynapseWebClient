@@ -124,6 +124,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		addUserPicturePanel();
 		initClickHandlers();
 		refreshTestSiteHeader();
+		clear();
+	}
+	
+	@Override
+	public void clear() {
+		setProjectHeaderText("");
+		showSmallLogo();
 	}
 	
 	@Override
