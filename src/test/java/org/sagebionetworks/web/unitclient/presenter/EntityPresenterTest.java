@@ -123,7 +123,7 @@ public class EntityPresenterTest {
 	}	
 	
 	@Test
-	public void testSetPlaceWithVersion() {
+	public void testSetPlaceAndRefreshWithVersion() {
 		Long versionNumber = 1L;
 		Synapse place = Mockito.mock(Synapse.class);
 		when(place.getVersionNumber()).thenReturn(1L);
@@ -157,7 +157,7 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testSetPlaceWithoutVersion() {
+	public void testSetPlaceAndRefreshWithoutVersion() {
 		Long versionNumber = 1L;
 		Synapse place = Mockito.mock(Synapse.class);
 		when(place.getVersionNumber()).thenReturn(1L);
@@ -186,7 +186,7 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testRefreshWikiBasedEntity() {
+	public void testSetPlaceAndRefreshWikiBasedEntity() {
 		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
@@ -199,7 +199,7 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testRefreshWikiBasedEntityInTestWebsite() {
+	public void testSetPlaceAndRefreshWikiBasedEntityInTestWebsite() {
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
 		Exception caught = new Exception("test");
@@ -222,7 +222,7 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testRefreshFailure() {
+	public void testSetPlaceAndRefreshFailure() {
 		Exception caught = new Exception("test");
 		//will show full project page for wiki based entities when in alpha mode
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
@@ -234,6 +234,14 @@ public class EntityPresenterTest {
 		//verify synapse client call
 		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
+	}
+	
+	@Test
+	public void testClear() {
+		entityPresenter.clear();
+		verify(mockView).clear();
+		verify(mockSynAlert).clear();
+		verify(mockOpenInviteWidget).clear();
 	}
 	
 	@Test
