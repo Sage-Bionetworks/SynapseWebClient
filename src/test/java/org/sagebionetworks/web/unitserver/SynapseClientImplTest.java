@@ -1505,6 +1505,12 @@ public class SynapseClientImplTest {
 		assertFalse(bundle2.getIsTeamAdmin());
 		assertEquals(profile2, bundle2.getUserProfile());
 	}
+	
+	@Test
+	public void testIsTeamMember() throws NumberFormatException, RestServiceException, SynapseException {
+		synapseClient.isTeamMember(entityId, Long.valueOf(teamA.getId()));
+		verify(mockSynapse).getTeamMembershipStatus(teamA.getId(), entityId);
+	}
 
 	@Test
 	public void testGetEntityHeaderBatch() throws SynapseException,
