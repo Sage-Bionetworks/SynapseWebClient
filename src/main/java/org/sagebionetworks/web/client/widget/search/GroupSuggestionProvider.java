@@ -57,6 +57,7 @@ public class GroupSuggestionProvider implements SuggestionProvider {
 			this.prefix = prefix;
 		}
 		
+		public String getName() { return team.getName(); }
 		public Team getTeam()		{	return team;			}
 		public String getPrefix() 				{	return prefix;			}
 		public void setPrefix(String prefix)	{	this.prefix = prefix;	}

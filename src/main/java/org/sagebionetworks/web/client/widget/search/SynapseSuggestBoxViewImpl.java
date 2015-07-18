@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.search;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.SuggestBox;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 
@@ -22,6 +23,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	private Presenter presenter;
 	SuggestBox suggestBox;
 	TextBox selectedItem;
+	Text selectedItemText;
 	SageImageBundle sageImageBundle;
 	
 	@Inject
@@ -34,7 +36,6 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		suggestBox.getValueBox().addStyleName("form-control");
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
-
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
 				selectSuggestion((SynapseSuggestion)event.getSelectedItem());
@@ -78,8 +79,10 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 			}
 			
 		});
+		selectedItemText = new Text();
 		this.add(suggestBox);
 		this.add(selectedItem);
+		this.add(selectedItemText);
 	}
 	
 	@Override
@@ -172,5 +175,10 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	@Override
 	public String getText() {
 		return suggestBox.getText();
+	}
+
+	@Override
+	public void setSelectedText(String displayString) {
+		selectedItemText.setText(displayString);
 	}
 }

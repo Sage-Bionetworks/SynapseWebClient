@@ -58,6 +58,7 @@ public class UserGroupSuggestionProvider implements SuggestionProvider {
 			this.prefix = prefix;
 		}
 		
+		public String getName() 				{	return header.getUserName();	};
 		public UserGroupHeader getHeader()		{	return header;			}
 		public String getPrefix() 				{	return prefix;			}
 		public void setPrefix(String prefix)	{	this.prefix = prefix;	}

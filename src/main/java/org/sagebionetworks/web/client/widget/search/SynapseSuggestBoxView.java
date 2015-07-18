@@ -54,4 +54,5 @@ public interface SynapseSuggestBoxView extends IsWidget, SynapseView {
 
 	void configure(SynapseSuggestOracle oracle);
 	void setText(String text);
+	void setSelectedText(String displayString);
 }

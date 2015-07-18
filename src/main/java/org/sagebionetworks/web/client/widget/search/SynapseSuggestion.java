@@ -6,4 +6,5 @@ public interface SynapseSuggestion extends Suggestion {
 	public String getId();
 	public String isIndividual();
 	public String getPrefix();
+	public String getName();
 }

@@ -79,9 +79,12 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	@Override
 	public void setSelectedSuggestion(SynapseSuggestion selectedSuggestion) {
 		this.selectedSuggestion = selectedSuggestion;
-		if(callback != null && selectedSuggestion != null) {
-			callback.invoke(selectedSuggestion);
-		}
+		if (selectedSuggestion != null) {
+			view.setSelectedText("Currently selected: " + selectedSuggestion.getName());
+			if(callback != null) {
+				callback.invoke(selectedSuggestion);
+			}
+		}		
 	}
 	
 	public String getText() {
