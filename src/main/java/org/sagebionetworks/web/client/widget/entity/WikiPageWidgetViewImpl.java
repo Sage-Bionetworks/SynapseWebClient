@@ -12,6 +12,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -72,7 +74,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Button restoreButton;
 	
 	@UiField
-	SimplePanel wikiHistoryPanel;
+	FlowPanel wikiHistoryPanel;
 	
 	@UiField
 	FlowPanel wikiSubpagesPanel;
@@ -137,13 +139,15 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			public void onClick(ClickEvent event) {
 				if (!historyCollapse.isCollapsing()) {
 					if (historyCollapse.isShown()) {
-						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
-					} else {
 						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+					} else {
+						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
 					}
 				}
 			}
 		});
+		historyCollapse.hide();
+		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
 	}
 	
 	@Override
@@ -153,6 +157,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void clear() {
+		historyCollapse.hide();
+		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
 		loadingPanel.setVisible(false);
 		diffVersionAlert.setVisible(false);
 		noWikiCanEditMessage.setVisible(false);
@@ -271,7 +277,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void setWikiHistoryWidget(IsWidget historyWidget) {
-		wikiHistoryPanel.setWidget(historyWidget);
+		GWT.debugger();
+		wikiHistoryPanel.clear();
+		wikiHistoryPanel.add(historyWidget);
 	}
 	
 	@Override
@@ -316,11 +324,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void hideHistory() {
+		GWT.debugger();
 		wikiHistoryPanel.setVisible(false);
 	}
 	
 	@Override
 	public void showHistory() {
+		GWT.debugger();
 		wikiHistoryPanel.setVisible(true);
 	}
 	
