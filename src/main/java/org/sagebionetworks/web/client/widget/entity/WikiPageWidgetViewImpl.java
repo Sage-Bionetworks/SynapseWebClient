@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -277,7 +276,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void setWikiHistoryWidget(IsWidget historyWidget) {
-		GWT.debugger();
 		wikiHistoryPanel.clear();
 		wikiHistoryPanel.add(historyWidget);
 	}
@@ -324,13 +322,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void hideHistory() {
-		GWT.debugger();
 		wikiHistoryPanel.setVisible(false);
 	}
 	
 	@Override
 	public void showHistory() {
-		GWT.debugger();
 		wikiHistoryPanel.setVisible(true);
 	}
 	
