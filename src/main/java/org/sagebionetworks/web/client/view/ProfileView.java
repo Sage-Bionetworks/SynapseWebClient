@@ -67,6 +67,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void clearSortOptions();
 	void setGetCertifiedVisible(boolean isVisible);
 	void setEmptyProjectUIVisible(boolean b);
+	void setSynapseEmailVisible(boolean isVisible);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
