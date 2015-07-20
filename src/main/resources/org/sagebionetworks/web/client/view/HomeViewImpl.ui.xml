@@ -184,7 +184,7 @@
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-yellow-bg margin-top-10">
+			<b:Row addStyleNames="synapse-blue-bg margin-top-10">
 				<b:Column size="SM_12">
 					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="PROGRAMATIC CLIENTS"
@@ -251,7 +251,7 @@
 		</b:Container>
 		
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-blue-bg margin-top-40">
+			<b:Row addStyleNames="synapse-yellow-bg margin-top-40">
 				<b:Column size="SM_12">
 					<b:Heading ui:field="organizeDigitalResearchAssetsHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="ORGANIZE YOUR DIGITAL RESEARCH ASSETS"
