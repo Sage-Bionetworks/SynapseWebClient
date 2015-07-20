@@ -53,7 +53,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 		sendInviteButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.sendInvite(inviteTextArea.getValue());
+				presenter.validateAndSendInvite(inviteTextArea.getValue());
 			}
 		});
 		cancelButton.addClickHandler(new ClickHandler() {
