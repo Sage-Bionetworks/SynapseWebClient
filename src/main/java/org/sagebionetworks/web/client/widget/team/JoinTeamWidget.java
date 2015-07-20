@@ -276,7 +276,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 				if (!DisplayUtils.isDefined(text)) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-					wikiPage.loadMarkdownFromWikiPage(wikiKey, true, true);
+					boolean isPreview=true, isIgnoreLoadingFailure=true;
+					wikiPage.loadMarkdownFromWikiPage(wikiKey, isPreview, isIgnoreLoadingFailure);
 					view.showWikiAccessRequirement(wikiPage.asWidget(), termsOfUseCallback);
 				} else {
 					view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);	
