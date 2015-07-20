@@ -239,9 +239,9 @@ public class EntityPresenterTest {
 	@Test
 	public void testClear() {
 		entityPresenter.clear();
-		verify(mockView).clear();
-		verify(mockSynAlert).clear();
-		verify(mockOpenInviteWidget).clear();
+		verify(mockView, times(2)).clear();
+		verify(mockSynAlert, times(2)).clear();
+		verify(mockOpenInviteWidget, times(2)).clear();
 	}
 	
 	@Test

@@ -16,7 +16,7 @@ public interface InviteWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	public interface Presenter extends SynapsePresenter {
-		void sendInvite(String invitationMessage);
+		void validateAndSendInvite(String invitationMessage);
 		void configure(Team team);
 		void show();
 		void hide();

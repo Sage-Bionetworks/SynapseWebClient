@@ -21,7 +21,6 @@ public class VimeoConfigEditor implements IFrameConfigView.Presenter, WidgetEdit
 	@Inject
 	public VimeoConfigEditor(IFrameConfigView view) {
 		this.view = view;
-		view.setPresenter(this);
 		view.initView();
 	}	
 	

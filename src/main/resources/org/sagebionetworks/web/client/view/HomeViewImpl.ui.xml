@@ -249,6 +249,86 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
+		
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-blue-bg margin-top-40">
+				<b:Column size="SM_12">
+					<b:Heading ui:field="organizeDigitalResearchAssetsHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="ORGANIZE YOUR DIGITAL RESEARCH ASSETS"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Store and access files"></b:Heading>
+						<b:Heading size="H6" text="Synapse provides APIs and clients to store and access files using a unique Synapse ID through the web, R, python, and the command line." />
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Query structured data"></b:Heading>
+						<b:Heading size="H6" text="Use Synapse Tables to query structured data right from your web browser, or from any analytical client!" />
+					</b:Panel>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-green-bg margin-top-40">
+				<b:Column size="SM_12">
+					<b:Heading ui:field="getCreditHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="GET CREDIT FOR YOUR RESEARCH"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Mint a doi"></b:Heading>
+						<b:Heading size="H6" text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
+						<b:Heading size="H6" text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
+					</b:Panel>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		
+		
+		<b:Container fluid="true">
+			<b:Row addStyleNames="synapse-purple-bg margin-top-40">
+				<b:Column size="SM_12">
+					<b:Heading ui:field="collaborateHeading" size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
+							text="COLLABORATE"
+					></b:Heading>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		<b:Container fluid="true">
+			<b:Row>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
+						<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public!" />
+					</b:Panel>
+				</b:Column>
+				<b:Column size="SM_6" addStyleNames="margin-top-30">
+					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
+						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Create or join a team"></b:Heading>
+						<b:Heading size="H6" text="Manage your Synapse Teams from your profile page - organize groups of people who are collaborating with you." />
+					</b:Panel>
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		
 		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 

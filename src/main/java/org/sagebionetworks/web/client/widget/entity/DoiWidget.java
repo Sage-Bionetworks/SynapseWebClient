@@ -59,7 +59,7 @@ public class DoiWidget implements Presenter {
 	}
 
 	public void configureDoi() {
-		view.clear();
+		clear();
 		//get this entity's Doi (if it has one)
 		doi = null;
 		timer = null;
@@ -98,10 +98,7 @@ public class DoiWidget implements Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (caught instanceof NotFoundException) {
-					if (canEdit)
-						view.showCreateDoi();
-				} else {
+				if (!(caught instanceof NotFoundException)) {
 					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(caught.getMessage());
 				}
@@ -109,21 +106,6 @@ public class DoiWidget implements Presenter {
 		});
 	}
 
-	@Override
-	public void createDoi() {
-	  synapseClient.createDoi(entityId, versionNumber, new AsyncCallback<Void>() {
-	    @Override
-	    public void onSuccess(Void v) {
-	      view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
-	      configureDoi();
-	    }
-	    @Override
-	    public void onFailure(Throwable caught) {
-	      if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-	        view.showErrorMessage(caught.getMessage());
-	    }
-	  });
-	} 
 	@Override
 	public void getDoiPrefix(AsyncCallback<String> callback) {
 		stackConfigService.getDoiPrefix(callback);
@@ -156,10 +138,11 @@ public class DoiWidget implements Presenter {
 	public static String getDoiSpan(String fullDoi){
 		return "<span>" + fullDoi +"</span>";
 	}
-
 	
 	public void clear() {
+		view.setVisible(false);
 		view.clear();
 	}
 
+	
 }

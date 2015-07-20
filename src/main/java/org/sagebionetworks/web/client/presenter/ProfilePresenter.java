@@ -241,6 +241,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner) {
+		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
