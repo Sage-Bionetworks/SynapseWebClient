@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,7 +44,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JoinTeamWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private WikiPageWidget wikiPageWidget;
+	private MarkdownWidget wikiPage;
 	private GWTWrapper gwt;
 	private String teamId;
 	private boolean isChallengeSignup;
@@ -69,7 +71,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			AuthenticationController authenticationController, 
 			JSONObjectAdapter jsonObjectAdapter,
 			GWTWrapper gwt,
-			WikiPageWidget wikiPageWidget
+			MarkdownWidget wikiPage
 			) {
 		this.view = view;
 		view.setPresenter(this);
@@ -78,10 +80,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.authenticationController = authenticationController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
-		this.wikiPageWidget = wikiPageWidget;
-		wikiPageWidget.showCreatedBy(false);
-		wikiPageWidget.showModifiedBy(false);
-		wikiPageWidget.showWikiHistory(false);
+		this.wikiPage = wikiPage;
 	}
 	
 	/**
@@ -277,8 +276,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 				if (!DisplayUtils.isDefined(text)) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-					wikiPageWidget.configure(wikiKey, false, null, false);
-					view.showWikiAccessRequirement(wikiPageWidget.asWidget(), termsOfUseCallback);
+					wikiPage.loadMarkdownFromWikiPage(wikiKey, true, true);
+					view.showWikiAccessRequirement(wikiPage.asWidget(), termsOfUseCallback);
 				} else {
 					view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);	
 				}
