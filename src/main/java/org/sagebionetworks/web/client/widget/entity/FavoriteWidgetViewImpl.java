@@ -46,6 +46,7 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 		favoriteIcon.removeStyleName("greyText-imp");
 		favoriteIcon.addStyleName("favoriteIcon");
 		favoriteIcon.setVisible(true);
+		tip.setTitle("Click the star to remove this to your favorites!");
 	}
 	
 	@Override
@@ -54,6 +55,7 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 		favoriteIcon.removeStyleName("favoriteIcon");
 		favoriteIcon.addStyleName("greyText-imp");
 		favoriteIcon.setVisible(true);
+		tip.setTitle("Click the star to add this to your favorites!");
 	}
 
 	@Override
