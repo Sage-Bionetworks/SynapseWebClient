@@ -2253,3 +2253,700 @@ td.datePickerMonth {
 .border-bottom-1 {
   border-bottom: 1px solid #dddddd;
 }
+
+/* Provenance graph css */
+.provEntityNode {
+	opacity:0.8; 
+	filter:alpha(opacity=80); 
+	width:96px; 
+	height:46.8px;
+	padding-top: 2.4px;  
+	z-index:20; 
+	position:absolute;
+	top: 28.8px; 
+	color:black;
+	font-family:helvetica, sans; 
+	font-size:12px;
+	text-align:center;	
+	background-repeat: no-repeat;	
+	background-position: 42px 0px;
+}
+
+.provActivityNode { 
+	border:0.1em dotted #ccc; 
+	opacity:0.8; 
+	filter:alpha(opacity=80); 
+	width: 132px;
+	z-index:20; 
+	position:absolute; 
+	color:black;
+	font-family:helvetica, sans;
+	padding-top:3px; 	
+	font-size:12px;	
+
+	box-shadow: 2px 2px 10px #aaa;
+   -o-box-shadow: 2px 2px 10px #aaa;
+   -webkit-box-shadow: 2px 2px 10px #aaa;
+   -moz-box-shadow: 2px 2px 10px #aaa;
+   -moz-border-radius:3px;
+	border-radius:4px;
+}
+
+.provActivityNode .provActivityLabel {
+	font-size: 9.6px;
+	line-height: 10px;
+	text-transform: uppercase;
+	word-wrap: break-word;
+	font-weight: bold;
+}
+
+.provActivityNode .provActivityLabelTime  {
+	font-size: 9.6px;
+	line-height: 10px;
+	text-transform: uppercase;
+	word-wrap: break-word;
+}
+
+
+.provActivityNode .provActivityUndefinedIcon {
+	margin-top: -2.4px;
+}
+
+.provActivityNode .provEntityNode {
+	position: absolute;
+	top: 21.6px;
+	left: 6px;
+}
+
+.provExpandNode {
+	opacity:0.8; 
+	filter:alpha(opacity=80); 
+	width:32.4px; height:16.8px; 
+	z-index:20; 
+	position:absolute;	
+	color:black;
+	font-family:helvetica, sans;
+	padding-top:0px; 
+	font-size:12px;
+	text-align:center;	
+}
+
+.provUndefinedChange {
+	background-repeat: no-repeat;	
+	background-position: 48px 20.4px;
+	text-align: center;
+
+} 
+
+.provVersionDisplay {
+	font-size: 9.6px;
+	margin-top: -4.8px;
+}
+/* End provenance graph css */
+
+
+/* Code highlighting css */
+pre code {
+  display: block; padding: 0.5em;
+  background-color: #f4f4f4;
+  font-family:"Courier New", Courier, monospace;
+}
+
+pre code,
+pre .subst,
+pre .lisp .title,
+pre .clojure .built_in {
+  color: black;
+}
+
+pre .string,
+pre .title,
+pre .parent,
+pre .tag .value,
+pre .rules .value,
+pre .rules .value .number,
+pre .preprocessor,
+pre .ruby .symbol,
+pre .ruby .symbol .string,
+pre .aggregate,
+pre .template_tag,
+pre .django .variable,
+pre .smalltalk .class,
+pre .addition,
+pre .flow,
+pre .stream,
+pre .bash .variable,
+pre .apache .cbracket {
+  color: #050;
+}
+
+pre .comment,
+pre .annotation,
+pre .template_comment,
+pre .diff .header,
+pre .chunk {
+  color: #777;
+}
+
+pre .number,
+pre .date,
+pre .regexp,
+pre .literal,
+pre .smalltalk .symbol,
+pre .smalltalk .char,
+pre .change,
+pre .tex .special {
+  color: #800;
+}
+
+pre .label,
+pre .javadoc,
+pre .ruby .string,
+pre .decorator,
+pre .filter .argument,
+pre .localvars,
+pre .array,
+pre .attr_selector,
+pre .pseudo,
+pre .pi,
+pre .doctype,
+pre .deletion,
+pre .envvar,
+pre .shebang,
+pre .apache .sqbracket,
+pre .nginx .built_in,
+pre .tex .formula,
+pre .prompt,
+pre .clojure .attribute {
+  color: #00e;
+}
+
+pre .keyword,
+pre .id,
+pre .phpdoc,
+pre .title,
+pre .built_in,
+pre .aggregate,
+pre .smalltalk .class,
+pre .winutils,
+pre .bash .variable,
+pre .apache .tag,
+pre .xml .tag,
+pre .tex .command,
+pre .request,
+pre .status {
+  font-weight: bold;
+  color: navy;
+}
+
+pre .nginx .built_in {
+  font-weight: normal;
+}
+
+pre .coffeescript .javascript,
+pre .javascript .xml,
+pre .tex .formula,
+pre .xml .javascript,
+pre .xml .vbscript,
+pre .xml .css,
+pre .xml .cdata {
+  opacity: 0.5;
+}
+
+/* --- */
+pre .apache .tag {
+  font-weight: bold;
+  color: blue;
+}
+
+/* End code highlighting css */
+
+
+
+
+/* Svarog css.  TODO: remove classes overwritten by bootstrap styling */
+
+/*-------------------------------------------------------*/
+	/*BODY*/
+/*-------------------------------------------------------*/
+
+body {
+	color:#666666;
+	font-size:12px;
+	line-height:1.5em;
+}
+::selection {
+	background:#000;
+	color:#fff;
+}
+::-moz-selection {
+	background:#000;
+	color:#fff;
+}
+img::selection {
+	background: transparent;
+}
+img::-moz-selection {
+	background: transparent;
+}
+
+/*-------------------------------------------------------*/
+	/*Typography*/
+/*-------------------------------------------------------*/
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 200;
+	color:#000000; }
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { font-weight: inherit; }
+h1 { font-size: 36px; line-height: 50px; margin-bottom: 10px;}
+h2 { font-size: 32px; line-height: 40px; margin-bottom: 10px; }
+h3 { font-size: 26px; line-height: 23px; margin-bottom: 10px; }
+h4 { font-size: 22px; line-height: 30px; margin-bottom: 4px; }
+h5 { font-size: 16px; line-height: 24px; margin-bottom: 4px; }
+h6 { font-size: 14px; line-height: 21px; }
+
+p { margin: 0 0 20px 0; }
+.small { font-size:90%;}
+p img { margin: 0; }
+p.lead { font-size: 21px; line-height: 27px; color: #777;  }
+.em { font-style: italic; color:#777777; margin-top:3px; }
+.strong { font-weight: bold; color: #333; }
+.small-italic {font-size:90%; font-style:italic;}
+hr { border: solid #ddd; border-width: 1px 0 0; clear: both; margin: 10px 0 30px; height: 0; }
+/*404error*/
+p.error{
+	font-size:172px;
+	font-family:Arial;
+	margin-bottom:40px;
+	padding-right:20px;
+
+}
+.slogan .span-24 { border-top:1px solid #ececec; border-bottom:1px solid #ececec; padding-top:10px; padding-bottom:10px}
+.center { text-align:center !important;}
+.slogan h1 { margin-bottom:0px; text-transform:uppercase;}
+.slogan p { font-style:italic; font-size:11px;}
+.slogan h4 { margin-bottom:0px; text-transform:none;}
+.footer h6{ text-transform:uppercase; margin-bottom:8px; font-size:18px;}
+.footer-top-line h6 { text-transform:uppercase; padding-left:50px; background-image: url(../images/tweets.png); background-position:left center; background-repeat:no-repeat;  font-size:18px; margin-top:10px;}
+.from_portfolio h3 { margin-bottom:20px !important;}
+.footer p { padding-right:10px; width:210px; margin-bottom:5px !important;}
+.colored { color:#04bfea;}
+
+.link { color:#04bfea;}
+.link:hover { text-decoration: underline; cursor:pointer;}
+/*.link a:hover { text-decoration:underline;} */
+.footer .color a { text-align:center !important; display:block; margin-top:35px;}
+.footer-line p { margin-bottom:0px;}
+.footer-line {  color:#fff; margin-bottom:0px !important; padding-top:15px; padding-bottom:15px;}
+.footer-top-line { margin-bottom:0px !important; padding-top:20px;}
+
+/*-------------------------------------------------------*/
+	/*GRID*/
+/*-------------------------------------------------------*/
+
+.footer-wrapper { background-color:#f1f2f1; background-image:url(../images/pattern/14w.png); padding-bottom:20px; padding-top:20px;  } 
+.footer-line-wrapper {background:#000; margin:0 auto; border-top:1px solid #ececec; margin-bottom:20px !important; } 
+.footer-line-top-wrapper {background:#f1f2f1; background-image:url(../images/pattern/14w.png); margin:0 auto; border-bottom:1px solid #dfdfdf; border-top:1px solid #dfdfdf;} 
+.nocolor-line { height:10px; float:left; background:#04bfea}
+.logo { margin-top:27px !important;}
+.logo a { text-align:center !important;} 
+/* Columns
+-------------------------------------------------------------- */
+
+/* Sets up basic grid floating and margin. */
+div.span-1, div.span-2, div.span-3, div.span-4, div.span-5, div.span-6, div.span-7, div.span-8, div.span-9, div.span-10, div.span-11, div.span-12, div.span-13, div.span-14, div.span-15, div.span-16, div.span-17, div.span-18, div.span-19, div.span-20, div.span-21, div.span-22, div.span-23, div.span-24 {float:left; margin-right: 20px; margin-top:30px;}
+.columns .span-1, .columns .span-2, .columns .span-3, .columns .span-4, .columns .span-5, .columns .span-6, .columns .span-7, .columns .span-8, .columns .span-9, .columns .span-10, .columns .span-11, .columns .span-12, .columns .span-13, .columns .span-14, .columns .span-15, .columns .span-16, .columns .span-17, .columns .span-18, .columns .span-19, .columns .span-20, .columns .span-21, .columns .span-22, .columns .span-23, .columns .span-24 { height:30px; background:#ededed; text-align:center; margin-top:10px !important; padding-top:10px;}
+p.span-1, p.span-2, p.span-3, p.span-4, p.span-5, p.span-6, p.span-7, p.span-8, p.span-9, p.span-10, p.span-11, p.span-12, p.span-13, p.span-14, p.span-15, p.span-16, p.span-17, p.span-18, p.span-19, p.span-20, p.span-21, p.span-22, p.span-23, p.span-24 {float:left; margin-right: 20px; margin-top:30px;}
+/* The last column in a row needs this class. */
+div.last { margin-right: 0; }
+
+/* Use these classes to set the width of a column. */
+.span-1  { width: 20px;}
+.span-2  { width: 60px;}
+.span-3  { width: 100px;}
+.span-4  { width: 140px;}
+.span-5  { width: 180px;}
+.span-6  { width: 220px;}
+.inner-6  { width: 190px; padding:15px;}
+.span-7  { width: 260px;}
+.span-8  { width: 300px;}
+.inner-8 { width: 270px; padding:15px;}
+.span-9  { width: 340px;}
+.span-10 { width: 380px;}
+.span-11 { width: 420px;}
+.span-12 { width: 460px;}
+.inner-12 { width: 430px; padding:15px;}
+.span-13 { width: 500px;}
+.span-14 { width: 540px;}
+.span-15 { width: 580px;}
+.span-16 { width: 620px;}
+.inner-16 { width: 590px; padding:15px;}
+.span-17 { width: 660px;}
+.span-18 { width: 700px;}
+.span-19 { width: 740px;}
+.span-20 { width: 780px;}
+.span-21 { width: 820px;}
+.span-22 { width: 860px;}
+.span-23 { width: 900px;}
+.span-24, div.span-24 { width: 940px; }
+
+.inner-block img { border:1px solid #fff;}
+/* Add these to a column to append empty cols. */
+.append-1  { padding-right: 40px;}
+.append-2  { padding-right: 80px;}
+.append-3  { padding-right: 120px;}
+.append-4  { padding-right: 160px;}
+.append-5  { padding-right: 200px;}
+.append-6  { padding-right: 240px;}
+.append-7  { padding-right: 280px;}
+.append-8  { padding-right: 320px;}
+.append-9  { padding-right: 360px;}
+.append-10 { padding-right: 400px;}
+.append-11 { padding-right: 440px;}
+.append-12 { padding-right: 480px;}
+.append-13 { padding-right: 520px;}
+.append-14 { padding-right: 560px;}
+.append-15 { padding-right: 600px;}
+.append-16 { padding-right: 640px;}
+.append-17 { padding-right: 680px;}
+.append-18 { padding-right: 720px;}
+.append-19 { padding-right: 760px;}
+.append-20 { padding-right: 800px;}
+.append-21 { padding-right: 840px;}
+.append-22 { padding-right: 880px;}
+.append-23 { padding-right: 920px;}
+
+
+/* Add these to a column to prepend empty cols. */
+.prepend-1  { padding-left: 40px;}
+.prepend-2  { padding-left: 80px;}
+.prepend-3  { padding-left: 120px;}
+.prepend-4  { padding-left: 160px;}
+.prepend-5  { padding-left: 200px;}
+.prepend-6  { padding-left: 240px;}
+.prepend-7  { padding-left: 280px;}
+.prepend-8  { padding-left: 320px;}
+.prepend-9  { padding-left: 360px;}
+.prepend-10 { padding-left: 400px;}
+.prepend-11 { padding-left: 440px;}
+.prepend-12 { padding-left: 480px;}
+.prepend-13 { padding-left: 520px;}
+.prepend-14 { padding-left: 560px;}
+.prepend-15 { padding-left: 600px;}
+.prepend-16 { padding-left: 640px;}
+.prepend-17 { padding-left: 680px;}
+.prepend-18 { padding-left: 720px;}
+.prepend-19 { padding-left: 760px;}
+.prepend-20 { padding-left: 800px;}
+.prepend-21 { padding-left: 840px;}
+.prepend-22 { padding-left: 880px;}
+.prepend-23 { padding-left: 920px;}
+
+
+
+/* Border on right hand side of a column. */
+div.border {
+  padding-right:9px;
+  margin-right:10px;
+  border-right: 1px solid #eee;
+}
+
+/* Border with more whitespace, spans one column. */
+div.colborder {
+  padding-right:13px;
+  margin-right:10px;
+  border-right: 1px solid #eee;
+}
+
+/* Use these classes on an element to push it into the 
+   next column, or to pull it into the previous column.  */
+
+.pull-1 { margin-left: -40px;}
+.pull-2 { margin-left: -80px;}
+.pull-3 { margin-left: -120px;}
+.pull-4 { margin-left: -160px;}
+.pull-5 { margin-left: -200px;}
+.pull-6 { margin-left: -240px;}
+.pull-7 { margin-left: -280px;}
+.pull-8 { margin-left: -320px;}
+.pull-9 { margin-left: -360px;}
+.pull-10 { margin-left: -400px;}
+.pull-11 { margin-left: -440px;}
+.pull-12 { margin-left: -480px;}
+.pull-13 { margin-left: -520px;}
+.pull-14 { margin-left: -560px;}
+.pull-15 { margin-left: -600px;}
+.pull-16 { margin-left: -640px;}
+.pull-17 { margin-left: -680px;}
+.pull-18 { margin-left: -720px;}
+.pull-19 { margin-left: -760px;}
+.pull-20 { margin-left: -800px;}
+.pull-21 { margin-left: -840px;}
+.pull-22 { margin-left: -880px;}
+.pull-23 { margin-left: -920px;}
+.pull-24 { margin-left: -960px;}
+
+.pull-1, .pull-2, .pull-3, .pull-4, .pull-5, .pull-6, .pull-7, .pull-8, .pull-9, .pull-10, .pull-11, .pull-12, .pull-13, .pull-14, .pull-15, .pull-16, .pull-17, .pull-18, .pull-19, .pull-20, .pull-21, .pull-22, .pull-23, .pull-24 {float:left;position:relative;}
+
+
+.push-1 { margin: 0 -40px 1.5em 40px;}
+.push-2 { margin: 0 -80px 1.5em 65px;}
+.push-3 { margin: 0 -120px 1.5em 120px;}
+.push-4 { margin: 0 -160px 1.5em 160px;}
+.push-5 { margin: 0 -200px 1.5em 200px;}
+.push-6 { margin: 0 -240px 1.5em 240px;}
+.push-7 { margin: 0 -280px 1.5em 280px;}
+.push-8 { margin: 0 -320px 1.5em 320px;}
+.push-9 { margin: 0 -360px 1.5em 360px;}
+.push-10 { margin: 0 -400px 1.5em 400px;}
+.push-11 { margin: 0 -440px 1.5em 440px;}
+.push-12 { margin: 0 -480px 1.5em 480px;}
+.push-13 { margin: 0 -520px 1.5em 520px;}
+.push-14 { margin: 0 -560px 1.5em 560px;}
+.push-15 { margin: 0 -600px 1.5em 600px;}
+.push-16 { margin: 0 -640px 1.5em 640px;}
+.push-17 { margin: 0 -680px 1.5em 680px;}
+.push-18 { margin: 0 -720px 1.5em 720px;}
+.push-19 { margin: 0 -760px 1.5em 760px;}
+.push-20 { margin: 0 -800px 1.5em 800px;}
+.push-21 { margin: 0 -840px 1.5em 840px;}
+.push-22 { margin: 0 -880px 1.5em 880px;}
+.push-23 { margin: 0 -920px 1.5em 920px;}
+.push-24 { margin: 0 -960px 1.5em 960px;}
+
+.push-1, .push-2, .push-3, .push-4, .push-5, .push-6, .push-7, .push-8, .push-9, .push-10, .push-11, .push-12, .push-13, .push-14, .push-15, .push-16, .push-17, .push-18, .push-19, .push-20, .push-21, .push-22, .push-23, .push-24 {float:right;position:relative; margin-top:10px !important; margin-bottom:0px}
+
+.notopmargin { margin-top:0px !important;}
+.nobottommargin { margin-bottom:0px !important;}
+.last { margin-right:0px !important;}
+.left {float:left}
+.right {float:right}
+
+/*-------------------------------------------------------------------------------------------------*/
+	/*LISTS*/
+/*-------------------------------------------------------------------------------------------------*/
+
+.check-list {
+	font-size:11px;
+	list-style-type:none;
+	list-style-position:outside;
+}
+.check-list li {
+	margin:0px;	
+	display:block;
+	padding:6px 0px 6px 35px;
+	background: url("../images/check.png") no-repeat scroll transparent;
+	background-position: 0px 10px;
+	font-style:italic;
+	border-bottom:1px dotted #dedede;
+}
+.info-list {
+	font-size:12px;
+	list-style-type:none;
+	list-style-position:outside;
+}
+.info-list li {
+	margin:0px;	
+	display:block;
+	padding:11px 0px 11px 35px;
+	background: url(../images/info.png) no-repeat;
+	background-position:left center;
+	font-style:italic;
+}
+.cancel-list {
+	font-size:12px;
+	list-style-type:none;
+	list-style-position:outside;
+}
+.cancel-list li {
+	margin:0px;	
+	display:block;
+	padding:11px 0px 11px 35px;
+	background: url(../images/cancel.png) no-repeat;
+	background-position:left center;
+	font-style:italic;
+}
+.question-list {
+	font-size:12px;
+	list-style-type:none;
+	list-style-position:outside;
+}
+.question-list li {
+	margin:0px;	
+	display:block;
+	padding:11px 0px 11px 35px;
+	background: url(../images/question.png) no-repeat;
+	background-position:left center;
+	font-style:italic;
+}
+.warning-list {
+	font-size:12px;
+	list-style-type:none;
+	list-style-position:outside;
+}
+.warning-list li {
+	margin:0px;	
+	display:block;
+	padding:11px 0px 11px 35px;
+	background:url(../images/warning.png) no-repeat;
+	background-position:left center;
+	font-style:italic;
+}
+.arrow-list {
+	font-size:12px;
+	list-style-type:none;
+	list-style-position:outside;
+}
+.arrow-list li{
+	margin:0px;	
+	display:block;
+	padding:5px 0px 5px 35px;
+	background: url(../images/list-arrow.png) no-repeat;
+	background-position:0px 7px;
+	font-style:italic;
+}
+
+.list .dot-sep{
+		background-image:url('../images/dot-sep.png');
+		height:2px;
+		background-repeat:repeat-x;
+}
+
+.icon-white-big {
+	background-color:#000000;
+	width:16px;
+	height:16px;
+}
+.icon161-white {background-image:url('../images/icons-white.png'); background-position: 0px -128px;}
+
+.view {
+	background-color:#f1f2f1;
+	-moz-box-shadow:0px 1px 2px #aaa;
+	-webkit-box-shadow:0px 1px 2px #aaa;
+	box-shadow:0px 1px 2px #aaa;
+}
+.view .item a {
+	-moz-box-shadow: 0px 0px 0px;
+	-webkit-box-shadow: 0px 0px 0px;
+	box-shadow: 0px 0px 0px;
+	background-color:none;
+}
+.view:hover {
+	background-color:#e6e6e6;
+	background-image: url(../images/pattern/1w.png);
+	-moz-box-shadow:0px 1px 2px #aaa;
+	-webkit-box-shadow:0px 1px 2px #aaa;
+	box-shadow:0px 1px 2px #aaa;
+	-webkit-transition: background-color 0.4s ease-in-out;
+   -moz-transition: background-color 0.4s ease-in-out;
+   -o-transition: background-color 0.4s ease-in-out;
+   -ms-transition: background-color 0.4s ease-in-out;
+   transition: background-color 0.4s ease-in-out;
+}
+
+.view:hover .item a { background-color:none !important;}
+.view h5 .link {
+	padding-left:23px;
+	margin-bottom:50px;
+	text-transform:uppercase; 
+	background-image: url(../images/view.png);
+	background-repeat:no-repeat;
+	background-position:0px 5px;
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+	/*SOCIAL MEDIA ICONS */
+/*-------------------------------------------------------------------------------------------------*/
+.tweet-icon {
+	height:26px;
+	width:26px;
+	background-image:url('../images/social/t.png');
+	background-position: -0px -0px;
+	float:left;
+	margin-top:8px;
+	margin-right:10px;
+}
+	.tweet-icon:hover {
+		height:26px;
+		width:26px;
+		background-image:url('../images/social/t.png');
+		background-position: -0px -26px;
+	}
+
+.facebook-icon {
+	height:26px;
+	width:26px;
+	background-image:url('../images/social/f.png');
+	background-position: -0px -0px;
+	float:left;
+	margin-top:8px;
+	margin-right:10px;
+}
+	.facebook-icon:hover {
+		height:26px;
+		width:26px;
+		background-image:url('../images/social/f.png');
+		background-position: -0px -26px;
+	}
+
+/*-------------------------------------------------------------------------------------------------*/
+	/*TABLES */
+/*-------------------------------------------------------------------------------------------------*/
+
+table.tablesorter {
+	font-family:arial;
+	background-color: #f9f9f9;
+	margin:10px 0pt 15px;
+	font-size: 8pt;
+	width: 100%;
+	text-align: left;
+}
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background-color: #f9f9f9;
+	border: 1px solid #ededed;
+	font-size: 8pt;
+	padding: 4px;
+}
+table.tablesorter thead tr .header {
+	background-image: url('../images/bg.gif');
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+	padding-right: 20px;
+}
+table.tablesorter tbody td {
+	padding: 4px;
+	background-color: #fafafa;
+	vertical-align: top;
+	border: 1px solid #ededed
+}
+table.tablesorter tbody tr.odd td {
+	background-color:#333333;
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url('../images/asc.gif');
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url('../images/desc.gif');
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+background-color: #ededed;
+}
+
+/*-------------------------------------------------------*/
+/* ### Synapse Custom SVAROG ### */
+/*-------------------------------------------------------*/
+.color-line { height:10px; background:#FFCC00 }
+.separator { clear:both; height:1px; background:#ececec; }
+
+/* End Svarog css. */
+
+
+
+
+
+
+
+
+
+
+
