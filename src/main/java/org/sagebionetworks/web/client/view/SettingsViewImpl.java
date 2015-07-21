@@ -2,15 +2,14 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
@@ -370,7 +369,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	private boolean checkEmailFormat(){
 		DisplayUtils.hide(newEmailError);
-		if (LoginPresenter.isValidEmail(newEmailField.getValue())) {
+		if (ValidationUtils.isValidEmail(newEmailField.getValue())) {
 			return true;
 		}
 		else {

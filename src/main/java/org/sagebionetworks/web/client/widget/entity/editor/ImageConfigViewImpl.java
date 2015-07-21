@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -181,7 +182,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		if (isExternal()) {
-			if (!LoginPresenter.isValidUrl(urlField.getValue(), false))
+			if (!ValidationUtils.isValidUrl(urlField.getValue(), false))
 				throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_INVALID_URL_MESSAGE);
 			if (!DisplayUtils.isDefined(nameField.getValue()))
 				throw new IllegalArgumentException(DisplayConstants.IMAGE_CONFIG_INVALID_ALT_TEXT_MESSAGE);

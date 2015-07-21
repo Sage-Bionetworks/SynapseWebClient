@@ -19,6 +19,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Reference;
@@ -125,6 +126,36 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockView).setEntityFinder(mockEntityFinder);
 		verify(mockView).setURLDialog(mockUrlDialog);
 		verify(mockView).setPresenter(presenter);
+	}
+	
+	@Test
+	public void testConfigureSuccessProvenanceCreated() {
+		when(mockActivity.getUsed()).thenReturn(null);
+		AsyncMockStubber.callSuccessWith(mockActivity)
+				.when(mockSynClient).getOrCreateActivityForEntityVersion
+				(anyString(), anyLong(), any(AsyncCallback.class));
+		when(mockProvenanceList.getEntries()).thenReturn(new LinkedList<ProvenanceEntry>());
+		presenter.configure(mockEntityBundle, mockEntityUpdatedHandler);
+		verify(mockView).setName(mockActivity.getName());
+		verify(mockView).setDescription(mockActivity.getDescription());
+		verify(mockActivity).getUsed();
+		verify(mockInjector, Mockito.never()).getEntityRefEntry();
+		verify(mockInjector.getEntityRefEntry(), Mockito.never()).configure(mockRef.getTargetId(), mockRef.getTargetVersionNumber().toString());
+		verify(mockInjector.getEntityRefEntry(), Mockito.never()).setAnchorTarget(anyString());
+		verify(mockInjector, Mockito.never()).getURLEntry();
+		verify(mockInjector.getURLEntry(), Mockito.never()).configure(name, url);
+		verify(mockInjector.getURLEntry(), Mockito.never()).setAnchorTarget(anyString());
+		verify(mockProvenanceList, Mockito.never()).configure(anyList());
+		
+		
+		presenter.onSave();
+		verify(mockActivity).setName(mockView.getName());
+		verify(mockActivity).setDescription(mockView.getDescription());
+		ArgumentCaptor<Set> captor = ArgumentCaptor.forClass(Set.class);
+		verify(mockActivity).setUsed(captor.capture());
+		Set newProvSet = captor.getValue();
+		assertTrue(newProvSet.isEmpty());
+		verify(mockSynClient).putActivity(eq(mockActivity), any(AsyncCallback.class));
 	}
 	
 	@Test

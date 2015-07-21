@@ -19,7 +19,6 @@ public class YouTubeConfigEditor implements IFrameConfigView.Presenter, WidgetEd
 	@Inject
 	public YouTubeConfigEditor(IFrameConfigView view) {
 		this.view = view;
-		view.setPresenter(this);
 		view.initView();
 	}
 	@Override

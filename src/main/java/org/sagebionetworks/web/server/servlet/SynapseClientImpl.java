@@ -2035,7 +2035,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
+	
+	@Override
 	public Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException {
 		Boolean isMember = null;

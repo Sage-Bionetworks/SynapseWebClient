@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
@@ -66,7 +67,7 @@ public class JoinTeamWidgetTest {
 	PlaceChanger mockPlaceChanger;
 	List<AccessRequirement> ars;
 	UserProfile currentUserProfile;
-	WikiPageWidget mockWikiPageWidget;
+	MarkdownWidget mockWikiPageWidget;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -76,7 +77,7 @@ public class JoinTeamWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockGwt = mock(GWTWrapper.class);
-		mockWikiPageWidget = mock(WikiPageWidget.class);
+		mockWikiPageWidget = mock(MarkdownWidget.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -161,14 +162,12 @@ public class JoinTeamWidgetTest {
 	
 	@Test
 	public void testJoinRequestStep2WithNullRestrictionText() throws Exception {
-		verify(mockWikiPageWidget).showCreatedBy(false);
-		verify(mockWikiPageWidget).showModifiedBy(false);
-		verify(mockWikiPageWidget).showWikiHistory(false);
 		TermsOfUseAccessRequirement terms = new TermsOfUseAccessRequirement();
 		terms.setId(1L);
 		ars.add(terms);
 		joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(true), eq(true));
 		verify(mockView).showWikiAccessRequirement(any(Widget.class), any(Callback.class));
 	}
 

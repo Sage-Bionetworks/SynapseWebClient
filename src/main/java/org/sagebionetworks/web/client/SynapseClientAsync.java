@@ -15,7 +15,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
@@ -42,7 +41,6 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
-import org.sagebionetworks.repo.model.file.UploadDestinationLocation;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -441,4 +439,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<LogEntry> callback);
 
 	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
+	
+	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
 }

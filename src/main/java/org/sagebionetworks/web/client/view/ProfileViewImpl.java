@@ -885,4 +885,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setGetCertifiedVisible(boolean isVisible) {
 		getCertifiedAlert.setVisible(isVisible);	
 	}
+	@Override
+	public void setSynapseEmailVisible(boolean isVisible) {
+		synapseEmailField.setVisible(isVisible);
+	}
 }

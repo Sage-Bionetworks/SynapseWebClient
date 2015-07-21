@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Container;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -29,6 +31,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -111,6 +114,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	FocusPanel collaborateBox;
 	
+	@UiField
+	Heading organizeDigitalResearchAssetsHeading;
+	@UiField
+	Heading getCreditHeading;
+	@UiField
+	Heading collaborateHeading;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -173,7 +183,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		});
 		// Other links
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
-		
 		dreamChallengesBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -199,22 +208,20 @@ public class HomeViewImpl extends Composite implements HomeView {
 		creditForResearchBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("GetCreditForYourResearch"));
+				Window.scrollTo(0, getCreditHeading.getAbsoluteTop());
 			}
 		});
+		
 		organizeResearchAssetsBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("OrganizeYourDigitalResearchAssets"));
+				Window.scrollTo(0, organizeDigitalResearchAssetsHeading.getAbsoluteTop());
 			}
 		});
 		collaborateBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//go to new research communities page
-				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("Collaborate"));
+				Window.scrollTo(0, collaborateHeading.getAbsoluteTop());
 			}
 		});
 		

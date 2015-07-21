@@ -179,10 +179,13 @@ public class TeamPresenterTest {
 
 	@Test
 	public void testGetTeamEmail() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic"));
 		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here"));
 		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail(" \n\r unlikely\t case "));
 		assertEquals("Another_UnlikelyCase@synapse.org", presenter.getTeamEmail(" %^$##* Another_Unlikely\t &*#$)(!!@~Case "));
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		assertEquals("", presenter.getTeamEmail("basic"));
 	}
 	
 }
