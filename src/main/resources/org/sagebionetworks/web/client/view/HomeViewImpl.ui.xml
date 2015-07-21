@@ -263,14 +263,32 @@
 			<b:Row>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
 					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
-						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Store and access files"></b:Heading>
-						<b:Heading size="H6" text="Synapse provides APIs and clients to store and access files using a unique Synapse ID through the web, R, python, and the command line." />
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="10">
+									<g:Image resource='{sageImageBundle.directory}' addStyleNames="margin-10" height="63px" width="75px"/>
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Store and access files"></b:Heading>
+									<b:Heading size="H6" text="Synapse provides APIs and clients to store and access files using a unique Synapse ID through the web, R, python, and the command line." />
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
 					</b:Panel>
 				</b:Column>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
 					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
-						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Query structured data"></b:Heading>
-						<b:Heading size="H6" text="Use Synapse Tables to query structured data right from your web browser, or from any analytical client!" />
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="10">
+									<g:Image resource='{sageImageBundle.directory}' addStyleNames="margin-10" height="63px" width="75px"/>
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Query structured data"></b:Heading>
+									<b:Heading size="H6" text="Use Synapse Tables to query structured data right from your web browser, or from any analytical client!" />
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
 					</b:Panel>
 				</b:Column>
 			</b:Row>
@@ -289,14 +307,32 @@
 			<b:Row>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
 					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
-						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Mint a doi"></b:Heading>
-						<b:Heading size="H6" text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="10">
+									<g:Image resource='{sageImageBundle.prov}' addStyleNames="margin-10" height="74px" width="75px"/>
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Mint a doi"></b:Heading>
+									<b:Heading size="H6" text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
 					</b:Panel>
 				</b:Column>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
 					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
-						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
-						<b:Heading size="H6" text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="10">
+									<g:Image resource='{sageImageBundle.prov}' addStyleNames="margin-10" height="74px" width="75px"/>
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
+									<b:Heading size="H6" text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
 					</b:Panel>
 				</b:Column>
 			</b:Row>
@@ -316,14 +352,32 @@
 			<b:Row>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
 					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
-						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
-						<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public!" />
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="10">
+									<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="margin-10" height="60px" width="75px"/>
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
+									<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public!" />
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
 					</b:Panel>
 				</b:Column>
 				<b:Column size="SM_6" addStyleNames="margin-top-30">
 					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
-						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Create or join a team"></b:Heading>
-						<b:Heading size="H6" text="Manage your Synapse Teams from your profile page - organize groups of people who are collaborating with you." />
+						<t:Table>
+							<t:TableRow>
+								<t:TableData paddingRight="10">
+									<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="margin-10" height="60px" width="75px"/>
+								</t:TableData>
+								<t:TableData paddingRight="2">
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Create or join a team"></b:Heading>
+									<b:Heading size="H6" text="Manage your Synapse Teams from your profile page - organize groups of people who are collaborating with you." />
+								</t:TableData>
+							</t:TableRow>
+						</t:Table>
 					</b:Panel>
 				</b:Column>
 			</b:Row>
