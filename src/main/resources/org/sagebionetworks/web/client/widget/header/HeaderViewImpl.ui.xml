@@ -11,7 +11,7 @@
 	        	<g:Image ui:field="synapseLogo" resource="{sageImages.logo}" 
 	        	    addStyleNames="imageButton margin-bottom-15 margin-right-5" width="25px" height="25px"/>
 	            <b:Heading size="H2" addStyleNames="displayInline color-white">
-	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white"/>
+	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone"/>
 	        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline" visible="false"/>
 	        	</b:Heading>
 		  	</bh:Div>
