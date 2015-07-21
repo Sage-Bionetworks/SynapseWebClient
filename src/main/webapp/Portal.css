@@ -2223,7 +2223,7 @@ td.datePickerMonth {
 
 /* Provenance graph css */
 .provEntityNode {
-	opacity:0.8; 
+	opacity:0.9; 
 	filter:alpha(opacity=80); 
 	width:96px; 
 	height:46.8px;
@@ -2241,7 +2241,7 @@ td.datePickerMonth {
 
 .provActivityNode { 
 	border:0.1em dotted #ccc; 
-	opacity:0.8; 
+	opacity:0.9; 
 	filter:alpha(opacity=80); 
 	width: 132px;
 	z-index:20; 
@@ -2309,6 +2309,7 @@ td.datePickerMonth {
 	font-size: 9.6px;
 	margin-top: -4.8px;
 }
+
 /* End provenance graph css */
 
 
@@ -2432,6 +2433,7 @@ pre .apache .tag {
 
 
 /* Svarog css.  TODO: remove classes overwritten by bootstrap styling */
+
 
 /*-------------------------------------------------------*/
 	/*BODY*/
@@ -2855,54 +2857,10 @@ div.colborder {
 		background-position: -0px -26px;
 	}
 
-/*-------------------------------------------------------------------------------------------------*/
-	/*TABLES */
-/*-------------------------------------------------------------------------------------------------*/
-
-table.tablesorter {
-	font-family:arial;
-	background-color: #f9f9f9;
-	margin:10px 0pt 15px;
-	font-size: 8pt;
-	width: 100%;
-	text-align: left;
-}
-table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-	background-color: #f9f9f9;
-	border: 1px solid #ededed;
-	font-size: 8pt;
-	padding: 4px;
-}
-table.tablesorter thead tr .header {
-	background-image: url('../images/bg.gif');
-	background-repeat: no-repeat;
-	background-position: center right;
-	cursor: pointer;
-	padding-right: 20px;
-}
-table.tablesorter tbody td {
-	padding: 4px;
-	background-color: #fafafa;
-	vertical-align: top;
-	border: 1px solid #ededed
-}
-table.tablesorter tbody tr.odd td {
-	background-color:#333333;
-}
-table.tablesorter thead tr .headerSortUp {
-	background-image: url('../images/asc.gif');
-}
-table.tablesorter thead tr .headerSortDown {
-	background-image: url('../images/desc.gif');
-}
-table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-background-color: #ededed;
-}
 
 /*-------------------------------------------------------*/
 /* ### Synapse Custom SVAROG ### */
 /*-------------------------------------------------------*/
-.color-line { height:10px; background:#FFCC00 }
 .separator { clear:both; height:1px; background:#ececec; }
 
 /* End Svarog css. */
