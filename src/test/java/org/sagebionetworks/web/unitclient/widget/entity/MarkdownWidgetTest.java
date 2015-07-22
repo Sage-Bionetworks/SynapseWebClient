@@ -143,9 +143,8 @@ public class MarkdownWidgetTest {
 		verify(mockWikiPageKey).setWikiPageId(anyString());
 		
 		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
-		verify(mockView).setEmptyVisible(true);
+		verify(mockView, Mockito.times(2)).setEmptyVisible(false);
 		verify(mockView).clearMarkdown();
-		verify(mockView).setEmptyVisible(false);
 		verify(mockView).setMarkdown(sampleHTML);
 		// Called three times between tablesorter, loadMath, and loadWidgets, 
 		// then another three to determine null
@@ -178,9 +177,9 @@ public class MarkdownWidgetTest {
 		callbackCaptor.getValue().invoke();
 		
 		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockView).setEmptyVisible(false);
 		verify(mockView).setEmptyVisible(true);
 		verify(mockView).clearMarkdown();
-		verify(mockView, Mockito.never()).setEmptyVisible(false);
 	}
 	
 	
