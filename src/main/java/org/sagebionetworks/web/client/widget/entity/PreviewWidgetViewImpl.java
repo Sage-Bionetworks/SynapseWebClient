@@ -30,29 +30,34 @@ import com.google.inject.Inject;
 public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetView, IsWidget{
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private String previewHtml;
 	private Anchor fullScreenAnchor; 
 	private Dialog previewDialog;
 	private boolean isCode;
+	private Widget currentPopupPreviewWidget;
 	
 	@Inject
 	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, IconsImageBundle iconsImageBundle, Dialog dialog) {
 		this.synapseJSNIUtils = synapseJsniUtils;
 		this.previewDialog = dialog;
-		dialog.setSize(ModalSize.LARGE);
+		dialog.addStyleName("modal-fullscreen");
 		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
+		fullScreenAnchor.addStyleName("position-absolute");
 		fullScreenAnchor.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (previewHtml != null) {
-					previewDialog.configure("Preview", new HTMLPanel(previewHtml), DisplayConstants.OK, null, null, true);
-					previewDialog.show();
-					if (isCode) {
-						synapseJSNIUtils.highlightCodeBlocks();
-					}
-				}
+				showPopup();
 			}
 		});
+	}
+	
+	private void showPopup() {
+		if (currentPopupPreviewWidget != null) {
+			previewDialog.configure("Preview", currentPopupPreviewWidget, DisplayConstants.OK, null, null, true);
+			previewDialog.show();
+			if (isCode) {
+				synapseJSNIUtils.highlightCodeBlocks();
+			}
+		}
 	}
 	
 	@Override
@@ -68,13 +73,13 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	@Override
 	public void setImagePreview(final String fullFileUrl, String previewUrl) {
 		clear();
-	
+		add(fullScreenAnchor);
 		final Image image = new Image();
-		image.addStyleName("imageButton imageDescriptor");
+		image.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
 		image.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(fullFileUrl, "", "");
+				showPopup();
 			}
 		});
 		image.addErrorHandler(new ErrorHandler() {
@@ -83,9 +88,11 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 				presenter.imagePreviewLoadFailed(event);
 		    }
 		});
-		
 		add(image);
 		image.setUrl(previewUrl);
+		
+		currentPopupPreviewWidget = new Image(previewUrl);
+		currentPopupPreviewWidget.addStyleName("maxWidth100 maxHeight100");
 	}
 	
 	@Override
@@ -132,16 +139,17 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	
 	@Override
 	public void clear() {
-		previewHtml = null;
+		currentPopupPreviewWidget = null;
 		isCode = false;
 		super.clear();
 	}
 	
 	private void setPreview(String html) {
-		previewHtml = html;
 		add(fullScreenAnchor);
+		currentPopupPreviewWidget = new HTMLPanel(html);
 		ScrollPanel wrapper= new ScrollPanel(new HTMLPanel(html));
-		wrapper.setHeight("205px");
+		wrapper.setHeight("200px");
+		wrapper.addStyleName("margin-left-20");
 		add(wrapper);
 	}
 	@Override
