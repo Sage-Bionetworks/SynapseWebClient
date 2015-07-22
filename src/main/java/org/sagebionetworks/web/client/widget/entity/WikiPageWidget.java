@@ -109,6 +109,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		markdownWidget.clear();
 		breadcrumb.clear();
 		wikiSubpages.clearState();
+		view.hideCreatedModified();
 	}
 
 	@Override
@@ -423,7 +424,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		if (isEmbeddedInOwnerPage) {
 			view.hideMarkdown();
 			view.hideHistory();
-			view.hideCreatedModified();
+			
 			if (caught instanceof NotFoundException) {
 				if (canEdit) {
 					view.showNoWikiCanEditMessage();

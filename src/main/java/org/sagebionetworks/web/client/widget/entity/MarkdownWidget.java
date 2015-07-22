@@ -78,7 +78,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	@Override
 	public void configure(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
 		clear();
-		view.setEmptyVisible(true);
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.isPreview= isPreview;
@@ -95,7 +94,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 							loadTableSorters();
 							loadMath(wikiKey, isPreview);
 							loadWidgets(wikiKey, isPreview);
-						}						
+						} else {
+							view.setEmptyVisible(true);
+						}
 					}
 				});
 			}
@@ -110,6 +111,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	public void clear() {
 		synAlert.clear();
 		view.clearMarkdown();
+		view.setEmptyVisible(false);
 	}
 	
 	
