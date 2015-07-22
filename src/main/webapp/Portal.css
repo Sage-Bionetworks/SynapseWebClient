@@ -874,7 +874,6 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: hidden;
 	text-align: justify;
-	font-size: 13px; /* Body font-size defined by Svarog as 12px, bootstrap as 14px */
 }
 
 .markdown ol { 
@@ -1933,12 +1932,6 @@ iframe[seamless] {
  */
 .modal {
     overflow-y: auto !important;
-}
-
-.form-group>textarea.form-control {
-	border: 1px solid #dddddd;
-	padding: 5px;
-	border-radius: .2em;
 }
 
 .dropdown-menu>li>a, 
