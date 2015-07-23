@@ -26,7 +26,8 @@ public class FileCellEditorImplTest {
 	CallbackP<FileUpload> mockFinishedUploadingCallback;
 	
 	String fileHandleId = "222";
-	String testFileName = "testing.txt";	
+	String testFileName = "testing.txt";
+	double fileSize = 10;
 	
 	@Before
 	public void before(){
@@ -35,7 +36,7 @@ public class FileCellEditorImplTest {
 		mockFileInputWidget = mock(FileHandleUploadWidget.class);
 		mockFileUpload = mock(FileUpload.class);
 		editor = new FileCellEditorImpl(mockView, mockFileInputWidget);
-		mockMetadata = new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType())};
+		mockMetadata = new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType(), fileSize)};
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(mockMetadata);
 		when(mockFileUpload.getFileMeta()).thenReturn(mockMetadata[0]);
 		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);

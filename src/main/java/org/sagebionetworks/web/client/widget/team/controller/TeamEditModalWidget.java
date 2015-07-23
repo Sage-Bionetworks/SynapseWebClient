@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
@@ -49,7 +50,9 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				view.setImageURL(baseImageURL + "?rawFileHandleId=" + uploadedFileHandleId);
 			}
 		});
-		uploader.setValidation(new ImageFileValidator());
+		ImageFileValidator imageValidator = new ImageFileValidator();
+		imageValidator.setMaxSize(UserProfileEditorWidgetImpl.MAX_IMAGE_SIZE);
+		uploader.setValidation(imageValidator);
 		uploader.setUploadingCallback(new Callback() {
 			@Override
 			public void invoke() {

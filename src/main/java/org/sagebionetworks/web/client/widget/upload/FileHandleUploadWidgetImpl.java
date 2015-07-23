@@ -66,7 +66,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			for(int i=0; i<fileNames.length; i++){
 				String name = fileNames[i];
 				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
-				results[i] = new FileMetadata(name, contentType);
+				double fileSize = synapseJsniUtils.getFileSize(inputId, i);
+				results[i] = new FileMetadata(name, contentType, fileSize);
 			}
 		}
 		return results;
