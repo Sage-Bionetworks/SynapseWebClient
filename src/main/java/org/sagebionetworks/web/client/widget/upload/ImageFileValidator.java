@@ -28,6 +28,11 @@ public class ImageFileValidator extends AbstractFileValidator {
 	public void setMaxSize(double maxFileSize) {
 		this.maxFileSize = maxFileSize;
 	}
+	
+	public double getMaxFileSize() {
+		return maxFileSize;
+	}
+	
 	@Override
 	public String getInvalidMessage() {
 		return invalidMessage;
