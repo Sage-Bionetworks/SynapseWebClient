@@ -1,17 +1,20 @@
 package org.sagebionetworks.web.client.widget.upload;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class ImageFileValidator extends AbstractFileValidator {
 	
-	private Callback invalidCallback;
-	
+	private double maxFileSize = -1;
+	private String invalidMessage;
 	@Override
 	public boolean isValid(FileMetadata file) {
+		invalidMessage = WebConstants.INVALID_IMAGE_FILETYPE_MESSAGE;
 		String contentType = file.getContentType();
 		if (file == null){
+			return false;
+		} else if (maxFileSize > 0 && file.getFileSize() > maxFileSize) {
+			invalidMessage = WebConstants.INVALID_FILE_SIZE + DisplayUtils.getFriendlySize(maxFileSize, false);
 			return false;
 		} else if (contentType != null) {
 			 return DisplayUtils.isRecognizedImageContentType(contentType);
@@ -21,10 +24,13 @@ public class ImageFileValidator extends AbstractFileValidator {
 			return DisplayUtils.isRecognizedImageContentType("image/"+extension);
 		}
 	}
-
+	
+	public void setMaxSize(double maxFileSize) {
+		this.maxFileSize = maxFileSize;
+	}
 	@Override
 	public String getInvalidMessage() {
-		return WebConstants.INVALID_IMAGE_FILETYPE_MESSAGE;
+		return invalidMessage;
 	}
 
 }
