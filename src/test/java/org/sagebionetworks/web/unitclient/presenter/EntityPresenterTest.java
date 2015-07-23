@@ -234,6 +234,8 @@ public class EntityPresenterTest {
 		//verify synapse client call
 		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
+		//header should be reconfigured to set back to Synapse
+		verify(mockHeaderWidget).configure(false);
 	}
 	
 	@Test
