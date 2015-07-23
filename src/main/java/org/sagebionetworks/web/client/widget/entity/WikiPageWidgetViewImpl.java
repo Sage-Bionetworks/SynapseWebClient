@@ -61,10 +61,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Span createdOnField;
 	
 	@UiField
-	SimplePanel	modifiedByBadgePanel;
+	Span modifiedByBadgePanel;
 	
 	@UiField
-	SimplePanel	createdByBadgePanel;
+	Span createdByBadgePanel;
 	
 	@UiField
 	Button wikiHistoryButton;
@@ -254,7 +254,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void setModifiedByBadge(IsWidget modifiedByUserBadge) {
-		modifiedByBadgePanel.setWidget(modifiedByUserBadge);
+		modifiedByBadgePanel.clear();
+		modifiedByBadgePanel.add(modifiedByUserBadge);
 	}
 	
 	@Override
@@ -264,7 +265,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void setCreatedByBadge(IsWidget createdByUserBadge) {
-		createdByBadgePanel.setWidget(createdByUserBadge);
+		createdByBadgePanel.clear();
+		createdByBadgePanel.add(createdByUserBadge);
 	}
 	
 	@Override

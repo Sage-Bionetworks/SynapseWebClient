@@ -100,6 +100,7 @@ public class EntityViewImpl implements EntityView {
 		openInvitesPanel.setVisible(false);
 		accessDependentMessage.setVisible(false);
 		loadingUI.setVisible(false);
+		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
 	
