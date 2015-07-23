@@ -228,6 +228,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					view.clear();
 					synAlert.handleException(caught);
 				}
+				headerWidget.configure(false);
 			}			
 		};
 		if (versionNumber == null) {
