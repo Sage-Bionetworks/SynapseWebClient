@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
-	public static final double MAX_IMAGE_SIZE = ClientProperties.MB * 2; //2MB
+	public static final double MAX_IMAGE_SIZE = ClientProperties.MB * 5; //5MB
 	public static final String PLEASE_ENTER_A_VALID_URL = "Please enter a valid URL";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
 	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
