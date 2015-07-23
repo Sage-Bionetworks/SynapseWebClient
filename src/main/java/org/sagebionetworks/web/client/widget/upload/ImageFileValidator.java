@@ -16,7 +16,7 @@ public class ImageFileValidator extends AbstractFileValidator {
 		String contentType = file.getContentType();
 		if (file == null){
 			return false;
-		} else if (maxFileSize != null && file.getFileSize() > maxFileSize) {
+		} else if (!isValidSize(file.getFileSize())) {
 			invalidMessage = WebConstants.INVALID_FILE_SIZE + DisplayUtils.getFriendlySize(maxFileSize, false);
 			return false;
 		} else if (contentType != null) {
@@ -26,6 +26,10 @@ public class ImageFileValidator extends AbstractFileValidator {
 			String extension = filename.substring(filename.lastIndexOf(".")+1);
 			return DisplayUtils.isRecognizedImageContentType("image/"+extension);
 		}
+	}
+	
+	public boolean isValidSize(double fileSize) {
+		return maxFileSize == null || fileSize < maxFileSize;
 	}
 	
 	public void setMaxSize(Double maxFileSize) {
