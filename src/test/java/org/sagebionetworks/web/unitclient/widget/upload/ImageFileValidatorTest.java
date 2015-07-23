@@ -62,6 +62,9 @@ public class ImageFileValidatorTest {
 		//test non-null max file size
 		imageValidator.setMaxSize(100.0);
 		assertTrue(imageValidator.isValid(mockMeta));
+		//unit test isValidSize
+		assertTrue(imageValidator.isValidSize(10.0));
+		assertFalse(imageValidator.isValidSize(1000.0));
 	}
 	
 	@Test
