@@ -5,15 +5,18 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class ImageFileValidator extends AbstractFileValidator {
 	
-	private double maxFileSize = -1;
+	private Double maxFileSize;
 	private String invalidMessage;
+	public ImageFileValidator() {
+		maxFileSize = null;
+	}
 	@Override
 	public boolean isValid(FileMetadata file) {
 		invalidMessage = WebConstants.INVALID_IMAGE_FILETYPE_MESSAGE;
 		String contentType = file.getContentType();
 		if (file == null){
 			return false;
-		} else if (maxFileSize > 0 && file.getFileSize() > maxFileSize) {
+		} else if (maxFileSize != null && file.getFileSize() > maxFileSize) {
 			invalidMessage = WebConstants.INVALID_FILE_SIZE + DisplayUtils.getFriendlySize(maxFileSize, false);
 			return false;
 		} else if (contentType != null) {
@@ -25,11 +28,11 @@ public class ImageFileValidator extends AbstractFileValidator {
 		}
 	}
 	
-	public void setMaxSize(double maxFileSize) {
+	public void setMaxSize(Double maxFileSize) {
 		this.maxFileSize = maxFileSize;
 	}
 	
-	public double getMaxFileSize() {
+	public Double getMaxFileSize() {
 		return maxFileSize;
 	}
 	
