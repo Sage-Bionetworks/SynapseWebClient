@@ -19,7 +19,6 @@ import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.Question;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -33,7 +32,6 @@ public class QuestionContainerWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserAccountServiceAsync;
 	GlobalApplicationState mockGlobalApplicationState;
-	RssServiceAsync mockRssService;
 //	Question mockQuestion;
 	MultichoiceQuestion mockMultichoiceQuestion;
 	QuestionContainerWidget questionContainerWidget;
@@ -47,7 +45,6 @@ public class QuestionContainerWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserAccountServiceAsync = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockRssService = mock(RssServiceAsync.class);
 		mockMultichoiceQuestion = mock(MultichoiceQuestion.class, withSettings().extraInterfaces(Question.class));
 		mockAnswerOne = mock(MultichoiceAnswer.class);
 		mockAnswerTwo = mock(MultichoiceAnswer.class);

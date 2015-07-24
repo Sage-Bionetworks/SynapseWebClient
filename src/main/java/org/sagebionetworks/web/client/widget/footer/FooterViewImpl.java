@@ -34,11 +34,6 @@ public class FooterViewImpl extends Composite implements FooterView {
 	@UiField
 	Span repoVersionSpan;
 	
-	@UiField
-	FocusPanel twitterBox;
-	@UiField
-	FocusPanel facebookBox;
-	
 	private Presenter presenter;
 	private CookieProvider cookies;
 	
@@ -48,18 +43,6 @@ public class FooterViewImpl extends Composite implements FooterView {
 		this.cookies = cookies;
 		initDebugModeLink();		
 		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
-		twitterBox.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("https://twitter.com/sagebio", "", "");
-			}
-		});
-		facebookBox.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow("http://www.facebook.com/pages/Sage-Bionetworks/246302308981", "", "");
-			}
-		});
 	}
 	
 	private void initDebugModeLink() {

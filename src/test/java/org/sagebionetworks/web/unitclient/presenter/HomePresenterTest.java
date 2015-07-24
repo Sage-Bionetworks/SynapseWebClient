@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -16,8 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.RSSEntry;
-import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -27,7 +25,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -38,6 +35,8 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
@@ -66,9 +65,9 @@ public class HomePresenterTest {
 	List<EntityHeader> testEvaluationResults;
 	List<OpenUserInvitationBundle> openInvitations;
 	
-	RSSFeed testFeed = null;
 	String testTeamId = "42";
 	UserSessionData testSessionData;
+	ResourceLoader mockResourceLoader;
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
 		mockView = mock(HomeView.class);
@@ -80,7 +79,7 @@ public class HomePresenterTest {
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockGwtWrapper = mock(GWTWrapper.class);
 		mockCookies = mock(CookieProvider.class);
-		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://synapse.org/filehandle/");
+		mockResourceLoader = mock(ResourceLoader.class);
 		
 		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		testEvaluationResults = new ArrayList<EntityHeader>();
@@ -101,15 +100,6 @@ public class HomePresenterTest {
 		openInvitations = new ArrayList<OpenUserInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		
-		testFeed = new RSSFeed();
-		RSSEntry entry = new RSSEntry();
-		entry.setTitle("A Title");
-		entry.setAuthor("An Author");
-		entry.setLink("http://somewhere");
-		List<RSSEntry> entries = new ArrayList<RSSEntry>();
-		entries.add(entry);
-		testFeed.setEntries(entries);
-		
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -117,9 +107,11 @@ public class HomePresenterTest {
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
-				mockRssService,
 				adapter,
-				mockCookies);
+				mockCookies,
+				mockResourceLoader,
+				mockSynapseJSNIUtils
+				);
 		verify(mockView).setPresenter(homePresenter);
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 		
@@ -160,11 +152,17 @@ public class HomePresenterTest {
 	
 	@Test
 	public void testNewsFeed() throws JSONObjectAdapterException {
-		//when news is loaded, the view should be updated with the service result
-		String exampleNewsFeedResult = "news feed";
-		AsyncMockStubber.callSuccessWith(exampleNewsFeedResult).when(mockRssService).getCachedContent(anyString(), any(AsyncCallback.class));		
 		homePresenter.loadNewsFeed();
-		verify(mockView).showNews(anyString());
+		
+		verify(mockView).prepareTwitterContainer(anyString());
+		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(false);
+		homePresenter.twitterContainerReady("twitterElementId");
+		verify(mockResourceLoader).isLoaded(any(WebResource.class));
+		verify(mockResourceLoader).requires(any(WebResource.class), any(AsyncCallback.class));
+		
+		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
+		homePresenter.twitterContainerReady("twitterElementId");
+		verify(mockSynapseJSNIUtils).showTwitterFeed(anyString(), anyString(), anyString(), anyString(), anyInt());
 	}	
 	
 	

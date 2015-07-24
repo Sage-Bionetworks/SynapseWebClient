@@ -68,6 +68,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem commandLineLink;
 	@UiField
 	AnchorListItem restAPILink;
+	@UiField
+	AnchorListItem governanceLink;
 
 	@UiField
 	SimplePanel projectFavoritePanel;
@@ -262,6 +264,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				DisplayUtils.newWindow(ClientProperties.REST_API_URL, "", "");
 			}
 		});
+		governanceLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(ClientProperties.GOVERNANCE_HELP_URL, "", "");
+			}
+		});
+		
 		headerFavButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

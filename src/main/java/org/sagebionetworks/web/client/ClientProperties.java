@@ -104,6 +104,7 @@ public class ClientProperties {
 	 * Client Documentation
 	 */
 	public static final String REST_API_URL = "http://rest.synapse.org";
+	public static final String GOVERNANCE_HELP_URL = "#!Help:Governance";
 	public static final String CLIENT_R_API_URL = "http://r-docs.synapse.org";
 	public static final String CLIENT_R_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.R_CLIENT;
 	public static final String CLIENT_PYTHON_API_URL = "http://python-docs.synapse.org";

@@ -25,8 +25,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class HomePresenter extends AbstractActivity implements HomeView.Presenter, Presenter<Home> {
-	private static final int MAX_NEWS_ITEMS = 3;
-	
 	private Home place;
 	private HomeView view;
 	private GlobalApplicationState globalApplicationState;
@@ -132,7 +130,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		};
 		if (resourceLoader.isLoaded(ClientProperties.TWITTER_JS))
-			//already loaded
 			jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, SYNAPSE_BLUE, SYNAPSE_BLUE, twitterHeight);
 		else
 			resourceLoader.requires(ClientProperties.TWITTER_JS, initializedCallback);		

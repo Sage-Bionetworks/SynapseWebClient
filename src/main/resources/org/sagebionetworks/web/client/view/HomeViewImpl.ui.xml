@@ -123,7 +123,7 @@
 							<bh:Div addStyleNames="margin-10">
 								<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
 							</bh:Div>
-							<b:Heading size="H5" addStyleNames="color-white" text="See all the current DREAM challenges available on Synapse. >"></b:Heading>
+							<b:Heading size="H5" addStyleNames="color-white" text="Synapse is the platform on which DREAM operates.  Learn more. >"></b:Heading>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
