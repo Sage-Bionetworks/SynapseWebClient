@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
@@ -35,6 +36,7 @@ public class JoinTeamConfigEditorTest {
 	DialogCallback mockCallback;
 	GroupSuggestion mockSuggestion;
 	SynapseClientAsync mockSynClient;
+	SynapseJSNIUtils mockJSNI;
 	
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
@@ -62,6 +64,7 @@ public class JoinTeamConfigEditorTest {
 		mockProvider = mock(GroupSuggestionProvider.class);
 		mockCallback = mock(DialogCallback.class);
 		mockSynClient = mock(SynapseClientAsync.class);
+		mockJSNI = mock(SynapseJSNIUtils.class);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamID);
 		descriptor.put(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY, String.valueOf(isChallenge));
@@ -74,7 +77,7 @@ public class JoinTeamConfigEditorTest {
 		testTeam = new Team();
 		testTeam.setId(teamID);
 		testTeam.setName(teamName);
-		presenter = new JoinTeamConfigEditor(mockView, mockSuggestBox, mockProvider, mockSynClient);
+		presenter = new JoinTeamConfigEditor(mockView, mockSuggestBox, mockProvider, mockSynClient, mockJSNI);
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getId()).thenReturn(suggestionID);
 		AsyncMockStubber.callSuccessWith(testTeam).when(mockSynClient).getTeam(Mockito.anyString(), Mockito.any(AsyncCallback.class));

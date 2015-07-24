@@ -12,26 +12,26 @@
 					<g:SimplePanel ui:field="suggestBoxPanel"/>
 				</b:FormGroup>
 				<b:FormGroup>
-				    <b:FormLabel for="joinButtonText">Wiki Text for Non-Members</b:FormLabel>
+				    <b:FormLabel for="joinButtonText">Wiki text for non-members</b:FormLabel>
 					<b:TextBox ui:field="joinButtonField" name="joinButtonText" b:id="joinButtonText"/>
 				</b:FormGroup>	
 				<b:FormGroup>
-				    <b:FormLabel for="memberMessageField">Wiki Text for Members</b:FormLabel>
+				    <b:FormLabel for="memberMessageField">Wiki text for members</b:FormLabel>
 					<b:TextBox ui:field="memberMessageField" name="memberMessageField" b:id="memberMessageField"/>
 				</b:FormGroup>	
 				<b:FormGroup>
-				    <b:FormLabel for="joinSuccessText">Successfully joined Notification Wiki Text</b:FormLabel>
+				    <b:FormLabel for="joinSuccessText">"Successfully joined" notification wiki text</b:FormLabel>
 					<b:TextBox ui:field="joinSuccessField" name="joinSuccessText" b:id="joinSuccessText" />
 				</b:FormGroup>	
 				<b:FormGroup>
-				    <b:FormLabel for="requestOpenInfoText">Team Request Pending Wiki Text</b:FormLabel>
+				    <b:FormLabel for="requestOpenInfoText">"Team request pending" wiki text</b:FormLabel>
 					<b:TextBox ui:field="requestOpenInfoField" name="requestOpenInfoText" b:id="requestOpenInfoText" />
 				</b:FormGroup>	
 				<b:FormGroup>
-				    <b:CheckBox ui:field="isChallengeCheckbox" text="Is this a Challenge Sign-up?" />
+				    <b:CheckBox ui:field="isChallengeCheckbox" text="Is this a challenge sign-up?" />
 				</b:FormGroup>	
 				<b:FormGroup>
-				<b:CheckBox ui:field="isSimpleRequestCheckbox" text="Prompt joining User for Team Request Message?"/>
+				<b:CheckBox ui:field="isSimpleRequestCheckbox" text="Prompt joining user for team request message?"/>
 				</b:FormGroup>
 			</b:FormGroup>
 		</b:FieldSet>
