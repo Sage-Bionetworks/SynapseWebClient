@@ -37,8 +37,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private SynapseJSNIUtils jsniUtils;
 	private int twitterHeight;
 	public static final String TWITTER_DATA_WIDGET_ID = "624656608589561856";
-	public static final String TWITTER_LINK_COLOR = "#1e7098";
-	public static final String TWITTER_BORDER_COLOR = "#ccc";
+	public static final String SYNAPSE_BLUE = "#1e7098";
 	public static final int TWITTER_STANDARD_HEIGHT = 390;
 	public static final int TWITTER_MINIMAL_HEIGHT = 200;
 	public static final String TWITTER_ELEMENT_ID = "twitter-feed";
@@ -125,7 +124,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		AsyncCallback<Void> initializedCallback = new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, TWITTER_LINK_COLOR, TWITTER_BORDER_COLOR, twitterHeight);
+				jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, SYNAPSE_BLUE, SYNAPSE_BLUE, twitterHeight);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -134,7 +133,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		};
 		if (resourceLoader.isLoaded(ClientProperties.TWITTER_JS))
 			//already loaded
-			jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, TWITTER_LINK_COLOR, TWITTER_BORDER_COLOR, twitterHeight);
+			jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, SYNAPSE_BLUE, SYNAPSE_BLUE, twitterHeight);
 		else
 			resourceLoader.requires(ClientProperties.TWITTER_JS, initializedCallback);		
 	}

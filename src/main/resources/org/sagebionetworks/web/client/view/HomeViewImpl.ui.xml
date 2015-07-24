@@ -67,7 +67,7 @@
 					<bh:Div ui:field="loginUI" addStyleNames="synapse-blue-bg padding-30" />
 				</b:Column>
 				<b:Column size="SM_5">
-					<g:SimplePanel ui:field="newsFeed"/>
+					<g:SimplePanel ui:field="newsFeed" />
 				</b:Column>
 			</b:Row>
 		</b:Container>
