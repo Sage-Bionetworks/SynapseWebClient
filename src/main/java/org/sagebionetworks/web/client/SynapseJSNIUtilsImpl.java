@@ -471,4 +471,23 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			}
 		});
 	}-*/;
+	
+	
+	@Override
+	public void showTwitterFeed(String dataWidgetId, String elementId,
+			String linkColor, String borderColor, int height) {
+		_showTwitterFeed(dataWidgetId, elementId, linkColor, borderColor, height);		
+	}
+
+	private final static native void _showTwitterFeed(String dataWidgetId,
+			String elementId, String linkColorHex, String borderColorHex,
+			int heightInPx) /*-{
+		var element = $doc.getElementById(elementId);
+		$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
+			height : heightInPx,
+			chrome : "nofooter",
+			linkColor : linkColorHex,
+			borderColor : borderColorHex
+		});
+	}-*/;
 }
