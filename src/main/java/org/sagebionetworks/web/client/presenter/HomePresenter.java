@@ -36,7 +36,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private ResourceLoader resourceLoader;
 	private SynapseJSNIUtils jsniUtils;
 	private int twitterHeight;
-	public static final String TWITTER_DATA_WIDGET_ID = "624655976839299073";
+	public static final String TWITTER_DATA_WIDGET_ID = "624656608589561856";
 	public static final String TWITTER_LINK_COLOR = "#1e7098";
 	public static final String TWITTER_BORDER_COLOR = "#ccc";
 	public static final int TWITTER_STANDARD_HEIGHT = 390;
