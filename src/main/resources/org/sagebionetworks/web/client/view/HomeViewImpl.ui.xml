@@ -12,21 +12,7 @@
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="header"/>
-		<b:Container fluid="true">
-			<b:Row addStyleNames="margin-top-15">
-				<b:Column size="SM_7">
-					<b:Heading size="H2" text="Contribute to the Cure" addStyleNames="font-weight-bolder synapse-blue font-size-3-2x margin-left-15" />
-				</b:Column>
-				<b:Column size="SM_5">
-					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-10 margin-left-15" visible="false">
-						<b:Heading size="H5" addStyleNames="color-white margin-top-5" text="WELCOME BACK"></b:Heading>
-						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" />
-					</bh:Div>
-					<bh:Div ui:field="registerUI"></bh:Div>
-					<bh:Div ui:field="loginUI" addStyleNames="synapse-blue-bg padding-10" />
-				</b:Column>
-			</b:Row>
-		</b:Container>
+		
 		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
@@ -70,6 +56,22 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
+		<b:Container fluid="true">
+			<b:Row addStyleNames="margin-top-40">
+				<b:Column size="SM_7">
+					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-30 margin-left-15" visible="false">
+						<b:Heading size="H3" addStyleNames="color-white margin-top-5" text="WELCOME BACK"></b:Heading>
+						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" marginBottom="33" />
+					</bh:Div>
+					<bh:Div ui:field="registerUI"></bh:Div>
+					<bh:Div ui:field="loginUI" addStyleNames="synapse-blue-bg padding-30" />
+				</b:Column>
+				<b:Column size="SM_5">
+					<g:SimplePanel ui:field="newsFeed" />
+				</b:Column>
+			</b:Row>
+		</b:Container>
+		
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-blue-bg margin-top-40">
 				<b:Column size="SM_12">
@@ -121,30 +123,14 @@
 							<bh:Div addStyleNames="margin-10">
 								<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
 							</bh:Div>
-							<b:Heading size="H5" addStyleNames="color-white" text="See all the current DREAM challenges available on Synapse. >"></b:Heading>
+							<b:Heading size="H5" addStyleNames="color-white" text="Synapse is the platform on which DREAM operates.  Learn more. >"></b:Heading>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
 			</b:Row>
 		</b:Container>
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-green-bg margin-top-40">
-				<b:Column size="SM_12">
-					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="NEWS"
-					></b:Heading>
-				</b:Column>
-			</b:Row>
-		</b:Container>
-		<b:Container fluid="true">
-			<b:Row>
-				<b:Column size="SM_12">
-					<g:SimplePanel ui:field="newsFeed"/>
-				</b:Column>
-			</b:Row>
-		</b:Container>
-		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-purple-bg margin-top-10">
+			<b:Row addStyleNames="synapse-purple-bg margin-top-40">
 				<b:Column size="SM_12">
 					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
 							text="GOVERNANCE"
@@ -183,73 +169,6 @@
 					</b:Column>
 			</b:Row>
 		</b:Container>
-		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-blue-bg margin-top-10">
-				<b:Column size="SM_12">
-					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="PROGRAMATIC CLIENTS"
-					></b:Heading>
-				</b:Column>
-			</b:Row>
-		</b:Container>
-		<b:Container fluid="true">
-			<b:Row>
-				<b:Column size="SM_12">
-					<g:FlowPanel addStyleNames="padding-10">
-						<bh:Paragraph text="Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
-						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
-						   all from the comfort of your own code. Don't see your language of choice here? Check out our 
-						   full&nbsp;"  addStyleNames="displayInline"/>
-						<g:Anchor ui:field="restApiLink" addStyleNames="displayInline"/>
-					 </g:FlowPanel>
-				</b:Column>
-			</b:Row>
-		</b:Container>
-		<b:Container fluid="true">
-			<b:Row>
-			    <b:Column size="SM_3">
-			    	<bh:Div addStyleNames="padding-10">
-				    	<bh:Span>
-				    	    <g:Image resource='{sageImageBundle.logoR45}' />
-				    	</bh:Span>
-				    	<b:Heading size="H4" text="R Client" addStyleNames="displayInline"/>
-				    	<g:SimplePanel ui:field="rClientInstallPanel" />
-				    	<g:Anchor ui:field="rAPILink"/> <bh:Text text="&nbsp;&amp;&nbsp;" /> <g:Anchor ui:field="rExampleCodeLink"/>
-				    </bh:Div>
-				</b:Column>
-				<b:Column size="SM_3">
-					<bh:Div addStyleNames="padding-10">
-						<bh:Span>
-				    	    <g:Image resource='{sageImageBundle.logoPython45}' />
-				    	</bh:Span>
-				    	<b:Heading size="H4" text="Python Client" addStyleNames="displayInline"/>
-				    	<g:SimplePanel ui:field="pythonClientInstallPanel" />
-						<g:Anchor ui:field="pythonAPILink"/> <bh:Text text="&nbsp;&amp;&nbsp;" /><g:Anchor ui:field="pythonExampleCodeLink"/>
-					</bh:Div>
-				</b:Column>
-				<b:Column size="SM_3">
-					<bh:Div addStyleNames="padding-10">
-						<bh:Span>
-				    	    <g:Image resource='{sageImageBundle.logoCommandLine45}' />
-				    	</bh:Span>
-				    	<b:Heading size="H4" text="Command Line Client" addStyleNames="displayInline"/>
-				    	<g:SimplePanel ui:field="clClientInstallPanel" />
-						<g:Anchor ui:field="clAPILink"/><bh:Text text="&nbsp;&amp;&nbsp;" /><g:Anchor ui:field="clExampleCodeLink"/>
-					</bh:Div>
-				</b:Column>							
-				<b:Column size="SM_3">
-					<bh:Div addStyleNames="padding-10">
-						<bh:Span>
-				    	    <g:Image resource='{sageImageBundle.logoJava45}' />
-				    	</bh:Span>
-				    	<b:Heading size="H4" text="Java Client" addStyleNames="displayInline"/>
-				    	<g:SimplePanel ui:field="javaClientInstallPanel" />
-				    	<g:Anchor ui:field="javaAPILink"/><bh:Text text="&nbsp;&amp;&nbsp;" /><g:Anchor ui:field="javaExampleCodeLink"/>
-				    </bh:Div>
-				</b:Column>
-			</b:Row>
-		</b:Container>
-		
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-yellow-bg margin-top-40">
 				<b:Column size="SM_12">

@@ -1,15 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -19,31 +14,26 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
-import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -69,32 +59,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Div registerUI;
 	@UiField
 	Div loginUI;
-	@UiField
-	SimplePanel rClientInstallPanel;
-	@UiField
-	SimplePanel pythonClientInstallPanel;
-	@UiField
-	SimplePanel javaClientInstallPanel;
-	@UiField
-	SimplePanel clClientInstallPanel;
-	@UiField
-	Anchor rAPILink;	
-	@UiField
-	Anchor rExampleCodeLink;	
-	@UiField
-	Anchor pythonAPILink;	
-	@UiField
-	Anchor pythonExampleCodeLink;	
-	@UiField
-	Anchor clAPILink;	
-	@UiField
-	Anchor clExampleCodeLink;	
-	@UiField
-	Anchor javaAPILink;	
-	@UiField
-	Anchor javaExampleCodeLink;	
-	@UiField
-	Anchor restApiLink;
 	
 	@UiField
 	FocusPanel dreamChallengesBox;
@@ -170,9 +134,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		
-		// Programmatic Clients
-		fillProgrammaticClientInstallCode();
-		
 		registerUI.add(registerWidget.asWidget());
 		
 		loginWidget.setUserListener(new UserListener() {
@@ -182,11 +143,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		// Other links
-		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
 		dreamChallengesBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Location.assign("http://dreamchallenges.org/");
+				Window.open("http://dreamchallenges.org/", "", "");
 			}
 		});
 		openResearchProjectsBox.addClickHandler(new ClickHandler() {
@@ -238,8 +198,23 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("Certification"));
 			}
 		});
-	}
 		
+	}
+	@Override
+	public void prepareTwitterContainer(final String elementId) {
+		newsFeed.clear();
+		final Div newDiv = new Div();
+		newDiv.addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					newDiv.getElement().setId(elementId);
+					presenter.twitterContainerReady(elementId);
+				}
+			}
+		});
+		newsFeed.add(newDiv);
+	}
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button
@@ -292,14 +267,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 	
 	@Override
-	public void showNews(String html){
-		HTMLPanel panel = new HTMLPanel(html);		
-		DisplayUtils.sendAllLinksToNewWindow(panel);
-		newsFeed.clear();
-		newsFeed.add(panel);
-	}
-	
-	@Override
 	public void refresh() {
 		header.clear();
 		headerWidget.configure(true);
@@ -331,37 +298,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		dashboardUI.setVisible(false);
 		registerUI.setVisible(false);
 		loginUI.setVisible(false);
-	}
-
-
-	private void fillProgrammaticClientInstallCode() {
-		configureNewWindowLink(rAPILink, ClientProperties.CLIENT_R_API_URL, DisplayConstants.API_DOCUMENTATION);
-		configureNewWindowLink(rExampleCodeLink, ClientProperties.CLIENT_R_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
-		configureNewWindowLink(pythonAPILink, ClientProperties.CLIENT_PYTHON_API_URL, DisplayConstants.API_DOCUMENTATION);
-		configureNewWindowLink(pythonExampleCodeLink, ClientProperties.CLIENT_PYTHON_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
-		configureNewWindowLink(clAPILink, ClientProperties.CLIENT_CL_API_URL, DisplayConstants.API_DOCUMENTATION);
-		configureNewWindowLink(clExampleCodeLink, ClientProperties.CLIENT_CL_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
-		configureNewWindowLink(javaAPILink, ClientProperties.CLIENT_JAVA_API_URL, DisplayConstants.API_DOCUMENTATION);
-		configureNewWindowLink(javaExampleCodeLink, ClientProperties.CLIENT_JAVA_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
-		
-		rClientInstallPanel.add(new HTML(ProgrammaticClientCode.getRClientInstallHTML()));
-		pythonClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
-		clClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
-
-		Button showJava = new Button(DisplayConstants.SHOW);
-		showJava.removeStyleName("gwt-Button");
-		showJava.addStyleName("btn btn-default btn-lg btn-block margin-top-5");
-		showJava.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				Bootbox.alert("<h4>"+DisplayConstants.INSTALL_JAVA_MAVEN + "</h4>" + ProgrammaticClientCode.getJavaClientInstallHTML().asString(), new AlertCallback() {
-					@Override
-					public void callback() {
-					}
-				});
-			}
-		});	
-		javaClientInstallPanel.add(showJava);
 	}
 
 	private void configureNewWindowLink(Anchor a, String href, String text) {

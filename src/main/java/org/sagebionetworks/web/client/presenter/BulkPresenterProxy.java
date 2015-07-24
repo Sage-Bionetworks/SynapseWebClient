@@ -27,14 +27,13 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.SignedToken;
+import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -150,11 +149,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 					// search results page
 					SearchPresenter presenter = ginjector.getSearchPresenter();
 					presenter.setPlace((Search) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof WikiPlace) {
-					// wiki page
-					WikiPresenter presenter = ginjector.getWikiPresenter();
-					presenter.setPlace((WikiPlace) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Wiki) {
 					SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();

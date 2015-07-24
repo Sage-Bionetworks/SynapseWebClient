@@ -79,8 +79,6 @@ import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
-import org.sagebionetworks.web.client.view.WikiView;
-import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
@@ -230,6 +228,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
@@ -254,8 +254,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -662,10 +660,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SearchViewImpl.class).in(Singleton.class);
 		bind(SearchView.class).to(SearchViewImpl.class);
 
-		// WikiView
-		bind(WikiViewImpl.class).in(Singleton.class);
-		bind(WikiView.class).to(WikiViewImpl.class);
-		
 		// Down
 		bind(DownViewImpl.class).in(Singleton.class);
 		bind(DownView.class).to(DownViewImpl.class);

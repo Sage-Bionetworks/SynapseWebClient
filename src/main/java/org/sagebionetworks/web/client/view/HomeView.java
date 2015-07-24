@@ -16,12 +16,12 @@ public interface HomeView extends IsWidget, SynapseView {
 		
 	public void refresh();
 	
-	public void showNews(String html);
 	public void showLoggedInUI(UserSessionData userData);
 	public void showRegisterUI();
 	public void showLoginUI();
-	
+	public void prepareTwitterContainer(String elementId);
 	public interface Presenter extends SynapsePresenter {
 		void onUserChange();
+		void twitterContainerReady(String elementId);
 	}
 }

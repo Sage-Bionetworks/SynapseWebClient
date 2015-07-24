@@ -13,19 +13,10 @@
 
 		<!-- FOOTER -->	
 		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-blue-bg margin-top-10">
-				<b:Column size="SM_12">
-					<b:Heading size="H3" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10"
-							text="PARTNERS"
-					></b:Heading>
-				</b:Column>
-			</b:Row>
-		</b:Container>
-		<b:Container fluid="true">
-			<b:Row>
-				<b:Column size="SM_12">
+	        <b:Row addStyleNames="synapse-blue-bg margin-top-30 padding-15">
+	       		<b:Column size="SM_12" addStyleNames="margin-bottom-10">
 					<g:HTMLPanel>
-						<div class="margin-top-40 margin-left-15 margin-right-15">
+						<div>
 							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.lsdfa.org/" target="_new"><g:Image resource='{sageImageBundle.lsdfLogo}' styleName='padding-5' /></a></div>                            
 							<!-- image needs to be updated <div class="img-thumbnail margin-bottom-5"><a href="http://www.cancer.gov/" target="_new"><g:Image resource='{sageImageBundle.nciLogo}' styleName='padding-5' /></a></div> -->                                                       
 							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nhlbiLogo}' styleName='padding-5' /></a></div>                                                       
@@ -36,59 +27,8 @@
 						</div>
 					</g:HTMLPanel>
 				</b:Column>
-			</b:Row>
-		</b:Container>
-		<b:Container fluid="true">
-	        <b:Row addStyleNames="synapse-blue-bg margin-top-30 padding-15">
-				<b:Column size="SM_4" addStyleNames="margin-top-15 margin-bottom-15">
-					<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
-							text="Governance"
-					></b:Heading>
-					<b:Anchor href="static/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf" text="Terms and Conditions of Use" addStyleNames="color-white margin-left-10 displayBlock"/>
-					<b:Anchor href="static/governance/SynapseCommonsDataUseProcedure.pdf" text="Date Use Procedure" addStyleNames="color-white margin-left-10 displayBlock"/>
-					<b:Anchor href="static/governance/SynapsePrivacyPolicy.pdf" text="Privacy Policy" addStyleNames="color-white margin-left-10 displayBlock"/>
-				</b:Column>
-				<b:Column size="SM_5" addStyleNames="margin-top-15 margin-bottom-15">
-					<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
-							text="Support"
-					></b:Heading>
-					<b:Anchor href="#!Help:GettingStarted" text="Tutorial" addStyleNames="color-white margin-left-10 displayBlock"/>
-					<b:Anchor href="http://r-docs.synapse.org/" text="R Client Documentation" addStyleNames="color-white margin-left-10 displayBlock"/>
-					<b:Anchor href="http://python-docs.synapse.org/" text="Python Client Documentation" addStyleNames="color-white margin-left-10 displayBlock" />
-					<b:Anchor href="http://python-docs.synapse.org/CommandLineClient.html" text="Command Line Client Documentation" addStyleNames="color-white margin-left-10 displayBlock"/>
-					<b:Anchor href="https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java" text="Java Client" addStyleNames="color-white margin-left-10 displayBlock"/>
-				</b:Column>
-				<b:Column size="SM_3" addStyleNames="margin-top-15 margin-bottom-15">
-					<b:Heading size="H6" addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 font-weight-bolder"
-							text="Connect with us"
-					></b:Heading>
-					<!-- Twitter -->
-					<bh:Div>
-						<g:FocusPanel ui:field="twitterBox" addStyleNames="imageButton margin-left-10 displayInline">
-							<b:IconStack>
-								<b:Icon type="CIRCLE" stackBase="true" addStyleNames="color-white"/>
-								<b:Icon type="TWITTER" stackTop="true" addStyleNames="synapse-blue"/>
-							</b:IconStack>
-						</g:FocusPanel>
-						<b:Anchor text="Twitter" href="https://twitter.com/sagebio" addStyleNames="color-white margin-left-10" />
-					</bh:Div>
-					
-					<!-- Facebook -->
-					<bh:Div>
-						<g:FocusPanel ui:field="facebookBox" addStyleNames="imageButton margin-left-10 displayInline">
-							<b:IconStack>
-								<b:Icon type="CIRCLE" stackBase="true" addStyleNames="color-white"/>
-								<b:Icon type="FACEBOOK" stackTop="true" addStyleNames="synapse-blue"/>
-							</b:IconStack>
-						</g:FocusPanel>
-						<b:Anchor text="Facebook" href="http://www.facebook.com/pages/Sage-Bionetworks/246302308981" addStyleNames="color-white margin-left-10" />
-					</bh:Div>
-				</b:Column>
-			</b:Row>
-		</b:Container>
-		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-blue-bg margin-top-10 padding-15">
-	        	<b:Column size="SM_12">
+				<bh:Hr />
+				<b:Column size="SM_12">
 					<t:Table width="100%">
 						<t:TableRow>
 							<t:TableData paddingRight="2" >

@@ -44,6 +44,7 @@
 					<b:AnchorListItem ui:field="pythonLink">Python client</b:AnchorListItem>
 					<b:AnchorListItem ui:field="commandLineLink">Command line client</b:AnchorListItem>
 					<b:AnchorListItem ui:field="restAPILink">REST API docs</b:AnchorListItem>
+					<b:AnchorListItem ui:field="governanceLink">Data use conditions</b:AnchorListItem>
 				</b:DropDownMenu>
 			</b:ButtonGroup>
 		    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5"/>
