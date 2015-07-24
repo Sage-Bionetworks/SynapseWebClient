@@ -115,16 +115,15 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 						// "Sort" stuff'
 						subpageOrderHint = result;
 						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders.getResults(), subpageOrderHint);
-						
 						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
+										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
 						view.configure(wikiHeaders.getResults(), wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback());
+								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 				});
@@ -164,10 +163,5 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 
 	public interface UpdateOrderHintCallback {
 		void updateOrderHint(List<String> newOrderHintIdList);
-	}
-
-	@Override
-	public CallbackP<WikiPageKey> getReloadWikiPageCallback() {
-		return this.reloadWikiPageCallback;
 	}
 }

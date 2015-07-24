@@ -63,31 +63,48 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	}
 	
 	@Override
-	public void sendInvite(String invitationMessage) {
+	public void validateAndSendInvite(final String invitationMessage) {
 		UserGroupSuggestion suggestion = (UserGroupSuggestion)peopleSuggestWidget.getSelectedSuggestion();
 		if(suggestion != null) {
 			UserGroupHeader header = suggestion.getHeader();
-			String principalId = header.getOwnerId();
-			final String firstName = header.getFirstName();
-			final String lastName = header.getLastName();
-			final String userName = header.getUserName();
-			
-			synapseClient.inviteMember(principalId, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.hide();
-					view.showInfo("Invitation Sent", "An invitation has been sent to " + DisplayUtils.getDisplayName(firstName, lastName, userName));
-					teamUpdatedCallback.invoke();
-				}
+			synapseClient.isTeamMember(header.getOwnerId(), Long.valueOf(team.getId()), new AsyncCallback<Boolean>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
 				}
-			});			
-		}
-		else {
+				@Override
+				public void onSuccess(Boolean result) {
+					if (!result) {
+						doSendInvite(invitationMessage);
+					} else {
+						synAlert.showError("This user is already a member.");
+					}
+				}
+			});
+		} else {
 			synAlert.showError("Please select a user to send an invite to.");
+			
 		}
+	}
+	
+	public void doSendInvite(String invitationMessage) {
+		UserGroupHeader header = ((UserGroupSuggestion)peopleSuggestWidget.getSelectedSuggestion()).getHeader();
+		final String principalId = header.getOwnerId();
+		final String firstName = header.getFirstName();
+		final String lastName = header.getLastName();
+		final String userName = header.getUserName();
+		synapseClient.inviteMember(principalId, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.hide();
+				view.showInfo("Invitation Sent", "An invitation has been sent to " + DisplayUtils.getDisplayName(firstName, lastName, userName));
+				teamUpdatedCallback.invoke();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 
 	@Override

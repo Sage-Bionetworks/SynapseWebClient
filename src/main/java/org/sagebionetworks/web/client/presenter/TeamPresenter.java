@@ -154,7 +154,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				};
 				view.setPublicJoinVisible(team.getCanPublicJoin());
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
-				view.setMediaObjectPanel(team);			
+				view.setMediaObjectPanel(team);
+				view.setTeamEmailAddress(getTeamEmail(team.getName()));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
 
 				if (teamMembershipStatus != null) {
@@ -178,7 +179,16 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 		});
 	}
-		
+	
+	public String getTeamEmail(String teamName) {
+		if (authenticationController.isLoggedIn()) {
+			//strip out any non-word character.  Not a (letter, number, underscore)
+			return teamName.replaceAll("\\W", "") + "@synapse.org";
+		} else {
+			return "";
+		}
+	}
+	
 	private void showView(org.sagebionetworks.web.client.place.Team place) {
 		String teamId = place.getTeamId();
 		refresh(teamId);

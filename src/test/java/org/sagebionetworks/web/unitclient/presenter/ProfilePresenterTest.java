@@ -1318,5 +1318,19 @@ public class ProfilePresenterTest {
 		profilePresenter.setGetCertifiedDismissed();
 		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()), eq(Boolean.FALSE.toString()), any(Date.class));
 	}
+	
+	@Test
+	public void testShowEmailIfLoggedIn() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
+		verify(mockView).setSynapseEmailVisible(true);
+	}
+	@Test
+	public void testHideEmailIfAnonymous() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
+		verify(mockView).setSynapseEmailVisible(false);
+	}
+
 
 }

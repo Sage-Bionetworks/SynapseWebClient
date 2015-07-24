@@ -64,4 +64,8 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	void showNoWikiCannotEditMessage();
 	public void hideMarkdown();
 	public void showMarkdown();
+	public void showMainPanel();
+	public void hideMainPanel();
+	void showHistoryCollapse();
+	void hideHistoryCollapse();
 }

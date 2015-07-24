@@ -6,45 +6,47 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-    
-	<g:FlowPanel addStyleNames="min-height-200" ui:field="mainPanel">
-	    <g:HTMLPanel ui:field="loadingPanel">
-			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-			&nbsp;Loading...
-		</g:HTMLPanel>
-	    <g:SimplePanel ui:field="synAlertPanel"/>
-	    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
-	    <g:FlowPanel ui:field="wikiPagePanel">
-	        <g:SimplePanel ui:field="breadcrumbPanel"/>
-	        <b:Heading size="H2" ui:field="wikiHeading" addStyleNames="margin-bottom-0-imp"/>
-	        <b:Alert ui:field="diffVersionAlert" visible="false">
-	            <g:HTMLPanel>
-	                <bh:Span addStyleNames="margin-left-5" 
-	                    text="You are viewing an old version of this page. View the"/>
-	                <b:Anchor ui:field="anchorToCurrentVersion" addStyleNames="link" text="current version."/>
-	            	<b:Button ui:field="restoreButton" addStyleNames="wikiHistoryButton margin-top-10" text="Restore" visible="false"/>
-	            </g:HTMLPanel>
-	        </b:Alert>
-	        <bh:Italic ui:field="noWikiCanEditMessage" text="There is no content. Please click Edit Wiki from the Tools menu." visible="false"/>
-	        <bh:Italic ui:field="noWikiCannotEditMessage" text="A Wiki has not been created." visible="false"/>
-	    	<g:SimplePanel ui:field="markdownPanel"/>
-	    	<g:FlowPanel addStyleNames="margin-top-10 clearleft" ui:field="createdModifiedHistoryPanel">
-			    <g:HTMLPanel ui:field="modifiedByPanel">
-   			        Modified by
-   			        <g:SimplePanel ui:field="modifiedByBadgePanel" addStyleNames="displayInline"/>
-			        <bh:Span ui:field="modifiedOnField"/>
-			    </g:HTMLPanel>
-			    <g:HTMLPanel ui:field="createdByPanel">
-			        Created by 
-			        <g:SimplePanel ui:field="createdByBadgePanel" addStyleNames="displayInline"/>
-			        <bh:Span ui:field="createdOnField"/>
-			    </g:HTMLPanel>
-			    <b:Button ui:field="wikiHistoryButton" dataToggle="COLLAPSE" iconPosition="RIGHT" 
-			        icon="CARET_DOWN" dataTarget="#historyCollapse" text="Wiki History"/>
-			    <b:Collapse b:id="historyCollapse" ui:field="historyCollapse" toggle="false">
-       			    <g:SimplePanel addStyleNames="margin-top-10" ui:field="wikiHistoryPanel"/>
-			    </b:Collapse>
-			</g:FlowPanel>
-	    </g:FlowPanel>
-	</g:FlowPanel>
+    <g:FlowPanel>
+        <g:SimplePanel ui:field="synAlertPanel"/>
+        <g:FlowPanel addStyleNames="min-height-200" ui:field="mainPanel">
+		    <g:HTMLPanel ui:field="loadingPanel">
+				<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+				&nbsp;Loading...
+			</g:HTMLPanel>
+		    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
+		    <g:FlowPanel ui:field="wikiPagePanel">
+		        <g:SimplePanel ui:field="breadcrumbPanel"/>
+		        <b:Heading size="H2" ui:field="wikiHeading" addStyleNames="margin-bottom-0-imp"/>
+		        <b:Alert ui:field="diffVersionAlert" visible="false">
+		            <g:HTMLPanel>
+		                <bh:Span addStyleNames="margin-left-5" 
+		                    text="You are viewing an old version of this page. View the"/>
+		                <b:Anchor ui:field="anchorToCurrentVersion" addStyleNames="link" text="current version."/>
+		            	<b:Button ui:field="restoreButton" addStyleNames="wikiHistoryButton margin-top-10" text="Restore" visible="false"/>
+		            </g:HTMLPanel>
+		        </b:Alert>
+		        <bh:Italic ui:field="noWikiCanEditMessage" text="There is no content. Please click Edit Wiki from the Tools menu." visible="false"/>
+		        <bh:Italic ui:field="noWikiCannotEditMessage" text="A Wiki has not been created." visible="false"/>
+		    	<g:SimplePanel ui:field="markdownPanel"/>
+		    	<g:FlowPanel addStyleNames="margin-top-10 clearleft" ui:field="createdModifiedHistoryPanel">
+				    <g:HTMLPanel ui:field="modifiedByPanel">
+	   			        Modified by
+	   			        <g:SimplePanel ui:field="modifiedByBadgePanel" addStyleNames="displayInline"/>
+				        <bh:Span ui:field="modifiedOnField"/>
+				    </g:HTMLPanel>
+				    <g:HTMLPanel ui:field="createdByPanel">
+				        Created by 
+				        <g:SimplePanel ui:field="createdByBadgePanel" addStyleNames="displayInline"/>
+				        <bh:Span ui:field="createdOnField"/>
+				    </g:HTMLPanel>
+				    <b:Button ui:field="wikiHistoryButton" dataToggle="COLLAPSE" iconPosition="LEFT" 
+				        icon="CARET_SQUARE_O_RIGHT" dataTarget="#historyCollapse" text="Wiki History"/>
+				    <b:Collapse b:id="historyCollapse" ui:field="historyCollapse" toggle="false">
+	       			    <g:FlowPanel addStyleNames="margin-top-10" ui:field="wikiHistoryPanel"/>
+					</b:Collapse>
+				</g:FlowPanel>
+		    </g:FlowPanel>
+		</g:FlowPanel>
+    </g:FlowPanel>
+	
 </ui:UiBinder>

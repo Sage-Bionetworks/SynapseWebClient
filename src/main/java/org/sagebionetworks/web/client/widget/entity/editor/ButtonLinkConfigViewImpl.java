@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -45,9 +45,9 @@ public class ButtonLinkConfigViewImpl implements ButtonLinkConfigView {
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!LoginPresenter.isValidUrl(urlField.getValue(), false))
+		if (!ValidationUtils.isValidUrl(urlField.getValue(), false))
 			throw new IllegalArgumentException("Invalid URL: " + urlField.getValue());
-		if (!LoginPresenter.isValidWidgetName(nameField.getValue()))
+		if (!ValidationUtils.isValidWidgetName(nameField.getValue()))
 			throw new IllegalArgumentException("Invalid name: " + nameField.getValue());
 	}
 

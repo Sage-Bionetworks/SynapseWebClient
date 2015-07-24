@@ -110,6 +110,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		markdownWidget.clear();
 		breadcrumb.clear();
 		wikiSubpages.clearState();
+		view.hideCreatedModified();
 	}
 
 	@Override
@@ -130,6 +131,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
 			final Callback callback, final boolean isEmbeddedInOwnerPage) {
 		clear();
+		view.showMainPanel();
 		view.showLoading();
 		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
@@ -226,6 +228,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		};
 		historyWidget.configure(wikiKey, canEdit, actionHandler);
 		view.setWikiHistoryWidget(historyWidget);
+		view.showWikiHistory(true);
+		view.hideHistoryCollapse();
 	}
 	
 	@Override
@@ -272,7 +276,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			list.setReferences(allRefs);
 			synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 				@Override
-				public void onSuccess(PaginatedResults<EntityHeader> headers) {	
+				public void onSuccess(PaginatedResults<EntityHeader> headers) {
 					if (headers.getTotalNumberOfResults() == 1) {
 						EntityHeader theHeader = headers.getResults().get(0);
 						String ownerObjectName = theHeader.getName();
@@ -296,6 +300,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	
 	private void refresh() {
+		view.showMainPanel();
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
 	}
 
@@ -420,7 +425,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		if (isEmbeddedInOwnerPage) {
 			view.hideMarkdown();
 			view.hideHistory();
-			view.hideCreatedModified();
+			
 			if (caught instanceof NotFoundException) {
 				if (canEdit) {
 					view.showNoWikiCanEditMessage();
@@ -439,16 +444,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 				synapseAlert.handleException(caught);
 			}
 		}
-	}
-
-	private void show403() {
-		clear();
-		synapseAlert.show403();
-	}
-
-	private void show404() {
-		clear();
-		synapseAlert.show404();
 	}
 
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
@@ -471,5 +466,15 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	public void setCanEdit(boolean canEdit) {
 		this.canEdit = canEdit;
+	}
+	
+	public void show404() {
+		view.hideMainPanel();
+		synapseAlert.show404();
+	}
+	
+	public void show403() {
+		view.hideMainPanel();
+		synapseAlert.show403();
 	}
 }
