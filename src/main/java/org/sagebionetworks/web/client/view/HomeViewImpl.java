@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -197,9 +198,23 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new StandaloneWiki("Certification"));
 			}
 		});
-		newsFeed.getElement().setId(HomePresenter.TWITTER_ELEMENT_ID);
-	}
 		
+	}
+	@Override
+	public void prepareTwitterContainer(final String elementId) {
+		newsFeed.clear();
+		final Div newDiv = new Div();
+		newDiv.addAttachHandler(new AttachEvent.Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached()) {
+					newDiv.getElement().setId(elementId);
+					presenter.twitterContainerReady(elementId);
+				}
+			}
+		});
+		newsFeed.add(newDiv);
+	}
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button

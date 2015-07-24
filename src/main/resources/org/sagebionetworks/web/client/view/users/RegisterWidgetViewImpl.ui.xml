@@ -5,10 +5,10 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div addStyleNames="synapse-blue-bg padding-10">
-		<b:Heading size="H5" addStyleNames="color-white margin-top-5" text="NEW TO SYNAPSE? REGISTER NOW"></b:Heading>
-		<g:TextBox ui:field="emailAddressField" width="100%" />
-		<bh:Div height="35px">
-			<b:Button ui:field="registerBtn" pull="RIGHT" size="SMALL" addStyleNames="margin-top-10">Register</b:Button>
+		<b:Heading size="H4" addStyleNames="color-white margin-top-5" text="NEW TO SYNAPSE? REGISTER NOW"></b:Heading>
+		<g:TextBox ui:field="emailAddressField" width="100%" addStyleNames="margin-top-20" />
+		<bh:Div height="88px">
+			<b:Button ui:field="registerBtn" pull="RIGHT" size="LARGE" addStyleNames="margin-top-40">Register</b:Button>
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder> 

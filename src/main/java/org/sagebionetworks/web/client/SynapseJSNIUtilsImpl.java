@@ -485,7 +485,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		var element = $doc.getElementById(elementId);
 		$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
 			height : heightInPx,
-			chrome : "nofooter",
+			chrome : "nofooter noheader",
 			linkColor : linkColorHex,
 			borderColor : borderColorHex
 		});

@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.RSSEntry;
-import org.sagebionetworks.repo.model.RSSFeed;
+import java.util.Date;
+
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -19,7 +17,6 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -38,10 +35,12 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private CookieProvider cookies;
 	private ResourceLoader resourceLoader;
 	private SynapseJSNIUtils jsniUtils;
-	public static final String TWITTER_DATA_WIDGET_ID = "624656608589561856";
+	private int twitterHeight;
+	public static final String TWITTER_DATA_WIDGET_ID = "624655976839299073";
 	public static final String TWITTER_LINK_COLOR = "#1e7098";
 	public static final String TWITTER_BORDER_COLOR = "#ccc";
-	public static final int TWITTER_HEIGHT = 400;
+	public static final int TWITTER_STANDARD_HEIGHT = 390;
+	public static final int TWITTER_MINIMAL_HEIGHT = 200;
 	public static final String TWITTER_ELEMENT_ID = "twitter-feed";
 	
 	@Inject
@@ -76,20 +75,21 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		view.setPresenter(this);
 		checkAcceptToU();
 		view.refresh();
-		// Thing to load regardless of Authentication
-		loadNewsFeed();
-		// Things to load for authenticated users
 		if(authenticationController.isLoggedIn()) {
 			view.showLoggedInUI(authenticationController.getCurrentUserSessionData());
 			//validate token
 			validateToken();
+			twitterHeight = TWITTER_MINIMAL_HEIGHT;
 		} else {
 			if (cookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY) != null) {
 				view.showLoginUI();
+				twitterHeight = TWITTER_STANDARD_HEIGHT;
 			} else {
 				view.showRegisterUI();
+				twitterHeight = TWITTER_MINIMAL_HEIGHT;
 			}
 		}
+		loadNewsFeed();
 	}
 		
 	public void validateToken() {
@@ -115,10 +115,17 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void loadNewsFeed(){
+		long uniqueId = new Date().getTime();
+		final String twitterElementId = TWITTER_ELEMENT_ID+uniqueId;
+		view.prepareTwitterContainer(twitterElementId);
+	}
+	
+	@Override
+	public void twitterContainerReady(final String elementId) {
 		AsyncCallback<Void> initializedCallback = new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, TWITTER_ELEMENT_ID, TWITTER_LINK_COLOR, TWITTER_BORDER_COLOR, TWITTER_HEIGHT);
+				jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, TWITTER_LINK_COLOR, TWITTER_BORDER_COLOR, twitterHeight);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -127,9 +134,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		};
 		if (resourceLoader.isLoaded(ClientProperties.TWITTER_JS))
 			//already loaded
-			jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, TWITTER_ELEMENT_ID, TWITTER_LINK_COLOR, TWITTER_BORDER_COLOR, TWITTER_HEIGHT);
+			jsniUtils.showTwitterFeed(TWITTER_DATA_WIDGET_ID, elementId, TWITTER_LINK_COLOR, TWITTER_BORDER_COLOR, twitterHeight);
 		else
-			resourceLoader.requires(ClientProperties.TWITTER_JS, initializedCallback);
+			resourceLoader.requires(ClientProperties.TWITTER_JS, initializedCallback);		
 	}
 	
 	@Override

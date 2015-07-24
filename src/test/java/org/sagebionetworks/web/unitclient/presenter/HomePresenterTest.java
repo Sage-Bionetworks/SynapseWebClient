@@ -56,7 +56,6 @@ public class HomePresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	StackConfigServiceAsync mockStackConfigService;
-	RssServiceAsync mockRssService;
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookies;
@@ -76,7 +75,6 @@ public class HomePresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		mockRssService = mock(RssServiceAsync.class);
 		mockSearchService = mock(SearchServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
