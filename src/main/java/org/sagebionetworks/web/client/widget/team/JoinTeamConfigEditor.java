@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
@@ -25,14 +26,17 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	private SynapseSuggestBox teamSuggestBox;
 	private SynapseClientAsync synClient;
 	private GroupSuggestionProvider provider;
+	private SynapseJSNIUtils jsniUtils;
 
 	@Inject
 	public JoinTeamConfigEditor(JoinTeamConfigEditorView view,
 			SynapseSuggestBox teamSuggestBox,
-			GroupSuggestionProvider provider, SynapseClientAsync synClient) {
+			GroupSuggestionProvider provider, SynapseClientAsync synClient,
+			SynapseJSNIUtils jsniUtils) {
 		this.provider = provider;
 		this.synClient = synClient;
 		this.teamSuggestBox = teamSuggestBox;
+		this.jsniUtils = jsniUtils;
 		teamSuggestBox.setSuggestionProvider(provider);
 		this.view = view;
 		this.view.setSuggestWidget(teamSuggestBox);
@@ -52,8 +56,7 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 			synClient.getTeam(descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY), new AsyncCallback<Team>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					// Fail silently, leaving the name blank. The descriptor will be set, so users won't save
-					// over their old team.
+					jsniUtils.consoleError(caught.getMessage());
 				}
 				@Override
 				public void onSuccess(Team team) {
