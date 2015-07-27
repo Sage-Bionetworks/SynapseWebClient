@@ -61,7 +61,7 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 						html.append("\" style=\"width: 20px; height: 20px\"></img></span>");
 					}
 					else
-						html.append(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText displayInline"));
+						html.append(DisplayUtils.getFontAwesomeIcon("user font-size-13 imageButton userProfileImage lightGreyText displayInline"));
 						
 					html.append("&nbsp;"+DisplayUtils.getDisplayName(profile)+"</a>");
 					userId2html.put(profile.getOwnerId(), html.toString());
