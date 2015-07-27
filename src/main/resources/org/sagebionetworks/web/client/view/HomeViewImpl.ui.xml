@@ -188,8 +188,16 @@
 									<g:Image resource='{sageImageBundle.directory}' addStyleNames="margin-10" height="63px" width="75px"/>
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Store and access files"></b:Heading>
-									<b:Heading size="H6" text="Synapse provides APIs and clients to store and access files using a unique Synapse ID through the web, R, python, and the command line." />
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Access your data anywhere"></b:Heading>
+									<b:Heading size="H6">
+										<bh:Text>Synapse provides APIs to store or access your data from the web or programmatically via one of our supported analytical clients (</bh:Text>
+										<b:Anchor target="_blank" href="http://r-docs.synapse.org/" text="R"/>
+										<bh:Text>,&nbsp;</bh:Text>
+										<b:Anchor target="_blank" href="http://python-docs.synapse.org/" text="Python"/>
+										<bh:Text>,&nbsp;</bh:Text>
+										<b:Anchor target="_blank" href="http://python-docs.synapse.org/CommandLineClient.html" text="command line"/>
+										<bh:Text>)</bh:Text>
+									</b:Heading>
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -232,8 +240,8 @@
 									<g:Image resource='{sageImageBundle.prov}' addStyleNames="margin-10" height="74px" width="75px"/>
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Mint a doi"></b:Heading>
-									<b:Heading size="H6" text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
+									<b:Heading size="H6" text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -247,8 +255,8 @@
 									<g:Image resource='{sageImageBundle.prov}' addStyleNames="margin-10" height="74px" width="75px"/>
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
-									<b:Heading size="H6" text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Mint a doi"></b:Heading>
+									<b:Heading size="H6" text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -256,8 +264,6 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
-		
-		
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-purple-bg margin-top-40">
 				<b:Column size="SM_12">
@@ -278,7 +284,7 @@
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
-									<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public!" />
+									<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public! Create Synapse Teams to manage your collaborations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -292,8 +298,8 @@
 									<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="margin-10" height="60px" width="75px"/>
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Create or join a team"></b:Heading>
-									<b:Heading size="H6" text="Manage your Synapse Teams from your profile page - organize groups of people who are collaborating with you." />
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Communicate your findings"></b:Heading>
+									<b:Heading size="H6" text="Use the Synapse Wiki services to communicate your Project's research findings by embedding rich content such as images, Tables, Provenance, and even LaTeX equations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
