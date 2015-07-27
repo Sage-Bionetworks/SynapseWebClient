@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -19,12 +21,14 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.FileValidator;
+import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -96,11 +100,18 @@ public class TeamEditModalWidgetTest {
 	public void testConstruction() {
 		verify(mockJSNIUtils).getBaseFileHandleUrl();
 		verify(mockUploader).configure(anyString(), any(CallbackP.class));
-		verify(mockUploader).setValidation(any(FileValidator.class));
 		verify(mockUploader).setUploadingCallback(any(Callback.class));
 		verify(mockView).setUploadWidget(mockUploader.asWidget());
 		verify(mockView).setAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setPresenter(presenter);
+		
+		//also verify that max image size is set
+		ArgumentCaptor<FileValidator> captor = ArgumentCaptor.forClass(FileValidator.class);
+		verify(mockUploader).setValidation(captor.capture());
+		FileValidator validator = captor.getValue();
+		assertTrue(validator instanceof ImageFileValidator);
+		ImageFileValidator v = (ImageFileValidator)validator;
+		assertEquals(UserProfileEditorWidgetImpl.MAX_IMAGE_SIZE, v.getMaxFileSize(), .1);
 	}
 	
 	@Test

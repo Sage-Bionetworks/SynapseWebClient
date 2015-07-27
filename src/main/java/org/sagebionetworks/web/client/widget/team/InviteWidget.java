@@ -4,14 +4,12 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,21 +22,20 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private Callback teamUpdatedCallback;
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
-	private UserGroupSuggestBox peopleSuggestWidget;
-	private SynapseJSNIUtils synapseJSNIUtils;
+	private SynapseSuggestBox peopleSuggestWidget;
 	
 	@Inject
 	public InviteWidget(InviteWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GWTWrapper gwt, SynapseAlert synAlert,
-			UserGroupSuggestBox peopleSuggestBox,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseSuggestBox peopleSuggestBox,
+			UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
-		this.synapseJSNIUtils = synapseJSNIUtils;
+		peopleSuggestWidget.setSuggestionProvider(provider);
 		view.setSuggestWidget(peopleSuggestBox.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
@@ -48,7 +45,6 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public void configure(Team team) {
 		clear();
 		this.team = team;
-		peopleSuggestWidget.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 		peopleSuggestWidget.setPlaceholderText("Enter a user name...");
 	}
 	
@@ -68,7 +64,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	
 	@Override
 	public void validateAndSendInvite(final String invitationMessage) {
-		UserGroupSuggestion suggestion = peopleSuggestWidget.getSelectedSuggestion();
+		UserGroupSuggestion suggestion = (UserGroupSuggestion)peopleSuggestWidget.getSelectedSuggestion();
 		if(suggestion != null) {
 			UserGroupHeader header = suggestion.getHeader();
 			synapseClient.isTeamMember(header.getOwnerId(), Long.valueOf(team.getId()), new AsyncCallback<Boolean>() {
@@ -92,7 +88,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	}
 	
 	public void doSendInvite(String invitationMessage) {
-		UserGroupHeader header = peopleSuggestWidget.getSelectedSuggestion().getHeader();
+		UserGroupHeader header = ((UserGroupSuggestion)peopleSuggestWidget.getSelectedSuggestion()).getHeader();
 		final String principalId = header.getOwnerId();
 		final String firstName = header.getFirstName();
 		final String lastName = header.getLastName();

@@ -1,24 +1,21 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
+public interface SynapseSuggestBoxView extends IsWidget, SynapseView {
 	
 	/**
 	 * Gets the string of text in the suggest box.
 	 * @return The text of the currently contained in the suggest box.
 	 */
 	String getText();
-	UserGroupSuggestOracle getUserGroupSuggestOracle();
+	SynapseSuggestOracle getUserGroupSuggestOracle();
 	void hideLoading();
 	void clear();
-	void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset);
+	void updateFieldStateForSuggestions(int numResults, int offset);
 	void setPlaceholderText(String text);
 	int getWidth();
 	
@@ -40,12 +37,22 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		UserGroupSuggestion getSelectedSuggestion();
-		void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion);
+		SynapseSuggestion getSelectedSuggestion();
+		void setSelectedSuggestion(SynapseSuggestion selectedSuggestion);
 		
 		void getPrevSuggestions();
 		void getNextSuggestions();
 		
-		void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
+		void addItemSelectedHandler(CallbackP<SynapseSuggestion> callback);
+		void showLoading();
+		void hideLoading();
+		void showErrorMessage(String message);
+		void updateFieldStateForSuggestions(int numResults,
+				int offset);
+		void handleOracleException(Throwable caught);
 	}
+
+	void configure(SynapseSuggestOracle oracle);
+	void setText(String text);
+	void setSelectedText(String displayString);
 }

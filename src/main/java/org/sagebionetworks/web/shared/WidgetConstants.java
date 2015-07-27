@@ -64,6 +64,7 @@ public class WidgetConstants {
 	public static final String OLD_JOIN_EVALUATION_CONTENT_TYPE = "joinevaluation";
 	public static final String JOIN_TEAM_CONTENT_TYPE = "jointeam";
 	public static final String JOIN_EVALUATION_FRIENDLY_NAME ="Join Evaluation";
+	public static final String JOIN_TEAM_FRIENDLY_NAME = "Join Team Button";
 	
 	public static final String SUBMIT_TO_EVALUATION_CONTENT_TYPE = "evalsubmit";
 	

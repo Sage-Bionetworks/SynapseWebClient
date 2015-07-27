@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
 
+import com.google.gwt.junit.GWTMockUtilities;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,9 +28,12 @@ public class ImageFileValidatorTest {
 	public void testImage() {
 		when(mockMeta.getContentType()).thenReturn("image/jpg");
 		when(mockMeta.getFileName()).thenReturn("test.jpg");
+		when(mockMeta.getFileSize()).thenReturn(10.0);
+		assertTrue(imageValidator.getMaxFileSize() == null);
 		assertTrue(imageValidator.isValid(mockMeta));
 		when(mockMeta.getContentType()).thenReturn(null);	
 		assertTrue(imageValidator.isValid(mockMeta));
+		
 		
 		when(mockMeta.getContentType()).thenReturn("image/png");
 		when(mockMeta.getFileName()).thenReturn("test.png");
@@ -54,6 +59,12 @@ public class ImageFileValidatorTest {
 		when(mockMeta.getContentType()).thenReturn(null);	
 		assertTrue(imageValidator.isValid(mockMeta));
 
+		//test non-null max file size
+		imageValidator.setMaxSize(100.0);
+		assertTrue(imageValidator.isValid(mockMeta));
+		//unit test isValidSize
+		assertTrue(imageValidator.isValidSize(10.0));
+		assertFalse(imageValidator.isValidSize(1000.0));
 	}
 	
 	@Test
