@@ -940,6 +940,7 @@ a.shortBtn {
 	font-size: 32px !important;
 }
 
+span.font-size-150,
 .font-size-150,
 i.font-size-150 {
 	font-size: 150px;
@@ -949,6 +950,7 @@ i.font-size-150 {
 	font-size: 90px;
 }
 
+span.font-size-58,
 .font-size-58 {
 	font-size: 58px;
 }
@@ -985,6 +987,7 @@ i.font-size-150 {
 	font-size: 14px;
 }
 
+span.font-size-13,
 .font-size-13 {
 	font-size: 13px;
 }

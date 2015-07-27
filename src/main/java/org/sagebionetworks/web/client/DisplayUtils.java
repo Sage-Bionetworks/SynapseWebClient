@@ -1693,8 +1693,8 @@ public class DisplayUtils {
 		return "<span class=\"glyphicon " + iconClass + "\"></span>";
 	}
 
-	public static String getFontelloIcon(String iconClass) {
-		return "<span class=\"icon-" + iconClass + "\"></span>";
+	public static String getFontAwesomeIcon(String iconClass) {
+		return "<span class=\"fa fa-" + iconClass + "\"></span>";
 	}
 
 	public static EntityHeader getProjectHeader(EntityPath entityPath) {
@@ -1727,7 +1727,7 @@ public class DisplayUtils {
  			//display default picture
  			String iconClass = defaultPictureSinglePerson ? "user" : "users";
  			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
- 			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before"));
+ 			HTML profilePicture = new HTML(DisplayUtils.getFontAwesomeIcon(iconClass + " font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before"));
  			profilePicture.addStyleName("pull-left media-object displayInline ");
  			if (clickHandler != null)
  				profilePicture.addClickHandler(clickHandler);
