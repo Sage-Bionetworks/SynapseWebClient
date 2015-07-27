@@ -203,6 +203,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public PeopleSearchPresenter getPeopleSearchPresenter();
 	
+	public SynapseStandaloneWikiPresenter getSynapseStandaloneWikiPresenter();
+	
 	public EventBus getEventBus();
 	
 	public JiraURLHelper getJiraURLHelper();
