@@ -47,7 +47,7 @@
 					<b:AnchorListItem ui:field="governanceLink">Data use conditions</b:AnchorListItem>
 				</b:DropDownMenu>
 			</b:ButtonGroup>
-		    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5"/>
+		    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5 margin-bottom-20"/>
 			<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 		    	<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
 		    	<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
