@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
@@ -100,6 +101,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
@@ -127,6 +129,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
+import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
@@ -318,6 +321,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityTreeItem getEntityTreeItemWidget();
 	public MoreTreeItem getMoreTreeWidget();
 	public UserGroupListWidget getUserGroupListWidget();
+	public UserGroupSuggestionProvider getUserGroupSuggestOracleImpl();
 	
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();
@@ -334,6 +338,6 @@ public interface PortalGinInjector extends Ginjector {
 	public RegisterTeamDialog getRegisterTeamDialog();
 	public AnnotationEditor getAnnotationEditor();
 	public FileHistoryRowView getFileHistoryRow();
-	
-	public SynapseStandaloneWikiPresenter getSynapseStandaloneWikiPresenter();
+
+	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 }

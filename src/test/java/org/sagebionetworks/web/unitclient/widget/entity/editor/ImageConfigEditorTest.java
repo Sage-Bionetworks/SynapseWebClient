@@ -43,6 +43,7 @@ public class ImageConfigEditorTest {
 	String fileHandleId = "222";
 	String testFileName = "testing.png";
 	String testAttachmentName = "attachment1.png";
+	double fileSize = 10;
 
 	
 	@Before
@@ -60,7 +61,7 @@ public class ImageConfigEditorTest {
 		editor.configure(wikiKey, descriptor, mockCallback);
 		when(mockAttachments.isValid()).thenReturn(true);
 		when(mockAttachments.getSelectedFilename()).thenReturn(testAttachmentName);
-		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, "image/png")});
+		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata(testFileName, "image/png", fileSize)});
 		when(mockView.isSynapseEntity()).thenReturn(false);
 		when(mockView.isFromAttachments()).thenReturn(false);
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMeta);
