@@ -283,8 +283,8 @@
 									<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="margin-10" height="60px" width="75px"/>
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
-									<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public! Create Synapse Teams to manage your collaborations." />
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Communicate your findings"></b:Heading>
+									<b:Heading size="H6" text="Use the Synapse Wiki services to communicate your Project's research findings by embedding rich content such as images, Tables, Provenance, and even LaTeX equations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -298,13 +298,13 @@
 									<g:Image resource='{sageImageBundle.collaborate}' addStyleNames="margin-10" height="60px" width="75px"/>
 								</t:TableData>
 								<t:TableData paddingRight="2">
-									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Communicate your findings"></b:Heading>
-									<b:Heading size="H6" text="Use the Synapse Wiki services to communicate your Project's research findings by embedding rich content such as images, Tables, Provenance, and even LaTeX equations." />
+									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
+									<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public! Create Synapse Teams to manage your collaborations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
 					</b:Panel>
-				</b:Column>
+				</b:Column>				
 			</b:Row>
 		</b:Container>
 		
