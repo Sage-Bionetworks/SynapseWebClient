@@ -186,4 +186,8 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 			}
 		});
 	}
+	
+	public String getEntityId() {
+		return entityId;
+	}
 }
