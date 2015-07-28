@@ -2595,11 +2595,6 @@ p.error{
 .footer-top-line h6 { text-transform:uppercase; padding-left:50px; background-image: url(../images/tweets.png); background-position:left center; background-repeat:no-repeat;  font-size:18px; margin-top:10px;}
 .from_portfolio h3 { margin-bottom:20px !important;}
 .footer p { padding-right:10px; width:210px; margin-bottom:5px !important;}
-.colored { color:#04bfea;}
-
-.link { color:#04bfea;}
-.link:hover { text-decoration: underline; cursor:pointer;}
-/*.link a:hover { text-decoration:underline;} */
 .footer .color a { text-align:center !important; display:block; margin-top:35px;}
 .footer-line p { margin-bottom:0px;}
 .footer-line {  color:#fff; margin-bottom:0px !important; padding-top:15px; padding-bottom:15px;}
