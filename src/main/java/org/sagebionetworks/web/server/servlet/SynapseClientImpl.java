@@ -2656,6 +2656,36 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public String sendMessageToEntityOwner(
+			String entityId,
+			String subject,
+			String messageBody,
+			String hostPageBaseURL) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			MessageToUser message = new MessageToUser();
+			message.setSubject(subject);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
+			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
+			String fileHandleId = synapseClient.uploadToFileHandle(
+					cleanedMessageBody.getBytes(MESSAGE_CHARSET),
+					HTML_MESSAGE_CONTENT_TYPE);
+			message.setFileHandleId(fileHandleId);
+			MessageToUser sentMessage = synapseClient.sendMessage(message, entityId);
+			JSONObjectAdapter sentMessageJson = sentMessage
+					.writeToJSONObject(adapterFactory.createNew());
+			return sentMessageJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	
+	
+	@Override
 	public Boolean isAliasAvailable(String alias, String aliasType)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();

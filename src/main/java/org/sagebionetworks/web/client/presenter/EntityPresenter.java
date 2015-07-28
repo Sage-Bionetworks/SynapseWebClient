@@ -255,7 +255,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	public void show403() {
 		clear();
-		synAlert.show403();
+		synAlert.show403(entityId);
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
