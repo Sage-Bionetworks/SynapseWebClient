@@ -351,4 +351,12 @@ public class EntityPresenterTest {
 		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockSynapseJSNIUtils).consoleError(exceptionMessage);
 	}
+	
+	@Test
+	public void testShow403() {
+		entityPresenter.show403();
+		verify(mockSynAlert).show403(anyString());
+		verify(mockView).hideEntityPageTop();
+		verify(mockView).showOpenTeamInvites();
+	}
 }
