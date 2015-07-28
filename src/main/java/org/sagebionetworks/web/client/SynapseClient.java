@@ -386,6 +386,9 @@ public interface SynapseClient extends RemoteService {
 
 	public String sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL) throws RestServiceException;
 	
+	public String sendMessageToEntityOwner(String entityId, String subject, String messageBody, String hostPageBaseURL)
+			throws RestServiceException;
+	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
 	
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 

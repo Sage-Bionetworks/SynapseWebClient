@@ -183,7 +183,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	}
 	
 	public void show403() {
-		synAlert.show403();
+		synAlert.show403(entityId);
 		view.show403();
 	}
 	
