@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -18,9 +17,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,13 +37,9 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	private PortalGinInjector ginInjector;
 
 	@UiField
-	HTMLPanel versions;
-	@UiField
 	Panel previousVersions;
 	@UiField
 	TBody previousVersionsTable;
-	@UiField
-	InlineLabel allVersions;
 	@UiField
 	SimplePanel paginationWidgetContainer;
 	@UiField
@@ -63,17 +56,13 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	public FileHistoryWidgetViewImpl(PortalGinInjector ginInjector, PromptTwoValuesModalView editVersionInfoDialog) {
 		this.ginInjector = ginInjector;
 		this.editVersionInfoModal = editVersionInfoDialog;
-		
-		initWidget(uiBinder.createAndBindUi(this));
-		DisplayUtils.configureShowHide(allVersions, previousVersions);
-		
+		initWidget(uiBinder.createAndBindUi(this));		
 		editVersionInfoModal.setPresenter(new PromptTwoValuesModalView.Presenter() {
 			@Override
 			public void onPrimary() {
 				presenter.updateVersionInfo(editVersionInfoModal.getValue1(), editVersionInfoModal.getValue2());
 			}
 		});
-		
 		editInfoButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -87,11 +76,6 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		clear();
 		currentVersionLink.setTargetHistoryToken(DisplayUtils.getSynapseHistoryTokenNoHash(entity.getId()));
 		currentVersionLink.setVisible(isShowingOlderVersion);
-		setVersionsVisible(false);
-		if (entity instanceof Versionable) {
-			setVersionsVisible(true);
-			setFileHistoryVisible(isShowingOlderVersion);
-		}
 	}
 	
 	@Override
@@ -129,13 +113,6 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		fileHistoryRow.setCanEdit(canEdit);
 		fileHistoryRow.setIsVersionLink(!isVersionSelected);
 	}
-
-	@Override
-	public void setFileHistoryVisible(boolean v) {
-		String text = v ? DisplayConstants.HIDE_LC : DisplayConstants.SHOW_LC;
-		allVersions.setText(text);
-		previousVersions.setVisible(v);
-	}
 	
 	@Override
 	public void setPresenter(Presenter presenter) {
@@ -158,14 +135,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	@Override
 	public void clear() {
 		//reset versions ui
-		setVersionsVisible(false);
-		previousVersions.setVisible(false);
-		allVersions.setText(DisplayConstants.SHOW_LC);
 		clearVersions();
-	}
-	
-	public void setVersionsVisible(boolean visible) {
-		versions.setVisible(visible);
 	}
 	
 	@Override

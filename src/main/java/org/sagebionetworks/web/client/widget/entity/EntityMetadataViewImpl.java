@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
@@ -18,11 +16,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -59,23 +57,22 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Collapse annotationsContent;
 	@UiField
 	SimplePanel annotationsContainer;
+	@UiField
+	Collapse fileHistoryContent;
+	@UiField
+	SimplePanel fileHistoryContainer;
 	
 	private Presenter presenter;
-	
-	@UiField(provided = true)
-	final IconsImageBundle icons;
 
 	AnnotationsRendererWidget annotationsWidget;
 	RestrictionWidget restrictionWidget;
 	
 	@Inject
-	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			FavoriteWidget favoriteWidget,
+	public EntityMetadataViewImpl(FavoriteWidget favoriteWidget,
 			DoiWidget doiWidget,
 			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget
 			) {
-		this.icons = iconsImageBundle;
 		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
@@ -89,6 +86,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		doiPanel.setWidget(doiWidget.asWidget());
 		annotationsContainer.setWidget(annotationsWidget.asWidget());
 		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
+		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -106,6 +104,21 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			annotationsContent.hide();
 		}
 	}
+	
+	@Override
+	public void setFileHistoryWidget(IsWidget fileHistoryWidget) {
+		fileHistoryContainer.setWidget(fileHistoryWidget);
+	}
+	
+	@Override
+	public void setFileHistoryVisible(boolean visible) {
+		if (visible) {
+			fileHistoryContent.show();
+		} else {
+			fileHistoryContent.hide();
+		}
+	}
+	
 	@Override
 	public void setEntityBundle(EntityBundle bundle, boolean canAdmin, boolean canEdit, boolean isShowingOlderVersion) {
 		clearmeta();
@@ -118,8 +131,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			}
 		});
 		
-		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
-		synapseIconForEntity.applyTo(entityIcon);
+//		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
+//		synapseIconForEntity.applyTo(entityIcon);
 		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
@@ -208,4 +221,5 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		annotationsWidget.setEntityUpdatedHandler(handler);
 	}
+
 }

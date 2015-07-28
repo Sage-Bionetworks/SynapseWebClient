@@ -153,6 +153,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureLink();
 			configureSubmit();
 			configureAnnotations();
+			configureFileHistory();
 			configureFileUpload();
 			configureProvenance();
 			configureChangeStorageLocation();
@@ -311,8 +312,27 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_RIGHT);
 		}
 	}
+	
 
-
+	private void configureFileHistory(){
+		if(entityBundle.getEntity() instanceof FileEntity){
+			actionMenu.setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
+			actionMenu.setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
+			actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, this);
+		}else{
+			actionMenu.setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
+			actionMenu.setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
+		}
+	}
+	
+	@Override
+	public void onFileHistoryToggled(boolean shown) {
+		if(shown){
+			actionMenu.setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_DOWN);
+		}else{
+			actionMenu.setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_RIGHT);
+		}
+	}
 	
 	private void configureSubmit(){
 		if(isSubmittableType(entityBundle.getEntity())){

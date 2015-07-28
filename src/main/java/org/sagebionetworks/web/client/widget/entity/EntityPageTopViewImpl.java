@@ -187,6 +187,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private static int WIDGET_HEIGHT_PX = 270;
 	private String currentProjectAnchorTargetId;
 	private boolean annotationsShown;
+	private boolean fileHistoryShown;
 	private RClientModalWidgetViewImpl rLoadWidget;
 	private PythonClientModalWidgetViewImpl pythonLoadWidget;
 	private JavaClientModalWidgetViewImpl javaLoadWidget;
@@ -784,6 +785,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				entityMetadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
+		fileHistoryShown = false;
+		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				fileHistoryShown = !fileHistoryShown;
+				controller.onFileHistoryToggled(fileHistoryShown);
+				entityMetadata.setFileHistoryVisible(fileHistoryShown);
+			}
+		});
+		if (versionNumber != null) {
+			((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
+		}
 		return actionMenu;
 	}
 }

@@ -17,12 +17,16 @@ public class EntityMetadata implements Presenter {
 	private EntityMetadataView view;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private AuthenticationController authenticationController;
+	private FileHistoryWidget fileHistoryWidget;
 	
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			FileHistoryWidget fileHistoryWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
+		this.fileHistoryWidget = fileHistoryWidget;
+		this.view.setFileHistoryWidget(fileHistoryWidget);
 		this.view.setPresenter(this);
 	}
 
@@ -38,7 +42,10 @@ public class EntityMetadata implements Presenter {
 		if (bundle.getEntity() instanceof FileEntity) {
 			showEntityName = false;
 		}
-		
+		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
+		this.view.setFileHistoryWidget(fileHistoryWidget);
+		// need some update handling
+//		fileHistoryWidget.setEntityUpdatedHandler(handler); 
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 		view.setEntityNameVisible(showEntityName);
 	}
@@ -66,4 +73,9 @@ public class EntityMetadata implements Presenter {
 	public void setAnnotationsVisible(boolean visible) {
 		view.setAnnotationsVisible(visible);
 	}
+	
+	public void setFileHistoryVisible(boolean visible) {
+		view.setFileHistoryVisible(visible);
+	}
+	
 }

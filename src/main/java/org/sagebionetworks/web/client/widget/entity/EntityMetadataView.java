@@ -23,6 +23,9 @@ public interface EntityMetadataView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void fireEntityUpdatedEvent();
 	}
+	void setFileHistoryVisible(boolean visible);
+
+	void setFileHistoryWidget(IsWidget fileHistoryWidget);
 
 
 
