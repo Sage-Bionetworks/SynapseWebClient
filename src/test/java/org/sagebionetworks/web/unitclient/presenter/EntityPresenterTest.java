@@ -356,6 +356,7 @@ public class EntityPresenterTest {
 	public void testShow403() {
 		entityPresenter.show403();
 		verify(mockSynAlert).show403(anyString());
-		verify(mockView).show403();
+		verify(mockView).hideEntityPageTop();
+		verify(mockView).showOpenTeamInvites();
 	}
 }
