@@ -35,6 +35,10 @@
 				You are not authorized to access the page requested.
 			</p>
   		</g:HTMLPanel>
+  		<bh:Div ui:field="requestAccessUI">
+  			<bh:Paragraph>You can request access from the owner.</bh:Paragraph>
+  			<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request access" size="LARGE" dataLoadingText="Sending request..."/>
+  		</bh:Div>
 	  	<b:Modal ui:field="jiraDialog" title="Synapse Error" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
 				<b:FieldSet>

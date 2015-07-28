@@ -47,6 +47,10 @@ public class SynapseAlertViewImpl implements
 	Alert loginAlert;
 	@UiField
 	Button loginButton;
+	@UiField
+	Div requestAccessUI;
+	@UiField
+	Button requestAccessButton;
 	
 	Presenter presenter;
 	
@@ -69,6 +73,12 @@ public class SynapseAlertViewImpl implements
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onLoginClicked();
+			}
+		});
+		requestAccessButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onRequestAccess();
 			}
 		});
 	}
@@ -107,6 +117,7 @@ public class SynapseAlertViewImpl implements
 		widget.setVisible(false);
 		httpCode403.setVisible(false);
 		httpCode404.setVisible(false);
+		requestAccessUI.setVisible(false);
 	}
 	
 	@Override
@@ -134,4 +145,17 @@ public class SynapseAlertViewImpl implements
 		httpCode404.setVisible(true);
 	}
 	
+	@Override
+	public void showRequestAccessUI() {
+		requestAccessButton.state().reset();
+		requestAccessUI.setVisible(true);
+	}
+	@Override
+	public void hideRequestAccessUI() {
+		requestAccessUI.setVisible(false);
+	}
+	@Override
+	public void showRequestAccessButtonLoading() {
+		requestAccessButton.state().loading();	
+	}
 }

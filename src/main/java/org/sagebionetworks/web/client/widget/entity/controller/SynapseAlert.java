@@ -35,5 +35,6 @@ public interface SynapseAlert extends IsWidget {
 	 */
 	void clear();
 	void show403();
+	void show403(String entityId);
 	void show404();
 }
