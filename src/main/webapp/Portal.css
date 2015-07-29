@@ -520,11 +520,6 @@ button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a
 	margin: 4px 10px 0 0; 
 }
 
-/* Clear out GWT's link color */
-a, a:visited, a:hover {
-  color: inherit;
-}
-
 a.shortBtn {		
 	display: inline-block; 
 	margin: 6px 5px 7px 0px;
@@ -1566,7 +1561,6 @@ ol.lowerroman {
 .displayBlock {
 	display: block;
 }
-
 
 .smallerText {
 	font-size: 0.8em;
