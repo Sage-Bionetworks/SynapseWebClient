@@ -136,6 +136,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	public void clear() {
 		//reset versions ui
 		clearVersions();
+		currentVersionLink.setVisible(false);
 	}
 	
 	@Override

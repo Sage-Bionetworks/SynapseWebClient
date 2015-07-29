@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -17,16 +18,15 @@ public class EntityMetadata implements Presenter {
 	private EntityMetadataView view;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private AuthenticationController authenticationController;
-	private FileHistoryWidget fileHistoryWidget;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
 			AuthenticationController authenticationController,
-			FileHistoryWidget fileHistoryWidget) {
+			PortalGinInjector ginInjector) {
 		this.view = view;
+		this.ginInjector = ginInjector;
 		this.authenticationController = authenticationController;
-		this.fileHistoryWidget = fileHistoryWidget;
-		this.view.setFileHistoryWidget(fileHistoryWidget);
 		this.view.setPresenter(this);
 	}
 
@@ -40,12 +40,15 @@ public class EntityMetadata implements Presenter {
 		boolean showDetailedMetadata = true;
 		boolean showEntityName = true;
 		if (bundle.getEntity() instanceof FileEntity) {
+			FileHistoryWidget fileHistoryWidget = ginInjector.getFileHistoryWidget();
 			showEntityName = false;
+			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
+			fileHistoryWidget.setEntityUpdatedHandler(entityUpdatedHandler);
+			this.view.setFileHistoryWidget(fileHistoryWidget);
+		} else {
+			view.setFileHistoryVisible(false);
 		}
-		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-		this.view.setFileHistoryWidget(fileHistoryWidget);
 		// need some update handling
-//		fileHistoryWidget.setEntityUpdatedHandler(handler); 
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 		view.setEntityNameVisible(showEntityName);
 	}

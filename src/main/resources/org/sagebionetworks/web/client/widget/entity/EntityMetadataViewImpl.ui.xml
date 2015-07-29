@@ -18,10 +18,10 @@
 		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline"></g:HTMLPanel>
 		    </bh:Div>
 			<g:SimplePanel ui:field="doiPanel"/>
-		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse"  >
+		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse">
 		    	<g:SimplePanel ui:field="annotationsContainer" styleName="highlight-box margin-bottom-15"></g:SimplePanel> 
 		    </b:Collapse>
-		    <b:Collapse ui:field="fileHistoryContent" toggle="false" b:id="fileHistoryContentCollapse"  >
+		    <b:Collapse ui:field="fileHistoryContent" toggle="false" b:id="fileHistoryContentCollapse">
 		    	<g:SimplePanel ui:field="fileHistoryContainer" styleName="highlight-box margin-bottom-15"></g:SimplePanel> 
 		    </b:Collapse>
 	    </g:HTMLPanel>

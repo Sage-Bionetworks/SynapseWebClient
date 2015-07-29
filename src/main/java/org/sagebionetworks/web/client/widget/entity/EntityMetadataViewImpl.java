@@ -122,7 +122,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setEntityBundle(EntityBundle bundle, boolean canAdmin, boolean canEdit, boolean isShowingOlderVersion) {
 		clearmeta();
-		
 		Entity e = bundle.getEntity();
 		restrictionWidget.configure(bundle, true, false, true, new Callback() {
 			@Override
@@ -136,7 +135,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
-					
 		dataUseContainer.clear();
 		Widget dataUse = restrictionWidget.asWidget();
 		if(dataUse != null) {
@@ -159,6 +157,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		// annotations		
 		configureAnnotations(bundle, canEdit);
+		
+		if (fileHistoryContent.isShown() && !isShowingOlderVersion) {
+			fileHistoryContent.toggle();
+		}
 	}
 
 	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {

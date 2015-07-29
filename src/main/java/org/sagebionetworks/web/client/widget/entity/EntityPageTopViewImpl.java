@@ -221,7 +221,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.folderFilesBrowser = folderFilesBrowser;
 		this.projectFilesBrowser = projectFilesBrowser;
 		this.previewWidget = previewWidget;
-		this.fileHistoryWidget = fileHistoryWidget;
 		this.wikiPageWidget = wikiPageWidget;
 		this.tableListWidget = tableListWidget;
 		this.rLoadWidget = rLoadWidget;
@@ -230,7 +229,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.pythonLoadWidget = pythonLoadWidget;
 		this.globalApplicationState = globalApplicationState;
 		initWidget(uiBinder.createAndBindUi(this));
-		fileHistoryContainer.add(fileHistoryWidget.asWidget());
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
@@ -359,7 +357,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileProgrammaticClientsContainer.clear();
 		fileModifiedAndCreatedContainer.clear();
 		wikiPageContainer.clear();
-		fileHistoryContainer.setVisible(false);
 		
 		tableBreadcrumbContainer.clear();
 		tableMetadataContainer.clear();
@@ -393,7 +390,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectFilesBrowser.setEntityUpdatedHandler(handler);
 		folderFilesBrowser.setEntityUpdatedHandler(handler);
 		entityMetadata.setEntityUpdatedHandler(handler);
-		fileHistoryWidget.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -444,10 +440,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
-				
-		// File History
-		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-		fileHistoryContainer.setVisible(true);
+
 		// Description
 		fileDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki
@@ -785,17 +778,25 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				entityMetadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
-		fileHistoryShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				fileHistoryShown = !fileHistoryShown;
-				controller.onFileHistoryToggled(fileHistoryShown);
-				entityMetadata.setFileHistoryVisible(fileHistoryShown);
+		Entity entity = bundle.getEntity();
+		if (entity instanceof Entity && entity instanceof Versionable) {
+			final Versionable vb = (Versionable)entity;
+			fileHistoryShown = false;
+			actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
+				@Override
+				public void onAction(Action action) {
+					fileHistoryShown = !fileHistoryShown;
+					controller.onFileHistoryToggled(fileHistoryShown);
+					entityMetadata.setFileHistoryVisible(fileHistoryShown);
+				}
+			});
+			if (versionNumber != null) {
+				if (!fileHistoryShown) {
+					((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
+				}
+			} else if (fileHistoryShown) {
+				((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
 			}
-		});
-		if (versionNumber != null) {
-			((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
 		}
 		return actionMenu;
 	}

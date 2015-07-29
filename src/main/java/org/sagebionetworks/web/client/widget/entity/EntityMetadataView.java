@@ -27,6 +27,4 @@ public interface EntityMetadataView extends IsWidget, SynapseView {
 
 	void setFileHistoryWidget(IsWidget fileHistoryWidget);
 
-
-
 }

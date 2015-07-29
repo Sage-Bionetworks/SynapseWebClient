@@ -150,25 +150,25 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		// TODO: If we ever change the offset api to actually take 0 as a valid
 		// offset, then we need to remove "+1"
 		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue() + 1, VERSION_LIMIT,
-				new AsyncCallback<PaginatedResults<VersionInfo>>() {
-					@Override
-					public void onSuccess(PaginatedResults<VersionInfo> result) {
-						PaginatedResults<VersionInfo> paginatedResults;
-						paginatedResults = result;
-						paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
-						if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
-							versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
-						}
-						for (VersionInfo versionInfo : paginatedResults.getResults()) {
-							view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
-						}
+			new AsyncCallback<PaginatedResults<VersionInfo>>() {
+				@Override
+				public void onSuccess(PaginatedResults<VersionInfo> result) {
+					PaginatedResults<VersionInfo> paginatedResults;
+					paginatedResults = result;
+					paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
+					if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
+						versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
 					}
+					for (VersionInfo versionInfo : paginatedResults.getResults()) {
+						view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
+					}
+				}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(caught.getMessage());
-					}
-				});
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
 	}
 
 	

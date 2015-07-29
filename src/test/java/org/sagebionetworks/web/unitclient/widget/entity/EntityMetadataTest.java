@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
@@ -19,15 +20,15 @@ public class EntityMetadataTest {
 	EntityMetadataView mockView;
 	String entityId = "syn123";
 	EntityMetadata widget;
-	FileHistoryWidget mockFileHistory;
+	PortalGinInjector mockInjector;
 	AuthenticationController mockAuthenticationController;
 
 	@Before
 	public void before() {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockView = mock(EntityMetadataView.class);
-		mockFileHistory = mock(FileHistoryWidget.class);
-		widget = new EntityMetadata(mockView, mockAuthenticationController, mockFileHistory);
+		mockInjector = mock(PortalGinInjector.class);
+		widget = new EntityMetadata(mockView, mockAuthenticationController, mockInjector);
 	}
 	
 	@Test
