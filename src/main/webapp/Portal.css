@@ -4,6 +4,7 @@ Synapse color scheme
 .colored { color:#1e7098;}
 .link { color:#1e7098;}
 .link, .link:visited, .link:hover {  color:#1e7098; }
+.link:hover { text-decoration: underline; cursor:pointer;}
 a {color:#1e7098;text-decoration:none;}
 a:visited{color:#1e7098; text-decoration:none;}
 a:hover{color:#1e7098; text-decoration:underline;}
