@@ -520,11 +520,6 @@ button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a
 	margin: 4px 10px 0 0; 
 }
 
-/* Clear out GWT's link color */
-a, a:visited, a:hover {
-  color: inherit;
-}
-
 a.shortBtn {		
 	display: inline-block; 
 	margin: 6px 5px 7px 0px;
@@ -1567,7 +1562,6 @@ ol.lowerroman {
 	display: block;
 }
 
-
 .smallerText {
 	font-size: 0.8em;
 }
@@ -1677,6 +1671,11 @@ ol.lowerroman {
 .moveup-70 {
 	position: relative;
 	top: -70px;
+}
+
+.moveup-18 {
+	position: relative;
+	top: -18px;
 }
 
 .moveup-10 {

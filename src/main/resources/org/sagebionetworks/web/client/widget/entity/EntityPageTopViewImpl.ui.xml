@@ -6,7 +6,7 @@
 
 	<g:HTMLPanel styleName="margin-left-15 margin-right-15">		
 		<!--Project level information -->
-		<b:Row addStyleNames="margin-top-5" ui:field="projectMetaContainer">
+		<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15 padding-bottom-15" ui:field="projectMetaContainer">
 			<bh:Div addStyleNames="margin-left-15 margin-right-15">
 				<g:SimplePanel ui:field="projectActionMenuContainer"/>
 			</bh:Div>
