@@ -3,12 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
@@ -27,9 +23,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityMetadataViewImpl extends Composite implements EntityMetadataView {
-
-	private FavoriteWidget favoriteWidget;
-	private DoiWidget doiWidget;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -62,29 +55,12 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel fileHistoryContainer;
 	
+	private RestrictionWidget restrictionWidget;
 	private Presenter presenter;
-
-	AnnotationsRendererWidget annotationsWidget;
-	RestrictionWidget restrictionWidget;
 	
 	@Inject
-	public EntityMetadataViewImpl(FavoriteWidget favoriteWidget,
-			DoiWidget doiWidget,
-			AnnotationsRendererWidget annotationsWidget,
-			RestrictionWidget restrictionWidget
-			) {
-		this.favoriteWidget = favoriteWidget;
-		this.doiWidget = doiWidget;
-		this.annotationsWidget = annotationsWidget;
-		this.restrictionWidget = restrictionWidget;
+	public EntityMetadataViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
-				
-		favoritePanel.addStyleName("inline-block");
-		favoritePanel.setWidget(favoriteWidget.asWidget());
-		
-		doiPanel.addStyleName("inline-block");
-		doiPanel.setWidget(doiWidget.asWidget());
-		annotationsContainer.setWidget(annotationsWidget.asWidget());
 		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
@@ -94,6 +70,26 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			}
 		});
 
+	}
+
+	@Override
+	public void setFavoriteWidget(IsWidget favoriteWidget) {
+		favoritePanel.setWidget(favoriteWidget);
+	}
+
+	@Override
+	public void setDoiWidget(IsWidget doiWidget) {
+		doiPanel.setWidget(doiWidget);
+	}
+
+	@Override
+	public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
+		annotationsContainer.setWidget(annotationsWidget);		
+	}
+
+	@Override
+	public void setRestrictionWidget(RestrictionWidget restrictionWidget) {
+		this.restrictionWidget = restrictionWidget;
 	}
 
 	@Override
@@ -120,8 +116,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 	
 	@Override
-	public void setEntityBundle(EntityBundle bundle, boolean canAdmin, boolean canEdit, boolean isShowingOlderVersion) {
-		clearmeta();
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
+		clear();
 		Entity e = bundle.getEntity();
 		restrictionWidget.configure(bundle, true, false, true, new Callback() {
 			@Override
@@ -129,12 +125,29 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		
 //		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
 //		synapseIconForEntity.applyTo(entityIcon);
-		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
+		boolean isShowingOlderVersion = versionNumber == null;
+		configureFileHistory(isShowingOlderVersion);
+		configureAnnotations();
+		configureRestrictionWidget();
+	}
+	
+	private void configureFileHistory(boolean isShowingOlderVersion) {
+		if (fileHistoryContent.isShown() && !isShowingOlderVersion) {
+			fileHistoryContent.toggle();
+		}
+	}
+	
+	private void configureAnnotations() {
+		if (annotationsContent.isShown()) {
+			annotationsContent.toggle();
+		}
+	}
+	
+	private void configureRestrictionWidget() {
 		dataUseContainer.clear();
 		Widget dataUse = restrictionWidget.asWidget();
 		if(dataUse != null) {
@@ -143,37 +156,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			dataUseContainer.add(dataUse);
 		} else {
 			dataUseContainer.setVisible(false);
-		}		
-		
-		Long versionNumber = null;
-		if (e instanceof Versionable) {
-			Versionable vb = (Versionable) e;
-			versionNumber = vb.getVersionNumber();
 		}
-		favoriteWidget.configure(bundle.getEntity().getId());
-		
-		//doi widget
-		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
-		
-		// annotations		
-		configureAnnotations(bundle, canEdit);
-		
-		if (fileHistoryContent.isShown() && !isShowingOlderVersion) {
-			fileHistoryContent.toggle();
-		}
-	}
-
-	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {
-		// configure widget
-		annotationsWidget.configure(bundle, canEdit);
-		
-		if (annotationsContent.isShown())
-			annotationsContent.toggle();
-	}
-	
-	private void clearmeta() {
-		dataUseContainer.clear();
-		doiWidget.clear();
 	}
 
 	@Override
@@ -190,12 +173,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setEntityNameVisible(boolean visible) {
 		this.entityNamePanel.setVisible(visible);
 	}
-	
-	
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
 
 	public void setEntityName(String text) {
 		entityName.setInnerText(text);
@@ -204,24 +181,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setEntityId(String text) {
 		idField.setText(text);
 	}
-	
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void showLoading() {
-}
 
 	@Override
 	public void clear() {
-		clearmeta();
-	}
-
-	@Override
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		annotationsWidget.setEntityUpdatedHandler(handler);
+		dataUseContainer.clear();
 	}
 
 }

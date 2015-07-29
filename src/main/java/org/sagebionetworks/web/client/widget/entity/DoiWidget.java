@@ -13,10 +13,11 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DoiWidget implements Presenter {
+public class DoiWidget implements Presenter, IsWidget {
 
 	public static final String DOI = "doi:";
 	public static final int REFRESH_TIME = 13 * 1000; //13 seconds

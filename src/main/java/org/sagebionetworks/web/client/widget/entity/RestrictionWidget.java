@@ -26,10 +26,11 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter {
+public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	
 	Callback entityUpdated;
 	EntityBundle bundle;

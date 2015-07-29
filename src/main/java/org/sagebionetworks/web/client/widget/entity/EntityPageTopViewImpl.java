@@ -171,7 +171,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel tableListWidgetContainer;
 	
-	private FileHistoryWidget fileHistoryWidget;
 	private TableListWidget tableListWidget;
 	private Long versionNumber;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -780,7 +779,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		});
 		Entity entity = bundle.getEntity();
 		if (entity instanceof Entity && entity instanceof Versionable) {
-			final Versionable vb = (Versionable)entity;
 			fileHistoryShown = false;
 			actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
 				@Override

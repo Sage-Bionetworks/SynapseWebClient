@@ -12,9 +12,13 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
+import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
 public class EntityMetadataTest {
 	EntityMetadataView mockView;
@@ -22,13 +26,24 @@ public class EntityMetadataTest {
 	EntityMetadata widget;
 	PortalGinInjector mockInjector;
 	AuthenticationController mockAuthenticationController;
-
+	private AnnotationsRendererWidget mockAnnotationsWidget;
+	private FavoriteWidget mockFavoriteWidget;
+	private DoiWidget mockDoiWidget;
+	private RestrictionWidget mockRestrictionWidget;
+	private FileHistoryWidget mockFileHistoryWidget;
+	
 	@Before
 	public void before() {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockView = mock(EntityMetadataView.class);
 		mockInjector = mock(PortalGinInjector.class);
-		widget = new EntityMetadata(mockView, mockAuthenticationController, mockInjector);
+		mockAnnotationsWidget = mock(AnnotationsRendererWidget.class);
+		mockFavoriteWidget = mock(FavoriteWidget.class);
+		mockDoiWidget = mock(DoiWidget.class);
+		mockRestrictionWidget = mock(RestrictionWidget.class);
+		mockFileHistoryWidget = mock(FileHistoryWidget.class);
+		widget = new EntityMetadata(mockView, mockAuthenticationController, mockInjector, mockFavoriteWidget, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget);
+		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 	}
 	
 	@Test
@@ -44,7 +59,7 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		Long versionNumber = -122L;
 		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setEntityBundle(bundle, canChangePermissions, canCertifiedUserEdit, true);
+		verify(mockView).setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setEntityNameVisible(true);
 	}
@@ -61,7 +76,7 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		Long versionNumber = null;
 		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setEntityBundle(bundle, canChangePermissions, canCertifiedUserEdit, false);
+		verify(mockView).setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setEntityNameVisible(false);
 	}

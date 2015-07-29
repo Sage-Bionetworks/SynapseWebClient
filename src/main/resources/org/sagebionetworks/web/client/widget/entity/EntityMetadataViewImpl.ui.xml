@@ -8,7 +8,13 @@
 	<g:HTMLPanel>
 		<h2 style="margin-bottom: 0px;">	
 			<g:HTMLPanel ui:field="entityNamePanel">			
-				 <span class="liftLargeIcon"><g:Image ui:field="entityIcon" styleName="liftLargeIcon"/></span>&nbsp;<span ui:field="entityName"/>&nbsp;<g:SimplePanel ui:field="favoritePanel"/>			
+				 <span class="liftLargeIcon">
+				 	<g:Image ui:field="entityIcon" styleName="liftLargeIcon"/>
+				 </span>
+				 &nbsp;
+				 <span ui:field="entityName"/>
+				 &nbsp;
+				 <g:SimplePanel ui:field="favoritePanel" addStyleNames="inline-block"/>			
 			</g:HTMLPanel>
 		</h2>
 		<g:HTMLPanel ui:field="detailedMetadata">
@@ -17,12 +23,12 @@
 		    	<g:TextBox ui:field="idField" width="85px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline"></g:HTMLPanel>
 		    </bh:Div>
-			<g:SimplePanel ui:field="doiPanel"/>
+			<g:SimplePanel ui:field="doiPanel" addStyleNames="inline-block"/>
 		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse">
-		    	<g:SimplePanel ui:field="annotationsContainer" styleName="highlight-box margin-bottom-15"></g:SimplePanel> 
+		    	<g:SimplePanel ui:field="annotationsContainer" addStyleNames="highlight-box margin-bottom-15"></g:SimplePanel> 
 		    </b:Collapse>
 		    <b:Collapse ui:field="fileHistoryContent" toggle="false" b:id="fileHistoryContentCollapse">
-		    	<g:SimplePanel ui:field="fileHistoryContainer" styleName="highlight-box margin-bottom-15"></g:SimplePanel> 
+		    	<g:SimplePanel ui:field="fileHistoryContainer" addStyleNames="highlight-box margin-bottom-15"></g:SimplePanel> 
 		    </b:Collapse>
 	    </g:HTMLPanel>
 	</g:HTMLPanel>
