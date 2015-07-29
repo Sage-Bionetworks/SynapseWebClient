@@ -161,15 +161,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					@Override
 					public void onSuccess(WikiPage result) {
 						try {
-							currentPage = result;
+							updateCurrentPage(result);
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							wikiKey.setWikiPageId(currentPage.getId());							
-							resetWikiMarkdown(currentPage.getMarkdown());
-							configureWikiTitle(isRootWiki, currentPage.getTitle());
-							configureHistoryWidget(canEdit);
 							configureBreadcrumbs(isRootWiki, ownerObjectName);
 							configureWikiSubpagesWidget(isEmbeddedInOwnerPage);	
-							configureCreatedModifiedBy();
 							view.hideLoading();
 						} catch (Exception e) {
 							onFailure(e);
@@ -378,6 +373,15 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		});
 	}
 	
+	private void updateCurrentPage(WikiPage result) {
+		currentPage = result;
+		boolean isRootWiki = currentPage.getParentWikiId() == null;
+		wikiKey.setWikiPageId(currentPage.getId());
+		resetWikiMarkdown(currentPage.getMarkdown());
+		configureWikiTitle(isRootWiki, currentPage.getTitle());
+		configureHistoryWidget(canEdit);
+		configureCreatedModifiedBy();
+	}
 	@Override
 	public void reloadWikiPage() {
 		synapseAlert.clear();
@@ -388,11 +392,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					view.hideDiffVersionAlert();
 					isCurrentVersion = true;
 					final boolean isRootWiki = result.getParentWikiId() == null;
-					currentPage = result;
-					wikiKey.setWikiPageId(result.getId());
-					resetWikiMarkdown(result.getMarkdown());
-					configureWikiTitle(isRootWiki, result.getTitle());
-					configureHistoryWidget(canEdit);
+					updateCurrentPage(result);
 					setOwnerObjectName(new CallbackP<String>() {
 						@Override
 						public void invoke(String param) {
