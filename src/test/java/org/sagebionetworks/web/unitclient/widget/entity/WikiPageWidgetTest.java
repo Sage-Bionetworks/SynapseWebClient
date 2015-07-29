@@ -246,6 +246,9 @@ public class WikiPageWidgetTest {
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).hideDiffVersionAlert();
 		verify(mockCallbackP).invoke(anyString());
+		//also verify that the created by and modified by are updated when wiki page is reloaded
+		verify(mockView).showCreatedModified();
+		verify(mockUserBadge, times(2)).configure(anyString());
 	}
 
 	@Test
