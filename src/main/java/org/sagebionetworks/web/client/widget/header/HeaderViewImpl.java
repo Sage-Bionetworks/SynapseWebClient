@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -43,7 +44,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Image synapseLogo;
 	@UiField
-	Div headerDiv;
+	Row headerDiv;
 	@UiField
 	Anchor projectHeadingAnchor;
 	@UiField
@@ -167,7 +168,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		synapseLogo.addStyleName("margin-bottom-40");
 		synapseLogo.setHeight("66px");
 		synapseLogo.setWidth("66px");
-		headerDiv.setHeight("100px");
 		headerDiv.setPaddingTop(16);
 	}
 	
@@ -178,7 +178,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		synapseLogo.addStyleName("margin-bottom-15");
 		synapseLogo.setHeight("25px");
 		synapseLogo.setWidth("25px");
-		headerDiv.setHeight("50px");
 		headerDiv.setPaddingTop(9);
 	}
 	
