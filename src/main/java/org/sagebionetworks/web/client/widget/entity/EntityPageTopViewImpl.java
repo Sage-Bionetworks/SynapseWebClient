@@ -245,7 +245,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
 		fileLink.setText(DisplayConstants.FILES);		
 		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
-		tablesLink.setHTML(DisplayConstants.TABLES + DisplayConstants.BETA_BADGE_HTML);		
+		tablesLink.setHTML(DisplayConstants.TABLES);		
 		tablesLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.TABLES));
 		adminLink.setText(DisplayConstants.CHALLENGE_ADMIN);
 		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));

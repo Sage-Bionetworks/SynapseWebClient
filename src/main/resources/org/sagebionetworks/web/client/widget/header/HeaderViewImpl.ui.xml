@@ -10,7 +10,7 @@
 	        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 displayInline">
 	        	<g:Image ui:field="synapseLogo" resource="{sageImages.logo}" 
 	        	    addStyleNames="imageButton margin-bottom-15 margin-right-5" width="25px" height="25px"/>
-	            <b:Heading size="H2" addStyleNames="displayInline color-white">
+	            <b:Heading size="H2" addStyleNames="displayInline color-white synapse-blue-bg">
 	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone"/>
 	        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline" visible="false"/>
 	        	</b:Heading>
@@ -20,7 +20,7 @@
 			</b:Tooltip> 
 			<b:Tooltip placement="BOTTOM" title="Favorites">
 				<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
-					<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px"></b:Button>
+					<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px" addStyleNames="favoriteIcon"></b:Button>
 					<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:ButtonGroup>

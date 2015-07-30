@@ -11,10 +11,11 @@
 		<g:HTMLPanel ui:field="detailedMetadata">
 		    <bh:Div>
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
-		    	<g:TextBox ui:field="idField" width="90px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
+		    	<g:TextBox ui:field="idField" width="90px" addStyleNames="border-none noBackground " readOnly="true" />
+		    	<bh:Span ui:field="doiPanel" />
 		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline"></g:HTMLPanel>
 		    </bh:Div>
-			<g:SimplePanel ui:field="doiPanel"/>
+			
 		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse"  >
 		    	<g:SimplePanel ui:field="annotationsContainer" styleName="highlight-box margin-bottom-15"></g:SimplePanel> 
 		    </b:Collapse>

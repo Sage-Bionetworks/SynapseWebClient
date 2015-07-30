@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Versionable;
@@ -43,7 +44,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	TextBox idField;
 	@UiField
-	SimplePanel doiPanel;
+	Span doiPanel;
 	@UiField
 	Collapse annotationsContent;
 	@UiField
@@ -69,9 +70,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
 		this.restrictionWidget = restrictionWidget;
-		initWidget(uiBinder.createAndBindUi(this));		
-		doiPanel.addStyleName("inline-block");
-		doiPanel.setWidget(doiWidget.asWidget());
+		initWidget(uiBinder.createAndBindUi(this));
+		doiPanel.add(doiWidget.asWidget());
 		annotationsContainer.setWidget(annotationsWidget.asWidget());
 		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 		idField.addClickHandler(new ClickHandler() {
