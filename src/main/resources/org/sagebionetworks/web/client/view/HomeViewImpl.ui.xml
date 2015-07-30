@@ -112,7 +112,7 @@
 										<g:Image resource='{sageImageBundle.unlock}' addStyleNames="margin-10" />
 									</t:TableData>
 									<t:TableData paddingRight="2">
-										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="OPEN RESEARCH PROJECTS"></b:Heading>
+										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="OPEN RESOURCES"></b:Heading>
 									</t:TableData>
 								</t:TableRow>
 							</t:Table>
