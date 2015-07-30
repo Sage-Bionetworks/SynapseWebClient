@@ -60,7 +60,10 @@
 			<b:Row addStyleNames="margin-top-40">
 				<b:Column size="SM_7">
 					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-30 margin-left-15 margin-bottom-15" visible="false">
-						<b:Heading size="H3" addStyleNames="color-white margin-top-5" text="WELCOME BACK"></b:Heading>
+						<bh:Div>
+							<b:Heading size="H3" addStyleNames="color-white margin-top-5 displayInline margin-right-5" text="WELCOME BACK,"></b:Heading>
+							<b:Heading ui:field="userDisplayName" size="H3" addStyleNames="color-white margin-top-5 displayInline" text=""></b:Heading>
+						</bh:Div>
 						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" marginBottom="33" />
 					</bh:Div>
 					<bh:Div ui:field="registerUI" addStyleNames="margin-bottom-15"></bh:Div>

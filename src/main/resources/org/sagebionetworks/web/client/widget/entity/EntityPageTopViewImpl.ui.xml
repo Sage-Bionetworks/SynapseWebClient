@@ -6,14 +6,16 @@
 
 	<g:HTMLPanel styleName="margin-left-15 margin-right-15">		
 		<!--Project level information -->
-		<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15 padding-bottom-15" ui:field="projectMetaContainer">
-			<bh:Div addStyleNames="margin-left-15 margin-right-15">
-				<g:SimplePanel ui:field="projectActionMenuContainer"/>
-			</bh:Div>
-			<bh:Div addStyleNames="margin-left-15 margin-right-15">
-				<g:SimplePanel ui:field="projectMetadataContainer"/>
-				<g:SimplePanel ui:field="projectDescriptionContainer"/>
-			</bh:Div>
+		<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15" ui:field="projectMetaContainer">
+			<b:Column size="XS_12">
+				<bh:Div addStyleNames="margin-left-15 margin-right-15">
+					<g:SimplePanel ui:field="projectActionMenuContainer"/>
+				</bh:Div>
+				<bh:Div addStyleNames="margin-left-15 margin-right-15">
+					<g:SimplePanel ui:field="projectMetadataContainer"/>
+					<g:SimplePanel ui:field="projectDescriptionContainer"/>
+				</bh:Div>
+			</b:Column>
 		</b:Row>
 		
 		<div class="row margin-top-15" ui:field="navtabContainer">

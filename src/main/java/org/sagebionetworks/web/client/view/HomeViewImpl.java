@@ -84,6 +84,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Heading getCreditHeading;
 	@UiField
 	Heading collaborateHeading;
+	@UiField
+	Heading userDisplayName;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -233,6 +235,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void showLoggedInUI(UserSessionData userData) {
 		setUserProfilePicture(userData);
 		dashboardUI.setVisible(true);
+		userDisplayName.setText(userData.getProfile().getUserName().toUpperCase());
 	}
 
 	@Override
@@ -298,6 +301,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		dashboardUI.setVisible(false);
 		registerUI.setVisible(false);
 		loginUI.setVisible(false);
+		userDisplayName.setText("");
 	}
 
 	private void configureNewWindowLink(Anchor a, String href, String text) {
