@@ -156,7 +156,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 
 	@Override
 	public Widget asWidget() {
-		if (!includeRestrictionWidget()) return null;
 		return view.asWidget();
 	}
 	

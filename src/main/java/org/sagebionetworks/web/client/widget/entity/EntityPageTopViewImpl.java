@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -421,7 +420,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * Private Methods
 	 */
 	// Render the File entity	
-	private void renderFileEntity(final EntityBundle bundle, String entityTypeDisplay, Long versionNumber, final String wikiPageId, EntityHeader projectHeader) {
+	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, Long versionNumber, final String wikiPageId, EntityHeader projectHeader) {
 		// tab container
 		setTabSelected(EntityArea.FILES, false); // select files tab for file
 		

@@ -139,27 +139,27 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}
 				else {
-						// Redirect if Entity is a Link
-						if(bundle.getEntity() instanceof Link) {
-							Reference ref = ((Link)bundle.getEntity()).getLinksTo();
-							entityId = null;
-							if(ref != null){
-								// redefine where the page is and refresh
-								entityId = ref.getTargetId();
-								versionNumber = ref.getTargetVersionNumber();
-								refresh();
-								return;
-							} else {
-								// show error and then allow entity bundle to go to view
-								view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
-							}
+					// Redirect if Entity is a Link
+					if(bundle.getEntity() instanceof Link) {
+						Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+						entityId = null;
+						if(ref != null){
+							// redefine where the page is and refresh
+							entityId = ref.getTargetId();
+							versionNumber = ref.getTargetVersionNumber();
+							refresh();
+							return;
+						} else {
+							// show error and then allow entity bundle to go to view
+							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
-						EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
-						if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-						if (projectHeader != null)
-							loadBackgroundImage(projectHeader.getId());
-						EntityPresenter.filterToDownloadARs(bundle);
-						view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
+					}
+					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
+					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					if (projectHeader != null)
+						loadBackgroundImage(projectHeader.getId());
+					EntityPresenter.filterToDownloadARs(bundle);
+					view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
 				}
 			}
 			

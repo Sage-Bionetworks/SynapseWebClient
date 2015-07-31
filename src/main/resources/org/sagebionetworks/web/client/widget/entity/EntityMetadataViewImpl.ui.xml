@@ -24,8 +24,8 @@
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
 		    	<g:TextBox ui:field="idField" width="85px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline">
-		    	    <span addStyleNames="margin-right-5 boldText">Conditions for use:</span>
-		    	    <g:SimplePanel ui:field="restrictionPanel"/>
+		    	    <span class="margin-right-5 boldText">Conditions for use:</span>
+		    	    <g:HTMLPanel ui:field="restrictionPanel"></g:HTMLPanel>
 		    	</g:HTMLPanel>
 		    </bh:Div>
 			<g:SimplePanel ui:field="doiPanel" addStyleNames="inline-block"/>

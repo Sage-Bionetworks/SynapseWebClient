@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -38,13 +40,13 @@ public class EntityMetadata implements Presenter {
 		this.view.setFavoriteWidget(favoriteWidget);
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
-		this.view.setRestrictionWidget(restrictionWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
 	}
-
+	
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		clear();
 		Entity en = bundle.getEntity();
@@ -60,8 +62,11 @@ public class EntityMetadata implements Presenter {
 			fileHistoryWidget.setEntityUpdatedHandler(entityUpdatedHandler);
 			view.setFileHistoryWidget(fileHistoryWidget);
 			view.setFileHistoryVisible(versionNumber != null);
+			view.setRestrictionPanelVisible(true);
 		} else {
 			view.setFileHistoryVisible(false);
+			view.setRestrictionPanelVisible(en instanceof TableEntity
+					|| en instanceof Folder);
 		}
 		restrictionWidget.configure(bundle, true, false, true, new Callback() {
 			@Override
@@ -69,7 +74,7 @@ public class EntityMetadata implements Presenter {
 				fireEntityUpdatedEvent();
 			}
 		});
-		view.setRestrictionPanelVisible(restrictionWidget.asWidget() != null);
+		this.view.setRestrictionWidget(restrictionWidget);
 		favoriteWidget.configure(bundle.getEntity().getId());
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
 		annotationsWidget.configure(bundle, canEdit);

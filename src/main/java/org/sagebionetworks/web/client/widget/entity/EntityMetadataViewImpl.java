@@ -51,17 +51,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
-	SimplePanel restrictionPanel;
+	HTMLPanel restrictionPanel;
 	@UiField
 	Collapse fileHistoryContent;
 	@UiField
 	SimplePanel fileHistoryContainer;
 		
 	@UiField(provided = true)
-	IconsImageBundle icons;
+	final IconsImageBundle icons;
 	
 	@Inject
-	public EntityMetadataViewImpl() {
+	public EntityMetadataViewImpl(IconsImageBundle icons) {
+		this.icons = icons;
 		initWidget(uiBinder.createAndBindUi(this));
 		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
@@ -89,8 +90,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 
 	@Override
-	public void setRestrictionWidget(RestrictionWidget restrictionWidget) {
-		restrictionPanel.setWidget(restrictionWidget);
+	public void setRestrictionWidget(IsWidget restrictionWidget) {
+		restrictionPanel.clear();
+		restrictionPanel.add(restrictionWidget);
 	}
 
 	@Override

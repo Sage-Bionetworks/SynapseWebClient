@@ -28,8 +28,6 @@ public interface EntityMetadataView extends IsWidget {
 
 	public void setAnnotationsRendererWidget(IsWidget annotationsWidget);
 
-	void setRestrictionWidget(RestrictionWidget restrictionWidget);
-
 	void clear();
 
 	void setEntityName(String text);
@@ -39,5 +37,7 @@ public interface EntityMetadataView extends IsWidget {
 	void getAndSetEntityIcon(Entity en);
 
 	public void setRestrictionPanelVisible(boolean visible);
+
+	void setRestrictionWidget(IsWidget restrictionWidget);
 
 }
