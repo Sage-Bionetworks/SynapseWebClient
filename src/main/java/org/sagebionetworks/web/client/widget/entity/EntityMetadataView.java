@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.repo.model.Entity;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityMetadataView extends IsWidget {
 
-	public void setPresenter(Presenter p);
-	
 	public void setDetailedMetadataVisible(boolean visible);
 	
 	public void setEntityNameVisible(boolean visible);
@@ -38,8 +36,8 @@ public interface EntityMetadataView extends IsWidget {
 
 	void setEntityId(String text);
 
-	void configureRestrictionWidget();
+	void getAndSetEntityIcon(Entity en);
 
-	void setAttachCallback(Callback attachCallback);
+	public void setRestrictionPanelVisible(boolean visible);
 
 }

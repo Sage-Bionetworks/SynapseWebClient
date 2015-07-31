@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
@@ -22,6 +23,8 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+
+import com.google.gwt.user.client.ui.Widget;
 
 public class EntityMetadataTest {
 	EntityMetadataView mockView;
@@ -56,6 +59,7 @@ public class EntityMetadataTest {
 		boolean canCertifiedUserEdit = true;
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		when(mockRestrictionWidget.asWidget()).thenReturn(null);
 		Project project = new Project();
 		project.setName(entityName);
 		project.setId(entityId);
@@ -68,10 +72,14 @@ public class EntityMetadataTest {
 		verify(mockView).setEntityNameVisible(true);
 		verify(mockView).setEntityId(entityId);
 		verify(mockView).setEntityName(entityName);
+		verify(mockView).getAndSetEntityIcon(project);
 		verify(mockView).setFileHistoryVisible(false);
+		verify(mockView).setRestrictionPanelVisible(false);
 		verify(mockFavoriteWidget).configure(entityId);
 		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
+		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
+				Mockito.anyBoolean(), any(Callback.class));
 	}
 	
 	@Test
@@ -93,12 +101,15 @@ public class EntityMetadataTest {
 		verify(mockView).setEntityNameVisible(false);
 		verify(mockView).setEntityId(entityId);
 		verify(mockView).setEntityName(entityName);
+		verify(mockView).getAndSetEntityIcon(fileEntity);
 		verify(mockView).setFileHistoryVisible(false);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockFavoriteWidget).configure(entityId);
 		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
+		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
+				Mockito.anyBoolean(), any(Callback.class));
 	}
 	
 	@Test
@@ -120,12 +131,15 @@ public class EntityMetadataTest {
 		verify(mockView).setEntityNameVisible(false);
 		verify(mockView).setEntityId(entityId);
 		verify(mockView).setEntityName(entityName);
+		verify(mockView).getAndSetEntityIcon(fileEntity);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockView).setFileHistoryVisible(true);
 		verify(mockFavoriteWidget).configure(entityId);
 		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
+		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
+				Mockito.anyBoolean(), any(Callback.class));
 	}
 	
 }

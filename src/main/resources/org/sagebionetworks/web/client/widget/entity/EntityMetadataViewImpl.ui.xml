@@ -5,6 +5,8 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget">
  
+    <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
+    
 	<g:HTMLPanel>
 		<h2 style="margin-bottom: 0px;">	
 			<g:HTMLPanel ui:field="entityNamePanel">			
@@ -21,7 +23,10 @@
 		    <bh:Div>
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
 		    	<g:TextBox ui:field="idField" width="85px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
-		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline"></g:HTMLPanel>
+		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline">
+		    	    <span addStyleNames="margin-right-5 boldText">Conditions for use:</span>
+		    	    <g:SimplePanel ui:field="restrictionPanel"/>
+		    	</g:HTMLPanel>
 		    </bh:Div>
 			<g:SimplePanel ui:field="doiPanel" addStyleNames="inline-block"/>
 		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse">

@@ -35,7 +35,6 @@ public class EntityMetadata implements Presenter {
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.restrictionWidget = restrictionWidget;
-		this.view.setPresenter(this);
 		this.view.setFavoriteWidget(favoriteWidget);
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
@@ -52,14 +51,9 @@ public class EntityMetadata implements Presenter {
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		boolean showDetailedMetadata = true;
 		boolean showEntityName = true;
-		restrictionWidget.configure(bundle, true, false, true, new Callback() {
-			@Override
-			public void invoke() {
-				fireEntityUpdatedEvent();
-			}
-		});
 		view.setEntityId(en.getId());
 		view.setEntityName(en.getName());
+		view.getAndSetEntityIcon(en);
 		if (bundle.getEntity() instanceof FileEntity) {
 			showEntityName = false;
 			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
@@ -69,12 +63,18 @@ public class EntityMetadata implements Presenter {
 		} else {
 			view.setFileHistoryVisible(false);
 		}
+		restrictionWidget.configure(bundle, true, false, true, new Callback() {
+			@Override
+			public void invoke() {
+				fireEntityUpdatedEvent();
+			}
+		});
+		view.setRestrictionPanelVisible(restrictionWidget.asWidget() != null);
 		favoriteWidget.configure(bundle.getEntity().getId());
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
 		annotationsWidget.configure(bundle, canEdit);
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 		view.setEntityNameVisible(showEntityName);		
-		view.configureRestrictionWidget();
 	}	
 
 	@Override

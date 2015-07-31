@@ -1,22 +1,21 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -52,13 +51,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
+	SimplePanel restrictionPanel;
+	@UiField
 	Collapse fileHistoryContent;
 	@UiField
 	SimplePanel fileHistoryContainer;
-	
-	private RestrictionWidget restrictionWidget;
-	private Presenter presenter;
-	private Callback attachCallback;
+		
+	@UiField(provided = true)
+	IconsImageBundle icons;
 	
 	@Inject
 	public EntityMetadataViewImpl() {
@@ -71,19 +71,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				idField.selectAll();
 			}
 		});
-		this.addAttachHandler(new Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (attachCallback != null) {
-					attachCallback.invoke();
-				}
-			}
-		});
-	}
-	
-	@Override
-	public void setAttachCallback(Callback attachCallback) {
-		this.attachCallback = attachCallback;
 	}
 
 	@Override
@@ -103,22 +90,22 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setRestrictionWidget(RestrictionWidget restrictionWidget) {
-		this.restrictionWidget = restrictionWidget;
+		restrictionPanel.setWidget(restrictionWidget);
 	}
 
 	@Override
 	public void setAnnotationsVisible(boolean visible) {
 		if (visible) {
-//			if (!annotationsContent.isShown()) {
-//				annotationsContent.toggle();
-//			}
 			annotationsContent.show();
 		} else {
-//			if (annotationsContent.isShown()) {
-//				annotationsContent.toggle();
-//			}
 			annotationsContent.hide();
 		}
+	}
+	
+	@Override
+	public void getAndSetEntityIcon(Entity en) {
+		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(en, DisplayUtils.IconSize.PX24, icons));
+		synapseIconForEntity.applyTo(entityIcon);
 	}
 	
 	@Override
@@ -129,54 +116,17 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setFileHistoryVisible(boolean visible) {
 		if (visible) {
-//			if (!fileHistoryContent.isShown()) {
-//				fileHistoryContent.toggle();
-//			}
-			GWT.debugger();
 			fileHistoryContent.show();
 		} else {
-//			if (fileHistoryContent.isShown()) {
-//				fileHistoryContent.toggle();
-//			}
-			GWT.debugger();
 			fileHistoryContent.hide();
 		}
 	}
 	
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {		
-//		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
-//		synapseIconForEntity.applyTo(entityIcon);
-	}
-	
 	@Override
 	public void clear() {
-//		if (fileHistoryContent.isShown()) {
-//			fileHistoryContent.toggle();
-//		}
 		fileHistoryContent.hide();
 		dataUseContainer.clear();
 		annotationsContent.hide();
-//		if (annotationsContent.isShown()) {
-//			annotationsContent.toggle();
-//		}
-	}
-	
-	@Override
-	public void configureRestrictionWidget() {
-		dataUseContainer.clear();
-		Widget dataUse = restrictionWidget.asWidget();
-		if(dataUse != null) {
-			dataUseContainer.setVisible(true);
-			dataUseContainer.add(new InlineHTML("<span style=\"margin-right: 5px;\" class=\"boldText\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>"));
-			dataUseContainer.add(dataUse);
-		} else {
-			dataUseContainer.setVisible(false);
-		}
-	}
-
-	@Override
-	public void setPresenter(Presenter p) {
-		presenter = p;
 	}
 	
 	@Override
@@ -197,6 +147,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setEntityId(String text) {
 		idField.setText(text);
+	}
+
+	@Override
+	public void setRestrictionPanelVisible(boolean visible) {
+		dataUseContainer.setVisible(visible);
 	}
 
 
