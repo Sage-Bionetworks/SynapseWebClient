@@ -5,13 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -131,7 +131,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		Condition condition = EntityQueryUtils.buildCondition(
 				EntityFieldName.createdByPrincipalId, Operator.EQUALS, authenticationController.getCurrentUserPrincipalId());
 		newQuery.setConditions(Arrays.asList(condition));
-		newQuery.setFilterByType(org.sagebionetworks.repo.model.entity.query.EntityType.project);
+		newQuery.setFilterByType(EntityType.project);
 		newQuery.setLimit(PROJECT_LIMIT);
 		newQuery.setOffset(ZERO_OFFSET);
 		return newQuery;

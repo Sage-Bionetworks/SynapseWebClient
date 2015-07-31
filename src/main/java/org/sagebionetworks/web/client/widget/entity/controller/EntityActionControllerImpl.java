@@ -5,6 +5,7 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -134,7 +135,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.actionMenu = actionMenu;
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
-		this.enityTypeDisplay = EntityType.getEntityTypeForClass(entityBundle.getEntity().getClass()).getDisplayName();
+		EntityType type = EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass());
+		this.enityTypeDisplay =EntityTypeUtils.getMetadata(type).getDisplayName();
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
 		actionMenu.addControllerWidget(uploader.asWidget());

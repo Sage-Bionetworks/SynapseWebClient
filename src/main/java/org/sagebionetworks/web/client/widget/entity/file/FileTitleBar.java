@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -42,7 +43,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		this.entityBundle = bundle;
 
 		// Get EntityType
-		EntityType entityType = EntityType.getEntityTypeForClass(bundle.getEntity().getClass());
+		EntityType entityType = EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass());
 		view.createTitlebar(bundle, entityType, authenticationController);
 	}
 	
