@@ -42,7 +42,7 @@ public class EntityMetadataTest {
 		mockDoiWidget = mock(DoiWidget.class);
 		mockRestrictionWidget = mock(RestrictionWidget.class);
 		mockFileHistoryWidget = mock(FileHistoryWidget.class);
-		widget = new EntityMetadata(mockView, mockAuthenticationController, mockInjector, mockFavoriteWidget, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget);
+		widget = new EntityMetadata(mockView, mockAuthenticationController, mockFavoriteWidget, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget, mockFileHistoryWidget);
 		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 	}
 	
@@ -59,7 +59,6 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		Long versionNumber = -122L;
 		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setEntityNameVisible(true);
 	}
@@ -76,7 +75,6 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		Long versionNumber = null;
 		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setEntityNameVisible(false);
 	}

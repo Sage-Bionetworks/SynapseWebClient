@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -420,7 +421,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * Private Methods
 	 */
 	// Render the File entity	
-	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, Long versionNumber, String wikiPageId, EntityHeader projectHeader) {
+	private void renderFileEntity(final EntityBundle bundle, String entityTypeDisplay, Long versionNumber, final String wikiPageId, EntityHeader projectHeader) {
 		// tab container
 		setTabSelected(EntityArea.FILES, false); // select files tab for file
 		
@@ -431,15 +432,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if (bundle.getEntity() instanceof FileEntity) {
 			fileTitleBar.configure(bundle);
 			fileTitlebarContainer.setVisible(true);
-		} 	
+		}
+		
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
+		
 		// ActionMenu
 		fileActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		fileActionMenuContainer.add(actionMenu.asWidget());
-
+		
 		// Description
 		fileDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki
@@ -459,6 +462,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		createProgrammaticClientsWidget(bundle, versionNumber);
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
+
 	}
 	
 	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin)  {
@@ -506,10 +510,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		fileBreadcrumbContainer.add(breadcrumb.asWidget());
-		// ActionMenu
-		fileActionMenuContainer.clear();
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
-		fileActionMenuContainer.add(actionMenu.asWidget());
+		
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		fileMetadataContainer.add(entityMetadata.asWidget());
@@ -522,6 +523,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fileBrowserContainer.add(configureFilesBrowser(folderFilesBrowser, bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
+		
+		// ActionMenu
+		fileActionMenuContainer.clear();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		fileActionMenuContainer.add(actionMenu.asWidget());
 	}
 
 	// Render the Project entity
@@ -536,11 +542,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
 		projectMetadataContainer.add(entityMetadata.asWidget());
 		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
-	
-		// ActionMenu
-		projectActionMenuContainer.clear();
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
-		projectActionMenuContainer.add(actionMenu.asWidget());
 
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiPageContainer, bundle, wikiPageId, area);
@@ -562,6 +563,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 					DisplayUtils.show(adminListItem);
 			}
 		});
+		
+		// ActionMenu
+		projectActionMenuContainer.clear();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		projectActionMenuContainer.add(actionMenu.asWidget());
 	}
 
 	/**
@@ -653,11 +659,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		tableMetadataContainer.add(entityMetadata.asWidget());
-		// ActionMenu
-		tableActionMenuContainer.clear();
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, null);
-		tableActionMenuContainer.add(actionMenu.asWidget());
-
+		
 		// Table
 		QueryChangeHandler qch = new QueryChangeHandler() {			
 			@Override
@@ -675,6 +677,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
+		
+		// ActionMenu
+		tableActionMenuContainer.clear();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, null);
+		tableActionMenuContainer.add(actionMenu.asWidget());
+
 		IsWidget tableWidget = null;
 		// V2
 		TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
@@ -683,9 +691,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		Widget tableW = tableWidget.asWidget();
 		tableWidgetContainer.add(tableW);
 		// Created By/Modified By
-		tableModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
+		tableModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));	
 	}
-
 	
 	private Widget createProvenanceWidget(EntityBundle bundle, boolean fullWidth) {
 		// Create the property body
@@ -756,9 +763,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @param bundle
 	 * @return
 	 */
-	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId){
-		// Create a menu
+	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId) {
 		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		// Create a menu
 		// Create a controller.
 		final EntityActionController controller = ginInjector.createEntityActionController();
 		actionMenu.addControllerWidget(controller.asWidget());
@@ -778,7 +785,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		});
 		Entity entity = bundle.getEntity();
-		if (entity instanceof Entity && entity instanceof Versionable) {
+		if (entity instanceof Entity && entity instanceof FileEntity) {
 			fileHistoryShown = false;
 			actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
 				@Override

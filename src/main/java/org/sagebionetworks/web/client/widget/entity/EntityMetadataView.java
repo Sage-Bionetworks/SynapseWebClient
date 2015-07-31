@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -34,6 +34,12 @@ public interface EntityMetadataView extends IsWidget {
 
 	void clear();
 
-	void setEntityBundle(EntityBundle bundle, Long versionNumber);
+	void setEntityName(String text);
+
+	void setEntityId(String text);
+
+	void configureRestrictionWidget();
+
+	void setAttachCallback(Callback attachCallback);
 
 }

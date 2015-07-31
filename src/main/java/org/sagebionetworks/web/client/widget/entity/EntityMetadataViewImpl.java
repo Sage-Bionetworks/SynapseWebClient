@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -10,6 +9,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -57,6 +58,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	private RestrictionWidget restrictionWidget;
 	private Presenter presenter;
+	private Callback attachCallback;
 	
 	@Inject
 	public EntityMetadataViewImpl() {
@@ -69,7 +71,19 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				idField.selectAll();
 			}
 		});
-
+		this.addAttachHandler(new Handler() {
+			@Override
+			public void onAttachOrDetach(AttachEvent event) {
+				if (attachCallback != null) {
+					attachCallback.invoke();
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void setAttachCallback(Callback attachCallback) {
+		this.attachCallback = attachCallback;
 	}
 
 	@Override
@@ -95,8 +109,14 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setAnnotationsVisible(boolean visible) {
 		if (visible) {
+//			if (!annotationsContent.isShown()) {
+//				annotationsContent.toggle();
+//			}
 			annotationsContent.show();
 		} else {
+//			if (annotationsContent.isShown()) {
+//				annotationsContent.toggle();
+//			}
 			annotationsContent.hide();
 		}
 	}
@@ -109,45 +129,40 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setFileHistoryVisible(boolean visible) {
 		if (visible) {
+//			if (!fileHistoryContent.isShown()) {
+//				fileHistoryContent.toggle();
+//			}
+			GWT.debugger();
 			fileHistoryContent.show();
 		} else {
+//			if (fileHistoryContent.isShown()) {
+//				fileHistoryContent.toggle();
+//			}
+			GWT.debugger();
 			fileHistoryContent.hide();
 		}
 	}
 	
-	@Override
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
-		clear();
-		Entity e = bundle.getEntity();
-		restrictionWidget.configure(bundle, true, false, true, new Callback() {
-			@Override
-			public void invoke() {
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {		
 //		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
 //		synapseIconForEntity.applyTo(entityIcon);
-		setEntityName(e.getName());
-		setEntityId(e.getId());
-		boolean isShowingOlderVersion = versionNumber == null;
-		configureFileHistory(isShowingOlderVersion);
-		configureAnnotations();
-		configureRestrictionWidget();
 	}
 	
-	private void configureFileHistory(boolean isShowingOlderVersion) {
-		if (fileHistoryContent.isShown() && !isShowingOlderVersion) {
-			fileHistoryContent.toggle();
-		}
+	@Override
+	public void clear() {
+//		if (fileHistoryContent.isShown()) {
+//			fileHistoryContent.toggle();
+//		}
+		fileHistoryContent.hide();
+		dataUseContainer.clear();
+		annotationsContent.hide();
+//		if (annotationsContent.isShown()) {
+//			annotationsContent.toggle();
+//		}
 	}
 	
-	private void configureAnnotations() {
-		if (annotationsContent.isShown()) {
-			annotationsContent.toggle();
-		}
-	}
-	
-	private void configureRestrictionWidget() {
+	@Override
+	public void configureRestrictionWidget() {
 		dataUseContainer.clear();
 		Widget dataUse = restrictionWidget.asWidget();
 		if(dataUse != null) {
@@ -174,17 +189,16 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.entityNamePanel.setVisible(visible);
 	}
 
+	@Override
 	public void setEntityName(String text) {
 		entityName.setInnerText(text);
 	}
 
+	@Override
 	public void setEntityId(String text) {
 		idField.setText(text);
 	}
 
-	@Override
-	public void clear() {
-		dataUseContainer.clear();
-	}
+
 
 }
