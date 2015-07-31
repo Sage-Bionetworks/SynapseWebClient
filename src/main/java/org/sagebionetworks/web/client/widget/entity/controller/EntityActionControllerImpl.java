@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -42,6 +43,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -154,6 +156,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureFileUpload();
 			configureProvenance();
 			configureChangeStorageLocation();
+			configureCreateDOI();
 		}
 	}
 	
@@ -178,6 +181,51 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionEnabled(Action.CHANGE_STORAGE_LOCATION, false);
 		}
 	}
+	
+	private void configureCreateDOI() {
+		boolean canEdit = permissions.getCanEdit();
+		actionMenu.setActionVisible(Action.CREATE_DOI, false);
+		actionMenu.setActionEnabled(Action.CREATE_DOI, false);
+		if (canEdit) {
+			actionMenu.addActionListener(Action.CREATE_DOI, this);
+			synapseClient.getEntityDoi(entity.getId(), getVersion(), new AsyncCallback<Doi>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					boolean isNotFound = caught instanceof NotFoundException;
+					//show command if not found
+					actionMenu.setActionVisible(Action.CREATE_DOI, isNotFound);
+					actionMenu.setActionEnabled(Action.CREATE_DOI, isNotFound);
+				}
+				public void onSuccess(Doi result) {
+					//if there's a Doi, then continue to not show command
+				};
+			});
+		}
+	}
+	
+	private Long getVersion(){
+		Long version = null;
+		Entity entity = entityBundle.getEntity();
+		if (entity instanceof Versionable) {
+			version = ((Versionable)entity).getVersionNumber();
+		}
+		return version;
+	}
+	
+	private void onCreateDOI() {
+		synapseClient.createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void v) {
+				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+
 	
 	private void configureFileUpload() {
 		if(entityBundle.getEntity() instanceof FileEntity ){
@@ -392,6 +440,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CHANGE_STORAGE_LOCATION:
 			onChangeStorageLocation();
+			break;
+		case CREATE_DOI:
+			onCreateDOI();
 			break;
 		default:
 			break;

@@ -81,7 +81,7 @@ public class DoiWidgetTest {
 	public void testConfigureNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		doiWidget.configure(entityId, true, null);
-		verify(mockView).showCreateDoi();
+		verify(mockView).setVisible(false);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -89,7 +89,7 @@ public class DoiWidgetTest {
 	public void testConfigureNotFoundNonEditable() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		doiWidget.configure(entityId, false, null);
-		verify(mockView, Mockito.times(0)).showCreateDoi();
+		verify(mockView).setVisible(false);
 	}
 
 	
@@ -98,24 +98,6 @@ public class DoiWidgetTest {
 	public void testConfigureOtherError() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		doiWidget.configure(entityId, true, null);
-		verify(mockView).showErrorMessage(anyString());
-	}
-	
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testCreateDoi() throws Exception {
-		doiWidget.createDoi();
-		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-	}
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testCreateDoiFail() throws Exception {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		doiWidget.createDoi();
-		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	

@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -33,7 +33,7 @@ public class ShinySiteConfigViewImpl implements ShinySiteConfigView {
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!LoginPresenter.isValidUrl(urlField.getValue(), false))
+		if (!ValidationUtils.isValidUrl(urlField.getValue(), false))
 			throw new IllegalArgumentException(DisplayConstants.INVALID_URL_MESSAGE);
 		if(!ShinySiteWidget.isValidShinySite(urlField.getValue()))
 			throw new IllegalArgumentException(urlField.getValue() + DisplayConstants.INVALID_SHINY_SITE);

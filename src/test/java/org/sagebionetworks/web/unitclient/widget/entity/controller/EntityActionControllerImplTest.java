@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -37,6 +38,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -845,4 +847,63 @@ public class EntityActionControllerImplTest {
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testCreateDoi() throws Exception {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_DOI);
+		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+		//refresh page
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testCreateDoiFail() throws Exception {
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_DOI);
+		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testConfigureDoiNotFound() throws Exception {
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		//initially hide, then show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, true);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, true);
+	}
+	
+	
+	@Test
+	public void testConfigureDoiNotFoundNonEditable() throws Exception {
+		permissions.setCanEdit(false);
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		//initially hide, never show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionEnabled(Action.CREATE_DOI, true);
+	}
+	
+	@Test
+	public void testConfigureDoiFound() throws Exception {
+		Doi mockDoi = Mockito.mock(Doi.class);
+		AsyncMockStubber.callSuccessWith(mockDoi).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		//initially hide, never show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
+		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionEnabled(Action.CREATE_DOI, true);
+
+	}
+
+	
 }

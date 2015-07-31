@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.ValidationUtils;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -12,7 +12,6 @@ import com.google.inject.Inject;
 public class IFrameConfigViewImpl implements IFrameConfigView {
 	public interface IFrameConfigViewImplUiBinder extends UiBinder<Widget, IFrameConfigViewImpl> {}
 	private Widget widget;
-	private Presenter presenter;
 	@UiField
 	TextBox urlField;
 	
@@ -28,7 +27,7 @@ public class IFrameConfigViewImpl implements IFrameConfigView {
 	@Override
 	public void checkParams() throws IllegalArgumentException {
 		String url = getVideoUrl();
-		if (!LoginPresenter.isValidUrl(url, false))
+		if (!ValidationUtils.isValidUrl(url, false))
 			throw new IllegalArgumentException("Invalid URL: " + url);
 	}
 	@Override
@@ -45,11 +44,6 @@ public class IFrameConfigViewImpl implements IFrameConfigView {
 	public Widget asWidget() {
 		return widget;
 	}	
-	
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {

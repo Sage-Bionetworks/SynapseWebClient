@@ -49,8 +49,12 @@ public interface SynapseAlertView extends IsWidget {
 	public interface Presenter {
 		void onCreateJiraIssue(String userReport);
 		void onLoginClicked();
+		void onRequestAccess();
 	}
 
 	void show403();
+	void showRequestAccessUI();
+	void hideRequestAccessUI();
+	void showRequestAccessButtonLoading();
 	void show404();
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,9 +31,9 @@ public class LinkConfigViewImpl implements LinkConfigView {
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!LoginPresenter.isValidUrl(urlField.getValue(), false))
+		if (!ValidationUtils.isValidUrl(urlField.getValue(), false))
 			throw new IllegalArgumentException("Invalid URL: " + urlField.getValue());
-		if (!LoginPresenter.isValidWidgetName(nameField.getValue()))
+		if (!ValidationUtils.isValidWidgetName(nameField.getValue()))
 			throw new IllegalArgumentException("Invalid name: " + nameField.getValue());
 	}
 
