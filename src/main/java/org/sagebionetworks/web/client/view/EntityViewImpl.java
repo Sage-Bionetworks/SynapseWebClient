@@ -91,6 +91,7 @@ public class EntityViewImpl implements EntityView {
 	
 	@Override
 	public void setSynAlertWidget(IsWidget synAlert) {
+		synAlert.asWidget().addStyleName("min-height-400 margin-top-60");
 		synAlertContainer.setWidget(synAlert);
 	}
 	
