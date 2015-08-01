@@ -12,48 +12,50 @@
 	        	    addStyleNames="imageButton margin-bottom-15 margin-right-5" width="25px" height="25px"/>
 	            <b:Heading size="H2" addStyleNames="displayInline color-white">
 	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone"/>
-	        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline" visible="false"/>
+	        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-5" visible="false"/>
 	        	</b:Heading>
 		  	</bh:Div>
-			<b:Tooltip placement="BOTTOM" title="Log out">
-				<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="26px" />	
-			</b:Tooltip>
-			<b:ButtonGroup addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-				<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px">Help</b:Button>
-				<b:DropDownMenu addStyleNames="dropdown-menu-right">
-					<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Getting started</b:AnchorListItem>
-					<b:AnchorListItem ui:field="forumLink">Forum</b:AnchorListItem>
-					<b:AnchorListItem ui:field="rLink">R client</b:AnchorListItem>
-					<b:AnchorListItem ui:field="pythonLink">Python client</b:AnchorListItem>
-					<b:AnchorListItem ui:field="commandLineLink">Command line client</b:AnchorListItem>
-					<b:AnchorListItem ui:field="restAPILink">REST API docs</b:AnchorListItem>
-					<b:AnchorListItem ui:field="governanceLink">Data use conditions</b:AnchorListItem>
-				</b:DropDownMenu>
-			</b:ButtonGroup> 
-			<b:Tooltip placement="BOTTOM" title="Favorites">
-				<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
-					<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px" addStyleNames="favoriteIcon"></b:Button>
-					<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
+		  	<bh:Span ui:field="headerButtons" addStyleNames="right">
+				<b:Tooltip placement="BOTTOM" title="Log out">
+					<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="26px" />	
+				</b:Tooltip>
+				<b:ButtonGroup addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px">Help</b:Button>
+					<b:DropDownMenu addStyleNames="dropdown-menu-right">
+						<b:AnchorListItem icon="BOOK" href="#!Help:GettingStarted">Getting started</b:AnchorListItem>
+						<b:AnchorListItem ui:field="forumLink">Forum</b:AnchorListItem>
+						<b:AnchorListItem ui:field="rLink">R client</b:AnchorListItem>
+						<b:AnchorListItem ui:field="pythonLink">Python client</b:AnchorListItem>
+						<b:AnchorListItem ui:field="commandLineLink">Command line client</b:AnchorListItem>
+						<b:AnchorListItem ui:field="restAPILink">REST API docs</b:AnchorListItem>
+						<b:AnchorListItem ui:field="governanceLink">Data use conditions</b:AnchorListItem>
 					</b:DropDownMenu>
-				</b:ButtonGroup>
-			</b:Tooltip>
-			<b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" height="26px" >@ Trash can</b:Button>
-		    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-				<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="26px">Log in</b:Button>
-			</g:SimplePanel>
-		    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-				<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="26px">Register</b:Button>
-			</g:SimplePanel>
-			<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-				<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="26px" addStyleNames="my-dashboard-header-button" />
-			</g:SimplePanel>
-		    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5 margin-bottom-20"/>
-			<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
-		    	<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
-		    	<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
-		    	<bh:Span addStyleNames="smallerText color-white">&nbsp;/&nbsp;</bh:Span>
-		    	<b:Anchor addStyleNames="smallerText displayInline color-white" ui:field="goToStandardSite">off</b:Anchor>
-		    </g:FlowPanel>
+				</b:ButtonGroup> 
+				<b:Tooltip placement="BOTTOM" title="Favorites">
+					<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
+						<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="26px" addStyleNames="favoriteIcon"></b:Button>
+						<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
+						</b:DropDownMenu>
+					</b:ButtonGroup>
+				</b:Tooltip>
+				<b:Button size="EXTRA_SMALL" ui:field="trashLink" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" height="26px" >@ Trash can</b:Button>
+			    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+					<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="26px">Log in</b:Button>
+				</g:SimplePanel>
+			    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+					<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="26px">Register</b:Button>
+				</g:SimplePanel>
+				<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+					<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="26px" addStyleNames="my-dashboard-header-button" />
+				</g:SimplePanel>
+			    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5 margin-bottom-20"/>
+				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+			    	<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
+			    	<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
+			    	<bh:Span addStyleNames="smallerText color-white">&nbsp;/&nbsp;</bh:Span>
+			    	<b:Anchor addStyleNames="smallerText displayInline color-white" ui:field="goToStandardSite">off</b:Anchor>
+			    </g:FlowPanel>
+			</bh:Span>
 		</b:Column>
 	</b:Row>
 </ui:UiBinder>
