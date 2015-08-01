@@ -84,7 +84,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SimplePanel loginLinkUI;
 	@UiField
 	Button loginLink;
-
+	
+	@UiField
+	Span headerButtons;
+	
 	@UiField
 	Button trashLink;
 	@UiField
@@ -169,6 +172,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		synapseLogo.setHeight("66px");
 		synapseLogo.setWidth("66px");
 		headerDiv.setPaddingTop(16);
+		headerButtons.setMarginTop(28);
 	}
 	
 	@Override
@@ -179,6 +183,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		synapseLogo.setHeight("25px");
 		synapseLogo.setWidth("25px");
 		headerDiv.setPaddingTop(9);
+		headerButtons.setMarginTop(0);
 	}
 	
 	/**
