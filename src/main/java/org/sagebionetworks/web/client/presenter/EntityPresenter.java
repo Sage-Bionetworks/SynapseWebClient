@@ -103,6 +103,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setFooterWidget(footerWidget);
 		view.setHeaderWidget(headerWidget);
 		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
+		synAlert.asWidget().addStyleName("min-height-400 margin-top-60");
 		view.setSynAlertWidget(synAlert);
 		clear();
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
