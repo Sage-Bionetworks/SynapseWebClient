@@ -20,7 +20,7 @@
 			</b:ButtonGroup>
 			<b:ButtonGroup>
 				<b:DropDown>
-					<b:Button icon="GEAR" dataToggle="DROPDOWN">Tools</b:Button>
+					<b:Button icon="GEAR" dataToggle="DROPDOWN" ui:field="toolsMenu">Tools</b:Button>
 					<b:DropDownMenu ui:field="toolsDropDown"
 						addStyleNames="dropdown-menu-right">
 						<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_TABLE_DATA">Upload
