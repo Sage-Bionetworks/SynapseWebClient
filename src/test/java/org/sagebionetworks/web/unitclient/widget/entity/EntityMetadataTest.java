@@ -24,8 +24,6 @@ import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
-import com.google.gwt.user.client.ui.Widget;
-
 public class EntityMetadataTest {
 	EntityMetadataView mockView;
 	String entityId = "syn123";

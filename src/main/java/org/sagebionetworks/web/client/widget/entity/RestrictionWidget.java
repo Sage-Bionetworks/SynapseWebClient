@@ -215,10 +215,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		view.open(jiraFlagLink);
 	}
 	
-	private ClickHandler getAboutLinkClickHandler(
-			final boolean hasAdministrativeAccess
-			) {
-		 
+	private ClickHandler getAboutLinkClickHandler(final boolean hasAdministrativeAccess) {
 		return new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
@@ -234,9 +231,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.currentAR = currentAR;
 	}
 	
-	public void showNextAccessRequirement(
-			final boolean hasAdministrativeAccess
-			) {
+	public void showNextAccessRequirement(final boolean hasAdministrativeAccess) {
 		
 		//iterate over access requirements until we reach one that we have not yet shown (or there are none left to show).
 		while(currentAR != null && shownAccessRequirements.contains(currentAR.getId())) {

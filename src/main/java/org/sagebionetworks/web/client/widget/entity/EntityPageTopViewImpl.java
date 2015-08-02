@@ -44,6 +44,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -801,6 +802,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			} else if (fileHistoryShown) {
 				((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
 			}
+		} else {
+			entityMetadata.setFileHistoryVisible(false);
 		}
 		return actionMenu;
 	}

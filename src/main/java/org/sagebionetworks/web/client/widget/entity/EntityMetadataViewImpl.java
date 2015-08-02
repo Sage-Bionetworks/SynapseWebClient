@@ -51,7 +51,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
-	HTMLPanel restrictionPanel;
+	SimplePanel restrictionPanel;
 	@UiField
 	Collapse fileHistoryContent;
 	@UiField
@@ -91,8 +91,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setRestrictionWidget(IsWidget restrictionWidget) {
-		restrictionPanel.clear();
-		restrictionPanel.add(restrictionWidget);
+		restrictionPanel.setWidget(restrictionWidget);
 	}
 
 	@Override
@@ -127,7 +126,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void clear() {
 		fileHistoryContent.hide();
-		dataUseContainer.clear();
+		dataUseContainer.setVisible(false);
 		annotationsContent.hide();
 	}
 	
@@ -155,7 +154,5 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setRestrictionPanelVisible(boolean visible) {
 		dataUseContainer.setVisible(visible);
 	}
-
-
 
 }
