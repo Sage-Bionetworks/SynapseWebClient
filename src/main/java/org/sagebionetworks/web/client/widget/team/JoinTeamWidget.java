@@ -27,15 +27,14 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,6 +56,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private List<AccessRequirement> accessRequirements;
 	private int currentPage;
 	private int currentAccessRequirement;
+	private TeamMembershipStatus teamMembershipStatus;
 	
 	public static final String[] EXTRA_INFO_URL_WHITELIST = { 
 		"https://www.projectdatasphere.org/projectdatasphere/",
@@ -96,7 +96,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.buttonText = null;
 		this.requestOpenInfoText = null;
 		this.widgetRefreshRequired = callback;
-		refresh();
+		refresh(null);
 	}
 	
 	public void configure(String teamId, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, 
@@ -109,7 +109,52 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
 		this.buttonText = buttonText;
-		view.configure(authenticationController.isLoggedIn(), teamMembershipStatus, isMemberMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
+		this.teamMembershipStatus = teamMembershipStatus;
+		view.clear();
+		if (buttonText != null && !buttonText.isEmpty()) {
+			view.setJoinButtonText(buttonText);
+		}
+		if (requestOpenInfoText != null && !requestOpenInfoText.isEmpty()) {
+			view.setRequestOpenText(requestOpenInfoText);
+		}
+		if (isMemberMessage != null && !isMemberMessage.isEmpty()) {
+			view.setIsMemberMessage(SafeHtmlUtils.htmlEscape(isMemberMessage));
+		}
+		boolean isLoggedIn = authenticationController.isLoggedIn();
+		// What is joinWizard?
+//		add(joinWizard);
+		if (isLoggedIn) {
+			view.showUserPanel();
+			//(note:  in all cases, clicking UI will check for unmet ToU)
+			if (teamMembershipStatus.getIsMember()) {
+				// don't show anything?
+				if (isMemberMessage != null && isMemberMessage.length() > 0) {
+					view.showIsMemberMessage();
+				}
+			} else if (teamMembershipStatus.getCanJoin()) { // not in team but can join with a single request
+				// show join button; clicking Join joins the team
+				view.showSimpleRequestButton();
+			} else if (teamMembershipStatus.getHasOpenRequest()) {
+				// display a message saying "your membership request is pending review by team administration"
+				view.showRequestedMessage();
+			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
+				// show request UI
+				if (isSimpleRequestButton) {
+					view.showSimpleRequestButton();
+				} else {
+					view.showRequestButton();
+				}
+			} else if (teamMembershipStatus.getHasUnmetAccessRequirement()) {
+			    // show Join; clicking shows ToU
+				view.showAcceptInviteButton();
+			} else {
+			    // illegal state
+				view.showErrorMessage("Unable to determine state");
+			}
+		} else {
+			view.hideUserPanel();
+			view.showAnonUserButton();
+		}
 	};
 
 	@Override
@@ -138,11 +183,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
 		this.buttonText = descriptor.get(WidgetConstants.JOIN_TEAM_BUTTON_TEXT);
 		this.requestOpenInfoText = descriptor.get(WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT);
-		
-		refresh();
+		refresh(null);
 	}
 	
-	private void refresh() {
+	private void refresh(final Callback refreshedCallback) {
 		boolean isLoggedIn = authenticationController.isLoggedIn();
 		if (isLoggedIn) {
 			synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, isLoggedIn, new AsyncCallback<TeamBundle>() {
@@ -153,7 +197,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					if (result.getTeamMembershipStatus() != null)
 						teamMembershipStatus = result.getTeamMembershipStatus();
 					configure(team.getId(), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
-
+					if (refreshedCallback != null) {
+						refreshedCallback.invoke();
+					}
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -189,8 +235,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					startChallengeSignup();
 				}
 				else { //skip to step 2
-					if (accessRequirements.size() > 0)
+					if (accessRequirements.size() > 0) {
 						view.showJoinWizard();
+					}
 					sendJoinRequestStep2();
 				}
 			}
@@ -367,10 +414,14 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;
-				String message = isAcceptingInvite ? successJoinMessage : "Request Sent";
-				view.showInfo(message, "");
-				refresh();
+				refresh(new Callback() {
+					@Override
+					public void invoke() {
+						String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;
+						String message = isAcceptingInvite || teamMembershipStatus.getIsMember() ? successJoinMessage : "Request Sent";
+						view.showInfo(message, "");
+					}
+				});
 				if (teamUpdatedCallback != null)
 					teamUpdatedCallback.invoke();
 				if (widgetRefreshRequired != null)

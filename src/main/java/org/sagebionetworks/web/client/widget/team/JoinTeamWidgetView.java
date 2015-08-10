@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
@@ -17,7 +16,6 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void configure(boolean isLoggedIn,TeamMembershipStatus teamMembershipStatus, String isMemberMessage, String buttonText, String requestOpenInfoText, boolean isSimpleRequestButton);
 	void showJoinWizard();
 	void hideJoinWizard();
 	
@@ -42,10 +40,22 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	
 	void setButtonsEnabled(boolean enable);
 	
-	public interface Presenter extends SynapsePresenter {
+	public interface Presenter extends SynapsePresenter, IsWidget {
 		public void sendJoinRequest(String message, boolean isAcceptingInvite);
 		//service may be added later to query for current user requests to allow deletion
 //		public void deleteAllJoinRequests();
 		void gotoLoginPage();
 	}
+
+	public void showUserPanel();
+	public void setIsMemberMessage(String htmlEscape);
+	public void showRequestedMessage();
+	public void showSimpleRequestButton();
+	public void showRequestButton();
+	public void showAcceptInviteButton();
+	public void hideUserPanel();
+	public void showAnonUserButton();
+	public void setJoinButtonText(String joinButtonText);
+	public void setRequestOpenText(String requestOpenText);
+	public void showIsMemberMessage();
 }

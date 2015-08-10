@@ -41,7 +41,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.shared.WebConstants;
