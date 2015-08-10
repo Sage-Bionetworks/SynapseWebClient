@@ -62,10 +62,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private SageImageBundle sageImageBundle;
 	
 	private JoinTeamWidgetView.Presenter presenter;
-//	private FlowPanel requestUIPanel;
-//	private Button requestButton, acceptInviteButton, anonymousUserButton, simpleRequestButton;
-//	private HTML requestedMessage;
-//	private TextArea messageArea;
 	private MarkdownWidget wikiPage;
 	private Dialog joinWizard;
 	private FlowPanel currentWizardContent;
