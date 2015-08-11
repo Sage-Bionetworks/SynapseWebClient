@@ -16,7 +16,7 @@
 		        <b:TextArea width="500px" placeholder="Enter message... (optional)" ui:field="messageArea"/>
 		    	<b:Button text="Send request" addStyleNames="margin-top-10" ui:field="sendRequestButton"/>
 		    </b:Collapse>
-		    <bh:Span addStyleNames="alert alert-info inline-block" ui:field="isMemberMessageSpan"/>
+		    <bh:Span addStyleNames="alert alert-info inline-block" ui:field="isMemberMessageSpan" text="Already a member"/>
 		</g:HTMLPanel>
 		<b:Button type="PRIMARY" size="LARGE" ui:field="anonUserButton" visible="false"/>
 	</g:HTMLPanel>

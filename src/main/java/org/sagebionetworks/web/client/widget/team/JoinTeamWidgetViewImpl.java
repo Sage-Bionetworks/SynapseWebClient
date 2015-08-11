@@ -72,7 +72,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private Widget widget;
 		
 	@Inject
-	public JoinTeamWidgetViewImpl(JoinTeamWidgetViewImplUiBinder binder, SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
+	public JoinTeamWidgetViewImpl(JoinTeamWidgetViewImplUiBinder binder, SageImageBundle sageImageBundle,
+			MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.wikiPage = wikiPage;
@@ -89,19 +90,19 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		acceptInviteButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.sendJoinRequest("", true);
+				presenter.sendJoinRequest("");
 			}
 		});		
 		simpleRequestButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.sendJoinRequest("", false);
+				presenter.sendJoinRequest("");
 			}
 		});
 		sendRequestButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.sendJoinRequest(messageArea.getValue(), false);
+				presenter.sendJoinRequest(messageArea.getValue());
 			}
 		});
 	}
@@ -115,8 +116,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	public void clear() {
 		// default button text and state
 		simpleRequestButton.setText("Join");
-		requestOpenMessageSpan.setText("");
-		isMemberMessageSpan.setText("Your request to join this team has been sent.");
+		requestOpenMessageSpan.setText("Your request to join this team has been sent.");
+		isMemberMessageSpan.setText("Already a member");
 		isMemberMessageSpan.setVisible(false);
 		anonUserButton.setVisible(false);
 		acceptInviteButton.setVisible(false);
@@ -125,6 +126,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		requestButton.setVisible(false);
 		userPanel.setVisible(false);
 		requestButton.setVisible(false);
+		requestUIPanel.hide();
 	}
 	
 	private void showAnonymousMessage() {
@@ -303,15 +305,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	public void updateWizardProgress(int currentPage, int totalPages) {
 		progressWidget.configure(currentPage, totalPages);
 	}
-
-	@Override
-	public void showUserPanel() {
-		userPanel.setVisible(true);
-	}
 	
 	@Override
-	public void hideUserPanel() {
-		userPanel.setVisible(false);
+	public void setUserPanelVisible(boolean isVisible) {
+		userPanel.setVisible(isVisible);
 	}
 
 	@Override
@@ -320,28 +317,28 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 
 	@Override
-	public void showRequestedMessage() {
-		requestOpenMessageSpan.setVisible(true);
+	public void setRequestMessageVisible(boolean isVisible) {
+		requestOpenMessageSpan.setVisible(isVisible);
 	}
-
+	
 	@Override
-	public void showSimpleRequestButton() {
-		simpleRequestButton.setVisible(true);
+	public void setSimpleRequestButtonVisible(boolean isVisible) {
+		simpleRequestButton.setVisible(isVisible);
 	}
-
+	
 	@Override
-	public void showRequestButton() {
-		requestButton.setVisible(true);
+	public void setRequestButtonVisible(boolean isVisible) {
+		requestButton.setVisible(isVisible);
 	}
-
+	
 	@Override
-	public void showAcceptInviteButton() {
-		acceptInviteButton.setVisible(true);
+	public void setAcceptInviteButtonVisible(boolean isVisible) {
+		acceptInviteButton.setVisible(isVisible);
 	}
-
+	
 	@Override
-	public void showAnonUserButton() {
-		anonUserButton.setVisible(true);
+	public void setAnonUserButtonVisible(boolean isVisible) {
+		anonUserButton.setVisible(isVisible);
 	}
 
 	@Override
@@ -353,11 +350,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	public void setRequestOpenText(String requestOpenText) {
 		requestOpenMessageSpan.setText(requestOpenText);
 	}
-
-	@Override
-	public void showIsMemberMessage() {
-		isMemberMessageSpan.setVisible(true);
-	}
 	
+	@Override
+	public void setIsMemberMessageVisible(boolean isVisible) {
+		isMemberMessageSpan.setVisible(isVisible);
+	}
 	
 }

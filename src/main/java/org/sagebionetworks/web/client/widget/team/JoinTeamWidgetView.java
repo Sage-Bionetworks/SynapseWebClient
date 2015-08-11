@@ -41,21 +41,20 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	void setButtonsEnabled(boolean enable);
 	
 	public interface Presenter extends SynapsePresenter, IsWidget {
-		public void sendJoinRequest(String message, boolean isAcceptingInvite);
+		public void sendJoinRequest(String message);
 		//service may be added later to query for current user requests to allow deletion
 //		public void deleteAllJoinRequests();
 		void gotoLoginPage();
 	}
 
-	public void showUserPanel();
 	public void setIsMemberMessage(String htmlEscape);
-	public void showRequestedMessage();
-	public void showSimpleRequestButton();
-	public void showRequestButton();
-	public void showAcceptInviteButton();
-	public void hideUserPanel();
-	public void showAnonUserButton();
 	public void setJoinButtonText(String joinButtonText);
 	public void setRequestOpenText(String requestOpenText);
-	public void showIsMemberMessage();
+	void setUserPanelVisible(boolean isVisible);
+	void setRequestMessageVisible(boolean isVisible);
+	void setSimpleRequestButtonVisible(boolean isVisible);
+	void setRequestButtonVisible(boolean isVisible);
+	void setAcceptInviteButtonVisible(boolean isVisible);
+	void setAnonUserButtonVisible(boolean isVisible);
+	void setIsMemberMessageVisible(boolean isVisible);
 }

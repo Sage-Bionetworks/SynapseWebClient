@@ -51,7 +51,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
 	private String message, isMemberMessage, successMessage, buttonText, requestOpenInfoText;
-	private boolean isAcceptingInvite, isSimpleRequestButton;
+	private boolean isSimpleRequestButton;
 	private Callback widgetRefreshRequired;
 	private List<AccessRequirement> accessRequirements;
 	private int currentPage;
@@ -96,7 +96,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.buttonText = null;
 		this.requestOpenInfoText = null;
 		this.widgetRefreshRequired = callback;
-		refresh(null);
+		refresh();
 	}
 	
 	public void configure(String teamId, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, 
@@ -124,36 +124,36 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		// What is joinWizard?
 //		add(joinWizard);
 		if (isLoggedIn) {
-			view.showUserPanel();
+			view.setUserPanelVisible(true);
 			//(note:  in all cases, clicking UI will check for unmet ToU)
 			if (teamMembershipStatus.getIsMember()) {
 				// don't show anything?
 				if (isMemberMessage != null && isMemberMessage.length() > 0) {
-					view.showIsMemberMessage();
+					view.setIsMemberMessageVisible(true);
 				}
 			} else if (teamMembershipStatus.getCanJoin()) { // not in team but can join with a single request
 				// show join button; clicking Join joins the team
-				view.showSimpleRequestButton();
+				view.setSimpleRequestButtonVisible(true);
 			} else if (teamMembershipStatus.getHasOpenRequest()) {
 				// display a message saying "your membership request is pending review by team administration"
-				view.showRequestedMessage();
+				view.setRequestMessageVisible(true);
 			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
 				// show request UI
 				if (isSimpleRequestButton) {
-					view.showSimpleRequestButton();
+					view.setSimpleRequestButtonVisible(true);
 				} else {
-					view.showRequestButton();
+					view.setRequestButtonVisible(true);
 				}
 			} else if (teamMembershipStatus.getHasUnmetAccessRequirement()) {
 			    // show Join; clicking shows ToU
-				view.showAcceptInviteButton();
+				view.setAcceptInviteButtonVisible(true);
 			} else {
 			    // illegal state
 				view.showErrorMessage("Unable to determine state");
 			}
 		} else {
-			view.hideUserPanel();
-			view.showAnonUserButton();
+			view.setUserPanelVisible(false);
+			view.setAnonUserButtonVisible(true);
 		}
 	};
 
@@ -183,10 +183,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
 		this.buttonText = descriptor.get(WidgetConstants.JOIN_TEAM_BUTTON_TEXT);
 		this.requestOpenInfoText = descriptor.get(WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT);
-		refresh(null);
+		refresh();
 	}
 	
-	private void refresh(final Callback refreshedCallback) {
+	private void refresh() {
 		boolean isLoggedIn = authenticationController.isLoggedIn();
 		if (isLoggedIn) {
 			synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, isLoggedIn, new AsyncCallback<TeamBundle>() {
@@ -197,9 +197,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					if (result.getTeamMembershipStatus() != null)
 						teamMembershipStatus = result.getTeamMembershipStatus();
 					configure(team.getId(), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
-					if (refreshedCallback != null) {
-						refreshedCallback.invoke();
-					}
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -212,9 +209,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	}
 	
 	@Override
-	public void sendJoinRequest(String message, boolean isAcceptingInvite) {
+	public void sendJoinRequest(String message) {
 		this.message = message;
-		this.isAcceptingInvite = isAcceptingInvite;
 		sendJoinRequestStep0();
 	}
 	
@@ -414,14 +410,14 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				refresh(new Callback() {
-					@Override
-					public void invoke() {
-						String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;
-						String message = isAcceptingInvite || teamMembershipStatus.getIsMember() ? successJoinMessage : "Request Sent";
-						view.showInfo(message, "");
-					}
-				});
+				if (teamMembershipStatus.getCanJoin()) {
+					refresh();
+				} else {
+					view.showInfo("Request Sent", "");
+				}
+//				refresh();
+//				String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;
+//				String message = isAcceptingInvite ? successJoinMessage : "Request Sent";
 				if (teamUpdatedCallback != null)
 					teamUpdatedCallback.invoke();
 				if (widgetRefreshRequired != null)
