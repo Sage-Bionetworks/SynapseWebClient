@@ -2,12 +2,13 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.Arrays;
 
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -20,7 +21,6 @@ import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-import org.sagebionetworks.repo.model.EntityBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;

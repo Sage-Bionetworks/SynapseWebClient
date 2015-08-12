@@ -2,12 +2,16 @@ package org.sagebionetworks.web.unitclient.widget.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
@@ -15,7 +19,6 @@ import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -28,7 +31,6 @@ import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

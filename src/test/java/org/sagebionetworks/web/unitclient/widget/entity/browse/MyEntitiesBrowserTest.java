@@ -1,20 +1,24 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;

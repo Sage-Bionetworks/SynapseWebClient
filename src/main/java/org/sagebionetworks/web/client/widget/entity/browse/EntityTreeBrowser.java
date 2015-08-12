@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.entity.query.Condition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -292,13 +293,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			return null;
 		EntityType entityType;
 		if (type.startsWith("org."))
-			entityType = EntityType.getEntityTypeForClassName(type);
+			entityType = EntityTypeUtils.getEntityTypeForClassName(type);
 		else
 			entityType = EntityType.valueOf(type.toLowerCase());
 		if (entityType == null)
 			return null;
 		return DisplayUtils.getSynapseIconForEntityClassName(
-				entityType.getClassForType().getName(), DisplayUtils.IconSize.PX16,
+				EntityTypeUtils.getClassForType(entityType).getName(), DisplayUtils.IconSize.PX16,
 				iconsImageBundle);
 	}
 }

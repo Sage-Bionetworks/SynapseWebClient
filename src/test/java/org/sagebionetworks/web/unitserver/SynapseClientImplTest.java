@@ -1993,7 +1993,7 @@ public class SynapseClientImplTest {
 		String tokenTypeName = NotificationTokenType.JoinTeam.name();
 		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
 	}
-	@Test(expected = BadRequestException.class)
+	@Test
 	public void testHandleSignedTokenJoinTeamWrongToken() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.JoinTeam.name();
 		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedNotificationSettingsToken);
@@ -2012,7 +2012,7 @@ public class SynapseClientImplTest {
 		String tokenTypeName = NotificationTokenType.Settings.name();
 		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
 	}
-	@Test(expected = BadRequestException.class)
+	@Test
 	public void testHandleSignedTokenNotificationSettingsWrongToken() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.Settings.name();
 		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
