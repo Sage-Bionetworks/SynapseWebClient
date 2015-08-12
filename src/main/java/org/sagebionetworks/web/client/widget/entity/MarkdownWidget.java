@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -117,7 +116,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	
 	public void loadTableSorters() {
-		GWT.debugger();
 		String id = WidgetConstants.MARKDOWN_TABLE_ID_PREFIX;
 		int i = 0;
 		ElementWrapper table = view.getElementById(id + i);
