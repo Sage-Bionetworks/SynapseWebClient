@@ -32,6 +32,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -334,7 +335,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			}
 			//if there is something to sort
 			if (COLUMN_SORT_TYPE.NONE != sort) {
-				newUri = newUri + "+order+by+%22"+columnName+"%22+"+sort.toString();
+				newUri = newUri.substring(0,newUri.indexOf("+order+by+")) + "+order+by+%22"+columnName+"%22+"+sort.toString();
 			}
 		}
 		return newUri;
