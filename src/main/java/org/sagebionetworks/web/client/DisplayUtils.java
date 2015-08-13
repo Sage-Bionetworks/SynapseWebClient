@@ -128,6 +128,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class DisplayUtils {
 	private static DateTimeFormat prettyFormat = null; 
@@ -976,7 +977,7 @@ public class DisplayUtils {
 	public static enum IconSize { PX16, PX24 };
 	
 	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		String className = type == null ? null : type.getEntityTypeClassName();		
+		String className = type == null ? null : EntityTypeUtils.getEntityTypeClassName(type);		
 		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
 	}
 

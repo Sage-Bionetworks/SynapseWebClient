@@ -34,6 +34,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {
@@ -292,13 +293,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			return null;
 		EntityType entityType;
 		if (type.startsWith("org."))
-			entityType = EntityType.getEntityTypeForClassName(type);
+			entityType = EntityTypeUtils.getEntityTypeForClassName(type);
 		else
 			entityType = EntityType.valueOf(type.toLowerCase());
 		if (entityType == null)
 			return null;
 		return DisplayUtils.getSynapseIconForEntityClassName(
-				entityType.getClassForType().getName(), DisplayUtils.IconSize.PX16,
+				EntityTypeUtils.getClassForType(entityType).getName(), DisplayUtils.IconSize.PX16,
 				iconsImageBundle);
 	}
 }
