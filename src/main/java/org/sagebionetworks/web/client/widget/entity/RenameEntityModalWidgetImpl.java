@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 /**
@@ -90,7 +91,7 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	@Override
 	public void onRename(Entity toRename, Callback handler) {
 		this.handler = handler;
-		String typeName = typeName = toRename.getEntityType();
+		String typeName = typeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(toRename.getClass()));
 		this.toRename = toRename;
 		this.startingName = toRename.getName();
 		this.view.clear();
