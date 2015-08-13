@@ -227,6 +227,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
@@ -251,8 +253,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -347,8 +347,8 @@ import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxViewImpl;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
@@ -479,6 +479,8 @@ import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditorView;
+import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditorViewImpl;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
@@ -575,7 +577,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//GWT utility methods
 		bind(GWTWrapperImpl.class).in(Singleton.class);
-		bind(GWTWrapper.class).to(GWTWrapperImpl.class);		
+		bind(GWTWrapper.class).to(GWTWrapperImpl.class);
+		bind(GWTTimer.class).to(GWTTimerImpl.class);
 		
 		//RequestBuilder
 		bind(RequestBuilderWrapperImpl.class).in(Singleton.class);
@@ -805,7 +808,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class);
 		
 		// User Suggest Box
-		bind(UserGroupSuggestBoxView.class).to(UserGroupSuggestBoxViewImpl.class);
+		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
 
 		// Home Search Box
 		bind(HomeSearchBoxViewImpl.class).in(Singleton.class);
@@ -1068,6 +1071,10 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//Request Team membership widget
 		bind(JoinTeamWidgetView.class).to(JoinTeamWidgetViewImpl.class);
+		
+		//Join Team Button Config widget
+		bind(JoinTeamConfigEditorView.class).to(JoinTeamConfigEditorViewImpl.class);
+		
 		//Submit to evaluation widget
 		bind(SubmitToEvaluationWidgetView.class).to(SubmitToEvaluationWidgetViewImpl.class);
 		//Team renderer

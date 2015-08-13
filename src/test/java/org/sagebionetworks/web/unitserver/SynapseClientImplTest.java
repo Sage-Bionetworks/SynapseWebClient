@@ -440,8 +440,8 @@ public class SynapseClientImplTest {
 
 		sentMessage = new MessageToUser();
 		sentMessage.setId("987");
-		when(
-				mockSynapse.sendMessage(any(MessageToUser.class))).thenReturn(sentMessage);
+		when(mockSynapse.sendMessage(any(MessageToUser.class))).thenReturn(sentMessage);
+		when(mockSynapse.sendMessage(any(MessageToUser.class), anyString())).thenReturn(sentMessage);
 
 		// getMyProjects getUserProjects
 		PaginatedResults headers = new PaginatedResults<ProjectHeader>();
@@ -1505,6 +1505,12 @@ public class SynapseClientImplTest {
 		assertFalse(bundle2.getIsTeamAdmin());
 		assertEquals(profile2, bundle2.getUserProfile());
 	}
+	
+	@Test
+	public void testIsTeamMember() throws NumberFormatException, RestServiceException, SynapseException {
+		synapseClient.isTeamMember(entityId, Long.valueOf(teamA.getId()));
+		verify(mockSynapse).getTeamMembershipStatus(teamA.getId(), entityId);
+	}
 
 	@Test
 	public void testGetEntityHeaderBatch() throws SynapseException,
@@ -1535,6 +1541,27 @@ public class SynapseClientImplTest {
 		MessageToUser toSendMessage = arg.getValue();
 		assertEquals(subject, toSendMessage.getSubject());
 		assertEquals(recipients, toSendMessage.getRecipients());
+		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
+	}
+	
+	@Test
+	public void testSendMessageToEntityOwner() throws SynapseException,
+			RestServiceException, JSONObjectAdapterException {
+		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor
+				.forClass(MessageToUser.class);
+		ArgumentCaptor<String> entityIdCaptor = ArgumentCaptor
+				.forClass(String.class);
+		
+		String subject = "The Mathematics of Quantum Neutrino Fields";
+		String messageBody = "Atoms are not to be trusted, they make up everything";
+		String hostPageBaseURL = "http://localhost/Portal.html";
+		String entityId = "syn98765";
+		synapseClient.sendMessageToEntityOwner(entityId, subject, messageBody, hostPageBaseURL);
+		verify(mockSynapse).uploadToFileHandle(any(byte[].class), eq(SynapseClientImpl.HTML_MESSAGE_CONTENT_TYPE));
+		verify(mockSynapse).sendMessage(arg.capture(), entityIdCaptor.capture());
+		MessageToUser toSendMessage = arg.getValue();
+		assertEquals(subject, toSendMessage.getSubject());
+		assertEquals(entityId, entityIdCaptor.getValue());
 		assertTrue(toSendMessage.getNotificationUnsubscribeEndpoint().startsWith(hostPageBaseURL));
 	}
 

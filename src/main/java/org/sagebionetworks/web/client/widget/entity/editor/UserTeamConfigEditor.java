@@ -17,7 +17,6 @@ public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, Widge
 	@Inject
 	public UserTeamConfigEditor(UserTeamConfigView view) {
 		this.view = view;
-		view.setPresenter(this);
 		view.initView();
 	}
 	@Override
@@ -60,7 +59,5 @@ public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, Widge
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-	/*
-	 * Private Methods
-	 */
+
 }

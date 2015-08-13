@@ -30,6 +30,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -109,6 +110,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		markdownWidget.clear();
 		breadcrumb.clear();
 		wikiSubpages.clearState();
+		view.hideCreatedModified();
 	}
 
 	@Override
@@ -159,15 +161,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					@Override
 					public void onSuccess(WikiPage result) {
 						try {
-							currentPage = result;
+							updateCurrentPage(result);
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							wikiKey.setWikiPageId(currentPage.getId());							
-							resetWikiMarkdown(currentPage.getMarkdown());
-							configureWikiTitle(isRootWiki, currentPage.getTitle());
-							configureHistoryWidget(canEdit);
 							configureBreadcrumbs(isRootWiki, ownerObjectName);
 							configureWikiSubpagesWidget(isEmbeddedInOwnerPage);	
-							configureCreatedModifiedBy();
 							view.hideLoading();
 						} catch (Exception e) {
 							onFailure(e);
@@ -226,6 +223,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		};
 		historyWidget.configure(wikiKey, canEdit, actionHandler);
 		view.setWikiHistoryWidget(historyWidget);
+		view.showWikiHistory(true);
+		view.hideHistoryCollapse();
 	}
 	
 	@Override
@@ -374,6 +373,15 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		});
 	}
 	
+	private void updateCurrentPage(WikiPage result) {
+		currentPage = result;
+		boolean isRootWiki = currentPage.getParentWikiId() == null;
+		wikiKey.setWikiPageId(currentPage.getId());
+		resetWikiMarkdown(currentPage.getMarkdown());
+		configureWikiTitle(isRootWiki, currentPage.getTitle());
+		configureHistoryWidget(canEdit);
+		configureCreatedModifiedBy();
+	}
 	@Override
 	public void reloadWikiPage() {
 		synapseAlert.clear();
@@ -384,11 +392,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 					view.hideDiffVersionAlert();
 					isCurrentVersion = true;
 					final boolean isRootWiki = result.getParentWikiId() == null;
-					currentPage = result;
-					wikiKey.setWikiPageId(result.getId());
-					resetWikiMarkdown(result.getMarkdown());
-					configureWikiTitle(isRootWiki, result.getTitle());
-					configureHistoryWidget(canEdit);
+					updateCurrentPage(result);
 					setOwnerObjectName(new CallbackP<String>() {
 						@Override
 						public void invoke(String param) {
@@ -421,7 +425,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		if (isEmbeddedInOwnerPage) {
 			view.hideMarkdown();
 			view.hideHistory();
-			view.hideCreatedModified();
+			
 			if (caught instanceof NotFoundException) {
 				if (canEdit) {
 					view.showNoWikiCanEditMessage();

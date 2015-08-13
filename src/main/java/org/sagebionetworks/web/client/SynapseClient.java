@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
@@ -44,7 +43,6 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
-import org.sagebionetworks.repo.model.file.UploadDestinationLocation;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -388,6 +386,9 @@ public interface SynapseClient extends RemoteService {
 
 	public String sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL) throws RestServiceException;
 	
+	public String sendMessageToEntityOwner(String entityId, String subject, String messageBody, String hostPageBaseURL)
+			throws RestServiceException;
+	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
 	
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
@@ -539,4 +540,7 @@ public interface SynapseClient extends RemoteService {
 	LogEntry hexDecodeLogEntry(String encodedLogEntry);
 
 	String hexEncodeLogEntry(LogEntry logEntry);
+
+	Boolean isTeamMember(String userId, Long groupPrincipalId)
+			throws RestServiceException;
 }

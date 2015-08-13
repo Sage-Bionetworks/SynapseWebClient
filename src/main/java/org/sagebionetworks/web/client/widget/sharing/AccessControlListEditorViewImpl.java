@@ -11,9 +11,9 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -23,6 +23,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -172,9 +173,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(toolTipAndCreateAclButton);
 			} else {
 				// Configure AddPeopleToAclPanel.
-				CallbackP<UserGroupSuggestion> addPersonCallback = new CallbackP<UserGroupSuggestion>() {
+				CallbackP<SynapseSuggestion> addPersonCallback = new CallbackP<SynapseSuggestion>() {
 					@Override
-					public void invoke(UserGroupSuggestion param) {
+					public void invoke(SynapseSuggestion param) {
 						addPersonToAcl(param);
 					}
 				};
@@ -259,9 +260,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		showErrorMessage(message);
 	}
 	
-	private void addPersonToAcl(UserGroupSuggestion selectedUser) {
-		if(selectedUser != null) {
-			String principalIdStr = selectedUser.getHeader().getOwnerId();
+	private void addPersonToAcl(SynapseSuggestion suggestion) {
+		if(suggestion != null) {
+			SynapseSuggestion selectedUser = suggestion;
+			String principalIdStr = selectedUser.getId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			presenter.setAccess(principalId, PermissionLevel.CAN_VIEW);

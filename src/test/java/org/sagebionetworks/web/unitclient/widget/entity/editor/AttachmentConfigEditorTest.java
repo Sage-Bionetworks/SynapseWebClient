@@ -39,6 +39,7 @@ public class AttachmentConfigEditorTest {
 	String testFileName = "testing.txt";
 	String testAttachmentName = "attachment1.png";
 	String fileHandleId = "222";
+	double fileSize = 10;
 	DialogCallback mockCallback;
 	CallbackP<FileUpload> mockFinishedUploadingCallback;
 	FileMetadata[] mockMetadata;
@@ -53,7 +54,7 @@ public class AttachmentConfigEditorTest {
 		mockCallback = mock(DialogCallback.class);
 		mockAttachments = mock(WikiAttachments.class);
 		editor = new AttachmentConfigEditor(mockView,mockFileInputWidget, mockAttachments);
-		mockMetadata = new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType())};
+		mockMetadata = new FileMetadata[]{new FileMetadata(testFileName, ContentTypeDelimiter.TEXT.getContentType(), fileSize)};
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(mockMetadata);
 		when(mockView.isNewAttachment()).thenReturn(true);
 		when(mockAttachments.isValid()).thenReturn(true);

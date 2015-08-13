@@ -123,4 +123,8 @@ public class Dialog extends Composite {
 	public void hide() {
 		modal.hide();
 	}
+	
+	public void addStyleName(String style) {
+		modal.addStyleName(style);
+	}
 }

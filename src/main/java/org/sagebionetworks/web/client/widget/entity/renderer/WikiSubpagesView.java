@@ -29,7 +29,8 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	public void configure(List<V2WikiHeader> wikiHeaders, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
 							String ownerObjectName, Place ownerObjectLink,
 							WikiPageKey curWikiKey, boolean isEmbeddedOwnerPage,
-							UpdateOrderHintCallback updateOrderHintCallback);
+							UpdateOrderHintCallback updateOrderHintCallback,
+							CallbackP<WikiPageKey> wikiPageCallback);
 	
 	void hideSubpages();
 	void showSubpages();
@@ -41,9 +42,6 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
-		public CallbackP<WikiPageKey> getReloadWikiPageCallback();
-
 		void configure(WikiPageKey wikiKey, Callback widgetRefreshRequired,
 				boolean embeddedInOwnerPage,
 				CallbackP<WikiPageKey> reloadWikiPageCallback);

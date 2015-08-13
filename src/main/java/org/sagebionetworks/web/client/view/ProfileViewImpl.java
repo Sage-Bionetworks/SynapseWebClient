@@ -237,7 +237,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private SageImageBundle sageImageBundle;
 	
 	//View profile widgets
-	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-150 lightGreyText"));
+	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
 	
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -884,5 +884,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setGetCertifiedVisible(boolean isVisible) {
 		getCertifiedAlert.setVisible(isVisible);	
+	}
+	@Override
+	public void setSynapseEmailVisible(boolean isVisible) {
+		synapseEmailField.setVisible(isVisible);
 	}
 }

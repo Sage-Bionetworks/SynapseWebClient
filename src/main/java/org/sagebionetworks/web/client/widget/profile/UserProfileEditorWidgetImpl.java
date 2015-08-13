@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
@@ -12,7 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
-	
+	public static final double MAX_IMAGE_SIZE = ClientProperties.MB * 5; //5MB
 	public static final String PLEASE_ENTER_A_VALID_URL = "Please enter a valid URL";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
 	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
@@ -62,7 +63,9 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 				setNewFileHandle(fileUploaded.getFileHandleId());
 			}
 		});
-		fileHandleUploadWidget.setValidation(new ImageFileValidator());
+		ImageFileValidator imageValidator = new ImageFileValidator();
+		imageValidator.setMaxSize(MAX_IMAGE_SIZE);
+		fileHandleUploadWidget.setValidation(imageValidator);
 	}
 
 	@Override
@@ -72,7 +75,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		boolean valid = true;
 		// username
 		String username = view.getUsername();
-		if (!LoginPresenter.isValidUsername(username)) {
+		if (!ValidationUtils.isValidUsername(username)) {
 			valid = false;
 			if(username.length() < 3){
 				view.showUsernameError(MUST_BE_AT_LEAST_3_CHARACTERS);
@@ -83,7 +86,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		// link
 		String link = view.getLink();
 		if(link != null && !"".equals(link.trim())){
-			if(!LoginPresenter.isValidUrl(link, true)){
+			if(!ValidationUtils.isValidUrl(link, true)){
 				valid = false;
 				view.showLinkError(PLEASE_ENTER_A_VALID_URL);
 			}

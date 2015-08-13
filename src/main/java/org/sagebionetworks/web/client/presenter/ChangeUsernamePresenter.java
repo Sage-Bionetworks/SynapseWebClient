@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ChangeUsernameView;
@@ -64,7 +65,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 		UserProfile profile = authController.getCurrentUserSessionData().getProfile();
 		if (profile != null) {
 			//quick check to see if it's valid.
-			if (LoginPresenter.isValidUsername(newUsername)) {
+			if (ValidationUtils.isValidUsername(newUsername)) {
 				profile.setUserName(newUsername);
 				
 				AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
