@@ -390,6 +390,27 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
+	public void testColumnConfigClickedSorting() {
+		String inputUri = ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+project";
+		APITableConfig tableConfig = getTableConfig();
+		tableConfig.setUri(inputUri);
+		widget.setTableConfig(tableConfig);
+		List<APITableColumnConfig> sortColumnConfigs = tableConfig.getColumnConfigs();
+		sortColumnConfigs.get(0).setSort(COLUMN_SORT_TYPE.NONE);
+		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
+		widget.columnConfigClicked(sortColumnConfigs.get(0));
+		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(inputUri.contains("order+by+"));
+		assertTrue(inputUri.contains("desc"));
+		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
+		widget.columnConfigClicked(sortColumnConfigs.get(1));
+		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(inputUri.contains("order+by+"));
+		assertTrue(inputUri.contains("asc"));
+		assertFalse(inputUri.contains("desc"));
+	}
+	
+	@Test
 	public void testGuessRendererFriendlyName() {
 		APITableConfig tableConfig = getTableConfig();
 		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(null, tableConfig));

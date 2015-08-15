@@ -332,6 +332,9 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					}
 				}
 			}
+			if (newUri.contains("+order+by+")) {
+				newUri = newUri.substring(0, newUri.indexOf("+order+by+"));
+			}
 			//if there is something to sort
 			if (COLUMN_SORT_TYPE.NONE != sort) {
 				newUri = newUri + "+order+by+%22"+columnName+"%22+"+sort.toString();
@@ -526,7 +529,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		}
 		return colValues;
 	}
+	
+	// for testing only
+	public void setTableConfig(APITableConfig tableConfig) {
+		this.tableConfig = tableConfig;
+	}
+
 		/*
 	 * Private Methods
 	 */
+	
 }
