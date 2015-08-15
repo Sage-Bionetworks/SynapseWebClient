@@ -529,6 +529,12 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		}
 		return colValues;
 	}
+	
+	// for testing only
+	public void setTableConfig(APITableConfig tableConfig) {
+		this.tableConfig = tableConfig;
+	}
+	
 		/*
 	 * Private Methods
 	 */
