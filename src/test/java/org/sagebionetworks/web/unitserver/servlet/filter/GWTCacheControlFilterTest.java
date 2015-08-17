@@ -41,7 +41,7 @@ public class GWTCacheControlFilterTest {
 	}
 	
 	@Test
-	public void testDoFilterMaxCache() throws IOException, ServletException {
+	public void testDoFilterCacheForeverFiles() throws IOException, ServletException {
 		when(mockRequest.getRequestURI()).thenReturn("1.cache.js");
 		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
 		
@@ -51,7 +51,7 @@ public class GWTCacheControlFilterTest {
 	}
 	
 	@Test
-	public void testDoFilterShortCache() throws IOException, ServletException {
+	public void testDoFilterCacheOtherFiles() throws IOException, ServletException {
 		when(mockRequest.getRequestURI()).thenReturn("image.jpg");
 		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
 		

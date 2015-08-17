@@ -33,13 +33,13 @@ public class GWTCacheControlFilter implements Filter {
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
 		long now = new Date().getTime();
 		if (requestURI.contains(".cache.")) {
-			//cache for a long time
+			//safe to cache forever
 			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
 			httpResponse.setHeader("Cache-Control", "max-age=31536000"); //a year
 			httpResponse.setDateHeader("Date", now);
 		}
 		else if (!requestURI.contains(".nocache.") && !requestURI.contains("portal.html")) {
-			//cache for a shorter time
+			//cache for a day
 			httpResponse.setHeader("Cache-Control", "max-age=86400"); //24 hours
 			httpResponse.setDateHeader("Date", now);
 		} else {
