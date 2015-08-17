@@ -29,17 +29,22 @@ public class GWTCacheControlFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
+		long now = new Date().getTime();
 		if (requestURI.contains(".cache.")) {
-			HttpServletResponse httpResponse = (HttpServletResponse) response;
+			//cache for a long time
 			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
-			httpResponse.setHeader("Cache-Control", "max-age=86400");
-			httpResponse.setDateHeader("Date", new Date().getTime());
+			httpResponse.setHeader("Cache-Control", "max-age=31536000"); //a year
+			httpResponse.setDateHeader("Date", now);
 		}
 		else if (!requestURI.contains(".nocache.") && !requestURI.contains("portal.html")) {
+			//cache for a shorter time
+			httpResponse.setHeader("Cache-Control", "max-age=86400"); //24 hours
+			httpResponse.setDateHeader("Date", now);
+		} else {
+			//do not cache
 			//http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
-			long now = new Date().getTime();
-			HttpServletResponse httpResponse = (HttpServletResponse) response;
 			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 			httpResponse.setHeader("Cache-Control", "max-age=0");
 			httpResponse.setHeader("Cache-Control", "no-cache");
