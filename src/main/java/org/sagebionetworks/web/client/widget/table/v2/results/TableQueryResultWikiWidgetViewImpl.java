@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
