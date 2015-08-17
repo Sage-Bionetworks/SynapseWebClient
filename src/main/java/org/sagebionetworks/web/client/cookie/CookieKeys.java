@@ -34,6 +34,12 @@ public class CookieKeys {
 	 * Last Place in the app
 	 */
 	public static String LAST_PLACE = "org.sagebionetworks.synapse.place.last.place";
+	
+	/**
+	 * Synapse portal version
+	 */
+	public static String LOADED_VERSIONS = "org.sagebionetworks.loaded.synapse.version";
+
 
 	/**
 	 * Current Place in the app

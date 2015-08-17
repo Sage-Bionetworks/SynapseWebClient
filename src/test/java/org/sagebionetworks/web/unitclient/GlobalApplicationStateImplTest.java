@@ -69,6 +69,7 @@ public class GlobalApplicationStateImplTest {
 		mockLogger = mock(ClientLogger.class);
 		mockView = mock(GlobalApplicationStateView.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		when(mockCookieProvider.getCookie(CookieKeys.LOADED_VERSIONS)).thenReturn("v1");
 		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
@@ -172,6 +173,9 @@ public class GlobalApplicationStateImplTest {
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		assertEquals(value, globalApplicationState.getSynapseProperty(key));
 		assertNull(globalApplicationState.getSynapseProperty("foo"));
+		//also sets synapse versions on app load
+		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockCookieProvider).setCookie(CookieKeys.LOADED_VERSIONS, "v1");
 		verify(mockCallback).invoke();
 	}
 	
