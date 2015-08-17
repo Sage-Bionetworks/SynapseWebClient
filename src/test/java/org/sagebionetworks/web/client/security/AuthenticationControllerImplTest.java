@@ -84,6 +84,8 @@ public class AuthenticationControllerImplTest {
 		
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("");
 		assertFalse(authenticationController.isLoggedIn());
+		
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.USER_LOGGED_IN_RECENTLY), anyString(), any(Date.class));
 	}
 	@Test
 	public void testReloadUserSessionDataFailure() {

@@ -741,9 +741,9 @@ public class SynapseClientImplTest {
 				.thenReturn(headerTreeResults);
 		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
 		verify(mockSynapse).getWikiHeaderTree(anyString(),
-				any(ObjectType.class));
+				eq(ObjectType.ENTITY));
 	}
-
+	
 	@Test
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();

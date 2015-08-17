@@ -69,6 +69,8 @@ import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.view.SignedTokenViewImpl;
+import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
+import org.sagebionetworks.web.client.view.SynapseStandaloneWikiViewImpl;
 import org.sagebionetworks.web.client.view.SynapseWikiView;
 import org.sagebionetworks.web.client.view.SynapseWikiViewImpl;
 import org.sagebionetworks.web.client.view.TeamSearchView;
@@ -77,12 +79,12 @@ import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
-import org.sagebionetworks.web.client.view.WikiView;
-import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
+import org.sagebionetworks.web.client.view.users.RegisterWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProvider;
 import org.sagebionetworks.web.client.widget.asynch.AsynchTableFileHandleProviderSingleton;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -109,7 +111,6 @@ import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -636,6 +637,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RegisterAccountViewImpl.class).in(Singleton.class);
 		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class);
 
+		bind(RegisterWidgetView.class).to(RegisterWidgetViewImpl.class);
+
 		// ProfileView
 		bind(ProfileViewImpl.class).in(Singleton.class);
 		bind(ProfileView.class).to(ProfileViewImpl.class);		
@@ -660,10 +663,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SearchViewImpl.class).in(Singleton.class);
 		bind(SearchView.class).to(SearchViewImpl.class);
 
-		// WikiView
-		bind(WikiViewImpl.class).in(Singleton.class);
-		bind(WikiView.class).to(WikiViewImpl.class);
-		
 		// Down
 		bind(DownViewImpl.class).in(Singleton.class);
 		bind(DownView.class).to(DownViewImpl.class);
@@ -943,8 +942,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
 		
-		bind(EntityIconsCache.class).in(Singleton.class);
-		
 		bind(EntityBadgeView.class).to(EntityBadgeViewImpl.class);
 		
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);
@@ -1115,6 +1112,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class);
 		
 		bind(FileHistoryRowView.class).to(FileHistoryRowViewImpl.class);
+		bind(SynapseStandaloneWikiView.class).to(SynapseStandaloneWikiViewImpl.class);
 		
 		bind(SynapseAlertView.class).to(SynapseAlertViewImpl.class);
 		bind(SynapseAlert.class).to(SynapseAlertImpl.class);

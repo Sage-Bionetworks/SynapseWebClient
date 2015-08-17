@@ -451,6 +451,12 @@ public class ProvUtilsTest {
 			public void initOnPopStateHandler() {
 				// TODO Auto-generated method stub
 			}
+			@Override
+			public void showTwitterFeed(String dataWidgetId, String elementId,
+					String linkColor, String borderColor, int height) {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 }

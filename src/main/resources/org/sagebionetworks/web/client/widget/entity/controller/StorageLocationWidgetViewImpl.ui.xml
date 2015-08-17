@@ -24,11 +24,11 @@
 						<b:InputGroup width="100%">
 							<b:InputGroupButton>
 								<b:Button ui:field="externalS3BannerDropdownButton"
-									dataToggle="DROPDOWN" height="34px" />
+									dataToggle="DROPDOWN" height="28px" />
 								<b:DropDownMenu ui:field="externalS3BannerOptions">
 								</b:DropDownMenu>
 							</b:InputGroupButton>
-							<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize " />
+							<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
 						</b:InputGroup>
 				     	
 					</bh:Div>
@@ -40,11 +40,11 @@
 						<b:InputGroup width="100%">
 							<b:InputGroupButton>
 								<b:Button ui:field="sftpBannerDropdownButton" dataToggle="DROPDOWN"
-									height="34px" />
+									height="28px" />
 								<b:DropDownMenu ui:field="sftpBannerOptions">
 								</b:DropDownMenu>
 							</b:InputGroupButton>
-							<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize " />
+							<b:TextBox ui:field="sftpBannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
 						</b:InputGroup>
 				    </bh:Div>
 			    </b:FormGroup>

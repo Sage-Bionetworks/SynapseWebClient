@@ -36,8 +36,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private LoginView view;
 	private EventBus bus;
 	private AuthenticationController authenticationController;
-	private String openIdActionUrl;
-	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	
@@ -57,23 +55,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		
 	}
 	
-	public static final String LOGIN_PLACE  = "LoginPlace";
-
 	@Override
 	public void setPlace(final LoginPlace place) {
 		this.loginPlace = place;
 		view.setPresenter(this);
 		view.clear();
-		openIdActionUrl = WebConstants.OPEN_ID_URI;
-		// note, this is now a relative URL
-		openIdReturnUrl = synapseJSNIUtils.getLocationPath()+synapseJSNIUtils.getLocationQueryString()+"#!"+LOGIN_PLACE; 
 		showView(place);
 	}
 	
-	public String getOpenIdReturnUrl() {
-		return openIdReturnUrl;
-	}
-
 	public void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
@@ -86,7 +75,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} else if (WebConstants.OPEN_ID_ERROR_TOKEN.equals(token)) {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 			view.showErrorMessage(DisplayConstants.SSO_ERROR_UNKNOWN);
-			view.showLogin(openIdActionUrl, openIdReturnUrl);
+			view.showLogin();
 		} else if (LoginPlace.CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
 			//go to the change username page
 			gotoChangeUsernamePlace();
@@ -97,7 +86,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			revalidateSession(token);
 		} else {
 			// standard view
-			view.showLogin(openIdActionUrl, openIdReturnUrl);
+			view.showLogin();
 		}
 	}
 	
@@ -157,7 +146,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			public void onFailure(Throwable t) {
 				if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
 					view.showErrorMessage("An error occurred. Please try logging in again.");
-				view.showLogin(openIdActionUrl, openIdReturnUrl);									
+				view.showLogin();									
 			}
 		});
 	}
@@ -167,7 +156,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		//the user should be logged in now.
 		if (!authenticationController.isLoggedIn()) {
 			view.showErrorMessage("An error occurred during login. Please try logging in again.");
-			view.showLogin(openIdActionUrl, openIdReturnUrl);
+			view.showLogin();
 		} else {
 			checkForTempUsername();	
 		}
@@ -192,7 +181,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 										@Override
 										public void onFailure(Throwable caught) {
 											view.showErrorMessage("An error occurred. Please try logging in again.");
-											view.showLogin(openIdActionUrl, openIdReturnUrl);
+											view.showLogin();
 										}
 
 										@Override
@@ -205,7 +194,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												public void onFailure(
 														Throwable caught) {
 													view.showErrorMessage("An error occurred. Please try logging in again.");
-													view.showLogin(openIdActionUrl, openIdReturnUrl);
+													view.showLogin();
 												}
 
 												@Override
@@ -227,7 +216,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 										@Override
 										public void onFailure(Throwable caught) {
 											view.showErrorMessage("An error occurred. Please try logging in again.");
-											view.showLogin(openIdActionUrl, openIdReturnUrl);
+											view.showLogin();
 										}
 
 										@Override
@@ -247,11 +236,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				@Override
 				public void onFailure(Throwable caught) {
 					if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
-						view.showLogin(openIdActionUrl, openIdReturnUrl);
+						view.showLogin();
 						return;
 					}
 					view.showErrorMessage("An error occurred. Please try logging in again.");
-					view.showLogin(openIdActionUrl, openIdReturnUrl);
+					view.showLogin();
 				}
 			};
 			

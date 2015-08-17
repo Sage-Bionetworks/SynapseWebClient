@@ -6,7 +6,6 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<g:HTMLPanel>
-        <div class="color-line"></div>
         <div class="clear"></div>
 		<g:SimplePanel ui:field="header" />
         <div class="separator margin-top-10-imp"></div>

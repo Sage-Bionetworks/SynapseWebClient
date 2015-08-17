@@ -24,10 +24,11 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.ProjectAreaState;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
+public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter, IsWidget  {
 
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
@@ -355,4 +356,5 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
+
 }

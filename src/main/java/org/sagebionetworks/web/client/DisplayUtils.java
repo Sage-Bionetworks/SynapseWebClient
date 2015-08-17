@@ -32,6 +32,7 @@ import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
@@ -974,18 +975,6 @@ public class DisplayUtils {
 		return "<a href=\"" + DisplayUtils.getSynapseHistoryToken(id) + "\">" + display + "</a>";
 	}
 	
-	public static enum IconSize { PX16, PX24 };
-	
-	public static ImageResource getSynapseIconForEntityType(EntityType type, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		String className = type == null ? null : EntityTypeUtils.getEntityTypeClassName(type);		
-		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
-	}
-
-	public static ImageResource getSynapseIconForEntity(Entity entity, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		String className = entity == null ? null : entity.getClass().getName();
-		return getSynapseIconForEntityClassName(className, iconSize, iconsImageBundle);
-	}
-	
 	/**
 	 * Create a loading panel with a centered spinner.
 	 * 
@@ -1015,31 +1004,35 @@ public class DisplayUtils {
 		return panel;
 	}
 	
-	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {
-		ImageResource icon = null;
+	public static IconType getIconTypeForEntity(Entity entity) {
+		String className = entity == null ? null : entity.getClass().getName();
+		return getIconTypeForEntityClassName(className);
+	}
+	
+	public static IconType getIconTypeForEntityClassName(String className) {
+		// default
+		IconType icon = IconType.FILE_O;
+		
 		if(Link.class.getName().equals(className)) {
-			icon = iconsImageBundle.synapseLink16();
+			icon = IconType.LINK;
 		} else if(Folder.class.getName().equals(className)) {
 			// Folder
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFolder16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFolder24();			
+			icon = IconType.FOLDER;
 		} else if(FileEntity.class.getName().equals(className)) {
 			// File
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseFile16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseFile24();			
+			icon = IconType.FILE_O;			
 		} else if(Project.class.getName().equals(className)) {
 			// Project
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseProject16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseProject24();			
+			icon = IconType.LIST_ALT;
 		} else if(TableEntity.class.getName().equals(className)) {
 			// TableEntity
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
-		} else {
-			// default to Model
-			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
-			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseModel24();			
+			icon = IconType.TABLE;
 		}
+		return icon;
+	}
+	public static Icon getSynapseIconForEntityClassName(String className, IconSize iconSize) {
+		Icon icon = new Icon(getIconTypeForEntityClassName(className));
+		icon.setSize(iconSize);
 		return icon;
 	}
 	
@@ -1208,9 +1201,6 @@ public class DisplayUtils {
 		}
 	}-*/;
 
-	public static native void setWindowTarget(JavaScriptObject window, String target)/*-{
-    	window.location = target;
-		}-*/;
 	/**
 	 * links in the wiki pages that reference other wiki pages don't include the domain.  this method adds the domain.
 	 * @param html

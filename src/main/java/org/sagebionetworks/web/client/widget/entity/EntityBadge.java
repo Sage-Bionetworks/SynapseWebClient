@@ -3,9 +3,14 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -20,7 +25,6 @@ import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,7 +33,6 @@ import com.google.inject.Inject;
 public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPresenter {
 	
 	private EntityBadgeView view;
-	private EntityIconsCache iconsCache;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
 	private EntityQueryResult entityHeader;
@@ -39,14 +42,12 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
-			EntityIconsCache iconsCache,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			UserBadge modifiedByUserBadge,
 			SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
-		this.iconsCache = iconsCache;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -59,7 +60,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	public void configure(EntityQueryResult header) {
 		entityHeader = header;
 		view.setEntity(header);
-		
+		view.setIcon(getIconTypeForEntityType(header.getEntityType()));
 		if (header.getModifiedByPrincipalId() != null) {
 			modifiedByUserBadge.configure(header.getModifiedByPrincipalId().toString());
 			view.setModifiedByWidgetVisible(true);
@@ -75,18 +76,29 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+
+	public static IconType getIconTypeForEntityType(String entityType) {
+		String className = FileEntity.class.getName();
+		if (entityType != null) {
+			if (entityType.equalsIgnoreCase("file")) {
+				className = FileEntity.class.getName();
+			} else if (entityType.equalsIgnoreCase("folder")) {
+				className = Folder.class.getName();
+			} else if (entityType.equalsIgnoreCase("project")) {
+				className = Project.class.getName();
+			} else if (entityType.equalsIgnoreCase("table")) {
+				className = TableEntity.class.getName();
+			}
+		}
+		return DisplayUtils.getIconTypeForEntityClassName(className);
+	}
+	
 	public void clearState() {
 	}
 
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
-	}
-	
-	@Override
-	public ImageResource getIconForType(String type) {
-		return iconsCache.getIconForType(type);
 	}
 	
 	@Override

@@ -20,7 +20,6 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
-import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -128,10 +127,6 @@ public class PortalServletModule extends ServletModule {
 		bind(JiraClientImpl.class).in(Singleton.class);
 		serve("/Portal/jira").with(JiraClientImpl.class);
 		bind(JiraJavaClient.class).to(JiraJavaClientImpl.class);
-		
-		// Setup the Rss service mapping
-		bind(RssServiceImpl.class).in(Singleton.class);
-		serve("/Portal/rss").with(RssServiceImpl.class);
 		
 		// OAuth2 
 		bind(OAuth2Servlet.class).in(Singleton.class);

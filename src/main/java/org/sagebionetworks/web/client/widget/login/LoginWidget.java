@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
@@ -22,6 +23,9 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseJSNIUtils synapseJsniUtils;
+	
+	public static final String LOGIN_PLACE  = "LoginPlace";
+	
 	@Inject
 	public LoginWidget(LoginWidgetView view, AuthenticationController controller, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils) {
 		this.view = view;
@@ -29,6 +33,9 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		this.authenticationController = controller;	
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJsniUtils = synapseJsniUtils;
+		openIdActionUrl = WebConstants.OPEN_ID_URI;
+		// note, this is now a relative URL
+		openIdReturnUrl = synapseJsniUtils.getLocationPath()+synapseJsniUtils.getLocationQueryString()+"#!"+LOGIN_PLACE;
 	}
 
 	public Widget asWidget() {
