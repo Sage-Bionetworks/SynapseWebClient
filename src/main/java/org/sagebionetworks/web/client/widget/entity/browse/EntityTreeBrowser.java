@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {

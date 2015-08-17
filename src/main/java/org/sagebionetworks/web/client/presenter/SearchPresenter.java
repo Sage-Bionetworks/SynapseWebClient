@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -31,7 +32,6 @@ import org.sagebionetworks.web.shared.SearchQueryUtils;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -230,7 +230,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public IconType getIconForHit(Hit hit) {
 		if(hit == null) return null;
 		EntityType type = EntityType.valueOf(hit.getNode_type());
-		return DisplayUtils.getIconTypeForEntityClassName(type.getEntityTypeClassName());
+		return DisplayUtils.getIconTypeForEntityClassName(EntityTypeUtils.getEntityTypeClassName(type));
 	}
 	
 	@Override

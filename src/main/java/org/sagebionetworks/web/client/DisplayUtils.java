@@ -129,6 +129,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class DisplayUtils {
 	private static DateTimeFormat prettyFormat = null; 
