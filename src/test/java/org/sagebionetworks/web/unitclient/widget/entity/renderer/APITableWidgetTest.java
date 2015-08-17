@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -387,6 +391,27 @@ public class APITableWidgetTest {
 		assertEquals("Annotation", APITableWidget.removeFirstToken("data.Annotation"));
 		assertEquals("date", APITableWidget.removeFirstToken("date"));
 		assertNull(APITableWidget.removeFirstToken(null));
+	}
+	
+	@Test
+	public void testColumnConfigClickedSorting() {
+		String inputUri = ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+project";
+		APITableConfig tableConfig = getTableConfig();
+		tableConfig.setUri(inputUri);
+		widget.setTableConfig(tableConfig);
+		List<APITableColumnConfig> sortColumnConfigs = tableConfig.getColumnConfigs();
+		sortColumnConfigs.get(0).setSort(COLUMN_SORT_TYPE.NONE);
+		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
+		widget.columnConfigClicked(sortColumnConfigs.get(0));
+		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(inputUri.contains("order+by+"));
+		assertTrue(inputUri.contains("desc"));
+		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
+		widget.columnConfigClicked(sortColumnConfigs.get(1));
+		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(inputUri.contains("order+by+"));
+		assertTrue(inputUri.contains("asc"));
+		assertFalse(inputUri.contains("desc"));
 	}
 	
 	@Test
