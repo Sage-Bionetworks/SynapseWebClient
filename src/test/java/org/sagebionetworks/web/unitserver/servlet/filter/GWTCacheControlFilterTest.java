@@ -49,29 +49,27 @@ public class GWTCacheControlFilterTest {
 		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
 	}
-	
-	@Test
-	public void testDoFilterCacheOtherFiles() throws IOException, ServletException {
-		when(mockRequest.getRequestURI()).thenReturn("image.jpg");
-		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
 		
-		verify(mockResponse).setHeader("Cache-Control", "max-age=86400");
-		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
-		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
-	}
-
-	
 	@Test
 	public void testDoFilterNoCache() throws IOException, ServletException {
 		when(mockRequest.getRequestURI()).thenReturn("Portal.nocache.js");
 		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
 		
-		verify(mockResponse).setDateHeader(eq("Expires"), anyLong());
-		verify(mockResponse).setHeader("Cache-Control", "max-age=0");
-		verify(mockResponse).setHeader("Cache-Control", "no-cache");
+		verify(mockResponse).setDateHeader("Expires", 0);
+		verify(mockResponse).setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
 		verify(mockResponse).setHeader("Pragma", "no-cache");
 		
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
 	}
 
+
+	@Test
+	public void testDoFilterOtherFiles() throws IOException, ServletException {
+		when(mockRequest.getRequestURI()).thenReturn("image.jpg");
+		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+		
+		verify(mockResponse, never()).setHeader(anyString(), anyString());
+		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
+		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
+	}
 }

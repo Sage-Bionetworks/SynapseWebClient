@@ -22,7 +22,7 @@ import org.sagebionetworks.web.client.ClientProperties;
  */
 public class GWTCacheControlFilter implements Filter {
 	
-	//break up into three buckets.  never cache, cache for some time, or cache forever (when changed, GWT will rename the file)
+	//never cache nocache, or cache forever (when changed GWT will rename the file path, but SWC-2556 indicates that Chrome may happily return a missing resource)
 	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.  cache for some time
 	private FilterConfig filterConfig;
 
@@ -32,22 +32,20 @@ public class GWTCacheControlFilter implements Filter {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
 		long now = new Date().getTime();
+		httpResponse.setDateHeader("Date", now);
+		
 		if (requestURI.contains(".cache.")) {
 			//safe to cache forever
 			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
 			httpResponse.setHeader("Cache-Control", "max-age=31536000"); //a year
-			httpResponse.setDateHeader("Date", now);
+			httpResponse.setHeader("Pragma", "");
+			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
-		else if (!requestURI.contains(".nocache.") && !requestURI.contains("portal.html")) {
-			//cache for a day
-			httpResponse.setHeader("Cache-Control", "max-age=86400"); //24 hours
-			httpResponse.setDateHeader("Date", now);
-		} else {
+		else if (requestURI.contains(".nocache.")) {
 			//do not cache
 			//http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
-			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
-			httpResponse.setHeader("Cache-Control", "max-age=0");
-			httpResponse.setHeader("Cache-Control", "no-cache");
+			httpResponse.setDateHeader("Expires", 0);
+			httpResponse.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
 			httpResponse.setHeader("Pragma", "no-cache");
 		}
 		filterChain.doFilter(request, response);
