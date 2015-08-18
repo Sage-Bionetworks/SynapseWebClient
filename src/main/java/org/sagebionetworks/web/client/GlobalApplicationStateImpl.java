@@ -35,7 +35,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
-	private String synapseVersion;
 	private boolean isEditing;
 	private HashMap<String, String> synapseProperties;
 	Set<String> wikiBasedEntites;
@@ -204,13 +203,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			@Override
 			public void onSuccess(String versions) {
 				boolean isVersionChange = false;
-				if(synapseVersion == null) {
-					synapseVersion = versions;
-				} else {
-					if(!synapseVersion.equals(versions)) {
-						view.showVersionOutOfDateGlobalMessage();
-						isVersionChange = true;
-					}
+				//synapse version is set on app load
+				String synapseVersion = cookieProvider.getCookie(CookieKeys.LOADED_VERSIONS);
+				if(!synapseVersion.equals(versions)) {
+					view.showVersionOutOfDateGlobalMessage();
+					isVersionChange = true;
 				}
 				if (callback != null) {
 					callback.onSuccess(new VersionState(versions, isVersionChange));
@@ -243,6 +240,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			public void onSuccess(HashMap<String, String> properties) {
 				synapseProperties = properties;
 				initWikiEntities(properties);
+				initSynapseVersions(c);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				c.invoke();
+			}
+		});
+	}
+	
+	public void initSynapseVersions(final Callback c) {
+		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
+			@Override
+			public void onSuccess(String versions) {
+				cookieProvider.setCookie(CookieKeys.LOADED_VERSIONS, versions);
 				c.invoke();
 			}
 			
@@ -252,6 +264,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			}
 		});
 	}
+
 	
 	@Override
 	public String getSynapseProperty(String key) {

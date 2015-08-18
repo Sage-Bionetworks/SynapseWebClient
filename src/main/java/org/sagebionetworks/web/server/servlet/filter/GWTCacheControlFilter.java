@@ -22,34 +22,33 @@ import org.sagebionetworks.web.client.ClientProperties;
  */
 public class GWTCacheControlFilter implements Filter {
 	
-	//break up into three buckets.  never cache, cache for some time, or cache forever (when changed, GWT will rename the file)
+	//never cache nocache, or cache forever (when changed GWT will rename the file path, but SWC-2556 indicates that Chrome may happily return a missing resource)
 	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.  cache for some time
 	private FilterConfig filterConfig;
 
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
+		long now = new Date().getTime();
+		httpResponse.setDateHeader("Date", now);
+		
 		if (requestURI.contains(".cache.")) {
-			setCacheMaxAge(response);
+			//safe to cache forever
+			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
+			httpResponse.setHeader("Cache-Control", "max-age=31536000"); //a year
+			httpResponse.setHeader("Pragma", "");
+			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
-		else if (!requestURI.contains(".nocache.") && !requestURI.contains("portal.html")) {
-			setCacheTime(response, CACHE_TIME);
+		else if (requestURI.contains(".nocache.")) {
+			//do not cache
+			//http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
+			httpResponse.setDateHeader("Expires", 0);
+			httpResponse.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
+			httpResponse.setHeader("Pragma", "no-cache");
 		}
 		filterChain.doFilter(request, response);
-	}
-
-	private void setCacheTime(ServletResponse response, long cacheTime) {
-		long now = new Date().getTime();
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		httpResponse.setDateHeader("Expires", now+cacheTime);
-		httpResponse.setDateHeader("Date", now);
-	}
-	
-	private void setCacheMaxAge(ServletResponse response) {
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		httpResponse.setHeader("Cache-Control", "max-age");
-		httpResponse.setDateHeader("Date", new Date().getTime());
 	}
 	
 	public void init(FilterConfig config) throws ServletException {
