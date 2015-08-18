@@ -6,7 +6,9 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -40,6 +42,9 @@ public class LoginWidgetTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockUserListener = mock(UserListener.class);
+		when(mockSynapseJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
+		when(mockSynapseJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
+
 		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynapseJSNIUtils);
 		loginWidget.setUserListener(mockUserListener);
 		UserSessionData usd = new UserSessionData();
@@ -65,6 +70,11 @@ public class LoginWidgetTest {
 		verify(mockUserListener).userChanged(any(UserSessionData.class));
 	}
 
+	@Test
+	public void testOpenIdReturnUrl() {
+		Assert.assertEquals("/Portal.html?foo=bar#!LoginPlace", loginWidget.getOpenIdReturnUrl());
+	}
+	
 	@Test
 	public void testSetUsernameAndPasswordErrorHandling() {
 		String u = "user";

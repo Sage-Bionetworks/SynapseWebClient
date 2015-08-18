@@ -10,10 +10,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView.Presenter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FavoriteWidget implements Presenter {
+public class FavoriteWidget implements Presenter, IsWidget {
 
 	private FavoriteWidgetView view;
 	private SynapseClientAsync synapseClient;

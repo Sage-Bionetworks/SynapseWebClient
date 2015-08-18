@@ -145,6 +145,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	@Override
 	public void setPlaceholderText(String text) {
 		selectedItem.getElement().setAttribute("placeholder", text);
+		suggestBox.getValueBox().getElement().setAttribute("placeholder", text);
 	}
 	
 	@Override

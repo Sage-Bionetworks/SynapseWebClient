@@ -104,6 +104,7 @@ public class ClientProperties {
 	 * Client Documentation
 	 */
 	public static final String REST_API_URL = "http://rest.synapse.org";
+	public static final String GOVERNANCE_HELP_URL = "#!Help:Governance";
 	public static final String CLIENT_R_API_URL = "http://r-docs.synapse.org";
 	public static final String CLIENT_R_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.R_CLIENT;
 	public static final String CLIENT_PYTHON_API_URL = "http://python-docs.synapse.org";
@@ -119,6 +120,7 @@ public class ClientProperties {
 	public static final WebResource CYTOSCAPE_JS = new WebResource("js/cytoscape-2.0.2.min.js", ResourceType.JAVASCRIPT);
 	public static final WebResource MATHJAX_LOADER_JS = new WebResource("js/mathjax-loader.js", ResourceType.JAVASCRIPT);
 	public static final WebResource MATHJAX_JS = new WebResource("https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default", ResourceType.JAVASCRIPT);
+	public static final WebResource TWITTER_JS = new WebResource("https://platform.twitter.com/widgets.js", ResourceType.JAVASCRIPT);
 	public static final WebResource JQUERY_JS = new WebResource("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js", ResourceType.JAVASCRIPT);
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
 	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";

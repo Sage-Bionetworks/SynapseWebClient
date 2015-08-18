@@ -1,27 +1,26 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-
-	<ui:style>
-		.important {
-			font-weight: bold;
-		}
-		
-		.rowTop {
-			vertical-align: top;
-		}
-	</ui:style>
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+    <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 
 	<g:HTMLPanel>
 		<!-- HEADER -->
-		<div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
+		<g:SimplePanel ui:field="headerPanel"/>
 		<g:Image ui:field="entityBackgroundImage" addStyleNames="entityBackgroundImage" />
-		<g:SimplePanel ui:field="synAlertContainer" addStyleNames="margin-10 overflow-auto"/>
-		<g:SimplePanel ui:field="entityPageTopPanel"/>
+		<g:SimplePanel ui:field="synAlertContainer"/>
+		<g:HTMLPanel ui:field="loadingUI" addStyleNames="min-height-500">
+			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+			&nbsp;Loading...
+		</g:HTMLPanel>
+		
+		<g:SimplePanel ui:field="entityPageTopPanel"  addStyleNames="min-height-500"/>
+		<b:Heading ui:field="accessDependentMessage"  size="H4" text="Access could be dependent upon membership in one of the following Teams"
+		     addStyleNames="margin-top-100 margin-left-15" visible="false"/>
+		<g:SimplePanel ui:field="openInvitesPanel" addStyleNames="margin-left-10 margin-bottom-10 margin-right-10" visible="false"/>
         <div class="clear"></div>
-		<g:SimplePanel ui:field="footer" />
+		<g:SimplePanel ui:field="footerPanel"/>
 	</g:HTMLPanel>
 </ui:UiBinder> 

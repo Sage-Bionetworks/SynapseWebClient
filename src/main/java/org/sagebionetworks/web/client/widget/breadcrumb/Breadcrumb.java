@@ -3,12 +3,12 @@ package org.sagebionetworks.web.client.widget.breadcrumb;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -25,13 +25,11 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 
 	private BreadcrumbView view;
 	private GlobalApplicationState globalApplicationState;
-	private IconsImageBundle iconsImageBundle;
 
 	@Inject
-	public Breadcrumb(BreadcrumbView view, GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle) {
+	public Breadcrumb(BreadcrumbView view, GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.iconsImageBundle = iconsImageBundle;
 		view.setPresenter(this);
 	}
 
@@ -52,7 +50,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 					EntityHeader element = path.get(i);
 					String name = element.getName();
 					Synapse place = new Synapse(element.getId());
-					ImageResource icon = DisplayUtils.getSynapseIconForEntityClassName(element.getType(), IconSize.PX16, iconsImageBundle);
+					IconType icon = DisplayUtils.getIconTypeForEntityClassName(element.getType());
 					if(optionalArea == EntityArea.FILES && Project.class.getName().equals(element.getType())) {
 						// show files as root
 						name = DisplayConstants.FILES;

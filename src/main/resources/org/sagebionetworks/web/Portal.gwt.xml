@@ -22,18 +22,19 @@
 	<inherits name="com.google.gwt.inject.Inject" />
 	
 	<!-- The gwtbootsrap dependencies must come before the portal entry point.  -->
-	<!-- replace the next line with this to move towards material design:  <inherits name="org.gwtbootstrap3.GwtBootstrap3PaperTheme"/>  -->
-    <inherits name="org.gwtbootstrap3.GwtBootstrap3"/>
-    <inherits name="org.gwtbootstrap3.extras.datetimepicker.DateTimePicker"/>
-    <inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
+	<inherits name="org.gwtbootstrap3.GwtBootstrap3PaperTheme"/>
+	<inherits name="org.gwtbootstrap3.extras.datetimepicker.DateTimePicker"/>
+	<inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
+	<inherits name="org.gwtbootstrap3.extras.select.Select"/>
+	<!-- Commented out unused gwt bootstrap extra modules.  
+	Note that importing will cause the associated render-blocking css to loaded.
     <inherits name="org.gwtbootstrap3.extras.card.Card"/>
     <inherits name="org.gwtbootstrap3.extras.slider.Slider"/>
     <inherits name="org.gwtbootstrap3.extras.toggleswitch.ToggleSwitch"/>
-    <inherits name="org.gwtbootstrap3.extras.select.Select"/>
     <inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/>
     <inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
     <inherits name="org.gwtbootstrap3.extras.growl.Growl"/>
-
+ 	-->
 	<!-- Specify the app entry point class. -->
 	<entry-point class='org.sagebionetworks.web.client.Portal' />
 	
@@ -51,9 +52,7 @@
 	<set-property name="compiler.useSourceMaps" value="true"/>
 	<set-property name="compiler.stackMode" value="emulated"/>
 	
-    <!-- Uncomment to limit compilation permutations to FF <set-property name="user.agent" value="gecko1_8" /> -->
-    
-	<!-- Specify the paths for translatable code -->
+    <!-- Specify the paths for translatable code -->
 	<source path='client' />
 	<source path='shared' />
 	
@@ -65,7 +64,7 @@
 	<inherits name="org.sagebionetworks.gwt.JSONAdapter"/>
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
 	
-	<!-- Limit build permuatations (testing only) 
+	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF
 	<set-property name="user.agent" value="safari"/>
 	  -->
 	

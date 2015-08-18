@@ -320,7 +320,7 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
+	void getPageNameToWikiKeyMap(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
 

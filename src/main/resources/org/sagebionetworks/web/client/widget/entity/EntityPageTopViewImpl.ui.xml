@@ -4,98 +4,92 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<ui:with field='icons'
-		type='org.sagebionetworks.web.client.IconsImageBundle' />
-
-	<g:HTMLPanel styleName="margin-left-15 margin-right-15">											
-				<bh:Div ui:field="projectTitleUI">
-			       	<g:Image styleName="displayInline moveup-2 margin-right-5" resource='{icons.synapseProject24}' />
-					<g:Anchor ui:field="projectHeaderAnchor" styleName="dropLargeIconText projectTitle" text="" />
+	<g:HTMLPanel styleName="margin-left-15 margin-right-15">		
+		<!--Project level information -->
+		<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15" ui:field="projectMetaContainer">
+			<b:Column size="XS_12">
+				<bh:Div addStyleNames="margin-left-15 margin-right-15">
+					<g:SimplePanel ui:field="projectActionMenuContainer"/>
 				</bh:Div>
+				<bh:Div addStyleNames="margin-left-15 margin-right-15">
+					<g:SimplePanel ui:field="projectMetadataContainer"/>
+					<g:SimplePanel ui:field="projectDescriptionContainer"/>
+				</bh:Div>
+			</b:Column>
+		</b:Row>
+		
+		<div class="row margin-top-15" ui:field="navtabContainer">
+		    <ul class="nav nav-tabs entity-tabs">				        
+			    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
+			    <li class="entity-tab" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
+			    <li class="entity-tab" ui:field="tablesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="tablesLink"></g:Anchor></li>
+			    <li class="entity-tab" ui:field="adminListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
+		    </ul>
+		</div>
+		
+		<b:Row ui:field="wikiTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
+			<b:Column size="XS_12">
+				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="wikiPageContainer"/>
+			</b:Column>
+		</b:Row>
+		<b:Row ui:field="filesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
+			<bh:Div addStyleNames="margin-left-15 margin-right-15">
+				<g:SimplePanel ui:field="fileActionMenuContainer"/>
+			</bh:Div>
+			<bh:Div addStyleNames="margin-left-15 margin-right-15">
+				<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
+				<g:SimplePanel ui:field="fileTitlebarContainer"/>
+				<g:SimplePanel ui:field="locationableTitlebarContainer"/>
+				<g:SimplePanel ui:field="fileMetadataContainer"/>
+			</bh:Div>
+			<b:Column size="XS_12">
+				<g:SimplePanel ui:field="fileHistoryContainer"/>
+				<g:SimplePanel ui:field="fileDescriptionContainer"/>
+				<g:SimplePanel ui:field="filesWikiPageContainer"/>
+				<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
+				<b:Row>
+					<g:SimplePanel ui:field="filePreviewContainer"/>
+					<g:SimplePanel ui:field="fileProvenanceContainer"/>
+				</b:Row>
+				<b:Row>
+					<b:Column size="XS_12">
+						<g:HTMLPanel ui:field="fileProgrammaticClientsContainer"/>		
+					</b:Column>
+				</b:Row>
+				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
+			</b:Column>
+		</b:Row>
+		<b:Row ui:field="tablesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15 padding-bottom-15">
+			<bh:Div addStyleNames="margin-left-15 margin-right-15">
+				<g:SimplePanel ui:field="tableActionMenuContainer"/>
+			</bh:Div>
+			<bh:Div addStyleNames="margin-left-15 margin-right-15">
+				<g:SimplePanel ui:field="tableBreadcrumbContainer"/>
+				<g:SimplePanel ui:field="tableMetadataContainer"/>
+			</bh:Div>
+			<b:Column size="XS_12">
+				<g:SimplePanel ui:field="tableListWidgetContainer"/>
+				<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
+				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
+				<g:FlowPanel addStyleNames="help-panel">
+					<b:BlockQuote styleName="panel">
+						<b:Icon type="TABLE" pull="LEFT" addStyleNames="font-size-150" />
+						<b:Heading text="Synapse Tables" size="H4"></b:Heading>
+						<bh:Text text="Synapse Tables is a new feature designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema."></bh:Text>
+						<bh:Div addStyleNames="margin-10">
+							<b:Button ui:field="tableLearnMoreButton" text="Learn More" type="PRIMARY"  />
+							<b:Button ui:field="tableAPIDocsButton" text="API Docs" type="DEFAULT" addStyleNames="margin-left-5" />
+						</bh:Div>
+					</b:BlockQuote>
+				</g:FlowPanel>
 				
-				<!--Project level information -->
-				<b:Row addStyleNames="margin-top-5">
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
-						<g:SimplePanel ui:field="projectActionMenuContainer"/>
-					</bh:Div>
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
-						<g:SimplePanel ui:field="projectMetadataContainer"/>
-						<g:SimplePanel ui:field="projectDescriptionContainer"/>
-					</bh:Div>
-				</b:Row>
-				
-   				<div class="row margin-top-15" ui:field="navtabContainer">
-				    <ul class="nav nav-tabs entity-tabs">				        
-					    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
-					    <li class="entity-tab" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
-					    <li class="entity-tab" ui:field="tablesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="tablesLink"></g:Anchor></li>
-					    <li class="entity-tab" ui:field="adminListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
-				    </ul>
-				</div>
-				
-				<b:Row ui:field="wikiTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
-					<b:Column size="XS_12">
-						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="wikiPageContainer"/>
-					</b:Column>
-				</b:Row>
-				<b:Row ui:field="filesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
-						<g:SimplePanel ui:field="fileActionMenuContainer"/>
-					</bh:Div>
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
-						<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
-						<g:SimplePanel ui:field="fileTitlebarContainer"/>
-						<g:SimplePanel ui:field="locationableTitlebarContainer"/>
-						<g:SimplePanel ui:field="fileMetadataContainer"/>
-					</bh:Div>
-					<b:Column size="XS_12">
-						<g:SimplePanel ui:field="fileHistoryContainer"/>
-						<g:SimplePanel ui:field="fileDescriptionContainer"/>
-						<g:SimplePanel ui:field="filesWikiPageContainer"/>
-						<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
-						<b:Row>
-							<g:SimplePanel ui:field="filePreviewContainer"/>
-							<g:SimplePanel ui:field="fileProvenanceContainer"/>
-						</b:Row>
-						<b:Row>
-							<b:Column size="XS_12">
-								<g:HTMLPanel ui:field="fileProgrammaticClientsContainer"/>		
-							</b:Column>
-						</b:Row>
-						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
-					</b:Column>
-				</b:Row>
-				<b:Row ui:field="tablesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15 padding-bottom-15">
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
-						<g:SimplePanel ui:field="tableActionMenuContainer"/>
-					</bh:Div>
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
-						<g:SimplePanel ui:field="tableBreadcrumbContainer"/>
-						<g:SimplePanel ui:field="tableMetadataContainer"/>
-					</bh:Div>
-					<b:Column size="XS_12">
-						<g:SimplePanel ui:field="tableListWidgetContainer"/>
-						<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
-						<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
-						<g:FlowPanel addStyleNames="help-panel">
-							<b:BlockQuote styleName="panel">
-								<b:Icon type="TABLE" pull="LEFT" addStyleNames="font-size-150" />
-								<b:Heading text="Synapse Tables" size="H4"></b:Heading>
-								<bh:Text text="Synapse Tables is a new feature designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema."></bh:Text>
-								<bh:Div addStyleNames="margin-10">
-									<b:Button ui:field="tableLearnMoreButton" text="Learn More" type="PRIMARY"  />
-									<b:Button ui:field="tableAPIDocsButton" text="API Docs" type="DEFAULT" addStyleNames="margin-left-5" />
-								</bh:Div>
-							</b:BlockQuote>
-						</g:FlowPanel>
-						
-					</b:Column>
-				</b:Row>
-				<b:Row ui:field="adminTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
-					<b:Column size="XS_12">
-						<g:SimplePanel ui:field="evaluationListContainer"/>
-					</b:Column>
-				</b:Row>
+			</b:Column>
+		</b:Row>
+		<b:Row ui:field="adminTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
+			<b:Column size="XS_12">
+				<g:SimplePanel ui:field="evaluationListContainer"/>
+			</b:Column>
+		</b:Row>
 	</g:HTMLPanel>
 </ui:UiBinder>
 

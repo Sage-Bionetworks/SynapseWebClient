@@ -13,15 +13,12 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -39,22 +36,15 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT
 			.create(EntityMetadataViewImplUiBinder.class);
 
-	@UiField
-	HTMLPanel entityNamePanel;
+
 	@UiField
 	HTMLPanel detailedMetadata;
 	@UiField
 	HTMLPanel dataUseContainer;
 	@UiField
-	Image entityIcon;
-	@UiField
-	SpanElement entityName;
-	@UiField
 	TextBox idField;
 	@UiField
-	SimplePanel favoritePanel;
-	@UiField
-	SimplePanel doiPanel;
+	Span doiPanel;
 	@UiField
 	Collapse annotationsContent;
 	@UiField
@@ -81,12 +71,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		this.annotationsWidget = annotationsWidget;
 		this.restrictionWidget = restrictionWidget;
 		initWidget(uiBinder.createAndBindUi(this));
-				
-		favoritePanel.addStyleName("inline-block");
-		favoritePanel.setWidget(favoriteWidget.asWidget());
-		
-		doiPanel.addStyleName("inline-block");
-		doiPanel.setWidget(doiWidget.asWidget());
+		doiPanel.add(doiWidget.asWidget());
 		annotationsContainer.setWidget(annotationsWidget.asWidget());
 		annotationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 		idField.addClickHandler(new ClickHandler() {
@@ -117,11 +102,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				presenter.fireEntityUpdatedEvent();
 			}
 		});
-		
-		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
-		synapseIconForEntity.applyTo(entityIcon);
-		
-		setEntityName(e.getName());
 		setEntityId(e.getId());
 					
 		dataUseContainer.clear();
@@ -171,19 +151,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		detailedMetadata.setVisible(visible);
 	}
 	
-	@Override
-	public void setEntityNameVisible(boolean visible) {
-		this.entityNamePanel.setVisible(visible);
-	}
-	
 	
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	public void setEntityName(String text) {
-		entityName.setInnerText(text);
 	}
 
 	public void setEntityId(String text) {
