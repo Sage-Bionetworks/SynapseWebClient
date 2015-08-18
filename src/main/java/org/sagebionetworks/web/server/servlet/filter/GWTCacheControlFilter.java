@@ -35,7 +35,6 @@ public class GWTCacheControlFilter implements Filter {
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
 		long now = new Date().getTime();
 		httpResponse.setDateHeader("Date", now);
-		
 		if (requestURI.contains(".cache.")) {
 			//safe to cache
 			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
@@ -43,12 +42,15 @@ public class GWTCacheControlFilter implements Filter {
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
-		else if (requestURI.contains(".nocache.") || requestURI.toLowerCase().contains("portal.html")) {
+		else if (requestURI.contains(".nocache.")) {
 			//do not cache
 			//http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
 			httpResponse.setDateHeader("Expires", 0);
 			httpResponse.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
 			httpResponse.setHeader("Pragma", "no-cache");
+		} else {
+			httpResponse.setHeader("Cache-Control", "");
+			httpResponse.setHeader("Pragma", "");
 		}
 		filterChain.doFilter(request, response);
 	}
