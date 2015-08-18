@@ -72,4 +72,17 @@ public class GWTCacheControlFilterTest {
 		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
 	}
+	
+
+	@Test
+	public void testDoFilterPortalHtml() throws IOException, ServletException {
+		//should not cache portal.html either
+		when(mockRequest.getRequestURI()).thenReturn("PoRtal.HTML");
+		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+		
+		verify(mockResponse).setDateHeader("Expires", 0);
+		verify(mockResponse).setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
+		verify(mockResponse).setHeader("Pragma", "no-cache");
+		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
+	}
 }

@@ -41,7 +41,7 @@ public class GWTCacheControlFilter implements Filter {
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
-		else if (requestURI.contains(".nocache.")) {
+		else if (requestURI.contains(".nocache.") || requestURI.toLowerCase().contains("portal.html")) {
 			//do not cache
 			//http://stackoverflow.com/questions/1341089/using-meta-tags-to-turn-off-caching-in-all-browsers
 			httpResponse.setDateHeader("Expires", 0);
