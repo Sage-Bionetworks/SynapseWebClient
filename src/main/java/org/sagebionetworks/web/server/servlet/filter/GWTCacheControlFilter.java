@@ -23,7 +23,9 @@ import org.sagebionetworks.web.client.ClientProperties;
 public class GWTCacheControlFilter implements Filter {
 	
 	//never cache nocache, or cache forever (when changed GWT will rename the file path, but SWC-2556 indicates that Chrome may happily return a missing resource)
-	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.  cache for some time
+	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.
+	public static final long CACHE_TIME_SECONDS=60*60*8;  //8 hours.
+	
 	private FilterConfig filterConfig;
 
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -35,9 +37,9 @@ public class GWTCacheControlFilter implements Filter {
 		httpResponse.setDateHeader("Date", now);
 		
 		if (requestURI.contains(".cache.")) {
-			//safe to cache forever
+			//safe to cache
 			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
-			httpResponse.setHeader("Cache-Control", "max-age=31536000"); //a year
+			httpResponse.setHeader("Cache-Control", "max-age="+CACHE_TIME_SECONDS);
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}

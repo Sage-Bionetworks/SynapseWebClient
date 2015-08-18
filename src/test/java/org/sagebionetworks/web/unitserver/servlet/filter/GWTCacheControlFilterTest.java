@@ -41,12 +41,13 @@ public class GWTCacheControlFilterTest {
 	}
 	
 	@Test
-	public void testDoFilterCacheForeverFiles() throws IOException, ServletException {
+	public void testDoFilterCacheFiles() throws IOException, ServletException {
 		when(mockRequest.getRequestURI()).thenReturn("1.cache.js");
 		filter.doFilter(mockRequest, mockResponse, mockFilterChain);
 		
-		verify(mockResponse).setHeader("Cache-Control", "max-age=31536000");
+		verify(mockResponse).setHeader("Cache-Control", "max-age=28800");
 		verify(mockResponse).setDateHeader(eq("Date"), anyLong());
+		verify(mockResponse).setDateHeader(eq("Expires"), anyLong());
 		verify(mockFilterChain).doFilter(mockRequest, mockResponse);
 	}
 		
