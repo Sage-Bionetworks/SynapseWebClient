@@ -3173,5 +3173,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	/**
+	 * Update an entity.
+	 */
+	@Override
+	public void updateFileEntity(FileEntity toUpdate, String id,
+			String fileName, String contentType) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			S3FileHandle newHandle = synapseClient.createS3FileHandleCopy(id, fileName, contentType);
+			toUpdate.setDataFileHandleId(newHandle.getId());
+			synapseClient.putEntity(toUpdate);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	
 	
 }

@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
@@ -442,4 +443,7 @@ public interface SynapseClientAsync {
 	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
+
+	void updateFileEntity(FileEntity fileEntity, String id, String fileName,
+			String contentType, AsyncCallback<Void> asyncCallback);
 }

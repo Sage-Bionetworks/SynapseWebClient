@@ -29,6 +29,8 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -48,6 +50,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
@@ -77,6 +80,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	RenameEntityModalWidget renameEntityModalWidget;
 	EntityFinder entityFinder;
 	EvaluationSubmitter submitter;
+	EditFileMetadataModalWidget editFileMetadataModalWidget;
+	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
 	
 	EntityBundle entityBundle;
 	String wikiPageId;
@@ -99,6 +104,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			AuthenticationController authenticationController,
 			AccessControlListModalWidget accessControlListModalWidget,
 			RenameEntityModalWidget renameEntityModalWidget,
+			EditFileMetadataModalWidget editFileMetadataModalWidget,
+			EditProjectMetadataModalWidget editProjectMetadataModalWidget,
 			EntityFinder entityFinder,
 			EvaluationSubmitter submitter,
 			UploadDialogWidget uploader,
@@ -114,6 +121,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.renameEntityModalWidget = renameEntityModalWidget;
+		this.editFileMetadataModalWidget = editFileMetadataModalWidget;
+		this.editProjectMetadataModalWidget = editProjectMetadataModalWidget;
 		this.entityFinder = entityFinder;
 		this.submitter = submitter;
 		this.uploader = uploader;
@@ -326,11 +335,39 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
+	private void configureEditProjectMetadataAction(){
+		if(entityBundle.getEntity() instanceof Project){
+			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.EDIT_PROJECT_METADATA, this);
+		}else{
+			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, false);
+			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, false);
+		}
+	}
+	
+	private void configureEditFileMetadataAction(){
+		if(entityBundle.getEntity() instanceof FileEntity){
+			actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.EDIT_FILE_METADATA, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.EDIT_FILE_METADATA, this);
+		} else{
+			actionMenu.setActionVisible(Action.EDIT_FILE_METADATA, false);
+			actionMenu.setActionEnabled(Action.EDIT_FILE_METADATA, false);
+		}
+	}
+	
 	private void configureRenameAction(){
-		actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
-		actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
-		actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+enityTypeDisplay);
-		actionMenu.addActionListener(Action.CHANGE_ENTITY_NAME, this);
+		//if File or Project then special Edit Metadata commands are shown
+		if(!(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Project)) {
+			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
+			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+enityTypeDisplay);
+			actionMenu.addActionListener(Action.CHANGE_ENTITY_NAME, this);
+		} else {
+			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
+			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, false);
+		}
 	}
 	
 	private void configureDeleteAction(){
@@ -414,6 +451,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CHANGE_ENTITY_NAME:
 			onRename();
+			break;
+		case EDIT_FILE_METADATA:
+			onEditFileMetadata();
+			break;
+		case EDIT_PROJECT_METADATA:
+			onEditProjectMetadata();
 			break;
 		case EDIT_WIKI_PAGE:
 			onEditWiki();
@@ -690,6 +733,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			}
 		});
 	}
+	
 	/**
 	 * Called if the preflight check for a rename passes.
 	 */
@@ -702,6 +746,50 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 
+	private void onEditFileMetadata() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckEditFileMetadata();
+			}
+		});
+	}
+	
+	/**
+	 * Called if the preflight check for edit file metadata passes.
+	 */
+	private void postCheckEditFileMetadata(){
+		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), entityBundle.getFileHandles(), new Callback() {
+			@Override
+			public void invoke() {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+		});
+	}
+	
+	private void onEditProjectMetadata() {
+		// Validate the user can update this entity.
+		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postCheckEditProjectMetadata();
+			}
+		});
+	}
+	
+	/**
+	 * Called if the preflight check for a edit project metadata passes.
+	 */
+	private void postCheckEditProjectMetadata(){
+		editProjectMetadataModalWidget.configure((Project)entityBundle.getEntity(), new Callback() {
+			@Override
+			public void invoke() {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+		});
+	}
+	
 	@Override
 	public void onDeleteEntity() {
 		// Confirm the delete with the user.
