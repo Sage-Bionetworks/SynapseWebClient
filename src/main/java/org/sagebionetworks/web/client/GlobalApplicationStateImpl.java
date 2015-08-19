@@ -41,6 +41,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
+	private String synapseVersion;
+	
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -204,13 +206,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			public void onSuccess(String versions) {
 				boolean isVersionChange = false;
 				//synapse version is set on app load
-				String synapseVersion = cookieProvider.getCookie(CookieKeys.LOADED_VERSIONS);
 				if(!synapseVersion.equals(versions)) {
 					view.showVersionOutOfDateGlobalMessage();
 					isVersionChange = true;
 				}
 				if (callback != null) {
-					callback.onSuccess(new VersionState(versions, isVersionChange));
+					callback.onSuccess(new VersionState(synapseVersion, isVersionChange));
 				}
 			}
 			
@@ -254,7 +255,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
-				cookieProvider.setCookie(CookieKeys.LOADED_VERSIONS, versions);
+				synapseVersion = versions;
 				c.invoke();
 			}
 			
@@ -320,5 +321,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void initOnPopStateHandler() {
 		this.synapseJSNIUtils.initOnPopStateHandler();
+	}
+	
+	public String getSynapseVersion() {
+		return synapseVersion;
 	}
 }

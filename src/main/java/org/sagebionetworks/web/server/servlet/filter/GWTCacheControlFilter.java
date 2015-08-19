@@ -23,7 +23,9 @@ import org.sagebionetworks.web.client.ClientProperties;
 public class GWTCacheControlFilter implements Filter {
 	
 	//never cache nocache, or cache forever (when changed GWT will rename the file path, but SWC-2556 indicates that Chrome may happily return a missing resource)
-	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.  cache for some time
+	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.
+	public static final long CACHE_TIME_SECONDS=60*60*8;  //8 hours.
+	
 	private FilterConfig filterConfig;
 
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -33,11 +35,10 @@ public class GWTCacheControlFilter implements Filter {
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
 		long now = new Date().getTime();
 		httpResponse.setDateHeader("Date", now);
-		
 		if (requestURI.contains(".cache.")) {
-			//safe to cache forever
+			//safe to cache
 			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
-			httpResponse.setHeader("Cache-Control", "max-age=31536000"); //a year
+			httpResponse.setHeader("Cache-Control", "max-age="+CACHE_TIME_SECONDS);
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
@@ -47,6 +48,9 @@ public class GWTCacheControlFilter implements Filter {
 			httpResponse.setDateHeader("Expires", 0);
 			httpResponse.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, pre-check=0, post-check=0");
 			httpResponse.setHeader("Pragma", "no-cache");
+		} else {
+			httpResponse.setHeader("Cache-Control", "");
+			httpResponse.setHeader("Pragma", "");
 		}
 		filterChain.doFilter(request, response);
 	}
