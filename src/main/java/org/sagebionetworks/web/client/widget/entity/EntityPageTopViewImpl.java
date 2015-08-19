@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -73,6 +72,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@UiField
+	Row projectMetaContainer;
+	@UiField
 	Anchor wikiLink;
 	@UiField
 	Anchor fileLink;
@@ -90,22 +91,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	LIElement tablesListItem;
 	@UiField
 	LIElement adminListItem;
-	
 	@UiField
 	Button tableLearnMoreButton;
 	@UiField
 	Button tableAPIDocsButton;
 	
-	@UiField
-	Div projectTitleUI;
-	@UiField
-	Anchor projectHeaderAnchor;
-	
 	private Presenter presenter;
-	
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
-	
 	private Breadcrumb breadcrumb;
 	
 	//project level info
@@ -232,7 +225,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
-
 		initProjectLayout();
 
 		initClickHandlers();
@@ -252,20 +244,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
 		fileLink.setText(DisplayConstants.FILES);		
 		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
-		tablesLink.setHTML(DisplayConstants.TABLES + DisplayConstants.BETA_BADGE_HTML);		
+		tablesLink.setHTML(DisplayConstants.TABLES);		
 		tablesLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.TABLES));
 		adminLink.setText(DisplayConstants.CHALLENGE_ADMIN);
 		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
 	}
 	
-	private void initClickHandlers() {
-		projectHeaderAnchor.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(currentProjectAnchorTargetId, null, null, null));
-			}
-		});
-		
+	private void initClickHandlers() {		
 		tableLearnMoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -304,11 +289,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.currentArea = area;
 		DisplayUtils.hide(adminListItem);
 		clearContent();
-		
 		hideTabContent();
-		
-		// project header
-		showProjectLink(projectHeader);
 	
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder;
@@ -364,12 +345,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tableWidgetContainer.clear();
 		tableModifiedAndCreatedContainer.clear();
 		tableListWidgetContainer.setVisible(false);
-	}
-	
-	private void showProjectLink(final EntityHeader projectHeader) {
-		currentProjectAnchorTargetId = projectHeader.getId();
-		projectTitleUI.setVisible(true);
-		projectHeaderAnchor.setText(projectHeader.getName());
 	}
 	
 	@Override
@@ -476,14 +451,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		InlineHTML inlineHtml = new InlineHTML(DisplayConstants.CREATED_BY);
 		attributionPanel.add(inlineHtml);
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
-		createdByBadgeWidget.addStyleName("movedown-7");
+		createdByBadgeWidget.addStyleName("movedown-4 margin-left-5");
 		attributionPanel.add(createdByBadgeWidget);
 		
 		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getCreatedOn()) + "<br>" + DisplayConstants.MODIFIED_BY);
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
-		modifiedByBadgeWidget.addStyleName("movedown-7");
+		modifiedByBadgeWidget.addStyleName("movedown-4 margin-left-5");
 		attributionPanel.add(modifiedByBadgeWidget);
 		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getModifiedOn()));
 		
@@ -537,7 +512,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// tab container
 		setTabSelected(area, false);
 
-		projectTitleUI.setVisible(false);
 		// Project header: Metadata & Description
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
 		projectMetadataContainer.add(entityMetadata.asWidget());
@@ -807,4 +781,5 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}
 		return actionMenu;
 	}
+
 }

@@ -6,12 +6,10 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-  <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
-
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
 			<h2 style="margin-bottom: 0px;">
-			 	<span class="liftLargeIcon"><g:Image ui:field="entityIcon"/></span>
+			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE"/>
 			 	<b:Anchor ui:field="directDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT"/>
 			 	<b:Anchor ui:field="authorizedDirectDownloadLink" styleName="downloadLink link displayInline" icon="DOWNLOAD" iconPosition="RIGHT" />
 			 	

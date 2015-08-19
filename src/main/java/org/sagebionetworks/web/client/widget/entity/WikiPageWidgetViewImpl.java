@@ -61,10 +61,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Span createdOnField;
 	
 	@UiField
-	SimplePanel	modifiedByBadgePanel;
+	Span modifiedByBadgePanel;
 	
 	@UiField
-	SimplePanel	createdByBadgePanel;
+	Span createdByBadgePanel;
 	
 	@UiField
 	Button wikiHistoryButton;
@@ -130,23 +130,22 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.reloadWikiPage();
-				hideDiffVersionAlert();
+				setDiffVersionAlertVisible(false);
 			}
 		});
 		wikiHistoryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (!historyCollapse.isCollapsing()) {
-					if (historyCollapse.isShown()) {
-						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
-					} else {
-						wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
-					}
+				if (historyCollapse.isShown()) {
+					wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+					historyCollapse.hide();
+				} else {
+					wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
+					historyCollapse.show();
 				}
 			}
 		});
-		historyCollapse.hide();
-		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+		historyCollapse.hide();	
 	}
 	
 	@Override
@@ -165,29 +164,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	
 	@Override
-	public void showNoWikiCanEditMessage() {
-		noWikiCanEditMessage.setVisible(true);
-	}
-	
-	@Override
-	public void showNoWikiCannotEditMessage() {
-		noWikiCannotEditMessage.setVisible(true);
-	}
-	
-	@Override
-	public void showDiffVersionAlert() {
-		diffVersionAlert.setVisible(true);
-	}
-	
-	@Override
-	public void hideDiffVersionAlert() {
-		diffVersionAlert.setVisible(false);
-	}
-	
-	@Override
 	public void showPopup(String title, String message, MessagePopup popupType, Callback okCallback, Callback cancelCallback) {
-		DisplayUtils.showPopup(title, message, 
-				popupType, okCallback, cancelCallback);
+		DisplayUtils.showPopup(title, message, popupType, okCallback, cancelCallback); 
 	}
 	
 	@Override
@@ -220,11 +198,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		modifiedByPanel.setVisible(isVisible);
 	}
 
-	@Override
-	public void showWikiHistory(boolean isVisible) {
-		wikiHistoryPanel.setVisible(isVisible);
-	}
-
 	/*
 	 *     +------+
 	 *     | Wiki |
@@ -255,7 +228,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void setModifiedByBadge(IsWidget modifiedByUserBadge) {
-		modifiedByBadgePanel.setWidget(modifiedByUserBadge);
+		modifiedByBadgePanel.clear();
+		modifiedByBadgePanel.add(modifiedByUserBadge);
 	}
 	
 	@Override
@@ -265,7 +239,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void setCreatedByBadge(IsWidget createdByUserBadge) {
-		createdByBadgePanel.setWidget(createdByUserBadge);
+		createdByBadgePanel.clear();
+		createdByBadgePanel.add(createdByUserBadge);
 	}
 	
 	@Override
@@ -279,25 +254,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiHistoryPanel.clear();
 		wikiHistoryPanel.add(historyWidget);
 	}
-	
-	@Override
-	public void showRestoreButton() {
-		restoreButton.setVisible(true);
-	}
 
 	@Override
 	public void setSynapseAlertWidget(IsWidget synapseAlert) {
 		synAlertPanel.setWidget(synapseAlert);
-	}
-	
-	@Override
-	public void showLoading() {
-		loadingPanel.setVisible(true);
-	}
-	
-	@Override
-	public void hideLoading() {
-		loadingPanel.setVisible(false);
 	}
 
 	@Override
@@ -311,62 +271,57 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void showBreadcrumbs() {
-		breadcrumbPanel.setVisible(true);
+	public void setRestoreButtonVisible(boolean isVisible) {
+		restoreButton.setVisible(isVisible);
 	}
 
 	@Override
-	public void hideBreadcrumbs() {
-		breadcrumbPanel.setVisible(false);
-	}
-	
-	@Override
-	public void hideHistory() {
-		wikiHistoryPanel.setVisible(false);
-	}
-	
-	@Override
-	public void showHistory() {
-		wikiHistoryPanel.setVisible(true);
-	}
-	
-	@Override
-	public void hideCreatedModified() {
-		createdModifiedHistoryPanel.setVisible(false);
-	}
-	
-	@Override
-	public void showCreatedModified() {
-		createdModifiedHistoryPanel.setVisible(true);
+	public void setDiffVersionAlertVisible(boolean isVisible) {
+		diffVersionAlert.setVisible(isVisible);
 	}
 
 	@Override
-	public void hideMarkdown() {
-		markdownPanel.setVisible(false);
+	public void setBreadcrumbsVisible(boolean isVisible) {
+		breadcrumbPanel.setVisible(isVisible);
 	}
 
 	@Override
-	public void showMarkdown() {
-		markdownPanel.setVisible(true);		
+	public void setCreatedModifiedVisible(boolean isVisible) {
+		createdModifiedHistoryPanel.setVisible(isVisible);
 	}
 
 	@Override
-	public void showMainPanel() {
-		mainPanel.setVisible(true);
-	}
-
-	@Override
-	public void hideMainPanel() {
-		mainPanel.setVisible(false);
+	public void setNoWikiCannotEditMessageVisible(boolean isVisible) {
+		noWikiCannotEditMessage.setVisible(isVisible);
 	}
 	
 	@Override
-	public void showHistoryCollapse() {
-		historyCollapse.show();
+	public void setNoWikiCanEditMessageVisible(boolean isVisible) {
+		noWikiCanEditMessage.setVisible(isVisible);
+		
+	}
+
+	@Override
+	public void setMarkdownVisible(boolean isVisible) {
+		markdownPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void setMainPanelVisible(boolean isVisible) {
+		mainPanel.setVisible(isVisible);
 	}
 	
 	@Override
-	public void hideHistoryCollapse() {
-		historyCollapse.hide();
+	public void setLoadingVisible(boolean isVisible) {
+		loadingPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void setWikiHistoryVisible(boolean isVisible) {
+		if (isVisible) {
+			historyCollapse.show();
+		} else {
+			historyCollapse.hide();
+		}
 	}
 }

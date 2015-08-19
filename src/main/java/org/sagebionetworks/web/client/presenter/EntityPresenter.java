@@ -29,13 +29,23 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
+import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -44,9 +54,11 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse> {
+public class EntityPresenter extends AbstractActivity implements EntityView.Presenter, Presenter<Synapse>, IsWidget {
 		
 	private Synapse place;
 	private EntityView view;
@@ -60,14 +72,25 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String areaToken;
 	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private Header headerWidget;
+	private EntityPageTop entityPageTop;
+	private Footer footerWidget;
+	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	
 	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
+	
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
-			SynapseJSNIUtils synapseJsniUtils,
-			SynapseAlert synAlert) {
+			SynapseJSNIUtils synapseJsniUtils, SynapseAlert synAlert,
+			EntityPageTop entityPageTop, Header headerWidget,
+			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
+		this.headerWidget = headerWidget;
+		this.footerWidget = footerWidget;
+		this.entityPageTop = entityPageTop;
+		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
 		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
@@ -75,11 +98,36 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
 		this.synapseJsniUtils = synapseJsniUtils;
-		view.setPresenter(this);
+		//place widgets and configure
+		view.setEntityPageTopWidget(entityPageTop);
+		view.setFooterWidget(footerWidget);
+		view.setHeaderWidget(headerWidget);
+		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
+		view.setSynAlertWidget(synAlert);
+		clear();
+		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				refresh();
+			}
+		});
+		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
+			@Override
+			public void areaChanged(EntityArea area, String areaToken) {
+				updateEntityArea(area, areaToken);
+			}
+
+			@Override
+			public void replaceArea(EntityArea area, String areaToken) {
+				replaceEntityArea(area, areaToken);
+			}
+		});
+		headerWidget.refresh();
 	}
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
+		clear();
 		// Install the view
 		panel.setWidget(view);
 	}
@@ -87,9 +135,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	@Override
 	public void setPlace(Synapse place) {
 		this.place = place;
-		this.view.setPresenter(this);		
-		this.view.setSynAlertWidget(synAlert.asWidget());
-		
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
 		this.area = place.getArea();
@@ -97,7 +142,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		refresh();
 	}
 	
-	public void updateArea(EntityArea area, String areaToken) {
+	public void updateEntityArea(EntityArea area, String areaToken) {
+		clear();
 		this.area = area;
 		this.areaToken = areaToken;
 		place.setArea(area);
@@ -107,7 +153,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	}
 	
 	@Override
-	public void replaceArea(EntityArea area, String areaToken) {
+	public void replaceEntityArea(EntityArea area, String areaToken) {
+		clear();
 		this.area = area;
 		this.areaToken = areaToken;
 		place.setArea(area);
@@ -117,6 +164,14 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	}
 
 	@Override
+	public void clear() {
+		synAlert.clear();
+		openTeamInvitesWidget.clear();
+		view.clear();
+		view.setAccessDependentMessageVisible(false);
+	}
+	
+	@Override
     public String mayStop() {
         view.clear();
         return null;
@@ -124,17 +179,17 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void refresh() {
-		synAlert.clear();
-		view.setBackgroundImageVisible(false);
+		clear();
 		// Hide the view panel contents until async callback completes
-		view.showLoading();
-		
+		view.setBackgroundImageVisible(false);
+		view.setLoadingVisible(true);
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
+				view.setLoadingVisible(false);
 				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}
@@ -159,12 +214,15 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					if (projectHeader != null)
 						loadBackgroundImage(projectHeader.getId());
 					EntityPresenter.filterToDownloadARs(bundle);
-					view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
+					entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
+					entityPageTop.refresh();
+					view.setEntityPageTopWidget(entityPageTop);
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				if(caught instanceof NotFoundException) {
 					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
@@ -184,12 +242,34 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	public void show403() {
 		synAlert.show403();
-		view.show403();
+		view.setLoadingVisible(false);
+		view.hideEntityPageTop();
+		//also add the open team invitations widget (accepting may gain access to this project)
+		openTeamInvitesWidget.configure(new Callback() {
+			@Override
+			public void invoke() {
+				//when team is updated, refresh to see if we can now access
+				refresh();
+			}
+			
+		}, new CallbackP<List<OpenUserInvitationBundle>>() {
+
+			@Override
+			public void invoke(List<OpenUserInvitationBundle> invites) {
+				//if there are any, then also add the title text to the panel
+				if (invites != null && invites.size() > 0) {
+					view.setAccessDependentMessageVisible(true);
+				}
+			}
+			
+		});
 	}
 	
 	public void show404() {
 		synAlert.show404();
-		view.show404();
+		view.setLoadingVisible(false);
+		view.hideEntityPageTop();
+		view.hideOpenTeamInvites();
 	}
 	
 	public void loadBackgroundImage(final String projectEntityId) {
@@ -247,5 +327,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
 		bundle.setUnmetAccessRequirements(filteredList);
+	}
+
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }

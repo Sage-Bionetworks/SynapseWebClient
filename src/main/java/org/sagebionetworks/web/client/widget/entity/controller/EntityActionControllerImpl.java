@@ -47,6 +47,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
@@ -133,7 +134,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.actionMenu = actionMenu;
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
-		this.enityTypeDisplay = EntityType.getEntityTypeForClass(entityBundle.getEntity().getClass()).getDisplayName();
+		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
 		actionMenu.addControllerWidget(uploader.asWidget());

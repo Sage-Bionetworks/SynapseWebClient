@@ -1,18 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -30,22 +29,17 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT
 			.create(EntityMetadataViewImplUiBinder.class);
 
-	@UiField
-	HTMLPanel entityNamePanel;
+
 	@UiField
 	HTMLPanel detailedMetadata;
 	@UiField
 	HTMLPanel dataUseContainer;
 	@UiField
-	Image entityIcon;
-	@UiField
-	SpanElement entityName;
-	@UiField
 	TextBox idField;
 	@UiField
-	SimplePanel favoritePanel;
-	@UiField
 	SimplePanel doiPanel;
+	@UiField
+	Span entityName;
 	@UiField
 	Collapse annotationsContent;
 	@UiField
@@ -56,6 +50,10 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Collapse fileHistoryContent;
 	@UiField
 	SimplePanel fileHistoryContainer;
+	@UiField
+	SimplePanel favoritePanel;
+	@UiField
+	HTMLPanel entityNamePanel;
 		
 	@UiField(provided = true)
 	final IconsImageBundle icons;
@@ -105,8 +103,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	
 	@Override
 	public void getAndSetEntityIcon(Entity en) {
-		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(en, DisplayUtils.IconSize.PX24, icons));
-		synapseIconForEntity.applyTo(entityIcon);
+//		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(en, DisplayUtils.IconSize.PX24, icons));
+//		synapseIconForEntity.applyTo(entityIcon);
 	}
 	
 	@Override
@@ -142,7 +140,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setEntityName(String text) {
-		entityName.setInnerText(text);
+		entityName.setText(text);
 	}
 
 	@Override

@@ -1,14 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface WikiPageWidgetView extends IsWidget, SynapseView {
+public interface WikiPageWidgetView extends IsWidget {
 
 	/**
 	 * Set the presenter.
@@ -39,33 +38,28 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	void showPopup(String title, String message, MessagePopup popupType,
 			org.sagebionetworks.web.client.utils.Callback okCallback,
 			org.sagebionetworks.web.client.utils.Callback cancelCallback);
-	void hideLoading();
-	void showCreatedBy(boolean isVisible);
-	void showModifiedBy(boolean isVisible);
-	void showWikiHistory(boolean isVisible);
+
 	void setMarkdownWidget(IsWidget markdownWidget);
 	void setBreadcrumbWidget(IsWidget breadcrumb);
 	void setSynapseAlertWidget(IsWidget synapseAlert);
-	void showDiffVersionAlert();
-	public void showRestoreButton();
 	void setModifiedByBadge(IsWidget modifiedByUserBadge);
 	void setModifiedByText(String modifiedByText);
 	void setCreatedByBadge(IsWidget createdByUserBadge);
 	void setCreatedByText(String createdByText);
-	void hideDiffVersionAlert();
-	public void showBreadcrumbs();
-	public void hideBreadcrumbs();
 	void setWikiHeadingText(String title);
-	void hideHistory();
-	void showHistory();
-	void hideCreatedModified();
-	void showCreatedModified();
-	void showNoWikiCanEditMessage();
-	void showNoWikiCannotEditMessage();
-	public void hideMarkdown();
-	public void showMarkdown();
-	public void showMainPanel();
-	public void hideMainPanel();
-	void showHistoryCollapse();
-	void hideHistoryCollapse();
+	public void setRestoreButtonVisible(boolean isVisible);
+	public void setDiffVersionAlertVisible(boolean isVisible);
+	public void showCreatedBy(boolean isVisible);
+	public void showModifiedBy(boolean isVisible);
+	public void setBreadcrumbsVisible(boolean isVisible);
+	public void setCreatedModifiedVisible(boolean isVisible);
+	public void setNoWikiCannotEditMessageVisible(boolean isVisible);
+	public void setMarkdownVisible(boolean isVisible);
+	public void setMainPanelVisible(boolean isVisible);
+	public void setWikiHistoryVisible(boolean isVisible);
+	public void setNoWikiCanEditMessageVisible(boolean b);
+	void setLoadingVisible(boolean isVisible);
+	public void showErrorMessage(String message);
+	void showInfo(String title, String message);
+	public void clear();
 }

@@ -22,10 +22,10 @@
 				<t:TableHeader width="350px" addStyleNames="visible-lg">
 					<bh:Span text="Modified By"/>
 				</t:TableHeader>
-				<t:TableHeader width="130px" addStyleNames="visible-sm visible-md visible-lg">
+				<t:TableHeader width="165px" addStyleNames="visible-sm visible-md visible-lg">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
-				<t:TableHeader width="75px">
+				<t:TableHeader width="100px">
 					<bh:Span text="ID" />
 				</t:TableHeader>
 			</t:TableRow>

@@ -24,11 +24,9 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -124,7 +122,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		verify(mockView).showLoading();
+		verify(mockView).setLoadingVisible(true);
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
 		verify(mockBreadcrumb, never()).configure(anyList(), anyString());
@@ -135,7 +133,7 @@ public class WikiPageWidgetTest {
 		verify(mockView).setWikiSubpagesWidget(mockSubpages);
 		verify(mockUserBadge, times(2)).configure(anyString());
 		// once to clear, once after loading shown
-		verify(mockView, times(2)).hideLoading();
+		verify(mockView, times(2)).setLoadingVisible(false);
 	}
 	
 	@Test
@@ -144,10 +142,10 @@ public class WikiPageWidgetTest {
 		boolean canEdit = false;
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, true);
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
-		verify(mockView).hideMarkdown();
-		verify(mockView).hideHistory();
-		verify(mockView).hideCreatedModified();
-		verify(mockView).showNoWikiCannotEditMessage();
+		verify(mockView).setMarkdownVisible(false);
+		verify(mockView).setWikiHistoryVisible(false);
+		verify(mockView).setCreatedModifiedVisible(false);
+		verify(mockView).setNoWikiCannotEditMessageVisible(true);
 	}
 	
 	@Test
@@ -156,10 +154,10 @@ public class WikiPageWidgetTest {
 		boolean canEdit = true;
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, true);
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
-		verify(mockView).hideMarkdown();
-		verify(mockView).hideHistory();
-		verify(mockView).hideCreatedModified();
-		verify(mockView).showNoWikiCanEditMessage();
+		verify(mockView).setMarkdownVisible(false);
+		verify(mockView).setWikiHistoryVisible(false);
+		verify(mockView).setCreatedModifiedVisible(false);
+		verify(mockView).setNoWikiCanEditMessageVisible(true);
 	}
 
 	@Test
@@ -202,7 +200,7 @@ public class WikiPageWidgetTest {
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(0);
 		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
+		presenter.setOwnerObjectName(mockCallbackP);
 		verify(mockSynapseAlert).show404();
 	}
 	
@@ -228,7 +226,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testShowWikiHistory(){
 		presenter.showWikiHistory(false);
-		verify(mockView).showWikiHistory(false);
+		verify(mockView).setWikiHistoryVisible(false);
 	}
 
 	@Test
@@ -244,8 +242,11 @@ public class WikiPageWidgetTest {
 		presenter.reloadWikiPage();
 		verify(mockSynapseAlert).clear();
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockView).hideDiffVersionAlert();
+		verify(mockView).setDiffVersionAlertVisible(false);
 		verify(mockCallbackP).invoke(anyString());
+		//also verify that the created by and modified by are updated when wiki page is reloaded
+		verify(mockView).setCreatedModifiedVisible(true);
+		verify(mockUserBadge, times(2)).configure(anyString());
 	}
 
 	@Test

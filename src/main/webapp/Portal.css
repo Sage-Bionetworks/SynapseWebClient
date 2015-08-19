@@ -1,3 +1,92 @@
+/***************
+Synapse color scheme
+****************/
+.colored { color:#1e7098;}
+.link { color:#1e7098;}
+.link, .link:visited, .link:hover {  color:#1e7098; }
+.link:hover { text-decoration: underline; cursor:pointer;}
+a {color:#1e7098;text-decoration:none;}
+a:visited{color:#1e7098; text-decoration:none;}
+a:hover{color:#1e7098; text-decoration:underline;}
+a:focus{color:#1e7098; text-decoration:underline;}
+.synapse-yellow {color:#68b2bb;}
+.synapse-blue {color:#1e7098;}
+.synapse-purple {color:#7772b4;}
+.synapse-green {color:#0ea862;}
+
+.synapse-yellow-bg {background-color:#68b2bb;}
+.synapse-blue-bg {background-color:#1e7098;}
+.synapse-purple-bg {background-color:#7772b4;}
+.synapse-green-bg {background-color:#0ea862;}
+
+.pagination>li>a, .pagination>li>span
+{
+	color: #1e7098;
+}
+
+.pagination>.active>a,.pagination>.active>span,.pagination>.active>a:hover,.pagination>.active>span:hover,.pagination>.active>a:focus,.pagination>.active>span:focus
+{
+	background-color: #1e7098;
+	border-color:#1e7098;
+}
+.btn-link {
+	color: #1e7098;
+}
+
+a.button_readmore:hover {
+	background-color:#ffcc00;
+}
+.new-item { 
+	background-color:#FFCC00;
+}
+.featured { 
+	background-color:#FFCC00;
+}
+.more{
+	background-color:#FFCC00;
+}
+.ca-more{
+	background-color:#FFCC00;
+}
+.ca-close{
+	background-color:#FFCC00;
+}
+.ca-item .title { 
+	background-color:#FFCC00;
+}
+.mega-button {
+	background-color:#FFCC00;
+}
+.ca-content .live {
+	background-color:#FFCC00;
+}
+
+.ca-content .buy {
+	background-color:#FFCC00;
+}
+.va-slice h3:hover{
+	color:#FFCC00;
+}
+.va-slice ul li a{
+	background:#FFCC00;
+}
+.va-more{
+	background-color:#FFCC00;
+}
+
+/* Bootstrap overrides */
+.btn-primary {
+	color: #fff !important;
+}
+
+a.btn-primary {
+	color: #fff !important;
+}
+
+/***************
+End Synapse color scheme
+****************/
+
 /** Add css rules here for your application. */
 /** Example rules used by the template application (remove for your app) */
 /* h1 {
@@ -162,7 +251,8 @@
 	cursor: hand;
 }
 
-.border-none {
+/* File browser input box needs more fine-tuned selector for override*/
+.border-none, input[type=text][readonly].border-none {
 	border: none;
 }
 .userProfileImage {
@@ -398,7 +488,7 @@
 	font-size: 1.2em;
 }
 
-button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
+div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
 	color:#f0ad4e;
 }
 
@@ -429,11 +519,6 @@ button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a
 .addProjectBox {
 	width: 570px;
 	margin: 4px 10px 0 0; 
-}
-
-/* Clear out GWT's link color */
-a, a:visited, a:hover {
-  color: inherit;
 }
 
 a.shortBtn {		
@@ -670,8 +755,16 @@ a.shortBtn {
 	margin-top: 15px;
 }
 
+.margin-top-20 {
+	margin-top: 20px;
+}
+
 .margin-top-30 {
 	margin-top: 30px;
+}
+
+.margin-top-40 {
+	margin-top: 40px;
 }
 
 .margin-top-60 {
@@ -865,7 +958,6 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: hidden;
 	text-align: justify;
-	font-size: 13px; /* Body font-size defined by Svarog as 12px, bootstrap as 14px */
 }
 
 .markdown ol { 
@@ -902,6 +994,9 @@ a.shortBtn {
     white-space:pre;
     word-wrap: normal;
 }
+.color-white, .color-white:hover, .color-white:visited, .color-white:focus {
+	color: white;
+}
 
 .apitable label {
 	margin-left:5px;
@@ -919,6 +1014,7 @@ a.shortBtn {
 }
 
 .font-italic { font-style: italic; }
+.font-size-1.1em { font-size: 1.1em; }
 
 .public-acl-image {
 	background-image: url(images/icons/globe-green-16.png);
@@ -936,10 +1032,15 @@ a.shortBtn {
 	display:inline-block;
 }
 
+.font-weight-bolder {
+	font-weight: bolder;
+}
+
 .font-size-32 {
 	font-size: 32px !important;
 }
 
+span.font-size-150,
 .font-size-150,
 i.font-size-150 {
 	font-size: 150px;
@@ -949,6 +1050,11 @@ i.font-size-150 {
 	font-size: 90px;
 }
 
+.font-size-67 {
+	font-size: 67px;
+}
+
+span.font-size-58,
 .font-size-58 {
 	font-size: 58px;
 }
@@ -981,10 +1087,13 @@ i.font-size-150 {
 .font-size-15 {
 	font-size: 15px;
 }
-.font-size-14 {
+
+/* font size 14px.  File browser input box needs more fine-tuned selector for override*/
+.font-size-14, input[type=text][readonly].font-size-14 {
 	font-size: 14px;
 }
 
+span.font-size-13,
 .font-size-13 {
 	font-size: 13px;
 }
@@ -1004,6 +1113,11 @@ i.font-size-lg {
 i.font-size-2x {
 	font-size:2em;
 }
+
+.font-size-3-2x {
+	font-size:3.2em;
+}
+
 .font-size-5x,
 i.font-size-5x {
 	font-size:5em;
@@ -1217,7 +1331,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /**********************************/
 	
-.wikifilepreviewimg {
+.center-in-div {
 	margin:auto; 
 	display:block;
 }
@@ -1260,8 +1374,7 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration:underline;
 }
 
-.entityTreeItem, .entityTreeItem-font {
-	font: normal 11px arial, tahoma, helvetica, sans-serif;
+.entityTreeItem {
 	padding-right: 0px !important; /** Override gwt TreeItem BASE_BARE_ELEM padding of 3px **/
 }
 
@@ -1313,6 +1426,11 @@ strong {
 .underline {
 	text-decoration: underline;
 }
+
+.textDecorationNone, .textDecorationNone:visited, .textDecorationNone:hover, .textDecorationNone:focus, .textDecorationNone:active {
+	text-decoration: none;
+}
+
 ol.decimal {	
 	list-style: decimal outside;
 	padding: 0 0 0 30px;
@@ -1387,11 +1505,13 @@ ol.lowerroman {
 	padding: 15px;
 }
 
+.padding-30 {
+	padding: 30px;
+}
 
 .padding-2 {
 	padding: 2px;
 }
-
 
 .howToUseLink {
 	font-size: 16px;
@@ -1431,8 +1551,16 @@ ol.lowerroman {
 	display: inline;
 }
 
+.displayInlineTable {
+	display: inline-table;
+}
+
+
 .displayInlineBlock {
 	display: inline-block;
+}
+.displayBlock {
+	display: block;
 }
 
 .smallerText {
@@ -1544,6 +1672,11 @@ ol.lowerroman {
 .moveup-70 {
 	position: relative;
 	top: -70px;
+}
+
+.moveup-18 {
+	position: relative;
+	top: -18px;
 }
 
 .moveup-10 {
@@ -1685,14 +1818,6 @@ ol.lowerroman {
 	margin-top: 10px !important;
 }
 
-.small-header {
-	height: 45px;
-}
-
-.largeHeader {
-	height: 90px;
-}
-
 .vertical-align-middle {
 	vertical-align: middle;
 }
@@ -1710,78 +1835,6 @@ ol.lowerroman {
 .separator-margin-top {	margin-top: 40px; }
 .separator-header-home { margin-top: 20px; }
 .separator-header-page { margin-top: 3px; }
-
-/*============================*/
-/* Custom Carousel Control */
-.carousel-control-clean {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 15%;
-  font-size: 20px;
-  color: #ffffff;
-  text-align: center;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  opacity: 0.7;
-  filter: alpha(opacity=70);
-}
-
-.carousel-control-clean.left {
-  background-image: -webkit-gradient(linear, 0 top, 100% top, from(rgba(0, 0, 0, 0.2)), to(rgba(0, 0, 0, 0.0001)));
-  background-image: -webkit-linear-gradient(left, color-stop(rgba(0, 0, 0, 0.2) 0), color-stop(rgba(0, 0, 0, 0.0001) 100%));
-  background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0.2) 0, rgba(0, 0, 0, 0.0001) 100%);
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.2) 0, rgba(0, 0, 0, 0.0001) 100%);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);
-}
-
-.carousel-control-clean.right {
-  right: 0;
-  left: auto;
-  background-image: -webkit-gradient(linear, 0 top, 100% top, from(rgba(0, 0, 0, 0.0001)), to(rgba(0, 0, 0, 0.2)));
-  background-image: -webkit-linear-gradient(left, color-stop(rgba(0, 0, 0, 0.0001) 0), color-stop(rgba(0, 0, 0, 0.2) 100%));
-  background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.2) 100%);
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.2) 100%);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);
-}
-
-.carousel-control-clean:hover,
-.carousel-control-clean:focus {
-  color: #ffffff;
-  text-decoration: none;
-  opacity: 0.9;
-  filter: alpha(opacity=90);
-}
-
-.carousel-control-clean .icon-prev,
-.carousel-control-clean .icon-next,
-.carousel-control-clean .glyphicon-chevron-left,
-.carousel-control-clean .glyphicon-chevron-right {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 5;
-  display: inline-block;
-}
-
-.carousel-control-clean .icon-prev,
-.carousel-control-clean .icon-next {
-  width: 20px;
-  height: 20px;
-  margin-top: -10px;
-  margin-left: -10px;
-  font-family: serif;
-}
-
-.carousel-control-clean .icon-prev:before {
-  content: '\2039';
-}
-
-.carousel-control-clean .icon-next:before {
-  content: '\203a';
-}
 
 .projectTitle {
 	color: #555;
@@ -1914,7 +1967,6 @@ a.projectTitle:hover {
   position: relative;
   font-size: 16px;
   height: auto;
-  padding: 10px;
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
@@ -2005,7 +2057,7 @@ iframe[seamless] {
 }
 
 h1, .h1, h2, .h2, h3, .h3 {
-	margin-top: 0px !important;
+	margin-top: 10px !important;
 }
 
 ul, ol {
@@ -2065,6 +2117,10 @@ ul, ol {
 	color: #5bc0de;
 }
 
+div.input-group > input.search-textbox {
+	border: 1px solid #eee;
+	padding-left: 10px;
+}
 
 /* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
 /* By default it's not affixed in mobile views, so undo that */
@@ -2088,7 +2144,6 @@ ul, ol {
 .nav > .active > a,
 .nav > .active:hover > a,
 .nav > .active:focus > a {
-  font-weight: bold;
   color: black !important;
   text-decoration:none;
   background-color: transparent;
@@ -2099,11 +2154,11 @@ ul, ol {
   padding-top:    3px;
   padding-bottom: 3px;
   padding-left: 30px;
-  font-size: 90%;
+  font-size: 1.1em;
 }
 .bs-sidenav .nav .nav > li > a {
   padding-left: 40px;
-  font-size: 80%;
+  font-size: 1em;
 }
 .bs-sidenav .nav .nav .nav > li > a {
   padding-left: 50px;
@@ -2265,7 +2320,7 @@ td.datePickerMonth {
 
 /* Provenance graph css */
 .provEntityNode {
-	opacity:0.8; 
+	opacity:0.9; 
 	filter:alpha(opacity=80); 
 	width:96px; 
 	height:46.8px;
@@ -2283,7 +2338,7 @@ td.datePickerMonth {
 
 .provActivityNode { 
 	border:0.1em dotted #ccc; 
-	opacity:0.8; 
+	opacity:0.9; 
 	filter:alpha(opacity=80); 
 	width: 132px;
 	z-index:20; 
@@ -2351,6 +2406,7 @@ td.datePickerMonth {
 	font-size: 9.6px;
 	margin-top: -4.8px;
 }
+
 /* End provenance graph css */
 
 
@@ -2475,6 +2531,7 @@ pre .apache .tag {
 
 /* Svarog css.  TODO: remove classes overwritten by bootstrap styling */
 
+
 /*-------------------------------------------------------*/
 	/*BODY*/
 /*-------------------------------------------------------*/
@@ -2538,11 +2595,6 @@ p.error{
 .footer-top-line h6 { text-transform:uppercase; padding-left:50px; background-image: url(../images/tweets.png); background-position:left center; background-repeat:no-repeat;  font-size:18px; margin-top:10px;}
 .from_portfolio h3 { margin-bottom:20px !important;}
 .footer p { padding-right:10px; width:210px; margin-bottom:5px !important;}
-.colored { color:#04bfea;}
-
-.link { color:#04bfea;}
-.link:hover { text-decoration: underline; cursor:pointer;}
-/*.link a:hover { text-decoration:underline;} */
 .footer .color a { text-align:center !important; display:block; margin-top:35px;}
 .footer-line p { margin-bottom:0px;}
 .footer-line {  color:#fff; margin-bottom:0px !important; padding-top:15px; padding-bottom:15px;}
@@ -2897,54 +2949,10 @@ div.colborder {
 		background-position: -0px -26px;
 	}
 
-/*-------------------------------------------------------------------------------------------------*/
-	/*TABLES */
-/*-------------------------------------------------------------------------------------------------*/
-
-table.tablesorter {
-	font-family:arial;
-	background-color: #f9f9f9;
-	margin:10px 0pt 15px;
-	font-size: 8pt;
-	width: 100%;
-	text-align: left;
-}
-table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-	background-color: #f9f9f9;
-	border: 1px solid #ededed;
-	font-size: 8pt;
-	padding: 4px;
-}
-table.tablesorter thead tr .header {
-	background-image: url('../images/bg.gif');
-	background-repeat: no-repeat;
-	background-position: center right;
-	cursor: pointer;
-	padding-right: 20px;
-}
-table.tablesorter tbody td {
-	padding: 4px;
-	background-color: #fafafa;
-	vertical-align: top;
-	border: 1px solid #ededed
-}
-table.tablesorter tbody tr.odd td {
-	background-color:#333333;
-}
-table.tablesorter thead tr .headerSortUp {
-	background-image: url('../images/asc.gif');
-}
-table.tablesorter thead tr .headerSortDown {
-	background-image: url('../images/desc.gif');
-}
-table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-background-color: #ededed;
-}
 
 /*-------------------------------------------------------*/
 /* ### Synapse Custom SVAROG ### */
 /*-------------------------------------------------------*/
-.color-line { height:10px; background:#FFCC00 }
 .separator { clear:both; height:1px; background:#ececec; }
 
 /* End Svarog css. */

@@ -2,23 +2,21 @@ package org.sagebionetworks.web.client.widget.footer;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.dom.client.ScriptElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,34 +26,27 @@ public class FooterViewImpl extends Composite implements FooterView {
 	}
 
 	@UiField
-	ScriptElement searchScript;	
+	Anchor debugLink;	
 	@UiField
-	FlowPanel debugModePanel;	
+	Anchor copyrightYear;
 	@UiField
-	SpanElement copyrightYear;
+	Span portalVersionSpan;
 	@UiField
-	SpanElement portalVersionSpan;
-	@UiField
-	SpanElement repoVersionSpan;
+	Span repoVersionSpan;
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public FooterViewImpl(Binder binder, CookieProvider cookies, SynapseJSNIUtils synapseJSNIUtils) {
+	public FooterViewImpl(Binder binder, CookieProvider cookies) {
 		this.initWidget(binder.createAndBindUi(this));
-		searchScript.setText("var TRANSMART_SEARCH = \"http://transmart.sagebase.org/transmart/search/search?sourcepage=search&id=\";		$(function() {			$( \"#query\" ).autocomplete({				source: function( request, response ) {					$.ajax({						url: \"http://transmart.sagebase.org/transmart/search/loadSearch\",						dataType: \"jsonp\",						data: {							query: \"all:\" + request.term												},						success: function( data ) {							response( $.map( data.rows, function( item ) {								return {									label: item.display + \": \" + item.keyword,									value: item.name,									id: item.id								}							}));						}					});				},				minLength: 1,				select: function( event, ui ) {					if(ui.item.id) {											document.location =  TRANSMART_SEARCH + ui.item.id;					}				}			});		});");
 		this.cookies = cookies;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		addDebugModeLink();		
-		copyrightYear.setInnerHTML(DateTimeFormat.getFormat("yyyy").format(new Date()));
+		initDebugModeLink();		
+		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
 	}
 	
-	private void addDebugModeLink() {
-		final Anchor debugModeLink = new Anchor();
-		debugModeLink.setText("@");
-		debugModeLink.addClickHandler(new ClickHandler() {
+	private void initDebugModeLink() {
+		debugLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (!DisplayUtils.isInTestWebsite(cookies)) {
@@ -80,8 +71,6 @@ public class FooterViewImpl extends Composite implements FooterView {
 				
 			}
 		});
-		debugModePanel.addStyleName("inline-block");
-		debugModePanel.add(debugModeLink);
 	}
 	
 	@Override
@@ -93,7 +82,7 @@ public class FooterViewImpl extends Composite implements FooterView {
 	public void setVersion(String portalVersion, String repoVersion) {
 		if(portalVersion == null) portalVersion = "--";
 		if(repoVersion == null) repoVersion = "--";
-		portalVersionSpan.setInnerHTML(portalVersion);
-		repoVersionSpan.setInnerHTML(repoVersion);		
+		portalVersionSpan.setText(portalVersion);
+		repoVersionSpan.setText(repoVersion);		
 	}
 }

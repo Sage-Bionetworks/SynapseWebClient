@@ -5,7 +5,7 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
-  	<bh:Div visible="false" addStyleNames="margin-top-10">
+  	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
   		<b:Alert ui:field="loginAlert" type="INFO">
   			<bh:Strong text="Please login to access this resource." />
   			<b:Button ui:field="loginButton" icon="SIGN_IN" addStyleNames="margin-left-10">Log in</b:Button>
@@ -14,26 +14,28 @@
   			<bh:Strong ui:field="alertText"></bh:Strong>
   		</b:Alert>
   		<g:HTMLPanel ui:field="httpCode404" visible="false">
-  		    <p class="margin-left-15 error left colored">
-  		        404
-  		    </p>
-  		    <h1 class="margin-top-60-imp">
-				Page not found
-			</h1>
-			<p>
-				The page you requested was not found, that's all we know.
-			</p>
+  			<b:Row>
+  				<b:Column size="XS_2">
+  					<b:Icon type="WARNING" addStyleNames="text-warning font-size-5x" pull="RIGHT"/>
+  				</b:Column>
+  				<b:Column size="XS_10">
+  					<b:Heading size="H3" text="The page you requested was not found." />	
+  				</b:Column>
+  			</b:Row>
   		</g:HTMLPanel>
   		<g:HTMLPanel ui:field="httpCode403" visible="false">
-  		    <p class="margin-left-15 error left colored">
-  		        403
-  		    </p>
-  		    <h1 class="margin-top-60-imp">
-				Forbidden
-			</h1>
-			<p>
-				You are not authorized to access the page requested.
-			</p>
+  			<b:Row>
+  				<b:Column size="XS_2">
+  					<b:Icon type="WARNING" addStyleNames="text-warning font-size-5x margin-top-10" pull="RIGHT"/>
+  				</b:Column>
+  				<b:Column size="XS_10">
+  					<b:Heading size="H3" text="You are not authorized to access the page requested." />
+  					<bh:Div ui:field="requestAccessUI" addStyleNames="margin-top-20">
+			  			<b:Heading size="H4" text="You can request access from the owner." />
+			  			<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request access" size="LARGE" dataLoadingText="Sending request..."/>
+			  		</bh:Div>
+  				</b:Column>
+  			</b:Row>
   		</g:HTMLPanel>
 	  	<b:Modal ui:field="jiraDialog" title="Synapse Error" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>

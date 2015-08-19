@@ -30,7 +30,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
@@ -48,7 +47,6 @@ public class ProjectBadgeTest {
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
-	EntityIconsCache mockEntityIconsCache;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	ClientCache mockClientCache;
 	ProjectBadgeView mockView;
@@ -67,7 +65,6 @@ public class ProjectBadgeTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(ProjectBadgeView.class);
 		mockClientCache = mock(ClientCache.class);
-		mockEntityIconsCache = mock(EntityIconsCache.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockFavoriteWidget = mock(FavoriteWidget.class);
 		mockProjectHeader = mock(ProjectHeader.class);
@@ -81,7 +78,7 @@ public class ProjectBadgeTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, the view is attached
 		when(mockView.isAttached()).thenReturn(true);
-		widget = new ProjectBadge(mockView, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache, mockFavoriteWidget, mockGWT);
+		widget = new ProjectBadge(mockView, mockFavoriteWidget, mockGWT);
 		
 		//set up user profile
 		userProfile =  new UserProfile();

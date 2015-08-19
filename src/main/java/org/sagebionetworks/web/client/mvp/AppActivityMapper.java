@@ -28,12 +28,12 @@ import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.RestartActivityOptional;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
+import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
@@ -85,13 +85,13 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Challenges.class);
 		openAccessPlaces.add(Help.class);
 		openAccessPlaces.add(Search.class);
-		openAccessPlaces.add(WikiPlace.class);
 		openAccessPlaces.add(Team.class);
 		openAccessPlaces.add(TeamSearch.class);
 		openAccessPlaces.add(PeopleSearch.class);
 		openAccessPlaces.add(Down.class);
 		openAccessPlaces.add(Profile.class);
 		openAccessPlaces.add(Certificate.class);
+		openAccessPlaces.add(StandaloneWiki.class);
 		openAccessPlaces.add(SignedToken.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();

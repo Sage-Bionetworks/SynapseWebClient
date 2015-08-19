@@ -17,9 +17,7 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
 	<g:HTMLPanel>
-		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator margin-top-10-imp"></div>
 		<div class="container">
 			<g:SimplePanel ui:field="fullWidthPanel" styleName="margin-top-15" />
 			<div class="clear"></div>
