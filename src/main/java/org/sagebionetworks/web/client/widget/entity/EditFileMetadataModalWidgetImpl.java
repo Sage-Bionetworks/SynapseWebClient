@@ -3,10 +3,12 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -82,28 +84,41 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	}
 
 	@Override
-	public void configure(FileEntity fileEntity, List<FileHandle> fileHandles,
-			Callback handler) {
+	public void configure(final FileEntity fileEntity, final List<FileHandle> fileHandles, final Callback handler) {
+		this.handler = handler;
+		this.fileEntity = fileEntity;
+		this.startingName = fileEntity.getName();
+		
 		//can only be run on the current version.
-		if (fileEntity.getVersionNumber() != null) {
-			view.showErrorPopup(CURRENT_VERSION_ONLY_MESSAGE);
-		} else {
-			this.handler = handler;
-			this.fileEntity = fileEntity;
-			//find the non-preview file handle
-			for (FileHandle fileHandle : fileHandles) {
-				if (fileHandle.getId().equals(fileEntity.getDataFileHandleId())) {
-					this.fileHandle = fileHandle;
-					break;
+		//get the current version
+		synapseClient.getEntityVersions(fileEntity.getId(), 1, 1, new AsyncCallback<PaginatedResults<VersionInfo>>() {
+			@Override
+			public void onSuccess(PaginatedResults<VersionInfo> result) {
+				if (fileEntity.getVersionNumber() != result.getResults().get(0).getVersionNumber()) {
+					view.showErrorPopup(CURRENT_VERSION_ONLY_MESSAGE);
+				} else {
+					//find the non-preview file handle
+					for (FileHandle handle : fileHandles) {
+						if (handle.getId().equals(fileEntity.getDataFileHandleId())) {
+							fileHandle = handle;
+							break;
+						}
+					}
+					startingFileName = fileHandle.getFileName();
+					startingContentType = fileHandle.getContentType();
+					
+					view.clear();
+					view.configure(startingName, startingFileName, startingContentType);
+					view.show();	
 				}
+			};
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorPopup(caught.getMessage());
 			}
-			this.startingName = fileEntity.getName();
-			this.startingFileName = fileHandle.getFileName();
-			this.startingContentType = fileHandle.getContentType();
-			this.view.clear();
-			this.view.configure(startingName, startingFileName, startingContentType);
-			this.view.show();	
-		}
+		});
+		
 	}
 
 }
