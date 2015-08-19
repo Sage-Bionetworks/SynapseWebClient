@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -31,6 +32,8 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 	Alert alert;
 	@UiField
 	Button primaryButton;
+	@UiField
+	Div aliasUI;
 	
 	@Inject
 	public EditProjectMetadataModalViewImpl(Binder binder){
@@ -116,4 +119,8 @@ public class EditProjectMetadataModalViewImpl implements EditProjectMetadataModa
 	public String getAlias() {
 		return aliasField.getText();
 	};
+	@Override
+	public void setAliasUIVisible(boolean visible) {
+		aliasUI.setVisible(visible);
+	}
 }

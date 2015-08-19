@@ -29,6 +29,13 @@ public interface EditFileMetadataModalView extends IsWidget {
 	public void showError(String error);
 	
 	/**
+	 * Pop up an error message (outside of dialog)
+	 * @param error
+	 */
+	public void showErrorPopup(String error);
+	
+	
+	/**
 	 * Bind this view to its presenter.
 	 * @param presenter
 	 */

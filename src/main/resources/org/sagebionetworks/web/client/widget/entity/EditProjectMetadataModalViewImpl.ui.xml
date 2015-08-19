@@ -14,17 +14,18 @@
 					<b:FormLabel>Synapse name</b:FormLabel>
 					<b:TextBox ui:field="entityNameField" />
 				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel>Friendly URL project name</b:FormLabel>
-					<b:TextBox ui:field="aliasField" />
-				</b:FormGroup>
-				<g:FlowPanel addStyleNames="help-panel">
-					<b:BlockQuote styleName="panel">
-						<b:Heading text="Friendly URL Project Name" size="H4"></b:Heading>
-						<bh:Text text="After saving, you can access your project via http://www.synapse.org/<your friendly URL project name>"></bh:Text>
-					</b:BlockQuote>
-				</g:FlowPanel>
-				
+				<bh:Div ui:field="aliasUI">
+					<b:FormGroup>
+						<b:FormLabel>Friendly URL project name</b:FormLabel>
+						<b:TextBox ui:field="aliasField" />
+					</b:FormGroup>
+					<g:FlowPanel addStyleNames="help-panel">
+						<b:BlockQuote styleName="panel">
+							<b:Heading text="Friendly URL Project Name" size="H4"></b:Heading>
+							<bh:Text text="After saving, you can access your project via http://www.synapse.org/your friendly URL project name"></bh:Text>
+						</b:BlockQuote>
+					</g:FlowPanel>
+				</bh:Div>
 			</bh:Div>
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 		</b:ModalBody>

@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -61,6 +62,11 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 	public void showError(String error) {
 		alert.setVisible(true);
 		alert.setText(error);
+	}
+	
+	@Override
+	public void showErrorPopup(String error) {
+		DisplayUtils.showErrorMessage(error);
 	}
 
 	@Override

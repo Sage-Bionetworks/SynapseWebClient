@@ -15,6 +15,7 @@ import com.google.inject.Inject;
 public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalView.Presenter, EditFileMetadataModalWidget {
 	public static final String FILE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "File name must include at least one character.";
 	public static final String FILE_CONTENT_TYPE_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "File content type must include at least one character.";
+	public static final String CURRENT_VERSION_ONLY_MESSAGE = "Metadata can only be modified on the most current version of the file.";
 	
 	EditFileMetadataModalView view;
 	SynapseClientAsync synapseClient;
@@ -83,22 +84,26 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	@Override
 	public void configure(FileEntity fileEntity, List<FileHandle> fileHandles,
 			Callback handler) {
-		this.handler = handler;
-		this.fileEntity = fileEntity;
-		//find the non-preview file handle
-		for (FileHandle fileHandle : fileHandles) {
-			if (fileHandle.getId().equals(fileEntity.getDataFileHandleId())) {
-				this.fileHandle = fileHandle;
-				break;
+		//can only be run on the current version.
+		if (fileEntity.getVersionNumber() != null) {
+			view.showErrorPopup(CURRENT_VERSION_ONLY_MESSAGE);
+		} else {
+			this.handler = handler;
+			this.fileEntity = fileEntity;
+			//find the non-preview file handle
+			for (FileHandle fileHandle : fileHandles) {
+				if (fileHandle.getId().equals(fileEntity.getDataFileHandleId())) {
+					this.fileHandle = fileHandle;
+					break;
+				}
 			}
+			this.startingName = fileEntity.getName();
+			this.startingFileName = fileHandle.getFileName();
+			this.startingContentType = fileHandle.getContentType();
+			this.view.clear();
+			this.view.configure(startingName, startingFileName, startingContentType);
+			this.view.show();	
 		}
-		this.startingName = fileEntity.getName();
-		this.startingFileName = fileHandle.getFileName();
-		this.startingContentType = fileHandle.getContentType();
-		this.view.clear();
-		this.view.configure(startingName, startingFileName, startingContentType);
-		this.view.show();
 	}
-
 
 }

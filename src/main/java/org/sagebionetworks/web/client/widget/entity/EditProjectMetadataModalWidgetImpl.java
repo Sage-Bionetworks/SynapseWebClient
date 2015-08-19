@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -8,11 +9,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
-import org.sagebionetworks.repo.model.Project;
 
 public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataModalView.Presenter, EditProjectMetadataModalWidget {
 	EditProjectMetadataModalView view;
@@ -73,13 +69,14 @@ public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataMo
 	}
 
 	@Override
-	public void configure(Project project, Callback handler) {
+	public void configure(Project project, boolean canChangeSettings, Callback handler) {
 		this.handler = handler;
 		this.project = project;
 		this.startingName = project.getName();
 		this.startingAlias = project.getAlias();
 		this.view.clear();
 		this.view.configure(startingName, startingAlias);
+		this.view.setAliasUIVisible(canChangeSettings);
 		this.view.show();
 	}
 

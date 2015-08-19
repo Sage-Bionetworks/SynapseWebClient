@@ -20,7 +20,7 @@ public interface EditProjectMetadataModalView extends IsWidget {
 	
 	public String getAlias();
 	public String getEntityName();
-	
+	public void setAliasUIVisible(boolean visible);
 	/**
 	 * Show an error message..
 	 * @param error
