@@ -167,7 +167,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureProvenance();
 			configureChangeStorageLocation();
 			configureCreateDOI();
-			configureEditProjectMetadataAction();
+			//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
+//			configureEditProjectMetadataAction();
 			configureEditFileMetadataAction();
 		}
 	}
@@ -338,26 +339,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureEditProjectMetadataAction(){
-//		if(entityBundle.getEntity() instanceof Project){
-//			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
-//			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
-//			actionMenu.addActionListener(Action.EDIT_PROJECT_METADATA, this);
-//		}else{
-//			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, false);
-//			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, false);
-//		}
-		
-		//uncomment above code when permissions are sorted out on the backend (add new CHANGE_SETTINGS to all users with admin)
-		if(entityBundle.getEntity() instanceof Project) {
-			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
-			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
-			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+enityTypeDisplay);
-			actionMenu.addActionListener(Action.CHANGE_ENTITY_NAME, this);
-		} else {
-			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, false);
+		if(entityBundle.getEntity() instanceof Project){
+			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
+			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
+			actionMenu.addActionListener(Action.EDIT_PROJECT_METADATA, this);
+		}else{
+			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, false);
+			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, false);
 		}
-
 	}
 	
 	private void configureEditFileMetadataAction(){
@@ -372,8 +361,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureRenameAction(){
-		//if File or Project then special Edit Metadata commands are shown
-		if(!(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Project)) {
+		if(isRenameOnly(entityBundle.getEntity())) {
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
 			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+enityTypeDisplay);
@@ -454,6 +442,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return entity instanceof Versionable;
 	}
 
+
+	/**
+	 * Can this entity be renamed (File and Project will have additional editable fields)?
+	 * @param entity
+	 * @return
+	 */
+	public boolean isRenameOnly(Entity entity){
+		if(entity instanceof FileEntity){
+			return false;
+//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
+//		}else if(entity instanceof Project){
+//			return false;
+		}
+		return true;
+	}
+	
 	@Override
 	public void onAction(Action action) {
 		switch(action){
@@ -470,10 +474,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			onEditFileMetadata();
 			break;
 		case EDIT_PROJECT_METADATA:
-			//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
-//			onEditProjectMetadata();
-			//for now, just rename
-			onRename();
+			onEditProjectMetadata();
 			break;
 		case EDIT_WIKI_PAGE:
 			onEditWiki();
