@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -45,13 +45,10 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
@@ -800,12 +797,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * Called if the preflight check for a edit project metadata passes.
 	 */
 	private void postCheckEditProjectMetadata(){
-//		editProjectMetadataModalWidget.configure((Project)entityBundle.getEntity(), permissions.getCanChangeSettings(), new Callback() {
-//			@Override
-//			public void invoke() {
-//				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
-//			}
-//		});
+		//TODO: use permissions.getCanChangeSettings() when available
+//		boolean canChangeSettings = permissions.getCanChangeSettings();
+		boolean canChangeSettings = true;
+		editProjectMetadataModalWidget.configure((Project)entityBundle.getEntity(), canChangeSettings, new Callback() {
+			@Override
+			public void invoke() {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+		});
 	}
 	
 	@Override

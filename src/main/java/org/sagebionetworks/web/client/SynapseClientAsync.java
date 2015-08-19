@@ -444,6 +444,6 @@ public interface SynapseClientAsync {
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
 
-	void updateFileEntity(FileEntity fileEntity, String id, String fileName,
+	void updateFileEntity(FileEntity fileEntity, String fileHandleId, String fileName,
 			String contentType, AsyncCallback<Void> asyncCallback);
 }
