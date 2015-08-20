@@ -13,7 +13,7 @@
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
 		    	<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground " readOnly="true" />
 		    	<bh:Span ui:field="doiPanel" />
-		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline"></g:HTMLPanel>
+		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline margin-left-10"></g:HTMLPanel>
 		    </bh:Div>
 			
 		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse"  >
