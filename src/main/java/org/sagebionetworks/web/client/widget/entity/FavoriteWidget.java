@@ -86,10 +86,13 @@ public class FavoriteWidget implements Presenter, IsWidget {
 
 	public void updateIsFavoriteView() {
 		view.hideFavoriteAndLoading();
-		if (isFavorite(entityId))
-			view.showIsFavorite();
-		else
-			view.showIsNotFavorite();
+		if (isFavorite(entityId)) {
+			view.setFavoriteVisible(true);
+			view.setNotFavoriteVisible(false);
+		} else {
+			view.setFavoriteVisible(false);
+			view.setNotFavoriteVisible(true);
+		}
 	}
 
 	private void setIsFavorite(final String entityId,
