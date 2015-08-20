@@ -74,7 +74,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private SynapseJSNIUtils synapseJsniUtils;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
-	private Footer footerWidget;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	
 	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
@@ -88,7 +87,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			EntityPageTop entityPageTop, Header headerWidget,
 			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;

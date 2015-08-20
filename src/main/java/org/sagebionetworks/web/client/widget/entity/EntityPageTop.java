@@ -127,8 +127,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	}
 	}
     
-	@SuppressWarnings("unchecked")
-	public void clearState() {
+    public void clearState() {
 		view.clear();
 		// remove handlers
 		this.bundle = null;
