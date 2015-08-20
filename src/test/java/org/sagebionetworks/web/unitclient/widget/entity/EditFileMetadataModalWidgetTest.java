@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.BUTTON_TEXT;
-import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.LABLE_SUFFIX;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER;
-import static org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl.TITLE_PREFIX;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,19 +15,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalView;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
-import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidgetImpl;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -37,7 +34,6 @@ public class EditFileMetadataModalWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	Callback mockCallback;
 	String startName;
-	String entityDispalyType;
 	String parentId;
 	EditFileMetadataModalWidgetImpl widget;
 	FileEntity entity;
