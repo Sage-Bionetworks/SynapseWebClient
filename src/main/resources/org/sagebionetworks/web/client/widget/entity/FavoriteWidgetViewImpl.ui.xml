@@ -11,7 +11,7 @@
 			<b:Anchor addStyleNames="favoriteIcon" ui:field="favoriteIcon" icon="STAR"/>
 		</b:Tooltip>
 		<b:Tooltip trigger="HOVER" placement="RIGHT" title="Click the star to add this to your favorites!">
-			<b:Anchor addStyleNames="greyText-imp" ui:field="notFavoriteIcon" icon="STAR"/>
+			<b:Anchor addStyleNames="greyText-imp" ui:field="notFavoriteIcon" icon="STAR_O"/>
 		</b:Tooltip>
 		<g:Image ui:field="loadingUI" styleName="displayInline" resource='{sageImageBundle.loading16}' />
 	</bh:Span>
