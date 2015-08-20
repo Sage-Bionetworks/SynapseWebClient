@@ -8,21 +8,10 @@
     <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
     
 	<g:HTMLPanel>
-		<h2 style="margin-bottom: 0px;">	
-			<g:HTMLPanel ui:field="entityNamePanel">			
-				 <bh:Span addStyleNames="liftLargeIcon">
-				 	<g:Image ui:field="entityIcon" styleName="liftLargeIcon"/>
-				 </bh:Span>
-				 &nbsp;
-				 <bh:Span ui:field="entityName"/>
-				 &nbsp;
-				 <g:SimplePanel ui:field="favoritePanel" addStyleNames="inline-block"/>			
-			</g:HTMLPanel>
-		</h2>
 		<g:HTMLPanel ui:field="detailedMetadata">
 		    <bh:Div>
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
-		    	<g:TextBox ui:field="idField" width="85px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
+		    	<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline">
 		    	    <bh:Span addStyleNames="margin-right-5 boldText">Conditions for use:</bh:Span>
 		    	    <g:SimplePanel ui:field="restrictionPanel"></g:SimplePanel>

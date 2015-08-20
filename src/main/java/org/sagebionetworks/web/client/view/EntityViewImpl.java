@@ -47,17 +47,17 @@ public class EntityViewImpl implements EntityView {
 	@Override
 	public void setHeaderWidget(IsWidget headerWidget) {
 		headerPanel.setWidget(headerWidget);
-			}
+	}
 	
-			@Override
+	@Override
 	public void setFooterWidget(IsWidget footerWidget) {
 		footerPanel.setWidget(footerWidget);
-			}
+	}
 
-			@Override
+	@Override
 	public void setEntityPageTopWidget(IsWidget entityPageTopWidget) {
 		entityPageTopPanel.setWidget(entityPageTopWidget);
-			}
+	}
 		
 	@Override
 	public void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidget) {
@@ -109,29 +109,20 @@ public class EntityViewImpl implements EntityView {
 	public void setBackgroundImageUrl(String url) {
 		entityBackgroundImage.setUrl(url);
 	}
-			
+	
 	@Override
-	public void showOpenTeamInvites() {
-		openInvitesPanel.setVisible(true);
-	}
-
-	@Override
-	public void showEntityPageTop() {
-		entityPageTopPanel.setVisible(true);
+	public void setEntityPageTopVisible(boolean isVisible) {
+		entityPageTopPanel.setVisible(isVisible);
 	}
 
 	@Override
 	public void setAccessDependentMessageVisible(boolean isVisible) {
-		accessDependentMessage.setVisible(false);
+		accessDependentMessage.setVisible(isVisible);
 	}
 	
 	@Override
-	public void hideOpenTeamInvites() {
-		openInvitesPanel.setVisible(false);		
+	public void setOpenTeamInvitesVisible(boolean isVisible) {
+		openInvitesPanel.setVisible(isVisible);
 	}
 
-	@Override
-	public void hideEntityPageTop() {
-		entityPageTopPanel.setVisible(false);
-	}
 }

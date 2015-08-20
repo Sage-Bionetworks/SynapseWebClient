@@ -1,15 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.Entity;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityMetadataView extends IsWidget {
 
 	public void setDetailedMetadataVisible(boolean visible);
-	
-	public void setEntityNameVisible(boolean visible);
-	
+		
 	void setAnnotationsVisible(boolean visible);
 	
 	public interface Presenter {
@@ -22,22 +18,16 @@ public interface EntityMetadataView extends IsWidget {
 
 	void setFileHistoryWidget(IsWidget fileHistoryWidget);
 
-	public void setFavoriteWidget(IsWidget favoriteWidget);
-
 	public void setDoiWidget(IsWidget doiWidget);
 
 	public void setAnnotationsRendererWidget(IsWidget annotationsWidget);
 
 	void clear();
 
-	void setEntityName(String text);
-
-	void setEntityId(String text);
-
-	void getAndSetEntityIcon(Entity en);
-
 	public void setRestrictionPanelVisible(boolean visible);
 
 	void setRestrictionWidget(IsWidget restrictionWidget);
+
+	void setEntityId(String text);
 
 }

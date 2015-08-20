@@ -43,13 +43,11 @@ public interface EntityView extends IsWidget {
 	void setEntityPageTopWidget(IsWidget entityPageTopWidget);
 	void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
 	void setSynAlertWidget(IsWidget synAlert);
-	void showOpenTeamInvites();
-	void showEntityPageTop();
 	void setAccessDependentMessageVisible(boolean isVisible);
-	void hideOpenTeamInvites();
-	void hideEntityPageTop();
 	void clear();
 	void showInfo(String title, String message);
 	void setLoadingVisible(boolean isVisible);
 	void showErrorMessage(String message);
+	void setEntityPageTopVisible(boolean isVisible);
+	void setOpenTeamInvitesVisible(boolean isVisible);
 }

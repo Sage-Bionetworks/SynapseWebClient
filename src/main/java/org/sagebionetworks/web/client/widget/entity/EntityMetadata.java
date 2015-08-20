@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -20,25 +19,21 @@ public class EntityMetadata implements Presenter {
 	private EntityMetadataView view;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private AnnotationsRendererWidget annotationsWidget;
-	private FavoriteWidget favoriteWidget;
 	private DoiWidget doiWidget;
 	private FileHistoryWidget fileHistoryWidget;
 	private RestrictionWidget restrictionWidget;
 	
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
-			FavoriteWidget favoriteWidget,
 			DoiWidget doiWidget,
 			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget,
 			FileHistoryWidget fileHistoryWidget) {
 		this.view = view;
-		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.restrictionWidget = restrictionWidget;
-		this.view.setFavoriteWidget(favoriteWidget);
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
@@ -51,14 +46,10 @@ public class EntityMetadata implements Presenter {
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		clear();
 		Entity en = bundle.getEntity();
+		view.setEntityId(en.getId());
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		boolean showDetailedMetadata = true;
-		boolean showEntityName = true;
-		view.setEntityId(en.getId());
-		view.setEntityName(en.getName());
-		view.getAndSetEntityIcon(en);
 		if (bundle.getEntity() instanceof FileEntity) {
-			showEntityName = false;
 			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
 			fileHistoryWidget.setEntityUpdatedHandler(entityUpdatedHandler);
 			view.setFileHistoryWidget(fileHistoryWidget);
@@ -76,11 +67,9 @@ public class EntityMetadata implements Presenter {
 			}
 		});
 		this.view.setRestrictionWidget(restrictionWidget);
-		favoriteWidget.configure(bundle.getEntity().getId());
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
 		annotationsWidget.configure(bundle, canEdit);
 		view.setDetailedMetadataVisible(showDetailedMetadata);
-		view.setEntityNameVisible(showEntityName);
 	}	
 
 	@Override

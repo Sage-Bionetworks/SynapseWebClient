@@ -214,15 +214,19 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					if (projectHeader != null)
 						loadBackgroundImage(projectHeader.getId());
 					EntityPresenter.filterToDownloadARs(bundle);
+					entityPageTop.clearState();
 					entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 					entityPageTop.refresh();
 					view.setEntityPageTopWidget(entityPageTop);
+					view.setEntityPageTopVisible(true);
+					headerWidget.configure(false, projectHeader);
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoadingVisible(false);
+				headerWidget.configure(false);
 				if(caught instanceof NotFoundException) {
 					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
@@ -243,7 +247,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public void show403() {
 		synAlert.show403();
 		view.setLoadingVisible(false);
-		view.hideEntityPageTop();
+		view.setEntityPageTopVisible(false);
 		//also add the open team invitations widget (accepting may gain access to this project)
 		openTeamInvitesWidget.configure(new Callback() {
 			@Override
@@ -263,13 +267,14 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			}
 			
 		});
+		view.setOpenTeamInvitesVisible(true);
 	}
 	
 	public void show404() {
 		synAlert.show404();
 		view.setLoadingVisible(false);
-		view.hideEntityPageTop();
-		view.hideOpenTeamInvites();
+		view.setEntityPageTopVisible(false);
+		view.setOpenTeamInvitesVisible(false);
 	}
 	
 	public void loadBackgroundImage(final String projectEntityId) {

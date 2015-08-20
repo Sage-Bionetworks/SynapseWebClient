@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.google.gwt.core.client.GWT;
@@ -14,7 +12,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -39,8 +36,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel doiPanel;
 	@UiField
-	Span entityName;
-	@UiField
 	Collapse annotationsContent;
 	@UiField
 	SimplePanel annotationsContainer;
@@ -50,10 +45,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Collapse fileHistoryContent;
 	@UiField
 	SimplePanel fileHistoryContainer;
-	@UiField
-	SimplePanel favoritePanel;
-	@UiField
-	HTMLPanel entityNamePanel;
 		
 	@UiField(provided = true)
 	final IconsImageBundle icons;
@@ -70,11 +61,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 				idField.selectAll();
 			}
 		});
-	}
-
-	@Override
-	public void setFavoriteWidget(IsWidget favoriteWidget) {
-		favoritePanel.setWidget(favoriteWidget);
 	}
 
 	@Override
@@ -102,12 +88,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	}
 	
 	@Override
-	public void getAndSetEntityIcon(Entity en) {
-//		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(en, DisplayUtils.IconSize.PX24, icons));
-//		synapseIconForEntity.applyTo(entityIcon);
-	}
-	
-	@Override
 	public void setFileHistoryWidget(IsWidget fileHistoryWidget) {
 		fileHistoryContainer.setWidget(fileHistoryWidget);
 	}
@@ -131,16 +111,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setDetailedMetadataVisible(boolean visible) {
 		detailedMetadata.setVisible(visible);
-	}
-	
-	@Override
-	public void setEntityNameVisible(boolean visible) {
-		this.entityNamePanel.setVisible(visible);
-	}
-
-	@Override
-	public void setEntityName(String text) {
-		entityName.setText(text);
 	}
 
 	@Override
