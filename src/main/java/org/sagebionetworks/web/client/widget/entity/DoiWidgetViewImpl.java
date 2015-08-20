@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -11,10 +9,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -31,7 +27,7 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 	SimplePanel doiProcessing;
 	
 	@UiField
-	HTMLPanel doiHTML;
+	TextBox doi;
 	
 	Widget widget;
 	
@@ -44,12 +40,20 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		widget = uiBinder.createAndBindUi(this);
+		
+		doi.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				doi.selectAll();
+			}
+		});
 	}
 	
 	private void hideAllChildren() {
 		errorCreatingDoi.setVisible(false);
 		doiProcessing.setVisible(false);
-		doiHTML.getElement().setInnerHTML("");
+		doi.setText("");
+		doi.setVisible(false);
 	}
 	
 	@Override
@@ -74,8 +78,8 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 		hideAllChildren();
 		//ask for the doi prefix from the presenter, and show a link to that!
 		//first clear old handler, if there is one
-		doiHTML.setVisible(true);
-		doiHTML.getElement().setInnerHTML(doiText);
+		doi.setVisible(true);
+		doi.setText(doiText);
 	}
 	
 	@Override
