@@ -13,10 +13,8 @@
 		}
 	</ui:style>
 	<g:HTMLPanel>
-        <div class="color-line"></div>
         <div class="clear"></div>
 			<g:SimplePanel ui:field="header" />
-		        <div class="separator margin-top-10-imp"></div>
 		    	<div class="container margin-top-15"> 		
 				<g:HTMLPanel ui:field="loginView" visible="true">
 					<!-- LoginView -->				

@@ -35,13 +35,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
-	private String synapseVersion;
 	private boolean isEditing;
 	private HashMap<String, String> synapseProperties;
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private ClientLogger logger;
 	private GlobalApplicationStateView view;
+	private String synapseVersion;
+	
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -204,16 +205,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			@Override
 			public void onSuccess(String versions) {
 				boolean isVersionChange = false;
-				if(synapseVersion == null) {
-					synapseVersion = versions;
-				} else {
-					if(!synapseVersion.equals(versions)) {
-						view.showVersionOutOfDateGlobalMessage();
-						isVersionChange = true;
-					}
+				//synapse version is set on app load
+				if(!synapseVersion.equals(versions)) {
+					view.showVersionOutOfDateGlobalMessage();
+					isVersionChange = true;
 				}
 				if (callback != null) {
-					callback.onSuccess(new VersionState(versions, isVersionChange));
+					callback.onSuccess(new VersionState(synapseVersion, isVersionChange));
 				}
 			}
 			
@@ -243,6 +241,21 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			public void onSuccess(HashMap<String, String> properties) {
 				synapseProperties = properties;
 				initWikiEntities(properties);
+				initSynapseVersions(c);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				c.invoke();
+			}
+		});
+	}
+	
+	public void initSynapseVersions(final Callback c) {
+		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
+			@Override
+			public void onSuccess(String versions) {
+				synapseVersion = versions;
 				c.invoke();
 			}
 			
@@ -252,6 +265,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			}
 		});
 	}
+
 	
 	@Override
 	public String getSynapseProperty(String key) {
@@ -307,5 +321,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void initOnPopStateHandler() {
 		this.synapseJSNIUtils.initOnPopStateHandler();
+	}
+	
+	public String getSynapseVersion() {
+		return synapseVersion;
 	}
 }

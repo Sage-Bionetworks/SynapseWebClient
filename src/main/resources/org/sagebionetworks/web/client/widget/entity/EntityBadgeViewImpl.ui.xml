@@ -9,7 +9,9 @@
 	<t:Table width="100%" height="30px">
 		<t:TableRow>
 			<t:TableData width="20px">
-				<g:SimplePanel ui:field="iconContainer"/>
+				<g:FocusPanel ui:field="iconContainer">
+					<b:Icon ui:field="icon" type="FILE"/>
+				</g:FocusPanel>
 			</t:TableData>
 			<t:TableData addStyleNames="maxWidth50px overflow-x-hidden">
 				<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" >
@@ -19,11 +21,11 @@
 			<t:TableData width="350px" addStyleNames="visible-lg">
 				<g:SimplePanel ui:field="modifiedByField"/>
 			</t:TableData>
-			<t:TableData width="130px" addStyleNames="visible-sm visible-md visible-lg">
+			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="75px" >
-				<g:TextBox ui:field="idField" width="75px" addStyleNames="border-none noBackground" readOnly="true" />
+			<t:TableData width="100px" >
+				<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
 		</t:TableRow>
 	</t:Table>    

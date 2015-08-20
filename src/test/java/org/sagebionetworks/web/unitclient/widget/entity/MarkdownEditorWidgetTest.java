@@ -147,11 +147,11 @@ public class MarkdownEditorWidgetTest {
 		AsyncMockStubber
 				.callSuccessWith(testHelpPagesMap)
 				.when(mockSynapseClient)
-				.getHelpPages(any(AsyncCallback.class));
+				.getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		CallbackP<WikiPageKey> mockCallback = mock(CallbackP.class);
 		presenter.getFormattingGuideWikiKey(mockCallback);
 		//service was called
-		verify(mockSynapseClient).getHelpPages(any(AsyncCallback.class));
+		verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		//and callback was invoked with the formatting guide wiki key
 		ArgumentCaptor<WikiPageKey> wikiKeyCaptor = ArgumentCaptor.forClass(WikiPageKey.class);
 		verify(mockCallback).invoke(wikiKeyCaptor.capture());
@@ -164,11 +164,11 @@ public class MarkdownEditorWidgetTest {
 		AsyncMockStubber
 				.callFailureWith(new Exception())
 				.when(mockSynapseClient)
-				.getHelpPages(any(AsyncCallback.class));
+				.getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		CallbackP<WikiPageKey> mockCallback = mock(CallbackP.class);
 		presenter.getFormattingGuideWikiKey(mockCallback);
 		//service was called
-		verify(mockSynapseClient).getHelpPages(any(AsyncCallback.class));
+		verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	

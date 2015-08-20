@@ -48,7 +48,7 @@ public class WikiFilesPreviewWidgetViewImpl extends FlowPanel implements WikiFil
 				sb.append(ClientProperties.IMAGE_CENTERING_TABLE_START);
 				sb.append("<a class=\"item-preview spec-border-ie\" href=\"");
 				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),false));
-				sb.append("\"><img class=\"wikifilepreviewimg\" ");
+				sb.append("\"><img class=\"center-in-div\" ");
 				sb.append(" src=\"");
 				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileHandle.getFileName(),true));
 				sb.append("\"></img></a>");

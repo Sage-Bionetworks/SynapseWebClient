@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,7 +21,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public interface Binder extends UiBinder<Widget, UserBadgeViewImpl> {	}
 	
 	@UiField
-	Span loadingUI;
+	TableData loadingUI;
 	@UiField
 	Icon defaultUserPicture;
 	@UiField

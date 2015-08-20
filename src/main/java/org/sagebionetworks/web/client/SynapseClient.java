@@ -391,7 +391,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
 	
-	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
+	public HashMap<String, WikiPageKey> getPageNameToWikiKeyMap() throws RestServiceException; 
 
 	public String deleteApiKey() throws RestServiceException;
 	

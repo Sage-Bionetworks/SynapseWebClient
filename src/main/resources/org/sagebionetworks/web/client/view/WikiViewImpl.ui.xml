@@ -14,9 +14,7 @@
 	</ui:style>
 
 	<g:HTMLPanel>
-		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator margin-top-10-imp "></div>
 		<div class="container">
 			<ul class="breadcrumbs">
 				<li>

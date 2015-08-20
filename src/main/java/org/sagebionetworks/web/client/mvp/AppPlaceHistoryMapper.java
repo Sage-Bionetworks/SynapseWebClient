@@ -18,12 +18,12 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
+import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 
@@ -42,10 +42,11 @@ import com.google.gwt.place.shared.WithTokenizers;
 		ComingSoon.Tokenizer.class, Synapse.Tokenizer.class, Wiki.Tokenizer.class,
 		Search.Tokenizer.class,
 		Challenges.Tokenizer.class, Help.Tokenizer.class, Governance.Tokenizer.class,
-		WikiPlace.Tokenizer.class, Down.Tokenizer.class, Team.Tokenizer.class, 
+		Down.Tokenizer.class, Team.Tokenizer.class, 
 		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class, Certificate.Tokenizer.class, 
 		NewAccount.Tokenizer.class,
 		ChangeUsername.Tokenizer.class, Trash.Tokenizer.class, PeopleSearch.Tokenizer.class,
+		StandaloneWiki.Tokenizer.class,
 		SignedToken.Tokenizer.class, ErrorPlace.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

@@ -50,7 +50,7 @@ public class UserDataProvider {
 				}
 			}
 		}
-		logger.info("Cannot find user login data in the cookies using cookie.name="	+ CookieKeys.USER_LOGIN_TOKEN, new Exception("Missing " + CookieKeys.USER_LOGIN_TOKEN));
+		//Cannot find user login data in the cookies.  Treating as anonymous.;
 		return null;
 	}
 	

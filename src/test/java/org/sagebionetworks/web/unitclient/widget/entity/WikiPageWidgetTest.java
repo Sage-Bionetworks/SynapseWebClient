@@ -24,7 +24,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -202,7 +201,7 @@ public class WikiPageWidgetTest {
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(0);
 		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
+		presenter.setOwnerObjectName(mockCallbackP);
 		verify(mockSynapseAlert).show404();
 	}
 	
