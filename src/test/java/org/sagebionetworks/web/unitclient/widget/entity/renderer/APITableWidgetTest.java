@@ -379,6 +379,11 @@ public class APITableWidgetTest {
 		outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
 		assertFalse(outputUri.contains("order+by+"));
 		assertFalse(outputUri.contains("desc"));
+		
+		//also verify that the query case is not be altered (SWC-2569)
+		inputUri = ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+folder+where+projectId='syn123'";
+		outputUri = widget.getOrderedByURI(inputUri, tableConfig);
+		assertTrue(outputUri.contains("projectId"));
 	}
 	
 	@Test

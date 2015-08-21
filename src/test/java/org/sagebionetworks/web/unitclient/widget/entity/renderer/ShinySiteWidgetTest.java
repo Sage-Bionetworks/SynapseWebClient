@@ -81,6 +81,7 @@ public class ShinySiteWidgetTest {
 		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl));
 		assertTrue(ShinySiteWidget.isValidShinySite(validSiteUrl.toUpperCase()));
 		assertFalse(ShinySiteWidget.isValidShinySite(invalidSiteUrl));
+		assertTrue(ShinySiteWidget.isValidShinySite("https://docs.google.com/a/sagebase.org/forms/d/1JmVWhcCAx26Jd94nFY8HhtVBgJSReaBbphZid16T6V4/viewform"));
 		assertFalse(ShinySiteWidget.isValidShinySite(null));
 	}
 	
