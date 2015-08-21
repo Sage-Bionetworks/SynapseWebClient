@@ -56,7 +56,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatus() throws Exception {
 		doiWidget.configure(entityId, true, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoiCreated(doiWidget.getDoiHtml(testDoiPrefix, false));
+		verify(mockView).showDoiCreated(doiWidget.getDoi(testDoiPrefix, false));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -64,7 +64,7 @@ public class DoiWidgetTest {
 	public void testConfigureReadyStatusNotEditable() throws Exception {
 		doiWidget.configure(entityId, false, null);
 		verify(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showDoiCreated(doiWidget.getDoiHtml(testDoiPrefix, false));
+		verify(mockView).showDoiCreated(doiWidget.getDoi(testDoiPrefix, false));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -114,7 +114,7 @@ public class DoiWidgetTest {
 		String prefix = "10.5072/FK2.";
 		Long version = 42l;
 		doiWidget.configure(entityId, true, version);
-		String link = doiWidget.getDoiHtml(prefix, true);
+		String link = doiWidget.getDoi(prefix, true);
 		assertTrue(link.contains(entityId));
 		assertTrue(link.contains(version.toString()));
 		assertTrue(link.contains(prefix));
@@ -126,9 +126,9 @@ public class DoiWidgetTest {
 		String prefix = "";
 		Long version = 42l;
 		doiWidget.configure(entityId, true, version);
-		String link = doiWidget.getDoiHtml(prefix, true);
+		String link = doiWidget.getDoi(prefix, true);
 		assertTrue(link.length() == 0);
-		link = doiWidget.getDoiHtml(null, true);
+		link = doiWidget.getDoi(null, true);
 		assertTrue(link.length() == 0);
 	}
 	
