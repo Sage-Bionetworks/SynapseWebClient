@@ -109,7 +109,7 @@ public class EntityPageTopTest {
 				mockSchemaCache,
 				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
 		pageTop.setAreaChangeHandler(areaChangeHandler);
-		
+		pageTop.clearProjectAreaState();
 		// Setup the the entity
 		entity = new ExampleEntity();
 		entity.setId(entityId);
@@ -151,6 +151,29 @@ public class EntityPageTopTest {
 		ObjectSchema schema = new ObjectSchema();
 		schema.setTitle("");
 		when(mockSchemaCache.getSchemaEntity(any(Entity.class))).thenReturn(schema);
+	}
+	
+	@Test
+	public void testProjectAreaState() {
+		assertNull(pageTop.getCurrentEntityPageProjectId());
+		pageTop.configure(projectBundle, null, projectHeader, null, null);
+		assertEquals(projectId, pageTop.getCurrentEntityPageProjectId());
+		
+		//on tab change, page top is recreated, but the project id should change iff we reconfigure with a different project id
+		pageTop = new EntityPageTop(mockView, mockAuthenticationController,
+				mockSchemaCache,
+				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
+		assertEquals(projectId, pageTop.getCurrentEntityPageProjectId());
+		//configure with a table associated to the same project
+		pageTop.configure(entityBundleTable, null, projectHeader, null, null);
+		//did not change
+		assertEquals(projectId, pageTop.getCurrentEntityPageProjectId());
+		//not with a different project
+		EntityHeader newProjectHeader = new EntityHeader();
+		String newProjectId = "syn3141599999999";
+		newProjectHeader.setId(newProjectId);
+		pageTop.configure(entityBundleTable, null, newProjectHeader, null, null);
+		assertEquals(newProjectId, pageTop.getCurrentEntityPageProjectId());
 	}
 		
 	@Test 

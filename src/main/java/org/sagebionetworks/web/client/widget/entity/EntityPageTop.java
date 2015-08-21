@@ -195,7 +195,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if((currentArea == EntityArea.FILES && area == EntityArea.FILES) 
 				|| (bundle.getEntity() instanceof TableEntity && area == EntityArea.TABLES))
 			overrideCache = true;
-		EntityHeader lastFileAreaEntity = projectAreaState.getLastFileAreaEntity();
 		if(!overrideCache) {
 			if(area == EntityArea.WIKI) {
 				areaToken = projectAreaState.getLastWikiSubToken();
@@ -214,7 +213,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override
 	public boolean isPlaceChangeForArea(EntityArea targetTab) {
 		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());
-		EntityHeader lastFileAreaEntity = projectAreaState.getLastFileAreaEntity();
 		if(targetTab == EntityArea.ADMIN && !isProject) {
 			// admin area clicked outside of project requires goto
 			return true;
@@ -355,5 +353,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
-
+	
+	/**
+	 * For testing purposes only
+	 * @return currently loaded entity page project id
+	 */
+	public String getCurrentEntityPageProjectId() {
+		return projectAreaState.getProjectId();
+	}
+	public void clearProjectAreaState() {
+		projectAreaState = new ProjectAreaState();
+	}
 }
