@@ -133,9 +133,9 @@ public class EntityPresenterTest {
 		//verify that background image is cleared
 		verify(mockView).setBackgroundImageVisible(false);
 		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
-		verify(mockView).hideLoading();
+		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
-		verify(mockView).showEntityPageTop();
+		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop).clearState();
 		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockEntityPageTop).refresh();
@@ -144,32 +144,18 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testSetEntityBundle() {
-		EntityHeader entityHeader = new EntityHeader();
-		Long versionNumber = 1L;
-		entityPresenter.setEntityBundle(eb, versionNumber, entityHeader, area, areaToken);
-		verify(mockView).showEntityPageTop();
-		verify(mockEntityPageTop).clearState();
-		verify(mockEntityPageTop).configure(eb, versionNumber, entityHeader, area, areaToken);
-		verify(mockEntityPageTop).refresh();
-		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
-		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop); // needs to be replaced after config
-	}
-	
-	@Test
 	public void testSetPlaceAndRefreshWithoutVersion() {
 		Long versionNumber = 1L;
 		Synapse place = Mockito.mock(Synapse.class);
 		when(place.getVersionNumber()).thenReturn(1L);
 		when(place.getEntityId()).thenReturn(entityId);
-		
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
 		verify(mockView).setBackgroundImageVisible(false);
 		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
-		verify(mockView).hideLoading();
+		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
-		verify(mockView).showEntityPageTop();
+		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop).clearState();
 		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockEntityPageTop).refresh();
@@ -195,7 +181,7 @@ public class EntityPresenterTest {
 		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		//redirects to the wiki place
 		verify(mockPlaceChanger).goTo(any(Wiki.class));
-		verify(mockView, never()).showEntityPageTop();
+		verify(mockView, never()).setEntityPageTopVisible(true);
 	}
 	
 	@Test
@@ -356,7 +342,7 @@ public class EntityPresenterTest {
 	public void testShow403() {
 		entityPresenter.show403();
 		verify(mockSynAlert).show403(anyString());
-		verify(mockView).hideEntityPageTop();
-		verify(mockView).showOpenTeamInvites();
+		verify(mockView).setEntityPageTopVisible(false);
+		verify(mockView).setOpenTeamInvitesVisible(true);
 	}
 }

@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -43,12 +43,10 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
@@ -154,6 +152,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureLink();
 			configureSubmit();
 			configureAnnotations();
+			configureFileHistory();
 			configureFileUpload();
 			configureProvenance();
 			configureChangeStorageLocation();
@@ -312,8 +311,27 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_RIGHT);
 		}
 	}
+	
 
-
+	private void configureFileHistory(){
+		if(entityBundle.getEntity() instanceof FileEntity){
+			actionMenu.setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
+			actionMenu.setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
+			actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, this);
+		}else{
+			actionMenu.setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
+			actionMenu.setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
+		}
+	}
+	
+	@Override
+	public void onFileHistoryToggled(boolean shown) {
+		if(shown){
+			actionMenu.setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_DOWN);
+		}else{
+			actionMenu.setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_RIGHT);
+		}
+	}
 	
 	private void configureSubmit(){
 		if(isSubmittableType(entityBundle.getEntity())){

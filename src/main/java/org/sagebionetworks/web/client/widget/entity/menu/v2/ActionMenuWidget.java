@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface ActionMenuWidget extends IsWidget{
+public interface ActionMenuWidget extends IsWidget {
 
 	/**
 	 * Reset this action menu.  This will clear all listeners and hide all action.

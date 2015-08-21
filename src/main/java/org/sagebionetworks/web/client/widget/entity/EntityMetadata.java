@@ -1,12 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -15,35 +18,59 @@ public class EntityMetadata implements Presenter {
 
 	private EntityMetadataView view;
 	private EntityUpdatedHandler entityUpdatedHandler;
-	private AuthenticationController authenticationController;
+	private AnnotationsRendererWidget annotationsWidget;
+	private DoiWidget doiWidget;
+	private FileHistoryWidget fileHistoryWidget;
+	private RestrictionWidget restrictionWidget;
 	
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
-			AuthenticationController authenticationController) {
+			DoiWidget doiWidget,
+			AnnotationsRendererWidget annotationsWidget,
+			RestrictionWidget restrictionWidget,
+			FileHistoryWidget fileHistoryWidget) {
 		this.view = view;
-		this.authenticationController = authenticationController;
-		this.view.setPresenter(this);
+		this.doiWidget = doiWidget;
+		this.annotationsWidget = annotationsWidget;
+		this.fileHistoryWidget = fileHistoryWidget;
+		this.restrictionWidget = restrictionWidget;
+		this.view.setDoiWidget(doiWidget);
+		this.view.setAnnotationsRendererWidget(annotationsWidget);
+		this.view.setFileHistoryWidget(fileHistoryWidget);
+		this.view.setRestrictionWidget(restrictionWidget);
 	}
-
-
+	
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
+	
 	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
-		view.setEntityBundle(bundle, bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber != null);
-		boolean showDetailedMetadata = true;		
+		clear();
+		Entity en = bundle.getEntity();
+		view.setEntityId(en.getId());
+		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+		boolean showDetailedMetadata = true;
+		if (bundle.getEntity() instanceof FileEntity) {
+			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
+			fileHistoryWidget.setEntityUpdatedHandler(entityUpdatedHandler);
+			view.setFileHistoryWidget(fileHistoryWidget);
+			view.setFileHistoryVisible(versionNumber != null);
+			view.setRestrictionPanelVisible(true);
+		} else {
+			view.setFileHistoryVisible(false);
+			view.setRestrictionPanelVisible(en instanceof TableEntity
+					|| en instanceof Folder);
+		}
+		restrictionWidget.configure(bundle, true, false, true, new Callback() {
+			@Override
+			public void invoke() {
+				fireEntityUpdatedEvent();
+			}
+		});
+		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
+		annotationsWidget.configure(bundle, canEdit);
 		view.setDetailedMetadataVisible(showDetailedMetadata);
-	}
-	
-	private UserProfile getUserProfile() {
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		return (sessionData==null ? null : sessionData.getProfile());				
-	}
-	
-	public boolean isAnonymous() {
-		return getUserProfile()==null;
-	}
+	}	
 
 	@Override
 	public void fireEntityUpdatedEvent() {
@@ -53,10 +80,20 @@ public class EntityMetadata implements Presenter {
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
-		view.setEntityUpdatedHandler(handler);
+		this.annotationsWidget.setEntityUpdatedHandler(entityUpdatedHandler);
 	}
 
 	public void setAnnotationsVisible(boolean visible) {
 		view.setAnnotationsVisible(visible);
 	}
+	
+	public void setFileHistoryVisible(boolean visible) {
+		view.setFileHistoryVisible(visible);
+	}
+	
+	public void clear() {
+		doiWidget.clear();
+		view.clear();
+	}
+	
 }

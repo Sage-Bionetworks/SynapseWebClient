@@ -74,7 +74,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private SynapseJSNIUtils synapseJsniUtils;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
-	private Footer footerWidget;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	
 	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
@@ -88,7 +87,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			EntityPageTop entityPageTop, Header headerWidget,
 			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
@@ -109,7 +107,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				refresh();
-	}
+			}
 		});
 		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
 			@Override
@@ -117,7 +115,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				updateEntityArea(area, areaToken);
 			}
 
-	@Override
+			@Override
 			public void replaceArea(EntityArea area, String areaToken) {
 				replaceEntityArea(area, areaToken);
 			}
@@ -168,6 +166,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		synAlert.clear();
 		openTeamInvitesWidget.clear();
 		view.clear();
+		view.setAccessDependentMessageVisible(false);
 	}
 	
 	@Override
@@ -181,45 +180,51 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		clear();
 		// Hide the view panel contents until async callback completes
 		view.setBackgroundImageVisible(false);
-		view.showLoading();
+		view.setLoadingVisible(true);
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				view.hideLoading();
+				view.setLoadingVisible(false);
 				if (globalApplicationState.isWikiBasedEntity(entityId) && !DisplayUtils.isInTestWebsite(cookies)) {
 					globalApplicationState.getPlaceChanger().goTo(new Wiki(entityId, ObjectType.ENTITY.toString(), null));
 				}
 				else {
-						// Redirect if Entity is a Link
-						if(bundle.getEntity() instanceof Link) {
-							Reference ref = ((Link)bundle.getEntity()).getLinksTo();
-							entityId = null;
-							if(ref != null){
-								// redefine where the page is and refresh
-								entityId = ref.getTargetId();
-								versionNumber = ref.getTargetVersionNumber();
-								refresh();
-								return;
-							} else {
-								// show error and then allow entity bundle to go to view
-								view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
-							}
+					// Redirect if Entity is a Link
+					if(bundle.getEntity() instanceof Link) {
+						Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+						entityId = null;
+						if(ref != null){
+							// redefine where the page is and refresh
+							entityId = ref.getTargetId();
+							versionNumber = ref.getTargetVersionNumber();
+							refresh();
+							return;
+						} else {
+							// show error and then allow entity bundle to go to view
+							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
-						EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
-						if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-						if (projectHeader != null)
-							loadBackgroundImage(projectHeader.getId());
-						EntityPresenter.filterToDownloadARs(bundle);
-					setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);
+					}
+					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
+					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					if (projectHeader != null)
+						loadBackgroundImage(projectHeader.getId());
+					EntityPresenter.filterToDownloadARs(bundle);
+					entityPageTop.clearState();
+					entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
+					entityPageTop.refresh();
+					view.setEntityPageTopWidget(entityPageTop);
+					view.setEntityPageTopVisible(true);
+					headerWidget.configure(false, projectHeader);
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.hideLoading();
+				view.setLoadingVisible(false);
+				headerWidget.configure(false);
 				if(caught instanceof NotFoundException) {
 					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
@@ -228,7 +233,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					view.clear();
 					synAlert.handleException(caught);
 				}
-				headerWidget.configure(false);
 			}			
 		};
 		if (versionNumber == null) {
@@ -238,43 +242,39 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		}
 	}
 	
-	@Override
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
-		view.showEntityPageTop();
-		entityPageTop.clearState();
-		entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
-		entityPageTop.refresh();
-		headerWidget.configure(false, projectHeader);
-		view.setEntityPageTopWidget(entityPageTop);
-	}
-	
-	public void show404() {
-		clear();
-		synAlert.show404();
-	}
-	
 	public void show403() {
-		clear();
-		synAlert.show403(entityId);
-		Callback callback = new Callback() {
+		if (entityId != null) {
+			synAlert.show403(entityId);
+		}
+		view.setLoadingVisible(false);
+		view.setEntityPageTopVisible(false);
+		//also add the open team invitations widget (accepting may gain access to this project)
+		openTeamInvitesWidget.configure(new Callback() {
 			@Override
 			public void invoke() {
 				//when team is updated, refresh to see if we can now access
 				refresh();
 			}
-		};
-		CallbackP<List<OpenUserInvitationBundle>> teamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
+			
+		}, new CallbackP<List<OpenUserInvitationBundle>>() {
+
 			@Override
 			public void invoke(List<OpenUserInvitationBundle> invites) {
 				//if there are any, then also add the title text to the panel
 				if (invites != null && invites.size() > 0) {
-					view.showAccessDependentMessage();
+					view.setAccessDependentMessageVisible(true);
 				}
 			}
-		};
-		openTeamInvitesWidget.configure(callback, teamInvitationsCallback);
-		view.hideEntityPageTop();
-		view.showOpenTeamInvites();
+			
+		});
+		view.setOpenTeamInvitesVisible(true);
+	}
+	
+	public void show404() {
+		synAlert.show404();
+		view.setLoadingVisible(false);
+		view.setEntityPageTopVisible(false);
+		view.setOpenTeamInvitesVisible(false);
 	}
 	
 	public void loadBackgroundImage(final String projectEntityId) {
@@ -337,5 +337,5 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
-}
+	}
 }

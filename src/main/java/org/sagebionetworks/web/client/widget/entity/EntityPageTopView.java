@@ -79,4 +79,8 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		void handleWikiReload(String wikiPageId);
 
 	}
+
+	public void setFileHistoryVisible(boolean b);
+
+	public void toggleFileHistory();
 }

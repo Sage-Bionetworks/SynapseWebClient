@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExampleEntity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
@@ -540,7 +541,39 @@ public class EntityPageTopTest {
 		pageTop.configure(entityBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
 		pageTop.handleWikiReload(wikiPageId);
 	}
+	
+	@Test
+	public void testConfigureFileHistoryIsFileLatestVersion() {
+		FileEntity file = new FileEntity();
+		file.setId("123");
+		EntityBundle fileEntityBundle = new EntityBundle();
+		fileEntityBundle.setEntity(file);
+		pageTop.configure(fileEntityBundle, null, projectHeader, EntityArea.FILES, wikiSubpage);
+		verify(mockView).setFileHistoryVisible(true);
+		verify(mockView, never()).toggleFileHistory();
+	}
+	
+	public void testConfigureFileHistoryIsFileEarlierVersion() {
+		FileEntity file = new FileEntity();
+		file.setId("123");
+		EntityBundle fileEntityBundle = new EntityBundle();
+		fileEntityBundle.setEntity(file);
+		pageTop.configure(fileEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		verify(mockView).setFileHistoryVisible(true);
+		verify(mockView).toggleFileHistory();
+	}
 
+	@Test
+	public void testConfigureFileHistoryIsProject() {
+		Project project = new Project();
+		project.setId("123");
+		EntityBundle projectEntityBundle = new EntityBundle();
+		projectEntityBundle.setEntity(project);
+		pageTop.configure(projectEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		verify(mockView).setFileHistoryVisible(false);
+		verify(mockView, never()).toggleFileHistory();
+	}
+	
 	/*
 	 * Private Methods
 	 */

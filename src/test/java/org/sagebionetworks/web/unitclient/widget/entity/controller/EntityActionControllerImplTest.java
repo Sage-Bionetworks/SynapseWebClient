@@ -174,7 +174,7 @@ public class EntityActionControllerImplTest {
 	public void testConfigure(){
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
-		//delete
+		// delete
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.table));
@@ -183,7 +183,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.SHARE, true);
 		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
 		verify(mockActionMenu).addActionListener(Action.SHARE, controller);
-		// Rename
+		// rename
 		verify(mockActionMenu).setActionEnabled(Action.CHANGE_ENTITY_NAME, true);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
 		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+EntityTypeUtils.getDisplayName(EntityType.table));
@@ -191,6 +191,9 @@ public class EntityActionControllerImplTest {
 		// upload
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		// file history
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
 	}
 	
 	@Test
@@ -205,6 +208,27 @@ public class EntityActionControllerImplTest {
 		entityBundle.getPermissions().setCanPublicRead(false);
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.LOCK);
+	}
+	
+	@Test
+	public void testConfigureFileHistory() {
+		Entity file = new FileEntity();
+		file.setId(entityId);
+		file.setParentId(parentId);
+		permissions = new UserEntityPermissions();
+		permissions.setCanChangePermissions(true);
+		permissions.setCanDelete(true);
+		permissions.setCanPublicRead(true);
+		permissions.setCanUpload(true);
+		permissions.setCanAddChild(true);
+		permissions.setCanEdit(true);
+		permissions.setCanCertifiedUserEdit(true);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(file);
+		entityBundle.setPermissions(permissions);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
 	}
 	
 	@Test
@@ -903,6 +927,16 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
 		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
 		verify(mockActionMenu, never()).setActionEnabled(Action.CREATE_DOI, true);
+	}
+	
+	@Test
+	public void testOnFileHistoryToggled() {
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onFileHistoryToggled(true);
+		verify(mockActionMenu).setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_DOWN);
+		Mockito.reset(mockActionMenu);
+		controller.onFileHistoryToggled(false);
+		verify(mockActionMenu).setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_RIGHT);
 
 	}
 

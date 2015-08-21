@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -91,6 +93,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	boolean isTable = bundle.getEntity() instanceof TableEntity;
     	boolean isProject = entityId.equals(projectAreaState.getProjectId());
     	// For non-project file-tab entities, record them as the last file area place 
+    	
+    	configureFileHistory();
+    	
     	if(!isProject && !isTable && area != EntityArea.WIKI) {
     		EntityHeader lastFileAreaEntity = new EntityHeader();
     		lastFileAreaEntity.setId(entityId);
@@ -126,8 +131,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	}
 	}
     
-	@SuppressWarnings("unchecked")
-	public void clearState() {
+    public void clearState() {
 		view.clear();
 		// remove handlers
 		this.bundle = null;
@@ -329,6 +333,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			DisplayUtils.showErrorMessage("Failed to handle Wiki reload.");
 		}
 	}
+	
+	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
+		String wikiPageId = rootWikiId;
+		if (Synapse.EntityArea.WIKI == area && DisplayUtils.isDefined(areaToken))
+			wikiPageId = areaToken;
+		return wikiPageId;
+	}
+	
+	public void configureFileHistory() {
+		Entity entity = bundle.getEntity();
+		if (entity != null && entity instanceof FileEntity) {
+			view.setFileHistoryVisible(true);
+			if (versionNumber != null) {
+				view.toggleFileHistory();
+			}
+		} else {
+			view.setFileHistoryVisible(false);
+		}
+	}
 
 	/*
 	 * Private Methods
@@ -342,17 +365,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
 	}
 	
-	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
-		String wikiPageId = rootWikiId;
-		if (Synapse.EntityArea.WIKI == area && DisplayUtils.isDefined(areaToken))
-			wikiPageId = areaToken;
-		return wikiPageId;
-	}
-	
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
+	
 	
 	/**
 	 * For testing purposes only
