@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter, IsWidget  {
-
+	private static ProjectAreaState projectAreaState = new ProjectAreaState();
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
 	private EntitySchemaCache schemaCache;
@@ -43,7 +43,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String areaToken;
 	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
-	private ProjectAreaState projectAreaState;
 	private QueryTokenProvider queryTokenProvider;
 	
 	public static final String TABLE_QUERY_PREFIX = "query/";
@@ -63,7 +62,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.bus = bus;
 		this.globalApplicationState = globalApplicationState;	
 		this.queryTokenProvider = queryTokenProvider;
-		this.projectAreaState = new ProjectAreaState();
 		view.setPresenter(this);
 	}
 
@@ -75,8 +73,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      */
     public void configure(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	// reset state for newly visited project
-    	boolean isNewProject = projectHeader.getId().equals(projectAreaState.getProjectId());
-    	if(!isNewProject) {
+    	String projectHeaderId = projectHeader.getId();
+    	String areaStateProjectId = projectAreaState.getProjectId();
+    	boolean isNewProject = !projectHeaderId.equals(areaStateProjectId);
+    	if(isNewProject) {
     		projectAreaState = new ProjectAreaState();
     		projectAreaState.setProjectId(projectHeader.getId());
     	}
@@ -90,7 +90,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	String entityId = bundle.getEntity().getId();
     	boolean isTable = bundle.getEntity() instanceof TableEntity;
     	boolean isProject = entityId.equals(projectAreaState.getProjectId());
-    	
     	// For non-project file-tab entities, record them as the last file area place 
     	if(!isProject && !isTable && area != EntityArea.WIKI) {
     		EntityHeader lastFileAreaEntity = new EntityHeader();
@@ -191,13 +190,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		String entityId = projectHeader.getId();
 		String areaToken = null;
 		Long versionNumber = null;
-		
 		boolean overrideCache = false;
 		// return to root for file and tables
 		if((currentArea == EntityArea.FILES && area == EntityArea.FILES) 
 				|| (bundle.getEntity() instanceof TableEntity && area == EntityArea.TABLES))
 			overrideCache = true;
-		
+		EntityHeader lastFileAreaEntity = projectAreaState.getLastFileAreaEntity();
 		if(!overrideCache) {
 			if(area == EntityArea.WIKI) {
 				areaToken = projectAreaState.getLastWikiSubToken();
@@ -215,7 +213,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public boolean isPlaceChangeForArea(EntityArea targetTab) {
-		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());		
+		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());
+		EntityHeader lastFileAreaEntity = projectAreaState.getLastFileAreaEntity();
 		if(targetTab == EntityArea.ADMIN && !isProject) {
 			// admin area clicked outside of project requires goto
 			return true;
