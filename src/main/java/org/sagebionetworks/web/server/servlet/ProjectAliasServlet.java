@@ -110,13 +110,11 @@ public class ProjectAliasServlet extends HttpServlet {
 		} catch(Throwable e) {
 			//unable to get session token, so it's an anonymous request
 		}
-		
+		HttpServletRequest httpRqst = (HttpServletRequest)request;
+		URL requestURL = new URL(httpRqst.getRequestURL().toString());
 		try {
 			SynapseClient client = createNewClient(token);
-			HttpServletRequest httpRqst = (HttpServletRequest)request;
 			perThreadRequest.set(httpRqst);
-			
-			URL requestURL = new URL(httpRqst.getRequestURL().toString());
 			String alias = requestURL.getPath().substring(1);
 
 			EntityQuery query = getEntityQuery(alias);
@@ -137,7 +135,7 @@ public class ProjectAliasServlet extends HttpServlet {
 			entry.setMessage(e.getMessage());
 //			entry.setStacktrace(ExceptionUtils.getStackTrace(e));
 			String entryString = SerializationUtils.serializeAndHexEncode(entry);
-			response.sendRedirect(new URL(getBaseUrl(request) + "#!Error:"+entryString).toString());
+			response.sendRedirect(new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), "/#!Error:"+entryString).toString());
 		}
 	}
 		
