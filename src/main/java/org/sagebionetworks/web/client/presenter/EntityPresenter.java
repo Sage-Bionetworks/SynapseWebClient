@@ -338,4 +338,10 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
+	// for testing only
+	
+	public void setEntityId(String entityId) {
+		this.entityId = entityId;
+	}
 }
