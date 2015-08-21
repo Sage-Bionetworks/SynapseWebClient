@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -44,6 +43,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private MarkdownWidget wikiPage;
+	private WizardProgressWidget progressWidget;
 	private GWTWrapper gwt;
 	private String teamId;
 	private boolean isChallengeSignup;
@@ -71,7 +71,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			AuthenticationController authenticationController, 
 			JSONObjectAdapter jsonObjectAdapter,
 			GWTWrapper gwt,
-			MarkdownWidget wikiPage
+			MarkdownWidget wikiPage, 
+			WizardProgressWidget progressWidget
 			) {
 		this.view = view;
 		view.setPresenter(this);
@@ -81,6 +82,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
 		this.wikiPage = wikiPage;
+		this.progressWidget = progressWidget;
+		view.setProgressWidget(progressWidget);
 	}
 	
 	/**
@@ -281,16 +284,16 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	 * Gather additional info about the logged in user
 	 */
 	public void sendJoinRequestStep1(WikiPageKey challengeInfoWikiPageKey) {
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		UserProfile profile = sessionData.getProfile();
-		view.updateWizardProgress(currentPage, getTotalPageCount());
-		view.showChallengeInfoPage(profile, challengeInfoWikiPageKey, new Callback() {
+		progressWidget.configure(currentPage, getTotalPageCount());
+		view.setJoinWizardCallback(new Callback() {
 			@Override
 			public void invoke() {
 				currentPage++;
 				sendJoinRequestStep2();
 			}
 		});
+		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true, false);
+		view.setCurrentWizardContent(wikiPage);			
 	}
 	
 	/**
@@ -315,24 +318,35 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 			};
 			//pop up the requirement
-			view.updateWizardProgress(currentPage, getTotalPageCount());
+			progressWidget.configure(currentPage, getTotalPageCount());
 			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 				if (!DisplayUtils.isDefined(text)) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
 					boolean isPreview=true, isIgnoreLoadingFailure=true;
 					wikiPage.loadMarkdownFromWikiPage(wikiKey, isPreview, isIgnoreLoadingFailure);
-					view.showWikiAccessRequirement(wikiPage.asWidget(), termsOfUseCallback);
+					view.setAccessRequirementHTML("");
+					view.setCurrentWizardPanelVisible(true);
+					view.setCurrentWizardContent(wikiPage);
+					view.setJoinWizardCallback(termsOfUseCallback);
+					view.setJoinWizardPrimaryButtonText("Accept");
 				} else {
-					view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);	
+					view.setAccessRequirementHTML(text);
+					view.setCurrentWizardPanelVisible(false);
+					view.setJoinWizardCallback(termsOfUseCallback);
+					view.setJoinWizardPrimaryButtonText("Accept");
 				}
-				
 			} else if (accessRequirement instanceof ACTAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-				view.showACTAccessRequirement(text, termsOfUseCallback);
+				view.setAccessRequirementHTML(text);
+				view.setCurrentWizardPanelVisible(false);
+				view.setJoinWizardCallback(termsOfUseCallback);
+				view.setJoinWizardPrimaryButtonText("Continue");
 			} else if (accessRequirement instanceof PostMessageContentAccessRequirement) {
 				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
-				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url), termsOfUseCallback);
+				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url));
+				view.setJoinWizardCallback(termsOfUseCallback);
+				view.setJoinWizardPrimaryButtonText("Continue");
 			} else {
 				view.showErrorMessage("Unsupported access restriction type - " + accessRequirement.getClass().getName());
 			}

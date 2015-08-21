@@ -350,7 +350,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		//verify we showTermsOfUseAccessRequirement
 		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
-		verify(mockView).showPostMessageContentAccessRequirement(anyString(), callbackArg.capture());
+		verify(mockView).showPostMessageContentAccessRequirement(anyString());
 		
 		//manually invoke the okbutton callback
 		callbackArg.getValue().invoke();

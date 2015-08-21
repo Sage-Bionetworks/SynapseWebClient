@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,6 +24,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,7 +34,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	public interface JoinTeamWidgetViewImplUiBinder extends UiBinder<Widget, JoinTeamWidgetViewImpl> {}
 
 	@UiField
-	SimplePanel joinWizardContainer;
+	Dialog joinWizard;
 	@UiField
 	Button anonUserButton;
 	@UiField
@@ -56,6 +55,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	Button requestButton;
 	@UiField
 	Collapse requestUIPanel;
+	@UiField
+	SimplePanel progressWidgetPanel;
+	@UiField
+	SimplePanel currentWizardContentPanel;
+	@UiField
+	HTML accessRequirementHTML;
+	
 
 	
 	private static final int FIELD_WIDTH = 500;
@@ -63,23 +69,18 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	private JoinTeamWidgetView.Presenter presenter;
 	private MarkdownWidget wikiPage;
-	private Dialog joinWizard;
 	private FlowPanel currentWizardContent;
 	private Callback okButtonCallback;
-	private WizardProgressWidget progressWidget;
 	private HandlerRegistration messageHandler;
 	private Frame externalFrame;
 	private Widget widget;
 		
 	@Inject
 	public JoinTeamWidgetViewImpl(JoinTeamWidgetViewImplUiBinder binder, SageImageBundle sageImageBundle,
-			MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
+			MarkdownWidget wikiPage) {
 		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.wikiPage = wikiPage;
-		this.progressWidget = progressWidget;
-		this.joinWizard = joinWizard;
-		joinWizard.addStyleName("modal-fullscreen");
 		anonUserButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -105,6 +106,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				presenter.sendJoinRequest(messageArea.getValue());
 			}
 		});
+		currentWizardContentPanel.setWidget(currentWizardContent);
 	}
 	
 	@Override
@@ -186,10 +188,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	@Override
 	public void showJoinWizard() {
-		FlowPanel body = new FlowPanel();
-		body.add(progressWidget.asWidget());
-        body.add(currentWizardContent);
-		joinWizard.configure("Join", body, "Continue", DisplayConstants.BUTTON_CANCEL, new Dialog.Callback() {
+		joinWizard.configure("Join", "Continue", DisplayConstants.BUTTON_CANCEL, new Dialog.Callback() {
 			@Override
 			public void onPrimary() {
 				okButtonCallback.invoke();
@@ -200,32 +199,33 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				joinWizard.hide();
 			}
 		}, false);
-		
 		joinWizard.show();
 		enablePrimaryButton();
 	}
-			
-	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {
-		okButtonCallback = presenterCallback;
-		Widget wikiPageWidget = wikiPage.asWidget();
-        currentWizardContent.clear();
-        currentWizardContent.add(wikiPageWidget);
-		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true, false);
+	
+	@Override
+	public void setJoinWizardCallback(Callback callback) {
+		okButtonCallback = callback;
 	}
 	
 	@Override
-	public void showWikiAccessRequirement(Widget wikiPageWidget, Callback touAcceptanceCallback) {
-		showAccessRequirement(wikiPageWidget, touAcceptanceCallback, DisplayConstants.ACCEPT);
+	public void setJoinWizardPrimaryButtonText(String primaryButtonText) {
+		joinWizard.getPrimaryButton().setText(primaryButtonText);
 	}
 	
 	@Override
-	public void showTermsOfUseAccessRequirement(String arText, Callback touAcceptanceCallback) {
-		showAccessRequirement(new HTML(arText), touAcceptanceCallback, DisplayConstants.ACCEPT);
+	public void setAccessRequirementHTML(String html) {
+		accessRequirementHTML.setText(html);
 	}
 	
 	@Override
-	public void showACTAccessRequirement(String arText, Callback callback) {
-		showAccessRequirement(new HTML(arText), callback, DisplayConstants.BUTTON_CONTINUE);
+	public void setCurrentWizardPanelVisible(boolean isVisible) {
+		currentWizardContentPanel.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setCurrentWizardContent(IsWidget isWidget) {
+		currentWizardContentPanel.setWidget(isWidget);
 	}
 	
 	private void showAccessRequirement(Widget arTextWidget, Callback callback, String primaryButtonText) {
@@ -236,16 +236,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void showPostMessageContentAccessRequirement(String url, Callback touAcceptanceCallback) {
+	public void showPostMessageContentAccessRequirement(String url) {
 		//add the iframe, and wait for the message event to re-enable the continue button
 		joinWizard.getPrimaryButton().setEnabled(false);
-		joinWizard.getPrimaryButton().setText(DisplayConstants.BUTTON_CONTINUE);
-		currentWizardContent.clear();
 		externalFrame = new Frame(url);
 		externalFrame.setHeight("920px");
 		externalFrame.getElement().setAttribute("seamless", "true");
-		currentWizardContent.add(externalFrame);
-		okButtonCallback = touAcceptanceCallback;
+		setCurrentWizardContent(externalFrame);
 	}
 	
 	/**
@@ -302,11 +299,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void updateWizardProgress(int currentPage, int totalPages) {
-		progressWidget.configure(currentPage, totalPages);
-	}
-	
-	@Override
 	public void setUserPanelVisible(boolean isVisible) {
 		userPanel.setVisible(isVisible);
 	}
@@ -354,6 +346,11 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	@Override
 	public void setIsMemberMessageVisible(boolean isVisible) {
 		isMemberMessageSpan.setVisible(isVisible);
+	}
+
+	@Override
+	public void setProgressWidget(WizardProgressWidget progressWidget) {
+		progressWidgetPanel.setWidget(progressWidget);
 	}
 	
 }

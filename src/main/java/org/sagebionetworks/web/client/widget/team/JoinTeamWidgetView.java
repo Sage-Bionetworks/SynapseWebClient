@@ -1,15 +1,19 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface JoinTeamWidgetView extends IsWidget, SynapseView {
+	
+	public interface Presenter extends SynapsePresenter, IsWidget {
+		public void sendJoinRequest(String message);
+		//service may be added later to query for current user requests to allow deletion
+//		public void deleteAllJoinRequests();
+		void gotoLoginPage();
+	}
 	
 	/**
 	 * Set this view's presenter
@@ -18,35 +22,8 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	public void setPresenter(Presenter presenter);
 	void showJoinWizard();
 	void hideJoinWizard();
-	
-	void updateWizardProgress(int currentPage, int totalPages);
-	
-	void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback callback);
-	
-	void showWikiAccessRequirement(
-			Widget wikiPageWidget, 
-			Callback touAcceptanceCallback);
-	
-	void showTermsOfUseAccessRequirement(
-			String arText,
-			final Callback touAcceptanceCallback);
-	
-	void showACTAccessRequirement(
-			String arText,
-			final Callback callback);
-	
-	void showPostMessageContentAccessRequirement(String url, final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
-	
-	void setButtonsEnabled(boolean enable);
-	
-	public interface Presenter extends SynapsePresenter, IsWidget {
-		public void sendJoinRequest(String message);
-		//service may be added later to query for current user requests to allow deletion
-//		public void deleteAllJoinRequests();
-		void gotoLoginPage();
-	}
-
+	void setButtonsEnabled(boolean enable);	
 	public void setIsMemberMessage(String htmlEscape);
 	public void setJoinButtonText(String joinButtonText);
 	public void setRequestOpenText(String requestOpenText);
@@ -57,4 +34,11 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	void setAcceptInviteButtonVisible(boolean isVisible);
 	void setAnonUserButtonVisible(boolean isVisible);
 	void setIsMemberMessageVisible(boolean isVisible);
+	public void setProgressWidget(WizardProgressWidget progressWidget);
+	void setCurrentWizardContent(IsWidget isWidget);
+	void setJoinWizardCallback(Callback callback);
+	void setJoinWizardPrimaryButtonText(String primaryButtonText);
+	void setAccessRequirementHTML(String html);
+	void setCurrentWizardPanelVisible(boolean isVisible);
+	void showPostMessageContentAccessRequirement(String url);
 }
