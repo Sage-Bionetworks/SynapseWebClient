@@ -243,7 +243,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	}
 	
 	public void show403() {
-		synAlert.show403();
+		if (entityId != null) {
+			synAlert.show403(entityId);
+		}
 		view.setLoadingVisible(false);
 		view.setEntityPageTopVisible(false);
 		//also add the open team invitations widget (accepting may gain access to this project)

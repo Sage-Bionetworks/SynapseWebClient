@@ -37,6 +37,7 @@ public class EntityMetadata implements Presenter {
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
+		this.view.setRestrictionWidget(restrictionWidget);
 	}
 	
 	public Widget asWidget() {
@@ -66,7 +67,6 @@ public class EntityMetadata implements Presenter {
 				fireEntityUpdatedEvent();
 			}
 		});
-		this.view.setRestrictionWidget(restrictionWidget);
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
 		annotationsWidget.configure(bundle, canEdit);
 		view.setDetailedMetadataVisible(showDetailedMetadata);

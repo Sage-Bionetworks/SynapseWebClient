@@ -99,6 +99,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
 	private Breadcrumb breadcrumb;
+	private ActionMenuWidget actionMenu;
 	
 	//project level info
 	@UiField
@@ -395,7 +396,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * Private Methods
 	 */
 	// Render the File entity	
-	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, Long versionNumber, final String wikiPageId, EntityHeader projectHeader) {
+	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, Long versionNumber, String wikiPageId, EntityHeader projectHeader) {
 		// tab container
 		setTabSelected(EntityArea.FILES, false); // select files tab for file
 		
@@ -737,7 +738,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 * @return
 	 */
 	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId) {
-		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		actionMenu = ginInjector.createActionMenuWidget();
 		// Create a menu
 		// Create a controller.
 		final EntityActionController controller = ginInjector.createEntityActionController();
@@ -757,28 +758,26 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				entityMetadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
-		Entity entity = bundle.getEntity();
-		if (entity != null && entity instanceof FileEntity) {
-			fileHistoryShown = false;
-			actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
-				@Override
-				public void onAction(Action action) {
-					fileHistoryShown = !fileHistoryShown;
-					controller.onFileHistoryToggled(fileHistoryShown);
-					entityMetadata.setFileHistoryVisible(fileHistoryShown);
-				}
-			});
-			if (versionNumber != null) {
-				if (!fileHistoryShown) {
-					((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
-				}
-			} else if (fileHistoryShown) {
-				((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
+		fileHistoryShown = false;
+		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				fileHistoryShown = !fileHistoryShown;
+				controller.onFileHistoryToggled(fileHistoryShown);
+				entityMetadata.setFileHistoryVisible(fileHistoryShown);
 			}
-		} else {
-			entityMetadata.setFileHistoryVisible(false);
-		}
+		});
 		return actionMenu;
+	}
+
+	@Override
+	public void setFileHistoryVisible(boolean isVisible) {
+		entityMetadata.setFileHistoryVisible(isVisible);
+	}
+
+	@Override
+	public void toggleFileHistory() {
+		((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
 	}
 
 }

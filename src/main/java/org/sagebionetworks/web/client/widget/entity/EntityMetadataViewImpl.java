@@ -25,7 +25,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private static EntityMetadataViewImplUiBinder uiBinder = GWT
 			.create(EntityMetadataViewImplUiBinder.class);
 
-
 	@UiField
 	HTMLPanel detailedMetadata;
 	@UiField

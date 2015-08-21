@@ -145,7 +145,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				}
 			}
 		});
-		historyCollapse.hide();	
+		historyCollapse.hide();
+		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
 	}
 	
 	@Override

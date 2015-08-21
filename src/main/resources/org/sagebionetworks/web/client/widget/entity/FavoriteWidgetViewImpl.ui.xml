@@ -6,9 +6,12 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   >
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-  	<bh:Span addStyleNames="margin-left-2">
-		<b:Tooltip ui:field="tip" title="Click the star to add this to your favorites!" trigger="HOVER" placement="RIGHT">
-			<b:Anchor ui:field="favoriteIcon" icon="STAR"/>
+  	<bh:Span addStyleNames="margin-left-2 displayInlineBlock" ui:field="favWidgetContainer">
+		<b:Tooltip trigger="HOVER" placement="RIGHT" title="Click the star to remove this to your favorites!">
+			<b:Anchor addStyleNames="favoriteIcon" ui:field="favoriteIcon" icon="STAR"/>
+		</b:Tooltip>
+		<b:Tooltip trigger="HOVER" placement="RIGHT" title="Click the star to add this to your favorites!">
+			<b:Anchor addStyleNames="greyText-imp" ui:field="notFavoriteIcon" icon="STAR_O"/>
 		</b:Tooltip>
 		<g:Image ui:field="loadingUI" styleName="displayInline" resource='{sageImageBundle.loading16}' />
 	</bh:Span>

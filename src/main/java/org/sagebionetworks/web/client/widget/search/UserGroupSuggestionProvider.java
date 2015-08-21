@@ -67,14 +67,6 @@ public class UserGroupSuggestionProvider implements SuggestionProvider {
 		public String getDisplayString() {
 			StringBuilder result = new StringBuilder();
 			result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + "px;\">");
-			result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
-			if (header.getIsIndividual()) {
-				result.append(jsniUtils.getBaseProfileAttachmentUrl());
-				result.append("?userId=" + header.getOwnerId() + "&waitForUrl=true\" />");
-			} else {
-				result.append(jsniUtils.getBaseFileHandleUrl());
-				result.append("?teamId=" + header.getOwnerId() + "\" />");
-			}
 			result.append("<span class=\"search-item movedown-1 margin-right-5\">");
 			if (header.getIsIndividual()) {
 				result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
