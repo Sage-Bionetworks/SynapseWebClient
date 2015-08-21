@@ -5,11 +5,10 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   >
-  	<ui:with field='iconsImageBundle' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<bh:Div>
-		<g:Image resource='{iconsImageBundle.synapseProject16}' addStyleNames="displayInline margin-right-5" />
+		<b:Icon ui:field="icon" type="LIST_ALT" addStyleNames="displayInline margin-right-5 lightGreyText"/>
 		<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" trigger="HOVER">
-			<g:Anchor ui:field="anchor" addStyleNames="displayInline"/>
+			<g:Anchor ui:field="anchor" addStyleNames="displayInline font-size-1.1em"/>
 		</b:Tooltip>
 		<bh:Span ui:field="favoritesWidgetContainer"/>
 		<bh:Span ui:field="additionalTextUI" addStyleNames="margin-left-5">

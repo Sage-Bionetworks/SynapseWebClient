@@ -78,6 +78,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			public void onSuccess(UserSessionData userSessionData) {
 				if (userSessionData != null) {					
 					Date tomorrow = getDayFromNow();
+					cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", getWeekFromNow());
 					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 					currentUser = userSessionData;
 					callback.onSuccess(userSessionData);
@@ -151,6 +152,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private Date getDayFromNow() {
 		Date date = new Date();
 		CalendarUtil.addDaysToDate(date, 1);
+		return date;  
+	}
+	
+	private Date getWeekFromNow() {
+		Date date = new Date();
+		CalendarUtil.addDaysToDate(date, 7);
 		return date;  
 	}
 }

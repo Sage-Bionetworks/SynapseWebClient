@@ -91,9 +91,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 						if(result != null && !result.isEmpty()) {
 							view.setEmptyVisible(false);
 							view.setMarkdown(result);
-							loadTableSorters();
 							loadMath(wikiKey, isPreview);
 							loadWidgets(wikiKey, isPreview);
+							loadTableSorters();
 						} else {
 							view.setEmptyVisible(true);
 						}

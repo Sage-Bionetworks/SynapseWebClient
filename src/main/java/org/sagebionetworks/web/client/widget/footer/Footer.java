@@ -3,10 +3,11 @@ package org.sagebionetworks.web.client.widget.footer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class Footer implements FooterView.Presenter {
+public class Footer implements FooterView.Presenter, IsWidget {
 
 	private FooterView view;
 	GlobalApplicationState globalAppState;

@@ -55,7 +55,7 @@ public class LoginWidgetViewImpl extends Composite implements
 		final FormPanel form = new FormPanel();
 		form.setAction("/expect_404");
 		signInBtn = new SubmitButton();
-		signInBtn.addStyleName("btn btn-large btn-primary margin-top-10");
+		signInBtn.addStyleName("btn btn-large btn-primary");
 		signInBtn.setText(DisplayConstants.SIGN_IN);
 		forgotPasswordLink = new Anchor();
 		forgotPasswordLink.addStyleName("link movedown-4 margin-left-10");
@@ -83,15 +83,14 @@ public class LoginWidgetViewImpl extends Composite implements
 			}
 		});
 		
-		
 		username = TextBox.wrap(DOM.getElementById("synapse_username"));
 	    username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);
-	    username.addStyleName("form-control");
+	    username.addStyleName("form-control margin-top-20");
 		username.setFocus(true);
 		
 		password = PasswordTextBox.wrap(DOM.getElementById("synapse_password"));
 		password.getElement().setAttribute("placeholder", DisplayConstants.PASSWORD);
-		password.addStyleName("form-control");
+		password.addStyleName("form-control margin-top-20");
 		password.addKeyDownHandler(new KeyDownHandler() {
 		    @Override
 		    public void onKeyDown(KeyDownEvent event) {
@@ -104,8 +103,11 @@ public class LoginWidgetViewImpl extends Composite implements
 		FlowPanel loginFieldsPanel = new FlowPanel();
 		loginFieldsPanel.add(username);
 		loginFieldsPanel.add(password);
-		loginFieldsPanel.add(signInBtn);
-		loginFieldsPanel.add(forgotPasswordLink);
+		FlowPanel buttonPanel = new FlowPanel();
+		buttonPanel.addStyleName("margin-top-20");
+		buttonPanel.add(signInBtn);
+		buttonPanel.add(forgotPasswordLink);
+		loginFieldsPanel.add(buttonPanel);
 		synapseLoginFieldsContainer.add(form);
 		form.setWidget(loginFieldsPanel);
 		form.setMethod(FormPanel.METHOD_POST);

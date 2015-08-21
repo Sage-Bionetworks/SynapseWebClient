@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -36,12 +35,19 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EntityView;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
+import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -60,6 +66,10 @@ public class EntityPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	SynapseAlert mockSynAlert;
+	OpenTeamInvitationsWidget mockOpenInviteWidget;
+	Header mockHeaderWidget;
+	EntityPageTop mockEntityPageTop;
+	Footer mockFooterWidget;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
 	Entity EntityModel1;
@@ -82,7 +92,12 @@ public class EntityPresenterTest {
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockCookies, mockSynapseJSNIUtils, mockSynAlert);
+		mockOpenInviteWidget = mock(OpenTeamInvitationsWidget.class);
+		mockHeaderWidget = mock(Header.class);
+		mockEntityPageTop = mock(EntityPageTop.class);
+		mockFooterWidget = mock(Footer.class);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
+				mockCookies, mockSynapseJSNIUtils, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -91,23 +106,75 @@ public class EntityPresenterTest {
 		eb.setPath(path);
 		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setPresenter(entityPresenter);
 		id=0L;
-		
 		AsyncMockStubber.callSuccessWith(rootWikiId).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		rootWikiAttachments = new FileHandleResults();
 		AsyncMockStubber.callSuccessWith(rootWikiAttachments).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		when(mockGlobalApplicationState.isWikiBasedEntity(anyString())).thenReturn(false);
+		
+		verify(mockView).setEntityPageTopWidget(mockEntityPageTop);
+		verify(mockView).setFooterWidget(mockFooterWidget);
+		verify(mockView).setHeaderWidget(mockHeaderWidget);
+		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
+		verify(mockEntityPageTop).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
+		verify(mockEntityPageTop).setAreaChangeHandler(any(AreaChangeHandler.class));
+		verify(mockHeaderWidget, never()).configure(false); // waits to configure for entity header
+		verify(mockHeaderWidget).refresh();
 	}	
 	
 	@Test
-	public void testSetPlace() {
+	public void testSetPlaceAndRefreshWithVersion() {
+		Long versionNumber = 1L;
 		Synapse place = Mockito.mock(Synapse.class);
+		when(place.getVersionNumber()).thenReturn(1L);
+		when(place.getEntityId()).thenReturn(entityId);
+		
 		entityPresenter.setPlace(place);
-		verify(mockView, times(2)).setPresenter(entityPresenter);
 		//verify that background image is cleared
 		verify(mockView).setBackgroundImageVisible(false);
-		verify(mockView).setSynAlertWidget(mockSynAlert.asWidget());
-	}	
+		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockView).hideLoading();
+		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
+		verify(mockView).showEntityPageTop();
+		verify(mockEntityPageTop).clearState();
+		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
+		verify(mockEntityPageTop).refresh();
+		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
+		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
+	}
+	
+	@Test
+	public void testSetEntityBundle() {
+		EntityHeader entityHeader = new EntityHeader();
+		Long versionNumber = 1L;
+		entityPresenter.setEntityBundle(eb, versionNumber, entityHeader, area, areaToken);
+		verify(mockView).showEntityPageTop();
+		verify(mockEntityPageTop).clearState();
+		verify(mockEntityPageTop).configure(eb, versionNumber, entityHeader, area, areaToken);
+		verify(mockEntityPageTop).refresh();
+		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
+		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop); // needs to be replaced after config
+	}
+	
+	@Test
+	public void testSetPlaceAndRefreshWithoutVersion() {
+		Long versionNumber = 1L;
+		Synapse place = Mockito.mock(Synapse.class);
+		when(place.getVersionNumber()).thenReturn(1L);
+		when(place.getEntityId()).thenReturn(entityId);
+		
+		entityPresenter.setPlace(place);
+		//verify that background image is cleared
+		verify(mockView).setBackgroundImageVisible(false);
+		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockView).hideLoading();
+		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
+		verify(mockView).showEntityPageTop();
+		verify(mockEntityPageTop).clearState();
+		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
+		verify(mockEntityPageTop).refresh();
+		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
+	}
 	
 	@Test
 	public void testStart() {
@@ -119,27 +186,7 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testGetEntityBundle() {
-		Long version = null;
-		Synapse place = new Synapse(entityId, version, area, areaToken);
-		entityPresenter.setPlace(place);
-		//verify synapse client call
-		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
-	}
-	
-	@Test
-	public void testGetEntityBundleForVersion() {
-		Long version = 42L;
-		Synapse place = new Synapse(entityId, version, area, areaToken);
-		entityPresenter.setPlace(place);
-		//verify synapse client call
-		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(version), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
-	}
-	
-	@Test
-	public void testWikiBasedEntity() {
+	public void testSetPlaceAndRefreshWikiBasedEntity() {
 		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
@@ -148,24 +195,21 @@ public class EntityPresenterTest {
 		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		//redirects to the wiki place
 		verify(mockPlaceChanger).goTo(any(Wiki.class));
-		//view's setEntityBundle is never called
-		verify(mockView, never()).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
+		verify(mockView, never()).showEntityPageTop();
 	}
 	
 	@Test
-	public void testWikiBasedEntityInTestWebsite() {
-		//will show full project page for wiki based entities when in alpha mode
-		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+	public void testSetPlaceAndRefreshWikiBasedEntityInTestWebsite() {
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
+		Exception caught = new Exception("test");
+		//will show full project page for wiki based entities when in alpha mode
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityPresenter.setPlace(place);
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
 		//verify synapse client call
-		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), captor.capture());
-		verify(mockView).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
-		Exception caught = new Exception("test");
-		captor.getValue().onFailure(caught);
 		verify(mockSynAlert).handleException(caught);
 	}
 	
@@ -178,17 +222,28 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testRefreshFailure() {
+	public void testSetPlaceAndRefreshFailure() {
+		Exception caught = new Exception("test");
 		//will show full project page for wiki based entities when in alpha mode
-				when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
-				when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-				Long version = null;
-				Synapse place = new Synapse(entityId, version, area, areaToken);
-				entityPresenter.setPlace(place);
-				//verify synapse client call
-				verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
-				verify(mockView).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
-		
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		Long version = null;
+		Synapse place = new Synapse(entityId, version, area, areaToken);
+		entityPresenter.setPlace(place);
+		//verify synapse client call
+		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(caught);
+		//header should be reconfigured to set back to Synapse
+		verify(mockHeaderWidget).configure(false);
+	}
+	
+	@Test
+	public void testClear() {
+		entityPresenter.clear();
+		verify(mockView, times(2)).clear();
+		verify(mockSynAlert, times(2)).clear();
+		verify(mockOpenInviteWidget, times(2)).clear();
 	}
 	
 	@Test
@@ -301,6 +356,7 @@ public class EntityPresenterTest {
 	public void testShow403() {
 		entityPresenter.show403();
 		verify(mockSynAlert).show403(anyString());
-		verify(mockView).show403();
+		verify(mockView).hideEntityPageTop();
+		verify(mockView).showOpenTeamInvites();
 	}
 }

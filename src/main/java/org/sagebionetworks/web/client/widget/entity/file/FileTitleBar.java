@@ -20,6 +20,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPresenter {
 	
@@ -42,7 +43,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		this.entityBundle = bundle;
 
 		// Get EntityType
-		EntityType entityType = EntityType.getEntityTypeForClass(bundle.getEntity().getClass());
+		EntityType entityType = EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass());
 		view.createTitlebar(bundle, entityType, authenticationController);
 	}
 	

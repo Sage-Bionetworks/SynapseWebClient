@@ -3,10 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 	<g:HTMLPanel>
-
-		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
 
 		<div class="margin-top-15 margin-left-35 margin-right-40">
 			<div class="row">
