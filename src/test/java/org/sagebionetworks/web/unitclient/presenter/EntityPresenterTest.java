@@ -147,7 +147,7 @@ public class EntityPresenterTest {
 	public void testSetPlaceAndRefreshWithoutVersion() {
 		Long versionNumber = 1L;
 		Synapse place = Mockito.mock(Synapse.class);
-		when(place.getVersionNumber()).thenReturn(1L);
+		when(place.getVersionNumber()).thenReturn(versionNumber);
 		when(place.getEntityId()).thenReturn(entityId);
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
@@ -340,6 +340,7 @@ public class EntityPresenterTest {
 	
 	@Test
 	public void testShow403() {
+		entityPresenter.setEntityId("123");
 		entityPresenter.show403();
 		verify(mockSynAlert).show403(anyString());
 		verify(mockView).setEntityPageTopVisible(false);
