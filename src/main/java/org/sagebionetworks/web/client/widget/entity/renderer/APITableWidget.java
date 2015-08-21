@@ -315,7 +315,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	public String getOrderedByURI(String uri, APITableConfig tableConfig) {
-		String newUri = uri.toLowerCase();
+		String newUri = uri;
 		if (isQueryService(uri)) {
 			//find the order by column
 			COLUMN_SORT_TYPE sort = COLUMN_SORT_TYPE.NONE;
@@ -332,7 +332,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					}
 				}
 			}
-			int orderByIndex = newUri.indexOf("+order+by+");
+			int orderByIndex = newUri.toLowerCase().indexOf("+order+by+");
 			if (orderByIndex != -1) {
 				newUri = newUri.substring(0, orderByIndex);
 			}
