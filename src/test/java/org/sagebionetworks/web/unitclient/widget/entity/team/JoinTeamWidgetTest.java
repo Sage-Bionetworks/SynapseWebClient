@@ -68,6 +68,7 @@ public class JoinTeamWidgetTest {
 	List<AccessRequirement> ars;
 	UserProfile currentUserProfile;
 	MarkdownWidget mockWikiPageWidget;
+	TeamMembershipStatus status;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -95,11 +96,13 @@ public class JoinTeamWidgetTest {
         
 		
 		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, jsonObjectAdapter, mockGwt, mockWikiPageWidget);
-		TeamMembershipStatus status = new TeamMembershipStatus();
+		status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
 		status.setHasOpenRequest(false);
 		status.setIsMember(false);
+		status.setMembershipApprovalRequired(false);
+		status.setHasUnmetAccessRequirement(false);
 		joinWidget.configure(teamId, false, status, mockTeamUpdatedCallback, null, null, null, null, false);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
@@ -109,7 +112,6 @@ public class JoinTeamWidgetTest {
 		when(mockGwt.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
 	}
 
-	@Ignore
 	@Test
 	public void testSimpleRequestButton() throws Exception {
 		reset(mockView);
@@ -120,15 +122,14 @@ public class JoinTeamWidgetTest {
 		String openRequestText = "you have an open request.";
 		boolean isChallenge = false;
 		boolean isSimpleRequestButton = true;
-		joinWidget.configure(teamId, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText, openRequestText, isSimpleRequestButton);
+//		joinWidget.configure(teamId, isChallenge, status, mockTeamUpdatedCallback, isMemberMessage, successMessage, buttonText, openRequestText, isSimpleRequestButton);
 //		verify(mockView).configure(true, status, isMemberMessage, buttonText, openRequestText, isSimpleRequestButton);
 	}
 	
-	@Ignore
+	
 	@Test
 	public void testNormalRequestButton() throws Exception {
 		reset(mockView);
-		TeamMembershipStatus status = new TeamMembershipStatus();
 		String isMemberMessage = "already a member";
 		String successMessage = "successfully joined";
 		String buttonText = "join a team";
@@ -139,7 +140,7 @@ public class JoinTeamWidgetTest {
 //		verify(mockView).configure(true, status, isMemberMessage, buttonText, openRequestText, isSimpleRequestButton);
 	}
 	
-	@Ignore
+	
 	@Test
 	public void testJoinRequestStep1() throws Exception {
 		WikiPageKey challengeInfoKey = mock(WikiPageKey.class);
@@ -149,7 +150,7 @@ public class JoinTeamWidgetTest {
 		verify(mockView, times(2)).setButtonsEnabled(anyBoolean());
 	}
 	
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2WithRestriction() throws Exception {
@@ -161,7 +162,7 @@ public class JoinTeamWidgetTest {
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
 	}
-	@Ignore
+	
 	@Test
 	public void testJoinRequestStep2WithNullRestrictionText() throws Exception {
 		TermsOfUseAccessRequirement terms = new TermsOfUseAccessRequirement();
@@ -173,7 +174,7 @@ public class JoinTeamWidgetTest {
 		verify(mockView).showWikiAccessRequirement(any(Widget.class), any(Callback.class));
 	}
 
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2WithACTRestriction() throws Exception {
@@ -183,7 +184,7 @@ public class JoinTeamWidgetTest {
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).showACTAccessRequirement(anyString(), any(Callback.class));
 	}
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2NoRestriction() throws Exception {
@@ -193,18 +194,18 @@ public class JoinTeamWidgetTest {
 		verify(mockView, times(0)).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 	}
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetTotalPageCount() throws Exception {
 		boolean isChallengeSignup = true;
-        joinWidget.configure(teamId, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
+        joinWidget.configure(teamId, isChallengeSignup, status, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //one page for the AR
         Assert.assertEquals(1, joinWidget.getTotalPageCount());
         
         isChallengeSignup = false;
-        joinWidget.configure(teamId, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
+        joinWidget.configure(teamId, isChallengeSignup, status, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //0 pages
         Assert.assertEquals(0, joinWidget.getTotalPageCount());
@@ -216,28 +217,29 @@ public class JoinTeamWidgetTest {
         ars.add(terms);
         
         isChallengeSignup = true;
-        joinWidget.configure(teamId, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
+        joinWidget.configure(teamId, isChallengeSignup, status, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //One page for challenge info, one page for the AR
         Assert.assertEquals(2, joinWidget.getTotalPageCount());
         
         isChallengeSignup = false;
-        joinWidget.configure(teamId, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null, null, false);
+        joinWidget.configure(teamId, isChallengeSignup, status, mockTeamUpdatedCallback, null, null, null, null, false);
         joinWidget.sendJoinRequestStep0();
         //One page for challenge info
         Assert.assertEquals(1, joinWidget.getTotalPageCount());
 	}
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2Failure() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
 		joinWidget.sendJoinRequestStep0();
 		joinWidget.sendJoinRequestStep2();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockView, times(2)).showErrorMessage(anyString());
 	}
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep3() throws Exception {
@@ -248,16 +250,17 @@ public class JoinTeamWidgetTest {
 		verify(mockTeamUpdatedCallback).invoke();
 	}
 
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep3Failure() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(),anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
 		joinWidget.sendJoinRequest("");
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockView, times(2)).showErrorMessage(anyString());
 	}
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep3WikiRefresh() throws Exception {
@@ -274,7 +277,7 @@ public class JoinTeamWidgetTest {
 		verify(mockWidgetRefreshRequired).invoke();
 	}
 	
-	@Ignore
+	
 	@Test
 	public void testShowChallengeInfoParam() throws Exception {
 		Map<String, String> descriptor = new HashMap<String, String>();
@@ -299,7 +302,7 @@ public class JoinTeamWidgetTest {
 		Assert.assertFalse(joinWidget.isChallengeSignup());
 	}
 
-	@Ignore
+	
 	@Test
 	public void testSetLicenseAccepted() throws Exception {
 		//single ToU
@@ -319,7 +322,7 @@ public class JoinTeamWidgetTest {
         verify(mockView).hideJoinWizard();
 	}
 	
-	@Ignore
+	
 	@Test
 	public void testSetLicenseAcceptedACT() throws Exception {
 		//single ToU
@@ -338,7 +341,7 @@ public class JoinTeamWidgetTest {
         verify(mockView).hideJoinWizard();
 	}
 
-	@Ignore
+	
 	@Test
 	public void testSetLicenseAcceptedPostMessage() throws Exception {
 		//single ToU
@@ -356,17 +359,18 @@ public class JoinTeamWidgetTest {
         verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
         verify(mockView).hideJoinWizard();
 	}
-	@Ignore
+	
 	@Test
 	public void testSetLicenseAcceptedInvalidType() throws Exception {
 		//single ToU
 		AccessRequirement ar = mock(AccessRequirement.class);
 		ars.add(ar);
+		verify(mockView).showErrorMessage(anyString());
 		joinWidget.sendJoinRequestStep0();
 		//verify we show an error for an unrecognized ar
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockView, times(2)).showErrorMessage(anyString());
 	}
-	@Ignore
+	
 	@Test
 	public void testIsRecognizedSite() {
 		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) {
@@ -382,7 +386,7 @@ public class JoinTeamWidgetTest {
 			assertFalse(JoinTeamWidget.isRecognizedSite("https://www.jayhodgson.com/projectdatasphere/"));
 		}
 	}
-	@Ignore
+	
 	@Test
 	public void testenhancePostMessageUrl() {
 		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) {
@@ -411,7 +415,7 @@ public class JoinTeamWidgetTest {
 			assertTrue(enhancedUrl.contains(email));
 		}
 	}
-	@Ignore
+	
 	@Test
 	public void testEnhancePostMessageUrlNotLoggedIn() {
 		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) { 
@@ -421,7 +425,7 @@ public class JoinTeamWidgetTest {
 			assertEquals(url, joinWidget.enhancePostMessageUrl(url));
 		}
 	}
-	@Ignore
+	
 	@Test
 	public void testGetEncodedParamValueIfDefined() {
 		//return the param key if null value
