@@ -1,18 +1,20 @@
 package org.sagebionetworks.web.client.widget.modal;
 
+import java.util.Iterator;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiConstructor;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
 /**
  * Lightweight Bootstrap modal dialog, uses gwtbootstrap3.
@@ -22,8 +24,12 @@ import com.google.inject.Inject;
  * @author jhodgson
  * 
  */
-public class Dialog implements IsWidget {
+public class Dialog implements IsWidget, HasWidgets {
+	
 	public interface DialogUiBinder extends UiBinder<Widget, Dialog> {}
+	
+	private static DialogUiBinder uiBinder = GWT
+			.create(DialogUiBinder.class);
 	
 	private Callback callback;
 
@@ -33,20 +39,17 @@ public class Dialog implements IsWidget {
 	Button primaryButton;
 	@UiField
 	Button defaultButton;
-	
-	boolean autoHide;
-	
 	@UiField
 	Modal modal;
 	
+	boolean autoHide;
 	Widget widget;
 
 	/**
 	 * Create a new Modal dialog.
 	 */
-	@Inject
-	public Dialog(DialogUiBinder binder) {		
-		widget = binder.createAndBindUi(this);
+	public Dialog() {		
+		widget = uiBinder.createAndBindUi(this);
 		primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -155,5 +158,29 @@ public class Dialog implements IsWidget {
 	
 	public Widget asWidget() {
 		return widget;
+	}
+
+	public boolean isVisible() {
+		return widget.isVisible();
+	}
+
+	@Override
+	public void add(Widget w) {
+		mainContent.add(w);
+	}
+
+	@Override
+	public void clear() {
+		mainContent.clear();
+	}
+
+	@Override
+	public Iterator<Widget> iterator() {
+		return mainContent.iterator();
+	}
+
+	@Override
+	public boolean remove(Widget w) {
+		return mainContent.remove(w);
 	}
 }

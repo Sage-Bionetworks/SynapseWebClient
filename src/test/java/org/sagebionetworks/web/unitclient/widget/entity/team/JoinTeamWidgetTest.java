@@ -21,9 +21,9 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
+import org.sagebionetworks.web.client.widget.team.WizardProgressWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -51,7 +52,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.EvaluationSubmitterTest;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public class JoinTeamWidgetTest {
 
@@ -68,6 +68,7 @@ public class JoinTeamWidgetTest {
 	List<AccessRequirement> ars;
 	UserProfile currentUserProfile;
 	MarkdownWidget mockWikiPageWidget;
+	WizardProgressWidget mockWizardProgress;
 	TeamMembershipStatus status;
 	
 	@Before
@@ -79,23 +80,25 @@ public class JoinTeamWidgetTest {
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockGwt = mock(GWTWrapper.class);
 		mockWikiPageWidget = mock(MarkdownWidget.class);
-		jsonObjectAdapter = new JSONObjectAdapterImpl();
-		
-		mockPlaceChanger = mock(PlaceChanger.class);
-        when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		mockWizardProgress = mock(WizardProgressWidget.class);
         mockAuthenticationController = mock(AuthenticationController.class);
-        when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		mockPlaceChanger = mock(PlaceChanger.class);
+
+		jsonObjectAdapter = new JSONObjectAdapterImpl();
         UserSessionData currentUser = new UserSessionData();                
         currentUserProfile = new UserProfile();
+        ars = new ArrayList<AccessRequirement>();
+        
         currentUserProfile.setOwnerId("1");
         currentUser.setProfile(currentUserProfile);
         when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
-        ars = new ArrayList<AccessRequirement>();
+        when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+        when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
         AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));
         AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, jsonObjectAdapter, mockGwt, mockWikiPageWidget);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, jsonObjectAdapter, mockGwt, mockWikiPageWidget, mockWizardProgress);
 		status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
@@ -146,7 +149,9 @@ public class JoinTeamWidgetTest {
 		WikiPageKey challengeInfoKey = mock(WikiPageKey.class);
 		joinWidget.sendJoinRequestStep0();
 		joinWidget.sendJoinRequestStep1(challengeInfoKey);
-		verify(mockView).showChallengeInfoPage(any(UserProfile.class), eq(challengeInfoKey), any(Callback.class));
+		verify(mockView).setJoinWizardCallback(any(Callback.class));
+		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(true), eq(false));
+		verify(mockView).setCurrentWizardContent(mockWikiPageWidget);
 		verify(mockView, times(2)).setButtonsEnabled(anyBoolean());
 	}
 	
@@ -154,13 +159,16 @@ public class JoinTeamWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2WithRestriction() throws Exception {
+		String termsText = "terms have been set";
 		TermsOfUseAccessRequirement terms = new TermsOfUseAccessRequirement();
-		terms.setTermsOfUse("terms have been set");
+		terms.setTermsOfUse(termsText);
 		ars.add(terms);
-        
         joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
-		verify(mockView).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
+		verify(mockView).setAccessRequirementHTML(termsText);
+		verify(mockView).setJoinWizardCallback(any(Callback.class));
+		verify(mockView).setCurrentWizardPanelVisible(false);
+		verify(mockView).setJoinWizardPrimaryButtonText("Accept");
 	}
 	
 	@Test
@@ -169,9 +177,16 @@ public class JoinTeamWidgetTest {
 		terms.setId(1L);
 		ars.add(terms);
 		joinWidget.sendJoinRequestStep0();
-		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		verify(mockView).setButtonsEnabled(true);
+		verify(mockView).showJoinWizard();
+		verify(mockWizardProgress).configure(Mockito.anyInt(), Mockito.anyInt());
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));		
+		verify(mockView).setAccessRequirementHTML("");
+		verify(mockView).setJoinWizardCallback(any(Callback.class));
+		verify(mockView).setCurrentWizardPanelVisible(true);
+		verify(mockView).setJoinWizardPrimaryButtonText("Accept");
+		verify(mockView).setCurrentWizardContent(mockWikiPageWidget);
 		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(true), eq(true));
-		verify(mockView).showWikiAccessRequirement(any(Widget.class), any(Callback.class));
 	}
 
 	
@@ -179,10 +194,12 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testJoinRequestStep2WithACTRestriction() throws Exception {
 		ars.add(new ACTAccessRequirement());
-        
         joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
-		verify(mockView).showACTAccessRequirement(anyString(), any(Callback.class));
+		verify(mockView).setAccessRequirementHTML(anyString());
+		verify(mockView).setJoinWizardCallback(any(Callback.class));
+		verify(mockView).setCurrentWizardPanelVisible(false);
+		verify(mockView).setJoinWizardPrimaryButtonText("Continue");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -191,7 +208,10 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		//no ARs shown...
-		verify(mockView, times(0)).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
+		verify(mockView, never()).showJoinWizard();
+		verify(mockView).hideJoinWizard();
+		//no accessRequirements, so else should not be executed
+		verify(mockWizardProgress, never()).configure(Mockito.anyInt(), Mockito.anyInt());
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 	}
 	
@@ -312,7 +332,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		//verify we showTermsOfUseAccessRequirement
 		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
-		verify(mockView).showTermsOfUseAccessRequirement(anyString(), callbackArg.capture());
+		verify(mockView).setJoinWizardCallback(callbackArg.capture());
 		
 		//manually invoke the okbutton callback
 		callbackArg.getValue().invoke();
@@ -331,7 +351,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		//verify we showTermsOfUseAccessRequirement
 		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
-		verify(mockView).showACTAccessRequirement(anyString(), callbackArg.capture());
+		verify(mockView).setJoinWizardCallback(callbackArg.capture());
 		
 		//manually invoke the okbutton callback
 		callbackArg.getValue().invoke();
@@ -351,7 +371,7 @@ public class JoinTeamWidgetTest {
 		//verify we showTermsOfUseAccessRequirement
 		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).showPostMessageContentAccessRequirement(anyString());
-		
+		verify(mockView).setJoinWizardCallback(callbackArg.capture());
 		//manually invoke the okbutton callback
 		callbackArg.getValue().invoke();
 				

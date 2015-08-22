@@ -5,8 +5,9 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget.modal">
 	<g:HTMLPanel>
-	    <g:HTMLPanel ui:field="userPanel" visible="false">		    
-		    <s:Dialog addStyleNames="modal-fullscreen" ui:field="joinWizard" binder>
+	    <g:HTMLPanel ui:field="userPanel" visible="false">
+	        <!--  addStyleNames="modal-fullscreen"-->	    
+		    <s:Dialog ui:field="joinWizard">
 		        <g:SimplePanel ui:field="progressWidgetPanel"/>
 		        <g:SimplePanel ui:field="currentWizardContentPanel"/>
 		        <g:HTML ui:field="accessRequirementHTML"/>

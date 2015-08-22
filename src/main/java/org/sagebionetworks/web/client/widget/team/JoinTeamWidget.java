@@ -321,9 +321,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			progressWidget.configure(currentPage, getTotalPageCount());
 			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-				if (!DisplayUtils.isDefined(text)) {
+				if (text == null || text.trim().isEmpty()) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-					boolean isPreview=true, isIgnoreLoadingFailure=true;
+					boolean isPreview=true;
+					boolean isIgnoreLoadingFailure=true;
 					wikiPage.loadMarkdownFromWikiPage(wikiKey, isPreview, isIgnoreLoadingFailure);
 					view.setAccessRequirementHTML("");
 					view.setCurrentWizardPanelVisible(true);
