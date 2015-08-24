@@ -4,20 +4,25 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget">
-
-  <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
  
+    <ui:with field="icons" type="org.sagebionetworks.web.client.IconsImageBundle" />
+    
 	<g:HTMLPanel>
 		<g:HTMLPanel ui:field="detailedMetadata">
 		    <bh:Div>
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
-		    	<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground " readOnly="true" />
-		    	<bh:Span ui:field="doiPanel" />
-		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline"></g:HTMLPanel>
+		    	<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
+   				<g:SimplePanel ui:field="doiPanel" addStyleNames="displayInline"/>
+		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline">
+		    	    <bh:Span addStyleNames="margin-right-5 boldText">Conditions for use:</bh:Span>
+		    	    <g:SimplePanel ui:field="restrictionPanel"></g:SimplePanel>
+		    	</g:HTMLPanel>
 		    </bh:Div>
-			
-		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse"  >
-		    	<g:SimplePanel ui:field="annotationsContainer" styleName="highlight-box margin-bottom-15"></g:SimplePanel> 
+		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse">
+		    	<g:SimplePanel ui:field="annotationsContainer" addStyleNames="highlight-box margin-bottom-15"></g:SimplePanel> 
+		    </b:Collapse>
+		    <b:Collapse ui:field="fileHistoryContent" toggle="false" b:id="fileHistoryContentCollapse">
+		    	<g:SimplePanel ui:field="fileHistoryContainer" addStyleNames="highlight-box margin-bottom-15"></g:SimplePanel> 
 		    </b:Collapse>
 	    </g:HTMLPanel>
 	</g:HTMLPanel>

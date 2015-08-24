@@ -1,13 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface EntityView extends IsWidget, SynapseView {
+public interface EntityView extends IsWidget {
 		
 	public interface Presenter {
 
@@ -32,8 +29,6 @@ public interface EntityView extends IsWidget, SynapseView {
 		 */
 		void replaceEntityArea(EntityArea area, String areaToken);
 		void clear();
-		void setEntityBundle(EntityBundle bundle, Long versionNumber,
-				EntityHeader projectHeader, EntityArea area, String areaToken);
 	}
 	/**
 	 * Set entity to display
@@ -47,12 +42,12 @@ public interface EntityView extends IsWidget, SynapseView {
 	void setHeaderWidget(IsWidget headerWidget);
 	void setEntityPageTopWidget(IsWidget entityPageTopWidget);
 	void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
-	void hideLoading();
 	void setSynAlertWidget(IsWidget synAlert);
-	void showAccessDependentMessage();
-	void showOpenTeamInvites();
-	void showEntityPageTop();
-	void hideAccessDependentMessage();
-	void hideOpenTeamInvites();
-	void hideEntityPageTop();
+	void setAccessDependentMessageVisible(boolean isVisible);
+	void clear();
+	void showInfo(String title, String message);
+	void setLoadingVisible(boolean isVisible);
+	void showErrorMessage(String message);
+	void setEntityPageTopVisible(boolean isVisible);
+	void setOpenTeamInvitesVisible(boolean isVisible);
 }

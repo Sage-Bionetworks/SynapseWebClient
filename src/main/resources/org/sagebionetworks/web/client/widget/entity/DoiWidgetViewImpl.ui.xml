@@ -7,14 +7,12 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
 	<bh:Span> 
-	    <bh:Text>(</bh:Text>
 	    <b:Alert ui:field="errorCreatingDoi" addStyleNames="boldText" visible="false">
 	        <bh:Strong text="Error creating DOI"/>
 	    </b:Alert>
-	    <g:HTMLPanel ui:field="doiHTML" addStyleNames="inline-block" visible="false"/>
+	    <g:TextBox ui:field="doi" width="230px" addStyleNames="border-none noBackground padding-0" readOnly="true" />
 	    <g:SimplePanel ui:field="doiProcessing" addStyleNames="inline-block">
 	        <bh:Text text="DOI processing"/>
 	    </g:SimplePanel>
-	    <bh:Text>)</bh:Text>
 	</bh:Span>
 </ui:UiBinder>

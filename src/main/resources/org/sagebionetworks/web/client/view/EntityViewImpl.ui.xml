@@ -19,7 +19,7 @@
 		<g:SimplePanel ui:field="entityPageTopPanel"  addStyleNames="min-height-500"/>
 		<b:Heading ui:field="accessDependentMessage"  size="H4" text="Access could be dependent upon membership in one of the following Teams"
 		     addStyleNames="margin-top-100 margin-left-15" visible="false"/>
-		<g:SimplePanel ui:field="openInvitesPanel" addStyleNames="margin-left-10 margin-bottom-10 margin-right-10" visible="false"/>
+   		<g:SimplePanel ui:field="openInvitesPanel" addStyleNames="margin-left-10 margin-bottom-10 margin-right-10" visible="false"/>	    
         <div class="clear"></div>
 		<g:SimplePanel ui:field="footerPanel"/>
 	</g:HTMLPanel>

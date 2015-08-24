@@ -39,4 +39,6 @@ public interface EntityActionController extends IsWidget {
 	 */
 	void onAnnotationsToggled(boolean shown);
 
+	void onFileHistoryToggled(boolean shown);
+
 }

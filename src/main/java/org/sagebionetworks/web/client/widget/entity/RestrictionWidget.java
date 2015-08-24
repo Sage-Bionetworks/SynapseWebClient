@@ -26,10 +26,11 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter {
+public class RestrictionWidget implements RestrictionWidgetView.Presenter, SynapseWidgetPresenter, IsWidget {
 	
 	Callback entityUpdated;
 	EntityBundle bundle;
@@ -155,7 +156,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 
 	@Override
 	public Widget asWidget() {
-		if (!includeRestrictionWidget()) return null;
 		return view.asWidget();
 	}
 	
@@ -215,10 +215,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		view.open(jiraFlagLink);
 	}
 	
-	private ClickHandler getAboutLinkClickHandler(
-			final boolean hasAdministrativeAccess
-			) {
-		 
+	private ClickHandler getAboutLinkClickHandler(final boolean hasAdministrativeAccess) {
 		return new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
@@ -234,9 +231,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.currentAR = currentAR;
 	}
 	
-	public void showNextAccessRequirement(
-			final boolean hasAdministrativeAccess
-			) {
+	public void showNextAccessRequirement(final boolean hasAdministrativeAccess) {
 		
 		//iterate over access requirements until we reach one that we have not yet shown (or there are none left to show).
 		while(currentAR != null && shownAccessRequirements.contains(currentAR.getId())) {

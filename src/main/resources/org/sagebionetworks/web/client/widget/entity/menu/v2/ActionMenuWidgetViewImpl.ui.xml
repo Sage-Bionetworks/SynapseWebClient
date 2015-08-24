@@ -15,7 +15,9 @@
 			<b:ButtonGroup>
 				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_ANNOTATIONS">Annotations</a:ActionButton>
 			</b:ButtonGroup>
-			
+			<b:ButtonGroup>
+				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_FILE_HISTORY">File History</a:ActionButton>
+			</b:ButtonGroup>
 			<b:ButtonGroup>
 				<b:DropDown>
 					<b:Button icon="GEAR" dataToggle="DROPDOWN">Tools</b:Button>
