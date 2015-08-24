@@ -166,7 +166,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureCreateDOI();
 			//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
 //			configureEditProjectMetadataAction();
-			configureEditFileMetadataAction();
+			//TODO: Dependent on PLFM-3457
+//			configureEditFileMetadataAction();
 		}
 	}
 	
@@ -446,12 +447,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isRenameOnly(Entity entity){
-		if(entity instanceof FileEntity){
-			return false;
+//TODO: Dependent on PLFM-3457
+//		if(entity instanceof FileEntity){
+//			return false;
 //TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
 //		}else if(entity instanceof Project){
 //			return false;
-		}
+//		}
 		return true;
 	}
 	

@@ -89,8 +89,7 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 		this.fileEntity = fileEntity;
 		this.startingName = fileEntity.getName();
 		
-		//can only be run on the current version.
-		//get the current version
+		//Can only be run on the current version? Rework from PLFM-3457 will decide.
 		synapseClient.getEntityVersions(fileEntity.getId(), 1, 1, new AsyncCallback<PaginatedResults<VersionInfo>>() {
 			@Override
 			public void onSuccess(PaginatedResults<VersionInfo> result) {
