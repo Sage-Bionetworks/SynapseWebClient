@@ -54,6 +54,8 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -75,6 +77,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityActionControllerImplTest {
@@ -87,6 +90,8 @@ public class EntityActionControllerImplTest {
 	AuthenticationController mockAuthenticationController;
 	AccessControlListModalWidget mockAccessControlListModalWidget;
 	RenameEntityModalWidget mockRenameEntityModalWidget;
+	EditFileMetadataModalWidget mockEditFileMetadataModalWidget;
+	EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
 	EntityFinder mockEntityFinder;
 	EvaluationSubmitter mockSubmitter;
 	UploadDialogWidget mockUploader;
@@ -115,6 +120,9 @@ public class EntityActionControllerImplTest {
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
 		mockRenameEntityModalWidget = Mockito.mock(RenameEntityModalWidget.class);
+		mockEditFileMetadataModalWidget = Mockito.mock(EditFileMetadataModalWidget.class);
+		mockEditProjectMetadataModalWidget = Mockito.mock(EditProjectMetadataModalWidget.class);
+		
 		mockAuthenticationController = Mockito
 				.mock(AuthenticationController.class);
 		mockMarkdownEditorWidget = Mockito.mock(MarkdownEditorWidget.class);
@@ -136,7 +144,8 @@ public class EntityActionControllerImplTest {
 				mockPreflightController,
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockUploader,
+				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
+				mockEntityFinder, mockSubmitter, mockUploader,
 				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget);
 		
 		parentId = "syn456";

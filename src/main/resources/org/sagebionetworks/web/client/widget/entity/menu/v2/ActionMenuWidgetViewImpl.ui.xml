@@ -31,6 +31,8 @@
 							action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Query Results</a:ActionMenuItem>
 						<b:Divider ui:field="basicDivider" visible="false" />
 						<a:ActionMenuItem icon="EDIT" action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
+						<a:ActionMenuItem icon="EDIT" action="EDIT_FILE_METADATA">Edit Metadata</a:ActionMenuItem>
+						<a:ActionMenuItem icon="EDIT" action="EDIT_PROJECT_METADATA">Edit Metadata</a:ActionMenuItem>
 						<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_NEW_FILE">Upload a New Version of the File</a:ActionMenuItem>
 						<a:ActionMenuItem icon="NEWSPAPER_O" action="EDIT_WIKI_PAGE">Edit Wiki</a:ActionMenuItem>
 						<a:ActionMenuItem icon="NEWSPAPER_O" action="VIEW_WIKI_SOURCE">View Wiki Source</a:ActionMenuItem>

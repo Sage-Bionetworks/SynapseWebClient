@@ -107,6 +107,14 @@ import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalView;
+import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalView;
+import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogView;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
@@ -1125,5 +1133,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
 		bind(ErrorView.class).to(ErrorViewImpl.class);
 		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
+		
+		bind(EditFileMetadataModalView.class).to(EditFileMetadataModalViewImpl.class);
+		bind(EditFileMetadataModalWidget.class).to(EditFileMetadataModalWidgetImpl.class);
+		bind(EditProjectMetadataModalView.class).to(EditProjectMetadataModalViewImpl.class);
+		bind(EditProjectMetadataModalWidget.class).to(EditProjectMetadataModalWidgetImpl.class);
+
 	}
 }
