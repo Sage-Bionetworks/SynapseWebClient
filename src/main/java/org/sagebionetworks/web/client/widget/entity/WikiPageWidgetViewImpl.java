@@ -162,6 +162,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		diffVersionAlert.setVisible(false);
 		noWikiCanEditMessage.setVisible(false);
 		noWikiCannotEditMessage.setVisible(false);
+		wikiHeading.setText("");
 	}
 	
 	@Override

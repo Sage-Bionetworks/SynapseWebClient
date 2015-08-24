@@ -12,11 +12,9 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
@@ -45,9 +43,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	// utility
 	private SynapseClientAsync synapseClient;
-	private GlobalApplicationState globalApplicationState;
 	private WikiPageWidgetView view; 
-	private AuthenticationController authenticationController;
 
 	// callback
 	private Callback callback;
@@ -78,15 +74,11 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	@Inject
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
 			SynapseAlert synapseAlert, WikiHistoryWidget historyWidget,
 			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
 			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.synapseAlert = synapseAlert;
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
