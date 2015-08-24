@@ -14,6 +14,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -24,12 +25,11 @@ import com.google.gwt.user.client.ui.Widget;
  * @author jhodgson
  * 
  */
-public class Dialog implements IsWidget, HasWidgets {
+public class Dialog extends UIObject implements IsWidget, HasWidgets {
 	
 	public interface DialogUiBinder extends UiBinder<Widget, Dialog> {}
 	
-	private static DialogUiBinder uiBinder = GWT
-			.create(DialogUiBinder.class);
+	private DialogUiBinder uiBinder;
 	
 	private Callback callback;
 
@@ -48,7 +48,8 @@ public class Dialog implements IsWidget, HasWidgets {
 	/**
 	 * Create a new Modal dialog.
 	 */
-	public Dialog() {		
+	public Dialog() {
+		uiBinder = GWT.create(DialogUiBinder.class);
 		widget = uiBinder.createAndBindUi(this);
 		primaryButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -83,21 +84,9 @@ public class Dialog implements IsWidget, HasWidgets {
 	 * @param autoHide if true, will hide the dialog on primary or default button click.
 	 */
 	public void configure(String title, Widget body, String primaryButtonText, String defaultButtonText, Callback callback, boolean autoHide) {
-		this.autoHide = autoHide;
+		configure(title, primaryButtonText, defaultButtonText, callback, autoHide);
 		mainContent.clear();
-		this.callback = callback;
-		boolean isPrimaryButtonVisible = primaryButtonText != null;
-		primaryButton.setVisible(isPrimaryButtonVisible);
-		if (isPrimaryButtonVisible)
-			primaryButton.setText(primaryButtonText);
-		
-		boolean isDefaultButtonVisible = defaultButtonText != null;
-		defaultButton.setVisible(isDefaultButtonVisible);
-		if (isDefaultButtonVisible)
-			defaultButton.setText(defaultButtonText);
 		mainContent.add(body);
-		modal.setTitle(title);
-		modal.setHideOtherModals(false);
 	}
 	
 	/**

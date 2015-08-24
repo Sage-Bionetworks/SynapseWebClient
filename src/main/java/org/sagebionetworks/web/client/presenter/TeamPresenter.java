@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -48,7 +47,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter,
 			SynapseAlert synAlert, TeamLeaveModalWidget leaveTeamWidget,
 			TeamDeleteModalWidget deleteTeamWidget,
 			TeamEditModalWidget editTeamWidget, InviteWidget inviteWidget,

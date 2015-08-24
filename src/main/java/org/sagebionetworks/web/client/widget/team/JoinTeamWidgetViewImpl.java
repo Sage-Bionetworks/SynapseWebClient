@@ -106,6 +106,16 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				presenter.sendJoinRequest(messageArea.getValue());
 			}
 		});
+		requestButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (requestUIPanel.isShown()) {
+					requestUIPanel.hide();
+				} else {
+					requestUIPanel.show();
+				}
+			}
+		});
 		currentWizardContentPanel.setWidget(currentWizardContent);
 	}
 	

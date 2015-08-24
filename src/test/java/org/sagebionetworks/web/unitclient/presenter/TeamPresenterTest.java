@@ -42,7 +42,6 @@ public class TeamPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalAppState;
 	SynapseClientAsync mockSynClient;
-	JSONObjectAdapter mockJSONAdapter;
 	SynapseAlert mockSynAlert;
 	TeamLeaveModalWidget mockLeaveModal;
 	TeamDeleteModalWidget mockDeleteModal;
@@ -74,7 +73,6 @@ public class TeamPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
 		mockSynClient = mock(SynapseClientAsync.class);
-		mockJSONAdapter = mock(JSONObjectAdapter.class);
 		mockSynAlert = mock(SynapseAlert.class);
 		mockLeaveModal = mock(TeamLeaveModalWidget.class);
 		mockDeleteModal = mock(TeamDeleteModalWidget.class);
@@ -84,7 +82,7 @@ public class TeamPresenterTest {
 		mockMemberListWidget = mock(MemberListWidget.class);
 		mockOpenMembershipRequestsWidget = mock(OpenMembershipRequestsWidget.class);
 		mockOpenUserInvitationsWidget = mock(OpenUserInvitationsWidget.class);
-		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, mockSynClient, mockJSONAdapter, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, mockInviteModal, mockJoinWidget, mockMemberListWidget, mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget);
+		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, mockInviteModal, mockJoinWidget, mockMemberListWidget, mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget);
 		mockTeam = mock(Team.class);
 		when(mockTeam.getName()).thenReturn(teamName);
 		mockTeamBundle = mock(TeamBundle.class);

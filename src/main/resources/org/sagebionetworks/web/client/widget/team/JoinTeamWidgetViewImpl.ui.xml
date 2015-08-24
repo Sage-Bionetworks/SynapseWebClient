@@ -6,8 +6,7 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget.modal">
 	<g:HTMLPanel>
 	    <g:HTMLPanel ui:field="userPanel" visible="false">
-	        <!--  addStyleNames="modal-fullscreen"-->	    
-		    <s:Dialog ui:field="joinWizard">
+		    <s:Dialog ui:field="joinWizard" addStyleNames="modal-fullscreen">
 		        <g:SimplePanel ui:field="progressWidgetPanel"/>
 		        <g:SimplePanel ui:field="currentWizardContentPanel"/>
 		        <g:HTML ui:field="accessRequirementHTML"/>
@@ -17,8 +16,8 @@
 		    <bh:Span addStyleNames="alert alert-info inline-block" ui:field="requestOpenMessageSpan" text="Your request to join this team has been sent."/>
 		    
 		    <!-- For non-simple requests where the user can send a request message. -->
-		    <b:Button text="Request to Join Team" icon="PLUS" ui:field="requestButton" visible="false" dataToggle="COLLAPSE" dataTarget="#requestUIPanel"/>
-		    <b:Collapse addStyleNames="margin-top-5 highlight-box highlight-line-min" ui:field="requestUIPanel" b:id="requestUIPanel" toggle="false">
+		    <b:Button text="Request to Join Team" icon="PLUS" ui:field="requestButton" visible="false" dataToggle="COLLAPSE"/>
+		    <b:Collapse addStyleNames="margin-top-5 highlight-box highlight-line-min" ui:field="requestUIPanel" toggle="false">
 		        <b:TextArea width="500px" placeholder="Enter message... (optional)" ui:field="messageArea"/>
 		    	<b:Button text="Send request" addStyleNames="margin-top-10" ui:field="sendRequestButton"/>
 		    </b:Collapse>

@@ -124,13 +124,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			view.setIsMemberMessage(SafeHtmlUtils.htmlEscape(isMemberMessage));
 		}
 		boolean isLoggedIn = authenticationController.isLoggedIn();
-		// What is joinWizard?
-//		add(joinWizard);
 		if (isLoggedIn) {
 			view.setUserPanelVisible(true);
 			//(note:  in all cases, clicking UI will check for unmet ToU)
 			if (teamMembershipStatus.getIsMember()) {
-				// don't show anything?
 				if (isMemberMessage != null && isMemberMessage.length() > 0) {
 					view.setIsMemberMessageVisible(true);
 				}
@@ -308,7 +305,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			sendJoinRequestStep3();
 		} else {
 			final AccessRequirement accessRequirement = accessRequirements.get(currentAccessRequirement);
-			Callback termsOfUseCallback = new Callback() {
+			view.setJoinWizardCallback(new Callback() {
 				@Override
 				public void invoke() {
 					//agreed to terms of use.
@@ -316,11 +313,12 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					currentPage++;
 					setLicenseAccepted(accessRequirement);
 				}
-			};
+			});
 			//pop up the requirement
 			progressWidget.configure(currentPage, getTotalPageCount());
 			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
+				view.setJoinWizardPrimaryButtonText("Accept");
 				if (text == null || text.trim().isEmpty()) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
 					boolean isPreview=true;
@@ -329,24 +327,18 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					view.setAccessRequirementHTML("");
 					view.setCurrentWizardPanelVisible(true);
 					view.setCurrentWizardContent(wikiPage);
-					view.setJoinWizardCallback(termsOfUseCallback);
-					view.setJoinWizardPrimaryButtonText("Accept");
 				} else {
 					view.setAccessRequirementHTML(text);
 					view.setCurrentWizardPanelVisible(false);
-					view.setJoinWizardCallback(termsOfUseCallback);
-					view.setJoinWizardPrimaryButtonText("Accept");
 				}
 			} else if (accessRequirement instanceof ACTAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 				view.setAccessRequirementHTML(text);
 				view.setCurrentWizardPanelVisible(false);
-				view.setJoinWizardCallback(termsOfUseCallback);
 				view.setJoinWizardPrimaryButtonText("Continue");
 			} else if (accessRequirement instanceof PostMessageContentAccessRequirement) {
 				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
 				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url));
-				view.setJoinWizardCallback(termsOfUseCallback);
 				view.setJoinWizardPrimaryButtonText("Continue");
 			} else {
 				view.showErrorMessage("Unsupported access restriction type - " + accessRequirement.getClass().getName());
@@ -430,9 +422,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				} else {
 					view.showInfo("Request Sent", "");
 				}
-//				refresh();
-//				String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;
-//				String message = isAcceptingInvite ? successJoinMessage : "Request Sent";
 				if (teamUpdatedCallback != null)
 					teamUpdatedCallback.invoke();
 				if (widgetRefreshRequired != null)
