@@ -57,27 +57,18 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 	}
 
 	@Override
-	public void hideFavoriteAndLoading() {
-		loadingUI.setVisible(false);
+	public void setLoadingVisible(boolean isVisible) {
+		loadingUI.setVisible(isVisible);
 	}
 
+	@Override
+	public void setFavWidgetContainerVisible(boolean isVisible) {
+		favWidgetContainer.setVisible(isVisible);
+	}
+	
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
-	}
-
-	@Override
-	public void showLoading() {
-		loadingUI.setVisible(true);
-	}
-
-	@Override
-	public void clear() {
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
