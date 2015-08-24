@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;

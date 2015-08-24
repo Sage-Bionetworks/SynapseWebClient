@@ -1,15 +1,11 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.TextArea;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.UserProfile;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.EventHandlerUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -17,92 +13,132 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetView {
+	
+	public interface JoinTeamWidgetViewImplUiBinder extends UiBinder<Widget, JoinTeamWidgetViewImpl> {}
+
+	@UiField
+	Dialog joinWizard;
+	@UiField
+	Button anonUserButton;
+	@UiField
+	Button acceptInviteButton;
+	@UiField
+	Button simpleRequestButton;
+	@UiField
+	TextArea messageArea;
+	@UiField
+	Button sendRequestButton;
+	@UiField
+	Span isMemberMessageSpan;
+	@UiField
+	Span requestOpenMessageSpan;
+	@UiField
+	HTMLPanel userPanel;
+	@UiField
+	Button requestButton;
+	@UiField
+	Collapse requestUIPanel;
+	@UiField
+	SimplePanel progressWidgetPanel;
+	@UiField
+	SimplePanel currentWizardContentPanel;
+	@UiField
+	HTML accessRequirementHTML;
+	
+
+	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
 	
 	private JoinTeamWidgetView.Presenter presenter;
-	private FlowPanel requestUIPanel;
-	private Button requestButton, acceptInviteButton, anonymousUserButton, simpleRequestButton;
-	private HTML requestedMessage;
-	private TextArea messageArea;
 	private MarkdownWidget wikiPage;
-	private Dialog joinWizard;
 	private FlowPanel currentWizardContent;
 	private Callback okButtonCallback;
-	private WizardProgressWidget progressWidget;
 	private HandlerRegistration messageHandler;
 	private Frame externalFrame;
-	
+	private Widget widget;
+		
 	@Inject
-	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
+	public JoinTeamWidgetViewImpl(JoinTeamWidgetViewImplUiBinder binder, SageImageBundle sageImageBundle,
+			MarkdownWidget wikiPage) {
+		widget = binder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.wikiPage = wikiPage;
-		this.progressWidget = progressWidget;
-		this.joinWizard = joinWizard;
-		joinWizard.addStyleName("modal-fullscreen");
+		anonUserButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//redirect to login page
+				showAnonymousMessage();
+			}
+		});		
+		acceptInviteButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sendJoinRequest("");
+			}
+		});		
+		simpleRequestButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sendJoinRequest("");
+			}
+		});
+		sendRequestButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.sendJoinRequest(messageArea.getValue());
+			}
+		});
+		requestButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (requestUIPanel.isShown()) {
+					requestUIPanel.hide();
+				} else {
+					requestUIPanel.show();
+				}
+			}
+		});
+		currentWizardContentPanel.setWidget(currentWizardContent);
 	}
 	
 	@Override
-	public void configure(boolean isLoggedIn,
-			TeamMembershipStatus teamMembershipStatus, 
-			String isMemberMessage, 
-			String buttonText, 
-			String requestOpenInfoText, 
-			boolean isSimpleRequestButton) {
-		clear();
-		String joinButtonText = buttonText == null ? WidgetConstants.JOIN_TEAM_DEFAULT_BUTTON_TEXT : buttonText;
-		String requestOpenText = requestOpenInfoText == null ? WidgetConstants.JOIN_TEAM_DEFAULT_OPEN_REQUEST_TEXT : requestOpenInfoText;
-		initView(joinButtonText, requestOpenText);
-		add(joinWizard);
-		if (isLoggedIn) {
-			//(note:  in all cases, clicking UI will check for unmet ToU)
-			if (teamMembershipStatus.getIsMember()) {
-				// don't show anything?
-				if(isMemberMessage != null && isMemberMessage.length() > 0){
-					add(new HTML(DisplayUtils.getAlertHtmlSpan(SafeHtmlUtils.htmlEscape(isMemberMessage), "", BootstrapAlertType.INFO)));
-				}
-			} else if (teamMembershipStatus.getCanJoin()) { // not in team but can join with a single request
-				// show join button; clicking Join joins the team
-				add(acceptInviteButton);
-			} else if (teamMembershipStatus.getHasOpenRequest()) {
-				// display a message saying "your membership request is pending review by team administration"
-				add(requestedMessage);
-			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
-				// show request UI
-				if (isSimpleRequestButton) {
-					add(simpleRequestButton);
-				} else {
-					add(requestButton);
-					add(requestUIPanel);
-					requestUIPanel.setVisible(false);
-				}
-			} else if (teamMembershipStatus.getHasUnmetAccessRequirement()) {
-			    // show Join; clicking shows ToU
-				add(acceptInviteButton);
-			} else {
-			    // illegal state
-				showErrorMessage("Unable to determine state");
-			}
-		}
-		else {
-			add(anonymousUserButton);
-		}
+	public Widget asWidget() {
+		return widget;
+	}
+	
+	@Override
+	public void clear() {
+		// default button text and state
+		simpleRequestButton.setText("Join");
+		requestOpenMessageSpan.setText("Your request to join this team has been sent.");
+		isMemberMessageSpan.setText("Already a member");
+		isMemberMessageSpan.setVisible(false);
+		anonUserButton.setVisible(false);
+		acceptInviteButton.setVisible(false);
+		requestOpenMessageSpan.setVisible(false);
+		simpleRequestButton.setVisible(false);
+		requestButton.setVisible(false);
+		userPanel.setVisible(false);
+		requestButton.setVisible(false);
+		requestUIPanel.hide();
 	}
 	
 	private void showAnonymousMessage() {
@@ -117,69 +153,9 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			public void invoke() {
 			}	
 		};
-
 		DisplayUtils.showPopup("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, okCallback, cancelCallback);
 	}
 	
-	private void initView(String joinButtonText, String requestOpenText) {
-		if (requestUIPanel == null) {
-			anonymousUserButton = new Button(joinButtonText, new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					//redirect to login page
-					showAnonymousMessage();
-				}
-			});
-			anonymousUserButton.setType(ButtonType.PRIMARY);
-			anonymousUserButton.setSize(ButtonSize.LARGE);
-			
-			acceptInviteButton =  new Button(joinButtonText, new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.sendJoinRequest("", true);
-				}
-			});
-			acceptInviteButton.setType(ButtonType.PRIMARY);
-			acceptInviteButton.setSize(ButtonSize.LARGE);
-			
-			simpleRequestButton = new Button(joinButtonText, new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.sendJoinRequest("", false);
-				}
-			});
-			simpleRequestButton.setType(ButtonType.PRIMARY);
-			simpleRequestButton.setSize(ButtonSize.LARGE);
-			
-			requestedMessage = new HTML(DisplayUtils.getAlertHtmlSpan("Request open.", requestOpenText, BootstrapAlertType.INFO));
-			requestUIPanel = new FlowPanel();
-			requestUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
-			requestButton = new Button("Request to Join Team", IconType.PLUS, new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					requestUIPanel.setVisible(!requestUIPanel.isVisible());
-				}
-			});
-			
-			messageArea = new TextArea();
-			messageArea.setWidth(FIELD_WIDTH + "px");
-			messageArea.setPlaceholder("Enter message... (optional)");
-
-			requestUIPanel.add(messageArea);
-			
-			Button sendRequestButton = new Button("Send Request", new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.sendJoinRequest(messageArea.getValue(), false);
-				}
-			});
-			sendRequestButton.addStyleName("margin-top-5");
-			requestUIPanel.add(sendRequestButton);
-		}
-		messageArea.setValue("");
-		currentWizardContent = new FlowPanel();
-		currentWizardContent.addStyleName("min-height-400 padding-5");
-	}	
 	@Override
 	public void showLoading() {
 		clear();
@@ -189,7 +165,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	@Override
 	public void setButtonsEnabled(boolean enable) {
 		requestButton.setEnabled(enable);
-		anonymousUserButton.setEnabled(enable);
+		anonUserButton.setEnabled(enable);
 		acceptInviteButton.setEnabled(enable);
 		simpleRequestButton.setEnabled(enable);
 	}
@@ -198,7 +174,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-
 	}
 
 	
@@ -211,8 +186,9 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 
 	@Override
 	public void hideJoinWizard() {
-		if (joinWizard != null && joinWizard.isVisible())
+		if (joinWizard != null && joinWizard.isVisible()) {
 			joinWizard.hide();
+		}
 	}
 
 	@Override
@@ -222,10 +198,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	@Override
 	public void showJoinWizard() {
-		FlowPanel body = new FlowPanel();
-		body.add(progressWidget.asWidget());
-        body.add(currentWizardContent);
-		joinWizard.configure("Join", body, "Continue", DisplayConstants.BUTTON_CANCEL, new Dialog.Callback() {
+		joinWizard.configure("Join", "Continue", DisplayConstants.BUTTON_CANCEL, new Dialog.Callback() {
 			@Override
 			public void onPrimary() {
 				okButtonCallback.invoke();
@@ -236,32 +209,33 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				joinWizard.hide();
 			}
 		}, false);
-		
 		joinWizard.show();
 		enablePrimaryButton();
 	}
-			
-	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {
-		okButtonCallback = presenterCallback;
-		Widget wikiPageWidget = wikiPage.asWidget();
-        currentWizardContent.clear();
-        currentWizardContent.add(wikiPageWidget);
-		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true, false);
+	
+	@Override
+	public void setJoinWizardCallback(Callback callback) {
+		okButtonCallback = callback;
 	}
 	
 	@Override
-	public void showWikiAccessRequirement(Widget wikiPageWidget, Callback touAcceptanceCallback) {
-		showAccessRequirement(wikiPageWidget, touAcceptanceCallback, DisplayConstants.ACCEPT);
+	public void setJoinWizardPrimaryButtonText(String primaryButtonText) {
+		joinWizard.getPrimaryButton().setText(primaryButtonText);
 	}
 	
 	@Override
-	public void showTermsOfUseAccessRequirement(String arText, Callback touAcceptanceCallback) {
-		showAccessRequirement(new HTML(arText), touAcceptanceCallback, DisplayConstants.ACCEPT);
+	public void setAccessRequirementHTML(String html) {
+		accessRequirementHTML.setText(html);
 	}
 	
 	@Override
-	public void showACTAccessRequirement(String arText, Callback callback) {
-		showAccessRequirement(new HTML(arText), callback, DisplayConstants.BUTTON_CONTINUE);
+	public void setCurrentWizardPanelVisible(boolean isVisible) {
+		currentWizardContentPanel.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setCurrentWizardContent(IsWidget isWidget) {
+		currentWizardContentPanel.setWidget(isWidget);
 	}
 	
 	private void showAccessRequirement(Widget arTextWidget, Callback callback, String primaryButtonText) {
@@ -272,16 +246,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void showPostMessageContentAccessRequirement(String url, Callback touAcceptanceCallback) {
+	public void showPostMessageContentAccessRequirement(String url) {
 		//add the iframe, and wait for the message event to re-enable the continue button
 		joinWizard.getPrimaryButton().setEnabled(false);
-		joinWizard.getPrimaryButton().setText(DisplayConstants.BUTTON_CONTINUE);
-		currentWizardContent.clear();
 		externalFrame = new Frame(url);
 		externalFrame.setHeight("920px");
 		externalFrame.getElement().setAttribute("seamless", "true");
-		currentWizardContent.add(externalFrame);
-		okButtonCallback = touAcceptanceCallback;
+		setCurrentWizardContent(externalFrame);
 	}
 	
 	/**
@@ -338,9 +309,58 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void updateWizardProgress(int currentPage, int totalPages) {
-		progressWidget.configure(currentPage, totalPages);
+	public void setUserPanelVisible(boolean isVisible) {
+		userPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void setIsMemberMessage(String htmlEscape) {
+		isMemberMessageSpan.setText(htmlEscape);
+	}
+
+	@Override
+	public void setRequestMessageVisible(boolean isVisible) {
+		requestOpenMessageSpan.setVisible(isVisible);
 	}
 	
+	@Override
+	public void setSimpleRequestButtonVisible(boolean isVisible) {
+		simpleRequestButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setRequestButtonVisible(boolean isVisible) {
+		requestButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setAcceptInviteButtonVisible(boolean isVisible) {
+		acceptInviteButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setAnonUserButtonVisible(boolean isVisible) {
+		anonUserButton.setVisible(isVisible);
+	}
+
+	@Override
+	public void setJoinButtonText(String joinButtonText) {
+		simpleRequestButton.setText(joinButtonText);
+	}
+
+	@Override
+	public void setRequestOpenText(String requestOpenText) {
+		requestOpenMessageSpan.setText(requestOpenText);
+	}
+	
+	@Override
+	public void setIsMemberMessageVisible(boolean isVisible) {
+		isMemberMessageSpan.setVisible(isVisible);
+	}
+
+	@Override
+	public void setProgressWidget(WizardProgressWidget progressWidget) {
+		progressWidgetPanel.setWidget(progressWidget);
+	}
 	
 }

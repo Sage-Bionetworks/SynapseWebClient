@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -34,6 +33,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,6 +43,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private MarkdownWidget wikiPage;
+	private WizardProgressWidget progressWidget;
 	private GWTWrapper gwt;
 	private String teamId;
 	private boolean isChallengeSignup;
@@ -50,11 +51,12 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
 	private String message, isMemberMessage, successMessage, buttonText, requestOpenInfoText;
-	private boolean isAcceptingInvite, isSimpleRequestButton;
+	private boolean isSimpleRequestButton;
 	private Callback widgetRefreshRequired;
 	private List<AccessRequirement> accessRequirements;
 	private int currentPage;
 	private int currentAccessRequirement;
+	private TeamMembershipStatus teamMembershipStatus;
 	
 	public static final String[] EXTRA_INFO_URL_WHITELIST = { 
 		"https://www.projectdatasphere.org/projectdatasphere/",
@@ -69,7 +71,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			AuthenticationController authenticationController, 
 			JSONObjectAdapter jsonObjectAdapter,
 			GWTWrapper gwt,
-			MarkdownWidget wikiPage
+			MarkdownWidget wikiPage, 
+			WizardProgressWidget progressWidget
 			) {
 		this.view = view;
 		view.setPresenter(this);
@@ -79,6 +82,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
 		this.wikiPage = wikiPage;
+		this.progressWidget = progressWidget;
+		view.setProgressWidget(progressWidget);
 	}
 	
 	/**
@@ -107,7 +112,49 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
 		this.buttonText = buttonText;
-		view.configure(authenticationController.isLoggedIn(), teamMembershipStatus, isMemberMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
+		this.teamMembershipStatus = teamMembershipStatus;
+		view.clear();
+		if (buttonText != null && !buttonText.isEmpty()) {
+			view.setJoinButtonText(buttonText);
+		}
+		if (requestOpenInfoText != null && !requestOpenInfoText.isEmpty()) {
+			view.setRequestOpenText(requestOpenInfoText);
+		}
+		if (isMemberMessage != null && !isMemberMessage.isEmpty()) {
+			view.setIsMemberMessage(SafeHtmlUtils.htmlEscape(isMemberMessage));
+		}
+		boolean isLoggedIn = authenticationController.isLoggedIn();
+		if (isLoggedIn) {
+			view.setUserPanelVisible(true);
+			//(note:  in all cases, clicking UI will check for unmet ToU)
+			if (teamMembershipStatus.getIsMember()) {
+				if (isMemberMessage != null && isMemberMessage.length() > 0) {
+					view.setIsMemberMessageVisible(true);
+				}
+			} else if (teamMembershipStatus.getCanJoin()) { // not in team but can join with a single request
+				// show join button; clicking Join joins the team
+				view.setSimpleRequestButtonVisible(true);
+			} else if (teamMembershipStatus.getHasOpenRequest()) {
+				// display a message saying "your membership request is pending review by team administration"
+				view.setRequestMessageVisible(true);
+			} else if (teamMembershipStatus.getMembershipApprovalRequired()) {
+				// show request UI
+				if (isSimpleRequestButton) {
+					view.setSimpleRequestButtonVisible(true);
+				} else {
+					view.setRequestButtonVisible(true);
+				}
+			} else if (teamMembershipStatus.getHasUnmetAccessRequirement()) {
+			    // show Join; clicking shows ToU
+				view.setAcceptInviteButtonVisible(true);
+			} else {
+			    // illegal state
+				view.showErrorMessage("Unable to determine state");
+			}
+		} else {
+			view.setUserPanelVisible(false);
+			view.setAnonUserButtonVisible(true);
+		}
 	};
 
 	@Override
@@ -136,7 +183,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
 		this.buttonText = descriptor.get(WidgetConstants.JOIN_TEAM_BUTTON_TEXT);
 		this.requestOpenInfoText = descriptor.get(WidgetConstants.JOIN_TEAM_OPEN_REQUEST_TEXT);
-		
 		refresh();
 	}
 	
@@ -151,7 +197,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					if (result.getTeamMembershipStatus() != null)
 						teamMembershipStatus = result.getTeamMembershipStatus();
 					configure(team.getId(), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText, requestOpenInfoText, isSimpleRequestButton);
-
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -164,9 +209,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	}
 	
 	@Override
-	public void sendJoinRequest(String message, boolean isAcceptingInvite) {
+	public void sendJoinRequest(String message) {
 		this.message = message;
-		this.isAcceptingInvite = isAcceptingInvite;
 		sendJoinRequestStep0();
 	}
 	
@@ -187,8 +231,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					startChallengeSignup();
 				}
 				else { //skip to step 2
-					if (accessRequirements.size() > 0)
+					if (accessRequirements.size() > 0) {
 						view.showJoinWizard();
+					}
 					sendJoinRequestStep2();
 				}
 			}
@@ -236,16 +281,16 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	 * Gather additional info about the logged in user
 	 */
 	public void sendJoinRequestStep1(WikiPageKey challengeInfoWikiPageKey) {
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		UserProfile profile = sessionData.getProfile();
-		view.updateWizardProgress(currentPage, getTotalPageCount());
-		view.showChallengeInfoPage(profile, challengeInfoWikiPageKey, new Callback() {
+		progressWidget.configure(currentPage, getTotalPageCount());
+		view.setJoinWizardCallback(new Callback() {
 			@Override
 			public void invoke() {
 				currentPage++;
 				sendJoinRequestStep2();
 			}
 		});
+		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true, false);
+		view.setCurrentWizardContent(wikiPage);			
 	}
 	
 	/**
@@ -260,7 +305,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			sendJoinRequestStep3();
 		} else {
 			final AccessRequirement accessRequirement = accessRequirements.get(currentAccessRequirement);
-			Callback termsOfUseCallback = new Callback() {
+			view.setJoinWizardCallback(new Callback() {
 				@Override
 				public void invoke() {
 					//agreed to terms of use.
@@ -268,26 +313,33 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					currentPage++;
 					setLicenseAccepted(accessRequirement);
 				}
-			};
+			});
 			//pop up the requirement
-			view.updateWizardProgress(currentPage, getTotalPageCount());
+			progressWidget.configure(currentPage, getTotalPageCount());
 			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-				if (!DisplayUtils.isDefined(text)) {
+				view.setJoinWizardPrimaryButtonText("Accept");
+				if (text == null || text.trim().isEmpty()) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-					boolean isPreview=true, isIgnoreLoadingFailure=true;
+					boolean isPreview=true;
+					boolean isIgnoreLoadingFailure=true;
 					wikiPage.loadMarkdownFromWikiPage(wikiKey, isPreview, isIgnoreLoadingFailure);
-					view.showWikiAccessRequirement(wikiPage.asWidget(), termsOfUseCallback);
+					view.setAccessRequirementHTML("");
+					view.setCurrentWizardPanelVisible(true);
+					view.setCurrentWizardContent(wikiPage);
 				} else {
-					view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);	
+					view.setAccessRequirementHTML(text);
+					view.setCurrentWizardPanelVisible(false);
 				}
-				
 			} else if (accessRequirement instanceof ACTAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-				view.showACTAccessRequirement(text, termsOfUseCallback);
+				view.setAccessRequirementHTML(text);
+				view.setCurrentWizardPanelVisible(false);
+				view.setJoinWizardPrimaryButtonText("Continue");
 			} else if (accessRequirement instanceof PostMessageContentAccessRequirement) {
 				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
-				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url), termsOfUseCallback);
+				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url));
+				view.setJoinWizardPrimaryButtonText("Continue");
 			} else {
 				view.showErrorMessage("Unsupported access restriction type - " + accessRequirement.getClass().getName());
 			}
@@ -365,10 +417,11 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;
-				String message = isAcceptingInvite ? successJoinMessage : "Request Sent";
-				view.showInfo(message, "");
-				refresh();
+				if (teamMembershipStatus.getCanJoin()) {
+					refresh();
+				} else {
+					view.showInfo("Request Sent", "");
+				}
 				if (teamUpdatedCallback != null)
 					teamUpdatedCallback.invoke();
 				if (widgetRefreshRequired != null)
