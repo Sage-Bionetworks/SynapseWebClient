@@ -52,7 +52,9 @@ public class FavoriteWidget implements Presenter, IsWidget {
 	}
 	
 	public void setIsFavorite(boolean favorite) {
-		view.showLoading();
+		view.setLoadingVisible(true);
+		view.setFavoriteVisible(false);
+		view.setNotFavoriteVisible(false);
 		setIsFavorite(entityId, favorite, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -67,11 +69,14 @@ public class FavoriteWidget implements Presenter, IsWidget {
 	}
 	
 	public void configureIsFavorite() {
-		if (!authenticationController.isLoggedIn()) {
-			view.hideFavoriteAndLoading();
-		} else if(globalApplicationState.getFavorites() != null) {
+		boolean isLoggedIn = authenticationController.isLoggedIn();
+		view.setLoadingVisible(isLoggedIn);
+		view.setFavWidgetContainerVisible(isLoggedIn);
+		if (isLoggedIn && globalApplicationState.getFavorites() != null) {
+			view.setFavWidgetContainerVisible(true);
 			updateIsFavoriteView();
-		} else { 
+		} else if (isLoggedIn) {
+			view.setFavWidgetContainerVisible(true);
 			updateStoredFavorites(new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
@@ -85,7 +90,7 @@ public class FavoriteWidget implements Presenter, IsWidget {
 	}
 
 	public void updateIsFavoriteView() {
-		view.hideFavoriteAndLoading();
+		view.setLoadingVisible(false);
 		if (isFavorite(entityId)) {
 			view.setFavoriteVisible(true);
 			view.setNotFavoriteVisible(false);

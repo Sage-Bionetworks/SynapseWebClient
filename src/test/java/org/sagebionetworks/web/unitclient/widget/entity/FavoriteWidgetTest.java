@@ -34,6 +34,9 @@ public class FavoriteWidgetTest {
 	FavoriteWidgetView mockView;
 	String entityId = "syn123";
 	FavoriteWidget favoriteWidget;
+	EntityHeader fav;
+	List<EntityHeader> favs;
+	
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -41,8 +44,8 @@ public class FavoriteWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(FavoriteWidgetView.class);
-		List<EntityHeader> favs = new ArrayList<EntityHeader>();
-		EntityHeader fav = new EntityHeader();
+		favs = new ArrayList<EntityHeader>();
+		fav = new EntityHeader();
 		fav.setId("syn456");
 		favs.add(fav);
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(favs);
@@ -54,17 +57,23 @@ public class FavoriteWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetIsFavorite() throws Exception {
+		EntityHeader newFav = new EntityHeader();
+		newFav.setId("syn123");
+		favs.add(newFav);
 		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
-		favorites.setResults(results);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(new EntityHeader()).when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(true);
-		verify(mockView).showLoading();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView, Mockito.times(2)).setNotFavoriteVisible(false);
+		verify(mockView).setFavoriteVisible(false);
+		verify(mockView).setFavoriteVisible(true);
 		verify(mockSynapseClient).addFavorite(eq(entityId), any(AsyncCallback.class));
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
+		verify(mockView).setLoadingVisible(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,10 +84,14 @@ public class FavoriteWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(false);
-		verify(mockView).showLoading();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView, Mockito.times(2)).setFavoriteVisible(false);
+		verify(mockView).setNotFavoriteVisible(false);
+		verify(mockView).setNotFavoriteVisible(true);
 		verify(mockSynapseClient).removeFavorite(eq(entityId), any(AsyncCallback.class));
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
+		verify(mockView).setLoadingVisible(false);
 	}
 	
 	@Test
@@ -88,7 +101,6 @@ public class FavoriteWidgetTest {
 		favoriteWidget.updateIsFavoriteView();
 		verify(mockView).setNotFavoriteVisible(true);
 		verify(mockView).setFavoriteVisible(false);
-		verify(mockView).hideFavoriteAndLoading();
 	}
 	
 	@Test
@@ -102,14 +114,13 @@ public class FavoriteWidgetTest {
 		favoriteWidget.updateIsFavoriteView();
 		verify(mockView).setNotFavoriteVisible(false);
 		verify(mockView).setFavoriteVisible(true);
-		verify(mockView).hideFavoriteAndLoading();
 	}
 
 	@Test
 	public void testFavoriteAnynomous(){
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		favoriteWidget.configure(entityId);
-		verify(mockView).hideFavoriteAndLoading();
+		verify(mockView).setLoadingVisible(false);		
 		verify(mockView, Mockito.never()).setNotFavoriteVisible(Mockito.anyBoolean());
 		verify(mockView, Mockito.never()).setFavoriteVisible(Mockito.anyBoolean());
 	}
