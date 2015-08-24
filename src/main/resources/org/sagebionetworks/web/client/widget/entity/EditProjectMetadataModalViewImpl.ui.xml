@@ -22,7 +22,7 @@
 					<g:FlowPanel addStyleNames="help-panel">
 						<b:BlockQuote styleName="panel">
 							<b:Heading text="Friendly URL Project Name" size="H4"></b:Heading>
-							<bh:Text text="After saving, you can access your project via http://www.synapse.org/your friendly URL project name"></bh:Text>
+							<bh:Text text="After saving, you can access your project via http://www.synapse.org/YourFriendlyProjectName"></bh:Text>
 						</b:BlockQuote>
 					</g:FlowPanel>
 				</bh:Div>
