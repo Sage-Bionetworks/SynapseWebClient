@@ -23,9 +23,13 @@
 	
 	<!-- The gwtbootsrap dependencies must come before the portal entry point.  -->
 	<inherits name="org.gwtbootstrap3.GwtBootstrap3PaperTheme"/>
-	<inherits name="org.gwtbootstrap3.extras.datetimepicker.DateTimePicker"/>
-	<inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
+    <inherits name="org.gwtbootstrap3.extras.datetimepicker.DateTimePicker"/>
+    <inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
 	<inherits name="org.gwtbootstrap3.extras.select.Select"/>
+
+    <inherits name="org.gwtvisualizationwrappers.CytoscapeJs"/>
+    <inherits name="org.gwtvisualizationwrappers.Biodalliance"/>
+
 	<!-- Commented out unused gwt bootstrap extra modules.  
 	Note that importing will cause the associated render-blocking css to loaded.
     <inherits name="org.gwtbootstrap3.extras.card.Card"/>
@@ -34,8 +38,9 @@
     <inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/>
     <inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
     <inherits name="org.gwtbootstrap3.extras.growl.Growl"/>
- 	-->
 	<!-- Specify the app entry point class. -->
+
+
 	<entry-point class='org.sagebionetworks.web.client.Portal' />
 	
 	<set-property name="gwt.logging.logLevel" value="SEVERE"/>
@@ -52,7 +57,7 @@
 	<set-property name="compiler.useSourceMaps" value="true"/>
 	<set-property name="compiler.stackMode" value="emulated"/>
 	
-    <!-- Specify the paths for translatable code -->
+	<!-- Specify the paths for translatable code -->
 	<source path='client' />
 	<source path='shared' />
 	
