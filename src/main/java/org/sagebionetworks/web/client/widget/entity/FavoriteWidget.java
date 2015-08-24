@@ -72,21 +72,24 @@ public class FavoriteWidget implements Presenter, IsWidget {
 		boolean isLoggedIn = authenticationController.isLoggedIn();
 		view.setLoadingVisible(isLoggedIn);
 		view.setFavWidgetContainerVisible(isLoggedIn);
-		if (isLoggedIn && globalApplicationState.getFavorites() != null) {
-			view.setFavWidgetContainerVisible(true);
-			updateIsFavoriteView();
-		} else if (isLoggedIn) {
-			view.setFavWidgetContainerVisible(true);
-			updateStoredFavorites(new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					updateIsFavoriteView();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-				}
-			});
+		if (isLoggedIn) {
+			if (globalApplicationState.getFavorites() != null) {
+				view.setFavWidgetContainerVisible(true);
+				updateIsFavoriteView();
+			} else {
+				view.setFavWidgetContainerVisible(true);
+				updateStoredFavorites(new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						updateIsFavoriteView();
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+				});
+			}
 		}
+		
 	}
 
 	public void updateIsFavoriteView() {
