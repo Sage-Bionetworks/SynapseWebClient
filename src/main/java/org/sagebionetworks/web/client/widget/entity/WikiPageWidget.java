@@ -102,6 +102,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		breadcrumb.clear();
 		wikiSubpages.clearState();
 		view.setCreatedModifiedVisible(false);
+		view.setWikiHeadingText("");
 	}
 
 	@Override
