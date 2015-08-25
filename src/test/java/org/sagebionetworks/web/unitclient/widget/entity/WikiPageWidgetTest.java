@@ -85,7 +85,8 @@ public class WikiPageWidgetTest {
 		mockMarkdownWidget = mock(MarkdownWidget.class);
 		mockInjector = mock(PortalGinInjector.class);
 		mockUserBadge = mock(UserBadge.class);
-
+		mockCallbackP = mock(CallbackP.class);
+		
 		when(mockInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockSynapseAlert, mockHistoryWidget, mockMarkdownWidget,
 				mockBreadcrumb, mockSubpages, mockInjector);
