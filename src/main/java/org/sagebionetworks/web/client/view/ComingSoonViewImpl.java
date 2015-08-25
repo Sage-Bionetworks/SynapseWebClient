@@ -128,59 +128,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Override
 	public void clear() {		
 	}
-//	
-//	private native JavaScriptObject getBiodallianceBrowserConfig(String containerId) /*-{
-//		var biodallianceBrowserConfig = {
-//				pageName: containerId,
-//				chr: '21', 
-//				viewStart:  33031597, 
-//				viewEnd:  33041570, 
-//				cookieKey: 'human', 
-//				fullScreen: true,
-//				coordSystem: { 
-//					speciesName: 'human', 
-//					taxon: 9606, 
-//					auth: 'NCBI', 
-//					version: '37', 
-//					ucscName: 'hg19'},
-//				baseColors: {
-//	                 'A': 'black',
-//	                 'C': 'black',
-//	                 'G': 'black',
-//	                 'T': 'black',
-//	                 '-': 'black', //deletion
-//	                 'I': 'red'    //insertion
-//	            },
-//				sources: 
-//					[{name: 'Genome',
-//					twoBitURI: 'Portal/filehandle?entityId=syn4557603&preview=false&proxy=false&version=1',
-//					tier_type: 'sequence',
-//					provides_entrypoints: true,
-//					pinned: true}, 
-//
-//					{name: 'GENCODE',
-//					bwgURI: 'Portal/filehandle?entityId=syn4557576&preview=false&proxy=false&version=1', //'human/gencode.bb',
-//					stylesheet_uri: 'Portal/filehandle?entityId=syn4557577&preview=false&proxy=false&version=1',//'human/gencode.xml',	
-//					collapseSuperGroups: true, 
-//					trixURI: 'Portal/filehandle?entityId=syn4557578&preview=false&proxy=false&version=1',//'human/geneIndex.ix',
-//					subtierMax:5,
-//					pinned:true}
-//					,
-//					{name: 'A2_i14.mkdup.coordsort.bw',
-//						collapseSuperGroups:true,
-//						bwgURI: 'Portal/filehandle?entityId=syn3928320&preview=false&proxy=false&version=1',//'case/A2_i14.mkdup.coordsort.bw',
-//						style: [{type : 'default',
-//								style: {glyph: 'HISTOGRAM',
-//										COLOR1:'red',
-//										COLOR2:'red',
-//										COLOR3:'red',
-//										HEIGHT:30}}]
-//					}]
-//				};
-//		return biodallianceBrowserConfig;
-//	}-*/;
 	
-
 	private native JavaScriptObject getBiodallianceBrowserConfig(String containerId) /*-{
 		var biodallianceBrowserConfig = {
 				pageName: containerId,
@@ -204,10 +152,27 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	                 'I': 'red'    //insertion
 	            },
 				sources: 
-					[
+					[{name: 'Genome',
+					twoBitURI: 'Portal/fileresolver?entityId=syn4557603&version=1',
+					tier_type: 'sequence',
+					provides_entrypoints: true,
+					pinned: true,
+					resolver: function(url) {
+                       return fetch(url, {  
+						  credentials: 'include'  //sending credentials with a fetch request (session cookie)
+						}).then(function(resp) {
+                           return resp.json();
+                       }).then(function(rdata) {
+                           return rdata.url;
+                       });
+                    }}, 
+
 					{name: 'GENCODE',
 					bwgURI: 'Portal/fileresolver?entityId=syn4557576&version=1', //'human/gencode.bb',
+					stylesheet_uri: 'Portal/fileresolver?entityId=syn4557577&version=1',//'human/gencode.xml',	
 					collapseSuperGroups: true, 
+					trixURI: 'Portal/fileresolver?entityId=syn455757&version=1',//'human/geneIndex.ix',
+					subtierMax:5,
 					pinned:true,
 					resolver: function(url) {
                        return fetch(url, {  
@@ -218,10 +183,30 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
                            return rdata.url;
                        });
                     }}
-					]
+					,
+					{name: 'A2_i14.mkdup.coordsort.bw',
+						collapseSuperGroups:true,
+						bwgURI: 'Portal/fileresolver?entityId=syn3928320&version=1',//'case/A2_i14.mkdup.coordsort.bw',
+						style: [{type : 'default',
+								style: {glyph: 'HISTOGRAM',
+										COLOR1:'red',
+										COLOR2:'red',
+										COLOR3:'red',
+										HEIGHT:30}}],
+						resolver: function(url) {
+	                       return fetch(url, {  
+							  credentials: 'include'  //sending credentials with a fetch request (session cookie)
+							}).then(function(resp) {
+	                           return resp.json();
+	                       }).then(function(rdata) {
+	                           return rdata.url;
+	                       });
+                    	}
+					}]
 				};
 		return biodallianceBrowserConfig;
 	}-*/;
+	
 
 	
 	private static final String CYJS="{\r\n" + 

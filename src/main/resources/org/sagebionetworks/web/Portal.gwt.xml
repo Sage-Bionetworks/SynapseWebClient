@@ -38,6 +38,7 @@
     <inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/>
     <inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
     <inherits name="org.gwtbootstrap3.extras.growl.Growl"/>
+    -->
 	<!-- Specify the app entry point class. -->
 
 
