@@ -1,10 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
-import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013;
+import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013dev;
 import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph242;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -17,7 +14,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -71,20 +68,20 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());	
-		cytoscapeView.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					String id = "cy1";
-					cytoscapeView.getElement().setId(id);
-					//cyjs is exported from Cytoscape via File->Export->Network->Cytoscape.js JSON (.cyjs)
-					String cyjs = CYJS;
-					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
-					String styleJson = null; //set to null to avoid checking in large test constant
-					new CytoscapeGraph242().show(id,  cyjs, styleJson);
-				};
-			}
-		});
+//		cytoscapeView.addAttachHandler(new AttachEvent.Handler() {
+//			@Override
+//			public void onAttachOrDetach(AttachEvent event) {
+//				if (event.isAttached()) {
+//					String id = "cy1";
+//					cytoscapeView.getElement().setId(id);
+//					//cyjs is exported from Cytoscape via File->Export->Network->Cytoscape.js JSON (.cyjs)
+//					String cyjs = CYJS;
+//					//styleJson is exported from Cytoscape via File->Export->Style->style for Cytoscape.js (JSON)
+//					String styleJson = null; //set to null to avoid checking in large test constant
+//					new CytoscapeGraph242().show(id,  cyjs, styleJson);
+//				};
+//			}
+//		});
 
 		biodallianceView.addAttachHandler(new AttachEvent.Handler() {
 			@Override
@@ -92,7 +89,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 				if (event.isAttached()) {
 					String id = "biodallianceId";
 					biodallianceView.getElement().setId(id);
-					new Biodalliance013().show(id);
+					new Biodalliance013dev().show(getBiodallianceBrowserConfig(id));
 				};
 			}
 		});
@@ -131,6 +128,101 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Override
 	public void clear() {		
 	}
+//	
+//	private native JavaScriptObject getBiodallianceBrowserConfig(String containerId) /*-{
+//		var biodallianceBrowserConfig = {
+//				pageName: containerId,
+//				chr: '21', 
+//				viewStart:  33031597, 
+//				viewEnd:  33041570, 
+//				cookieKey: 'human', 
+//				fullScreen: true,
+//				coordSystem: { 
+//					speciesName: 'human', 
+//					taxon: 9606, 
+//					auth: 'NCBI', 
+//					version: '37', 
+//					ucscName: 'hg19'},
+//				baseColors: {
+//	                 'A': 'black',
+//	                 'C': 'black',
+//	                 'G': 'black',
+//	                 'T': 'black',
+//	                 '-': 'black', //deletion
+//	                 'I': 'red'    //insertion
+//	            },
+//				sources: 
+//					[{name: 'Genome',
+//					twoBitURI: 'Portal/filehandle?entityId=syn4557603&preview=false&proxy=false&version=1',
+//					tier_type: 'sequence',
+//					provides_entrypoints: true,
+//					pinned: true}, 
+//
+//					{name: 'GENCODE',
+//					bwgURI: 'Portal/filehandle?entityId=syn4557576&preview=false&proxy=false&version=1', //'human/gencode.bb',
+//					stylesheet_uri: 'Portal/filehandle?entityId=syn4557577&preview=false&proxy=false&version=1',//'human/gencode.xml',	
+//					collapseSuperGroups: true, 
+//					trixURI: 'Portal/filehandle?entityId=syn4557578&preview=false&proxy=false&version=1',//'human/geneIndex.ix',
+//					subtierMax:5,
+//					pinned:true}
+//					,
+//					{name: 'A2_i14.mkdup.coordsort.bw',
+//						collapseSuperGroups:true,
+//						bwgURI: 'Portal/filehandle?entityId=syn3928320&preview=false&proxy=false&version=1',//'case/A2_i14.mkdup.coordsort.bw',
+//						style: [{type : 'default',
+//								style: {glyph: 'HISTOGRAM',
+//										COLOR1:'red',
+//										COLOR2:'red',
+//										COLOR3:'red',
+//										HEIGHT:30}}]
+//					}]
+//				};
+//		return biodallianceBrowserConfig;
+//	}-*/;
+	
+
+	private native JavaScriptObject getBiodallianceBrowserConfig(String containerId) /*-{
+		var biodallianceBrowserConfig = {
+				pageName: containerId,
+				chr: '21', 
+				viewStart:  33031597, 
+				viewEnd:  33041570, 
+				cookieKey: 'human', 
+				fullScreen: true,
+				coordSystem: { 
+					speciesName: 'human', 
+					taxon: 9606, 
+					auth: 'NCBI', 
+					version: '37', 
+					ucscName: 'hg19'},
+				baseColors: {
+	                 'A': 'black',
+	                 'C': 'black',
+	                 'G': 'black',
+	                 'T': 'black',
+	                 '-': 'black', //deletion
+	                 'I': 'red'    //insertion
+	            },
+				sources: 
+					[
+					{name: 'GENCODE',
+					bwgURI: 'Portal/fileresolver?entityId=syn4557576&version=1', //'human/gencode.bb',
+					collapseSuperGroups: true, 
+					pinned:true,
+					resolver: function(url) {
+                       return fetch(url, {  
+						  credentials: 'include'  //sending credentials with a fetch request (session cookie)
+						}).then(function(resp) {
+                           return resp.json();
+                       }).then(function(rdata) {
+                           return rdata.url;
+                       });
+                    }}
+					]
+				};
+		return biodallianceBrowserConfig;
+	}-*/;
+
 	
 	private static final String CYJS="{\r\n" + 
 			"  \"format_version\" : \"1.0\",\r\n" + 

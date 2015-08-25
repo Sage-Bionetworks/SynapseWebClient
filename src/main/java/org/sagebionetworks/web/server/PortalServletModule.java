@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.FileEntityResolver;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
@@ -107,6 +108,11 @@ public class PortalServletModule extends ServletModule {
 		// FileHandle upload
 		bind(FileHandleServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_HANDLE_UPLOAD_SERVLET).with(FileHandleServlet.class);
+		
+		// FileHandle upload
+		bind(FileEntityResolver.class).in(Singleton.class);
+		serve("/Portal/"+WebConstants.FILE_ENTITY_RESOLVER_SERVLET).with(FileEntityResolver.class);
+				
 		
 		// User Profile Attachment (photo)
 		bind(UserProfileAttachmentServlet.class).in(Singleton.class);
