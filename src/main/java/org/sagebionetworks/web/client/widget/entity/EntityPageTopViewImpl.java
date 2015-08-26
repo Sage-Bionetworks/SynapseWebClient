@@ -18,7 +18,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -30,6 +29,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -97,6 +97,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	private Presenter presenter;
 	private FileTitleBar fileTitleBar;
+	private BasicTitleBar folderTitleBar, tableTitleBar;
 	private PortalGinInjector ginInjector;
 	private Breadcrumb breadcrumb;
 	private ActionMenuWidget actionMenu;
@@ -145,7 +146,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel fileTitlebarContainer;
 	@UiField
-	SimplePanel locationableTitlebarContainer;
+	SimplePanel folderTitlebarContainer;
+	@UiField
+	SimplePanel tableTitlebarContainer;
+	
 	@UiField
 	SimplePanel fileMetadataContainer;
 	@UiField
@@ -173,12 +177,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private FilesBrowser folderFilesBrowser;
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
-	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	private EntityArea currentArea;
 	private AdministerEvaluationsList evaluationList;
 	private static int WIDGET_HEIGHT_PX = 270;
-	private String currentProjectAnchorTargetId;
 	private boolean annotationsShown;
 	private boolean fileHistoryShown;
 	private RClientModalWidgetViewImpl rLoadWidget;
@@ -189,6 +191,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			FileTitleBar fileTitleBar,
+			BasicTitleBar folderTitleBar,
+			BasicTitleBar tableTitleBar,
 			Breadcrumb breadcrumb,
 			EntityMetadata entityMetadata, 
 			FileHistoryWidget fileHistoryWidget, 
@@ -203,13 +207,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			PythonClientModalWidgetViewImpl pythonLoadWidget,
 			JavaClientModalWidgetViewImpl javaLoadWidget,
 			CommandLineClientModalWidgetViewImpl commandLineLoadWidget,
-			PreviewWidget previewWidget, CookieProvider cookies,
-			GlobalApplicationState globalApplicationState) {
+			PreviewWidget previewWidget, CookieProvider cookies) {
 		this.breadcrumb = breadcrumb;
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.evaluationList = evaluationList;
 		this.fileTitleBar = fileTitleBar;
+		this.folderTitleBar = folderTitleBar;
+		this.tableTitleBar = tableTitleBar;
 		this.ginInjector = ginInjector;
 		this.folderFilesBrowser = folderFilesBrowser;
 		this.projectFilesBrowser = projectFilesBrowser;
@@ -220,10 +225,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.javaLoadWidget = javaLoadWidget;
 		this.commandLineLoadWidget = commandLineLoadWidget;
 		this.pythonLoadWidget = pythonLoadWidget;
-		this.globalApplicationState = globalApplicationState;
 		initWidget(uiBinder.createAndBindUi(this));
 		evaluationListContainer.add(evaluationList.asWidget());
 		fileTitlebarContainer.add(fileTitleBar.asWidget());
+		folderTitlebarContainer.add(folderTitleBar.asWidget());
+		tableTitlebarContainer.add(tableTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
 		initProjectLayout();
 
@@ -327,7 +333,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		fileBreadcrumbContainer.clear();
 		fileTitlebarContainer.setVisible(false);
-		locationableTitlebarContainer.setVisible(false);
+		folderTitlebarContainer.setVisible(false);
+		tableTitlebarContainer.setVisible(false);
 		fileMetadataContainer.clear();
 		fileActionMenuContainer.clear();
 		fileDescriptionContainer.clear();
@@ -437,7 +444,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		createProgrammaticClientsWidget(bundle, versionNumber);
 		// Created By/Modified By
 		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
-
 	}
 	
 	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin)  {
@@ -485,6 +491,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		fileBreadcrumbContainer.add(breadcrumb.asWidget());
+		
+		folderTitleBar.configure(bundle);
+		folderTitlebarContainer.setVisible(true);
 		
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
@@ -628,11 +637,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// add breadcrumbs
 		breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
-		tableBreadcrumbContainer.add(breadcrumb.asWidget());		
+		tableBreadcrumbContainer.add(breadcrumb.asWidget());
 		// TODO: Add table name?
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		tableMetadataContainer.add(entityMetadata.asWidget());
+		
+		tableTitleBar.configure(bundle);
+		tableTitlebarContainer.setVisible(true);
 		
 		// Table
 		QueryChangeHandler qch = new QueryChangeHandler() {			
