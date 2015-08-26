@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -30,6 +31,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	ButtonToolBar buttonToolBar;
 	@UiField
 	Div controllerContainer;
+	@UiField
+	Button toolsMenu;
 	
 	Widget widget;
 
@@ -83,7 +86,7 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 
 	@Override
 	public void setToolsButtonVisible(boolean visible) {
-		buttonToolBar.setVisible(visible);
+		toolsMenu.setVisible(visible);
 	}
 
 }

@@ -32,6 +32,7 @@ import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -68,6 +69,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWi
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -77,8 +79,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityActionControllerImplTest {
 
@@ -206,14 +206,48 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
-	public void testConfigurePublicRead(){
+	public void testConfigurePublicReadTable(){
 		entityBundle.getPermissions().setCanPublicRead(true);
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
+		// for a table entity, do not show file history
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
 	}
 	
 	@Test
-	public void testConfigureNotPublic(){
+	public void testConfigurePublicReadFile(){
+		Entity file = new FileEntity();
+		file.setId(entityId);
+		file.setParentId(parentId);
+		entityBundle.setEntity(file);
+		entityBundle.getPermissions().setCanPublicRead(true);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
+		// for a table entity, do not show file history
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
+		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_FILE_HISTORY), any(ActionListener.class));
+	}
+	
+	@Test
+	public void testConfigureNotPublicAnonymous(){
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		entityBundle.getPermissions().setCanPublicRead(false);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu, never()).setActionVisible(any(Action.class), eq(true));
+		verify(mockActionMenu, never()).setActionEnabled(any(Action.class), eq(true));
+		verify(mockActionMenu, never()).addActionListener(any(Action.class), any(ActionListener.class));
+	}
+	
+	@Test
+	public void testConfigureNotPublicIsLoggedIn(){
 		entityBundle.getPermissions().setCanPublicRead(false);
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.LOCK);
