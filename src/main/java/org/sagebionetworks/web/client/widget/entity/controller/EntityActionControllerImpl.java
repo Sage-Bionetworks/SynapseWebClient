@@ -145,6 +145,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());
 		actionMenu.addControllerWidget(this.submitter.asWidget());
 		actionMenu.addControllerWidget(uploader.asWidget());
+		
 		if (!isUserAuthenticated) {
 			actionMenu.setToolsButtonVisible(false);
 			if (permissions.getCanPublicRead()) {

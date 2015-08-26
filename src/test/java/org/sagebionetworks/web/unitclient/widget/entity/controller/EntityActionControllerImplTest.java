@@ -237,7 +237,17 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
-	public void testConfigureNotPublic(){
+	public void testConfigureNotPublicAnonymous(){
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		entityBundle.getPermissions().setCanPublicRead(false);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu, never()).setActionVisible(any(Action.class), eq(true));
+		verify(mockActionMenu, never()).setActionEnabled(any(Action.class), eq(true));
+		verify(mockActionMenu, never()).addActionListener(any(Action.class), any(ActionListener.class));
+	}
+	
+	@Test
+	public void testConfigureNotPublicIsLoggedIn(){
 		entityBundle.getPermissions().setCanPublicRead(false);
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.LOCK);
