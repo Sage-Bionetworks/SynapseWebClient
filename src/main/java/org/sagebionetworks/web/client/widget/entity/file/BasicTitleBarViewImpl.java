@@ -2,15 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityType;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,7 +17,7 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	private Presenter presenter;
 	
 	@UiField
-	SpanElement fileName;
+	Span fileName;
 	@UiField
 	SimplePanel favoritePanel;
 	@UiField
@@ -46,7 +43,7 @@ public class BasicTitleBarViewImpl implements BasicTitleBarView {
 	}
 	@Override
 	public void setTitle(String name) {
-		fileName.setInnerText(name);
+		fileName.setText(name);
 	}
 	
 	@Override

@@ -26,7 +26,6 @@ public class BasicTitleBar implements BasicTitleBarView.Presenter, SynapseWidget
 	
 	public void configure(EntityBundle bundle) {		
 		favWidget.configure(bundle.getEntity().getId());
-		view.setPresenter(this);
 		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
 		view.setTitle(bundle.getEntity().getName());
 		view.setIconType(DisplayUtils.getIconTypeForEntity(bundle.getEntity()));

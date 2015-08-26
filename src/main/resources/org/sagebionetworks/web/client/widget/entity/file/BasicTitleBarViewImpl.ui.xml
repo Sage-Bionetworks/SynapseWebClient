@@ -6,13 +6,11 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<g:HTMLPanel ui:field="panel">
-		<g:HTMLPanel ui:field="fileFoundContainer">
-			<h2 style="margin-bottom: 0px;">
-			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FOLDER"/>
-			 	<span ui:field="fileName"/>
-			 	<g:SimplePanel ui:field="favoritePanel"/>
-			</h2>
-		</g:HTMLPanel>
+	<g:HTMLPanel>
+		<h2 style="margin-bottom: 0px;">
+		 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FOLDER"/>
+		 	<bh:Span ui:field="fileName"/>
+		 	<g:SimplePanel ui:field="favoritePanel"/>
+		</h2>
 	</g:HTMLPanel>
 </ui:UiBinder>
