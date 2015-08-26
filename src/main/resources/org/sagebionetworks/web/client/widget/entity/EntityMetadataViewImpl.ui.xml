@@ -15,7 +15,7 @@
    				<g:SimplePanel ui:field="doiPanel" addStyleNames="displayInline"/>
 		    	<g:HTMLPanel ui:field="dataUseContainer" addStyleNames="displayInline">
 		    	    <bh:Span addStyleNames="margin-right-5 boldText">Conditions for use:</bh:Span>
-		    	    <g:SimplePanel ui:field="restrictionPanel"></g:SimplePanel>
+		    	    <g:SimplePanel ui:field="restrictionPanel" addStyleNames="displayInline"></g:SimplePanel>
 		    	</g:HTMLPanel>
 		    </bh:Div>
 		    <b:Collapse ui:field="annotationsContent" toggle="false" b:id="annotationContentCollapse">
