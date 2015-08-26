@@ -130,6 +130,15 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	}
 	
 	private native JavaScriptObject getBiodallianceBrowserConfig(String containerId) /*-{
+		var resolverFunction = function(url) {
+                       return fetch(url, {  
+						  credentials: 'include'  //sending credentials with a fetch request (session cookie)
+						}).then(function(resp) {
+                           return resp.json();
+                       }).then(function(rdata) {
+                           return rdata.url;
+                       });
+                    }
 		var biodallianceBrowserConfig = {
 				pageName: containerId,
 				chr: '21', 
@@ -157,15 +166,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 					tier_type: 'sequence',
 					provides_entrypoints: true,
 					pinned: true,
-					resolver: function(url) {
-                       return fetch(url, {  
-						  credentials: 'include'  //sending credentials with a fetch request (session cookie)
-						}).then(function(resp) {
-                           return resp.json();
-                       }).then(function(rdata) {
-                           return rdata.url;
-                       });
-                    }}, 
+					resolver: resolverFunction}, 
 
 					{name: 'GENCODE',
 					bwgURI: 'Portal/fileresolver?entityId=syn4557576&version=1', //'human/gencode.bb',
@@ -174,34 +175,18 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 					trixURI: 'Portal/fileresolver?entityId=syn455757&version=1',//'human/geneIndex.ix',
 					subtierMax:5,
 					pinned:true,
-					resolver: function(url) {
-                       return fetch(url, {  
-						  credentials: 'include'  //sending credentials with a fetch request (session cookie)
-						}).then(function(resp) {
-                           return resp.json();
-                       }).then(function(rdata) {
-                           return rdata.url;
-                       });
-                    }}
-					,
+					resolver: resolverFunction
+					},
 					{name: 'A2_i14.mkdup.coordsort.bw',
 						collapseSuperGroups:true,
 						bwgURI: 'Portal/fileresolver?entityId=syn3928320&version=1',//'case/A2_i14.mkdup.coordsort.bw',
 						style: [{type : 'default',
 								style: {glyph: 'HISTOGRAM',
-										COLOR1:'red',
-										COLOR2:'red',
-										COLOR3:'red',
-										HEIGHT:30}}],
-						resolver: function(url) {
-	                       return fetch(url, {  
-							  credentials: 'include'  //sending credentials with a fetch request (session cookie)
-							}).then(function(resp) {
-	                           return resp.json();
-	                       }).then(function(rdata) {
-	                           return rdata.url;
-	                       });
-                    	}
+										COLOR1:'blue',
+										COLOR2:'blue',
+										COLOR3:'blue',
+										HEIGHT:100}}],
+						resolver: resolverFunction
 					}]
 				};
 		return biodallianceBrowserConfig;
