@@ -254,6 +254,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;

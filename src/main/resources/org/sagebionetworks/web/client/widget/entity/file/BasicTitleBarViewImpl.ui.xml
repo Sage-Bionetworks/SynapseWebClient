@@ -9,7 +9,7 @@
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
 			<h2 style="margin-bottom: 0px;">
-			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText"/>
+			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FOLDER"/>
 			 	<span ui:field="fileName"/>
 			 	<g:SimplePanel ui:field="favoritePanel"/>
 			</h2>
