@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -54,7 +55,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			SynapseClientAsync synapseClient,
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
 			PortalGinInjector ginInjector,
-			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController ) {		
+			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController,
+			BiodallianceWidget biodallianceWidget) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
@@ -82,17 +84,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 //				};
 //			}
 //		});
-
-		biodallianceView.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					String id = "biodallianceId";
-					biodallianceView.getElement().setId(id);
-					new Biodalliance013dev().show(getBiodallianceBrowserConfig(id));
-				};
-			}
-		});
+		biodallianceView.add(biodallianceWidget.asWidget());
 		
 	}
 	
@@ -128,70 +120,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Override
 	public void clear() {		
 	}
-	
-	private native JavaScriptObject getBiodallianceBrowserConfig(String containerId) /*-{
-		var resolverFunction = function(url) {
-                       return fetch(url, {  
-						  credentials: 'include'  //sending credentials with a fetch request (session cookie)
-						}).then(function(resp) {
-                           return resp.json();
-                       }).then(function(rdata) {
-                           return rdata.url;
-                       });
-                    }
-		var biodallianceBrowserConfig = {
-				pageName: containerId,
-				chr: '21', 
-				viewStart:  33031597, 
-				viewEnd:  33041570, 
-				cookieKey: 'human', 
-				fullScreen: true,
-				coordSystem: { 
-					speciesName: 'human', 
-					taxon: 9606, 
-					auth: 'NCBI', 
-					version: '37', 
-					ucscName: 'hg19'},
-				baseColors: {
-	                 'A': 'black',
-	                 'C': 'black',
-	                 'G': 'black',
-	                 'T': 'black',
-	                 '-': 'black', //deletion
-	                 'I': 'red'    //insertion
-	            },
-				sources: 
-					[{name: 'Genome',
-					twoBitURI: 'Portal/fileresolver?entityId=syn4557603&version=1',
-					tier_type: 'sequence',
-					provides_entrypoints: true,
-					pinned: true,
-					resolver: resolverFunction}, 
-
-					{name: 'GENCODE',
-					bwgURI: 'Portal/fileresolver?entityId=syn4557576&version=1', //'human/gencode.bb',
-					stylesheet_uri: 'Portal/fileresolver?entityId=syn4557577&version=1',//'human/gencode.xml',	
-					collapseSuperGroups: true, 
-					trixURI: 'Portal/fileresolver?entityId=syn455757&version=1',//'human/geneIndex.ix',
-					subtierMax:5,
-					pinned:true,
-					resolver: resolverFunction
-					},
-					{name: 'A2_i14.mkdup.coordsort.bw',
-						collapseSuperGroups:true,
-						bwgURI: 'Portal/fileresolver?entityId=syn3928320&version=1',//'case/A2_i14.mkdup.coordsort.bw',
-						style: [{type : 'default',
-								style: {glyph: 'HISTOGRAM',
-										COLOR1:'blue',
-										COLOR2:'blue',
-										COLOR3:'blue',
-										HEIGHT:100}}],
-						resolver: resolverFunction
-					}]
-				};
-		return biodallianceBrowserConfig;
-	}-*/;
-	
 
 	
 	private static final String CYJS="{\r\n" + 
