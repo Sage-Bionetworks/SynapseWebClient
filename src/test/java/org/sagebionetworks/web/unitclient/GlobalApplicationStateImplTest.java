@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
@@ -35,7 +36,9 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.springframework.mock.web.MockAsyncContext;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
@@ -56,6 +59,7 @@ public class GlobalApplicationStateImplTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	ClientLogger mockLogger;
 	GlobalApplicationStateView mockView;
+	HashMap<String, String> testProps;
 	
 	@Before
 	public void before(){
@@ -69,6 +73,9 @@ public class GlobalApplicationStateImplTest {
 		mockLogger = mock(ClientLogger.class);
 		mockView = mock(GlobalApplicationStateView.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		testProps = new HashMap<String, String>();
+		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		
 		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
@@ -147,31 +154,46 @@ public class GlobalApplicationStateImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckVersionCompatibility() {
-		globalApplicationState.checkVersionCompatibility(null);
-		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		globalApplicationState.initSynapseProperties(new Callback() {
+			@Override
+			public void invoke() {}
+		});
+		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
+		globalApplicationState.checkVersionCompatibility(callback);
+		verify(mockSynapseClient, times(2)).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
+		//verify callback was given the correct version
+		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
+		verify(callback).onSuccess(captor.capture());
+		assertEquals("v1", captor.getValue().getVersion());
 		
 		// simulate change repo version
 		reset(mockSynapseClient);
 		AsyncMockStubber.callSuccessWith("v2").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState.checkVersionCompatibility(null);
+		callback = mock(AsyncCallback.class);
+		globalApplicationState.checkVersionCompatibility(callback);
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showVersionOutOfDateGlobalMessage();
+		//verify callback was given the currently loaded version (not the current version)
+		captor = ArgumentCaptor.forClass(VersionState.class);
+		verify(callback).onSuccess(captor.capture());
+		assertEquals("v1", captor.getValue().getVersion());
 	}
 	
 	@Test
 	public void testInitSynapseProperties() {
-		HashMap<String, String> testProps = new HashMap<String, String>();
 		String key = "k1";
 		String value = "v1";
 		testProps.put(key, value);
-		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		Callback mockCallback = mock(Callback.class);
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		assertEquals(value, globalApplicationState.getSynapseProperty(key));
 		assertNull(globalApplicationState.getSynapseProperty("foo"));
+		//also sets synapse versions on app load
+		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		assertEquals("v1", globalApplicationState.getSynapseVersion());
 		verify(mockCallback).invoke();
 	}
 	

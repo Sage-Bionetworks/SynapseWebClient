@@ -86,5 +86,4 @@
 		
 		<bh:Div ui:field="accessRestrictionDialogContainer" />
 	</bh:Span>
-	
 </ui:UiBinder>

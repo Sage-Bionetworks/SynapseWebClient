@@ -7,17 +7,20 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class Header implements HeaderView.Presenter {
+public class Header implements HeaderView.Presenter, IsWidget {
 
 	public static enum MenuItems {
 		DATASETS, TOOLS, NETWORKS, PEOPLE, PROJECTS
@@ -27,13 +30,19 @@ public class Header implements HeaderView.Presenter {
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private FavoriteWidget favWidget;
 	
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient) {
+	public Header(HeaderView view, AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
+			FavoriteWidget favWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		this.favWidget = favWidget;
+		view.clear();
+		view.setProjectFavoriteWidget(favWidget);
 		view.setPresenter(this);
 	}
 	
@@ -46,7 +55,27 @@ public class Header implements HeaderView.Presenter {
 	}
 	
 	public void configure(boolean largeLogo) {
-		view.setLargeLogo(largeLogo);
+		view.setProjectHeaderText("Synapse");
+		view.setProjectHeaderAnchorTarget("#");
+		view.hideProjectFavoriteWidget();
+		setLogo(largeLogo);
+	}
+	
+	public void setLogo(boolean largeLogo) {
+		if (largeLogo) {
+			view.showLargeLogo();
+		} else {
+			view.showSmallLogo();
+		}
+	}
+	
+	public void configure(boolean largeLogo, EntityHeader projectHeader) {
+		String projectId = projectHeader.getId();
+		favWidget.configure(projectId);
+		view.setProjectHeaderAnchorTarget("#!Synapse:" + projectId);
+		view.setProjectHeaderText(projectHeader.getName());
+		view.showProjectFavoriteWidget();
+		setLogo(largeLogo);
 	}
 
 	public Widget asWidget() {
@@ -73,6 +102,11 @@ public class Header implements HeaderView.Presenter {
 	@Override
 	public void onLogoutClick() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));	
+	}
+	
+	@Override
+	public void onLogoClick() {
+		globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN));	
 	}
 
 	@Override

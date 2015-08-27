@@ -6,14 +6,13 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:FlowPanel> 
-	    <bh:Span text="DOI:" addStyleNames="boldText margin-right-5"/>
+	<bh:Span> 
 	    <b:Alert ui:field="errorCreatingDoi" addStyleNames="boldText" visible="false">
 	        <bh:Strong text="Error creating DOI"/>
 	    </b:Alert>
-	    <g:HTMLPanel ui:field="doiHTML" addStyleNames="inline-block" visible="false"/>
+	    <g:TextBox ui:field="doi" width="230px" addStyleNames="border-none noBackground padding-0" readOnly="true" />
 	    <g:SimplePanel ui:field="doiProcessing" addStyleNames="inline-block">
 	        <bh:Text text="DOI processing"/>
 	    </g:SimplePanel>
-	</g:FlowPanel>
+	</bh:Span>
 </ui:UiBinder>

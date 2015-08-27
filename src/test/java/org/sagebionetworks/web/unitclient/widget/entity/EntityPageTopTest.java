@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExampleEntity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.SortDirection;
@@ -109,7 +110,7 @@ public class EntityPageTopTest {
 				mockSchemaCache,
 				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
 		pageTop.setAreaChangeHandler(areaChangeHandler);
-		
+		pageTop.clearProjectAreaState();
 		// Setup the the entity
 		entity = new ExampleEntity();
 		entity.setId(entityId);
@@ -151,6 +152,29 @@ public class EntityPageTopTest {
 		ObjectSchema schema = new ObjectSchema();
 		schema.setTitle("");
 		when(mockSchemaCache.getSchemaEntity(any(Entity.class))).thenReturn(schema);
+	}
+	
+	@Test
+	public void testProjectAreaState() {
+		assertNull(pageTop.getCurrentEntityPageProjectId());
+		pageTop.configure(projectBundle, null, projectHeader, null, null);
+		assertEquals(projectId, pageTop.getCurrentEntityPageProjectId());
+		
+		//on tab change, page top is recreated, but the project id should change iff we reconfigure with a different project id
+		pageTop = new EntityPageTop(mockView, mockAuthenticationController,
+				mockSchemaCache,
+				mockGlobalApplicationState, mockEventBus, queryTokenProvider);
+		assertEquals(projectId, pageTop.getCurrentEntityPageProjectId());
+		//configure with a table associated to the same project
+		pageTop.configure(entityBundleTable, null, projectHeader, null, null);
+		//did not change
+		assertEquals(projectId, pageTop.getCurrentEntityPageProjectId());
+		//not with a different project
+		EntityHeader newProjectHeader = new EntityHeader();
+		String newProjectId = "syn3141599999999";
+		newProjectHeader.setId(newProjectId);
+		pageTop.configure(entityBundleTable, null, newProjectHeader, null, null);
+		assertEquals(newProjectId, pageTop.getCurrentEntityPageProjectId());
 	}
 		
 	@Test 
@@ -517,7 +541,39 @@ public class EntityPageTopTest {
 		pageTop.configure(entityBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
 		pageTop.handleWikiReload(wikiPageId);
 	}
+	
+	@Test
+	public void testConfigureFileHistoryIsFileLatestVersion() {
+		FileEntity file = new FileEntity();
+		file.setId("123");
+		EntityBundle fileEntityBundle = new EntityBundle();
+		fileEntityBundle.setEntity(file);
+		pageTop.configure(fileEntityBundle, null, projectHeader, EntityArea.FILES, wikiSubpage);
+		verify(mockView).setFileHistoryVisible(true);
+		verify(mockView, never()).toggleFileHistory();
+	}
+	
+	public void testConfigureFileHistoryIsFileEarlierVersion() {
+		FileEntity file = new FileEntity();
+		file.setId("123");
+		EntityBundle fileEntityBundle = new EntityBundle();
+		fileEntityBundle.setEntity(file);
+		pageTop.configure(fileEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		verify(mockView).setFileHistoryVisible(true);
+		verify(mockView).toggleFileHistory();
+	}
 
+	@Test
+	public void testConfigureFileHistoryIsProject() {
+		Project project = new Project();
+		project.setId("123");
+		EntityBundle projectEntityBundle = new EntityBundle();
+		projectEntityBundle.setEntity(project);
+		pageTop.configure(projectEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		verify(mockView).setFileHistoryVisible(false);
+		verify(mockView, never()).toggleFileHistory();
+	}
+	
 	/*
 	 * Private Methods
 	 */

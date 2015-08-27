@@ -2,7 +2,9 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,18 +36,15 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
-import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityBadgeTest {
@@ -53,7 +52,6 @@ public class EntityBadgeTest {
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
-	EntityIconsCache mockEntityIconsCache;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	ClientCache mockClientCache;
 	AsyncCallback<KeyValueDisplay<String>> getInfoCallback;
@@ -76,14 +74,13 @@ public class EntityBadgeTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityBadgeView.class);
 		mockClientCache = mock(ClientCache.class);
-		mockEntityIconsCache = mock(EntityIconsCache.class);
 		getInfoCallback = mock(AsyncCallback.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockTransformer = mock(AnnotationTransformer.class);
 		mockUserBadge = mock(UserBadge.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils);
+		widget = new EntityBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key1", Collections.EMPTY_LIST));
@@ -144,16 +141,6 @@ public class EntityBadgeTest {
 		verify(mockView).setModifiedOn(smallDateString);
 	}
 
-
-	@Test
-	public void testGetIconForType() throws Exception {
-		//check the passthrough
-		ImageResource testResource = mock(ImageResource.class);
-		when(mockEntityIconsCache.getIconForType(anyString())).thenReturn(testResource);
-		ImageResource returnedResource = widget.getIconForType("water");
-		assertEquals(testResource, returnedResource);
-	}
-	
 	@Test
 	public void testGetInfoHappyCase() throws Exception {
 		String entityId = "syn12345";

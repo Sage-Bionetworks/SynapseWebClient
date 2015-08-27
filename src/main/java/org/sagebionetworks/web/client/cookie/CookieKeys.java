@@ -18,6 +18,8 @@ public class CookieKeys {
 	 */
 	public static String APPLIED_DATASETS_FILTERS = "org.sagebionetworks.datasets.applied.filters";
 
+	public static String USER_LOGGED_IN_RECENTLY = "org.sagebionetworks.security.user.login.recently";
+	
 	/**
 	 * Login token
 	 */
@@ -32,7 +34,7 @@ public class CookieKeys {
 	 * Last Place in the app
 	 */
 	public static String LAST_PLACE = "org.sagebionetworks.synapse.place.last.place";
-
+	
 	/**
 	 * Current Place in the app
 	 */

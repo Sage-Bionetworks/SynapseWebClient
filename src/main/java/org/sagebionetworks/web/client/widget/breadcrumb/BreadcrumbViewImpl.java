@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.breadcrumb;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -10,10 +11,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -56,11 +54,9 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 			final LinkData data = breadcrumbs.get(i);
 			String text = data.getText();
 			text = stubString(text);
-			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			if(data.getIcon() != null) 
-				shb.appendHtmlConstant(AbstractImagePrototype.create(data.getIcon()).getHTML() + " ");
-			shb.appendEscaped(text);	
-			Anchor anchor = new Anchor(shb.toSafeHtml());
+			Anchor anchor = new Anchor();
+			anchor.setText(text);
+			anchor.setIcon(data.getIconType());
 			anchor.addStyleName("displayInline");
 			anchor.addClickHandler(new ClickHandler() {				
 				@Override

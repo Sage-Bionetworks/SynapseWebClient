@@ -81,8 +81,6 @@ public class LoginPresenterTest {
 		usd.setSession(session);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
-		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
@@ -100,12 +98,6 @@ public class LoginPresenterTest {
 		jsonObjectAdapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
 		String userProfileJson = jsonObjectAdapter.toJSONString();
 		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testSetPlaceDefault() {
-		setPlace();
-		Assert.assertEquals("/Portal.html?foo=bar#!LoginPlace", loginPresenter.getOpenIdReturnUrl());
 	}
 	
 	@Test 
@@ -131,7 +123,7 @@ public class LoginPresenterTest {
 		LoginPlace place = new LoginPlace(WebConstants.OPEN_ID_ERROR_TOKEN);
 		loginPresenter.setPlace(place);
 		verify(mockView).showErrorMessage(anyString());
-		verify(mockView).showLogin(anyString(), anyString());
+		verify(mockView).showLogin();
 	}
 	
 	@Test 
@@ -245,7 +237,7 @@ public class LoginPresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		loginPresenter.userAuthenticated();
 		verify(mockView).showErrorMessage(anyString());
-		verify(mockView).showLogin(anyString(), anyString());
+		verify(mockView).showLogin();
 	}
 	
 	

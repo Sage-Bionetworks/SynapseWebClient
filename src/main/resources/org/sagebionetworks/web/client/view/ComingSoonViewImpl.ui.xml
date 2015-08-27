@@ -15,9 +15,7 @@
 
 	<g:HTMLPanel>
 		<!-- HEADER -->
-		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
 		<h2>Coming Soon</h2>
 		<div style="margin: 15px;">
 			<g:SimplePanel ui:field="entityView" />

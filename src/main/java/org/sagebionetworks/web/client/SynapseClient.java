@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
@@ -77,6 +78,7 @@ import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -391,7 +393,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
 	
-	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
+	public HashMap<String, WikiPageKey> getPageNameToWikiKeyMap() throws RestServiceException; 
 
 	public String deleteApiKey() throws RestServiceException;
 	
@@ -543,4 +545,6 @@ public interface SynapseClient extends RemoteService {
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
+	
+	void updateFileEntity(FileEntity fileEntity, String id, String fileName, String contentType) throws RestServiceException;
 }

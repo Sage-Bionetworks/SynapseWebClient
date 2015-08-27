@@ -10,10 +10,11 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView.Presenter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FavoriteWidget implements Presenter {
+public class FavoriteWidget implements Presenter, IsWidget {
 
 	private FavoriteWidgetView view;
 	private SynapseClientAsync synapseClient;
@@ -51,7 +52,9 @@ public class FavoriteWidget implements Presenter {
 	}
 	
 	public void setIsFavorite(boolean favorite) {
-		view.showLoading();
+		view.setLoadingVisible(true);
+		view.setFavoriteVisible(false);
+		view.setNotFavoriteVisible(false);
 		setIsFavorite(entityId, favorite, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -66,29 +69,36 @@ public class FavoriteWidget implements Presenter {
 	}
 	
 	public void configureIsFavorite() {
-		if (!authenticationController.isLoggedIn()) {
-			view.hideFavoriteAndLoading();
-		} else if(globalApplicationState.getFavorites() != null) {
-			updateIsFavoriteView();
-		} else { 
-			updateStoredFavorites(new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					updateIsFavoriteView();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-				}
-			});
+		boolean isLoggedIn = authenticationController.isLoggedIn();
+		view.setLoadingVisible(isLoggedIn);
+		view.setFavWidgetContainerVisible(isLoggedIn);
+		if (isLoggedIn) {
+			if (globalApplicationState.getFavorites() != null) {
+				updateIsFavoriteView();
+			} else {
+				updateStoredFavorites(new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						updateIsFavoriteView();
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+				});
+			}
 		}
+		
 	}
 
 	public void updateIsFavoriteView() {
-		view.hideFavoriteAndLoading();
-		if (isFavorite(entityId))
-			view.showIsFavorite();
-		else
-			view.showIsNotFavorite();
+		view.setLoadingVisible(false);
+		if (isFavorite(entityId)) {
+			view.setFavoriteVisible(true);
+			view.setNotFavoriteVisible(false);
+		} else {
+			view.setFavoriteVisible(false);
+			view.setNotFavoriteVisible(true);
+		}
 	}
 
 	private void setIsFavorite(final String entityId,

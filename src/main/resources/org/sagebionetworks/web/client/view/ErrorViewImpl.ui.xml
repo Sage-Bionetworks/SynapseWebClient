@@ -4,10 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<bh:Div addStyleNames="color-line"/>
 		<g:SimplePanel ui:field="header" />
-		<bh:Div addStyleNames="separator margin-top-10-imp"/>
-		
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400">
 			<b:Heading ui:field="title" size="H1" />
 			<b:Lead ui:field="message"/>

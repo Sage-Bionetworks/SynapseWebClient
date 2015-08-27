@@ -32,6 +32,7 @@ import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -54,6 +55,8 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -66,6 +69,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWi
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -86,6 +90,8 @@ public class EntityActionControllerImplTest {
 	AuthenticationController mockAuthenticationController;
 	AccessControlListModalWidget mockAccessControlListModalWidget;
 	RenameEntityModalWidget mockRenameEntityModalWidget;
+	EditFileMetadataModalWidget mockEditFileMetadataModalWidget;
+	EditProjectMetadataModalWidget mockEditProjectMetadataModalWidget;
 	EntityFinder mockEntityFinder;
 	EvaluationSubmitter mockSubmitter;
 	UploadDialogWidget mockUploader;
@@ -114,6 +120,9 @@ public class EntityActionControllerImplTest {
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = Mockito.mock(PlaceChanger.class);
 		mockRenameEntityModalWidget = Mockito.mock(RenameEntityModalWidget.class);
+		mockEditFileMetadataModalWidget = Mockito.mock(EditFileMetadataModalWidget.class);
+		mockEditProjectMetadataModalWidget = Mockito.mock(EditProjectMetadataModalWidget.class);
+		
 		mockAuthenticationController = Mockito
 				.mock(AuthenticationController.class);
 		mockMarkdownEditorWidget = Mockito.mock(MarkdownEditorWidget.class);
@@ -135,7 +144,8 @@ public class EntityActionControllerImplTest {
 				mockPreflightController,
 				mockSynapseClient, mockGlobalApplicationState,
 				mockAuthenticationController, mockAccessControlListModalWidget,
-				mockRenameEntityModalWidget, mockEntityFinder, mockSubmitter, mockUploader,
+				mockRenameEntityModalWidget, mockEditFileMetadataModalWidget, mockEditProjectMetadataModalWidget,
+				mockEntityFinder, mockSubmitter, mockUploader,
 				mockMarkdownEditorWidget, mockProvenanceEditorWidget, mockStorageLocationWidget);
 		
 		parentId = "syn456";
@@ -173,37 +183,95 @@ public class EntityActionControllerImplTest {
 	public void testConfigure(){
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockAccessControlListModalWidget).configure(any(Entity.class), anyBoolean());
-		//delete
+		// delete
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
-		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+EntityType.table.getDisplayName());
+		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.table));
 		verify(mockActionMenu).addActionListener(Action.DELETE_ENTITY, controller);
 		// share
 		verify(mockActionMenu).setActionEnabled(Action.SHARE, true);
 		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
 		verify(mockActionMenu).addActionListener(Action.SHARE, controller);
-		// Rename
+		// rename
 		verify(mockActionMenu).setActionEnabled(Action.CHANGE_ENTITY_NAME, true);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
-		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+EntityType.table.getDisplayName());
+		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+EntityTypeUtils.getDisplayName(EntityType.table));
 		verify(mockActionMenu).addActionListener(Action.CHANGE_ENTITY_NAME, controller);
 		// upload
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
+		// file history
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
 	}
 	
 	@Test
-	public void testConfigurePublicRead(){
+	public void testConfigurePublicReadTable(){
 		entityBundle.getPermissions().setCanPublicRead(true);
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
+		// for a table entity, do not show file history
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
 	}
 	
 	@Test
-	public void testConfigureNotPublic(){
+	public void testConfigurePublicReadFile(){
+		Entity file = new FileEntity();
+		file.setId(entityId);
+		file.setParentId(parentId);
+		entityBundle.setEntity(file);
+		entityBundle.getPermissions().setCanPublicRead(true);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
+		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
+		// for a table entity, do not show file history
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
+		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_FILE_HISTORY), any(ActionListener.class));
+	}
+	
+	@Test
+	public void testConfigureNotPublicAnonymous(){
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		entityBundle.getPermissions().setCanPublicRead(false);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu, never()).setActionVisible(any(Action.class), eq(true));
+		verify(mockActionMenu, never()).setActionEnabled(any(Action.class), eq(true));
+		verify(mockActionMenu, never()).addActionListener(any(Action.class), any(ActionListener.class));
+	}
+	
+	@Test
+	public void testConfigureNotPublicIsLoggedIn(){
 		entityBundle.getPermissions().setCanPublicRead(false);
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.LOCK);
+	}
+	
+	@Test
+	public void testConfigureFileHistory() {
+		Entity file = new FileEntity();
+		file.setId(entityId);
+		file.setParentId(parentId);
+		permissions = new UserEntityPermissions();
+		permissions.setCanChangePermissions(true);
+		permissions.setCanDelete(true);
+		permissions.setCanPublicRead(true);
+		permissions.setCanUpload(true);
+		permissions.setCanAddChild(true);
+		permissions.setCanEdit(true);
+		permissions.setCanCertifiedUserEdit(true);
+		entityBundle = new EntityBundle();
+		entityBundle.setEntity(file);
+		entityBundle.setPermissions(permissions);
+		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
 	}
 	
 	@Test
@@ -290,7 +358,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
-		verify(mockActionMenu).setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+EntityType.folder.getDisplayName());
+		verify(mockActionMenu).setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.folder));
 		verify(mockActionMenu).addActionListener(Action.MOVE_ENTITY, controller);
 	}
 	
@@ -417,7 +485,7 @@ public class EntityActionControllerImplTest {
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(DELETED, THE + EntityType.table.getDisplayName() + WAS_SUCCESSFULLY_DELETED);
+		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
 		verify(mockGlobalApplicationState).gotoLastPlace(new Synapse(parentId, null, EntityArea.TABLES, null) );
 	}
 	
@@ -902,6 +970,16 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
 		verify(mockActionMenu).setActionEnabled(Action.CREATE_DOI, false);
 		verify(mockActionMenu, never()).setActionEnabled(Action.CREATE_DOI, true);
+	}
+	
+	@Test
+	public void testOnFileHistoryToggled() {
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		controller.onFileHistoryToggled(true);
+		verify(mockActionMenu).setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_DOWN);
+		Mockito.reset(mockActionMenu);
+		controller.onFileHistoryToggled(false);
+		verify(mockActionMenu).setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_RIGHT);
 
 	}
 

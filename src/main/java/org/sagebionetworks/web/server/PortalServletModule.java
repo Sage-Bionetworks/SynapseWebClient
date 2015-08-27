@@ -20,20 +20,18 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.NcboSearchService;
-import org.sagebionetworks.web.server.servlet.RssServiceImpl;
+import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
-import org.sagebionetworks.web.server.servlet.filter.CRCSCFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
-import org.sagebionetworks.web.server.servlet.filter.UpForAChallengeFilter;
 import org.sagebionetworks.web.server.servlet.oauth2.OAuth2Servlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -62,16 +60,10 @@ public class PortalServletModule extends ServletModule {
 		// This supports RPC
 		filter("/Portal/*").through(RPCValidationFilter.class);
 		bind(RPCValidationFilter.class).in(Singleton.class);
-
-		bind(UpForAChallengeFilter.class).in(Singleton.class);
-		filter("/upforachallenge").through(UpForAChallengeFilter.class);
 		
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
 		
-		bind(CRCSCFilter.class).in(Singleton.class);
-		filter("/crcsc").through(CRCSCFilter.class);
-
 		// Setup the Synapse service
 		bind(SynapseClientImpl.class).in(Singleton.class);
 		serve("/Portal/synapseclient").with(SynapseClientImpl.class);
@@ -129,10 +121,6 @@ public class PortalServletModule extends ServletModule {
 		serve("/Portal/jira").with(JiraClientImpl.class);
 		bind(JiraJavaClient.class).to(JiraJavaClientImpl.class);
 		
-		// Setup the Rss service mapping
-		bind(RssServiceImpl.class).in(Singleton.class);
-		serve("/Portal/rss").with(RssServiceImpl.class);
-		
 		// OAuth2 
 		bind(OAuth2Servlet.class).in(Singleton.class);
 		serve("/Portal/oauth2callback").with(OAuth2Servlet.class);
@@ -153,9 +141,13 @@ public class PortalServletModule extends ServletModule {
 		bind(ProjectSearchRedirectFilter.class).in(Singleton.class);
 		filter(ProjectSearchRedirectFilter.PROJECT+"*").through(ProjectSearchRedirectFilter.class);
 		
-		
-		
 		handleGWTPlaces();
+		
+		// Catch-all.  Note that "/*" would override all other servlet binding, and "/" overrides the default handler 
+		//(which we need for GWT place handling).
+		// This is also where project aliases are handled.
+		bind(ProjectAliasServlet.class).in(Singleton.class);
+		serveRegex("\\/\\w+").with(ProjectAliasServlet.class);
 	}
 	
 	public void handleGWTPlaces() {

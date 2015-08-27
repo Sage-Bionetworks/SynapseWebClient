@@ -23,21 +23,21 @@ import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
+import org.sagebionetworks.web.client.presenter.SynapseStandaloneWikiPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
-import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -179,8 +179,6 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public SynapseWikiPresenter getSynapseWikiPresenter();
 	
-	public WikiPresenter getWikiPresenter();
-	
 	public DownPresenter getDownPresenter();
 	
 	public TeamPresenter getTeamPresenter();
@@ -204,6 +202,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TeamSearchPresenter getTeamSearchPresenter();
 	
 	public PeopleSearchPresenter getPeopleSearchPresenter();
+	
+	public SynapseStandaloneWikiPresenter getSynapseStandaloneWikiPresenter();
 	
 	public EventBus getEventBus();
 	
@@ -340,6 +340,7 @@ public interface PortalGinInjector extends Ginjector {
 	public RegisterTeamDialog getRegisterTeamDialog();
 	public AnnotationEditor getAnnotationEditor();
 	public FileHistoryRowView getFileHistoryRow();
-
+	public FileHistoryWidget getFileHistoryWidget();
+	
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 }

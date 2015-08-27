@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,10 +18,11 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 	private Presenter presenter;
 
 	@UiField
-	Tooltip tip;
-	
+	Span favWidgetContainer;
 	@UiField
 	Anchor favoriteIcon;
+	@UiField
+	Anchor notFavoriteIcon;
 	@UiField
 	Image loadingUI;
 	
@@ -38,49 +38,37 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 				presenter.favoriteClicked();
 			}
 		});
+		notFavoriteIcon.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.favoriteClicked();
+			}
+		});
 	}
 	
 	@Override
-	public void showIsFavorite() {
-		favoriteIcon.setIcon(IconType.STAR);
-		favoriteIcon.removeStyleName("greyText-imp");
-		favoriteIcon.addStyleName("favoriteIcon");
-		favoriteIcon.setVisible(true);
-		tip.setTitle("Click the star to remove this to your favorites!");
+	public void setFavoriteVisible(boolean isVisible) {
+		favoriteIcon.setVisible(isVisible);
 	}
 	
 	@Override
-	public void showIsNotFavorite() {
-		favoriteIcon.setIcon(IconType.STAR_O);
-		favoriteIcon.removeStyleName("favoriteIcon");
-		favoriteIcon.addStyleName("greyText-imp");
-		favoriteIcon.setVisible(true);
-		tip.setTitle("Click the star to add this to your favorites!");
+	public void setNotFavoriteVisible(boolean isVisible) {
+		notFavoriteIcon.setVisible(isVisible);
 	}
 
 	@Override
-	public void hideFavoriteAndLoading() {
-		favoriteIcon.setVisible(false);
-		loadingUI.setVisible(false);
+	public void setLoadingVisible(boolean isVisible) {
+		loadingUI.setVisible(isVisible);
 	}
 
+	@Override
+	public void setFavWidgetContainerVisible(boolean isVisible) {
+		favWidgetContainer.setVisible(isVisible);
+	}
+	
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
-	}
-
-	@Override
-	public void showLoading() {
-		loadingUI.setVisible(true);
-	}
-
-	@Override
-	public void clear() {
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override

@@ -379,6 +379,11 @@ public class APITableWidgetTest {
 		outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
 		assertFalse(outputUri.contains("order+by+"));
 		assertFalse(outputUri.contains("desc"));
+		
+		//also verify that the query case is not be altered (SWC-2569)
+		inputUri = ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+folder+where+projectId='syn123'";
+		outputUri = widget.getOrderedByURI(inputUri, tableConfig);
+		assertTrue(outputUri.contains("projectId"));
 	}
 	
 	@Test
@@ -387,6 +392,27 @@ public class APITableWidgetTest {
 		assertEquals("Annotation", APITableWidget.removeFirstToken("data.Annotation"));
 		assertEquals("date", APITableWidget.removeFirstToken("date"));
 		assertNull(APITableWidget.removeFirstToken(null));
+	}
+	
+	@Test
+	public void testColumnConfigClickedSorting() {
+		String inputUri = ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+project";
+		APITableConfig tableConfig = getTableConfig();
+		tableConfig.setUri(inputUri);
+		widget.setTableConfig(tableConfig);
+		List<APITableColumnConfig> sortColumnConfigs = tableConfig.getColumnConfigs();
+		sortColumnConfigs.get(0).setSort(COLUMN_SORT_TYPE.NONE);
+		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
+		widget.columnConfigClicked(sortColumnConfigs.get(0));
+		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(inputUri.contains("order+by+"));
+		assertTrue(inputUri.contains("desc"));
+		sortColumnConfigs.get(1).setSort(COLUMN_SORT_TYPE.DESC);
+		widget.columnConfigClicked(sortColumnConfigs.get(1));
+		inputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(inputUri.contains("order+by+"));
+		assertTrue(inputUri.contains("asc"));
+		assertFalse(inputUri.contains("desc"));
 	}
 	
 	@Test

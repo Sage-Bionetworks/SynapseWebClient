@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -9,6 +8,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 /**
  * A simple modal dialog for renaming an entity.
@@ -90,7 +91,7 @@ public class RenameEntityModalWidgetImpl implements PromptModalView.Presenter, R
 	@Override
 	public void onRename(Entity toRename, Callback handler) {
 		this.handler = handler;
-		String typeName = EntityType.getEntityTypeForClass(toRename.getClass()).getDisplayName();
+		String typeName = typeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(toRename.getClass()));
 		this.toRename = toRename;
 		this.startingName = toRename.getName();
 		this.view.clear();

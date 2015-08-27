@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
@@ -84,7 +83,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 			Header headerWidget, 
 			Footer footerWidget,
 			SageImageBundle sageImageBundle, 
-			LoginWidget loginWidget, 
 			CertificateWidget certificateWidget,
 			PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));

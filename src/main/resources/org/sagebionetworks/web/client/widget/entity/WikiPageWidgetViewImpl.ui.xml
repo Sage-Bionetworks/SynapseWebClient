@@ -31,17 +31,17 @@
 		    	<g:FlowPanel addStyleNames="margin-top-10 clearleft" ui:field="createdModifiedHistoryPanel">
 				    <g:HTMLPanel ui:field="modifiedByPanel">
 	   			        Modified by
-	   			        <g:SimplePanel ui:field="modifiedByBadgePanel" addStyleNames="displayInline"/>
+	   			        <bh:Span ui:field="modifiedByBadgePanel" addStyleNames="movedown-4" />
 				        <bh:Span ui:field="modifiedOnField"/>
 				    </g:HTMLPanel>
 				    <g:HTMLPanel ui:field="createdByPanel">
 				        Created by 
-				        <g:SimplePanel ui:field="createdByBadgePanel" addStyleNames="displayInline"/>
+				        <bh:Span ui:field="createdByBadgePanel" addStyleNames="movedown-4"/>
 				        <bh:Span ui:field="createdOnField"/>
 				    </g:HTMLPanel>
-				    <b:Button ui:field="wikiHistoryButton" dataToggle="COLLAPSE" iconPosition="LEFT" 
-				        icon="CARET_SQUARE_O_RIGHT" dataTarget="#historyCollapse" text="Wiki History"/>
-				    <b:Collapse b:id="historyCollapse" ui:field="historyCollapse" toggle="false">
+				    <b:Button ui:field="wikiHistoryButton" iconPosition="LEFT" icon="CARET_SQUARE_O_RIGHT" 
+				        text="Wiki History" addStyleNames="margin-top-10"/>
+				    <b:Collapse ui:field="historyCollapse" toggle="false">
 	       			    <g:FlowPanel addStyleNames="margin-top-10" ui:field="wikiHistoryPanel"/>
 					</b:Collapse>
 				</g:FlowPanel>

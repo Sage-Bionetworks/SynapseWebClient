@@ -15,10 +15,11 @@ import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.Presenter {
+public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.Presenter, IsWidget {
 	private OpenTeamInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;

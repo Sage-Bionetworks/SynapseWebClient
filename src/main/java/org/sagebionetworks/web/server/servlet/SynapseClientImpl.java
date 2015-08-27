@@ -438,11 +438,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private static final Integer MAX_LIMIT = Integer.MAX_VALUE;
 	private static final Integer ZERO_OFFSET = 0;
 
-
-	private static final int USER_PAGINATION_OFFSET = 0;
-	// before we hit this limit we will use another mechanism to find users
-	private static final int USER_PAGINATION_LIMIT = 1000;
-	
 	/**
 	 * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
 	 * @param in
@@ -2722,7 +2717,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
+	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getPageNameToWikiKeyMap()
 			throws RestServiceException {
 		initHelpPagesMap();
 		return pageName2WikiKeyMap;
@@ -3177,6 +3172,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	/**
+	 * Update an entity.
+	 */
+	@Override
+	public void updateFileEntity(FileEntity toUpdate, String fileHandleId,
+			String fileName, String contentType) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			S3FileHandle newHandle = synapseClient.createS3FileHandleCopy(fileHandleId, fileName, contentType);
+			toUpdate.setDataFileHandleId(newHandle.getId());
+			synapseClient.putEntity(toUpdate);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 	
 	
 }

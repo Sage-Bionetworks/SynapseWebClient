@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -24,11 +26,12 @@ import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.ProjectAreaState;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
-
+public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter, IsWidget  {
+	private static ProjectAreaState projectAreaState = new ProjectAreaState();
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
 	private EntitySchemaCache schemaCache;
@@ -42,7 +45,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String areaToken;
 	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
-	private ProjectAreaState projectAreaState;
 	private QueryTokenProvider queryTokenProvider;
 	
 	public static final String TABLE_QUERY_PREFIX = "query/";
@@ -62,7 +64,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.bus = bus;
 		this.globalApplicationState = globalApplicationState;	
 		this.queryTokenProvider = queryTokenProvider;
-		this.projectAreaState = new ProjectAreaState();
 		view.setPresenter(this);
 	}
 
@@ -74,8 +75,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      */
     public void configure(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	// reset state for newly visited project
-    	boolean isNewProject = projectHeader.getId().equals(projectAreaState.getProjectId());
-    	if(!isNewProject) {
+    	String projectHeaderId = projectHeader.getId();
+    	String areaStateProjectId = projectAreaState.getProjectId();
+    	boolean isNewProject = !projectHeaderId.equals(areaStateProjectId);
+    	if(isNewProject) {
     		projectAreaState = new ProjectAreaState();
     		projectAreaState.setProjectId(projectHeader.getId());
     	}
@@ -89,8 +92,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	String entityId = bundle.getEntity().getId();
     	boolean isTable = bundle.getEntity() instanceof TableEntity;
     	boolean isProject = entityId.equals(projectAreaState.getProjectId());
-    	
     	// For non-project file-tab entities, record them as the last file area place 
+    	
+    	configureFileHistory();
+    	
     	if(!isProject && !isTable && area != EntityArea.WIKI) {
     		EntityHeader lastFileAreaEntity = new EntityHeader();
     		lastFileAreaEntity.setId(entityId);
@@ -126,8 +131,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	}
 	}
     
-	@SuppressWarnings("unchecked")
-	public void clearState() {
+    public void clearState() {
 		view.clear();
 		// remove handlers
 		this.bundle = null;
@@ -190,13 +194,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		String entityId = projectHeader.getId();
 		String areaToken = null;
 		Long versionNumber = null;
-		
 		boolean overrideCache = false;
 		// return to root for file and tables
 		if((currentArea == EntityArea.FILES && area == EntityArea.FILES) 
 				|| (bundle.getEntity() instanceof TableEntity && area == EntityArea.TABLES))
 			overrideCache = true;
-		
 		if(!overrideCache) {
 			if(area == EntityArea.WIKI) {
 				areaToken = projectAreaState.getLastWikiSubToken();
@@ -214,7 +216,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public boolean isPlaceChangeForArea(EntityArea targetTab) {
-		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());		
+		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());
 		if(targetTab == EntityArea.ADMIN && !isProject) {
 			// admin area clicked outside of project requires goto
 			return true;
@@ -331,6 +333,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			DisplayUtils.showErrorMessage("Failed to handle Wiki reload.");
 		}
 	}
+	
+	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
+		String wikiPageId = rootWikiId;
+		if (Synapse.EntityArea.WIKI == area && DisplayUtils.isDefined(areaToken))
+			wikiPageId = areaToken;
+		return wikiPageId;
+	}
+	
+	public void configureFileHistory() {
+		Entity entity = bundle.getEntity();
+		if (entity != null && entity instanceof FileEntity) {
+			view.setFileHistoryVisible(true);
+			if (versionNumber != null) {
+				view.toggleFileHistory();
+			}
+		} else {
+			view.setFileHistoryVisible(false);
+		}
+	}
 
 	/*
 	 * Private Methods
@@ -344,15 +365,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
 	}
 	
-	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
-		String wikiPageId = rootWikiId;
-		if (Synapse.EntityArea.WIKI == area && DisplayUtils.isDefined(areaToken))
-			wikiPageId = areaToken;
-		return wikiPageId;
-	}
-	
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
+	}
+	
+	
+	/**
+	 * For testing purposes only
+	 * @return currently loaded entity page project id
+	 */
+	public String getCurrentEntityPageProjectId() {
+		return projectAreaState.getProjectId();
+	}
+	public void clearProjectAreaState() {
+		projectAreaState = new ProjectAreaState();
 	}
 }

@@ -1,19 +1,22 @@
 package org.sagebionetworks.web.client.widget.breadcrumb;
 
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 
 public class LinkData {
 
 	private String text;
-	private ImageResource icon;
+	private IconType icon;
 	private Place place;
 
 	public LinkData(String text, Place place) {
 		this(text, null, place);
 	}
 
-	public LinkData(String text, ImageResource icon, Place place) {
+	public LinkData(String text, IconType icon, Place place) {
 		this.text = text;
 		this.icon = icon;
 		this.place = place;
@@ -27,11 +30,11 @@ public class LinkData {
 		this.text = text;
 	}
 
-	public ImageResource getIcon() {
+	public IconType getIconType() {
 		return icon;
 	}
 
-	public void setIcon(ImageResource icon) {
+	public void setIconType(IconType icon) {
 		this.icon = icon;
 	}
 
