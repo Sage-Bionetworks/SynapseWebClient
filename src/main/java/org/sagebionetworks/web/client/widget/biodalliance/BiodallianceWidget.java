@@ -74,7 +74,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		String styleGlyphType = "HISTOGRAM";
 		String styleColor = "red";
 		int trackHeightPx = 120;
-		BiodallianceSource source = new BiodallianceSource(sourceName, "syn3928320", 1L, styleType, styleGlyphType, styleColor, trackHeightPx);
+		BiodallianceBwigSource source = new BiodallianceBwigSource(sourceName, "syn3928320", 1L, styleType, styleGlyphType, styleColor, trackHeightPx);
 		addBigwigSource(config, source);
 		new Biodalliance013dev().show(config);
 	}
@@ -168,7 +168,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	
 	private void addBigwigSource(
 			JavaScriptObject biodallianceBrowserConfig,
-			BiodallianceSource source) {
+			BiodallianceBwigSource source) {
 		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceBwgURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
 	}
 	private native void addBigwigSource(

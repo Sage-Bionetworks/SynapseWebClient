@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.biodalliance;
 
-public class BiodallianceSource {
+public class BiodallianceBwigSource {
 	String sourceName;
 	String sourceBwgURI;
 	public static final String DEFAULT_STYLE_TYPE = "default";
@@ -11,7 +11,7 @@ public class BiodallianceSource {
 	String styleGlyphType;
 	String styleColor;
 	int trackHeightPx;
-	public BiodallianceSource(String sourceName, String entityId, Long version,
+	public BiodallianceBwigSource(String sourceName, String entityId, Long version,
 			String styleType, String styleGlyphType, String styleColor,
 			Integer trackHeightPx) {
 		this.sourceName = sourceName;
