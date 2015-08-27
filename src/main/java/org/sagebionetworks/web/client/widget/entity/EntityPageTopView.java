@@ -82,5 +82,4 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 	public void setFileHistoryVisible(boolean b);
 
-	public void toggleFileHistory();
 }
