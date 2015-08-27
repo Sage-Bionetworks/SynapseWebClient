@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013dev;
-import org.gwtvisualizationwrappers.client.cytoscape.CytoscapeGraph242;
+import java.util.ArrayList;
+
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -9,14 +9,14 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceBwigSource;
 import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceWidget;
+import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -84,6 +84,16 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 //				};
 //			}
 //		});
+		String sourceName="A2_i14.mkdup.coordsort.bw";
+		String styleType = "default";
+		String styleGlyphType = "HISTOGRAM";
+		String styleColor = "red";
+		int trackHeightPx = 120;
+		BiodallianceBwigSource source = new BiodallianceBwigSource(sourceName, "syn3928320", 1L, styleType, styleGlyphType, styleColor, trackHeightPx);
+		ArrayList sources = new ArrayList();
+		sources.add(source);
+		biodallianceWidget.configure(Species.HUMAN, "21", 33031597, 33041570, sources);
+		
 		biodallianceView.add(biodallianceWidget.asWidget());
 		
 	}

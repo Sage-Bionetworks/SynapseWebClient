@@ -50,4 +50,9 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
+	
+	@Override
+	public boolean isAttached() {
+		return widget.isAttached();
+	}
 }

@@ -10,6 +10,7 @@ public interface BiodallianceWidgetView extends IsWidget {
 	 */
 	void setPresenter(Presenter presenter);
 	void setContainerId(String id);
+	boolean isAttached();
 	
 	/**
 	 * Presenter interface

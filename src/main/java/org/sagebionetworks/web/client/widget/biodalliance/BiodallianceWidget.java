@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.biodalliance;
 
 import java.util.Date;
+import java.util.List;
 
 import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013dev;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -16,11 +17,21 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 
 	public static final String FILE_RESOLVER_URL="Portal/" + WebConstants.FILE_ENTITY_RESOLVER_SERVLET+"?";
 	
+	public enum Species {
+		HUMAN, MOUSE
+	}
+	
 	BiodallianceWidgetView view;
 	AuthenticationController authenticationController;
 	GlobalApplicationState globalApplicationState;
 	HumanBiodallianceConfig humanConfig; 
 	MouseBiodallianceConfig mouseConfig;
+	boolean isConfigured;
+	BiodallianceConfigInterface currentConfig;
+	String initChr;
+	int initViewStart, initViewEnd;
+	List<BiodallianceBwigSource> sources;
+	
 	@Inject
 	public BiodallianceWidget(BiodallianceWidgetView view, 
 			AuthenticationController authenticationController, 
@@ -32,9 +43,31 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		this.globalApplicationState = globalApplicationState;
 		this.humanConfig = humanConfig;
 		this.mouseConfig = mouseConfig;
+		isConfigured = false;
 		view.setPresenter(this);
 	}
 	
+	public void configure(Species species, 
+			String initChr,
+			int initViewStart,
+			int initViewEnd, 
+			List<BiodallianceBwigSource> sources) {
+		this.initChr = initChr;
+	    this.initViewStart = initViewStart;
+	    this.initViewEnd = initViewEnd;
+	    this.sources = sources;
+		if (Species.HUMAN.equals(species)) {
+			currentConfig = humanConfig;
+		} else if (Species.MOUSE.equals(species)) {
+			currentConfig = mouseConfig;
+		}
+		
+		isConfigured = true;
+		//if view is already attached, then show the browser
+		if (view.isAttached()) {
+			showBiodallianceBrowser();
+		}
+	}
 	public static String getFileResolverURL(String entityIdAndVersion) {
 		if (entityIdAndVersion != null) {
 			String[] tokens = entityIdAndVersion.split("\\.");
@@ -62,28 +95,28 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		return view.asWidget();
 	}
 	
-	@Override
-	public void viewAttached() {
-		//init
-		String initChr = "21";
-	    int initViewStart = 33031597;
-	    int initViewEnd = 33041570;
-	    String baseColor = "black";
+	public void showBiodallianceBrowser() {
+		String baseColor = "black";
 	    String deletionColor = "black";
 	    String insertionColor = "red";
 	    
-		JavaScriptObject config = createNewBiodallianceBrowserConfig(initChr, initViewStart, initViewEnd, baseColor, deletionColor, insertionColor, humanConfig);
+		JavaScriptObject config = createNewBiodallianceBrowserConfig(initChr, initViewStart, initViewEnd, baseColor, deletionColor, insertionColor, currentConfig);
 		
-		//add a source
-		String sourceName="A2_i14.mkdup.coordsort.bw";
-		String sourceBwgURI = FILE_RESOLVER_URL + "entityId=syn3928320&version=1"; //'case/A2_i14.mkdup.coordsort.bw',
-		String styleType = "default";
-		String styleGlyphType = "HISTOGRAM";
-		String styleColor = "red";
-		int trackHeightPx = 120;
-		BiodallianceBwigSource source = new BiodallianceBwigSource(sourceName, "syn3928320", 1L, styleType, styleGlyphType, styleColor, trackHeightPx);
-		addBigwigSource(config, source);
+		//add a source(s)
+		for (BiodallianceBwigSource source : sources) {
+			addBigwigSource(config, source);	
+		}
+		
 		new Biodalliance013dev().show(config);
+	}
+	
+	@Override
+	public void viewAttached() {
+		if (isConfigured) {
+			//ready to show
+			showBiodallianceBrowser();
+		}
+		
 	}
 	
 	private JavaScriptObject createNewBiodallianceBrowserConfig(
