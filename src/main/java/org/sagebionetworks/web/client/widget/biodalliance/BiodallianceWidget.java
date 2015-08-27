@@ -30,7 +30,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	BiodallianceConfigInterface currentConfig;
 	String initChr;
 	int initViewStart, initViewEnd;
-	List<BiodallianceBwigSource> sources;
+	List<BiodallianceSource> sources;
 	
 	@Inject
 	public BiodallianceWidget(BiodallianceWidgetView view, 
@@ -51,7 +51,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			String initChr,
 			int initViewStart,
 			int initViewEnd, 
-			List<BiodallianceBwigSource> sources) {
+			List<BiodallianceSource> sources) {
 		this.initChr = initChr;
 	    this.initViewStart = initViewStart;
 	    this.initViewEnd = initViewEnd;
@@ -96,15 +96,15 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	}
 	
 	public void showBiodallianceBrowser() {
-		String baseColor = "black";
-	    String deletionColor = "black";
-	    String insertionColor = "red";
-	    
-		JavaScriptObject config = createNewBiodallianceBrowserConfig(initChr, initViewStart, initViewEnd, baseColor, deletionColor, insertionColor, currentConfig);
+		JavaScriptObject config = createNewBiodallianceBrowserConfig(initChr, initViewStart, initViewEnd, currentConfig);
 		
 		//add a source(s)
-		for (BiodallianceBwigSource source : sources) {
-			addBigwigSource(config, source);	
+		for (BiodallianceSource source : sources) {
+			if (source instanceof BiodallianceBwigSource) {
+				addBigwigSource(config, (BiodallianceBwigSource)source);	
+			} else if (source instanceof BiodallianceVCFSource) {
+				addVCFSource(config, (BiodallianceVCFSource)source);
+			}
 		}
 		
 		new Biodalliance013dev().show(config);
@@ -123,9 +123,6 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			String initChr,
 			int initViewStart,
 			int initViewEnd,
-			String baseColor,
-			String deletionColor,
-			String insertionColor,
 			BiodallianceConfigInterface config
 			) {
 		long uniqueId = new Date().getTime();
@@ -134,7 +131,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		
 		return createNewBiodallianceBrowserConfig(containerId, initChr, initViewStart, initViewEnd, config.getTwoBitURI(),
 				config.getBwgURI(), config.getStylesheetURI(), config.getTrixURI(), config.getSpeciesName(), config.getTaxon(), config.getAuthName(),
-				config.getVersion(), config.getUscsName(), baseColor, deletionColor, insertionColor);
+				config.getVersion(), config.getUscsName());
 	}
 	
 	private native JavaScriptObject createNewBiodallianceBrowserConfig(
@@ -150,10 +147,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			int coordSystemTaxon,
 			String coordSystemAuth,
 			String coordSystemVersion,
-			String coordSystemUcscName,
-			String baseColor,
-			String deletionColor,
-			String insertionColor
+			String coordSystemUcscName
 			) /*-{
 		var resolverFunction = function(url) {
 		   return fetch(url, {  
@@ -179,12 +173,12 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 					version: coordSystemVersion, 
 					ucscName: coordSystemUcscName},
 				baseColors: {
-	                 'A': baseColor,
-	                 'C': baseColor,
-	                 'G': baseColor,
-	                 'T': baseColor,
-	                 '-': deletionColor, //deletion
-	                 'I': insertionColor    //insertion
+	                 'A': 'black',
+	                 'C': 'black',
+	                 'G': 'black',
+	                 'T': 'black',
+	                 '-': 'black', //deletion
+	                 'I': 'red'    //insertion
 	            },
 				sources: [{name: 'Genome',
 					twoBitURI: genomeFileURI,
@@ -209,7 +203,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	private void addBigwigSource(
 			JavaScriptObject biodallianceBrowserConfig,
 			BiodallianceBwigSource source) {
-		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceBwgURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
+		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
 	}
 	private native void addBigwigSource(
 			JavaScriptObject biodallianceBrowserConfig,
@@ -243,6 +237,49 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			resolver: resolverFunction
 	    }
 	    biodallianceBrowserConfig.sources.push(newSource);
-}-*/;
+	}-*/;
+	
+	
+	private void addVCFSource(
+			JavaScriptObject biodallianceBrowserConfig,
+			BiodallianceVCFSource source) {
+		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
+	}
+	
+	private native void addVCFSource(
+			JavaScriptObject biodallianceBrowserConfig,
+			String sourceName,
+			String sourceURI,
+			String styleType, 
+			String styleGlyphType,
+			String styleColor,
+			int trackHeightPx
+			) /*-{
+		var resolverFunction = function(url) {
+		   return fetch(url, {  
+			  credentials: 'include'  //sending credentials with a fetch request (session cookie)
+			}).then(function(resp) {
+		       return resp.json();
+		   }).then(function(rdata) {
+		       return rdata.url;
+		   });
+		}
+	    var newSource = {
+	    	name: sourceName,
+			collapseSuperGroups:true,
+			uri: sourceURI,
+			payload: 'vcf',
+			tier_type: 'tabix',
+			style: [{type : styleType,
+					style: {glyph: styleGlyphType,
+							COLOR1:styleColor,
+							COLOR2:styleColor,
+							COLOR3:styleColor,
+							HEIGHT:trackHeightPx}}],
+			collapseSuperGroups: true, 
+			resolver: resolverFunction
+	    }
+	    biodallianceBrowserConfig.sources.push(newSource);
+	}-*/;
 	
 }

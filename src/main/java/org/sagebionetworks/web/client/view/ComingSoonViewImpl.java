@@ -87,9 +87,10 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		String sourceName="A2_i14.mkdup.coordsort.bw";
 		String styleType = "default";
 		String styleGlyphType = "HISTOGRAM";
-		String styleColor = "red";
+		String styleColor = "grey";
 		int trackHeightPx = 120;
-		BiodallianceBwigSource source = new BiodallianceBwigSource(sourceName, "syn3928320", 1L, styleType, styleGlyphType, styleColor, trackHeightPx);
+		BiodallianceBwigSource source = new BiodallianceBwigSource(sourceName, "syn3928320", 1L);
+		source.setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
 		ArrayList sources = new ArrayList();
 		sources.add(source);
 		biodallianceWidget.configure(Species.HUMAN, "21", 33031597, 33041570, sources);
