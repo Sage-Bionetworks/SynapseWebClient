@@ -187,6 +187,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PythonClientModalWidgetViewImpl pythonLoadWidget;
 	private JavaClientModalWidgetViewImpl javaLoadWidget;
 	private CommandLineClientModalWidgetViewImpl commandLineLoadWidget;
+	private EntityActionController controller;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -753,7 +754,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu = ginInjector.createActionMenuWidget();
 		// Create a menu
 		// Create a controller.
-		final EntityActionController controller = ginInjector.createEntityActionController();
+		controller = ginInjector.createEntityActionController();
 		actionMenu.addControllerWidget(controller.asWidget());
 		controller.configure(actionMenu, bundle, wikiPageId, new EntityUpdatedHandler() {
 			@Override
@@ -784,12 +785,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void setFileHistoryVisible(boolean isVisible) {
+		fileHistoryShown = isVisible;
 		entityMetadata.setFileHistoryVisible(isVisible);
+		if (controller != null) {
+			controller.onFileHistoryToggled(isVisible);
+		}
 	}
-
-	@Override
-	public void toggleFileHistory() {
-		((ActionListener)actionMenu).onAction(Action.TOGGLE_FILE_HISTORY);
-	}
-
 }
