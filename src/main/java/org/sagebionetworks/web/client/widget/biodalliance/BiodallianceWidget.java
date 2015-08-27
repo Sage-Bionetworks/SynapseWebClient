@@ -36,16 +36,23 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	}
 	
 	public static String getFileResolverURL(String entityIdAndVersion) {
-		StringBuilder sb = new StringBuilder();
 		if (entityIdAndVersion != null) {
 			String[] tokens = entityIdAndVersion.split("\\.");
 			if (tokens.length == 2) {
-				sb.append(FILE_RESOLVER_URL);
-				sb.append("entityId=");
-				sb.append(tokens[0]);
-				sb.append("&version=");
-				sb.append(tokens[1]);
+				return getFileResolverURL(tokens[0], tokens[1]);
 			}
+		}
+		return null;
+	}
+	
+	public static String getFileResolverURL(String entityId, String version) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(FILE_RESOLVER_URL);
+		sb.append("entityId=");
+		sb.append(entityId);
+		if (version != null) {
+			sb.append("&version=");
+			sb.append(version);
 		}
 		return sb.toString();
 	}

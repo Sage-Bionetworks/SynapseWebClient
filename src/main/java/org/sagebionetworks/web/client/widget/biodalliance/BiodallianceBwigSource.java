@@ -15,7 +15,8 @@ public class BiodallianceBwigSource {
 			String styleType, String styleGlyphType, String styleColor,
 			Integer trackHeightPx) {
 		this.sourceName = sourceName;
-		this.sourceBwgURI = BiodallianceWidget.getFileResolverURL(entityId + "." + version);
+		String versionString = version != null ? version.toString() : null;
+		this.sourceBwgURI = BiodallianceWidget.getFileResolverURL(entityId, versionString);
 		this.styleType = styleType == null ? DEFAULT_STYLE_TYPE : styleType;
 		this.styleGlyphType = styleGlyphType == null ? DEFAULT_STYLE_GLYPH_TYPE : styleGlyphType;
 		this.styleColor = styleColor == null ? DEFAULT_STYLE_COLOR : styleColor;
