@@ -6,10 +6,14 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -106,11 +110,14 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		synapseClient.getEntityInfo(entityId, new AsyncCallback<EntityBundlePlus>() {
 			@Override
 			public void onSuccess(EntityBundlePlus result) {
-				Entity entity = result.getEntityBundle().getEntity();
-				Annotations annotations = result.getEntityBundle().getAnnotations();
-				String rootWikiId = result.getEntityBundle().getRootWikiId();
+				EntityBundle eb = result.getEntityBundle();
+				Entity entity = eb.getEntity();
+				Annotations annotations = eb.getAnnotations();
+				String rootWikiId = eb.getRootWikiId();
+				List<FileHandle> handles = eb.getFileHandles();
 				KeyValueDisplay<String> keyValueDisplay = ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(result.getProfile()), false);
 				addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiId);
+				addContentSize(keyValueDisplay, handles);
 				callback.onSuccess(keyValueDisplay);		
 			}
 			@Override
@@ -118,6 +125,11 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				callback.onFailure(caught);
 			}
 		});
+	}
+	
+	public void addContentSize(KeyValueDisplay<String> keyValueDisplay, List<FileHandle> handles) {
+		for (FileHandle handle: handles) {
+		}
 	}
 	
 	/**
