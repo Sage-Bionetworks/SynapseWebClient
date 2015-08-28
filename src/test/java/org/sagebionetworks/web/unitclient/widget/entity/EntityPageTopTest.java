@@ -549,8 +549,8 @@ public class EntityPageTopTest {
 		EntityBundle fileEntityBundle = new EntityBundle();
 		fileEntityBundle.setEntity(file);
 		pageTop.configure(fileEntityBundle, null, projectHeader, EntityArea.FILES, wikiSubpage);
-		verify(mockView).setFileHistoryVisible(true);
-		verify(mockView, never()).toggleFileHistory();
+		pageTop.refresh();
+		verify(mockView).setFileHistoryVisible(false);
 	}
 	
 	public void testConfigureFileHistoryIsFileEarlierVersion() {
@@ -559,8 +559,8 @@ public class EntityPageTopTest {
 		EntityBundle fileEntityBundle = new EntityBundle();
 		fileEntityBundle.setEntity(file);
 		pageTop.configure(fileEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		pageTop.refresh();
 		verify(mockView).setFileHistoryVisible(true);
-		verify(mockView).toggleFileHistory();
 	}
 
 	@Test
@@ -570,8 +570,8 @@ public class EntityPageTopTest {
 		EntityBundle projectEntityBundle = new EntityBundle();
 		projectEntityBundle.setEntity(project);
 		pageTop.configure(projectEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		pageTop.refresh();
 		verify(mockView).setFileHistoryVisible(false);
-		verify(mockView, never()).toggleFileHistory();
 	}
 	
 	/*
