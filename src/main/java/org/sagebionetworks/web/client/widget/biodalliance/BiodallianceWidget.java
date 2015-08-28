@@ -100,10 +100,10 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		
 		//add a source(s)
 		for (BiodallianceSource source : sources) {
-			if (source instanceof BiodallianceBwigSource) {
-				addBigwigSource(config, (BiodallianceBwigSource)source);	
-			} else if (source instanceof BiodallianceVCFSource) {
-				addVCFSource(config, (BiodallianceVCFSource)source);
+			if (BiodallianceSource.SourceType.BIGWIG.equals(source.getSourceType())) {
+				addBigwigSource(config, source);	
+			} else if (BiodallianceSource.SourceType.VCF.equals(source.getSourceType())) {
+				addVCFSource(config, source);
 			}
 		}
 		
@@ -116,7 +116,6 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			//ready to show
 			showBiodallianceBrowser();
 		}
-		
 	}
 	
 	private JavaScriptObject createNewBiodallianceBrowserConfig(
@@ -202,7 +201,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	
 	private void addBigwigSource(
 			JavaScriptObject biodallianceBrowserConfig,
-			BiodallianceBwigSource source) {
+			BiodallianceSource source) {
 		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
 	}
 	private native void addBigwigSource(
@@ -239,10 +238,9 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	    biodallianceBrowserConfig.sources.push(newSource);
 	}-*/;
 	
-	
 	private void addVCFSource(
 			JavaScriptObject biodallianceBrowserConfig,
-			BiodallianceVCFSource source) {
+			BiodallianceSource source) {
 		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
 	}
 	

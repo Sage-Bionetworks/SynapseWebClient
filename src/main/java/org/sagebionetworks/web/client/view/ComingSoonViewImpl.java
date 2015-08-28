@@ -9,7 +9,8 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceBwigSource;
+import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceSource;
+import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceSource.SourceType;
 import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -89,9 +90,10 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		String styleGlyphType = "HISTOGRAM";
 		String styleColor = "grey";
 		int trackHeightPx = 120;
-		BiodallianceBwigSource source = new BiodallianceBwigSource(sourceName, "syn3928320", 1L);
+		BiodallianceSource source = new BiodallianceSource();
+		source.configure(sourceName, "syn3928320", 1L, SourceType.BIGWIG);
 		source.setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
-		ArrayList sources = new ArrayList();
+		ArrayList<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
 		sources.add(source);
 		biodallianceWidget.configure(Species.HUMAN, "21", 33031597, 33041570, sources);
 		
