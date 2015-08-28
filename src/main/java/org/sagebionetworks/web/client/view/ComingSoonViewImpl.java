@@ -95,7 +95,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		source.setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
 		ArrayList<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
 		sources.add(source);
-		biodallianceWidget.configure(Species.HUMAN, "21", 33031597, 33041570, sources);
+		biodallianceWidget.configure(Species.HUMAN, "1", 3025001, 3525001, sources);
 		
 		biodallianceView.add(biodallianceWidget.asWidget());
 		

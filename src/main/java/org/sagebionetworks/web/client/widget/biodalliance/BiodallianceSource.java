@@ -16,6 +16,10 @@ public class BiodallianceSource {
 	String styleGlyphType = DEFAULT_STYLE_GLYPH_TYPE;
 	String styleColor = DEFAULT_STYLE_COLOR;
 	int trackHeightPx = DEFAULT_HEIGHT;
+
+	public enum SourceType {
+		BIGWIG, VCF
+	}
 	SourceType sourceType;
 	
 	/**
@@ -29,11 +33,6 @@ public class BiodallianceSource {
 	public static final String STYLE_GLYPH_TYPE_KEY = "styleGlyphType";
 	public static final String STYLE_COLOR_KEY = "color";
 	public static final String STYLE_HEIGHT = "height";
-	
-	
-	public enum SourceType {
-		BIGWIG, VCF
-	}
 	
 	public BiodallianceSource() {
 	}

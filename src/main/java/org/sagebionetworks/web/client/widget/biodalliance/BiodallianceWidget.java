@@ -160,6 +160,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 				
 		var biodallianceBrowserConfig = {
 				pageName: containerId,
+				noPersist: true,
 				chr: initChr, 
 				viewStart:  initViewStart, 
 				viewEnd:  initViewEnd, 
