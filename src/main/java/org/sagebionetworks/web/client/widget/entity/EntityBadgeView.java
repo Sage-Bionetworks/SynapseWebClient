@@ -44,6 +44,4 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 		void entityClicked(EntityQueryResult entityHeader);
 	}
 
-	
-
 }

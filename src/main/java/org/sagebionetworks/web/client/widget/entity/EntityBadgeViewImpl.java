@@ -47,12 +47,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	FocusPanel iconContainer;
 	@UiField
 	Icon icon;
-	
 	@UiField
 	FlowPanel entityContainer;
 	@UiField
 	TextBox idField;
-	
 	@UiField
 	SimplePanel modifiedByField;
 	@UiField

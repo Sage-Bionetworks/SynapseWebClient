@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -110,6 +112,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		synapseClient.getEntityInfo(entityId, new AsyncCallback<EntityBundlePlus>() {
 			@Override
 			public void onSuccess(EntityBundlePlus result) {
+				GWT.debugger();
 				EntityBundle eb = result.getEntityBundle();
 				Entity entity = eb.getEntity();
 				Annotations annotations = eb.getAnnotations();
@@ -128,7 +131,18 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	public void addContentSize(KeyValueDisplay<String> keyValueDisplay, List<FileHandle> handles) {
-		for (FileHandle handle: handles) {
+		Map<String,String> map = keyValueDisplay.getMap();
+		List<String> order = keyValueDisplay.getKeyDisplayOrder();
+		if (handles != null) {
+			for (FileHandle handle: handles) {
+				if (!(handle instanceof PreviewFileHandle)) {
+					Long contentSize = handle.getContentSize();
+					if (contentSize != null && contentSize > 0) {
+						order.add("File Size");
+						map.put("File Size", DisplayUtils.getFriendlySize(contentSize, true));
+					}
+				}
+			}
 		}
 	}
 	
