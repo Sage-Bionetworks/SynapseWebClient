@@ -112,7 +112,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		synapseClient.getEntityInfo(entityId, new AsyncCallback<EntityBundlePlus>() {
 			@Override
 			public void onSuccess(EntityBundlePlus result) {
-				GWT.debugger();
 				EntityBundle eb = result.getEntityBundle();
 				Entity entity = eb.getEntity();
 				Annotations annotations = eb.getAnnotations();
@@ -139,7 +138,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 					Long contentSize = handle.getContentSize();
 					if (contentSize != null && contentSize > 0) {
 						order.add("File Size");
-						map.put("File Size", DisplayUtils.getFriendlySize(contentSize, true));
+						map.put("File Size", view.getFriendlySize(contentSize, true));
 					}
 				}
 			}

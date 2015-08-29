@@ -226,6 +226,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void setModifiedByWidgetVisible(boolean visible) {
 		modifiedByWidget.setVisible(visible);
 	}
+
+
+	@Override
+	public String getFriendlySize(Long contentSize, boolean abbreviatedUnits) {
+		return DisplayUtils.getFriendlySize(contentSize, abbreviatedUnits);
+	}
 	
 	/*
 	 * Private Methods

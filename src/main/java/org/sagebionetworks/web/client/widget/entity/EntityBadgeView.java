@@ -43,5 +43,6 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 		void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback);
 		void entityClicked(EntityQueryResult entityHeader);
 	}
+	String getFriendlySize(Long contentSize, boolean b);
 
 }

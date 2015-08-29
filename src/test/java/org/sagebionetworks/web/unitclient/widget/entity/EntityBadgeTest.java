@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -25,6 +24,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -232,5 +234,26 @@ public class EntityBadgeTest {
 		assertEquals(4, map.size());
 		assertEquals(4, order.size());
 		assertTrue(map.containsKey("key1"));
+	}
+	
+	@Test
+	public void testAddContentSize() {
+		
+		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
+		FileHandle previewFileHandle = new PreviewFileHandle();
+		fileHandles.add(previewFileHandle);
+		widget.addContentSize(keyValueDisplay, fileHandles);
+		assertEquals(0, map.size());
+		assertEquals(0, order.size());
+		assertFalse(map.containsKey("File Size"));
+		
+		FileHandle s3FileHandle = new S3FileHandle();
+		s3FileHandle.setContentSize(500L);
+		fileHandles.add(s3FileHandle);
+		
+		widget.addContentSize(keyValueDisplay, fileHandles);
+		assertEquals(1, map.size());
+		assertEquals(1, order.size());
+		assertTrue(map.containsKey("File Size"));
 	}
 }
