@@ -19,6 +19,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
@@ -44,6 +45,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -154,7 +156,6 @@ import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.common.cache.Cache;
-import org.junit.Ignore;
 
 /**
  * Test for the SynapseClientImpl
@@ -349,7 +350,7 @@ public class SynapseClientImplTest {
 		bundle.setUnmetAccessRequirements(accessRequirements);
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
 				.thenReturn(bundle);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID)))
+		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES)))
 				.thenReturn(bundle);
 
 		EntityBundle emptyBundle = new EntityBundle();
