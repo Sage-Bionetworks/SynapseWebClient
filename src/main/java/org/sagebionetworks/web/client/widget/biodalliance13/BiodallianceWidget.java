@@ -1,25 +1,36 @@
-package org.sagebionetworks.web.client.widget.biodalliance;
+package org.sagebionetworks.web.client.widget.biodalliance13;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013dev;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsWidget{
+public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsWidget, WidgetRendererPresenter{
 
 	public static final String FILE_RESOLVER_URL="Portal/" + WebConstants.FILE_ENTITY_RESOLVER_SERVLET+"?";
 	
 	public enum Species {
 		HUMAN, MOUSE
 	}
+	
+	public static final Species DEFAULT_SPECIES= Species.HUMAN;
+	public static final String DEFAULT_CHR= "1";
+	public static final int DEFAULT_VIEW_START = 3025001;
+	public static final int DEFAULT_VIEW_END = 3525001;
 	
 	BiodallianceWidgetView view;
 	AuthenticationController authenticationController;
@@ -68,6 +79,53 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			showBiodallianceBrowser();
 		}
 	}
+	
+	@Override
+	public void configure(WikiPageKey wikiKey,
+			Map<String, String> descriptor,
+			Callback widgetRefreshRequired, Long wikiVersionInView) {
+		//get values from descriptor (params map) and pass to other configure.
+		Species species = DEFAULT_SPECIES;
+		
+		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SPECIES_KEY)){
+			species = Species.valueOf(descriptor.get(WidgetConstants.BIODALLIANCE_SPECIES_KEY));
+		}
+		
+		String chr = DEFAULT_CHR;
+		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_CHR_KEY)){
+			chr = descriptor.get(WidgetConstants.BIODALLIANCE_CHR_KEY);
+		}
+		
+		int viewStart = DEFAULT_VIEW_START;
+		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_VIEW_START_KEY)){
+			viewStart = Integer.parseInt(descriptor.get(WidgetConstants.BIODALLIANCE_VIEW_START_KEY));
+		}
+		
+		int viewEnd = DEFAULT_VIEW_END;
+		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_VIEW_END_KEY)){
+			viewEnd = Integer.parseInt(descriptor.get(WidgetConstants.BIODALLIANCE_VIEW_END_KEY));
+		}
+		
+		List<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
+		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 0)){
+			//discover all sources
+			sources.addAll(getSources(descriptor));
+		}
+		configure(species, chr, viewStart, viewEnd, sources);
+	}
+	
+	public List<BiodallianceSource> getSources(Map<String, String> descriptor) {
+		//reconstruct biodalliance sources (if there are any)
+		List<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
+		int i = 0;
+		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
+			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
+			sources.add(new BiodallianceSource(sourceJsonString));
+			i++;
+		}
+		return sources;
+	}
+	
 	public static String getFileResolverURL(String entityIdAndVersion) {
 		if (entityIdAndVersion != null) {
 			String[] tokens = entityIdAndVersion.split("\\.");

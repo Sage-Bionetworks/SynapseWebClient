@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.biodalliance;
+package org.sagebionetworks.web.client.widget.biodalliance13;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.AttachEvent;

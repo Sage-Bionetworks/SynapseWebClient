@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.biodalliance;
+package org.sagebionetworks.web.client.widget.biodalliance13;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
 

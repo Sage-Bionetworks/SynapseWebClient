@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.biodalliance;
+package org.sagebionetworks.web.client.widget.biodalliance13;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -39,14 +39,15 @@ public class BiodallianceSource {
 	
 	public BiodallianceSource(String json) {
 		JSONObject value = (JSONObject)JSONParser.parseStrict(json);
-		sourceName = value.get(SOURCE_NAME_KEY).toString();
-		entityId = value.get(SOURCE_ENTITY_ID_KEY).toString();
-		version = Long.parseLong(value.get(SOURCE_ENTITY_VERSION_KEY).toString());
-		styleType = value.get(STYLE_TYPE_KEY).toString();
-		styleGlyphType = value.get(STYLE_GLYPH_TYPE_KEY).toString();
-		styleColor = value.get(STYLE_COLOR_KEY).toString();
-		trackHeightPx = Integer.parseInt(value.get(STYLE_HEIGHT).toString());
-		String sourceTypeString = value.get(SOURCE_TYPE).toString();
+		sourceName = value.get(SOURCE_NAME_KEY).isString().stringValue();
+		entityId = value.get(SOURCE_ENTITY_ID_KEY).isString().stringValue();
+		String versionString = value.get(SOURCE_ENTITY_VERSION_KEY).isString().stringValue();
+		version = Long.parseLong(versionString);
+		styleType = value.get(STYLE_TYPE_KEY).isString().stringValue();
+		styleGlyphType = value.get(STYLE_GLYPH_TYPE_KEY).isString().stringValue();
+		styleColor = value.get(STYLE_COLOR_KEY).isString().stringValue();
+		trackHeightPx = Integer.parseInt(value.get(STYLE_HEIGHT).isString().stringValue());
+		String sourceTypeString = value.get(SOURCE_TYPE).isString().stringValue();
 		configure(sourceName, entityId, version, SourceType.valueOf(sourceTypeString));
 	}
 	

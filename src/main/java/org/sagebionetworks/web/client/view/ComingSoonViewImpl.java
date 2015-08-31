@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -9,15 +10,17 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceSource;
-import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceSource.SourceType;
-import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceWidget;
-import org.sagebionetworks.web.client.widget.biodalliance.BiodallianceWidget.Species;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource.SourceType;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -93,12 +96,18 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		BiodallianceSource source = new BiodallianceSource();
 		source.configure(sourceName, "syn3928320", 1L, SourceType.BIGWIG);
 		source.setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
-		ArrayList<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
-		sources.add(source);
-		biodallianceWidget.configure(Species.HUMAN, "1", 3025001, 3525001, sources);
 		
+		HashMap<String, String> wikiDescriptor = new HashMap<String, String>();
+		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_SPECIES_KEY, "HUMAN");
+		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_CHR_KEY, "1");
+		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_VIEW_START_KEY, "3025001");
+		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_VIEW_END_KEY, "3525001");
+		String json = source.toJsonObject().toString();
+		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+"0", json);
+		
+		//test configure based on wiki descriptor
+		biodallianceWidget.configure(null, wikiDescriptor, null, null);
 		biodallianceView.add(biodallianceWidget.asWidget());
-		
 	}
 	
 	@Override

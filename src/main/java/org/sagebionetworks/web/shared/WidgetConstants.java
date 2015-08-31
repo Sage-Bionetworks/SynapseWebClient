@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.shared;
 
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
+
 public class WidgetConstants {
 	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
     public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
@@ -144,6 +146,12 @@ public class WidgetConstants {
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
 	public static final String USER_TEAM_BADGE_WIDGET_ID_KEY = "id";
 	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
+	
+	public static final String BIODALLIANCE_SPECIES_KEY = "species";
+	public static final String BIODALLIANCE_CHR_KEY = "chr";
+	public static final String BIODALLIANCE_VIEW_START_KEY = "viewStart";
+	public static final String BIODALLIANCE_VIEW_END_KEY = "viewEnd";
+	public static final String BIODALLIANCE_SOURCE_PREFIX = "source";
 	
 	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String WIDGET_ENTITY_VERSION_KEY = "version";
