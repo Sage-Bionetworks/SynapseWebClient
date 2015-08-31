@@ -157,6 +157,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getChallengeParticipantsWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getPreviewWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.BIODALLIANCE_CONTENT_TYPE)) {
+			presenter = ginInjector.getBiodallianceRenderer();
 		}
 		//TODO: add other widget descriptors to this mapping as they become available
 		

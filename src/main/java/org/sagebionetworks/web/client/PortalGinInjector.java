@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -265,6 +266,7 @@ public interface PortalGinInjector extends Ginjector {
 	public RegisterChallengeTeamWidget getRegisterChallengeTeamWidget();
 	public ChallengeTeamsWidget getChallengeTeamsWidget();
 	public ChallengeParticipantsWidget getChallengeParticipantsWidget();
+	public BiodallianceWidget getBiodallianceRenderer();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
