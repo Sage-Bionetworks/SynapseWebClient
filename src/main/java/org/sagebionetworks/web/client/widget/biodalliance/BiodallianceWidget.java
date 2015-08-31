@@ -165,7 +165,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 				viewStart:  initViewStart, 
 				viewEnd:  initViewEnd, 
 				cookieKey: coordSystemSpeciesName, 
-				fullScreen: true,
+				fullScreen: false,
 				coordSystem: { 
 					speciesName: coordSystemSpeciesName, 
 					taxon: coordSystemTaxon, 
