@@ -328,8 +328,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (bundle.getEntity() instanceof Project) {
 			setArea(EntityArea.WIKI, wikiPageId);
 			view.configureProjectActionMenu(bundle, wikiPageId);
-		} else {
-			DisplayUtils.showErrorMessage("Failed to handle Wiki reload.");
 		}
 	}
 	
