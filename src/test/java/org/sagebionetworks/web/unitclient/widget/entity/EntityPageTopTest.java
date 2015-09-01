@@ -525,13 +525,27 @@ public class EntityPageTopTest {
 	}
 
 	@Test
-	public void testHandleWikiReloadSuccess() {
+	public void testHandleWikiReloadProject() {
 		String wikiPageId = "123";
 		// create some state for the wiki tab on project
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
 		pageTop.handleWikiReload(wikiPageId);
 		verify(areaChangeHandler).areaChanged(EntityArea.WIKI, wikiPageId);
 		verify(mockView).configureProjectActionMenu(projectBundle, wikiPageId);
+	}
+	
+	@Test
+	public void testHandleWikiReloadFile() {
+		String wikiPageId = "123";
+		FileEntity file = new FileEntity();
+		file.setId("syn456");
+		EntityBundle fileBundle = new EntityBundle();
+		fileBundle.setEntity(file);
+		fileBundle.setRootWikiId(wikiPageId);
+		// create some state for the wiki tab on project
+		pageTop.configure(fileBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
+		pageTop.handleWikiReload(wikiPageId);
+		verify(mockView).configureFileActionMenu(fileBundle, wikiPageId);
 	}
 	
 	@Test
