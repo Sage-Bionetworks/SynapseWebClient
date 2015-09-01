@@ -533,14 +533,6 @@ public class EntityPageTopTest {
 		verify(areaChangeHandler).areaChanged(EntityArea.WIKI, wikiPageId);
 		verify(mockView).configureProjectActionMenu(projectBundle, wikiPageId);
 	}
-
-	@Test (expected=java.lang.UnsatisfiedLinkError.class)
-	public void testHandleWikiReloadFailure() {
-		String wikiPageId = "123";
-		// create some state for the wiki tab on project
-		pageTop.configure(entityBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
-		pageTop.handleWikiReload(wikiPageId);
-	}
 	
 	@Test
 	public void testConfigureFileHistoryIsFileLatestVersion() {
