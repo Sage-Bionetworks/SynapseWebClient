@@ -9,13 +9,34 @@
 		<bh:Div>
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel addStyleNames="displayInline">Query</b:FormLabel>
-					<b:Button ui:field="helpButton" addStyleNames="displayInline" icon="QUESTION_CIRCLE" type="LINK"/>
-					<bh:Div>
-						<b:TextBox ui:field="" placeholder=""/>
-					</bh:Div>
+					<b:FormLabel>Species</b:FormLabel>
+					<b:ButtonGroup>
+						<b:Button ui:field="humanButton" text="Human"></b:Button>
+						<b:Button ui:field="mouseButton" text="Mouse"></b:Button>
+					</b:ButtonGroup>	
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel>chr</b:FormLabel>
+					<b:TextBox ui:field="chrField" placeholder="1"/>
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel>View start</b:FormLabel>
+					<b:TextBox ui:field="viewStartField" placeholder=""/>
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel>View end</b:FormLabel>
+					<b:TextBox ui:field="viewEndField" placeholder=""/>
 				</b:FormGroup>
 			</b:FieldSet>
+			<b:Panel>
+				<b:PanelHeader>
+		            <b:Heading size="H3" text="Tracks"/>
+		        </b:PanelHeader>
+		        <b:PanelBody addStyleNames="margin-bottom-5-imp">
+		            <g:FlowPanel ui:field="tracksContainer"/>
+		        </b:PanelBody>
+		        <b:Button ui:field="addTrackButton" icon="PLUS" type="INFO">Add Track</b:Button>
+			</b:Panel>
 		</bh:Div>
 		<g:FlowPanel addStyleNames="help-panel">
 			<b:BlockQuote styleName="panel">

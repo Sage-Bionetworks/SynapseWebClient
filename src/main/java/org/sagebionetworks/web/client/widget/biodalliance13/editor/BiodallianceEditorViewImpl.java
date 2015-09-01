@@ -1,19 +1,14 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
-import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -21,35 +16,30 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	public interface BiodallianceEditorViewImplUiBinder extends UiBinder<Widget, BiodallianceEditorViewImpl> {}
 	private Presenter presenter;
 	@UiField
-	TextBox mp4Entity;
+	TextBox chrField;
 	@UiField
-	TextBox oggEntity;
+	TextBox viewStartField;
 	@UiField
-	TextBox webmEntity;
+	TextBox viewEndField;
 	@UiField
-	Button mp4Button;
+	FlowPanel tracksContainer;
 	@UiField
-	Button oggButton;
+	Button addTrackButton;
 	@UiField
-	Button webmButton;
+	Button humanButton;
 	@UiField
-	Anchor moreInfoLink;
-	
-	EntityFinder entityFinder;
+	Button mouseButton;
 	
 	Widget widget;
 	
+	
 	@Inject
-	public BiodallianceEditorViewImpl(BiodallianceEditorViewImplUiBinder binder, EntityFinder entityFinder) {
+	public BiodallianceEditorViewImpl(BiodallianceEditorViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
-		mp4Button.addClickHandler(getClickHandler(mp4Entity));
-		oggButton.addClickHandler(getClickHandler(oggEntity));
-		webmButton.addClickHandler(getClickHandler(webmEntity));
-		moreInfoLink.addClickHandler(new ClickHandler() {
+		addTrackButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(ClientProperties.VIDEO_HTML5_BROWSER_LINK, "", "");
+				presenter.addTrackClicked();
 			}
 		});
 	}
@@ -58,30 +48,17 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	public void initView() {
 	}
 
-	public ClickHandler getClickHandler(final TextBox textBox) {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(false, new SelectedHandler<Reference>() {					
-					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {					
-							textBox.setValue(selected.getTargetId());
-							entityFinder.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
-					}
-				});
-				entityFinder.show();
-			}
-		};
-	}
+	
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if ("".equals(mp4Entity.getValue()) && "".equals(oggEntity.getValue()) && "".equals(webmEntity.getValue()))
-			throw new IllegalArgumentException(DisplayConstants.ERROR_ENTER_AT_LEAST_ONE_VIDEO_FILE);
+		if ("".equals(chrField.getValue())){
+			throw new IllegalArgumentException("Missing chr");
+		} else if ("".equals(viewStartField.getValue())){
+			throw new IllegalArgumentException("Missing view start");
+		} else if ("".equals(viewEndField.getValue())){
+			throw new IllegalArgumentException("Missing view end");
+		}
 	}
 
 	@Override
@@ -108,12 +85,59 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 		DisplayUtils.showInfo(title, message);
 	}
 	
+	@Override
+	public void addTrack(Widget w) {
+		tracksContainer.add(w);
+	}
 	
 	@Override
 	public void clear() {
-		mp4Entity.setValue("");
-		oggEntity.setValue("");
-		webmEntity.setValue("");
+		tracksContainer.clear();
+		chrField.setValue("");
+		viewStartField.setValue("");
+		viewEndField.setValue("");
+	}
+
+	public String getChr() {
+		return chrField.getValue();
+	}
+
+	public void setChr(String chr) {
+		this.chrField.setValue(chr);
+	}
+
+	public String getViewStart() {
+		return viewStartField.getValue();
+	}
+
+	public void setViewStart(String viewStart) {
+		this.viewStartField.setValue(viewStart);
+	}
+
+	public String getViewEnd() {
+		return viewEndField.getValue();
+	}
+
+	public void setViewEnd(String viewEnd) {
+		this.viewEndField.setValue(viewEnd);
+	}
+	@Override
+	public boolean isHuman() {
+		return humanButton.isActive();
+	}
+	@Override
+	public void setHuman() {
+		humanButton.setActive(true);
+		mouseButton.setActive(false);
 	}
 	
+	@Override
+	public boolean isMouse() {
+		return mouseButton.isActive();
+	}
+	@Override
+	public void setMouse() {
+		humanButton.setActive(false);
+		mouseButton.setActive(true);
+	}
 }

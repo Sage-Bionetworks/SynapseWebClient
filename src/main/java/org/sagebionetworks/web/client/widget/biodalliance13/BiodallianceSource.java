@@ -3,8 +3,9 @@ package org.sagebionetworks.web.client.widget.biodalliance13;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
+import com.google.inject.Inject;
 
-public class BiodallianceSource {
+public class BiodallianceSource implements BiodallianceSourceView.Presenter{
 	String sourceName, sourceURI, entityId;
 	Long version;
 	public static final String DEFAULT_STYLE_TYPE = "default";
@@ -12,11 +13,12 @@ public class BiodallianceSource {
 	public static final String DEFAULT_STYLE_COLOR = "grey";
 	public static final Integer DEFAULT_HEIGHT = 30;
 	
-	String styleType = DEFAULT_STYLE_TYPE;
-	String styleGlyphType = DEFAULT_STYLE_GLYPH_TYPE;
-	String styleColor = DEFAULT_STYLE_COLOR;
-	int trackHeightPx = DEFAULT_HEIGHT;
+	String styleType, styleGlyphType, styleColor;
+	int trackHeightPx;
 
+	//view, may not be set if only using this class to pass data around
+	BiodallianceSourceView view;
+	
 	public enum SourceType {
 		BIGWIG, VCF
 	}
@@ -35,7 +37,28 @@ public class BiodallianceSource {
 	public static final String STYLE_HEIGHT = "height";
 	
 	public BiodallianceSource() {
+		view = null;
+		initDefaults();
 	}
+	
+	@Inject
+	public BiodallianceSource(BiodallianceSourceView view) {
+		this.view = view;
+		view.setPresenter(this);
+		initDefaults();
+	}
+	
+	public void initDefaults() {
+		styleType = DEFAULT_STYLE_TYPE;
+		styleGlyphType = DEFAULT_STYLE_GLYPH_TYPE;
+		styleColor = DEFAULT_STYLE_COLOR;
+		trackHeightPx = DEFAULT_HEIGHT;
+		if (view != null) {
+			view.setHeight(Integer.toString(DEFAULT_HEIGHT));
+			view.setColor(styleColor);
+		}
+	}
+	
 	
 	public BiodallianceSource(String json) {
 		JSONObject value = (JSONObject)JSONParser.parseStrict(json);
@@ -49,6 +72,7 @@ public class BiodallianceSource {
 		trackHeightPx = Integer.parseInt(value.get(STYLE_HEIGHT).isString().stringValue());
 		String sourceTypeString = value.get(SOURCE_TYPE).isString().stringValue();
 		configure(sourceName, entityId, version, SourceType.valueOf(sourceTypeString));
+		setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
 	}
 	
 	public JSONObject toJsonObject() {
@@ -72,6 +96,11 @@ public class BiodallianceSource {
 		
 		this.sourceURI = BiodallianceWidget.getFileResolverURL(entityId, versionString);
 		this.sourceType = sourceType;
+		
+		if (view != null) {
+			view.setSourceName(sourceName);
+			view.setEntity(entityId, version);
+		}
 	}
 	
 	public void setStyle(String styleType, String styleGlyphType, String styleColor, int trackHeightPx) {
@@ -79,6 +108,10 @@ public class BiodallianceSource {
 		this.styleGlyphType = styleGlyphType;
 		this.styleColor = styleColor;
 		this.trackHeightPx = trackHeightPx;
+		if (view != null) {
+			view.setColor(styleColor);
+			view.setHeight(Integer.toString(trackHeightPx));
+		}
 	}
 	
 	public String getSourceName() {

@@ -1,0 +1,44 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	@UiField
+	Input colorPicker;
+	@UiField
+	TextBox heightField;
+	@UiField
+	Button moveUpButton;
+	@UiField
+	Button moveDownButton;
+	@UiField
+	Button deleteButton;
+	<t:Table width="100%" height="30px">
+		<t:TableRow>
+			<t:TableData addStyleNames="maxWidth50px">
+		    	<b:TextBox ui:field="sourceNameTextbox" styleName="displayInline"/>
+			</t:TableData>
+			<t:TableData addStyleNames="maxWidth50px">
+		    	<b:TextBox ui:field="entityPickerTextbox" styleName="displayInline"/>
+			</t:TableData>
+			<t:TableData width="100px">
+				<b:Input ui:field="colorPicker" type="COLOR"/>
+			</t:TableData>
+			<t:TableData width="200px">
+				<b:TextBox ui:field="heightField"/>
+			</t:TableData>
+			<t:TableData width="50px" >
+				<b:Button ui:field="moveUpButton" text="up" />
+			</t:TableData>
+			<t:TableData width="50px" >
+				<b:Button ui:field="moveDownButton" text="down" />
+			</t:TableData>
+			<t:TableData width="50px" >
+				<b:Button ui:field="deleteButton" text="x" />
+			</t:TableData>
+		</t:TableRow>
+	</t:Table>
+</ui:UiBinder>
