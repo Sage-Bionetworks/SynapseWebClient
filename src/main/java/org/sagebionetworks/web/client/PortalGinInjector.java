@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
+import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -240,6 +241,7 @@ public interface PortalGinInjector extends Ginjector {
 	public TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
 	public ProjectBackgroundConfigEditor getProjectBackgroundConfigEditor();
 	public PreviewConfigEditor getPreviewConfigEditor();
+	public BiodallianceEditor getBiodallianceEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
