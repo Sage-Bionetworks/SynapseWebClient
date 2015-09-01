@@ -39,6 +39,7 @@ public class AclUtils {
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(accessList));
 		
 		accessList.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
+		accessList.add(ACCESS_TYPE.CHANGE_SETTINGS);
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, new TreeSet<ACCESS_TYPE>(accessList));
 		
 		//Administer an Evaluation (must clean up new access_types, does not modify existing permission levels)
