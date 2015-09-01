@@ -399,6 +399,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		projectActionMenuContainer.add(actionMenu.asWidget());
 	}
+	
+	@Override
+	public void configureFileActionMenu(EntityBundle bundle, String wikiPageId) {
+		fileActionMenuContainer.clear();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		fileActionMenuContainer.add(actionMenu.asWidget());
+	}
 
 	/*
 	 * Private Methods
