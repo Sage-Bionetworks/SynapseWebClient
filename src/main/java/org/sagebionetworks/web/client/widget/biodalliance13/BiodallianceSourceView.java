@@ -18,10 +18,10 @@ public interface BiodallianceSourceView extends IsWidget, WidgetEditorView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void entitySelected(Reference ref);
 	}
 	
-	Reference getEntity();
-	void setEntity(String entityId, Long version);
+	void setEntityFinderText(String text);
 
 	String getColor();
 	void setColor(String color);
@@ -31,5 +31,7 @@ public interface BiodallianceSourceView extends IsWidget, WidgetEditorView {
 	
 	String getSourceName();
 	void setSourceName(String sourceName);
+	
+	void hideEntityFinder();
 	
 }

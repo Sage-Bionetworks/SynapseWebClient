@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class BiodallianceEditor implements BiodallianceEditorView.Presenter, WidgetEditorPresenter {
@@ -28,6 +29,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	@Inject
 	public BiodallianceEditor(BiodallianceEditorView view, PortalGinInjector ginInjector) {
 		this.view = view;
+		view.setPresenter(this);
 		this.ginInjector = ginInjector;
 		sources = new ArrayList<BiodallianceSource>();
 		view.initView();

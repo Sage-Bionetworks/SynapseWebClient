@@ -36,8 +36,8 @@
 		        </b:PanelHeader>
 		        <b:PanelBody addStyleNames="margin-bottom-5-imp">
 		            <g:FlowPanel ui:field="tracksContainer"/>
+		            <b:Button ui:field="addTrackButton" icon="PLUS" type="INFO" addStyleNames="margin-10">Add Track</b:Button>
 		        </b:PanelBody>
-		        <b:Button ui:field="addTrackButton" icon="PLUS" type="INFO">Add Track</b:Button>
 			</b:Panel>
 		</bh:Div>
 		<bh:Text text="Powered by" /> <b:Anchor text="Biodalliance" href="http://www.biodalliance.org" target="_blank" addStyleNames="margin-left-5"/>

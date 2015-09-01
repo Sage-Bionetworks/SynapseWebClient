@@ -35,24 +35,23 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 	Button moveDownButton;
 	@UiField
 	Button deleteButton;
-	Reference currentlySelected;
 	Presenter presenter;
 	@Inject
 	public BiodallianceSourceViewImpl(BiodallianceSourceViewImplUiBinder binder, EntityFinder entityFinder) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
+		entityPickerTextbox.addClickHandler(getClickHandler(entityPickerTextbox));
 	}
 
 	public ClickHandler getClickHandler(final TextBox textBox) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(false, new SelectedHandler<Reference>() {					
+				entityFinder.configure(true, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						if(selected.getTargetId() != null) {
-							setEntity(selected.getTargetId(), selected.getTargetVersionNumber());
-							entityFinder.hide();
+							presenter.entitySelected(selected);
 						} else {
 							DisplayUtils.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
 						}
@@ -63,15 +62,13 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 		};
 	}
 
-	public Reference getEntity() {
-		return currentlySelected;
+	@Override
+	public void hideEntityFinder() {
+		entityFinder.hide();
 	}
-
-	public void setEntity(String entityId, Long version) {
-		currentlySelected = new Reference();
-		currentlySelected.setTargetId(entityId);
-		currentlySelected.setTargetVersionNumber(version);
-		this.entityPickerTextbox.setValue(entityId + "." + version);
+	
+	public void setEntityFinderText(String text) {
+		this.entityPickerTextbox.setValue(text);
 	}
 
 	public String getColor() {
@@ -113,9 +110,6 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (currentlySelected == null) {
-			throw new IllegalArgumentException("Must select a file for each source");
-		}
 	}
 
 	@Override
@@ -128,10 +122,10 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 
 	@Override
 	public void clear() {
-		currentlySelected = null;
 	}
 
 	@Override
 	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }
