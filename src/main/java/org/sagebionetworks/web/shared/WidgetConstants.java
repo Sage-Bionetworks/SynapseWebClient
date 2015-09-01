@@ -148,6 +148,7 @@ public class WidgetConstants {
 	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
 	
 	public static final String BIODALLIANCE13_CONTENT_TYPE = "biodalliance13";
+	public static final String BIODALLIANCE_FRIENDLY_NAME = "Genome Browser";
 	public static final String BIODALLIANCE_SPECIES_KEY = "species";
 	public static final String BIODALLIANCE_CHR_KEY = "chr";
 	public static final String BIODALLIANCE_VIEW_START_KEY = "viewStart";

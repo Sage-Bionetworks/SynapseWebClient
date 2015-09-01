@@ -10,10 +10,12 @@
 			<b:FieldSet>
 				<b:FormGroup>
 					<b:FormLabel>Species</b:FormLabel>
-					<b:ButtonGroup>
-						<b:Button ui:field="humanButton" text="Human"></b:Button>
-						<b:Button ui:field="mouseButton" text="Mouse"></b:Button>
-					</b:ButtonGroup>	
+					<bh:Div>
+						<b:ButtonGroup dataToggle="BUTTONS">
+							<b:RadioButton name="species" active="true" ui:field="humanButton">Human</b:RadioButton>
+							<b:RadioButton name="species" ui:field="mouseButton">Mouse</b:RadioButton>
+						</b:ButtonGroup>
+					</bh:Div>	
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel>chr</b:FormLabel>
@@ -38,10 +40,6 @@
 		        <b:Button ui:field="addTrackButton" icon="PLUS" type="INFO">Add Track</b:Button>
 			</b:Panel>
 		</bh:Div>
-		<g:FlowPanel addStyleNames="help-panel">
-			<b:BlockQuote styleName="panel">
-				<bh:Text text="Powered by " /> <b:Anchor text="Biodalliance" href="http://www.biodalliance.org" target="_blank"/>
-			</b:BlockQuote>
-		</g:FlowPanel>
+		<bh:Text text="Powered by" /> <b:Anchor text="Biodalliance" href="http://www.biodalliance.org" target="_blank" addStyleNames="margin-left-5"/>
 	</bh:Div>
 </ui:UiBinder>

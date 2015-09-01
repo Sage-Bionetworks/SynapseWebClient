@@ -6,16 +6,6 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	@UiField
-	Input colorPicker;
-	@UiField
-	TextBox heightField;
-	@UiField
-	Button moveUpButton;
-	@UiField
-	Button moveDownButton;
-	@UiField
-	Button deleteButton;
 	<t:Table width="100%" height="30px">
 		<t:TableRow>
 			<t:TableData addStyleNames="maxWidth50px">

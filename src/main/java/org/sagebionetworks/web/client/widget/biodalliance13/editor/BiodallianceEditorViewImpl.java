@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -26,9 +27,9 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	@UiField
 	Button addTrackButton;
 	@UiField
-	Button humanButton;
+	RadioButton humanButton;
 	@UiField
-	Button mouseButton;
+	RadioButton mouseButton;
 	
 	Widget widget;
 	
@@ -123,21 +124,21 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	}
 	@Override
 	public boolean isHuman() {
-		return humanButton.isActive();
+		return humanButton.getValue();
 	}
 	@Override
 	public void setHuman() {
-		humanButton.setActive(true);
-		mouseButton.setActive(false);
+		humanButton.setValue(true);
+		mouseButton.setValue(false);
 	}
 	
 	@Override
 	public boolean isMouse() {
-		return mouseButton.isActive();
+		return mouseButton.getValue();
 	}
 	@Override
 	public void setMouse() {
-		humanButton.setActive(false);
-		mouseButton.setActive(true);
+		humanButton.setValue(false);
+		mouseButton.setValue(true);
 	}
 }

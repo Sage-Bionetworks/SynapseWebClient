@@ -88,26 +88,26 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 //				};
 //			}
 //		});
-		String sourceName="A2_i14.mkdup.coordsort.bw";
-		String styleType = "default";
-		String styleGlyphType = "HISTOGRAM";
-		String styleColor = "grey";
-		int trackHeightPx = 120;
-		BiodallianceSource source = new BiodallianceSource();
-		source.configure(sourceName, "syn3928320", 1L, SourceType.BIGWIG);
-		source.setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
-		
-		HashMap<String, String> wikiDescriptor = new HashMap<String, String>();
-		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_SPECIES_KEY, "HUMAN");
-		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_CHR_KEY, "1");
-		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_VIEW_START_KEY, "3025001");
-		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_VIEW_END_KEY, "3525001");
-		String json = source.toJsonObject().toString();
-		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+"0", json);
-		
-		//test configure based on wiki descriptor
-		biodallianceWidget.configure(null, wikiDescriptor, null, null);
-		biodallianceView.add(biodallianceWidget.asWidget());
+//		String sourceName="A2_i14.mkdup.coordsort.bw";
+//		String styleType = "default";
+//		String styleGlyphType = "HISTOGRAM";
+//		String styleColor = "grey";
+//		int trackHeightPx = 120;
+//		BiodallianceSource source = new BiodallianceSource();
+//		source.configure(sourceName, "syn3928320", 1L, SourceType.BIGWIG);
+//		source.setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
+//		
+//		HashMap<String, String> wikiDescriptor = new HashMap<String, String>();
+//		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_SPECIES_KEY, "HUMAN");
+//		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_CHR_KEY, "1");
+//		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_VIEW_START_KEY, "3025001");
+//		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_VIEW_END_KEY, "3525001");
+//		String json = source.toJsonObject().toString();
+//		wikiDescriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+"0", json);
+//		
+//		//test configure based on wiki descriptor
+//		biodallianceWidget.configure(null, wikiDescriptor, null, null);
+//		biodallianceView.add(biodallianceWidget.asWidget());
 	}
 	
 	@Override

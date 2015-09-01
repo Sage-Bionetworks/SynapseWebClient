@@ -114,7 +114,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		configure(species, chr, viewStart, viewEnd, sources);
 	}
 	
-	public List<BiodallianceSource> getSources(Map<String, String> descriptor) {
+	public static List<BiodallianceSource> getSources(Map<String, String> descriptor) {
 		//reconstruct biodalliance sources (if there are any)
 		List<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
 		int i = 0;
@@ -300,7 +300,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	private void addVCFSource(
 			JavaScriptObject biodallianceBrowserConfig,
 			BiodallianceSource source) {
-		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
+		addVCFSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
 	}
 	
 	private native void addVCFSource(

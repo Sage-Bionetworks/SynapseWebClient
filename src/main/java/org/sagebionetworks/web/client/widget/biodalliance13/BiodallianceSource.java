@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.biodalliance13;
 
+import org.sagebionetworks.repo.model.Reference;
+
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BiodallianceSource implements BiodallianceSourceView.Presenter{
+public class BiodallianceSource implements BiodallianceSourceView.Presenter, IsWidget{
 	String sourceName, sourceURI, entityId;
 	Long version;
 	public static final String DEFAULT_STYLE_TYPE = "default";
@@ -35,11 +39,6 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter{
 	public static final String STYLE_GLYPH_TYPE_KEY = "styleGlyphType";
 	public static final String STYLE_COLOR_KEY = "color";
 	public static final String STYLE_HEIGHT = "height";
-	
-	public BiodallianceSource() {
-		view = null;
-		initDefaults();
-	}
 	
 	@Inject
 	public BiodallianceSource(BiodallianceSourceView view) {
@@ -76,6 +75,7 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter{
 	}
 	
 	public JSONObject toJsonObject() {
+		updateFromView();
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put(SOURCE_NAME_KEY, new JSONString(sourceName));
 		jsonObject.put(SOURCE_ENTITY_ID_KEY, new JSONString(entityId));
@@ -86,6 +86,19 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter{
 		jsonObject.put(SOURCE_TYPE, new JSONString(sourceType.name()));
 		jsonObject.put(STYLE_HEIGHT, new JSONString(Integer.toString(trackHeightPx)));
 		return jsonObject;
+	}
+	
+	private void updateFromView() {
+		if (view != null) {
+			sourceName = view.getSourceName();
+			styleColor = view.getColor();
+			trackHeightPx = Integer.parseInt(view.getHeight());
+			Reference ref = view.getEntity();
+			if (ref != null) {
+				entityId = ref.getTargetId();
+				version = ref.getTargetVersionNumber();
+			}
+		}
 	}
 	
 	public void configure(String sourceName, String entityId, Long version, SourceType sourceType) {
@@ -137,5 +150,12 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter{
 		return sourceType;
 	}
 	
+	@Override
+	public Widget asWidget() {
+		if (view != null) {
+			return view.asWidget();
+		}
+		return null;
+	}
 	
 }
