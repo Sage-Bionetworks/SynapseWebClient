@@ -82,4 +82,6 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 	public void setFileHistoryVisible(boolean b);
 
+	void configureFileActionMenu(EntityBundle bundle, String wikiPageId);
+
 }
