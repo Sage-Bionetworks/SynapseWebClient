@@ -128,6 +128,7 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
+		set.add(ACCESS_TYPE.CHANGE_SETTINGS);
 		return set;
 	}
 	
@@ -143,9 +144,9 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.DELETE_SUBMISSION);
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
+		set.add(ACCESS_TYPE.CHANGE_SETTINGS);
 		return set;
 	}
-
 	
 	private Set<ACCESS_TYPE> getOwnerAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
@@ -155,6 +156,7 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
 		set.add(ACCESS_TYPE.DOWNLOAD);
+		set.add(ACCESS_TYPE.CHANGE_SETTINGS);
 		return set;
 	}
 
