@@ -181,7 +181,7 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter, IsW
 	
 	public void assertIndexFile(String fileName) throws IllegalArgumentException {
 		if (!(fileName.toLowerCase().endsWith(".tbi"))) {
-			throw new IllegalArgumentException("Invalid vcf tbi index file: " + fileName);
+			throw new IllegalArgumentException("Unrecognized index file: " + fileName);
 		}
 	}
 	

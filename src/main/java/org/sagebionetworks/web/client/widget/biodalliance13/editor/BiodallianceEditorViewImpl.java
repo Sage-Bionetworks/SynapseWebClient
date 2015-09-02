@@ -128,8 +128,9 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	}
 	@Override
 	public void setHuman() {
-		humanButton.setValue(true);
-		mouseButton.setValue(false);
+		humanButton.setActive(true);
+		humanButton.setValue(true, true);
+		mouseButton.setActive(false);
 	}
 	
 	@Override
@@ -138,7 +139,8 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	}
 	@Override
 	public void setMouse() {
-		humanButton.setValue(false);
-		mouseButton.setValue(true);
+		mouseButton.setActive(true);
+		mouseButton.setValue(true, true);
+		humanButton.setActive(false);
 	}
 }
