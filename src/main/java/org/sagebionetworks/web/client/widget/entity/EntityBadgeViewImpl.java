@@ -47,12 +47,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	FocusPanel iconContainer;
 	@UiField
 	Icon icon;
-	
 	@UiField
 	FlowPanel entityContainer;
 	@UiField
 	TextBox idField;
-	
 	@UiField
 	SimplePanel modifiedByField;
 	@UiField
@@ -227,6 +225,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public void setModifiedByWidgetVisible(boolean visible) {
 		modifiedByWidget.setVisible(visible);
+	}
+
+
+	@Override
+	public String getFriendlySize(Long contentSize, boolean abbreviatedUnits) {
+		return DisplayUtils.getFriendlySize(contentSize, abbreviatedUnits);
 	}
 	
 	/*

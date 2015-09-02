@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -29,12 +27,10 @@ import com.google.inject.Inject;
 
 public class TeamPresenter extends AbstractActivity implements TeamView.Presenter, Presenter<org.sagebionetworks.web.client.place.Team> {
 		
-	private org.sagebionetworks.web.client.place.Team place;
 	private TeamView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private Team team;
 	private SynapseAlert synAlert;
 	private TeamLeaveModalWidget leaveTeamWidget;
@@ -51,7 +47,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter,
 			SynapseAlert synAlert, TeamLeaveModalWidget leaveTeamWidget,
 			TeamDeleteModalWidget deleteTeamWidget,
 			TeamEditModalWidget editTeamWidget, InviteWidget inviteWidget,
@@ -63,7 +58,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
 		this.leaveTeamWidget = leaveTeamWidget;
 		this.deleteTeamWidget = deleteTeamWidget;
@@ -103,7 +97,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 
 	@Override
 	public void setPlace(org.sagebionetworks.web.client.place.Team place) {
-		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
 		clear();

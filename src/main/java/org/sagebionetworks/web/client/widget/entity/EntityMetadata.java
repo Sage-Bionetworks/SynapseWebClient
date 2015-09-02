@@ -54,10 +54,8 @@ public class EntityMetadata implements Presenter {
 			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
 			fileHistoryWidget.setEntityUpdatedHandler(entityUpdatedHandler);
 			view.setFileHistoryWidget(fileHistoryWidget);
-			view.setFileHistoryVisible(versionNumber != null);
 			view.setRestrictionPanelVisible(true);
 		} else {
-			view.setFileHistoryVisible(false);
 			view.setRestrictionPanelVisible(en instanceof TableEntity
 					|| en instanceof Folder);
 		}

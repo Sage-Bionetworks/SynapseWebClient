@@ -64,7 +64,6 @@ public class EntityMetadataTest {
 		Long versionNumber = -122L;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
-		verify(mockView).setFileHistoryVisible(false);
 		verify(mockView).setRestrictionPanelVisible(false);
 		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
@@ -88,7 +87,6 @@ public class EntityMetadataTest {
 		Long versionNumber = null;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
-		verify(mockView).setFileHistoryVisible(false);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
@@ -115,7 +113,6 @@ public class EntityMetadataTest {
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
-		verify(mockView).setFileHistoryVisible(true);
 		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),

@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import java.util.Date;
-
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
@@ -12,7 +8,6 @@ import org.sagebionetworks.web.client.widget.modal.Dialog.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 /**

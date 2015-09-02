@@ -268,6 +268,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
+import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -815,6 +817,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// FileBox
 		bind(FileTitleBarViewImpl.class).in(Singleton.class);
 		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class);
+		bind(BasicTitleBarView.class).to(BasicTitleBarViewImpl.class);
 				
 		// Search Box
 		bind(SearchBoxViewImpl.class).in(Singleton.class);

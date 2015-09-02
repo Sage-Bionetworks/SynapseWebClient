@@ -1,17 +1,21 @@
 package org.sagebionetworks.web.client.widget.modal;
 
+import java.util.Iterator;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
 /**
  * Lightweight Bootstrap modal dialog, uses gwtbootstrap3.
@@ -21,8 +25,11 @@ import com.google.inject.Inject;
  * @author jhodgson
  * 
  */
-public class Dialog extends Composite {
+public class Dialog extends UIObject implements IsWidget, HasWidgets {
+	
 	public interface DialogUiBinder extends UiBinder<Widget, Dialog> {}
+	
+	private DialogUiBinder uiBinder;
 	
 	private Callback callback;
 
@@ -32,18 +39,18 @@ public class Dialog extends Composite {
 	Button primaryButton;
 	@UiField
 	Button defaultButton;
-	
-	boolean autoHide;
-	
 	@UiField
 	Modal modal;
+	
+	boolean autoHide;
+	Widget widget;
 
 	/**
 	 * Create a new Modal dialog.
 	 */
-	@Inject
-	public Dialog(DialogUiBinder binder) {		
-		initWidget(binder.createAndBindUi(this));
+	public Dialog() {
+		uiBinder = GWT.create(DialogUiBinder.class);
+		widget = uiBinder.createAndBindUi(this);
 		primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -77,19 +84,29 @@ public class Dialog extends Composite {
 	 * @param autoHide if true, will hide the dialog on primary or default button click.
 	 */
 	public void configure(String title, Widget body, String primaryButtonText, String defaultButtonText, Callback callback, boolean autoHide) {
-		this.autoHide = autoHide;
+		configure(title, primaryButtonText, defaultButtonText, callback, autoHide);
 		mainContent.clear();
+		mainContent.add(body);
+	}
+	
+	/**
+	 * @param title The text shown in the title bar.
+	 * @param primaryButtonText The text for the primary button (i.e "Save").  The primary button is highlighted.
+	 * @param defaultButtonText The text for the default button (i.e "Cancel").  The default button will not be highlighted.  If null, will hide default button.
+	 * @param callback
+	 * @param autoHide if true, will hide the dialog on primary or default button click.
+	 */
+	public void configure(String title, String primaryButtonText, String defaultButtonText, Callback callback, boolean autoHide) {
+		this.autoHide = autoHide;
 		this.callback = callback;
 		boolean isPrimaryButtonVisible = primaryButtonText != null;
 		primaryButton.setVisible(isPrimaryButtonVisible);
 		if (isPrimaryButtonVisible)
 			primaryButton.setText(primaryButtonText);
-		
 		boolean isDefaultButtonVisible = defaultButtonText != null;
 		defaultButton.setVisible(isDefaultButtonVisible);
 		if (isDefaultButtonVisible)
 			defaultButton.setText(defaultButtonText);
-		mainContent.add(body);
 		modal.setTitle(title);
 		modal.setHideOtherModals(false);
 	}
@@ -126,5 +143,33 @@ public class Dialog extends Composite {
 	
 	public void addStyleName(String style) {
 		modal.addStyleName(style);
+	}
+	
+	public Widget asWidget() {
+		return widget;
+	}
+
+	public boolean isVisible() {
+		return widget.isVisible();
+	}
+
+	@Override
+	public void add(Widget w) {
+		mainContent.add(w);
+	}
+
+	@Override
+	public void clear() {
+		mainContent.clear();
+	}
+
+	@Override
+	public Iterator<Widget> iterator() {
+		return mainContent.iterator();
+	}
+
+	@Override
+	public boolean remove(Widget w) {
+		return mainContent.remove(w);
 	}
 }

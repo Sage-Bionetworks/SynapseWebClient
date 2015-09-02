@@ -6,10 +6,15 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -24,6 +29,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -106,11 +112,14 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		synapseClient.getEntityInfo(entityId, new AsyncCallback<EntityBundlePlus>() {
 			@Override
 			public void onSuccess(EntityBundlePlus result) {
-				Entity entity = result.getEntityBundle().getEntity();
-				Annotations annotations = result.getEntityBundle().getAnnotations();
-				String rootWikiId = result.getEntityBundle().getRootWikiId();
+				EntityBundle eb = result.getEntityBundle();
+				Entity entity = eb.getEntity();
+				Annotations annotations = eb.getAnnotations();
+				String rootWikiId = eb.getRootWikiId();
+				List<FileHandle> handles = eb.getFileHandles();
 				KeyValueDisplay<String> keyValueDisplay = ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(result.getProfile()), false);
 				addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiId);
+				addContentSize(keyValueDisplay, handles);
 				callback.onSuccess(keyValueDisplay);		
 			}
 			@Override
@@ -118,6 +127,22 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				callback.onFailure(caught);
 			}
 		});
+	}
+	
+	public void addContentSize(KeyValueDisplay<String> keyValueDisplay, List<FileHandle> handles) {
+		Map<String,String> map = keyValueDisplay.getMap();
+		List<String> order = keyValueDisplay.getKeyDisplayOrder();
+		if (handles != null) {
+			for (FileHandle handle: handles) {
+				if (!(handle instanceof PreviewFileHandle)) {
+					Long contentSize = handle.getContentSize();
+					if (contentSize != null && contentSize > 0) {
+						order.add("File Size");
+						map.put("File Size", view.getFriendlySize(contentSize, true));
+					}
+				}
+			}
+		}
 	}
 	
 	/**

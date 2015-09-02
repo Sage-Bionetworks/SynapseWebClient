@@ -61,8 +61,6 @@ public class WikiPageWidgetTest {
 	WikiPageWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
 	WikiPageWidget presenter;
-	GlobalApplicationState mockGlobalApplicationState;
-	AuthenticationController mockAuthenticationController;
 	SynapseAlert mockSynapseAlert;
 	WikiHistoryWidget mockHistoryWidget;
 	MarkdownWidget mockMarkdownWidget;
@@ -80,8 +78,6 @@ public class WikiPageWidgetTest {
 	public void before() throws Exception{
 		mockView = mock(WikiPageWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseAlert = mock(SynapseAlert.class);
 		mockHistoryWidget = mock(WikiHistoryWidget.class);
 		mockBreadcrumb = mock(Breadcrumb.class);
@@ -90,10 +86,10 @@ public class WikiPageWidgetTest {
 		mockInjector = mock(PortalGinInjector.class);
 		mockUserBadge = mock(UserBadge.class);
 		mockCallbackP = mock(CallbackP.class);
-
+		
 		when(mockInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
-		presenter = new WikiPageWidget(mockView, mockSynapseClient,	mockGlobalApplicationState, mockAuthenticationController,
-				mockSynapseAlert, mockHistoryWidget, mockMarkdownWidget, mockBreadcrumb, mockSubpages, mockInjector);
+		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockSynapseAlert, mockHistoryWidget, mockMarkdownWidget,
+				mockBreadcrumb, mockSubpages, mockInjector);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
 		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
@@ -227,6 +223,18 @@ public class WikiPageWidgetTest {
 	public void testShowWikiHistory(){
 		presenter.showWikiHistory(false);
 		verify(mockView).setWikiHistoryVisible(false);
+	}
+	
+	@Test
+	public void testClear() {
+		presenter.clear();
+		verify(mockView).clear();
+		verify(mockView).setLoadingVisible(false);
+		verify(mockMarkdownWidget).clear();
+		verify(mockBreadcrumb).clear();
+		verify(mockSubpages).clearState();
+		verify(mockView).setCreatedModifiedVisible(false);
+		verify(mockView).setWikiHeadingText("");
 	}
 
 	@Test

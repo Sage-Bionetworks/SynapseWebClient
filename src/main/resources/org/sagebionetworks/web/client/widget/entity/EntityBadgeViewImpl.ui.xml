@@ -18,7 +18,7 @@
 		    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
 				</b:Tooltip>
 			</t:TableData>
-			<t:TableData width="350px" addStyleNames="visible-lg">
+			<t:TableData width="275px" addStyleNames="visible-lg">
 				<g:SimplePanel ui:field="modifiedByField"/>
 			</t:TableData>
 			<t:TableData width="165px" addStyleNames="visible-sm visible-md visible-lg">
