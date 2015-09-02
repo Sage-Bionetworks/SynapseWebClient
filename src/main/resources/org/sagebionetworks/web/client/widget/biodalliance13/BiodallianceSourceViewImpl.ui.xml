@@ -14,7 +14,7 @@
 			<t:TableData addStyleNames="maxWidth50px">
 		    	<b:TextBox ui:field="entityPickerTextbox" styleName="displayInline"/>
 			</t:TableData>
-			<t:TableData width="100px">
+			<t:TableData width="50px">
 				<b:Input ui:field="colorPicker" type="COLOR"/>
 			</t:TableData>
 			<t:TableData width="200px">

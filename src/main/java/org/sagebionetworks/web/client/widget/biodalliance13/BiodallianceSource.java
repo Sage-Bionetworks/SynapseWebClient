@@ -41,10 +41,10 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter, IsW
 	/**
 	 * json keys
 	 */
-	public static final String SOURCE_NAME_KEY = "sourceName";
-	public static final String SOURCE_TYPE = "sourceType";
-	public static final String SOURCE_ENTITY_ID_KEY = "sourceEntityId";
-	public static final String SOURCE_ENTITY_VERSION_KEY = "sourceEntityVersion";
+	public static final String SOURCE_NAME_KEY = "name";
+	public static final String SOURCE_TYPE = "type";
+	public static final String SOURCE_ENTITY_ID_KEY = "entityId";
+	public static final String SOURCE_ENTITY_VERSION_KEY = "entityVersion";
 	public static final String STYLE_TYPE_KEY = "styleType";
 	public static final String STYLE_GLYPH_TYPE_KEY = "styleGlyphType";
 	public static final String STYLE_COLOR_KEY = "color";
