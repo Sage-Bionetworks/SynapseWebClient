@@ -956,7 +956,7 @@ a.shortBtn {
 
 .markdown {
 	word-wrap:break-word;
-	overflow: scroll;
+	overflow: auto;
 	text-align: justify;
 }
 
