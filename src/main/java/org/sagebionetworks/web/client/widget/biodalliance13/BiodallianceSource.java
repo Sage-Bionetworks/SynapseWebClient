@@ -69,22 +69,7 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter, IsW
 		}
 	}
 	
-	public BiodallianceSource(String json) {
-		JSONObject value = (JSONObject)JSONParser.parseStrict(json);
-		sourceName = value.get(SOURCE_NAME_KEY).isString().stringValue();
-		entityId = value.get(SOURCE_ENTITY_ID_KEY).isString().stringValue();
-		version = null;
-		if (value.containsKey(SOURCE_ENTITY_VERSION_KEY)) {
-			String versionString = value.get(SOURCE_ENTITY_VERSION_KEY).isString().stringValue();
-			version = Long.parseLong(versionString);
-		}
-		styleType = value.get(STYLE_TYPE_KEY).isString().stringValue();
-		styleGlyphType = value.get(STYLE_GLYPH_TYPE_KEY).isString().stringValue();
-		styleColor = value.get(STYLE_COLOR_KEY).isString().stringValue();
-		trackHeightPx = Integer.parseInt(value.get(STYLE_HEIGHT).isString().stringValue());
-		String sourceTypeString = value.get(SOURCE_TYPE).isString().stringValue();
-		configure(sourceName, entityId, version, SourceType.valueOf(sourceTypeString));
-		setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
+	public BiodallianceSource() {
 	}
 	
 	public JSONObject toJsonObject() {
@@ -130,7 +115,7 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter, IsW
 				}
 				sourceType = getSourceType(fileHandle.getFileName());
 				if (sourceType == null) {
-					onFailure(new IllegalArgumentException("Could not determine the source file type from the file name: " + fileHandle.getFileName()));
+					onFailure(new IllegalArgumentException("Could not determine a valid source file type from the file name: " + fileHandle.getFileName()));
 					return;
 				}
 				entityId = bundle.getEntity().getId();
@@ -181,6 +166,24 @@ public class BiodallianceSource implements BiodallianceSourceView.Presenter, IsW
 			trackHeightPx = Integer.parseInt(view.getHeight());
 			//entity id and version are pushed back from the view (on selection), so we don't need to update here
 		}
+	}
+	
+	public void configure(String fromJson) {
+		JSONObject value = (JSONObject)JSONParser.parseStrict(fromJson);
+		sourceName = value.get(SOURCE_NAME_KEY).isString().stringValue();
+		entityId = value.get(SOURCE_ENTITY_ID_KEY).isString().stringValue();
+		version = null;
+		if (value.containsKey(SOURCE_ENTITY_VERSION_KEY)) {
+			String versionString = value.get(SOURCE_ENTITY_VERSION_KEY).isString().stringValue();
+			version = Long.parseLong(versionString);
+		}
+		styleType = value.get(STYLE_TYPE_KEY).isString().stringValue();
+		styleGlyphType = value.get(STYLE_GLYPH_TYPE_KEY).isString().stringValue();
+		styleColor = value.get(STYLE_COLOR_KEY).isString().stringValue();
+		trackHeightPx = Integer.parseInt(value.get(STYLE_HEIGHT).isString().stringValue());
+		String sourceTypeString = value.get(SOURCE_TYPE).isString().stringValue();
+		configure(sourceName, entityId, version, SourceType.valueOf(sourceTypeString));
+		setStyle(styleType, styleGlyphType, styleColor, trackHeightPx);
 	}
 	
 	public void configure(String sourceName, String entityId, Long version, SourceType sourceType) {

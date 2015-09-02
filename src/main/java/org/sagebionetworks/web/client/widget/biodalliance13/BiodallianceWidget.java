@@ -114,13 +114,15 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		configure(species, chr, viewStart, viewEnd, sources);
 	}
 	
-	public static List<BiodallianceSource> getSources(Map<String, String> descriptor) {
+	public List<BiodallianceSource> getSources(Map<String, String> descriptor) {
 		//reconstruct biodalliance sources (if there are any)
 		List<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
 		int i = 0;
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
-			sources.add(new BiodallianceSource(sourceJsonString));
+			BiodallianceSource newSource = new BiodallianceSource();
+			newSource.configure(sourceJsonString);
+			sources.add(newSource);
 			i++;
 		}
 		return sources;

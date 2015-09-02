@@ -1,23 +1,18 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.Input;
-import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource;
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSourceViewImpl;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class BiodallianceEditor implements BiodallianceEditorView.Presenter, WidgetEditorPresenter {
@@ -61,7 +56,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		sources = new ArrayList<BiodallianceSource>();
 		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 0)){
 			//discover all sources
-			sources.addAll(BiodallianceWidget.getSources(descriptor));
+			sources.addAll(getSources(descriptor));
 		}
 		
 		view.setChr(chr);
@@ -76,6 +71,20 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		for (BiodallianceSource source : sources) {
 			view.addTrack(source.asWidget());
 		}
+	}
+	
+	public List<BiodallianceSource> getSources(Map<String, String> descriptor) {
+		//reconstruct biodalliance sources (if there are any)
+		List<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
+		int i = 0;
+		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
+			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
+			BiodallianceSource newSource = ginInjector.getBiodallianceSource();
+			newSource.configure(sourceJsonString);
+			sources.add(newSource);
+			i++;
+		}
+		return sources;
 	}
 	
 	@Override
