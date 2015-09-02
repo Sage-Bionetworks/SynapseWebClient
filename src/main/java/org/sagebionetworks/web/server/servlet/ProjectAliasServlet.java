@@ -124,7 +124,11 @@ public class ProjectAliasServlet extends HttpServlet {
 				EntityQueryResult result = results.getEntities().get(0);
 				newPath = "/#!Synapse:" + result.getId();
 			} else {
-				throw new SynapseNotFoundException("The requested URL " + requestURL.getPath() + " was not found on this server.");
+				String error = "The requested URL " + requestURL.getPath() + " was not found on this server.";
+				if (token == null) {
+					error += " \nPlease log in and try again.";
+				}
+				throw new SynapseNotFoundException(error);
 			}
 			URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), newPath);
 			response.sendRedirect(response.encodeRedirectURL(redirectURL.toString()));
