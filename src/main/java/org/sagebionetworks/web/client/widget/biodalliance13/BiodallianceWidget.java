@@ -121,7 +121,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
 			BiodallianceSource newSource = new BiodallianceSource();
-			newSource.configure(sourceJsonString);
+			newSource.initializeFromJson(sourceJsonString);
 			sources.add(newSource);
 			i++;
 		}
@@ -302,13 +302,14 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	private void addVCFSource(
 			JavaScriptObject biodallianceBrowserConfig,
 			BiodallianceSource source) {
-		addVCFSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
+		addVCFSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getSourceIndexURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
 	}
 	
 	private native void addVCFSource(
 			JavaScriptObject biodallianceBrowserConfig,
 			String sourceName,
 			String sourceURI,
+			String sourceIndexURI,
 			String styleType, 
 			String styleGlyphType,
 			String styleColor,
@@ -327,6 +328,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	    	name: sourceName,
 			collapseSuperGroups:true,
 			uri: sourceURI,
+			indexURI: sourceIndexURI,
 			payload: 'vcf',
 			tier_type: 'tabix',
 			style: [{type : styleType,

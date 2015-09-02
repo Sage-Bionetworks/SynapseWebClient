@@ -80,7 +80,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
 			BiodallianceSource newSource = ginInjector.getBiodallianceSource();
-			newSource.configure(sourceJsonString);
+			newSource.initializeFromJson(sourceJsonString);
 			sources.add(newSource);
 			i++;
 		}

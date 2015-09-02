@@ -26,6 +26,8 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 	@UiField
 	TextBox entityPickerTextbox;
 	@UiField
+	TextBox indexEntityPickerTextbox;
+	@UiField
 	Input colorPicker;
 	@UiField
 	TextBox heightField;
@@ -40,10 +42,11 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 	public BiodallianceSourceViewImpl(BiodallianceSourceViewImplUiBinder binder, EntityFinder entityFinder) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
-		entityPickerTextbox.addClickHandler(getClickHandler(entityPickerTextbox));
+		entityPickerTextbox.addClickHandler(getEntityPickerClickHandler());
+		indexEntityPickerTextbox.addClickHandler(getIndexEntityPickerClickHandler());
 	}
 
-	public ClickHandler getClickHandler(final TextBox textBox) {
+	public ClickHandler getEntityPickerClickHandler() {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
@@ -61,6 +64,25 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 			}
 		};
 	}
+	
+	public ClickHandler getIndexEntityPickerClickHandler() {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent arg0) {
+				entityFinder.configure(true, new SelectedHandler<Reference>() {					
+					@Override
+					public void onSelected(Reference selected) {
+						if(selected.getTargetId() != null) {
+							presenter.indexEntitySelected(selected);
+						} else {
+							DisplayUtils.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+						}
+					}
+				});
+				entityFinder.show();
+			}
+		};
+	}
 
 	@Override
 	public void hideEntityFinder() {
@@ -69,6 +91,11 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 	
 	public void setEntityFinderText(String text) {
 		this.entityPickerTextbox.setValue(text);
+	}
+	
+	@Override
+	public void setIndexEntityFinderText(String text) {
+		this.indexEntityPickerTextbox.setValue(text);
 	}
 
 	public String getColor() {
