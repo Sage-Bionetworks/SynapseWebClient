@@ -791,4 +791,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			controller.onFileHistoryToggled(isVisible);
 		}
 	}
+
+	@Override
+	public void configureFileActionMenu(EntityBundle bundle, String wikiPageId) {
+		fileActionMenuContainer.clear();
+		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
+		fileActionMenuContainer.add(actionMenu.asWidget());
+	}
 }
