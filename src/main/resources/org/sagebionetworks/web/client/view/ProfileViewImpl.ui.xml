@@ -13,19 +13,21 @@
 		<div class="separator margin-top-10-imp"></div>
 		<g:HTMLPanel>
 			<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true">
-				<t:Table>
-					<t:TableRow>
-						<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
-							<g:Image addStyleNames="displayInline margin-right-10" height="64px" width="50px" resource='{sageImageBundle.certificate}'/>
-						</t:TableData>
-						<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
-						    <b:Anchor addStyleNames="boldText" href="#!Quiz:Certification" text="Get Certified!"></b:Anchor>
-							<bh:Paragraph text="There are times where human data can only be shared with certain restrictions. 
-									Learn what the rules are and how to apply and comply with data privacy levels. 
-									This topic is covered during certification."/>
-						</t:TableData>
-					</t:TableRow>
-				</t:Table>
+				<g:FocusPanel ui:field="alertFocusPanel" addStyleNames="imageButton">
+					<t:Table>
+						<t:TableRow>
+							<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+								<g:Image addStyleNames="displayInline margin-right-10" height="64px" width="50px" resource='{sageImageBundle.certificate}'/>
+							</t:TableData>
+							<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+							    <b:Heading size="H5" addStyleNames="boldText color-white" text="Get Certified!" />
+								<bh:Paragraph text="There are times where human data can only be shared with certain restrictions. 
+										Learn what the rules are and how to apply and comply with data privacy levels. 
+										This topic is covered during certification."/>
+							</t:TableData>
+						</t:TableRow>
+					</t:Table>
+				</g:FocusPanel>
 			</b:Alert>
 			
 			<div class="margin-10">
