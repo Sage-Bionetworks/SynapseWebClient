@@ -3,11 +3,9 @@ package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,13 +18,16 @@ import com.google.inject.Inject;
 public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceSourceEditorView {
 	public interface BiodallianceSourceViewImplUiBinder extends UiBinder<Widget, BiodallianceSourceEditorViewImpl> {}
 	Widget widget;
-	EntityFinder entityFinder;
 	@UiField
 	TextBox sourceNameTextbox;
 	@UiField
 	TextBox entityPickerTextbox;
 	@UiField
+	Button entityPickerButton;
+	@UiField
 	TextBox indexEntityPickerTextbox;
+	@UiField
+	Button indexEntityPickerButton;
 	@UiField
 	Input colorPicker;
 	@UiField
@@ -37,56 +38,52 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	Button moveDownButton;
 	@UiField
 	Button deleteButton;
+	@UiField
+	Div entityFinderContainer;
+	@UiField
+	Div indexEntityFinderContainer;
+
 	Presenter presenter;
 	@Inject
-	public BiodallianceSourceEditorViewImpl(BiodallianceSourceViewImplUiBinder binder, EntityFinder entityFinder) {
+	public BiodallianceSourceEditorViewImpl(BiodallianceSourceViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		this.entityFinder = entityFinder;
-		entityPickerTextbox.addClickHandler(getEntityPickerClickHandler());
-		indexEntityPickerTextbox.addClickHandler(getIndexEntityPickerClickHandler());
+		ClickHandler entityPickerClickHandler = getEntityPickerClickHandler();
+		ClickHandler indexEntityPickerClickHandler = getIndexEntityPickerClickHandler();
+		entityPickerTextbox.addClickHandler(entityPickerClickHandler);
+		entityPickerButton.addClickHandler(entityPickerClickHandler);
+		indexEntityPickerTextbox.addClickHandler(indexEntityPickerClickHandler);
+		indexEntityPickerButton.addClickHandler(indexEntityPickerClickHandler);
 	}
 
 	public ClickHandler getEntityPickerClickHandler() {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(true, new SelectedHandler<Reference>() {					
-					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							presenter.entitySelected(selected);
-						} else {
-							DisplayUtils.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
-					}
-				});
-				entityFinder.show();
+				entityPickerTextbox.selectAll();
+				presenter.entityPickerClicked();
 			}
 		};
+	}
+	@Override
+	public void setEntityFinder(Widget widget) {
+		entityFinderContainer.clear();
+		entityFinderContainer.add(widget);
+	}
+	
+	@Override
+	public void setIndexEntityFinder(Widget widget) {
+		indexEntityFinderContainer.clear();
+		indexEntityFinderContainer.add(widget);
 	}
 	
 	public ClickHandler getIndexEntityPickerClickHandler() {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
-				entityFinder.configure(true, new SelectedHandler<Reference>() {					
-					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							presenter.indexEntitySelected(selected);
-						} else {
-							DisplayUtils.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
-					}
-				});
-				entityFinder.show();
+				indexEntityPickerTextbox.selectAll();
+				presenter.indexEntityPickerClicked();
 			}
 		};
-	}
-
-	@Override
-	public void hideEntityFinder() {
-		entityFinder.hide();
 	}
 	
 	public void setEntityFinderText(String text) {

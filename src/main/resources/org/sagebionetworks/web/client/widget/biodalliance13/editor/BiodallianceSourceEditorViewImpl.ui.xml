@@ -8,29 +8,41 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<t:Table width="100%" height="30px">
 		<t:TableRow>
-			<t:TableData width="100px">
-		    	<b:TextBox ui:field="sourceNameTextbox" styleName="displayInline"/>
+			<t:TableData paddingRight="5" addStyleNames="hidden-xs">
+		    	<b:TextBox ui:field="sourceNameTextbox" />
 			</t:TableData>
-			<t:TableData width="100px">
-		    	<b:TextBox ui:field="entityPickerTextbox" styleName="displayInline"/>
+			<t:TableData width="180px" paddingRight="5">
+				<b:InputGroup>
+				  <b:TextBox ui:field="entityPickerTextbox"/>
+				  <b:InputGroupButton>
+				    <b:Button ui:field="entityPickerButton" icon="SEARCH" text="" height="30px"/>
+				  </b:InputGroupButton>
+				</b:InputGroup>
+		    	<bh:Div ui:field="entityFinderContainer" />
 			</t:TableData>
-			<t:TableData width="100px">
-		    	<b:TextBox ui:field="indexEntityPickerTextbox" styleName="displayInline"/>
+			<t:TableData width="180px" paddingRight="5">
+				<b:InputGroup>
+				  <b:TextBox ui:field="indexEntityPickerTextbox"/>
+				  <b:InputGroupButton>
+				    <b:Button ui:field="indexEntityPickerButton" icon="SEARCH" text="" height="30px" />
+				  </b:InputGroupButton>
+				</b:InputGroup>
+		    	<bh:Div ui:field="indexEntityFinderContainer" />
 			</t:TableData>
-			<t:TableData width="25px">
-				<b:Input ui:field="colorPicker" type="COLOR"/>
-			</t:TableData>
-			<t:TableData width="100px">
+			<t:TableData width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
 				<b:TextBox ui:field="heightField"/>
 			</t:TableData>
-			<t:TableData width="25px" >
-				<b:Button ui:field="moveUpButton" text="up" />
+			<t:TableData width="34px" paddingRight="5">
+				<b:Input ui:field="colorPicker" type="COLOR"/>
 			</t:TableData>
-			<t:TableData width="25px" >
-				<b:Button ui:field="moveDownButton" text="down" />
+			<t:TableData width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
+				<b:Button ui:field="moveUpButton" text="u" size="SMALL"/>
 			</t:TableData>
-			<t:TableData width="25px" >
-				<b:Button ui:field="deleteButton" text="x" />
+			<t:TableData width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
+				<b:Button ui:field="moveDownButton" text="d" size="SMALL" />
+			</t:TableData>
+			<t:TableData width="30px" >
+				<b:Button ui:field="deleteButton" text="x" size="SMALL" />
 			</t:TableData>
 		</t:TableRow>
 	</t:Table>

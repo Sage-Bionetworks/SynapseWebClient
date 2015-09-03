@@ -20,6 +20,8 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 	public interface Presenter {
 		void entitySelected(Reference ref);
 		void indexEntitySelected(Reference ref);
+		void entityPickerClicked();
+		void indexEntityPickerClicked();
 	}
 	
 	void setEntityFinderText(String text);
@@ -34,5 +36,6 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 	String getSourceName();
 	void setSourceName(String sourceName);
 	
-	void hideEntityFinder();
+	void setEntityFinder(Widget widget);
+	void setIndexEntityFinder(Widget widget);
 }

@@ -14,8 +14,10 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,15 +33,37 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	BiodallianceSourceEditorView view;
 	private SynapseClientAsync synapseClient;
 	BiodallianceSource source;
-	
+	EntityFinder entityFinder, indexEntityFinder;
 	@Inject
-	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, SynapseClientAsync synapseClient) {
+	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, 
+			SynapseClientAsync synapseClient, 
+			EntityFinder entityFinder, 
+			EntityFinder indexEntityFinder) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.entityFinder = entityFinder;
+		this.indexEntityFinder = indexEntityFinder;
+		
 		view.setPresenter(this);
 		source = new BiodallianceSource();
 		view.setHeight(Integer.toString(source.getTrackHeightPx()));
 		view.setColor(source.getStyleColor());
+		view.setEntityFinder(entityFinder.asWidget());
+		view.setIndexEntityFinder(indexEntityFinder.asWidget());
+		
+		entityFinder.configure(true, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				entitySelected(selected);
+			}
+		});
+		
+		indexEntityFinder.configure(true, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				indexEntitySelected(selected);
+			}
+		});
 	}
 	
 	public void setSource(BiodallianceSource source) {
@@ -72,7 +96,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 					BiodallianceWidget.updateSourceURIs(source);
 					source.setSourceType(newSourceType);
 					view.setEntityFinderText(getEntityFinderText(newEntityId, newVersion));
-					view.hideEntityFinder();
+					entityFinder.hide();
 				} catch (Exception e) {
 					onFailure(e);
 				}
@@ -129,7 +153,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 					source.setIndexEntity(newIndexEntityId, newIndexVersion);
 					BiodallianceWidget.updateSourceURIs(source);
 					view.setIndexEntityFinderText(getEntityFinderText(newIndexEntityId, newIndexVersion));
-					view.hideEntityFinder();
+					indexEntityFinder.hide();
 				} catch (Exception e) {
 					onFailure(e);
 				}
@@ -147,6 +171,15 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		}
 	}
 	
+	@Override
+	public void entityPickerClicked() {
+		entityFinder.show();
+	}
+	
+	@Override
+	public void indexEntityPickerClicked() {
+		indexEntityFinder.show();
+	}
 	public void assertFileEntity(Entity entity) throws IllegalArgumentException {
 		if (!(entity instanceof FileEntity)) {
 			throw new IllegalArgumentException("Must select a file.");

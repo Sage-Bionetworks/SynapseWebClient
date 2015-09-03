@@ -4,7 +4,8 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
 		<bh:Div>
 			<b:FieldSet>
@@ -35,6 +36,26 @@
 		            <b:Heading size="H3" text="Tracks"/>
 		        </b:PanelHeader>
 		        <b:PanelBody addStyleNames="margin-bottom-5-imp">
+		        	<t:Table width="100%" height="30px">
+						<t:TableRow>
+							<t:TableHeader paddingRight="5" addStyleNames="hidden-xs">
+								<bh:Span text="Source name" />
+							</t:TableHeader>
+							<t:TableHeader width="180px" paddingRight="5">
+								<bh:Span text="File" />
+							</t:TableHeader>
+							<t:TableHeader width="180px" paddingRight="5">
+								<bh:Span text="Tabix File" />
+							</t:TableHeader>
+							<t:TableHeader width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
+								<bh:Span text="Height (px)" />
+							</t:TableHeader>
+							<t:TableHeader width="34px" paddingRight="5" /> <!-- color picker -->
+							<t:TableHeader width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs" /> <!-- move up -->
+							<t:TableHeader width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs" /> <!-- move down -->
+							<t:TableHeader width="30px"/> <!-- delete -->
+						</t:TableRow>
+					</t:Table>
 		            <g:FlowPanel ui:field="tracksContainer"/>
 		            <b:Button ui:field="addTrackButton" icon="PLUS" type="INFO" addStyleNames="margin-10">Add Track</b:Button>
 		        </b:PanelBody>
