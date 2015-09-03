@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;

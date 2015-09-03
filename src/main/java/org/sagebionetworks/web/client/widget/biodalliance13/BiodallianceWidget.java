@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013dev;
+import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceConfigInterface;
+import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -14,7 +16,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -121,30 +122,38 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
 			BiodallianceSource newSource = new BiodallianceSource(sourceJsonString);
+			updateSourceURIs(newSource);
 			sources.add(newSource);
 			i++;
 		}
 		return sources;
 	}
 	
+	public static void updateSourceURIs(BiodallianceSource source) {
+		source.setSourceURI(BiodallianceWidget.getFileResolverURL(source.getEntityId(), source.getVersion()));
+		source.setIndexSourceURI(BiodallianceWidget.getFileResolverURL(source.getIndexEntityId(), source.getIndexVersion()));
+	}
+	
 	public static String getFileResolverURL(String entityIdAndVersion) {
 		if (entityIdAndVersion != null) {
 			String[] tokens = entityIdAndVersion.split("\\.");
 			if (tokens.length == 2) {
-				return getFileResolverURL(tokens[0], tokens[1]);
+				return getFileResolverURL(tokens[0], Long.parseLong(tokens[1]));
 			}
 		}
 		return null;
 	}
 	
-	public static String getFileResolverURL(String entityId, String version) {
+	public static String getFileResolverURL(String entityId, Long version) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(FILE_RESOLVER_URL);
-		sb.append("entityId=");
-		sb.append(entityId);
-		if (version != null) {
-			sb.append("&version=");
-			sb.append(version);
+		if (entityId != null) {
+			sb.append(FILE_RESOLVER_URL);
+			sb.append("entityId=");
+			sb.append(entityId);
+			if (version != null) {
+				sb.append("&version=");
+				sb.append(version);
+			}
 		}
 		return sb.toString();
 	}
@@ -155,18 +164,11 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	}
 	
 	public void showBiodallianceBrowser() {
-		JavaScriptObject config = createNewBiodallianceBrowserConfig(initChr, initViewStart, initViewEnd, currentConfig);
+		long uniqueId = new Date().getTime();
+		String containerId = "biodallianceContainerId"+uniqueId;
+		view.setContainerId(containerId);
 		
-		//add a source(s)
-		for (BiodallianceSource source : sources) {
-			if (BiodallianceSource.SourceType.BIGWIG.equals(source.getSourceType())) {
-				addBigwigSource(config, source);	
-			} else if (BiodallianceSource.SourceType.VCF.equals(source.getSourceType())) {
-				addVCFSource(config, source);
-			}
-		}
-		
-		new Biodalliance013dev().show(config);
+		new Biodalliance013dev().show(containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
 	}
 	
 	@Override
@@ -176,170 +178,5 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			showBiodallianceBrowser();
 		}
 	}
-	
-	private JavaScriptObject createNewBiodallianceBrowserConfig(
-			String initChr,
-			int initViewStart,
-			int initViewEnd,
-			BiodallianceConfigInterface config
-			) {
-		long uniqueId = new Date().getTime();
-		String containerId = "biodallianceContainerId"+uniqueId;
-		view.setContainerId(containerId);
-		
-		return createNewBiodallianceBrowserConfig(containerId, initChr, initViewStart, initViewEnd, config.getTwoBitURI(),
-				config.getBwgURI(), config.getStylesheetURI(), config.getTrixURI(), config.getSpeciesName(), config.getTaxon(), config.getAuthName(),
-				config.getVersion(), config.getUscsName());
-	}
-	
-	private native JavaScriptObject createNewBiodallianceBrowserConfig(
-			String containerId,
-			String initChr,
-			int initViewStart,
-			int initViewEnd,
-			String genomeFileURI,
-			String gencodeBBFileURI,
-			String gencodeXMLFileURI, //stylesheet
-			String gencodeIndexFileURI,
-			String coordSystemSpeciesName,
-			int coordSystemTaxon,
-			String coordSystemAuth,
-			String coordSystemVersion,
-			String coordSystemUcscName
-			) /*-{
-		var resolverFunction = function(url) {
-		   return fetch(url, {  
-			  credentials: 'include'  //sending credentials with a fetch request (session cookie)
-			}).then(function(resp) {
-		       return resp.json();
-		   }).then(function(rdata) {
-		       return rdata.url;
-		   });
-		}
-				
-		var biodallianceBrowserConfig = {
-				pageName: containerId,
-				noPersist: true,
-				chr: initChr, 
-				viewStart:  initViewStart, 
-				viewEnd:  initViewEnd, 
-				cookieKey: coordSystemSpeciesName, 
-				fullScreen: false,
-				coordSystem: { 
-					speciesName: coordSystemSpeciesName, 
-					taxon: coordSystemTaxon, 
-					auth: coordSystemAuth, 
-					version: coordSystemVersion, 
-					ucscName: coordSystemUcscName},
-				baseColors: {
-	                 'A': 'black',
-	                 'C': 'black',
-	                 'G': 'black',
-	                 'T': 'black',
-	                 '-': 'black', //deletion
-	                 'I': 'red'    //insertion
-	            },
-				sources: [{name: 'Genome',
-					twoBitURI: genomeFileURI,
-					tier_type: 'sequence',
-					provides_entrypoints: true,
-					pinned: true,
-					resolver: resolverFunction}, 
-
-					{name: 'GENCODE',
-					bwgURI: gencodeBBFileURI,
-					stylesheet_uri: gencodeXMLFileURI,
-					collapseSuperGroups: true, 
-					trixURI: gencodeIndexFileURI,
-					subtierMax:5,
-					pinned:true,
-					resolver: resolverFunction
-					}]
-		};
-		return biodallianceBrowserConfig;
-	}-*/;
-	
-	private void addBigwigSource(
-			JavaScriptObject biodallianceBrowserConfig,
-			BiodallianceSource source) {
-		addBigwigSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
-	}
-	private native void addBigwigSource(
-			JavaScriptObject biodallianceBrowserConfig,
-			String sourceName,
-			String sourceBwgURI,
-			String styleType, 
-			String styleGlyphType,
-			String styleColor,
-			int trackHeightPx
-			) /*-{
-		var resolverFunction = function(url) {
-		   return fetch(url, {  
-			  credentials: 'include'  //sending credentials with a fetch request (session cookie)
-			}).then(function(resp) {
-		       return resp.json();
-		   }).then(function(rdata) {
-		       return rdata.url;
-		   });
-		}
-	    var newSource = {
-	    	name: sourceName,
-			collapseSuperGroups:true,
-			bwgURI: sourceBwgURI,
-			style: [{type : styleType,
-					style: {glyph: styleGlyphType,
-							COLOR1:styleColor,
-							COLOR2:styleColor,
-							COLOR3:styleColor,
-							HEIGHT:trackHeightPx}}],
-			collapseSuperGroups: true, 
-			resolver: resolverFunction
-	    }
-	    biodallianceBrowserConfig.sources.push(newSource);
-	}-*/;
-	
-	private void addVCFSource(
-			JavaScriptObject biodallianceBrowserConfig,
-			BiodallianceSource source) {
-		addVCFSource(biodallianceBrowserConfig, source.getSourceName(), source.getSourceURI(), source.getSourceIndexURI(), source.getStyleType(), source.getStyleGlyphType(), source.getStyleColor(), source.getTrackHeightPx());
-	}
-	
-	private native void addVCFSource(
-			JavaScriptObject biodallianceBrowserConfig,
-			String sourceName,
-			String sourceURI,
-			String sourceIndexURI,
-			String styleType, 
-			String styleGlyphType,
-			String styleColor,
-			int trackHeightPx
-			) /*-{
-		var resolverFunction = function(url) {
-		   return fetch(url, {  
-			  credentials: 'include'  //sending credentials with a fetch request (session cookie)
-			}).then(function(resp) {
-		       return resp.json();
-		   }).then(function(rdata) {
-		       return rdata.url;
-		   });
-		}
-	    var newSource = {
-	    	name: sourceName,
-			collapseSuperGroups:true,
-			uri: sourceURI,
-			indexURI: sourceIndexURI,
-			payload: 'vcf',
-			tier_type: 'tabix',
-			style: [{type : styleType,
-					style: {glyph: styleGlyphType,
-							COLOR1:styleColor,
-							COLOR2:styleColor,
-							COLOR3:styleColor,
-							HEIGHT:trackHeightPx}}],
-			collapseSuperGroups: true, 
-			resolver: resolverFunction
-	    }
-	    biodallianceBrowserConfig.sources.push(newSource);
-	}-*/;
 	
 }

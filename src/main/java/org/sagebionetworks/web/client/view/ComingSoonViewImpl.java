@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource;
+import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource.SourceType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -10,9 +12,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource.SourceType;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;

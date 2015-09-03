@@ -5,6 +5,8 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
 import java.util.List;
 
+import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource;
+import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource.SourceType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -13,8 +15,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource;
-import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceSource.SourceType;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -68,6 +69,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 					String newEntityId = bundle.getEntity().getId();
 					Long newVersion = ((FileEntity)bundle.getEntity()).getVersionNumber();
 					source.setEntity(newEntityId, newVersion);
+					BiodallianceWidget.updateSourceURIs(source);
 					source.setSourceType(newSourceType);
 					view.setEntityFinderText(getEntityFinderText(newEntityId, newVersion));
 					view.hideEntityFinder();
@@ -125,6 +127,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 					String newIndexEntityId = bundle.getEntity().getId();
 					Long newIndexVersion = ((FileEntity)bundle.getEntity()).getVersionNumber();
 					source.setIndexEntity(newIndexEntityId, newIndexVersion);
+					BiodallianceWidget.updateSourceURIs(source);
 					view.setIndexEntityFinderText(getEntityFinderText(newIndexEntityId, newIndexVersion));
 					view.hideEntityFinder();
 				} catch (Exception e) {
@@ -187,6 +190,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	
 	public void initializeFromJson(String json) {
 		source.initializeFromJson(json);
+		BiodallianceWidget.updateSourceURIs(source);
 		updateViewFromSource();
 	}
 	
