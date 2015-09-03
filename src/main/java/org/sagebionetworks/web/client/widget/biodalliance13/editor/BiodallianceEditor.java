@@ -20,15 +20,17 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	private BiodallianceEditorView view;
 	private PortalGinInjector ginInjector;
 	private Map<String, String> descriptor;
-	private List<BiodallianceSource> sources;
+	private List<BiodallianceSourceEditor> sourceEditors;
+	
 	@Inject
 	public BiodallianceEditor(BiodallianceEditorView view, PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.ginInjector = ginInjector;
-		sources = new ArrayList<BiodallianceSource>();
+		sourceEditors = new ArrayList<BiodallianceSourceEditor>();
 		view.initView();
 	}
+	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
@@ -53,10 +55,10 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			viewEnd = Integer.parseInt(descriptor.get(WidgetConstants.BIODALLIANCE_VIEW_END_KEY));
 		}
 		
-		sources = new ArrayList<BiodallianceSource>();
+		sourceEditors = new ArrayList<BiodallianceSourceEditor>();
 		if (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 0)){
 			//discover all sources
-			sources.addAll(getSources(descriptor));
+			sourceEditors.addAll(getSourceEditors(descriptor));
 		}
 		
 		view.setChr(chr);
@@ -68,20 +70,20 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			view.setMouse();
 		}
 		
-		for (BiodallianceSource source : sources) {
-			view.addTrack(source.asWidget());
+		for (BiodallianceSourceEditor editor : sourceEditors) {
+			view.addTrack(editor.asWidget());
 		}
 	}
 	
-	public List<BiodallianceSource> getSources(Map<String, String> descriptor) {
+	public List<BiodallianceSourceEditor> getSourceEditors(Map<String, String> descriptor) {
 		//reconstruct biodalliance sources (if there are any)
-		List<BiodallianceSource> sources = new ArrayList<BiodallianceSource>();
+		List<BiodallianceSourceEditor> sources = new ArrayList<BiodallianceSourceEditor>();
 		int i = 0;
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
-			BiodallianceSource newSource = ginInjector.getBiodallianceSource();
-			newSource.initializeFromJson(sourceJsonString);
-			sources.add(newSource);
+			BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
+			editor.setSource(new BiodallianceSource(sourceJsonString));
+			sources.add(editor);
 			i++;
 		}
 		return sources;
@@ -89,13 +91,13 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	
 	@Override
 	public void addTrackClicked() {
-		BiodallianceSource source = ginInjector.getBiodallianceSource();
-		sources.add(source);
-		view.addTrack(source.asWidget());
+		BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
+		sourceEditors.add(editor);
+		view.addTrack(editor.asWidget());
 	}
 	
 	public void clearState() {
-		sources.clear();
+		sourceEditors.clear();
 		view.clear();
 	}
 
@@ -118,8 +120,8 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		descriptor.put(WidgetConstants.BIODALLIANCE_VIEW_END_KEY, view.getViewEnd());
 		
 		//and add the sources to the map
-		for (int j = 0; j < sources.size(); j++) {
-			descriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+j, sources.get(j).toJsonObject().toString());
+		for (int j = 0; j < sourceEditors.size(); j++) {
+			descriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+j, sourceEditors.get(j).toJsonObject().toString());
 		}
 	}
 	

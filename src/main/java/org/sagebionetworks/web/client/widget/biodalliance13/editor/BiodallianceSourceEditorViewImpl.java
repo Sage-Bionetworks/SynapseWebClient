@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.biodalliance13;
+package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
@@ -17,8 +17,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceView {
-	public interface BiodallianceSourceViewImplUiBinder extends UiBinder<Widget, BiodallianceSourceViewImpl> {}
+public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceSourceEditorView {
+	public interface BiodallianceSourceViewImplUiBinder extends UiBinder<Widget, BiodallianceSourceEditorViewImpl> {}
 	Widget widget;
 	EntityFinder entityFinder;
 	@UiField
@@ -39,7 +39,7 @@ public class BiodallianceSourceViewImpl implements IsWidget, BiodallianceSourceV
 	Button deleteButton;
 	Presenter presenter;
 	@Inject
-	public BiodallianceSourceViewImpl(BiodallianceSourceViewImplUiBinder binder, EntityFinder entityFinder) {
+	public BiodallianceSourceEditorViewImpl(BiodallianceSourceViewImplUiBinder binder, EntityFinder entityFinder) {
 		widget = binder.createAndBindUi(this);
 		this.entityFinder = entityFinder;
 		entityPickerTextbox.addClickHandler(getEntityPickerClickHandler());
