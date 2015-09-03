@@ -15,7 +15,6 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -121,8 +120,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		int i = 0;
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
-			BiodallianceSource newSource = new BiodallianceSource();
-			newSource.initializeFromJson(sourceJsonString);
+			BiodallianceSource newSource = new BiodallianceSource(sourceJsonString);
 			sources.add(newSource);
 			i++;
 		}
