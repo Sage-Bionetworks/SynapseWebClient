@@ -36,13 +36,13 @@
 				<b:Input ui:field="colorPicker" type="COLOR"/>
 			</t:TableData>
 			<t:TableData width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
-				<b:Button ui:field="moveUpButton" text="u" size="SMALL"/>
+				<b:Button ui:field="moveUpButton" icon="ARROW_UP" text="" size="SMALL"/>
 			</t:TableData>
 			<t:TableData width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
-				<b:Button ui:field="moveDownButton" text="d" size="SMALL" />
+				<b:Button ui:field="moveDownButton" icon="ARROW_DOWN" text="" size="SMALL" />
 			</t:TableData>
 			<t:TableData width="30px" >
-				<b:Button ui:field="deleteButton" text="x" size="SMALL" />
+				<b:Button ui:field="deleteButton" icon="TIMES" text="" size="SMALL" type="DANGER" />
 			</t:TableData>
 		</t:TableRow>
 	</t:Table>

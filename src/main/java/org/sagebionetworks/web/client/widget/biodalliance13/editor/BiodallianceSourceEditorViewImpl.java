@@ -53,6 +53,24 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 		entityPickerButton.addClickHandler(entityPickerClickHandler);
 		indexEntityPickerTextbox.addClickHandler(indexEntityPickerClickHandler);
 		indexEntityPickerButton.addClickHandler(indexEntityPickerClickHandler);
+		moveUpButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.moveUpClicked();
+			}
+		});
+		moveDownButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.moveDownClicked();
+			}
+		});
+		deleteButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.deleteClicked();
+			}
+		});
 	}
 
 	public ClickHandler getEntityPickerClickHandler() {
@@ -151,5 +169,14 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	@Override
+	public void setMoveDownEnabled(boolean enabled) {
+		moveDownButton.setEnabled(enabled);
+	}
+	@Override
+	public void setMoveUpEnabled(boolean enabled) {
+		moveUpButton.setEnabled(enabled);
 	}
 }

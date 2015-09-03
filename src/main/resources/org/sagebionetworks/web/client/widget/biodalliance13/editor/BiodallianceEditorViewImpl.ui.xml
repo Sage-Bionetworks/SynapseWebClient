@@ -50,7 +50,7 @@
 							<t:TableHeader width="75px" paddingRight="5" addStyleNames="hidden-sm hidden-xs">
 								<bh:Span text="Height (px)" />
 							</t:TableHeader>
-							<t:TableHeader width="34px" paddingRight="5" /> <!-- color picker -->
+							<t:TableHeader width="50px" paddingRight="5" /> <!-- color picker -->
 							<t:TableHeader width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs" /> <!-- move up -->
 							<t:TableHeader width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs" /> <!-- move down -->
 							<t:TableHeader width="30px"/> <!-- delete -->

@@ -14,6 +14,7 @@ public interface BiodallianceEditorView extends IsWidget, WidgetEditorView {
 	 */
 	void setPresenter(Presenter presenter);
 	void addTrack(Widget w);
+	void clearTracks();
 	/**
 	 * Presenter interface
 	 */

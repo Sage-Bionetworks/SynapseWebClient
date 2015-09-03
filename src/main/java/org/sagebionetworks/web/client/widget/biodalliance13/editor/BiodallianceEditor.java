@@ -15,7 +15,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class BiodallianceEditor implements BiodallianceEditorView.Presenter, WidgetEditorPresenter {
+public class BiodallianceEditor implements BiodallianceEditorView.Presenter, WidgetEditorPresenter, BiodallianceSourceActionHandler {
 	
 	private BiodallianceEditorView view;
 	private PortalGinInjector ginInjector;
@@ -70,9 +70,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			view.setMouse();
 		}
 		
-		for (BiodallianceSourceEditor editor : sourceEditors) {
-			view.addTrack(editor.asWidget());
-		}
+		refreshTracks();
 	}
 	
 	public List<BiodallianceSourceEditor> getSourceEditors(Map<String, String> descriptor) {
@@ -82,7 +80,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
 			BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
-			editor.setSource(new BiodallianceSource(sourceJsonString));
+			editor.configure(new BiodallianceSource(sourceJsonString), this);
 			sources.add(editor);
 			i++;
 		}
@@ -92,8 +90,9 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	@Override
 	public void addTrackClicked() {
 		BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
+		editor.configure(new BiodallianceSource(), this);
 		sourceEditors.add(editor);
-		view.addTrack(editor.asWidget());
+		refreshTracks();
 	}
 	
 	public void clearState() {
@@ -110,6 +109,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
+		descriptor.clear();
 		descriptor.put(WidgetConstants.BIODALLIANCE_CHR_KEY, view.getChr());
 		Species species = Species.HUMAN;
 		if (view.isMouse()) {
@@ -138,5 +138,38 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-
+	
+	private void refreshTracks() {
+		view.clearTracks();
+		for (BiodallianceSourceEditor sourceEditor : sourceEditors) {
+			view.addTrack(sourceEditor.asWidget());
+			sourceEditor.setMoveDownEnabled(true);
+			sourceEditor.setMoveUpEnabled(true);
+		}
+		if (sourceEditors.size() > 0) {
+			sourceEditors.get(0).setMoveUpEnabled(false);
+			sourceEditors.get(sourceEditors.size() - 1).setMoveDownEnabled(false);
+		}
+	}
+	@Override
+	public void moveUp(BiodallianceSourceEditor sourceEditor) {
+		int index = sourceEditors.indexOf(sourceEditor);
+		sourceEditors.remove(index);
+		sourceEditors.add(index-1, sourceEditor);
+		refreshTracks();
+	}
+	
+	@Override
+	public void moveDown(BiodallianceSourceEditor sourceEditor) {
+		int index = sourceEditors.indexOf(sourceEditor);
+		sourceEditors.remove(index);
+		sourceEditors.add(index+1, sourceEditor);
+		refreshTracks();
+	}
+	
+	@Override
+	public void delete(BiodallianceSourceEditor sourceEditor) {
+		sourceEditors.remove(sourceEditor);
+		refreshTracks();
+	}
 }

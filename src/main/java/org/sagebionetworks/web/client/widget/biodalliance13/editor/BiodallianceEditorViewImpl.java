@@ -92,6 +92,11 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	}
 	
 	@Override
+	public void clearTracks() {
+		tracksContainer.clear();
+	}
+	
+	@Override
 	public void clear() {
 		tracksContainer.clear();
 		chrField.setValue("");

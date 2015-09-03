@@ -22,6 +22,9 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 		void indexEntitySelected(Reference ref);
 		void entityPickerClicked();
 		void indexEntityPickerClicked();
+		void moveUpClicked();
+		void moveDownClicked();
+		void deleteClicked();
 	}
 	
 	void setEntityFinderText(String text);
@@ -38,4 +41,6 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 	
 	void setEntityFinder(Widget widget);
 	void setIndexEntityFinder(Widget widget);
+	void setMoveUpEnabled(boolean enabled);
+	void setMoveDownEnabled(boolean enabled);
 }

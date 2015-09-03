@@ -32,7 +32,8 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	//view, may not be set if only using this class to pass data around
 	BiodallianceSourceEditorView view;
 	private SynapseClientAsync synapseClient;
-	BiodallianceSource source;
+	private BiodallianceSource source;
+	BiodallianceSourceActionHandler handler;
 	EntityFinder entityFinder, indexEntityFinder;
 	@Inject
 	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, 
@@ -45,9 +46,6 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		this.indexEntityFinder = indexEntityFinder;
 		
 		view.setPresenter(this);
-		source = new BiodallianceSource();
-		view.setHeight(Integer.toString(source.getTrackHeightPx()));
-		view.setColor(source.getStyleColor());
 		view.setEntityFinder(entityFinder.asWidget());
 		view.setIndexEntityFinder(indexEntityFinder.asWidget());
 		
@@ -66,8 +64,9 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		});
 	}
 	
-	public void setSource(BiodallianceSource source) {
+	public void configure(BiodallianceSource source, BiodallianceSourceActionHandler handler) {
 		this.source = source;
+		this.handler = handler;
 		updateViewFromSource();
 	}
 	
@@ -240,4 +239,29 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		return view.asWidget();
 	}
 	
+	@Override
+	public void deleteClicked() {
+		handler.delete(this);
+	}
+	
+	@Override
+	public void moveDownClicked() {
+		handler.moveDown(this);
+	}
+	
+	@Override
+	public void moveUpClicked() {
+		handler.moveUp(this);
+	}
+	
+	public BiodallianceSource getBiodallianceSource() {
+		return source;
+	}
+	
+	public void setMoveUpEnabled(boolean enabled) {
+		view.setMoveUpEnabled(enabled);
+	}
+	public void setMoveDownEnabled(boolean enabled) {
+		view.setMoveDownEnabled(enabled);
+	}
 }
