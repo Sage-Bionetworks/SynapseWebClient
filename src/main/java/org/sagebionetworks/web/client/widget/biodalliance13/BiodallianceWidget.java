@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 
 public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsWidget, WidgetRendererPresenter{
 
+	public static final String PORTAL_URL_PREFIX = "/Portal/";
 	public static final String FILE_RESOLVER_URL="Portal/" + WebConstants.FILE_ENTITY_RESOLVER_SERVLET+"?";
 	
 	public enum Species {
@@ -167,8 +168,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		long uniqueId = new Date().getTime();
 		String containerId = "biodallianceContainerId"+uniqueId;
 		view.setContainerId(containerId);
-		
-		new Biodalliance013dev().show(containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
+		new Biodalliance013dev().show(PORTAL_URL_PREFIX,containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
 	}
 	
 	@Override

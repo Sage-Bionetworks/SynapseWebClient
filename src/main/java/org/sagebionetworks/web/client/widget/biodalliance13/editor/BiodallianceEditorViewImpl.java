@@ -53,13 +53,6 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if ("".equals(chrField.getValue())){
-			throw new IllegalArgumentException("Missing chr");
-		} else if ("".equals(viewStartField.getValue())){
-			throw new IllegalArgumentException("Missing view start");
-		} else if ("".equals(viewEndField.getValue())){
-			throw new IllegalArgumentException("Missing view end");
-		}
 	}
 
 	@Override

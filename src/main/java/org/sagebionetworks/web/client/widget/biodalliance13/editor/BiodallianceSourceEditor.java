@@ -13,9 +13,8 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
@@ -46,9 +45,6 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		this.indexEntityFinder = indexEntityFinder;
 		
 		view.setPresenter(this);
-		view.setEntityFinder(entityFinder.asWidget());
-		view.setIndexEntityFinder(indexEntityFinder.asWidget());
-		
 		entityFinder.configure(true, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
@@ -70,6 +66,24 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		updateViewFromSource();
 	}
 	
+	public void checkParams() throws IllegalArgumentException {
+		String height = view.getHeight();
+		int heightInt;
+		try {
+			heightInt = Integer.parseInt(height);
+			if (heightInt < 1) {
+				throw new IllegalArgumentException("Track height must be a positive integer.");
+			}
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Invalid track height: " + e.getMessage());
+		}
+		
+		//source name and color are optional
+		if (source.getEntityId() == null || source.getVersion() == null) {
+			throw new IllegalArgumentException("A source file must be specified.");
+		}
+	}
+	
 	public JSONObject toJsonObject() {
 		updateFromView();
 		return source.toJsonObject();
@@ -77,15 +91,14 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	
 	@Override
 	public void entitySelected(Reference ref) {
-		updateFromView();
 		source.setEntity(null, null);
 		source.setSourceType(null);
 		//determine the source type of the given reference before accepting
-		int mask = ENTITY | FILE_HANDLES ;
+		int mask = ENTITY | FILE_HANDLES;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				try{
+				try {
 					assertFileEntity(bundle.getEntity());
 					FileHandle fileHandle = getFileHandle(bundle.getFileHandles());
 					SourceType newSourceType = getSourceType(fileHandle.getFileName());
@@ -118,7 +131,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	 * @param fileName
 	 * @return
 	 */
-	public static SourceType getSourceType(String fileName) {
+	public static SourceType getSourceType(String fileName) throws IllegalArgumentException{
 		if (fileName != null) {
 			int lastDot = fileName.lastIndexOf(".");
 			if (lastDot > -1) {
@@ -127,18 +140,22 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 					return SourceType.BIGWIG;
 				}
 				//else
-				if (".vcf".equals(extension)) {
+				if (".vcf".equals(extension) || fileName.toLowerCase().endsWith(".vcf.gz")) {
 					return SourceType.VCF;
 				}
+				//else
+				if (".bed".equals(extension) || fileName.toLowerCase().endsWith(".bed.gz")) {
+					return SourceType.BED;
+				}
+
 			}
 		}
-		return null;
+		throw new IllegalArgumentException("Unsupported source file type.");
 	}
 	
 	@Override
 	public void indexEntitySelected(Reference ref) {
 		source.setIndexEntity(null, null);
-		updateFromView();
 		int mask = ENTITY | FILE_HANDLES ;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override

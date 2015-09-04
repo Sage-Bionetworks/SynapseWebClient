@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -108,7 +109,10 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	@Override
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
-		view.checkParams();
+		checkParams();
+		for (BiodallianceSourceEditor biodallianceSourceEditor : sourceEditors) {
+			biodallianceSourceEditor.checkParams();
+		}
 		descriptor.clear();
 		descriptor.put(WidgetConstants.BIODALLIANCE_CHR_KEY, view.getChr());
 		Species species = Species.HUMAN;
@@ -123,6 +127,34 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		for (int j = 0; j < sourceEditors.size(); j++) {
 			descriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+j, sourceEditors.get(j).toJsonObject().toString());
 		}
+	}
+	
+	public void checkParams() throws IllegalArgumentException{
+		if ("".equals(view.getChr())){
+			throw new IllegalArgumentException("chr is a required parameter.");
+		} else if ("".equals(view.getViewStart())){
+			throw new IllegalArgumentException("View start is a required parameter.");
+		} else if ("".equals(view.getViewEnd())){
+			throw new IllegalArgumentException("View end is a required parameter.");
+		}
+		//try to parse
+		try {
+			int chr = Integer.parseInt(view.getChr());
+			if (chr < 1) {
+				throw new IllegalArgumentException("chr must be greater than or equal to 1.");
+			}
+			int viewStart = Integer.parseInt(view.getViewStart());
+			int viewEnd = Integer.parseInt(view.getViewEnd());
+			if (viewStart < 0) {
+				throw new IllegalArgumentException("View start must be a positive integer.");	
+			}
+			if (viewEnd < viewStart) {
+				throw new IllegalArgumentException("View start must less than view end.");
+			}
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Chr, view start, and view end must be integers.");
+		}
+		
 	}
 	
 	@Override

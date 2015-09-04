@@ -39,8 +39,6 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 	String getSourceName();
 	void setSourceName(String sourceName);
 	
-	void setEntityFinder(Widget widget);
-	void setIndexEntityFinder(Widget widget);
 	void setMoveUpEnabled(boolean enabled);
 	void setMoveDownEnabled(boolean enabled);
 }

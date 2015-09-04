@@ -5,10 +5,11 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -38,21 +39,35 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	Button moveDownButton;
 	@UiField
 	Button deleteButton;
-	@UiField
-	Div entityFinderContainer;
-	@UiField
-	Div indexEntityFinderContainer;
-
+	
 	Presenter presenter;
 	@Inject
 	public BiodallianceSourceEditorViewImpl(BiodallianceSourceViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		ClickHandler entityPickerClickHandler = getEntityPickerClickHandler();
-		ClickHandler indexEntityPickerClickHandler = getIndexEntityPickerClickHandler();
-		entityPickerTextbox.addClickHandler(entityPickerClickHandler);
-		entityPickerButton.addClickHandler(entityPickerClickHandler);
-		indexEntityPickerTextbox.addClickHandler(indexEntityPickerClickHandler);
-		indexEntityPickerButton.addClickHandler(indexEntityPickerClickHandler);
+		entityPickerTextbox.addFocusHandler(new FocusHandler() {
+			@Override
+			public void onFocus(FocusEvent event) {
+				entityPicker();	
+			}
+		});
+		entityPickerButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				entityPicker();
+			}
+		});
+		indexEntityPickerTextbox.addFocusHandler(new FocusHandler() {
+			@Override
+			public void onFocus(FocusEvent event) {
+				indexEntityPicker();
+			}
+		});
+		indexEntityPickerButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				indexEntityPicker();
+			}
+		});
 		moveUpButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -73,35 +88,14 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 		});
 	}
 
-	public ClickHandler getEntityPickerClickHandler() {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				entityPickerTextbox.selectAll();
-				presenter.entityPickerClicked();
-			}
-		};
-	}
-	@Override
-	public void setEntityFinder(Widget widget) {
-		entityFinderContainer.clear();
-		entityFinderContainer.add(widget);
+	public void entityPicker() {
+		entityPickerTextbox.selectAll();
+		presenter.entityPickerClicked();
 	}
 	
-	@Override
-	public void setIndexEntityFinder(Widget widget) {
-		indexEntityFinderContainer.clear();
-		indexEntityFinderContainer.add(widget);
-	}
-	
-	public ClickHandler getIndexEntityPickerClickHandler() {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				indexEntityPickerTextbox.selectAll();
-				presenter.indexEntityPickerClicked();
-			}
-		};
+	public void indexEntityPicker() {
+		indexEntityPickerTextbox.selectAll();
+		presenter.indexEntityPickerClicked();
 	}
 	
 	public void setEntityFinderText(String text) {
@@ -179,4 +173,5 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	public void setMoveUpEnabled(boolean enabled) {
 		moveUpButton.setEnabled(enabled);
 	}
+	
 }
