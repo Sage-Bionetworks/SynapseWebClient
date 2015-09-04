@@ -8,7 +8,8 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
 		<bh:Div>
-			<b:FieldSet>
+			<b:Anchor icon="QUESTION_CIRCLE" href="#!StandaloneWiki:GenomeBrowser" target="_blank" text="Help me configure" />
+			<b:FieldSet addStyleNames="margin-top-20">
 				<b:FormGroup>
 					<b:FormLabel>Species</b:FormLabel>
 					<bh:Div>
