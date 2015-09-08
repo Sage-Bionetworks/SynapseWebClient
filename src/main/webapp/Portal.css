@@ -2322,13 +2322,6 @@ td.datePickerMonth {
   border-bottom: 1px solid #dddddd;
 }
 
-.cytoscape-container {
-	height: 1000px;
-	width: 100%;
-	left: 0;
-	top: 0;
-}
-
 /* Provenance graph css */
 .provEntityNode {
 	opacity:0.9; 
