@@ -48,9 +48,7 @@ public class DoiWidget implements Presenter, IsWidget {
 	
 	public void configure(Doi newDoi) {
 		clear();
-		if (newDoi == null) {
-			view.showErrorMessage("No DOI found!");
-		} else {
+		if (newDoi != null) {
 			this.doi = newDoi;
 			this.entityId = newDoi.getId();
 			this.versionNumber = newDoi.getObjectVersion();
