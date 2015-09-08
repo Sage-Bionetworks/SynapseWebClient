@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView.Presenter;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -47,6 +48,7 @@ public class DoiWidget implements Presenter, IsWidget {
 	}
 	
 	public void configure(Doi newDoi) {
+		GWT.debugger();
 		clear();
 		if (newDoi != null) {
 			this.doi = newDoi;
