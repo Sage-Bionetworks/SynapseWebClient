@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.biodalliance13;
 
-import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceConfigInterface;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 
 import com.google.inject.Inject;

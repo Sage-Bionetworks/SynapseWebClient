@@ -5,8 +5,8 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
 import java.util.List;
 
-import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource;
-import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource.SourceType;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;

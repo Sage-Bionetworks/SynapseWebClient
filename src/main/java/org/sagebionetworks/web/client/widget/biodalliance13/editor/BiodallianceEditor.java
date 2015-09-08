@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;

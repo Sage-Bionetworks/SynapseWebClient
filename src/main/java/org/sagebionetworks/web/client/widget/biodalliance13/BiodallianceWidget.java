@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtvisualizationwrappers.client.biodalliance.Biodalliance013dev;
-import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceConfigInterface;
-import org.gwtvisualizationwrappers.client.biodalliance.BiodallianceSource;
+import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;

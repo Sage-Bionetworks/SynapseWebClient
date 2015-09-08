@@ -28,7 +28,7 @@
 	<inherits name="org.gwtbootstrap3.extras.select.Select"/>
 
     <inherits name="org.gwtvisualizationwrappers.CytoscapeJs"/>
-    <inherits name="org.gwtvisualizationwrappers.Biodalliance"/>
+    <inherits name="org.gwtvisualizationwrappers.Biodalliance13"/>
 
 	<!-- Commented out unused gwt bootstrap extra modules.  
 	Note that importing will cause the associated render-blocking css to loaded.
