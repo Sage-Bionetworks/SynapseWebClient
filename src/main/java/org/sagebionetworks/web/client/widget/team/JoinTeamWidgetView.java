@@ -25,7 +25,7 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	void showInfo(String title, String message);
 	void setButtonsEnabled(boolean enable);	
 	public void setIsMemberMessage(String htmlEscape);
-	public void setJoinButtonText(String joinButtonText);
+	public void setJoinButtonsText(String joinButtonText);
 	public void setRequestOpenText(String requestOpenText);
 	void setUserPanelVisible(boolean isVisible);
 	void setRequestMessageVisible(boolean isVisible);

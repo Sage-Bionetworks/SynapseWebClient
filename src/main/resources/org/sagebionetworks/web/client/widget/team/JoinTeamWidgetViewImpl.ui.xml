@@ -11,8 +11,8 @@
 		        <g:SimplePanel ui:field="currentWizardContentPanel"/>
 		        <g:HTML ui:field="accessRequirementHTML"/>
 		    </s:Dialog>
-		    <b:Button type="PRIMARY" size="LARGE" ui:field="acceptInviteButton"/>
-		    <b:Button type="PRIMARY" size="LARGE" ui:field="simpleRequestButton" text="Join" visible="false"/>
+		    <b:Button type="PRIMARY" size="LARGE" ui:field="acceptInviteButton" text="Join"/>
+		    <b:Button type="PRIMARY" size="LARGE" ui:field="simpleRequestButton" visible="false" text="Join"/>
 		    <bh:Span addStyleNames="alert alert-info inline-block" ui:field="requestOpenMessageSpan" text="Your request to join this team has been sent."/>
 		    
 		    <!-- For non-simple requests where the user can send a request message. -->
@@ -23,6 +23,6 @@
 		    </b:Collapse>
 		    <bh:Span addStyleNames="alert alert-info inline-block" ui:field="isMemberMessageSpan" text="Already a member"/>
 		</g:HTMLPanel>
-		<b:Button type="PRIMARY" size="LARGE" ui:field="anonUserButton" visible="false"/>
+		<b:Button type="PRIMARY" size="LARGE" ui:field="anonUserButton" visible="false" text="Join"/>
 	</g:HTMLPanel>
 </ui:UiBinder>
