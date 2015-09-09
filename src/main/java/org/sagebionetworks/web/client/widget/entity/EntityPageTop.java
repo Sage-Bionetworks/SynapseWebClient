@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.ProjectAreaState;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -93,8 +94,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	boolean isTable = bundle.getEntity() instanceof TableEntity;
     	boolean isProject = entityId.equals(projectAreaState.getProjectId());
     	// For non-project file-tab entities, record them as the last file area place 
-    	
-    	configureFileHistory();
     	
     	if(!isProject && !isTable && area != EntityArea.WIKI) {
     		EntityHeader lastFileAreaEntity = new EntityHeader();
@@ -330,7 +329,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			setArea(EntityArea.WIKI, wikiPageId);
 			view.configureProjectActionMenu(bundle, wikiPageId);
 		} else {
-			DisplayUtils.showErrorMessage("Failed to handle Wiki reload.");
+			view.configureFileActionMenu(bundle, wikiPageId);
 		}
 	}
 	
@@ -344,10 +343,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void configureFileHistory() {
 		Entity entity = bundle.getEntity();
 		if (entity != null && entity instanceof FileEntity) {
-			view.setFileHistoryVisible(true);
-			if (versionNumber != null) {
-				view.toggleFileHistory();
-			}
+			view.setFileHistoryVisible(versionNumber != null);
 		} else {
 			view.setFileHistoryVisible(false);
 		}
@@ -363,6 +359,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			globalApplicationState.replaceCurrentPlace(new Synapse(bundle.getEntity().getId(), versionNumber, EntityArea.WIKI, null));	
 		}
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
+    	configureFileHistory();
 	}
 	
 	private UserProfile getUserProfile() {

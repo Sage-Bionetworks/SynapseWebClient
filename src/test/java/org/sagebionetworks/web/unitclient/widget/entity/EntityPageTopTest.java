@@ -525,7 +525,7 @@ public class EntityPageTopTest {
 	}
 
 	@Test
-	public void testHandleWikiReloadSuccess() {
+	public void testHandleWikiReloadProject() {
 		String wikiPageId = "123";
 		// create some state for the wiki tab on project
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
@@ -533,13 +533,19 @@ public class EntityPageTopTest {
 		verify(areaChangeHandler).areaChanged(EntityArea.WIKI, wikiPageId);
 		verify(mockView).configureProjectActionMenu(projectBundle, wikiPageId);
 	}
-
-	@Test (expected=java.lang.UnsatisfiedLinkError.class)
-	public void testHandleWikiReloadFailure() {
+	
+	@Test
+	public void testHandleWikiReloadFile() {
 		String wikiPageId = "123";
+		FileEntity file = new FileEntity();
+		file.setId("syn456");
+		EntityBundle fileBundle = new EntityBundle();
+		fileBundle.setEntity(file);
+		fileBundle.setRootWikiId(wikiPageId);
 		// create some state for the wiki tab on project
-		pageTop.configure(entityBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
+		pageTop.configure(fileBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
 		pageTop.handleWikiReload(wikiPageId);
+		verify(mockView).configureFileActionMenu(fileBundle, wikiPageId);
 	}
 	
 	@Test
@@ -549,8 +555,8 @@ public class EntityPageTopTest {
 		EntityBundle fileEntityBundle = new EntityBundle();
 		fileEntityBundle.setEntity(file);
 		pageTop.configure(fileEntityBundle, null, projectHeader, EntityArea.FILES, wikiSubpage);
-		verify(mockView).setFileHistoryVisible(true);
-		verify(mockView, never()).toggleFileHistory();
+		pageTop.refresh();
+		verify(mockView).setFileHistoryVisible(false);
 	}
 	
 	public void testConfigureFileHistoryIsFileEarlierVersion() {
@@ -559,8 +565,8 @@ public class EntityPageTopTest {
 		EntityBundle fileEntityBundle = new EntityBundle();
 		fileEntityBundle.setEntity(file);
 		pageTop.configure(fileEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		pageTop.refresh();
 		verify(mockView).setFileHistoryVisible(true);
-		verify(mockView).toggleFileHistory();
 	}
 
 	@Test
@@ -570,8 +576,8 @@ public class EntityPageTopTest {
 		EntityBundle projectEntityBundle = new EntityBundle();
 		projectEntityBundle.setEntity(project);
 		pageTop.configure(projectEntityBundle, 1L, projectHeader, EntityArea.FILES, wikiSubpage);
+		pageTop.refresh();
 		verify(mockView).setFileHistoryVisible(false);
-		verify(mockView, never()).toggleFileHistory();
 	}
 	
 	/*

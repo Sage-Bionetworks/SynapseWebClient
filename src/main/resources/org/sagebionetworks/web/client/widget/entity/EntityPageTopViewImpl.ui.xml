@@ -38,8 +38,8 @@
 			</bh:Div>
 			<bh:Div addStyleNames="margin-left-15 margin-right-15">
 				<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
+				<g:SimplePanel ui:field="folderTitlebarContainer"/>
 				<g:SimplePanel ui:field="fileTitlebarContainer"/>
-				<g:SimplePanel ui:field="locationableTitlebarContainer"/>
 				<g:SimplePanel ui:field="fileMetadataContainer"/>
 			</bh:Div>
 			<b:Column size="XS_12">
@@ -65,6 +65,7 @@
 			</bh:Div>
 			<bh:Div addStyleNames="margin-left-15 margin-right-15">
 				<g:SimplePanel ui:field="tableBreadcrumbContainer"/>
+				<g:SimplePanel ui:field="tableTitlebarContainer"/>
 				<g:SimplePanel ui:field="tableMetadataContainer"/>
 			</bh:Div>
 			<b:Column size="XS_12">
@@ -72,7 +73,7 @@
 				<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
 				<g:FlowPanel addStyleNames="help-panel">
-					<b:BlockQuote styleName="panel">
+					<b:BlockQuote styleName="panel scroll-auto">
 						<b:Icon type="TABLE" pull="LEFT" addStyleNames="font-size-150" />
 						<b:Heading text="Synapse Tables" size="H4"></b:Heading>
 						<bh:Text text="Synapse Tables is a new feature designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema."></bh:Text>

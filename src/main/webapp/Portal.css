@@ -956,7 +956,7 @@ a.shortBtn {
 
 .markdown {
 	word-wrap:break-word;
-	overflow: hidden;
+	overflow: auto;
 	text-align: justify;
 }
 
@@ -1881,6 +1881,10 @@ a.projectTitle:hover {
 
 .rowAdaptiveHeight{
     overflow: hidden; 
+}
+
+.overflowHidden {
+    overflow: hidden;
 }
 
 .colAdaptiveHeight{ 

@@ -10,7 +10,6 @@ import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -20,6 +19,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -42,13 +42,13 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -231,6 +231,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	FlowPanel projectSynAlertPanel;
 	@UiField
 	SimplePanel teamSynAlertPanel;
+	@UiField
+	FocusPanel alertFocusPanel;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -308,6 +310,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.goTo(new Search(""));
+			}
+		});
+		
+		alertFocusPanel.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new Quiz("Certification"));
 			}
 		});
 

@@ -146,11 +146,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				ExternalFileHandle externalFileHandle = (ExternalFileHandle)fileHandle;
 				fileName.setInnerText(externalFileHandle.getExternalURL());
 
-//				if (externalFileHandle.getContentSize() != null) {
-//					fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(externalFileHandle.getContentSize().doubleValue(), true));
-//				} else {
+				if (externalFileHandle.getContentSize() != null) {
+					fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(externalFileHandle.getContentSize().doubleValue(), true));
+				} else {
 					fileSize.setInnerText("");	
-//				}
+				}
 				
 				fileLocation.setInnerText("| External Storage");
 				String md5 = externalFileHandle.getContentMd5();
