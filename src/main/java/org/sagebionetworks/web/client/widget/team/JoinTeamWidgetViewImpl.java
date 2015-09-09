@@ -127,7 +127,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	@Override
 	public void clear() {
 		// default button text and state
-		simpleRequestButton.setText("Join");
+		String defaultJoinText = "Join";
+		simpleRequestButton.setText(defaultJoinText);
+		anonUserButton.setText(defaultJoinText);
+		acceptInviteButton.setText(defaultJoinText);
 		requestOpenMessageSpan.setText("Your request to join this team has been sent.");
 		isMemberMessageSpan.setText("Already a member");
 		isMemberMessageSpan.setVisible(false);
@@ -344,8 +347,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 
 	@Override
-	public void setJoinButtonText(String joinButtonText) {
-		simpleRequestButton.setText(joinButtonText);
+	public void setJoinButtonsText(String buttonText) {
+		simpleRequestButton.setText(buttonText);
+		anonUserButton.setText(buttonText);
+		acceptInviteButton.setText(buttonText);
 	}
 
 	@Override
