@@ -17,7 +17,7 @@
 				<bh:Div ui:field="aliasUI">
 					<b:FormGroup>
 						<b:FormLabel>Friendly URL name</b:FormLabel>
-						<b:TextBox ui:field="aliasField" placeholder="UberImportantResearch"/>
+						<b:TextBox ui:field="aliasField" placeholder="UberInterestingResearch"/>
 					</b:FormGroup>
 					<g:FlowPanel addStyleNames="help-panel">
 						<b:BlockQuote styleName="panel">
@@ -26,7 +26,7 @@
 								<bh:Text text="Share your Synapse project using a personalized URL - which will redirect users to your Synapse project." />
 							</bh:Div>
 							<bh:Div>
-								<bh:Text text="E.g. http://www.synapse.org/UberImportantResearch" />
+								<bh:Text text="E.g. http://www.synapse.org/UberInterestingResearch" />
 							</bh:Div>
 							<b:Alert type="WARNING" addStyleNames="margin-top-10">
 								<bh:Strong text="Note &nbsp;" />
