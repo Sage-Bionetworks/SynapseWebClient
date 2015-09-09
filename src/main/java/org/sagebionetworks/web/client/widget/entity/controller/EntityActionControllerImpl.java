@@ -170,8 +170,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureProvenance();
 			configureChangeStorageLocation();
 			configureCreateDOI();
-			//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
-//			configureEditProjectMetadataAction();
+			configureEditProjectMetadataAction();
 			//TODO: Dependent on PLFM-3457
 //			configureEditFileMetadataAction();
 		}
@@ -475,10 +474,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 //TODO: Dependent on PLFM-3457
 //		if(entity instanceof FileEntity){
 //			return false;
-//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
-//		}else if(entity instanceof Project){
-//			return false;
-//		}
+//		} else
+		if(entity instanceof Project){
+			return false;
+		}
 		return true;
 	}
 	
@@ -824,9 +823,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * Called if the preflight check for a edit project metadata passes.
 	 */
 	private void postCheckEditProjectMetadata(){
-		//TODO: use permissions.getCanChangeSettings() when available
-//		boolean canChangeSettings = permissions.getCanChangeSettings();
-		boolean canChangeSettings = true;
+		Boolean canChangeSettings = permissions.getCanChangeSettings();
+		if (canChangeSettings == null) {
+			canChangeSettings = false;
+		}
 		editProjectMetadataModalWidget.configure((Project)entityBundle.getEntity(), canChangeSettings, new Callback() {
 			@Override
 			public void invoke() {
