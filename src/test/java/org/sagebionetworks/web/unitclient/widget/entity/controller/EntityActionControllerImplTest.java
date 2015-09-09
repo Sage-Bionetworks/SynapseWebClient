@@ -161,6 +161,7 @@ public class EntityActionControllerImplTest {
 		permissions.setCanAddChild(true);
 		permissions.setCanEdit(true);
 		permissions.setCanCertifiedUserEdit(true);
+		permissions.setCanChangeSettings(true);
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
@@ -584,6 +585,41 @@ public class EntityActionControllerImplTest {
 		// method under test
 		controller.onAction(Action.CHANGE_ENTITY_NAME);
 		verify(mockRenameEntityModalWidget, never()).onRename(any(Entity.class), any(Callback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+
+	@Test
+	public void testIsRenameOnly(){
+		assertTrue(controller.isRenameOnly(new FileEntity()));
+		assertTrue(controller.isRenameOnly(new TableEntity()));
+		assertFalse(controller.isRenameOnly(new Project()));
+	}
+	
+	@Test
+	public void testEditProjectMetadata(){
+		Entity project = new Project();
+		project.setId(entityId);
+		project.setParentId(parentId);
+		entityBundle.setEntity(project);
+		
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockEditProjectMetadataModalWidget).configure(any(Project.class), anyBoolean(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		// method under test
+		controller.onAction(Action.EDIT_PROJECT_METADATA);
+		verify(mockEditProjectMetadataModalWidget).configure(any(Project.class), anyBoolean(), any(Callback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testEditProjectMetadataFailedPreFlight(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockEditProjectMetadataModalWidget).configure(any(Project.class), anyBoolean(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		// method under test
+		controller.onAction(Action.EDIT_PROJECT_METADATA);
+		verify(mockEditProjectMetadataModalWidget, never()).configure(any(Project.class), anyBoolean(), any(Callback.class));
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 	
