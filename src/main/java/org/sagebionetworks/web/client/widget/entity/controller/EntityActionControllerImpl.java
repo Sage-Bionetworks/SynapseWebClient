@@ -45,7 +45,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -206,7 +205,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.CREATE_DOI, false);
 		if (canEdit) {
 			actionMenu.addActionListener(Action.CREATE_DOI, this);
-			synapseClient.getEntityDoi(entity.getId(), ((Synapse)globalApplicationState.getCurrentPlace()).getVersionNumber(), new AsyncCallback<Doi>() {
+			synapseClient.getEntityDoi(entity.getId(), getVersion(), new AsyncCallback<Doi>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					boolean isNotFound = caught instanceof NotFoundException;
@@ -231,7 +230,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onCreateDOI() {
-		synapseClient.createDoi(entity.getId(), ((Synapse)globalApplicationState.getCurrentPlace()).getVersionNumber(), new AsyncCallback<Void>() {
+		synapseClient.createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void v) {
 				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);

@@ -5,10 +5,11 @@ import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView.Presenter;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -23,6 +24,7 @@ public class DoiWidget implements Presenter, IsWidget {
 	private StackConfigServiceAsync stackConfigService;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	SynapseClientAsync synapseClient;
 	
 	private Timer timer = null;
 	
@@ -35,9 +37,11 @@ public class DoiWidget implements Presenter, IsWidget {
 	public DoiWidget(DoiWidgetView view,
 			GlobalApplicationState globalApplicationState, 
 			StackConfigServiceAsync stackConfigService,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.view.setPresenter(this);
+		this.synapseClient = synapseClient;
 		this.stackConfigService = stackConfigService;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
@@ -48,8 +52,8 @@ public class DoiWidget implements Presenter, IsWidget {
 	}
 	
 	public void configure(Doi newDoi) {
-		GWT.debugger();
 		clear();
+		timer = null;
 		if (newDoi != null) {
 			this.doi = newDoi;
 			this.entityId = newDoi.getId();
@@ -71,11 +75,23 @@ public class DoiWidget implements Presenter, IsWidget {
 							view.showErrorMessage(caught.getMessage());
 					}
 				});
-			}				
+			}		
 			if ((doiStatus == DoiStatus.IN_PROCESS) && timer == null) {
 				timer = new Timer() {
-					public void run() {
-						configure(doi);
+					public void run() {						
+						synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<Doi>() {
+							@Override
+							public void onSuccess(Doi result) {
+								configure(result);
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								if (!(caught instanceof NotFoundException)) {
+									if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+										view.showErrorMessage(caught.getMessage());
+								}
+							}
+						});
 					};
 				};
 				//schedule a timer to update the DOI status later
@@ -83,6 +99,16 @@ public class DoiWidget implements Presenter, IsWidget {
 			};
 		}
 	}
+	
+	
+	public void configureDoi() {
+		clear();
+		//get this entity's Doi (if it has one)
+		doi = null;
+		timer = null;
+		
+	}
+	
 
 	@Override
 	public void getDoiPrefix(AsyncCallback<String> callback) {

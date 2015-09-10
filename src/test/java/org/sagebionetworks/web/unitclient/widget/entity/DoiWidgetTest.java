@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -29,6 +30,7 @@ public class DoiWidgetTest {
 	Doi testDoi;
 	StackConfigServiceAsync mockStackConfigService;
 	AuthenticationController mockAuthenticationController;
+	SynapseClientAsync mockSynapseClient;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -36,11 +38,12 @@ public class DoiWidgetTest {
 		mockView = mock(DoiWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockStackConfigService = mock(StackConfigServiceAsync.class);
+		mockSynapseClient = mock(SynapseClientAsync.class);
 		testDoi = new Doi();
 		testDoi.setId(entityId);
 		testDoi.setDoiStatus(DoiStatus.CREATED);
 		AsyncMockStubber.callSuccessWith(testDoiPrefix).when(mockStackConfigService).getDoiPrefix(any(AsyncCallback.class));
-		doiWidget = new DoiWidget(mockView, mockGlobalApplicationState, mockStackConfigService, mockAuthenticationController);
+		doiWidget = new DoiWidget(mockView, mockGlobalApplicationState, mockStackConfigService, mockAuthenticationController, mockSynapseClient);
 	}
 	
 	@Test

@@ -52,7 +52,6 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -179,7 +178,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Override
 	public void refresh() {
-		GWT.debugger();
 		clear();
 		// Hide the view panel contents until async callback completes
 		view.setBackgroundImageVisible(false);
