@@ -205,4 +205,11 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		sourceEditors.remove(sourceEditor);
 		refreshTracks();
 	}
+
+	//for tests
+	public List<BiodallianceSourceEditor> getSourceEditors() {
+		return sourceEditors;
+	}
+	
+	
 }

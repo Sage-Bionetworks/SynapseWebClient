@@ -2,7 +2,9 @@ package org.sagebionetworks.web.unitclient.widget.biodalliance13.editor;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +28,11 @@ public class BiodallianceEditorTest {
 	PortalGinInjector mockGinInjector;
 	BiodallianceSourceEditor mockSourceEditor;
 	String testSourceJsonString = "json for source";
+	String chr = "99";
+	Species species = Species.MOUSE;
+	String viewStart = "4444";
+	String viewEnd = "55555";
+
 	@Before
 	public void setup() throws Exception {
 		mockView = mock(BiodallianceEditorView.class);
@@ -37,6 +44,15 @@ public class BiodallianceEditorTest {
 		JSONObject jsonObject = mock(JSONObject.class);
 		when(mockSourceEditor.toJsonObject()).thenReturn(jsonObject);
 		when(jsonObject.toString()).thenReturn(testSourceJsonString);
+		
+		//by default, view has valid values
+		String chr = "99";
+		String viewStart = "4444";
+		String viewEnd = "55555";
+		when(mockView.getChr()).thenReturn(chr);
+		when(mockView.getViewStart()).thenReturn(viewStart);
+		when(mockView.getViewEnd()).thenReturn(viewEnd);
+		when(mockView.isMouse()).thenReturn(true);
 	}
 		
 	@Test
@@ -56,10 +72,6 @@ public class BiodallianceEditorTest {
 	
 	@Test
 	public void testConfigureNonDefaults() {
-		String chr = "99";
-		Species species = Species.MOUSE;
-		String viewStart = "4444";
-		String viewEnd = "55555";
 		//add a couple of bogus sources
 		descriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 0, "source1");
 		descriptor.put(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 1, "source2");
@@ -94,14 +106,6 @@ public class BiodallianceEditorTest {
 	public void testUpdateFromView() {
 		editor.configure(null, descriptor, null);
 		
-		String chr = "99";
-		
-		String viewStart = "4444";
-		String viewEnd = "55555";
-		when(mockView.getChr()).thenReturn(chr);
-		when(mockView.getViewStart()).thenReturn(viewStart);
-		when(mockView.getViewEnd()).thenReturn(viewEnd);
-		when(mockView.isMouse()).thenReturn(true);
 		//add a track
 		editor.addTrackClicked();
 		
@@ -116,24 +120,98 @@ public class BiodallianceEditorTest {
 		assertEquals(Species.MOUSE.name(), descriptor.get(WidgetConstants.BIODALLIANCE_SPECIES_KEY));
 	}
 
-	@Test
-	public void testCheckParams() {
-		fail("Not yet implemented");
+	public void testValidCheckParams() {
+		editor.checkParams();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidChr1() {
+		when(mockView.getChr()).thenReturn("");
+		editor.checkParams();
+	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidChr2() {
+		when(mockView.getChr()).thenReturn("a");
+		editor.checkParams();
+	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidChr3() {
+		when(mockView.getChr()).thenReturn("-1");
+		editor.checkParams();
+	}
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidCViewStart() {
+		when(mockView.getViewStart()).thenReturn("");
+		editor.checkParams();
+	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidCViewStart2() {
+		when(mockView.getViewStart()).thenReturn("b");
+		editor.checkParams();
+	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidCViewStart3() {
+		when(mockView.getViewStart()).thenReturn("-4");
+		editor.checkParams();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidCViewEnd() {
+		when(mockView.getViewEnd()).thenReturn("");
+		editor.checkParams();
+	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidCViewEnd2() {
+		when(mockView.getViewEnd()).thenReturn("c");
+		editor.checkParams();
+	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidCViewEnd3() {
+		when(mockView.getViewEnd()).thenReturn("-5");
+		editor.checkParams();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidCViewStartEnd() {
+		//start can't be greater than end
+		when(mockView.getViewStart()).thenReturn("10");
+		when(mockView.getViewEnd()).thenReturn("5");
+		editor.checkParams();
+	}
+
+	private BiodallianceSourceEditor setupTrackEditor() {
+		BiodallianceSourceEditor mockSourceEditor= mock(BiodallianceSourceEditor.class);
+		JSONObject jsonObject = mock(JSONObject.class);
+		when(mockSourceEditor.toJsonObject()).thenReturn(jsonObject);
+		when(jsonObject.toString()).thenReturn(testSourceJsonString);
+		return mockSourceEditor;
 	}
 
 	@Test
-	public void testMoveUp() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testMoveDown() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testDelete() {
-		fail("Not yet implemented");
+	public void testMoveAndDelete() {
+		BiodallianceSourceEditor s1 = setupTrackEditor();
+		BiodallianceSourceEditor s2 = setupTrackEditor();
+		BiodallianceSourceEditor s3 = setupTrackEditor();
+		
+		when(mockGinInjector.getBiodallianceSourceEditor()).thenReturn(s1, s2, s3);
+		//add the 3 tracks
+		editor.addTrackClicked();
+		editor.addTrackClicked();
+		editor.addTrackClicked();
+		
+		//check source order with move up, delete, and down
+		List<BiodallianceSourceEditor> sourceEditors = editor.getSourceEditors();
+		assertEquals(Arrays.asList(s1, s2, s3), sourceEditors);
+		
+		editor.moveUp(s2);
+		assertEquals(Arrays.asList(s2, s1, s3), sourceEditors);
+		
+		editor.delete(s3);
+		assertEquals(Arrays.asList(s2, s1), sourceEditors);
+		
+		editor.moveDown(s2);
+		assertEquals(Arrays.asList(s1, s2), sourceEditors);
 	}
 
 }
