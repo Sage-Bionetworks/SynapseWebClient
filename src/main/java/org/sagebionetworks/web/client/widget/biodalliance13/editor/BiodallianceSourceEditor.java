@@ -225,7 +225,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	private void updateFromView() {
 		source.setSourceName(view.getSourceName());
 		source.setStyleColor(view.getColor());
-		source.setTrackHeightPx(Integer.parseInt(view.getHeight()));
+		source.setHeightPx(Integer.parseInt(view.getHeight()));
 		//entity id and version are pushed back from the view (on selection), so we don't need to update here
 	}
 	
@@ -234,7 +234,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		view.setEntityFinderText(getEntityFinderText(source.getEntityId(), source.getVersion()));
 		view.setIndexEntityFinderText(getEntityFinderText(source.getIndexEntityId(), source.getIndexVersion()));
 		view.setColor(source.getStyleColor());
-		view.setHeight(Integer.toString(source.getTrackHeightPx()));
+		view.setHeight(Integer.toString(source.getHeightPx()));
 	}
 	
 	public void initializeFromJson(String json) {
