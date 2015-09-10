@@ -115,7 +115,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.teamMembershipStatus = teamMembershipStatus;
 		view.clear();
 		if (buttonText != null && !buttonText.isEmpty()) {
-			view.setJoinButtonText(buttonText);
+			view.setJoinButtonsText(buttonText);
 		}
 		if (requestOpenInfoText != null && !requestOpenInfoText.isEmpty()) {
 			view.setRequestOpenText(requestOpenInfoText);
