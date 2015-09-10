@@ -35,7 +35,8 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	BiodallianceSourceActionHandler handler;
 	EntityFinder entityFinder, indexEntityFinder;
 	@Inject
-	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, 
+	public BiodallianceSourceEditor(
+			BiodallianceSourceEditorView view, 
 			SynapseClientAsync synapseClient, 
 			EntityFinder entityFinder, 
 			EntityFinder indexEntityFinder,
