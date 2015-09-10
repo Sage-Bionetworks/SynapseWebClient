@@ -69,7 +69,6 @@ public class DoiWidgetTest {
 		doiWidget.configure(null);
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
-		verify(mockView).showErrorMessage("No DOI found!");
 	}
 	
 	@Test
