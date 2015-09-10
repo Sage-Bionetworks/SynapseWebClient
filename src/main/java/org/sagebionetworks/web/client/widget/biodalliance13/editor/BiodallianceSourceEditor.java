@@ -38,11 +38,13 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	public BiodallianceSourceEditor(BiodallianceSourceEditorView view, 
 			SynapseClientAsync synapseClient, 
 			EntityFinder entityFinder, 
-			EntityFinder indexEntityFinder) {
+			EntityFinder indexEntityFinder,
+			BiodallianceSource source) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.entityFinder = entityFinder;
 		this.indexEntityFinder = indexEntityFinder;
+		this.source = source;
 		
 		view.setPresenter(this);
 		entityFinder.configure(true, new SelectedHandler<Reference>() {					
@@ -58,11 +60,15 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 				indexEntitySelected(selected);
 			}
 		});
+		updateViewFromSource();
 	}
 	
-	public void configure(BiodallianceSource source, BiodallianceSourceActionHandler handler) {
-		this.source = source;
+	public void setSourceActionHandler(BiodallianceSourceActionHandler handler) {
 		this.handler = handler;
+	}
+	
+	public void setSourceJson(String sourceJson) {
+		source.initializeFromJson(sourceJson);
 		updateViewFromSource();
 	}
 	

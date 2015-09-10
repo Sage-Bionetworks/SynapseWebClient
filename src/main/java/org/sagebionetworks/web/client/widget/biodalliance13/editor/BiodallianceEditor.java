@@ -81,7 +81,8 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
 			BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
-			editor.configure(new BiodallianceSource(sourceJsonString), this);
+			editor.setSourceActionHandler(this);
+			editor.setSourceJson(sourceJsonString);
 			sources.add(editor);
 			i++;
 		}
@@ -91,7 +92,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	@Override
 	public void addTrackClicked() {
 		BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
-		editor.configure(new BiodallianceSource(), this);
+		editor.setSourceActionHandler(this);
 		sourceEditors.add(editor);
 		refreshTracks();
 	}
