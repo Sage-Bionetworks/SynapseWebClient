@@ -1,18 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.biodalliance13.editor;
 
 import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+
+import java.util.Collections;
 
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;

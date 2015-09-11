@@ -1,5 +1,11 @@
 package org.sagebionetworks.web.client.widget.biodalliance13;
 
+import java.util.List;
+
+import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
+import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -54,5 +60,13 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 	@Override
 	public boolean isAttached() {
 		return widget.isAttached();
+	}
+	
+	@Override
+	public void showBiodallianceBrowser(String urlPrefix, String containerId,
+			String initChr, int initViewStart, int initViewEnd,
+			BiodallianceConfigInterface currentConfig,
+			List<BiodallianceSource> sources) {
+		new Biodalliance013dev().show(urlPrefix, containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
 	}
 }

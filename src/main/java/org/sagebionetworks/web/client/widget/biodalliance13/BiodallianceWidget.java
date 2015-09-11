@@ -39,7 +39,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	GlobalApplicationState globalApplicationState;
 	HumanBiodallianceConfig humanConfig; 
 	MouseBiodallianceConfig mouseConfig;
-	boolean isConfigured;
+	private boolean isConfigured;
 	BiodallianceConfigInterface currentConfig;
 	String initChr;
 	int initViewStart, initViewEnd;
@@ -168,7 +168,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		long uniqueId = new Date().getTime();
 		String containerId = "biodallianceContainerId"+uniqueId;
 		view.setContainerId(containerId);
-		new Biodalliance013dev().show(PORTAL_URL_PREFIX,containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
+		view.showBiodallianceBrowser(PORTAL_URL_PREFIX,containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
 	}
 	
 	@Override
@@ -179,4 +179,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		}
 	}
 	
+	public boolean isConfigured() {
+		return isConfigured;
+	}
 }
