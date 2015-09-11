@@ -24,8 +24,10 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceActionHandler;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -38,6 +40,7 @@ public class BiodallianceSourceEditorTest {
 	SynapseClientAsync mockSynapseClient;
 	EntityFinder mockEntityFinder, mockIndexEntityFinder;
 	BiodallianceSource mockSource;
+	BiodallianceSourceActionHandler mockBiodallianceSourceActionHandler;
 	
 	EntityBundle mockEntityBundle;
 	FileEntity selectedFile;
@@ -87,6 +90,8 @@ public class BiodallianceSourceEditorTest {
 		
 		when(mockView.getHeight()).thenReturn(viewHeight);
 		editor = new BiodallianceSourceEditor(mockView, mockSynapseClient, mockEntityFinder, mockIndexEntityFinder, mockSource);
+		mockBiodallianceSourceActionHandler = mock(BiodallianceSourceActionHandler.class);
+		editor.setSourceActionHandler(mockBiodallianceSourceActionHandler);
 	}
 
 	@Test
@@ -388,37 +393,58 @@ public class BiodallianceSourceEditorTest {
 	
 	@Test
 	public void testAssertFileEntity() {
-		fail("Not yet implemented");
+		editor.assertFileEntity(new FileEntity());
 	}
-
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testAssertFileEntityFailure() {
+		editor.assertFileEntity(new TableEntity());
+	}
+	
 	@Test
 	public void testAssertIndexFile() {
-		fail("Not yet implemented");
+		editor.assertIndexFile("foo.TBi");
+		editor.assertIndexFile("bar.TBI");
 	}
-
+	@Test (expected=IllegalArgumentException.class)
+	public void testAssertIndexFileFailure() {
+		editor.assertIndexFile("foo.bed");
+	}
+	
+	@Test
+	public void testAsWidget() {
+		editor.asWidget();
+		verify(mockView).asWidget();
+	}
+	
 	@Test
 	public void testDeleteClicked() {
-		fail("Not yet implemented");
+		editor.deleteClicked();
+		verify(mockBiodallianceSourceActionHandler).delete(editor);
 	}
 
 	@Test
 	public void testMoveDownClicked() {
-		fail("Not yet implemented");
+		editor.moveDownClicked();
+		verify(mockBiodallianceSourceActionHandler).moveDown(editor);
 	}
 
 	@Test
 	public void testMoveUpClicked() {
-		fail("Not yet implemented");
+		editor.moveUpClicked();
+		verify(mockBiodallianceSourceActionHandler).moveUp(editor);
 	}
 
 	@Test
 	public void testSetMoveUpEnabled() {
-		fail("Not yet implemented");
+		editor.setMoveUpEnabled(true);
+		verify(mockView).setMoveUpEnabled(true);
 	}
 
 	@Test
 	public void testSetMoveDownEnabled() {
-		fail("Not yet implemented");
+		editor.setMoveDownEnabled(false);
+		verify(mockView).setMoveDownEnabled(false);
 	}
 
 }
