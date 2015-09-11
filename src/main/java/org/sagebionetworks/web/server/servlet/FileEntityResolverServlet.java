@@ -29,9 +29,9 @@ import com.google.inject.Inject;
  * @author jay
  *
  */
-public class FileEntityResolver extends HttpServlet {
+public class FileEntityResolverServlet extends HttpServlet {
 
-	private static Logger logger = Logger.getLogger(FileEntityResolver.class.getName());
+	private static Logger logger = Logger.getLogger(FileEntityResolverServlet.class.getName());
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
@@ -45,7 +45,7 @@ public class FileEntityResolver extends HttpServlet {
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
 		public String getSessionToken() {
-			return UserDataProvider.getThreadLocalUserToken(FileEntityResolver.perThreadRequest.get());
+			return UserDataProvider.getThreadLocalUserToken(FileEntityResolverServlet.perThreadRequest.get());
 		}
 	};
 
@@ -80,7 +80,7 @@ public class FileEntityResolver extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
 			throws ServletException, IOException {
-		FileEntityResolver.perThreadRequest.set(arg0);
+		FileEntityResolverServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 
@@ -105,15 +105,17 @@ public class FileEntityResolver extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			response.setContentType("application/json");
-			Long versionNumber = Long.parseLong(entityVersion);
-			URL resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+			URL resolvedUrl;
+			if (entityVersion != null) {
+				Long versionNumber = Long.parseLong(entityVersion);
+				resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+			} else {
+				resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
+			}
 			JSONObject json = new JSONObject();
 			json.put("url", resolvedUrl.toString());
 			out.println(json.toString());
-		} catch (SynapseException e) {
-			logger.log(Level.WARNING, e.getMessage(), e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		} finally {
