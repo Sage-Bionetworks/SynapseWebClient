@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 
-import java.util.List;
-
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;
 import org.sagebionetworks.repo.model.Entity;
@@ -12,7 +10,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
@@ -89,6 +87,13 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		if (source.getEntityId() == null || source.getVersion() == null) {
 			throw new IllegalArgumentException("A source file must be specified.");
 		}
+		
+		//if a tabix source, then an index file is required
+		if (SourceType.VCF.equals(source.getSourceType()) || SourceType.BED.equals(source.getSourceType())) {
+			if (source.getIndexEntityId() == null || source.getIndexVersion() == null) {
+				throw new IllegalArgumentException("An index file must be specified for a tabix source.");
+			}	
+		}
 	}
 	
 	public JSONObject toJsonObject() {
@@ -107,7 +112,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			public void onSuccess(EntityBundle bundle) {
 				try {
 					assertFileEntity(bundle.getEntity());
-					FileHandle fileHandle = getFileHandle(bundle.getFileHandles());
+					FileHandle fileHandle = getFileHandle(bundle);
 					SourceType newSourceType = getSourceType(fileHandle.getFileName());
 					String newEntityId = bundle.getEntity().getId();
 					Long newVersion = ((FileEntity)bundle.getEntity()).getVersionNumber();
@@ -133,33 +138,6 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		}
 	}
 	
-	/**
-	 * Based on the file extension only, return the source type.  If it can't be determined, then this method will return null.
-	 * @param fileName
-	 * @return
-	 */
-	public static SourceType getSourceType(String fileName) throws IllegalArgumentException{
-		if (fileName != null) {
-			int lastDot = fileName.lastIndexOf(".");
-			if (lastDot > -1) {
-				String extension = fileName.substring(lastDot).toLowerCase();
-				if (".bw".equals(extension) || "bigwig".equals(extension)) {
-					return SourceType.BIGWIG;
-				}
-				//else
-				if (".vcf".equals(extension) || fileName.toLowerCase().endsWith(".vcf.gz")) {
-					return SourceType.VCF;
-				}
-				//else
-				if (".bed".equals(extension) || fileName.toLowerCase().endsWith(".bed.gz")) {
-					return SourceType.BED;
-				}
-
-			}
-		}
-		throw new IllegalArgumentException("Unsupported source file type.");
-	}
-	
 	@Override
 	public void indexEntitySelected(Reference ref) {
 		source.setIndexEntity(null, null);
@@ -169,7 +147,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			public void onSuccess(EntityBundle bundle) {
 				try{
 					assertFileEntity(bundle.getEntity());
-					FileHandle fileHandle = getFileHandle(bundle.getFileHandles());
+					FileHandle fileHandle = getFileHandle(bundle);
 					assertIndexFile(fileHandle.getFileName());
 					String newIndexEntityId = bundle.getEntity().getId();
 					Long newIndexVersion = ((FileEntity)bundle.getEntity()).getVersionNumber();
@@ -194,6 +172,33 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		}
 	}
 	
+
+	/**
+	 * Based on the file extension only, return the source type.  If it can't be determined, then this method will return null.
+	 * @param fileName
+	 * @return
+	 */
+	public SourceType getSourceType(String fileName) throws IllegalArgumentException{
+		if (fileName != null) {
+			int lastDot = fileName.lastIndexOf(".");
+			if (lastDot > -1) {
+				String extension = fileName.substring(lastDot).toLowerCase();
+				if (".bw".equals(extension) || ".bigwig".equals(extension)) {
+					return SourceType.BIGWIG;
+				}
+				//else
+				if (".vcf".equals(extension) || fileName.toLowerCase().endsWith(".vcf.gz")) {
+					return SourceType.VCF;
+				}
+				//else
+				if (".bed".equals(extension) || fileName.toLowerCase().endsWith(".bed.gz")) {
+					return SourceType.BED;
+				}
+
+			}
+		}
+		throw new IllegalArgumentException("Unsupported source file type.");
+	}
 	@Override
 	public void entityPickerClicked() {
 		entityFinder.show();
@@ -216,13 +221,8 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	}
 	
 	
-	public FileHandle getFileHandle(List<FileHandle> fileHandles) throws IllegalArgumentException {
-		FileHandle fileHandle = null;
-		for (FileHandle handle : fileHandles) {
-			if (!(handle instanceof PreviewFileHandle)) {
-				fileHandle = handle;
-			}
-		}
+	public FileHandle getFileHandle(EntityBundle bundle) throws IllegalArgumentException {
+		FileHandle fileHandle = DisplayUtils.getFileHandle(bundle);
 		if (fileHandle == null) {
 			throw new IllegalArgumentException("Could not find a valid file in the selection.");
 		}
@@ -236,7 +236,7 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		//entity id and version are pushed back from the view (on selection), so we don't need to update here
 	}
 	
-	private void updateViewFromSource() {
+	public void updateViewFromSource() {
 		view.setSourceName(source.getSourceName());
 		view.setEntityFinderText(getEntityFinderText(source.getEntityId(), source.getVersion()));
 		view.setIndexEntityFinderText(getEntityFinderText(source.getIndexEntityId(), source.getIndexVersion()));
