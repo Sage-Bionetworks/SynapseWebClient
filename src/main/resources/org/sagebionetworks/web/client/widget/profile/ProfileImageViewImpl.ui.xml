@@ -8,9 +8,13 @@
 	<g:HTMLPanel>
 		<b:Icon ui:field="defaultIcon" type="USER"
 			addStyleNames="font-size-150 lightGreyText" visible="true"/>
-
-		<b:Image ui:field="image" type="ROUNDED" width="150px" visible="false"/>
-
+		<g:HTMLPanel width="150px" addStyleNames="position-relative">
+		    <bh:Div addStyleNames="position-absolute topLevelZIndex topRight">
+    			<b:Button ui:field="removePicture" icon="TIMES" size="EXTRA_SMALL" type="DANGER"/>
+       		</bh:Div>
+       		<b:Image ui:field="image" type="ROUNDED" width="150px" visible="false"/>
+		</g:HTMLPanel>
+		
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

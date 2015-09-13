@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -15,6 +16,11 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	public ProfileImageWidgetImpl(ProfileImageView view, SynapseJSNIUtils jniUtils){
 		this.view = view;
 		baseUrl = jniUtils.getBaseProfileAttachmentUrl();
+	}
+	
+	@Override
+	public void setRemovePictureCallback(Callback callback) {
+		view.setRemovePictureCallback(callback);
 	}
 
 	@Override

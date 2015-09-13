@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -40,6 +41,7 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		}
 		modalView.hideError();
 		modalView.setProcessing(true);
+		GWT.debugger();
 		// Update the profile from the editor
 		updateProfileFromEditor();
 		// update the profile
@@ -143,9 +145,7 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		if(first.getCompany() != null){
 			second.setCompany(first.getCompany());
 		}
-		if(first.getProfilePicureFileHandleId() != null){
-			second.setProfilePicureFileHandleId(first.getProfilePicureFileHandleId());
-		}
+		second.setProfilePicureFileHandleId(first.getProfilePicureFileHandleId());
 		return second;
 	}
 

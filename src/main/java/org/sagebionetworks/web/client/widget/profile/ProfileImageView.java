@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ProfileImageView extends IsWidget{
@@ -14,4 +16,6 @@ public interface ProfileImageView extends IsWidget{
 	 * @param url
 	 */
 	public void setImageUrl(String url);
+
+	void setRemovePictureCallback(Callback callback);
 }
