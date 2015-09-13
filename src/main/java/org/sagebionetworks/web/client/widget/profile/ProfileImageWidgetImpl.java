@@ -30,7 +30,9 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 
 	@Override
 	public void configure(String userId, String fileHandleId) {
-		if(fileHandleId != null){
+		boolean hasProfilePicture = fileHandleId != null;
+		view.setRemovePictureButtonVisible(hasProfilePicture);
+		if (hasProfilePicture) {
 			String url = buildUrl(userId, fileHandleId, true, true);
 			view.setImageUrl(url);
 		}else{
@@ -40,6 +42,8 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	
 	@Override
 	public void configure(String fileHandleId) {
+		boolean hasProfilePicture = fileHandleId != null;
+		view.setRemovePictureButtonVisible(hasProfilePicture);
 		if(fileHandleId != null){
 			String url = buildUrl(null, fileHandleId, false, false);
 			view.setImageUrl(url);

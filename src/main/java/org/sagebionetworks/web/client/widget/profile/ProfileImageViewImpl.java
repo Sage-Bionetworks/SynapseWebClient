@@ -60,4 +60,9 @@ public class ProfileImageViewImpl implements ProfileImageView {
 	public Widget asWidget() {
 		return widget;
 	}
+
+	@Override
+	public void setRemovePictureButtonVisible(boolean isVisible) {
+		removePicture.setVisible(isVisible);
+	}
 }
