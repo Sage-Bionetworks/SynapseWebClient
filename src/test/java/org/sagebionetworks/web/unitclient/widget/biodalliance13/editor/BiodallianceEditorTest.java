@@ -204,13 +204,13 @@ public class BiodallianceEditorTest {
 		List<BiodallianceSourceEditor> sourceEditors = editor.getSourceEditors();
 		assertEquals(Arrays.asList(s1, s2, s3), sourceEditors);
 		
-		editor.moveUp(s2);
+		editor.onMoveUp(s2);
 		assertEquals(Arrays.asList(s2, s1, s3), sourceEditors);
 		
-		editor.delete(s3);
+		editor.onDelete(s3);
 		assertEquals(Arrays.asList(s2, s1), sourceEditors);
 		
-		editor.moveDown(s2);
+		editor.onMoveDown(s2);
 		assertEquals(Arrays.asList(s1, s2), sourceEditors);
 	}
 

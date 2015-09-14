@@ -30,7 +30,6 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	BiodallianceSourceEditorView view;
 	private SynapseClientAsync synapseClient;
 	private BiodallianceSource source;
-	BiodallianceSourceActionHandler handler;
 	EntityFinder entityFinder, indexEntityFinder;
 	@Inject
 	public BiodallianceSourceEditor(
@@ -60,10 +59,6 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			}
 		});
 		updateViewFromSource();
-	}
-	
-	public void setSourceActionHandler(BiodallianceSourceActionHandler handler) {
-		this.handler = handler;
 	}
 	
 	public void setSourceJson(String sourceJson) {
@@ -263,29 +258,14 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		return view.asWidget();
 	}
 	
-	@Override
-	public void deleteClicked() {
-		handler.delete(this);
-	}
-	
-	@Override
-	public void moveDownClicked() {
-		handler.moveDown(this);
-	}
-	
-	@Override
-	public void moveUpClicked() {
-		handler.moveUp(this);
-	}
-	
 	public BiodallianceSource getBiodallianceSource() {
 		return source;
 	}
 	
-	public void setMoveUpEnabled(boolean enabled) {
-		view.setMoveUpEnabled(enabled);
+	public boolean isSelected() {
+		return view.isSelected();
 	}
-	public void setMoveDownEnabled(boolean enabled) {
-		view.setMoveDownEnabled(enabled);
+	public void setSelected(boolean selected) {
+		view.setSelected(selected);
 	}
 }

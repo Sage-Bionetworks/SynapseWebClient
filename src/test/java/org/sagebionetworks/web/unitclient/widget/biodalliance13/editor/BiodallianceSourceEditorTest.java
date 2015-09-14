@@ -412,19 +412,19 @@ public class BiodallianceSourceEditorTest {
 	@Test
 	public void testDeleteClicked() {
 		editor.deleteClicked();
-		verify(mockBiodallianceSourceActionHandler).delete(editor);
+		verify(mockBiodallianceSourceActionHandler).onDelete(editor);
 	}
 
 	@Test
 	public void testMoveDownClicked() {
 		editor.moveDownClicked();
-		verify(mockBiodallianceSourceActionHandler).moveDown(editor);
+		verify(mockBiodallianceSourceActionHandler).onMoveDown(editor);
 	}
 
 	@Test
 	public void testMoveUpClicked() {
 		editor.moveUpClicked();
-		verify(mockBiodallianceSourceActionHandler).moveUp(editor);
+		verify(mockBiodallianceSourceActionHandler).onMoveUp(editor);
 	}
 
 	@Test

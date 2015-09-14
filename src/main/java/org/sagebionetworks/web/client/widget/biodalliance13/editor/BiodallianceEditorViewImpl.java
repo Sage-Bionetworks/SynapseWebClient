@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,9 +31,10 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	RadioButton humanButton;
 	@UiField
 	RadioButton mouseButton;
+	@UiField
+	SelectionToolbar selectionToolbar;
 	
 	Widget widget;
-	
 	
 	@Inject
 	public BiodallianceEditorViewImpl(BiodallianceEditorViewImplUiBinder binder) {
@@ -41,6 +43,38 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.addTrackClicked();
+			}
+		});
+		
+		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.deleteSelected();
+			}
+		});
+		selectionToolbar.setMovedownClicked(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onMoveDown();
+			}
+		});
+		
+		selectionToolbar.setMoveupClicked(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onMoveUp();
+			}
+		});
+		selectionToolbar.setSelectAllClicked(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.selectAll();
+			}
+		});
+		selectionToolbar.setSelectNoneClicked(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.selectNone();
 			}
 		});
 	}
@@ -141,4 +175,19 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 		mouseButton.setValue(true, true);
 		humanButton.setActive(false);
 	}
+	
+	@Override
+	public void setCanDelete(boolean canDelete) {
+		selectionToolbar.setCanDelete(canDelete);
+	}
+	
+	@Override
+	public void setCanMoveDown(boolean canMoveDown) {
+		selectionToolbar.setCanMoveDown(canMoveDown);
+	}
+	@Override
+	public void setCanMoveUp(boolean canMoveUp) {
+		selectionToolbar.setCanMoveUp(canMoveUp);
+	}
+	
 }

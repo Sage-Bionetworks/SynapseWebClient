@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,11 +34,7 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	@UiField
 	TextBox heightField;
 	@UiField
-	Button moveUpButton;
-	@UiField
-	Button moveDownButton;
-	@UiField
-	Button deleteButton;
+	CheckBox select;
 	
 	Presenter presenter;
 	@Inject
@@ -66,24 +62,6 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 			@Override
 			public void onClick(ClickEvent event) {
 				indexEntityPicker();
-			}
-		});
-		moveUpButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.moveUpClicked();
-			}
-		});
-		moveDownButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.moveDownClicked();
-			}
-		});
-		deleteButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteClicked();
 			}
 		});
 	}
@@ -166,12 +144,12 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 	}
 	
 	@Override
-	public void setMoveDownEnabled(boolean enabled) {
-		moveDownButton.setEnabled(enabled);
-	}
-	@Override
-	public void setMoveUpEnabled(boolean enabled) {
-		moveUpButton.setEnabled(enabled);
+	public boolean isSelected() {
+		return select.getValue();
 	}
 	
+	@Override
+	public void setSelected(boolean selected) {
+		select.setValue(selected);
+	}
 }

@@ -37,8 +37,10 @@
 		            <b:Heading size="H3" text="Tracks"/>
 		        </b:PanelHeader>
 		        <b:PanelBody addStyleNames="margin-bottom-5-imp">
+		        	<s:SelectionToolbar ui:field="selectionToolbar"/>
 		        	<t:Table width="100%" height="30px">
 						<t:TableRow>
+							<t:TableHeader width="30px"/> <!-- select checkbox -->
 							<t:TableHeader paddingRight="5" addStyleNames="hidden-xs">
 								<bh:Span text="Source name" />
 							</t:TableHeader>
@@ -52,9 +54,7 @@
 								<bh:Span text="Height (px)" />
 							</t:TableHeader>
 							<t:TableHeader width="50px" paddingRight="5" /> <!-- color picker -->
-							<t:TableHeader width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs" /> <!-- move up -->
-							<t:TableHeader width="30px" paddingRight="5" addStyleNames="hidden-sm hidden-xs" /> <!-- move down -->
-							<t:TableHeader width="30px"/> <!-- delete -->
+							
 						</t:TableRow>
 					</t:Table>
 		            <g:FlowPanel ui:field="tracksContainer"/>

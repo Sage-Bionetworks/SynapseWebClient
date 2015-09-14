@@ -131,7 +131,7 @@ public class EntityFinderTest {
 		entityFinder.loadVersions(id);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.UNABLE_TO_LOAD_VERSIONS);
-	}	
+	}
 	
 	@Test
 	public void testSelectionHandler() throws Exception {

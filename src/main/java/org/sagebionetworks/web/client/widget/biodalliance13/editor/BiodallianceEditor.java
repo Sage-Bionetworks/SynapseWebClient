@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
@@ -16,12 +15,13 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class BiodallianceEditor implements BiodallianceEditorView.Presenter, WidgetEditorPresenter, BiodallianceSourceActionHandler {
+public class BiodallianceEditor implements BiodallianceEditorView.Presenter, WidgetEditorPresenter {
 	
 	private BiodallianceEditorView view;
 	private PortalGinInjector ginInjector;
 	private Map<String, String> descriptor;
 	private List<BiodallianceSourceEditor> sourceEditors;
+	private boolean changingSelection = false;
 	
 	@Inject
 	public BiodallianceEditor(BiodallianceEditorView view, PortalGinInjector ginInjector) {
@@ -34,6 +34,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
+		changingSelection = false;
 		descriptor = widgetDescriptor;
 		
 		Species species = BiodallianceWidget.DEFAULT_SPECIES;
@@ -81,7 +82,6 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		while (descriptor.containsKey(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + i)) {
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
 			BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
-			editor.setSourceActionHandler(this);
 			editor.setSourceJson(sourceJsonString);
 			sources.add(editor);
 			i++;
@@ -92,7 +92,6 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	@Override
 	public void addTrackClicked() {
 		BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
-		editor.setSourceActionHandler(this);
 		sourceEditors.add(editor);
 		refreshTracks();
 	}
@@ -176,36 +175,122 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		view.clearTracks();
 		for (BiodallianceSourceEditor sourceEditor : sourceEditors) {
 			view.addTrack(sourceEditor.asWidget());
-			sourceEditor.setMoveDownEnabled(true);
-			sourceEditor.setMoveUpEnabled(true);
 		}
-		if (sourceEditors.size() > 0) {
-			sourceEditors.get(0).setMoveUpEnabled(false);
-			sourceEditors.get(sourceEditors.size() - 1).setMoveDownEnabled(false);
-		}
+		
+		checkSelectionState();
 	}
-	@Override
-	public void moveUp(BiodallianceSourceEditor sourceEditor) {
-		int index = sourceEditors.indexOf(sourceEditor);
+	
+	public void selectAll() {
+		changeAllSelection(true);
+	}
+
+	public void selectNone() {
+		changeAllSelection(false);
+	}
+
+	public void onMoveUp() {
+		int index = findFirstSelected();
+		BiodallianceSourceEditor sourceEditor = sourceEditors.get(index);
 		sourceEditors.remove(index);
 		sourceEditors.add(index-1, sourceEditor);
 		refreshTracks();
 	}
-	
-	@Override
-	public void moveDown(BiodallianceSourceEditor sourceEditor) {
-		int index = sourceEditors.indexOf(sourceEditor);
+
+	public void onMoveDown() {
+		int index = findFirstSelected();
+		BiodallianceSourceEditor sourceEditor = sourceEditors.get(index);
 		sourceEditors.remove(index);
 		sourceEditors.add(index+1, sourceEditor);
 		refreshTracks();
 	}
-	
-	@Override
-	public void delete(BiodallianceSourceEditor sourceEditor) {
-		sourceEditors.remove(sourceEditor);
+
+	public void deleteSelected() {
+		Iterator<BiodallianceSourceEditor> it = sourceEditors.iterator();
+		while(it.hasNext()){
+			BiodallianceSourceEditor row = it.next();
+			if(row.isSelected()){
+				it.remove();
+			}
+		}
 		refreshTracks();
+		// Check the selection state when done.
+		checkSelectionState();
 	}
 
+	/**
+	 * Find the first selected row.
+	 * @return
+	 */
+	private int findFirstSelected(){
+		int index = 0;
+		for(BiodallianceSourceEditor row: sourceEditors){
+			if(row.isSelected()){
+				return index;
+			}
+			index++;
+		}
+		throw new IllegalStateException("Nothing selected");
+	}
+	
+	public void selectionChanged(boolean isSelected) {
+		checkSelectionState();
+	}
+	
+	/**
+	 * Change the selection state of all rows to the passed value.
+	 * 
+	 * @param select
+	 */
+	private void changeAllSelection(boolean select){
+		try{
+			changingSelection = true;
+			// Select all 
+			for(BiodallianceSourceEditor row: sourceEditors){
+				row.setSelected(select);
+			}
+		}finally{
+			changingSelection = false;
+		}
+		checkSelectionState();
+	}
+	
+	/**
+	 * The current selection state determines which buttons are enabled.
+	 */
+	private void checkSelectionState(){
+		if(!changingSelection){
+			int index = 0;
+			int count = 0;
+			int lastIndex = 0;
+			for(BiodallianceSourceEditor row: sourceEditors) {
+				if(row.isSelected()){
+					count++;
+					lastIndex = index;
+				}
+				index++;
+			}
+			view.setCanDelete(count > 0);
+			view.setCanMoveUp(count == 1 && lastIndex > 0);
+			view.setCanMoveDown(count == 1 && lastIndex < sourceEditors.size()-1);
+		}
+	}
+	
+	/**
+	 * Are any of the rows selected?
+	 * @return
+	 */
+	private boolean anyRowsSelected(){
+		for(BiodallianceSourceEditor row: sourceEditors){
+			if(row.isSelected()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	
+		
 	//for tests
 	public List<BiodallianceSourceEditor> getSourceEditors() {
 		return sourceEditors;
