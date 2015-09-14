@@ -101,16 +101,7 @@ public class DoiWidget implements Presenter, IsWidget {
 				}
 			}
 		});
-	}	
-	
-	public void configureDoi() {
-		clear();
-		//get this entity's Doi (if it has one)
-		doi = null;
-		timer = null;
-		
 	}
-	
 
 	@Override
 	public void getDoiPrefix(AsyncCallback<String> callback) {
@@ -135,5 +126,4 @@ public class DoiWidget implements Presenter, IsWidget {
 		view.clear();
 	}
 
-	
 }
