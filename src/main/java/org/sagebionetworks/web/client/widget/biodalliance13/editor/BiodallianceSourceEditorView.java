@@ -22,6 +22,7 @@ public interface BiodallianceSourceEditorView extends IsWidget, WidgetEditorView
 		void indexEntitySelected(Reference ref);
 		void entityPickerClicked();
 		void indexEntityPickerClicked();
+		void onSelectionChanged();
 	}
 	
 	void setEntityFinderText(String text);

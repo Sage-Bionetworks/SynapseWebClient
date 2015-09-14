@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -62,6 +63,12 @@ public class BiodallianceSourceEditorViewImpl implements IsWidget, BiodallianceS
 			@Override
 			public void onClick(ClickEvent event) {
 				indexEntityPicker();
+			}
+		});
+		select.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onSelectionChanged();
 			}
 		});
 	}

@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -33,7 +34,8 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	RadioButton mouseButton;
 	@UiField
 	SelectionToolbar selectionToolbar;
-	
+	@UiField
+	Table trackColumnHeaders;
 	Widget widget;
 	
 	@Inject
@@ -45,7 +47,6 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 				presenter.addTrackClicked();
 			}
 		});
-		
 		selectionToolbar.setDeleteClickedCallback(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -189,5 +190,12 @@ public class BiodallianceEditorViewImpl implements BiodallianceEditorView {
 	public void setCanMoveUp(boolean canMoveUp) {
 		selectionToolbar.setCanMoveUp(canMoveUp);
 	}
-	
+	@Override
+	public void setButtonToolbarVisible(boolean visible) {
+		selectionToolbar.setVisible(visible);
+	}
+	@Override
+	public void setTrackHeaderColumnsVisible(boolean visible) {
+		trackColumnHeaders.setVisible(visible);
+	}
 }

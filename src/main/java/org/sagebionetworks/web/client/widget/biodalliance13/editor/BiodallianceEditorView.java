@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -38,9 +37,11 @@ public interface BiodallianceEditorView extends IsWidget, WidgetEditorView {
 	void setMouse();
 	boolean isHuman();
 	void setHuman();
+	void setTrackHeaderColumnsVisible(boolean visible);
 	
 	//selection toolbar state
 	void setCanDelete(boolean canDelete);
 	void setCanMoveUp(boolean canMoveUp);
 	void setCanMoveDown(boolean canMoveDown);
+	void setButtonToolbarVisible(boolean visible);
 }

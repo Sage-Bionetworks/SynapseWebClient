@@ -8,10 +8,10 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<t:Table width="100%" height="30px">
 		<t:TableRow>
-			<t:TableData>
+			<t:TableData width="35px">
 				<b:CheckBox ui:field="select" />
 			</t:TableData>
-			<t:TableData paddingRight="5" addStyleNames="hidden-xs">
+			<t:TableData width="150px" paddingRight="5" addStyleNames="hidden-xs">
 		    	<b:TextBox ui:field="sourceNameTextbox" />
 			</t:TableData>
 			<t:TableData width="180px" paddingRight="5">

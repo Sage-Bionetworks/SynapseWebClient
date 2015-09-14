@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 
@@ -31,6 +32,8 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	private SynapseClientAsync synapseClient;
 	private BiodallianceSource source;
 	EntityFinder entityFinder, indexEntityFinder;
+	Callback selectionChangedCallback;
+	
 	@Inject
 	public BiodallianceSourceEditor(
 			BiodallianceSourceEditorView view, 
@@ -267,5 +270,14 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	}
 	public void setSelected(boolean selected) {
 		view.setSelected(selected);
+	}
+	public void setSelectionChangedCallback(Callback selectionChangedCallback) {
+		this.selectionChangedCallback = selectionChangedCallback;
+	}
+	@Override
+	public void onSelectionChanged() {
+		if (selectionChangedCallback != null) {
+			selectionChangedCallback.invoke();
+		}
 	}
 }

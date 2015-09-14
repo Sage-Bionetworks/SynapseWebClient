@@ -3,12 +3,15 @@ package org.sagebionetworks.web.client.widget;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -16,7 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author jayhodgson
  *
  */
-public class SelectionToolbar {
+public class SelectionToolbar implements IsWidget {
 
 	public interface SelectionToolbarUiBinder extends UiBinder<Widget, SelectionToolbar> {}
 	@UiField
@@ -84,19 +87,23 @@ public class SelectionToolbar {
 		selectNoneItem.addClickHandler(selectNoneClicked);
 	}
 	
-	public void setButtonToolbarVisible(boolean isVisible) {
+	public void setVisible(boolean isVisible) {
 		buttonToolbar.setVisible(isVisible);
 	}
 	
-	public void setCanMoveDown(boolean isEnabled) {
-		moveDownButton.setEnabled(isEnabled);
+	public void setCanMoveDown(boolean canMoveDown) {
+		ButtonUtils.setEnabledAndType(canMoveDown, this.moveDownButton, ButtonType.INFO);
 	}
 
-	public void setCanMoveUp(boolean isEnabled) {
-		moveUpButton.setEnabled(isEnabled);
+	public void setCanMoveUp(boolean canMoveUp) {
+		ButtonUtils.setEnabledAndType(canMoveUp, this.moveUpButton, ButtonType.INFO);
 	}
 	
-	public void setCanDelete(boolean isEnabled) {
-		deleteSelectedButton.setEnabled(isEnabled);
+	public void setCanDelete(boolean canDelete) {
+		ButtonUtils.setEnabledAndType(canDelete, this.deleteSelectedButton, ButtonType.DANGER);
+	}
+	@Override
+	public Widget asWidget() {
+		return widget;
 	}
 }

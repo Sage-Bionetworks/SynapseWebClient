@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
@@ -22,6 +23,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	private Map<String, String> descriptor;
 	private List<BiodallianceSourceEditor> sourceEditors;
 	private boolean changingSelection = false;
+	private Callback selectionChangedCallback;
 	
 	@Inject
 	public BiodallianceEditor(BiodallianceEditorView view, PortalGinInjector ginInjector) {
@@ -29,6 +31,12 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		view.setPresenter(this);
 		this.ginInjector = ginInjector;
 		sourceEditors = new ArrayList<BiodallianceSourceEditor>();
+		selectionChangedCallback = new Callback() {
+			@Override
+			public void invoke() {
+				checkSelectionState();
+			}
+		};
 		view.initView();
 	}
 	
@@ -83,6 +91,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			String sourceJsonString = descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX+i);
 			BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
 			editor.setSourceJson(sourceJsonString);
+			editor.setSelectionChangedCallback(selectionChangedCallback);
 			sources.add(editor);
 			i++;
 		}
@@ -92,6 +101,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	@Override
 	public void addTrackClicked() {
 		BiodallianceSourceEditor editor = ginInjector.getBiodallianceSourceEditor();
+		editor.setSelectionChangedCallback(selectionChangedCallback);
 		sourceEditors.add(editor);
 		refreshTracks();
 	}
@@ -176,7 +186,9 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 		for (BiodallianceSourceEditor sourceEditor : sourceEditors) {
 			view.addTrack(sourceEditor.asWidget());
 		}
-		
+		boolean sourceTracksVisible = sourceEditors.size() > 0;
+		view.setButtonToolbarVisible(sourceTracksVisible);
+		view.setTrackHeaderColumnsVisible(sourceTracksVisible);
 		checkSelectionState();
 	}
 	
@@ -213,8 +225,6 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			}
 		}
 		refreshTracks();
-		// Check the selection state when done.
-		checkSelectionState();
 	}
 
 	/**
@@ -274,22 +284,6 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 			view.setCanMoveDown(count == 1 && lastIndex < sourceEditors.size()-1);
 		}
 	}
-	
-	/**
-	 * Are any of the rows selected?
-	 * @return
-	 */
-	private boolean anyRowsSelected(){
-		for(BiodallianceSourceEditor row: sourceEditors){
-			if(row.isSelected()){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
-	
 		
 	//for tests
 	public List<BiodallianceSourceEditor> getSourceEditors() {
