@@ -13,6 +13,7 @@
 	  <b:ModalBody>
 	    <bh:Div styleName="margin-bottom-20">
 	    	<g:SimplePanel ui:field="paramsPanel"></g:SimplePanel>
+	    	<g:SimplePanel ui:field="errorContainer"/>
 		</bh:Div>
 	  </b:ModalBody>
 	  <b:ModalFooter>
