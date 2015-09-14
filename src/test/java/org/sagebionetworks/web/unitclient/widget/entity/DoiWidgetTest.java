@@ -120,18 +120,20 @@ public class DoiWidgetTest {
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
 		verify(mockView).showDoiCreated(doiWidget.getDoi(testDoiPrefix, false));
+		Mockito.reset(mockView);
 		// when in error
 		testDoi.setDoiStatus(DoiStatus.ERROR);
 		doiWidget.getEntityDoi(entityId, null);
-		verify(mockView, Mockito.times(2)).setVisible(false);
-		verify(mockView, Mockito.times(2)).clear();
+		verify(mockView).setVisible(false);
+		verify(mockView).clear();
 		verify(mockView).showDoiError();
+		Mockito.reset(mockView);
 		// when in process, should throw UnsatisfiedLinkError
 		testDoi.setDoiStatus(DoiStatus.IN_PROCESS);
 		doiWidget.getEntityDoi(entityId, null);
-		verify(mockView, Mockito.times(3)).setVisible(false);
-		verify(mockView, Mockito.times(3)).clear();
-		verify(mockView).showDoiError();
+		verify(mockView).setVisible(false);
+		verify(mockView).clear();
+		verify(mockView).showDoiInProgress();
 	}
 	
 }
