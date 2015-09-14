@@ -1,8 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.biodalliance13.editor;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
@@ -19,7 +25,6 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceActionHandler;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -81,8 +86,6 @@ public class BiodallianceSourceEditorTest {
 		
 		when(mockView.getHeight()).thenReturn(viewHeight);
 		editor = new BiodallianceSourceEditor(mockView, mockSynapseClient, mockEntityFinder, mockIndexEntityFinder, mockSource);
-		mockBiodallianceSourceActionHandler = mock(BiodallianceSourceActionHandler.class);
-		editor.setSourceActionHandler(mockBiodallianceSourceActionHandler);
 	}
 
 	@Test
