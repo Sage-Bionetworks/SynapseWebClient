@@ -12,6 +12,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
@@ -91,7 +92,7 @@ public class BiodallianceEditorTest {
 		verify(mockView).clearTracks();
 		
 		verify(mockGinInjector, times(2)).getBiodallianceSourceEditor();
-		verify(mockSourceEditor, times(2)).setSourceActionHandler(editor);
+		verify(mockSourceEditor, times(2)).setSelectionChangedCallback(any(Callback.class));
 		verify(mockSourceEditor, times(2)).setSourceJson(anyString());
 	}
 
@@ -99,7 +100,7 @@ public class BiodallianceEditorTest {
 	public void testAddTrackClicked() {
 		editor.addTrackClicked();
 		verify(mockGinInjector).getBiodallianceSourceEditor();
-		verify(mockSourceEditor).setSourceActionHandler(editor);
+		verify(mockSourceEditor).setSelectionChangedCallback(any(Callback.class));
 	}
 
 	@Test
@@ -180,19 +181,21 @@ public class BiodallianceEditorTest {
 		editor.checkParams();
 	}
 
-	private BiodallianceSourceEditor setupTrackEditor() {
+	private BiodallianceSourceEditor setupTrackEditor(boolean isSelected) {
 		BiodallianceSourceEditor mockSourceEditor= mock(BiodallianceSourceEditor.class);
 		JSONObject jsonObject = mock(JSONObject.class);
 		when(mockSourceEditor.toJsonObject()).thenReturn(jsonObject);
 		when(jsonObject.toString()).thenReturn(testSourceJsonString);
+		when(mockSourceEditor.isSelected()).thenReturn(isSelected);
 		return mockSourceEditor;
 	}
 
 	@Test
 	public void testMoveAndDelete() {
-		BiodallianceSourceEditor s1 = setupTrackEditor();
-		BiodallianceSourceEditor s2 = setupTrackEditor();
-		BiodallianceSourceEditor s3 = setupTrackEditor();
+		//set up 3 tracks, where the second track reports that it's selected
+		BiodallianceSourceEditor s1 = setupTrackEditor(false);
+		BiodallianceSourceEditor s2 = setupTrackEditor(true);
+		BiodallianceSourceEditor s3 = setupTrackEditor(false);
 		
 		when(mockGinInjector.getBiodallianceSourceEditor()).thenReturn(s1, s2, s3);
 		//add the 3 tracks
@@ -204,14 +207,59 @@ public class BiodallianceEditorTest {
 		List<BiodallianceSourceEditor> sourceEditors = editor.getSourceEditors();
 		assertEquals(Arrays.asList(s1, s2, s3), sourceEditors);
 		
-		editor.onMoveUp(s2);
+		//move up clicked.  move s2 to index 0
+		editor.onMoveUp();
 		assertEquals(Arrays.asList(s2, s1, s3), sourceEditors);
 		
-		editor.onDelete(s3);
-		assertEquals(Arrays.asList(s2, s1), sourceEditors);
+		editor.deleteSelected();
+		assertEquals(Arrays.asList(s1, s3), sourceEditors);
 		
-		editor.onMoveDown(s2);
-		assertEquals(Arrays.asList(s1, s2), sourceEditors);
+		when(s1.isSelected()).thenReturn(true);
+		editor.onMoveDown();
+		assertEquals(Arrays.asList(s3, s1), sourceEditors);
+	}
+	
+	@Test
+	public void testSelectionToolbarState() {
+		//set up 2 tracks, nothing selected
+		BiodallianceSourceEditor s1 = setupTrackEditor(false);
+		BiodallianceSourceEditor s2 = setupTrackEditor(false);
+		
+		when(mockGinInjector.getBiodallianceSourceEditor()).thenReturn(s1, s2);
+		//add the tracks
+		editor.addTrackClicked();
+		editor.addTrackClicked();
+		
+		reset(mockView);
+		editor.checkSelectionState();
+		
+		verify(mockView).setCanDelete(false);
+		verify(mockView).setCanMoveUp(false);
+		verify(mockView).setCanMoveDown(false);
+		
+		//track 1 is selected, should now be able to move down or delete
+		reset(mockView);
+		when(s1.isSelected()).thenReturn(true);
+		editor.checkSelectionState();
+		verify(mockView).setCanDelete(true);
+		verify(mockView).setCanMoveUp(false);
+		verify(mockView).setCanMoveDown(true);
+		
+		//both tracks are selected, should be able to delete only
+		reset(mockView);
+		when(s2.isSelected()).thenReturn(true);
+		editor.checkSelectionState();
+		verify(mockView).setCanDelete(true);
+		verify(mockView).setCanMoveUp(false);
+		verify(mockView).setCanMoveDown(false);
+		
+		//track 2 is selected, should be able to delete or move up
+		reset(mockView);
+		when(s1.isSelected()).thenReturn(false);
+		editor.checkSelectionState();
+		verify(mockView).setCanDelete(true);
+		verify(mockView).setCanMoveUp(true);
+		verify(mockView).setCanMoveDown(false);
 	}
 
 }

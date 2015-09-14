@@ -267,7 +267,7 @@ public class BiodallianceEditor implements BiodallianceEditorView.Presenter, Wid
 	/**
 	 * The current selection state determines which buttons are enabled.
 	 */
-	private void checkSelectionState(){
+	public void checkSelectionState(){
 		if(!changingSelection){
 			int index = 0;
 			int count = 0;

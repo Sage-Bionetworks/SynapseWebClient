@@ -32,7 +32,6 @@ public class BiodallianceSourceEditorTest {
 	SynapseClientAsync mockSynapseClient;
 	EntityFinder mockEntityFinder, mockIndexEntityFinder;
 	BiodallianceSource mockSource;
-	BiodallianceSourceActionHandler mockBiodallianceSourceActionHandler;
 	
 	EntityBundle mockEntityBundle;
 	FileEntity selectedFile;
@@ -410,33 +409,11 @@ public class BiodallianceSourceEditorTest {
 	}
 	
 	@Test
-	public void testDeleteClicked() {
-		editor.deleteClicked();
-		verify(mockBiodallianceSourceActionHandler).onDelete(editor);
+	public void testSelection() {
+		editor.setSelected(true);
+		verify(mockView).setSelected(true);
+		
+		editor.isSelected();
+		verify(mockView).isSelected();
 	}
-
-	@Test
-	public void testMoveDownClicked() {
-		editor.moveDownClicked();
-		verify(mockBiodallianceSourceActionHandler).onMoveDown(editor);
-	}
-
-	@Test
-	public void testMoveUpClicked() {
-		editor.moveUpClicked();
-		verify(mockBiodallianceSourceActionHandler).onMoveUp(editor);
-	}
-
-	@Test
-	public void testSetMoveUpEnabled() {
-		editor.setMoveUpEnabled(true);
-		verify(mockView).setMoveUpEnabled(true);
-	}
-
-	@Test
-	public void testSetMoveDownEnabled() {
-		editor.setMoveDownEnabled(false);
-		verify(mockView).setMoveDownEnabled(false);
-	}
-
 }
