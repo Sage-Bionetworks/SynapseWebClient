@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 
 public class DoiWidget implements Presenter, IsWidget {
 
-	public static final int REFRESH_TIME = 5 * 1000; //5 seconds
+	public static final int REFRESH_TIME = 13 * 1000; //5 seconds
 	private DoiWidgetView view;
 	private StackConfigServiceAsync stackConfigService;
 	GlobalApplicationState globalApplicationState;
@@ -78,19 +78,7 @@ public class DoiWidget implements Presenter, IsWidget {
 			if (doiStatus == DoiStatus.IN_PROCESS) {
 				timer = new Timer() {
 					public void run() {
-						synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<Doi>() {
-							@Override
-							public void onSuccess(Doi result) {
-								configure(result, null);
-							}
-							@Override
-							public void onFailure(Throwable caught) {
-								if (!(caught instanceof NotFoundException)) {
-									if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-										view.showErrorMessage(caught.getMessage());
-								}
-							}
-						});
+						getEntityDoi(entityId, versionNumber);
 					};
 				};
 				//schedule a timer to update the DOI status later
@@ -98,7 +86,22 @@ public class DoiWidget implements Presenter, IsWidget {
 			};
 		}
 	}
-	
+
+	public void getEntityDoi(final String entityId, Long versionNumber) {
+		synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<Doi>() {
+			@Override
+			public void onSuccess(Doi result) {
+				configure(result, entityId);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!(caught instanceof NotFoundException)) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(caught.getMessage());
+				}
+			}
+		});
+	}	
 	
 	public void configureDoi() {
 		clear();

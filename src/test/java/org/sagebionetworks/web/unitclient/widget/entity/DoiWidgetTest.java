@@ -2,11 +2,14 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -43,6 +46,7 @@ public class DoiWidgetTest {
 		testDoi.setId(entityId);
 		testDoi.setDoiStatus(DoiStatus.CREATED);
 		AsyncMockStubber.callSuccessWith(testDoiPrefix).when(mockStackConfigService).getDoiPrefix(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testDoi).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		doiWidget = new DoiWidget(mockView, mockGlobalApplicationState, mockStackConfigService, mockAuthenticationController, mockSynapseClient);
 	}
 	
@@ -62,6 +66,13 @@ public class DoiWidgetTest {
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
 		verify(mockView).showDoiError();
+	}
+
+	@Test(expected=UnsatisfiedLinkError.class)
+	public void testConfigureInProcessStatus() throws Exception {
+		testDoi.setDoiStatus(DoiStatus.IN_PROCESS);
+		doiWidget.configure(testDoi, entityId);
+		verify(mockView).showDoiInProgress();
 	}
 	
 	@Test
@@ -99,6 +110,28 @@ public class DoiWidgetTest {
 		assertTrue(link.length() == 0);
 		link = doiWidget.getDoi(null, true);
 		assertTrue(link.length() == 0);
+	}
+
+	@Test(expected=UnsatisfiedLinkError.class)
+	public void testGetEntityDoi() {
+		// when ready
+		testDoi.setDoiStatus(DoiStatus.READY);
+		doiWidget.getEntityDoi(entityId, null);
+		verify(mockView).setVisible(false);
+		verify(mockView).clear();
+		verify(mockView).showDoiCreated(doiWidget.getDoi(testDoiPrefix, false));
+		// when in error
+		testDoi.setDoiStatus(DoiStatus.ERROR);
+		doiWidget.getEntityDoi(entityId, null);
+		verify(mockView, Mockito.times(2)).setVisible(false);
+		verify(mockView, Mockito.times(2)).clear();
+		verify(mockView).showDoiError();
+		// when in process, should throw UnsatisfiedLinkError
+		testDoi.setDoiStatus(DoiStatus.IN_PROCESS);
+		doiWidget.getEntityDoi(entityId, null);
+		verify(mockView, Mockito.times(3)).setVisible(false);
+		verify(mockView, Mockito.times(3)).clear();
+		verify(mockView).showDoiError();
 	}
 	
 }
