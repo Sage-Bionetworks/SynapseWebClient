@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -34,6 +35,7 @@ public class EntityMetadataTest {
 	private DoiWidget mockDoiWidget;
 	private RestrictionWidget mockRestrictionWidget;
 	private FileHistoryWidget mockFileHistoryWidget;
+	private Doi mockDoi;
 	
 	@Before
 	public void before() {
@@ -43,6 +45,7 @@ public class EntityMetadataTest {
 		mockDoiWidget = mock(DoiWidget.class);
 		mockRestrictionWidget = mock(RestrictionWidget.class);
 		mockFileHistoryWidget = mock(FileHistoryWidget.class);
+		mockDoi = mock(Doi.class);
 		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget, mockFileHistoryWidget);
 		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 	}
@@ -61,11 +64,12 @@ public class EntityMetadataTest {
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(project);
 		bundle.setPermissions(permissions);
+		bundle.setDoi(mockDoi);
 		Long versionNumber = -122L;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setRestrictionPanelVisible(false);
-		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
+		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
@@ -84,12 +88,13 @@ public class EntityMetadataTest {
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
+		bundle.setDoi(mockDoi);
 		Long versionNumber = null;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
-		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
+		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
@@ -102,18 +107,20 @@ public class EntityMetadataTest {
 		boolean canCertifiedUserEdit = false;
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		Long versionNumber = -122L;
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setName(entityName);
 		fileEntity.setId(entityId);
+		fileEntity.setVersionNumber(versionNumber);
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
-		Long versionNumber = -122L;
+		bundle.setDoi(mockDoi);
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
-		verify(mockDoiWidget).configure(entityId, canCertifiedUserEdit, versionNumber);
+		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));

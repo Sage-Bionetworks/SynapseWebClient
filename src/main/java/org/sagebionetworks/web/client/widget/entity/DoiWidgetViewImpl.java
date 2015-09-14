@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -29,6 +30,9 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 	@UiField
 	TextBox doi;
 	
+	@UiField
+	Span doiLabel;
+	
 	Widget widget;
 	
 	public interface Binder extends UiBinder<Widget, DoiWidgetViewImpl> {}
@@ -54,6 +58,7 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 		doiProcessing.setVisible(false);
 		doi.setText("");
 		doi.setVisible(false);
+		doiLabel.setVisible(false);
 	}
 	
 	@Override
@@ -80,6 +85,7 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 		//first clear old handler, if there is one
 		doi.setVisible(true);
 		doi.setText(doiText);
+		doiLabel.setVisible(true);
 	}
 	
 	@Override

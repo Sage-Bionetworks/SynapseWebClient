@@ -18,13 +18,12 @@ import com.google.inject.Inject;
 
 public class DoiWidget implements Presenter, IsWidget {
 
-	public static final String DOI = "doi:";
-	public static final int REFRESH_TIME = 13 * 1000; //13 seconds
+	public static final int REFRESH_TIME = 13 * 1000; //5 seconds
 	private DoiWidgetView view;
-	private SynapseClientAsync synapseClient;
 	private StackConfigServiceAsync stackConfigService;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	SynapseClientAsync synapseClient;
 	
 	private Timer timer = null;
 	
@@ -35,10 +34,10 @@ public class DoiWidget implements Presenter, IsWidget {
 	
 	@Inject
 	public DoiWidget(DoiWidgetView view,
-			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState, 
 			StackConfigServiceAsync stackConfigService,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
@@ -47,54 +46,52 @@ public class DoiWidget implements Presenter, IsWidget {
 		this.authenticationController = authenticationController;
 	}
 	
-	public void configure(String entityId, boolean canEdit, Long versionNumber) {
-		this.entityId = entityId;
-		this.versionNumber = versionNumber;
-		this.canEdit = canEdit;
-		configureDoi();
-	}
-	
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-	public void configureDoi() {
+	
+	public void configure(Doi newDoi, final String entityId) {
 		clear();
-		//get this entity's Doi (if it has one)
-		doi = null;
 		timer = null;
+		if (newDoi != null) {
+			this.doi = newDoi;
+			this.entityId = entityId;
+			this.versionNumber = newDoi.getObjectVersion();
+			final DoiStatus doiStatus = newDoi.getDoiStatus();
+			if (doiStatus == DoiStatus.ERROR) {
+				view.showDoiError();
+			} else if (doiStatus == DoiStatus.IN_PROCESS) {
+				view.showDoiInProgress();
+			} else if (doiStatus == DoiStatus.CREATED || doiStatus == DoiStatus.READY) {
+				getDoiPrefix(new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String prefix) {
+						view.showDoiCreated(getDoi(prefix, doiStatus == DoiStatus.READY));
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+							view.showErrorMessage(caught.getMessage());
+					}
+				});
+			}		
+			if (doiStatus == DoiStatus.IN_PROCESS) {
+				timer = new Timer() {
+					public void run() {
+						getEntityDoi(entityId, versionNumber);
+					};
+				};
+				//schedule a timer to update the DOI status later
+				timer.schedule(REFRESH_TIME);
+			};
+		}
+	}
+
+	public void getEntityDoi(final String entityId, Long versionNumber) {
 		synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<Doi>() {
 			@Override
 			public void onSuccess(Doi result) {
-				doi = result;
-				final DoiStatus doiStatus = doi.getDoiStatus();
-				if (doiStatus == DoiStatus.ERROR) {
-					view.showDoiError();
-				} else if (doiStatus == DoiStatus.IN_PROCESS) {
-					view.showDoiInProgress();
-				} else if (doiStatus == DoiStatus.CREATED || doiStatus == DoiStatus.READY) {
-					getDoiPrefix(new AsyncCallback<String>() {
-						@Override
-						public void onSuccess(String prefix) {
-							view.showDoiCreated(getDoi(prefix, doiStatus == DoiStatus.READY));
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-								view.showErrorMessage(caught.getMessage());
-						}
-					});
-				}				
-				if ((doiStatus == DoiStatus.IN_PROCESS) && timer == null) {
-					timer = new Timer() {
-						public void run() {
-							configureDoi();
-						};
-					};
-					//schedule a timer to update the DOI status later
-					timer.schedule(REFRESH_TIME);
-				};
+				configure(result, entityId);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -129,5 +126,4 @@ public class DoiWidget implements Presenter, IsWidget {
 		view.clear();
 	}
 
-	
 }
