@@ -69,7 +69,7 @@ public class EntityMetadataTest {
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setRestrictionPanelVisible(false);
-		verify(mockDoiWidget).configure(mockDoi);
+		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
@@ -94,7 +94,7 @@ public class EntityMetadataTest {
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
-		verify(mockDoiWidget).configure(mockDoi);
+		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));
@@ -107,19 +107,20 @@ public class EntityMetadataTest {
 		boolean canCertifiedUserEdit = false;
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		Long versionNumber = -122L;
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setName(entityName);
 		fileEntity.setId(entityId);
+		fileEntity.setVersionNumber(versionNumber);
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
-		Long versionNumber = -122L;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
-		verify(mockDoiWidget).configure(mockDoi);
+		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit);
 		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
 				Mockito.anyBoolean(), any(Callback.class));

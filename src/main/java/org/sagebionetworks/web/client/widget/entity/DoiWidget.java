@@ -18,8 +18,7 @@ import com.google.inject.Inject;
 
 public class DoiWidget implements Presenter, IsWidget {
 
-	public static final String DOI = "doi:";
-	public static final int REFRESH_TIME = 13 * 1000; //13 seconds
+	public static final int REFRESH_TIME = 5 * 1000; //5 seconds
 	private DoiWidgetView view;
 	private StackConfigServiceAsync stackConfigService;
 	GlobalApplicationState globalApplicationState;
@@ -51,12 +50,12 @@ public class DoiWidget implements Presenter, IsWidget {
 		return view.asWidget();
 	}
 	
-	public void configure(Doi newDoi) {
+	public void configure(Doi newDoi, final String entityId) {
 		clear();
 		timer = null;
 		if (newDoi != null) {
 			this.doi = newDoi;
-			this.entityId = newDoi.getId();
+			this.entityId = entityId;
 			this.versionNumber = newDoi.getObjectVersion();
 			final DoiStatus doiStatus = newDoi.getDoiStatus();
 			if (doiStatus == DoiStatus.ERROR) {
@@ -76,13 +75,13 @@ public class DoiWidget implements Presenter, IsWidget {
 					}
 				});
 			}		
-			if ((doiStatus == DoiStatus.IN_PROCESS) && timer == null) {
+			if (doiStatus == DoiStatus.IN_PROCESS) {
 				timer = new Timer() {
-					public void run() {						
+					public void run() {
 						synapseClient.getEntityDoi(entityId, versionNumber, new AsyncCallback<Doi>() {
 							@Override
 							public void onSuccess(Doi result) {
-								configure(result);
+								configure(result, null);
 							}
 							@Override
 							public void onFailure(Throwable caught) {

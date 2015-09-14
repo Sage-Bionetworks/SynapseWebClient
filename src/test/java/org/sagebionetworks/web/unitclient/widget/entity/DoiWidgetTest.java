@@ -49,7 +49,7 @@ public class DoiWidgetTest {
 	@Test
 	public void testConfigureReadyStatus() throws Exception {
 		testDoi.setDoiStatus(DoiStatus.READY);
-		doiWidget.configure(testDoi);
+		doiWidget.configure(testDoi, entityId);
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
 		verify(mockView).showDoiCreated(doiWidget.getDoi(testDoiPrefix, false));
@@ -58,7 +58,7 @@ public class DoiWidgetTest {
 	@Test
 	public void testConfigureErrorStatus() throws Exception {
 		testDoi.setDoiStatus(DoiStatus.ERROR);
-		doiWidget.configure(testDoi);
+		doiWidget.configure(testDoi, entityId);
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
 		verify(mockView).showDoiError();
@@ -66,7 +66,7 @@ public class DoiWidgetTest {
 	
 	@Test
 	public void testConfigureNotFound() throws Exception {
-		doiWidget.configure(null);
+		doiWidget.configure(null, entityId);
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
 	}
@@ -82,7 +82,7 @@ public class DoiWidgetTest {
 		String prefix = "10.5072/FK2.";
 		Long version = 42l;
 		testDoi.setObjectVersion(version);
-		doiWidget.configure(testDoi);
+		doiWidget.configure(testDoi, entityId);
 		String link = doiWidget.getDoi(prefix, true);
 		assertTrue(link.contains(entityId));
 		assertTrue(link.contains(version.toString()));
@@ -94,7 +94,7 @@ public class DoiWidgetTest {
 		String prefix = "";
 		Long version = 42l;
 		testDoi.setObjectVersion(version);
-		doiWidget.configure(testDoi);
+		doiWidget.configure(testDoi, entityId);
 		String link = doiWidget.getDoi(prefix, true);
 		assertTrue(link.length() == 0);
 		link = doiWidget.getDoi(null, true);

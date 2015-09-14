@@ -65,7 +65,7 @@ public class EntityMetadata implements Presenter {
 				fireEntityUpdatedEvent();
 			}
 		});
-		doiWidget.configure(bundle.getDoi());
+		doiWidget.configure(bundle.getDoi(), en.getId());
 		annotationsWidget.configure(bundle, canEdit);
 		view.setDetailedMetadataVisible(showDetailedMetadata);
 	}	

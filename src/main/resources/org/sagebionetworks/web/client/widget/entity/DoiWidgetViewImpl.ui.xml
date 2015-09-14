@@ -10,8 +10,9 @@
 	    <b:Alert ui:field="errorCreatingDoi" addStyleNames="boldText" visible="false">
 	        <bh:Strong text="Error creating DOI"/>
 	    </b:Alert>
-	    <g:TextBox ui:field="doi" width="230px" addStyleNames="border-none noBackground padding-0" readOnly="true" />
-	    <g:SimplePanel ui:field="doiProcessing" addStyleNames="inline-block">
+	    <bh:Span ui:field="doiLabel" addStyleNames="boldText margin-right-5" text="DOI: " visible="false"/>
+	    <g:TextBox ui:field="doi" width="240px" addStyleNames="border-none noBackground padding-0" readOnly="true" />
+	    <g:SimplePanel ui:field="doiProcessing" addStyleNames="inline-block padding-right-5">
 	        <bh:Text text="DOI processing"/>
 	    </g:SimplePanel>
 	</bh:Span>
