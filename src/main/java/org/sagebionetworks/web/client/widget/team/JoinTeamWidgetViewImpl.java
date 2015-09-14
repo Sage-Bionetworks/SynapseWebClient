@@ -228,7 +228,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	@Override
 	public void setAccessRequirementHTML(String html) {
-		accessRequirementHTML.setText(html);
+		accessRequirementHTML.setHTML(html);
 	}
 	
 	@Override
