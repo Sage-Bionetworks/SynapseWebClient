@@ -1035,6 +1035,10 @@ a.shortBtn {
 .font-weight-bolder {
 	font-weight: bolder;
 }
+.font-weight-normal {
+	font-weight: normal;
+}
+
 
 .font-size-32 {
 	font-size: 32px !important;
