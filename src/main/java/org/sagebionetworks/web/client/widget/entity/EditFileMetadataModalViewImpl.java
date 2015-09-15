@@ -29,8 +29,6 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 	@UiField
 	TextBox fileNameField;
 	@UiField
-	TextBox contentTypeField;
-	@UiField
 	Alert alert;
 	@UiField
 	Button primaryButton;
@@ -115,18 +113,13 @@ public class EditFileMetadataModalViewImpl implements EditFileMetadataModalView 
 	}
 
 	@Override
-	public void configure(String entityName, String fileName, String contentType) {
+	public void configure(String entityName, String fileName) {
 		this.entityNameField.setText(entityName);
 		this.fileNameField.setText(fileName);
-		this.contentTypeField.setText(contentType);
 	}
 	
 	@Override
 	public String getFileName() {
 		return fileNameField.getText();
 	};
-	@Override
-	public String getContentType() {
-		return contentTypeField.getText();
-	}
 }

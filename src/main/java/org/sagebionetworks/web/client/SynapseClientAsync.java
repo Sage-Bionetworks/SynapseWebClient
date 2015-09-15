@@ -443,7 +443,4 @@ public interface SynapseClientAsync {
 	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
-
-	void updateFileEntity(FileEntity fileEntity, String fileHandleId, String fileName,
-			String contentType, AsyncCallback<Void> asyncCallback);
 }

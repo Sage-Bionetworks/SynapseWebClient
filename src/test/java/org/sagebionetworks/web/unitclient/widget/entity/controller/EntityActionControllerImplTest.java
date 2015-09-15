@@ -593,7 +593,7 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testIsRenameOnly(){
-		assertTrue(controller.isRenameOnly(new FileEntity()));
+		assertFalse(controller.isRenameOnly(new FileEntity()));
 		assertTrue(controller.isRenameOnly(new TableEntity()));
 		assertFalse(controller.isRenameOnly(new Project()));
 	}

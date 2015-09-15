@@ -174,8 +174,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureChangeStorageLocation();
 			configureCreateDOI();
 			configureEditProjectMetadataAction();
-			//TODO: Dependent on PLFM-3457
-//			configureEditFileMetadataAction();
+			configureEditFileMetadataAction();
 		}
 	}
 	
@@ -475,11 +474,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isRenameOnly(Entity entity){
-//TODO: Dependent on PLFM-3457
-//		if(entity instanceof FileEntity){
-//			return false;
-//		} else
-		if(entity instanceof Project){
+		if(entity instanceof FileEntity){
+			return false;
+		} else if(entity instanceof Project){
 			return false;
 		}
 		return true;
@@ -804,8 +801,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	/**
 	 * Called if the preflight check for edit file metadata passes.
 	 */
-	private void postCheckEditFileMetadata(){
-		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), entityBundle.getFileHandles(), new Callback() {
+	private void postCheckEditFileMetadata() {
+		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), entityBundle.getFileName(), new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());

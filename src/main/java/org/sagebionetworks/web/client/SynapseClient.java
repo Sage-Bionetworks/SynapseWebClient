@@ -545,6 +545,4 @@ public interface SynapseClient extends RemoteService {
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
-	
-	void updateFileEntity(FileEntity fileEntity, String id, String fileName, String contentType) throws RestServiceException;
 }
