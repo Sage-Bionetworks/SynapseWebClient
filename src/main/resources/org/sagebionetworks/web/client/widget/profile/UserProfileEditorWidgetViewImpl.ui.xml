@@ -3,7 +3,6 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-
 		<b:Row>
 			<b:Column size="MD_3 SM_4 XS_12" addStyleNames="margin-bottom-10">
 				<g:SimplePanel ui:field="imagePanel"/>
@@ -31,7 +30,6 @@
 				</b:FormGroup>
 			</b:Column>
 		</b:Row>
-
 		<b:Row>
 			<b:Column size="SM_6">
 				<b:FormGroup>
@@ -48,7 +46,6 @@
 				</b:FormGroup>
 			</b:Column>
 		</b:Row>
-
 		<b:Row>
 			<b:Column size="SM_6">
 				<b:FormGroup>
@@ -81,7 +78,6 @@
 				</b:FormGroup>
 			</b:Column>
 		</b:Row>
-
 		<b:Row>
 			<b:Column size="SM_6">
 				<b:FormGroup ui:field="linkFormGroup">
@@ -91,7 +87,6 @@
 				</b:FormGroup>
 			</b:Column>
 		</b:Row>
-
 		<b:Row>
 			<b:Column size="SM_12">
 				<b:FormGroup>
@@ -101,7 +96,5 @@
 				</b:FormGroup>
 			</b:Column>
 		</b:Row>
-
 	</g:HTMLPanel>
-
 </ui:UiBinder> 

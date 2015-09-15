@@ -1615,12 +1615,6 @@ ol.lowerroman {
 .align-center {display: block; margin-left: auto; margin-right: auto;}
 .text-align-center { text-align: center;}
 
-.topRight {
-	position: absolute;
-	top: 0;
-	right: 0;
-}
-
 .bottomright {
 	position: absolute;
 	bottom: 0;
