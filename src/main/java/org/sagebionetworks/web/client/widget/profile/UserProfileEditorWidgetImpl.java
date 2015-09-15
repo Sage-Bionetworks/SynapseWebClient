@@ -153,6 +153,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	
 	private void setNewFileHandle(String fileHandleId) {
 		this.fileHandleId = fileHandleId;
+		this.fileHandleUploadWidget.reset();
 		this.imageWidget.configure(this.fileHandleId);
 	}
 
