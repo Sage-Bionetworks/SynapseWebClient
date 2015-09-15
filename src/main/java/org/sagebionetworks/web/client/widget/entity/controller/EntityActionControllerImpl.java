@@ -54,6 +54,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	public static final String MOVE_PREFIX = "Move ";
 
+	public static final String EDIT_WIKI_PREFIX = "Edit ";
+	public static final String EDIT_WIKI_SUFFIX = " Wiki";
+	
 	public static final String THE = "The ";
 
 	public static final String WAS_SUCCESSFULLY_DELETED = " was successfully deleted.";
@@ -259,6 +262,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.addActionListener(Action.EDIT_WIKI_PAGE, this);
+			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+enityTypeDisplay+EDIT_WIKI_SUFFIX);
 		}else{
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, false);
