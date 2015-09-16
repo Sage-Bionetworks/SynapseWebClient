@@ -32,6 +32,7 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 
 	@Override
 	public void apply() {
+		view.clearErrors();
 		//widgetDescriptor should have all of the updated parameter info.  But we do need to ask for the widget name from the view.
 		//ask for the new file handles that the editor added (if any)
 		List<String> newFileHandleIds = view.getNewFileHandleIds();

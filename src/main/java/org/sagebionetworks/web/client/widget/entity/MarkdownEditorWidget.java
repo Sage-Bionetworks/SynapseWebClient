@@ -294,6 +294,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_ATTACHMENT:
 			insertNewWidget(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE);
 			break;
+		case INSERT_BIODALLIANCE_GENOME_BROWSER:
+			insertNewWidget(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE);
+			break;
 		case INSERT_BUTTON_LINK:
 			insertNewWidget(WidgetConstants.BUTTON_LINK_CONTENT_TYPE);
 			break;

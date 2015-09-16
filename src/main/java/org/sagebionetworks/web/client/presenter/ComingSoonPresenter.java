@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -11,7 +10,6 @@ import org.sagebionetworks.web.client.view.ComingSoonView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
@@ -53,18 +51,7 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		this.place = place;
 		this.view.setPresenter(this);
 		final String token = place.toToken();
-		view.showErrorMessage("Testing error message dialog look and feel.");
-		synapseClient.getEntity(token, new AsyncCallback<Entity>() {			
-			@Override
-			public void onSuccess(Entity result) {
-				Entity entity = result;
-				view.setEntity(entity);
-			}			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showInfo("Error", "error getting: " + token);
-			}
-		});
+		//on attach, cytoscape graph and biodalliance browser are loaded
 	}
 
 	@Override
@@ -73,5 +60,4 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
         return null;
         
     }
-	
 }
