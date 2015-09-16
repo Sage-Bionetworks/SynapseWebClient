@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidge
 import org.sagebionetworks.web.shared.TeamBundle;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -145,7 +146,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 						refresh(teamId);
 					}
 				};
-				view.setPublicJoinVisible(team.getCanPublicJoin());
+				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
+				view.setPublicJoinVisible(canPublicJoin);
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
 				view.setMediaObjectPanel(team);
 				view.setTeamEmailAddress(getTeamEmail(team.getName()));

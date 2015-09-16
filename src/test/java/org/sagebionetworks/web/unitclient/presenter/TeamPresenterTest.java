@@ -136,10 +136,12 @@ public class TeamPresenterTest {
 		boolean isAdmin = false;
 		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
 		when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
+		//SWC-2655: also test null canPublicJoin
+		when(mockTeam.getCanPublicJoin()).thenReturn(null);
 		presenter.refresh(teamId);
 		
 		//once
-		verify(mockView).setPublicJoinVisible(canPublicJoin);
+		verify(mockView).setPublicJoinVisible(false);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
