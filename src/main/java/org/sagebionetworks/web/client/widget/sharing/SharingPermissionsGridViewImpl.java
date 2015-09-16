@@ -139,16 +139,23 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		}
 		
 		PermissionLevel permLevel = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));
+		boolean foundMatchingPermissionLevel = false;
 		for (int i = 0; i < permissionLevels.length; i++) {
 			listBox.addItem(permissionDisplay.get(permissionLevels[i]));
-			if (permissionLevels[i].equals(permLevel))
+			if (permissionLevels[i].equals(permLevel)) {
+				foundMatchingPermissionLevel = true;
 				listBox.setSelectedIndex(i);
+			}
+		}
+		if (!foundMatchingPermissionLevel) {
+			listBox.addItem("Custom");
+			listBox.setSelectedIndex(listBox.getItemCount()-1);
 		}
 		
 		listBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				if (setAccessCallback != null)
+				if (setAccessCallback != null && listBox.getSelectedIndex() < permissionLevels.length)
 					setAccessCallback.invoke(principalId, permissionLevels[listBox.getSelectedIndex()]);
 			}
 		});
