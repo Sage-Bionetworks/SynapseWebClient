@@ -113,8 +113,7 @@ public class BiodallianceEditorTest {
 		editor.updateDescriptorFromView();
 
 		//verify descriptor
-		descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 0);
-		
+		assertEquals(testSourceJsonString, descriptor.get(WidgetConstants.BIODALLIANCE_SOURCE_PREFIX + 0));
 		assertEquals(viewStart, descriptor.get(WidgetConstants.BIODALLIANCE_VIEW_START_KEY));
 		assertEquals(viewEnd, descriptor.get(WidgetConstants.BIODALLIANCE_VIEW_END_KEY));
 		assertEquals(chr, descriptor.get(WidgetConstants.BIODALLIANCE_CHR_KEY));
@@ -180,6 +179,14 @@ public class BiodallianceEditorTest {
 		when(mockView.getViewEnd()).thenReturn("5");
 		editor.checkParams();
 	}
+	
+	public void testViewStartEndEqual() {
+		//can start be equal to end?  assert that it can, for now
+		when(mockView.getViewStart()).thenReturn("5");
+		when(mockView.getViewEnd()).thenReturn("5");
+		editor.checkParams();
+	}
+
 
 	private BiodallianceSourceEditor setupTrackEditor(boolean isSelected) {
 		BiodallianceSourceEditor mockSourceEditor= mock(BiodallianceSourceEditor.class);

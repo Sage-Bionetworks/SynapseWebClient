@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.biodalliance13.editor;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
 
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;
@@ -9,8 +9,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -104,14 +102,13 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		source.setEntity(null, null);
 		source.setSourceType(null);
 		//determine the source type of the given reference before accepting
-		int mask = ENTITY | FILE_HANDLES;
+		int mask = ENTITY | FILE_NAME;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				try {
 					assertFileEntity(bundle.getEntity());
-					FileHandle fileHandle = getFileHandle(bundle);
-					SourceType newSourceType = getSourceType(fileHandle.getFileName());
+					SourceType newSourceType = getSourceType(bundle.getFileName());
 					String newEntityId = bundle.getEntity().getId();
 					Long newVersion = ((FileEntity)bundle.getEntity()).getVersionNumber();
 					source.setEntity(newEntityId, newVersion);
@@ -139,14 +136,13 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 	@Override
 	public void indexEntitySelected(Reference ref) {
 		source.setIndexEntity(null, null);
-		int mask = ENTITY | FILE_HANDLES ;
+		int mask = ENTITY | FILE_NAME;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				try{
 					assertFileEntity(bundle.getEntity());
-					FileHandle fileHandle = getFileHandle(bundle);
-					assertIndexFile(fileHandle.getFileName());
+					assertIndexFile(bundle.getFileName());
 					String newIndexEntityId = bundle.getEntity().getId();
 					Long newIndexVersion = ((FileEntity)bundle.getEntity()).getVersionNumber();
 					source.setIndexEntity(newIndexEntityId, newIndexVersion);
@@ -216,15 +212,6 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 		if (!(fileName.toLowerCase().endsWith(".tbi"))) {
 			throw new IllegalArgumentException("Unrecognized index file: " + fileName);
 		}
-	}
-	
-	
-	public FileHandle getFileHandle(EntityBundle bundle) throws IllegalArgumentException {
-		FileHandle fileHandle = DisplayUtils.getFileHandle(bundle);
-		if (fileHandle == null) {
-			throw new IllegalArgumentException("Could not find a valid file in the selection.");
-		}
-		return fileHandle;
 	}
 	
 	private void updateFromView() {
