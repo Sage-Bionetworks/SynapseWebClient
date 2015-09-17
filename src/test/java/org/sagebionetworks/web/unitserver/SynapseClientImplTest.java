@@ -350,7 +350,7 @@ public class SynapseClientImplTest {
 		bundle.setUnmetAccessRequirements(accessRequirements);
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
 				.thenReturn(bundle);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES)))
+		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS)))
 				.thenReturn(bundle);
 
 		EntityBundle emptyBundle = new EntityBundle();
@@ -1961,6 +1961,7 @@ public class SynapseClientImplTest {
 		EntityBundlePlus entityBundlePlus = synapseClient.getEntityInfo(entityId);
 		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
 		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
+		assertEquals(eup, entityBundlePlus.getEntityBundle().getPermissions());
 		assertEquals(testUserProfile, entityBundlePlus.getProfile());
 	}
 	
