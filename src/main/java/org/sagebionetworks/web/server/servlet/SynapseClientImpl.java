@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -3072,7 +3069,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			//first, get the entity bundle with all information that we want
-			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES;
+			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS;
 			EntityBundle bundle = synapseClient.getEntityBundle(entityId, partsMask);
 			//now get the profile for the last modified by
 			UserProfile modifiedByProfile = synapseClient.getUserProfile(bundle.getEntity().getModifiedBy());
