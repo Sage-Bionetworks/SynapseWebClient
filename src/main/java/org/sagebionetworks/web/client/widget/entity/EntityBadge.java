@@ -10,11 +10,10 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -29,7 +28,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -118,8 +116,10 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				String rootWikiId = eb.getRootWikiId();
 				List<FileHandle> handles = eb.getFileHandles();
 				KeyValueDisplay<String> keyValueDisplay = ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(result.getProfile()), false);
-				addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiId);
+				addAnnotations(keyValueDisplay, annotations);
 				addContentSize(keyValueDisplay, handles);
+				addPublicPrivate(keyValueDisplay, eb.getPermissions());
+				addWikiStatus(keyValueDisplay, rootWikiId);
 				callback.onSuccess(keyValueDisplay);		
 			}
 			@Override
@@ -144,14 +144,25 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			}
 		}
 	}
+
+	public void addPublicPrivate(KeyValueDisplay<String> keyValueDisplay, UserEntityPermissions permissions) {
+		Map<String,String> map = keyValueDisplay.getMap();
+		List<String> order = keyValueDisplay.getKeyDisplayOrder();
+		if (permissions.getCanPublicRead()) {
+			order.add("Public");
+			map.put("Public", "");
+		} else {
+			order.add("Private");
+			map.put("Private", "");	
+		}
+	}
 	
 	/**
 	 * Adds annotations and wiki status values to the given key value display
 	 * @param keyValueDisplay
 	 * @param annotations
-	 * @param rootWikiKeyId
 	 */
-	public void addAnnotationsAndWikiStatus(KeyValueDisplay<String> keyValueDisplay, Annotations annotations, String rootWikiKeyId) {
+	public void addAnnotations(KeyValueDisplay<String> keyValueDisplay, Annotations annotations) {
 		Map<String,String> map = keyValueDisplay.getMap();
 		List<String> order = keyValueDisplay.getKeyDisplayOrder();
 		
@@ -161,9 +172,20 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			order.add(key);
 			map.put(key, SafeHtmlUtils.htmlEscapeAllowEntities(transformer.getFriendlyValues(annotation)));
 		}
+	}
+	
+	/**
+	 * Adds annotations and wiki status values to the given key value display
+	 * @param keyValueDisplay
+	 * @param rootWikiKeyId
+	 */
+	public void addWikiStatus(KeyValueDisplay<String> keyValueDisplay, String rootWikiKeyId) {
+		Map<String,String> map = keyValueDisplay.getMap();
+		List<String> order = keyValueDisplay.getKeyDisplayOrder();
+		
 		if (DisplayUtils.isDefined(rootWikiKeyId)) {
-			order.add("*Note");
-			map.put("*Note", "Has a wiki");
+			order.add("Has a wiki");
+			map.put("Has a wiki", "");
 		}
 	}
 	

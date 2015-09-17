@@ -222,10 +222,13 @@ public class ProvViewUtil {
 					if(val == null) val = "";
 					val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
 					sb.appendHtmlConstant("<span class=\"boldText\">")
-					.appendEscaped(key + ":")
-					.appendHtmlConstant("</span> ")
-					.appendEscaped(val)
-					.appendHtmlConstant("<br/>");
+					.appendEscaped(key)
+					.appendHtmlConstant("</span>");
+					if (val.length() > 0) {
+						sb.appendEscaped(": ")
+						.appendEscaped(val);
+					}
+					sb.appendHtmlConstant("<br/>");
 				}
 			}
 		}
