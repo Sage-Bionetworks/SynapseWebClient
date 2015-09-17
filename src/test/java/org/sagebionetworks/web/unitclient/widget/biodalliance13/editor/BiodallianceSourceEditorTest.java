@@ -40,7 +40,6 @@ public class BiodallianceSourceEditorTest {
 	
 	EntityBundle mockEntityBundle;
 	FileEntity selectedFile;
-	FileHandle selectedFileHandle;
 	
 	BiodallianceSourceEditor editor;
 	
@@ -68,9 +67,6 @@ public class BiodallianceSourceEditorTest {
 		selectedFile = new FileEntity();
 		selectedFile.setDataFileHandleId(dataFileHandleId);
 		when(mockEntityBundle.getEntity()).thenReturn(selectedFile);
-		selectedFileHandle = new S3FileHandle();
-		selectedFileHandle.setId(dataFileHandleId);
-		when(mockEntityBundle.getFileHandles()).thenReturn(Collections.singletonList(selectedFileHandle));
 		
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
@@ -183,7 +179,7 @@ public class BiodallianceSourceEditorTest {
 		Long currentEntityVersion = 20L;
 		selectedFile.setVersionNumber(currentEntityVersion);
 		selectedFile.setId(selectedEntityId);
-		selectedFileHandle.setFileName("test.BW");
+		when(mockEntityBundle.getFileName()).thenReturn("test.BW");
 		
 		editor.entitySelected(ref);
 		
@@ -223,7 +219,7 @@ public class BiodallianceSourceEditorTest {
 		Reference ref = new Reference();
 		String selectedEntityId = "syn111";
 		ref.setTargetId(selectedEntityId);
-		selectedFileHandle.setFileName("invalid-source-type.txt");
+		when(mockEntityBundle.getFileName()).thenReturn("invalid-source-type.txt");
 		
 		editor.entitySelected(ref);
 		
@@ -238,7 +234,7 @@ public class BiodallianceSourceEditorTest {
 		ref.setTargetVersionNumber(selectedVersion);
 		selectedFile.setVersionNumber(selectedVersion);
 		selectedFile.setId(selectedEntityId);
-		selectedFileHandle.setFileName("test.bed");
+		when(mockEntityBundle.getFileName()).thenReturn("test.bed");
 		
 		editor.entitySelected(ref);
 		
@@ -278,7 +274,7 @@ public class BiodallianceSourceEditorTest {
 		Long currentEntityVersion = 20L;
 		selectedFile.setVersionNumber(currentEntityVersion);
 		selectedFile.setId(selectedEntityId);
-		selectedFileHandle.setFileName("test.TbI");
+		when(mockEntityBundle.getFileName()).thenReturn("test.TbI");
 		
 		editor.indexEntitySelected(ref);
 		
@@ -317,7 +313,7 @@ public class BiodallianceSourceEditorTest {
 		Reference ref = new Reference();
 		String selectedEntityId = "syn111";
 		ref.setTargetId(selectedEntityId);
-		selectedFileHandle.setFileName("invalid-index-file.bw");
+		when(mockEntityBundle.getFileName()).thenReturn("invalid-index-file.bw");
 		
 		editor.indexEntitySelected(ref);
 		
@@ -332,7 +328,7 @@ public class BiodallianceSourceEditorTest {
 		ref.setTargetVersionNumber(selectedVersion);
 		selectedFile.setVersionNumber(selectedVersion);
 		selectedFile.setId(selectedEntityId);
-		selectedFileHandle.setFileName("test.tbi");
+		when(mockEntityBundle.getFileName()).thenReturn("test.tbi");
 		
 		editor.indexEntitySelected(ref);
 		
