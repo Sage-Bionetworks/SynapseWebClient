@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;

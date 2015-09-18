@@ -21,6 +21,10 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
+import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
+import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -35,10 +39,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
 	private EntityUpdatedHandler entityUpdateHandler;
-	private GlobalApplicationState globalApplicationState;
 	private EntityBundle bundle;
 	private String entityTypeDisplay;
-	private EventBus bus;
 	private Long versionNumber;
 	private Synapse.EntityArea area;
 	private String areaToken;
@@ -51,23 +53,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
 	private Tabs tabs;
 	private WikiTab wikiTab;
-	private Tab filesTab, tablesTab, adminTab;
+	private FilesTab filesTab;
+	private Tab tablesTab, adminTab;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
-			EventBus bus,
 			QueryTokenProvider queryTokenProvider,
 			Tabs tabs,
 			WikiTab wikiTab,
-			Tab filesTab,
+			FilesTab filesTab,
 			Tab tablesTab,
 			Tab adminTab) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.bus = bus;
-		this.globalApplicationState = globalApplicationState;	
 		this.queryTokenProvider = queryTokenProvider;
 		this.tabs = tabs;
 		this.wikiTab = wikiTab;
@@ -80,7 +79,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	private void initTabs() {
 		tabs.addTab(wikiTab.asTab());
-		tabs.addTab(filesTab);
+		tabs.addTab(filesTab.asTab());
 		tabs.addTab(tablesTab);
 		tabs.addTab(adminTab);
 	}
@@ -92,59 +91,40 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      * @param bundle
      */
     public void configure(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
-    	// reset state for newly visited project
-    	String projectHeaderId = projectHeader.getId();
-    	String areaStateProjectId = projectAreaState.getProjectId();
-    	boolean isNewProject = !projectHeaderId.equals(areaStateProjectId);
-    	if(isNewProject) {
-    		projectAreaState = new ProjectAreaState();
-    		projectAreaState.setProjectId(projectHeader.getId());
-    	}
-    	
     	this.bundle = bundle;
     	this.versionNumber = versionNumber;
     	this.projectHeader = projectHeader;
     	this.area = area;
     	this.areaToken = areaToken;
     	
-    	String entityId = bundle.getEntity().getId();
-    	boolean isTable = bundle.getEntity() instanceof TableEntity;
-    	boolean isProject = entityId.equals(projectAreaState.getProjectId());
-    	// For non-project file-tab entities, record them as the last file area place 
+    	entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass()));
     	
-    	if(!isProject && !isTable && area != EntityArea.WIKI) {
-    		EntityHeader lastFileAreaEntity = new EntityHeader();
-    		lastFileAreaEntity.setId(entityId);
-    		lastFileAreaEntity.setVersionNumber(versionNumber);
-    		projectAreaState.setLastFileAreaEntity(lastFileAreaEntity);
-    	}
-    	
-    	// record last wiki state
-    	if(area == EntityArea.WIKI) {
-    		projectAreaState.setLastWikiSubToken(areaToken);
-    	}
-    	
-    	// record last table state
-    	if(isTable) {
-    		EntityHeader lastTableAreaEntity = new EntityHeader();
-    		lastTableAreaEntity.setId(entityId);
-    		projectAreaState.setLastTableAreaEntity(lastTableAreaEntity);
-    	}
-    	
-    	// default area is the base wiki page if we are navigating to the project
-    	if(area == null && isProject) {
-    		projectAreaState.setLastWikiSubToken(null);
-    	}
-    	
-    	// clear out file or table state if we go back to root
-    	if(area == EntityArea.FILES && isProject) {
-    		projectAreaState.setLastFileAreaEntity(null);
-    	}
+    	//configure each tab
+    	configureWikiTab();
+    	configureFilesTab();
 
-    	// clear out table state if we go back to root
-    	if(area == EntityArea.TABLES && isProject) {
-    		projectAreaState.setLastTableAreaEntity(null);
-    	}
+    	//set area, if undefined
+		if (area == null) {
+			if (bundle.getEntity() instanceof Project) {
+				area = EntityArea.WIKI;
+			} else {
+				area = EntityArea.FILES;
+			}
+		}
+
+    	//go to the tab corresponding to the area stated
+		if (area == EntityArea.WIKI) {
+			wikiTab.showTab();
+		} else if (area == EntityArea.FILES) {
+			filesTab.showTab();
+		} else if (area == EntityArea.TABLES) {
+			tablesTab.showTab();
+		} else if (area == EntityArea.ADMIN) {
+			adminTab.showTab();
+		}
+		
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
+    	configureFileHistory();
 	}
     
     public void clearState() {
@@ -164,13 +144,18 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void refresh() {
-		entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass()));
-		configureWikiTab();
-		if (area == null && bundle.getEntity() instanceof Project) {
-			wikiTab.showTab();
-		}
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
-    	configureFileHistory();
+		configure(bundle, versionNumber, projectHeader, area, areaToken);
+	}
+	
+	public void configureFilesTab() {
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				fireEntityUpdatedEvent();
+			}
+		};
+		
+		filesTab.configure(bundle, handler);
 	}
 	
 	public void configureWikiTab() {
@@ -198,7 +183,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void fireEntityUpdatedEvent() {
 		EntityUpdatedEvent event = new EntityUpdatedEvent();
 		entityUpdateHandler.onPersistSuccess(event);
-		bus.fireEvent(event);
 	}
 
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
@@ -230,74 +214,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.area = area;
 		this.areaToken = areaToken;
 		if(areaChangedHandler != null) areaChangedHandler.replaceArea(area, areaToken);
-	}
-
-	@Override
-	public void gotoProjectArea(EntityArea area, EntityArea currentArea) {
-		String entityId = projectHeader.getId();
-		String areaToken = null;
-		Long versionNumber = null;
-		boolean overrideCache = false;
-		// return to root for file and tables
-		if((currentArea == EntityArea.FILES && area == EntityArea.FILES) 
-				|| (bundle.getEntity() instanceof TableEntity && area == EntityArea.TABLES))
-			overrideCache = true;
-		if(!overrideCache) {
-			if(area == EntityArea.WIKI) {
-				areaToken = projectAreaState.getLastWikiSubToken();
-			} else if(area == EntityArea.FILES && projectAreaState.getLastFileAreaEntity() != null) {
-				entityId = projectAreaState.getLastFileAreaEntity().getId();
-				versionNumber = projectAreaState.getLastFileAreaEntity().getVersionNumber();
-			} else if(area == EntityArea.TABLES && projectAreaState.getLastTableAreaEntity() != null) {
-				entityId = projectAreaState.getLastTableAreaEntity().getId();
-			}
-		}
-
-		if(!entityId.equals(projectHeader.getId())) area = null; // don't specify area in place for non-project entities
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, area, areaToken));
-	}
-
-	@Override
-	public boolean isPlaceChangeForArea(EntityArea targetTab) {
-		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());
-		if(targetTab == EntityArea.ADMIN && !isProject) {
-			// admin area clicked outside of project requires goto
-			return true;
-		} else if(targetTab == EntityArea.FILES) {
-			// files area clicked in non-project entity requires goto root of files
-			// files area clicked with last-file-state requires goto
-			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
-				return true;				
-			}
-		} else if(targetTab == EntityArea.WIKI) {
-			if(!isProject || (isProject && projectAreaState.getLastWikiSubToken() != null)) {
-				// wiki area clicked in non-project entity requires goto
-				// wiki area with defined subtoken requires goto (can not guarantee that subpage is loaded loaded)
-				return true;							
-			}
-		} else if(targetTab == EntityArea.TABLES) {
-			// tables area clicked in non-project entity requires goto root of tables
-			// tables area clicked with last-table-state requires goto
-			if(!isProject || projectAreaState.getLastTableAreaEntity() != null)
-				return true;
-		}
-		return false;		
-	}
-
-	/**
-	 * Handle entity deleted event
-	 */
-	@Override
-	public void entityDeleted(EntityDeletedEvent event) {
-		if (event != null && event.getDeletedId() != null && projectAreaState != null) {			
-			if(projectAreaState.getLastTableAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastTableAreaEntity().getId())) {
-				// remove table state
-				projectAreaState.setLastTableAreaEntity(null);
-			} else if(projectAreaState.getLastFileAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastFileAreaEntity().getId())) { 
-				// remove file state
-				projectAreaState.setLastFileAreaEntity(null);
-			}
-		}
 	}
 
 	@Override
@@ -387,9 +303,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void configureFileHistory() {
 		Entity entity = bundle.getEntity();
 		if (entity != null && entity instanceof FileEntity) {
-			view.setFileHistoryVisible(versionNumber != null);
+			boolean isVisible = versionNumber != null;
+			view.setFileHistoryVisible(isVisible);
+			filesTab.setFileHistoryVisible(isVisible);
 		} else {
 			view.setFileHistoryVisible(false);
+			filesTab.setFileHistoryVisible(false);
 		}
 	}
 
@@ -397,17 +316,5 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
-	}
-	
-	
-	/**
-	 * For testing purposes only
-	 * @return currently loaded entity page project id
-	 */
-	public String getCurrentEntityPageProjectId() {
-		return projectAreaState.getProjectId();
-	}
-	public void clearProjectAreaState() {
-		projectAreaState = new ProjectAreaState();
 	}
 }

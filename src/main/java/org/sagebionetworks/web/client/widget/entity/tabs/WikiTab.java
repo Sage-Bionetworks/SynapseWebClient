@@ -1,9 +1,10 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 

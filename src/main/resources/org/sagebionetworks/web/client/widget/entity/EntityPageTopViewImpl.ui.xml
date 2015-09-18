@@ -32,33 +32,7 @@
 				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="wikiPageContainer"/>
 			</b:Column>
 		</b:Row>
-		<b:Row ui:field="filesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15">
-			<bh:Div addStyleNames="margin-left-15 margin-right-15">
-				<g:SimplePanel ui:field="fileActionMenuContainer"/>
-			</bh:Div>
-			<bh:Div addStyleNames="margin-left-15 margin-right-15">
-				<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
-				<g:SimplePanel ui:field="folderTitlebarContainer"/>
-				<g:SimplePanel ui:field="fileTitlebarContainer"/>
-				<g:SimplePanel ui:field="fileMetadataContainer"/>
-			</bh:Div>
-			<b:Column size="XS_12">
-				<g:SimplePanel ui:field="fileHistoryContainer"/>
-				<g:SimplePanel ui:field="fileDescriptionContainer"/>
-				<g:SimplePanel ui:field="filesWikiPageContainer"/>
-				<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
-				<b:Row>
-					<g:SimplePanel ui:field="filePreviewContainer"/>
-					<g:SimplePanel ui:field="fileProvenanceContainer"/>
-				</b:Row>
-				<b:Row>
-					<b:Column size="XS_12">
-						<g:HTMLPanel ui:field="fileProgrammaticClientsContainer"/>		
-					</b:Column>
-				</b:Row>
-				<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="fileModifiedAndCreatedContainer"/>
-			</b:Column>
-		</b:Row>
+		
 		<b:Row ui:field="tablesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15 padding-bottom-15">
 			<bh:Div addStyleNames="margin-left-15 margin-right-15">
 				<g:SimplePanel ui:field="tableActionMenuContainer"/>

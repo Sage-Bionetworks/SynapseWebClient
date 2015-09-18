@@ -96,8 +96,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	Button tableAPIDocsButton;
 	
 	private Presenter presenter;
-	private FileTitleBar fileTitleBar;
-	private BasicTitleBar folderTitleBar, tableTitleBar;
+	private BasicTitleBar tableTitleBar;
 	private PortalGinInjector ginInjector;
 	private Breadcrumb breadcrumb;
 	private ActionMenuWidget actionMenu;
@@ -113,8 +112,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	Row wikiTabContainer;
 	@UiField
-	Row filesTabContainer;
-	@UiField
 	Row tablesTabContainer;
 	@UiField
 	Row adminTabContainer;
@@ -124,36 +121,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	SimplePanel wikiPageContainer;
 	
-	//files
-	@UiField
-	SimplePanel fileHistoryContainer;
-	@UiField
-	SimplePanel fileDescriptionContainer;
-	@UiField
-	SimplePanel fileBrowserContainer;
-	@UiField
-	SimplePanel filesWikiPageContainer;
-	@UiField
-	SimplePanel filePreviewContainer;
-	@UiField
-	SimplePanel fileProvenanceContainer;
-	@UiField
-	HTMLPanel fileProgrammaticClientsContainer;
-	@UiField
-	SimplePanel fileModifiedAndCreatedContainer;
-	@UiField
-	SimplePanel fileBreadcrumbContainer;
-	@UiField
-	SimplePanel fileTitlebarContainer;
-	@UiField
-	SimplePanel folderTitlebarContainer;
 	@UiField
 	SimplePanel tableTitlebarContainer;
-	
-	@UiField
-	SimplePanel fileMetadataContainer;
-	@UiField
-	SimplePanel fileActionMenuContainer;
 	
 	//tables
 	@UiField
@@ -178,21 +147,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
 	private boolean isProject = false;
-	private EntityArea currentArea;
 	private AdministerEvaluationsList evaluationList;
 	private static int WIDGET_HEIGHT_PX = 270;
 	private boolean annotationsShown;
 	private boolean fileHistoryShown;
-	private RClientModalWidgetViewImpl rLoadWidget;
-	private PythonClientModalWidgetViewImpl pythonLoadWidget;
-	private JavaClientModalWidgetViewImpl javaLoadWidget;
-	private CommandLineClientModalWidgetViewImpl commandLineLoadWidget;
 	private EntityActionController controller;
 
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
-			FileTitleBar fileTitleBar,
-			BasicTitleBar folderTitleBar,
 			BasicTitleBar tableTitleBar,
 			Breadcrumb breadcrumb,
 			EntityMetadata entityMetadata, 
@@ -204,17 +166,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			FilesBrowser folderFilesBrowser,
 			WikiPageWidget wikiPageWidget,
 			TableListWidget tableListWidget,
-			RClientModalWidgetViewImpl rLoadWidget,
-			PythonClientModalWidgetViewImpl pythonLoadWidget,
-			JavaClientModalWidgetViewImpl javaLoadWidget,
-			CommandLineClientModalWidgetViewImpl commandLineLoadWidget,
 			PreviewWidget previewWidget, CookieProvider cookies) {
 		this.breadcrumb = breadcrumb;
 		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.evaluationList = evaluationList;
-		this.fileTitleBar = fileTitleBar;
-		this.folderTitleBar = folderTitleBar;
 		this.tableTitleBar = tableTitleBar;
 		this.ginInjector = ginInjector;
 		this.folderFilesBrowser = folderFilesBrowser;
@@ -222,18 +178,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.previewWidget = previewWidget;
 		this.wikiPageWidget = wikiPageWidget;
 		this.tableListWidget = tableListWidget;
-		this.rLoadWidget = rLoadWidget;
-		this.javaLoadWidget = javaLoadWidget;
-		this.commandLineLoadWidget = commandLineLoadWidget;
-		this.pythonLoadWidget = pythonLoadWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 		evaluationListContainer.add(evaluationList.asWidget());
-		fileTitlebarContainer.add(fileTitleBar.asWidget());
-		folderTitlebarContainer.add(folderTitleBar.asWidget());
 		tableTitlebarContainer.add(tableTitleBar.asWidget());
 		tableListWidgetContainer.add(tableListWidget);
-		initProjectLayout();
-
+		
 		initClickHandlers();
 
 		// use this callback to update wikiPageId
@@ -244,17 +193,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		};
 		this.wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
-	}
-	
-	private void initProjectLayout() {
-		wikiLink.setText(DisplayConstants.WIKI);
-		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
-		fileLink.setText(DisplayConstants.FILES);		
-		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
-		tablesLink.setHTML(DisplayConstants.TABLES);		
-		tablesLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.TABLES));
-		adminLink.setText(DisplayConstants.CHALLENGE_ADMIN);
-		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
 	}
 	
 	private void initClickHandlers() {		
@@ -273,22 +211,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		});
 	}
 	
-	private ClickHandler getTabClickHandler(final Synapse.EntityArea targetTab) {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// Change tabs locally (in view) for projects as long as requested tab does not requre a place change
-				if(isProject && !presenter.isPlaceChangeForArea(targetTab)) {
-					setTabSelected(targetTab, true);					
-				} else {	
-					// return to cached location
-					presenter.gotoProjectArea(targetTab, currentArea); 
-				}
-				currentArea = targetTab;
-			}
-		};
-	}
-
 	@Override
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader, String wikiPageId) {
@@ -297,34 +219,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		DisplayUtils.hide(adminListItem);
 		clearContent();
 		hideTabContent();
-	
-		// Custom layouts for certain entities
-		boolean isFolderLike = bundle.getEntity() instanceof Folder;
-		isProject = bundle.getEntity() instanceof Project;		
 		
-		if (isProject) {
-			renderProjectEntity(bundle, entityTypeDisplay, area, wikiPageId);
-		} else if (isFolderLike) {
-			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
-			renderFolderEntity(bundle, entityTypeDisplay, wikiPageId, projectHeader);
-			if (currentArea == null) currentArea = EntityArea.FILES;
-		} else if(bundle.getEntity() instanceof TableEntity) {
-			renderTableEntity(bundle, entityTypeDisplay, projectHeader, areaToken);
-		} else {
-			// default entity view
-			renderFileEntity(bundle, entityTypeDisplay, versionNumber, wikiPageId, projectHeader);
-			if (currentArea == null) currentArea = EntityArea.FILES;
-		}
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
 
-	}
-
-	private void hideTabContent(){
-		wikiTabContainer.setVisible(false);
-		filesTabContainer.setVisible(false);
-		tablesTabContainer.setVisible(false);
-		adminTabContainer.setVisible(false);
 	}
 	
 	private void clearContent() {
@@ -369,7 +267,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		fileTitleBar.setEntityUpdatedHandler(handler);
 		projectFilesBrowser.setEntityUpdatedHandler(handler);
 		folderFilesBrowser.setEntityUpdatedHandler(handler);
 		entityMetadata.setEntityUpdatedHandler(handler);
@@ -740,7 +637,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void setFileHistoryVisible(boolean isVisible) {
 		fileHistoryShown = isVisible;
-		entityMetadata.setFileHistoryVisible(isVisible);
 		if (controller != null) {
 			controller.onFileHistoryToggled(isVisible);
 		}

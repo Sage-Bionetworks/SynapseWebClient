@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -76,7 +75,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	
 	@Inject
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
-			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloaderHandler,
 			FavoriteWidget favoriteWidget,
 			GlobalApplicationState globalAppState,

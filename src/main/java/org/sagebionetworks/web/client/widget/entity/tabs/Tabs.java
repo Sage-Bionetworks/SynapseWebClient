@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity;
+package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import java.util.ArrayList;
 import java.util.List;
