@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.place.shared.Place;
@@ -23,9 +22,8 @@ public class Tab implements TabView.Presenter {
 		view.setPresenter(this);
 	}
 	
-	public void configure(String tabTitle, Widget content, Place initPlace) {
+	public void configure(String tabTitle, Widget content) {
 		view.configure(tabTitle, content);
-		setPlace(initPlace);
 	}
 	
 	public TabListItem getTabListItem() {

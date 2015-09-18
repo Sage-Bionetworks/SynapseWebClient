@@ -554,61 +554,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectActionMenuContainer.add(actionMenu.asWidget());
 	}
 
-	/**
-	 * Used only for setting the view's tab display
-	 * @param targetTab
-	 * @param userSelected 
-	 */
-	private void setTabSelected(Synapse.EntityArea targetTab, boolean userSelected) {
-		// tell presenter what tab we're on only if the user clicked
-		// this keeps extra goTos that break navigation from occurring 
-		if(userSelected) presenter.setArea(targetTab, null);
-		if(targetTab == null) targetTab = Synapse.EntityArea.WIKI; // select tab, set default if needed
-		
-		hideTabContent();
-		
-		wikiListItem.removeClassName("active");
-		filesListItem.removeClassName("active");
-		tablesListItem.removeClassName("active");
-		adminListItem.removeClassName("active");
-		wikiLink.addStyleName("link");
-		fileLink.addStyleName("link");
-		tablesLink.addStyleName("link");
-		adminLink.addStyleName("link");
-		
-		LIElement tab; 
-		Anchor link;
-		
-		if (targetTab == Synapse.EntityArea.WIKI) {
-			tab = wikiListItem;
-			link = wikiLink;
-			wikiTabContainer.setVisible(true);
-		} else if (targetTab == Synapse.EntityArea.FILES) {
-			tab = filesListItem;
-			link = fileLink;
-			filesTabContainer.setVisible(true);
-		} else if(targetTab == Synapse.EntityArea.TABLES) {
-			tab = tablesListItem;
-			link = tablesLink;
-			tablesTabContainer.setVisible(true);
-		} else {
-			tab = adminListItem;
-			link = adminLink;
-			adminTabContainer.setVisible(true);
-		}
-		
-		link.removeStyleName("link");
-		tab.addClassName("active");
-	}
-	
 	private void addWikiPageWidget(SimplePanel container, EntityBundle bundle, String wikiPageId, final Synapse.EntityArea area) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			Widget wikiW = wikiPageWidget.asWidget();
 			final SimplePanel wrapper = new SimplePanel(wikiW);
 			wrapper.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
-			if(!isProject) wrapper.addStyleName("margin-top-15");
-				container.add(wrapper);
+			if(!isProject) 
+				wrapper.addStyleName("margin-top-15");
+			container.add(wrapper);
 			boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
 				@Override

@@ -168,6 +168,10 @@ import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.TabView;
+import org.sagebionetworks.web.client.widget.entity.TabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.TabsView;
+import org.sagebionetworks.web.client.widget.entity.TabsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
@@ -1150,5 +1154,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BiodallianceWidgetView.class).to(BiodallianceWidgetViewImpl.class);
 		bind(BiodallianceSourceEditorView.class).to(BiodallianceSourceEditorViewImpl.class);
 		bind(BiodallianceEditorView.class).to(BiodallianceEditorViewImpl.class);
+		
+		bind(TabView.class).to(TabViewImpl.class);
+		bind(TabsView.class).to(TabsViewImpl.class);
 	}
 }

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
-import org.sagebionetworks.web.shared.ProjectAreaState;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -32,10 +32,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter, IsWidget  {
-	private static ProjectAreaState projectAreaState = new ProjectAreaState();
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
-	private EntitySchemaCache schemaCache;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private GlobalApplicationState globalApplicationState;
 	private EntityBundle bundle;
@@ -51,21 +49,40 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public static final String TABLE_QUERY_PREFIX = "query/";
 	public static final String TABLE_ROW_PREFIX = "row/";
 	public static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
+	private Tabs tabs;
+	private WikiTab wikiTab;
+	private Tab filesTab, tablesTab, adminTab;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			AuthenticationController authenticationController,
-			EntitySchemaCache schemaCache,
 			GlobalApplicationState globalApplicationState,
 			EventBus bus,
-			QueryTokenProvider queryTokenProvider) {
+			QueryTokenProvider queryTokenProvider,
+			Tabs tabs,
+			WikiTab wikiTab,
+			Tab filesTab,
+			Tab tablesTab,
+			Tab adminTab) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.schemaCache = schemaCache;
 		this.bus = bus;
 		this.globalApplicationState = globalApplicationState;	
 		this.queryTokenProvider = queryTokenProvider;
+		this.tabs = tabs;
+		this.wikiTab = wikiTab;
+		this.filesTab = filesTab;
+		this.tablesTab = tablesTab;
+		this.adminTab = adminTab;
+		initTabs();
 		view.setPresenter(this);
+	}
+	
+	private void initTabs() {
+		tabs.addTab(wikiTab.asTab());
+		tabs.addTab(filesTab);
+		tabs.addTab(tablesTab);
+		tabs.addTab(adminTab);
 	}
 
     /**
@@ -147,7 +164,34 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void refresh() {
-		sendDetailsToView(area, areaToken, projectHeader);
+		entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass()));
+		configureWikiTab();
+		if (area == null && bundle.getEntity() instanceof Project) {
+			wikiTab.showTab();
+		}
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
+    	configureFileHistory();
+	}
+	
+	public void configureWikiTab() {
+		String wikiPageId = getWikiPageId(area, areaToken, bundle.getRootWikiId());
+		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+		WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
+			@Override
+			public void pageUpdated() {
+				fireEntityUpdatedEvent();
+			}
+			@Override
+			public void noWikiFound() {
+				//if wiki area not specified and no wiki found, show Files tab instead for projects 
+				// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
+				if(area == null) {							
+					filesTab.showTab();
+				}
+			}
+		};
+		wikiTab.configure(projectHeader.getId(), wikiPageId, 
+				canEdit, callback, true);
 	}
 		
 	@Override
@@ -349,18 +393,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 	}
 
-	/*
-	 * Private Methods
-	 */
-	private void sendDetailsToView(Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
-		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
-		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		if (area == null && bundle.getEntity() instanceof Project) {
-			globalApplicationState.replaceCurrentPlace(new Synapse(bundle.getEntity().getId(), versionNumber, EntityArea.WIKI, null));	
-		}
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
-    	configureFileHistory();
-	}
 	
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
