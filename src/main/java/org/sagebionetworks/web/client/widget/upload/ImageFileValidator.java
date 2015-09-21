@@ -12,11 +12,12 @@ public class ImageFileValidator extends AbstractFileValidator {
 	}
 	@Override
 	public boolean isValid(FileMetadata file) {
+		if (file == null) {
+			return false;
+		}
 		invalidMessage = WebConstants.INVALID_IMAGE_FILETYPE_MESSAGE;
 		String contentType = file.getContentType();
-		if (file == null){
-			return false;
-		} else if (!isValidSize(file.getFileSize())) {
+		if (!isValidSize(file.getFileSize())) {
 			invalidMessage = WebConstants.INVALID_FILE_SIZE + DisplayUtils.getFriendlySize(maxFileSize, false);
 			return false;
 		} else if (contentType != null) {

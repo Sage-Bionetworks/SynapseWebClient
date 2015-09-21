@@ -96,27 +96,30 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 
 	@Override
 	public void onFileSelected() {
-		FileMetadata fileMeta = getSelectedFileMetadata()[0];
-		boolean isValidUpload = validator == null || validator.isValid(fileMeta);
-		if (isValidUpload) {
-			if (startedUploadingCallback != null) {
-				startedUploadingCallback.invoke();
-			}
-			view.updateProgress(1, "1%");
-			view.showProgress(true);
-			view.setInputEnabled(false);
-			view.hideError();
-			doMultipartUpload(fileMeta);		
-		} else {
-			Callback invalidFileCallback = validator.getInvalidFileCallback();
-			if (invalidFileCallback == null) {
-				String invalidMessage = validator.getInvalidMessage();
-				if (invalidMessage == null)
-					view.showError("Please select a valid filetype.");
-				else
-					view.showError(invalidMessage);	
+		FileMetadata[] fileMetaArr = getSelectedFileMetadata();
+		if (fileMetaArr != null) {
+			FileMetadata fileMeta = fileMetaArr[0];
+			boolean isValidUpload = validator == null || validator.isValid(fileMeta);
+			if (isValidUpload) {
+				if (startedUploadingCallback != null) {
+					startedUploadingCallback.invoke();
+				}
+				view.updateProgress(1, "1%");
+				view.showProgress(true);
+				view.setInputEnabled(false);
+				view.hideError();
+				doMultipartUpload(fileMeta);		
 			} else {
-				invalidFileCallback.invoke();
+				Callback invalidFileCallback = validator.getInvalidFileCallback();
+				if (invalidFileCallback == null) {
+					String invalidMessage = validator.getInvalidMessage();
+					if (invalidMessage == null)
+						view.showError("Please select a valid filetype.");
+					else
+						view.showError(invalidMessage);	
+				} else {
+					invalidFileCallback.invoke();
+				}
 			}
 		}
 	}

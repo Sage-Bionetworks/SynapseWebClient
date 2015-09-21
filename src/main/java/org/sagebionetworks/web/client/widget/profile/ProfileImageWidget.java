@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ProfileImageWidget extends IsWidget {
@@ -16,5 +18,9 @@ public interface ProfileImageWidget extends IsWidget {
 	 * @param fileHandleId
 	 */
 	void configure(String fileHandleId);
+
+	void setRemovePictureCallback(Callback callback);
+
+	public void onRemovePicture();
 
 }

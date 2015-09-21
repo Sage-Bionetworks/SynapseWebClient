@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.profile;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.ValidationUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
@@ -57,6 +58,12 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		view.setLink(profile.getUrl());
 		this.fileHandleId = profile.getProfilePicureFileHandleId();
 		imageWidget.configure(this.fileHandleId);
+		imageWidget.setRemovePictureCallback(new Callback() {
+			@Override
+			public void invoke() {
+				setNewFileHandle(null);
+			}
+		});
 		fileHandleUploadWidget.configure("Upload Image", new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUploaded) {
@@ -146,6 +153,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	
 	private void setNewFileHandle(String fileHandleId) {
 		this.fileHandleId = fileHandleId;
+		this.fileHandleUploadWidget.reset();
 		this.imageWidget.configure(this.fileHandleId);
 	}
 
