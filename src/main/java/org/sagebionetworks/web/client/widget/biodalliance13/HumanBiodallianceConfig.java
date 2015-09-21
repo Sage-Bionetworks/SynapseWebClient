@@ -17,6 +17,7 @@ public class HumanBiodallianceConfig implements BiodallianceConfigInterface {
 	public static String humanTwoBitURI;
 	public static String humanBwgURI;
 	public static String humanTrixURI;
+	public static String humanTrixxURI;
 	public static String humanStylesheetURI;
 	
 	public static boolean isUrlInitialized = false;
@@ -33,6 +34,7 @@ public class HumanBiodallianceConfig implements BiodallianceConfigInterface {
 		humanTwoBitURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.twobit"));
 		humanBwgURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.bwg"));
 		humanTrixURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.trix"));
+		humanTrixxURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.trixx"));
 		humanStylesheetURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.stylesheet"));
 		isUrlInitialized = true;
 	}
@@ -67,6 +69,10 @@ public class HumanBiodallianceConfig implements BiodallianceConfigInterface {
 	@Override
 	public String getTrixURI() {
 		return humanTrixURI;
+	}
+	@Override
+	public String getTrixxURI() {
+		return humanTrixxURI;
 	}
 	@Override
 	public String getStylesheetURI() {

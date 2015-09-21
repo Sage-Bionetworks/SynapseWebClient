@@ -18,6 +18,7 @@ public class MouseBiodallianceConfig implements BiodallianceConfigInterface {
 	public static String mouseTwoBitURI;
 	public static String mouseBwgURI;
 	public static String mouseTrixURI;
+	public static String mouseTrixxURI;
 	public static String mouseStylesheetURI;
 	
 	
@@ -33,6 +34,7 @@ public class MouseBiodallianceConfig implements BiodallianceConfigInterface {
 		mouseTwoBitURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.twobit"));
 		mouseBwgURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.bwg"));
 		mouseTrixURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.trix"));
+		mouseTrixxURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.trixx"));
 		mouseStylesheetURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.stylesheet"));
 		isUrlInitialized = true;
 	}
@@ -67,6 +69,10 @@ public class MouseBiodallianceConfig implements BiodallianceConfigInterface {
 	@Override
 	public String getTrixURI() {
 		return mouseTrixURI;
+	}
+	@Override
+	public String getTrixxURI() {
+		return mouseTrixxURI;
 	}
 	@Override
 	public String getStylesheetURI() {
