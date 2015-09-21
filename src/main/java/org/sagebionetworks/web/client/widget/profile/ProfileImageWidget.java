@@ -21,4 +21,6 @@ public interface ProfileImageWidget extends IsWidget {
 
 	void setRemovePictureCallback(Callback callback);
 
+	public void onRemovePicture();
+
 }

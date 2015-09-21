@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.profile;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Image;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,6 +23,7 @@ public class ProfileImageViewImpl implements ProfileImageView {
 	@UiField
 	Button removePicture;
 	
+	ProfileImageWidget presenter;
 	Callback removePictureCallback;
 	Widget widget;
 	
@@ -33,16 +33,18 @@ public class ProfileImageViewImpl implements ProfileImageView {
 		removePicture.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				removePictureCallback.invoke();
+				if (presenter != null) {
+					presenter.onRemovePicture();
+				}
 			}
 		});
 	}
 	
 	@Override
-	public void setRemovePictureCallback(Callback callback) {
-		this.removePictureCallback = callback;
+	public void setPresenter(ProfileImageWidget presenter) {
+		this.presenter = presenter;
 	}
-
+	
 	@Override
 	public void showDefault() {
 		image.setVisible(false);

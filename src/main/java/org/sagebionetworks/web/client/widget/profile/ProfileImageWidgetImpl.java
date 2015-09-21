@@ -11,16 +11,18 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	
 	ProfileImageView view;
 	String baseUrl;
+	Callback removePictureCallback;
 	
 	@Inject
 	public ProfileImageWidgetImpl(ProfileImageView view, SynapseJSNIUtils jniUtils){
 		this.view = view;
+		view.setPresenter(this);
 		baseUrl = jniUtils.getBaseProfileAttachmentUrl();
 	}
 	
 	@Override
-	public void setRemovePictureCallback(Callback callback) {
-		view.setRemovePictureCallback(callback);
+	public void setRemovePictureCallback(Callback removePictureCallback) {
+		this.removePictureCallback = removePictureCallback;
 	}
 
 	@Override
@@ -64,6 +66,13 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 		builder.append("&"+WebConstants.USER_PROFILE_APPLIED+"=");
 		builder.append(applied);
 		return builder.toString();
+	}
+
+	@Override
+	public void onRemovePicture() {
+		if (removePictureCallback != null) {
+			removePictureCallback.invoke();
+		}
 	}
 
 }
