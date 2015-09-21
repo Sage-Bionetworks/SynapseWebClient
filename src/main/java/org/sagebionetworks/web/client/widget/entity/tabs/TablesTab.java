@@ -10,16 +10,13 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.inject.Inject;
 
-public class WikiTab {
+public class TablesTab implements TablesTabView.Presenter{
 	Tab tab;
-	private WikiPageWidget wikiPageWidget;
 	
 	@Inject
-	public WikiTab(Tab tab, WikiPageWidget wikiPageWidget) {
+	public TablesTab(Tab tab) {
 		this.tab = tab;
-		this.wikiPageWidget = wikiPageWidget;
 		tab.configure("Wiki", wikiPageWidget.asWidget());
-		wikiPageWidget.asWidget().addStyleName("panel panel-default panel-body margin-bottom-0-imp");
 	}
 	
 	public void showTab() {
@@ -34,17 +31,9 @@ public class WikiTab {
 		tab.setTabClickedCallback(onClickCallback);
 	}
 	
-	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {
-		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
-	}
-	
-	public void configure(String entityId, String wikiPageId, Boolean canEdit,
-			Callback callback, boolean isEmbeddedInOwnerPage) {
-		Long versionNumber = null; //version is always null for project
-		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
+	public void configure() {
 		
-		wikiPageWidget.configure(wikiPageKey, canEdit, callback, isEmbeddedInOwnerPage);
-		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
+		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.TABLES, wikiPageId));
 	}
 	
 	public Tab asTab(){

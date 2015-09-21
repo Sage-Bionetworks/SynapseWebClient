@@ -18,7 +18,7 @@ import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class FilesTabViewImpl implements FilesTabView {
+public class TablesViewImpl implements FilesTabView {
 	@UiField
 	SimplePanel fileBrowserContainer;
 	@UiField
@@ -43,7 +43,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	@UiField
 	SimplePanel fileActionMenuContainer;
 	
-	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
+	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesViewImpl> {}
 	
 	Widget widget;
 	private RClientModalWidgetViewImpl rLoadWidget;
@@ -52,7 +52,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	private CommandLineClientModalWidgetViewImpl commandLineLoadWidget;
 	UserBadge createdByBadge, modifiedByBadge;
 	
-	public FilesTabViewImpl(
+	public TablesViewImpl(
 			RClientModalWidgetViewImpl rLoadWidget,
 			PythonClientModalWidgetViewImpl pythonLoadWidget,
 			JavaClientModalWidgetViewImpl javaLoadWidget,

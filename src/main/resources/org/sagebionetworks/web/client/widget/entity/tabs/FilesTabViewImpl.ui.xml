@@ -15,12 +15,11 @@
 			</bh:Div>
 			<b:Column size="XS_12">
 				<g:SimplePanel ui:field="fileHistoryContainer"/>
-				<g:SimplePanel ui:field="fileDescriptionContainer"/>
-				<g:SimplePanel ui:field="filesWikiPageContainer"/>
+				<g:SimplePanel ui:field="filesWikiPageContainer" addStyleNames="panel panel-default panel-body margin-bottom-0-imp"/>
 				<g:SimplePanel addStyleNames="margin-top-10" ui:field="fileBrowserContainer"/>
 				<b:Row>
-					<g:SimplePanel ui:field="filePreviewContainer"/>
-					<g:SimplePanel ui:field="fileProvenanceContainer"/>
+					<g:SimplePanel ui:field="filePreviewContainer" addStyleNames="highlight-box col-md-6"/>
+					<g:SimplePanel ui:field="fileProvenanceContainer" addStyleNames="highlight-box col-md-6"/>
 				</b:Row>
 				<b:Row>
 					<b:Column size="XS_12">

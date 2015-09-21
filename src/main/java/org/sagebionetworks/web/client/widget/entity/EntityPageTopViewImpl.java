@@ -302,22 +302,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	 */
 	// Render the File entity	
 	private void renderFileEntity(EntityBundle bundle, String entityTypeDisplay, Long versionNumber, String wikiPageId, EntityHeader projectHeader) {
-		// tab container
-		setTabSelected(EntityArea.FILES, false); // select files tab for file
-		
-		// add breadcrumbs
-		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
-		fileBreadcrumbContainer.add(breadcrumb.asWidget());
-		// File Title Bar
-		if (bundle.getEntity() instanceof FileEntity) {
-			fileTitleBar.configure(bundle);
-			fileTitlebarContainer.setVisible(true);
-		}
-		
-		// Entity Metadata
-		entityMetadata.setEntityBundle(bundle, versionNumber);
-		fileMetadataContainer.add(entityMetadata.asWidget());
-		
 		// ActionMenu
 		fileActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);

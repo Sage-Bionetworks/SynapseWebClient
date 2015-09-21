@@ -5,7 +5,7 @@ import org.sagebionetworks.repo.model.Entity;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface FilesTabView extends IsWidget {
+public interface TablesTabView extends IsWidget {
 	public interface Presenter {
 	}
 	
