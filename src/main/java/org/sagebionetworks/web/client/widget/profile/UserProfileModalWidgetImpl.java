@@ -143,7 +143,9 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		if(first.getCompany() != null){
 			second.setCompany(first.getCompany());
 		}
-		second.setProfilePicureFileHandleId(first.getProfilePicureFileHandleId());
+		if(first.getProfilePicureFileHandleId() != null){
+			second.setProfilePicureFileHandleId(first.getProfilePicureFileHandleId());
+		}
 		return second;
 	}
 
