@@ -34,7 +34,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private GWTWrapper gwt;
-	private String apiKey = null;
 	private SynapseAlert apiSynAlert;
 	private SynapseAlert notificationSynAlert;
 	private SynapseAlert addressSynAlert;
@@ -74,23 +73,18 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	public void getAPIKey() {
 		apiSynAlert.clear();
 		// lookup API key
-		if (apiKey == null) {
-			AsyncCallback<String> callback = new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					apiKey = result;
-					view.setApiKey(apiKey);
-				}
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.setApiKey(result);
+			}
 
-				@Override
-				public void onFailure(Throwable caught) {
-					apiSynAlert.handleException(caught);
-				}
-			};
-			synapseClient.getAPIKey(callback);
-		} else {
-			view.setApiKey(apiKey);
-		}
+			@Override
+			public void onFailure(Throwable caught) {
+				apiSynAlert.handleException(caught);
+			}
+		};
+		synapseClient.getAPIKey(callback);
 	}
 
 	@Override
