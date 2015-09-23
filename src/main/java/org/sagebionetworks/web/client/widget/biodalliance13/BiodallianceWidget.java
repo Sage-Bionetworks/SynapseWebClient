@@ -5,17 +5,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,6 +40,7 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 	GlobalApplicationState globalApplicationState;
 	HumanBiodallianceConfig humanConfig; 
 	MouseBiodallianceConfig mouseConfig;
+	SynapseAlert synAlert;
 	private boolean isConfigured;
 	BiodallianceConfigInterface currentConfig;
 	String initChr;
@@ -50,14 +52,17 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
 			HumanBiodallianceConfig humanConfig, 
-			MouseBiodallianceConfig mouseConfig) {
+			MouseBiodallianceConfig mouseConfig,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.humanConfig = humanConfig;
 		this.mouseConfig = mouseConfig;
+		this.synAlert = synAlert;
 		isConfigured = false;
 		view.setPresenter(this);
+		view.setSynAlert(synAlert.asWidget());
 	}
 	
 	public void configure(Species species, 
@@ -65,20 +70,25 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 			int initViewStart,
 			int initViewEnd, 
 			List<BiodallianceSource> sources) {
-		this.initChr = initChr;
-	    this.initViewStart = initViewStart;
-	    this.initViewEnd = initViewEnd;
-	    this.sources = sources;
-		if (Species.HUMAN.equals(species)) {
-			currentConfig = humanConfig;
-		} else if (Species.MOUSE.equals(species)) {
-			currentConfig = mouseConfig;
-		}
-		
-		isConfigured = true;
-		//if view is already attached, then show the browser
-		if (view.isAttached()) {
-			showBiodallianceBrowser();
+		synAlert.clear();
+		if (!authenticationController.isLoggedIn()) {
+			synAlert.showMustLogin();
+		} else {
+			this.initChr = initChr;
+		    this.initViewStart = initViewStart;
+		    this.initViewEnd = initViewEnd;
+		    this.sources = sources;
+			if (Species.HUMAN.equals(species)) {
+				currentConfig = humanConfig;
+			} else if (Species.MOUSE.equals(species)) {
+				currentConfig = mouseConfig;
+			}
+			
+			isConfigured = true;
+			//if view is already attached, then show the browser
+			if (view.isAttached()) {
+				showBiodallianceBrowser();
+			}
 		}
 	}
 	
@@ -168,7 +178,11 @@ public class BiodallianceWidget implements BiodallianceWidgetView.Presenter, IsW
 		long uniqueId = new Date().getTime();
 		String containerId = "biodallianceContainerId"+uniqueId;
 		view.setContainerId(containerId);
-		view.showBiodallianceBrowser(PORTAL_URL_PREFIX,containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
+		try {
+			view.showBiodallianceBrowser(PORTAL_URL_PREFIX,containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);	
+		} catch(JavaScriptException jse) {
+			synAlert.handleException(jse);
+		};
 	}
 	
 	@Override

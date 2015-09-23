@@ -6,6 +6,7 @@ import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInte
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface BiodallianceWidgetView extends IsWidget {
 
@@ -15,6 +16,7 @@ public interface BiodallianceWidgetView extends IsWidget {
 	 */
 	void setPresenter(Presenter presenter);
 	void setContainerId(String id);
+	void setSynAlert(Widget w);
 	boolean isAttached();
 	
 	/**
