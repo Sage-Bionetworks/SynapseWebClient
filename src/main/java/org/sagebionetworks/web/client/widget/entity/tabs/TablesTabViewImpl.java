@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class TablesTabViewImpl implements TablesTabView {
 	
@@ -48,6 +49,7 @@ public class TablesTabViewImpl implements TablesTabView {
 	
 	Widget widget;
 	UserBadge createdByBadge, modifiedByBadge;
+	@Inject
 	public TablesTabViewImpl(
 			UserBadge createdByBadge,
 			UserBadge modifiedByBadge
