@@ -89,7 +89,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 	private Long versionNumber;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private EntityMetadata entityMetadata;
 	private EntityActionController controller;
 
 	@Inject
@@ -97,7 +96,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			SynapseJSNIUtils synapseJSNIUtils,
 			PortalGinInjector ginInjector, 
 			CookieProvider cookies) {
-		this.entityMetadata = entityMetadata;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
 		
@@ -111,9 +109,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader, String wikiPageId) {
 		this.versionNumber = versionNumber;
 		this.currentArea = area;
-		DisplayUtils.hide(adminListItem);
-		clearContent();
-		hideTabContent();
 		
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
@@ -126,31 +121,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private void clearContent() {
-		projectMetadataContainer.clear();
+		projectMetadataContainer.setVisible(false);
 		projectDescriptionContainer.clear();
 		projectActionMenuContainer.clear();
-		
-		fileBreadcrumbContainer.clear();
-		fileTitlebarContainer.setVisible(false);
-		folderTitlebarContainer.setVisible(false);
-		tableTitlebarContainer.setVisible(false);
-		fileMetadataContainer.clear();
-		fileActionMenuContainer.clear();
-		fileDescriptionContainer.clear();
-		fileBrowserContainer.clear();
-		filesWikiPageContainer.clear();
-		filePreviewContainer.clear();
-		fileProvenanceContainer.clear();
-		fileProgrammaticClientsContainer.clear();
-		fileModifiedAndCreatedContainer.clear();
-		wikiPageContainer.clear();
-		
-		tableBreadcrumbContainer.clear();
-		tableMetadataContainer.clear();
-		tableActionMenuContainer.clear();
-		tableWidgetContainer.clear();
-		tableModifiedAndCreatedContainer.clear();
-		tableListWidgetContainer.setVisible(false);
 	}
 	
 	@Override
@@ -161,15 +134,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
-			}
-		};
-		projectFilesBrowser.setEntityUpdatedHandler(handler);
-		folderFilesBrowser.setEntityUpdatedHandler(handler);
-		entityMetadata.setEntityUpdatedHandler(handler);
 	}
 
 	@Override
@@ -187,7 +151,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void clear() {
-		fileTitleBar.clearState();
 	}
 
 	@Override
@@ -234,102 +197,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectActionMenuContainer.clear();
 		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
 		projectActionMenuContainer.add(actionMenu.asWidget());
-	}
-
-	private void addWikiPageWidget(SimplePanel container, EntityBundle bundle, String wikiPageId, final Synapse.EntityArea area) {
-		wikiPageWidget.clear();
-		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
-			Widget wikiW = wikiPageWidget.asWidget();
-			final SimplePanel wrapper = new SimplePanel(wikiW);
-			wrapper.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
-			if(!isProject) 
-				wrapper.addStyleName("margin-top-15");
-			container.add(wrapper);
-			boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
-				@Override
-				public void pageUpdated() {
-					presenter.fireEntityUpdatedEvent();
-				}
-				@Override
-				public void noWikiFound() {
-					if(isProject) {
-						//if wiki area not specified and no wiki found, show Files tab instead for projects 
-						// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
-						if(area == null) {							
-							setTabSelected(Synapse.EntityArea.FILES, false);
-						}
-					} else {
-						// hide description area, and add description command in the Tools menu
-						wrapper.setVisible(false);
-					}
-				}
-			}, true);
-		}
-	}
-	
-	private Widget createProvenanceWidget(EntityBundle bundle, boolean fullWidth) {
-		// Create the property body
-	    // the headers for properties.
-		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();						
-		
-		Map<String,String> configMap = new HashMap<String,String>();
-		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), version));
-		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
-		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
-		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
-	    provenanceWidget.configure(null, configMap, null, null);
-	    final Widget provViewWidget = provenanceWidget.asWidget(); 
-	    FlowPanel lc = new FlowPanel();
-	    lc.addStyleName("highlight-box");
-	    lc.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, DisplayConstants.PROVENANCE);
-	    lc.add(provViewWidget);
-	    SimplePanel wrapper = new SimplePanel(lc);
-	    String width = fullWidth ? "col-md-12" : "col-md-6";
-	    wrapper.addStyleName(width);
-		return wrapper;
-	}
-	
-	private void createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {
-		fileProgrammaticClientsContainer.clear();
-		String id = bundle.getEntity().getId();
-		rLoadWidget.configure(id, versionNumber);
-		pythonLoadWidget.configure(id);
-		javaLoadWidget.configure(id);
-		commandLineLoadWidget.configure(id);
-		fileProgrammaticClientsContainer.add(rLoadWidget.asWidget());
-		fileProgrammaticClientsContainer.add(pythonLoadWidget.asWidget());
-		fileProgrammaticClientsContainer.add(javaLoadWidget.asWidget());
-		fileProgrammaticClientsContainer.add(commandLineLoadWidget.asWidget());		
-	}
-
-	private Widget configureFilesBrowser(FilesBrowser filesBrowser, Entity entity, boolean canCertifiedUserAddChild, boolean isCertifiedUser) {
-		filesBrowser.configure(entity.getId(), canCertifiedUserAddChild, isCertifiedUser);
-		return filesBrowser.asWidget();
-	}
-	
-	private Widget createDescriptionWidget(final EntityBundle bundle, String entityTypeDisplay, boolean showWhenEmpty) {
-		final FlowPanel lc = new FlowPanel();
-		String description = bundle.getEntity().getDescription();
-	
-		if(!showWhenEmpty) {
-			if(description == null || "".equals(description))
-				return lc;
-		}
-		
-		lc.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div style=\"clear: left;\"></div>")));
-	
-		// Add the description body
-	    if(description != null && !("".equals(description))) {
-    		Label plainDescriptionText = new Label();
-    		plainDescriptionText.addStyleName("wiki-description");
-    		plainDescriptionText.setText(description);
-    		lc.add(plainDescriptionText);
-	    }
-	    
-   		return lc;
 	}
 	
 	/**

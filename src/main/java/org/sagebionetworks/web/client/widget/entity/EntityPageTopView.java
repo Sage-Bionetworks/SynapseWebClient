@@ -56,26 +56,6 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		String createEntityLink(String id, String version, String display);
 
-		boolean isPlaceChangeForArea(EntityArea targetTab);
-
 		void entityDeleted(EntityDeletedEvent event);
-
-		void setTableQuery(Query newQuery);
-
-		void setTableRow(TableRowHeader rowHeader);
-		
-		TableRowHeader getTableRowHeader();
-
-		Query getTableQuery();
-
-		/**
-		 * Handle what needs to change/reconfigure when a sub wiki is chosen.
-		 * @param wikiPageId
-		 */
-		void handleWikiReload(String wikiPageId);
-
 	}
-	
-	
-
 }

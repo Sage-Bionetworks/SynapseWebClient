@@ -1,27 +1,52 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.DOI;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.ObjectSchema;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.AdminTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -32,9 +57,12 @@ import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,6 +71,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private AuthenticationController authenticationController;
 	private EntityUpdatedHandler entityUpdateHandler;
+	private EntityBundle projectBundle;
 	private EntityBundle bundle;
 	private String entityTypeDisplay;
 	private Long versionNumber;
@@ -50,50 +79,69 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String areaToken;
 	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
-	private QueryTokenProvider queryTokenProvider;
 	
-	public static final String TABLE_QUERY_PREFIX = "query/";
-	public static final String TABLE_ROW_PREFIX = "row/";
-	public static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
 	private Tabs tabs;
 	private WikiTab wikiTab;
 	private FilesTab filesTab;
 	private TablesTab tablesTab;
 	private AdminTab adminTab;
 	private EntityMetadata projectMetadata;
+	private SynapseClientAsync synapseClient;
+	
+	private EntityActionController controller;
+	private ActionMenuWidget actionMenu;
+	boolean annotationsShown;
+	EntityUpdatedHandler handler;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
+			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
-			QueryTokenProvider queryTokenProvider,
 			Tabs tabs,
 			EntityMetadata projectMetadata,
 			WikiTab wikiTab,
 			FilesTab filesTab,
 			TablesTab tablesTab,
-			AdminTab adminTab) {
+			AdminTab adminTab,
+			EntityActionController controller,
+			ActionMenuWidget actionMenu
+			) {
 		this.view = view;
+		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
-		this.queryTokenProvider = queryTokenProvider;
 		this.tabs = tabs;
 		this.wikiTab = wikiTab;
 		this.filesTab = filesTab;
 		this.tablesTab = tablesTab;
 		this.adminTab = adminTab;
 		this.projectMetadata = projectMetadata;
+		this.controller = controller;
+		this.actionMenu = actionMenu;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
 		view.setPresenter(this);
 		
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
+		handler = new EntityUpdatedHandler() {
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				fireEntityUpdatedEvent();
 			}
 		};
 		projectMetadata.setEntityUpdatedHandler(handler);
+		
+		actionMenu.addControllerWidget(controller.asWidget());
+		
+		annotationsShown = false;
+		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				annotationsShown = !annotationsShown;
+				EntityPageTop.this.controller.onAnnotationsToggled(annotationsShown);
+				EntityPageTop.this.projectMetadata.setAnnotationsVisible(annotationsShown);
+			}
+		});
 	}
 	
 	private void initTabs() {
@@ -116,12 +164,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.areaToken = areaToken;
     	
     	entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass()));
+    	configureProject();
     	
-    	//configure each tab
-    	configureWikiTab();
+    	//configure tabs
     	configureFilesTab();
     	configureTablesTab();
     	configureAdminTab();
+    	//note: the wiki tab is always configured from the project bundle, so it is configured later (after getting the project bundle)
 
     	//set area, if undefined
 		if (area == null) {
@@ -143,9 +192,38 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			tabs.showTab(adminTab.asTab());
 		}
 		
-		projectMetadata.setEntityBundle(bundle, versionNumber);
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
 	}
+    
+    public void configureProject() {
+    	//get the project entity bundle (unless we're looking at the project!)
+    	if (projectHeader.getId().equals(bundle.getEntity().getId())) {
+    		projectBundle = bundle;
+    		configureFromProjectBundle();
+    	} else {
+    		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI ;
+    		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+    			@Override
+    			public void onSuccess(EntityBundle bundle) {
+					projectBundle = bundle;
+					configureFromProjectBundle();
+    			}
+    			
+    			@Override
+    			public void onFailure(Throwable caught) {
+    				view.showErrorMessage(caught.getMessage());
+    			}	
+    		};
+			synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
+    	}
+    }
+    
+    private void configureFromProjectBundle() {
+    	//set up owner project information
+    	projectMetadata.setEntityBundle(projectBundle, versionNumber);
+    	configureWikiTab();
+    	controller.configure(actionMenu, projectBundle, projectBundle.getRootWikiId(), handler);
+    }
     
     public void clearState() {
 		view.clear();
@@ -167,46 +245,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		configure(bundle, versionNumber, projectHeader, area, areaToken);
 	}
 	public void configureTablesTab() {
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				fireEntityUpdatedEvent();
-			}
-		};
-		
-		QueryChangeHandler qch = new QueryChangeHandler() {			
-			@Override
-			public void onQueryChange(Query newQuery) {
-				setTableQuery(newQuery);				
-			}
-
-			@Override
-			public Query getQueryString() {
-				return getTableQuery();
-			}
-
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				fireEntityUpdatedEvent();
-			}
-		};
-		tablesTab.configure(bundle, handler, qch);
-		
+		tablesTab.configure(bundle, handler, areaToken);
 	}
+	
 	public void configureFilesTab() {
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				fireEntityUpdatedEvent();
-			}
-		};
-		
 		filesTab.configure(bundle, handler);
 	}
 	
 	public void configureWikiTab() {
-		String wikiPageId = getWikiPageId(area, areaToken, bundle.getRootWikiId());
-		final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+		final boolean canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
 		final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
@@ -221,15 +268,15 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 			}
 		};
-		wikiTab.configure(projectHeader.getId(), wikiPageId, 
+		wikiTab.configure(projectBundle.getEntity().getId(), projectBundle.getRootWikiId(), 
 				canEdit, callback, true);
 		
 		
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
 			public void invoke(String wikiPageId) {
-				view.configureProjectActionMenu(bundle, wikiPageId);
-				wikiTab.configure(projectHeader.getId(), wikiPageId, 
+				view.configureProjectActionMenu(projectBundle, wikiPageId);
+				wikiTab.configure(projectBundle.getEntity().getId(), wikiPageId, 
 						canEdit, callback, true);
 			}
 		};
@@ -277,83 +324,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.areaToken = areaToken;
 		if(areaChangedHandler != null) areaChangedHandler.replaceArea(area, areaToken);
 	}
-
-	@Override
-	public void setTableRow(TableRowHeader rowHeader) {
-		if(rowHeader != null && rowHeader.getRowId() != null) {
-			String rowStr = rowHeader.getRowId();
-			if(rowHeader.getVersion() != null) rowStr += TABLE_ROW_VERSION_DELIMITER + rowHeader.getVersion();
-			setArea(EntityArea.TABLES, TABLE_ROW_PREFIX + rowStr);			
-		}
-	}
-
-	@Override
-	public TableRowHeader getTableRowHeader() {		
-		if(areaToken != null && areaToken.startsWith(TABLE_ROW_PREFIX)) {
-			TableRowHeader rowHeader = new TableRowHeader();
-			String rowHeaderStr = areaToken.substring(TABLE_ROW_PREFIX.length(), areaToken.length());
-			if(rowHeaderStr.contains(TABLE_ROW_VERSION_DELIMITER)) {					
-				String[] versionParts = rowHeaderStr.split(TABLE_ROW_VERSION_DELIMITER);
-				if(versionParts.length == 2) {
-					rowHeader.setRowId(versionParts[0]);
-					rowHeader.setVersion(versionParts[1]);
-				} else {
-					return null; // malformed
-				}
-			} else {
-				rowHeader.setRowId(rowHeaderStr);					
-			}
-			return rowHeader;
-		}
-		return null;
-	}
-
-	@Override
-	public void setTableQuery(Query newQuery) {
-		if(newQuery != null){
-			String token = queryTokenProvider.queryToToken(newQuery);
-			if(token != null){
-				/*
-				 * The first time we set a query in the URL we want to replace 
-				 * the current history.  All subsequent changes to the query
-				 * should be added to the browser's history.
-				 */
-				if(areaHasTableQuery()){
-					// Adds the new query to the browser's history.
-					setArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
-				}else{
-					// Replace the current entry in the browser's history with the new query.
-					replaceArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
-				}
-			}
-		}
-	}
-	
-	private boolean areaHasTableQuery(){
-		Query currentQuery = getTableQuery();
-		return currentQuery != null;
-	}
-	
-	@Override
-	public Query getTableQuery() {
-		if(areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
-			String token = areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
-			if(token != null){
-				return queryTokenProvider.tokenToQuery(token);
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public void handleWikiReload(String wikiPageId) {
-		if (bundle.getEntity() instanceof Project) {
-			setArea(EntityArea.WIKI, wikiPageId);
-			view.configureProjectActionMenu(bundle, wikiPageId);
-		} else {
-			view.configureFileActionMenu(bundle, wikiPageId);
-		}
-	}
 	
 	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
 		String wikiPageId = rootWikiId;
@@ -361,8 +331,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			wikiPageId = areaToken;
 		return wikiPageId;
 	}
-	
-	
 	
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
