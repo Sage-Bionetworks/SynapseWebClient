@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface EntityPageTopView extends IsWidget, SynapseView {
 
@@ -33,7 +34,9 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 	 * @param wikiPageId
 	 */
 	void configureProjectActionMenu(EntityBundle bundle, String wikiPageId);
-
+	void setProjectMetadata(Widget w);
+	void setTabs(Widget w);
+	
 	/**
 	 * Presenter interface
 	 */
@@ -72,9 +75,7 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		void handleWikiReload(String wikiPageId);
 
 	}
-
-	public void setFileHistoryVisible(boolean b);
-
-	public void configureFileActionMenu(EntityBundle bundle, String wikiPageId);
+	
+	
 
 }

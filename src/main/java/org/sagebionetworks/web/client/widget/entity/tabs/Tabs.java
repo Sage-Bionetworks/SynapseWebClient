@@ -5,9 +5,11 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class Tabs {
+public class Tabs implements IsWidget {
 	TabsView view;
 	CallbackP<Tab> onTabClickedCallback;
 	List<Tab> allTabs;
@@ -35,13 +37,24 @@ public class Tabs {
 		tab.setTabClickedCallback(onTabClickedCallback);
 	}
 	
-	public void onTabClicked(Tab tabClicked) {
-		//hide all tabs
+	private void hideAllTabs() {
 		for (Tab tab : allTabs) {
 			tab.hideTab();
 		}
-		//and show the tab that was clicked
-		tabClicked.showTab();
 	}
 	
+	public void showTab(Tab tab) {
+		hideAllTabs();
+		//and show the tab
+		tab.showTab();
+	}
+	
+	public void onTabClicked(Tab tabClicked) {
+		showTab(tabClicked);
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
+	}
 }

@@ -20,12 +20,16 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.tabs.AdminTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
+import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
+import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 
@@ -54,17 +58,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private Tabs tabs;
 	private WikiTab wikiTab;
 	private FilesTab filesTab;
-	private Tab tablesTab, adminTab;
+	private TablesTab tablesTab;
+	private AdminTab adminTab;
+	private EntityMetadata projectMetadata;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			AuthenticationController authenticationController,
 			QueryTokenProvider queryTokenProvider,
 			Tabs tabs,
+			EntityMetadata projectMetadata,
 			WikiTab wikiTab,
 			FilesTab filesTab,
-			Tab tablesTab,
-			Tab adminTab) {
+			TablesTab tablesTab,
+			AdminTab adminTab) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.queryTokenProvider = queryTokenProvider;
@@ -73,20 +80,31 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.filesTab = filesTab;
 		this.tablesTab = tablesTab;
 		this.adminTab = adminTab;
+		this.projectMetadata = projectMetadata;
+		
 		initTabs();
+		view.setTabs(tabs.asWidget());
+		view.setProjectMetadata(projectMetadata.asWidget());
 		view.setPresenter(this);
+		
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				fireEntityUpdatedEvent();
+			}
+		};
+		projectMetadata.setEntityUpdatedHandler(handler);
 	}
 	
 	private void initTabs() {
 		tabs.addTab(wikiTab.asTab());
 		tabs.addTab(filesTab.asTab());
-		tabs.addTab(tablesTab);
-		tabs.addTab(adminTab);
+		tabs.addTab(tablesTab.asTab());
+		tabs.addTab(adminTab.asTab());
 	}
 
     /**
-     * Update the bundle attached to this EntityPageTop. Consider calling refresh()
-     * to notify an attached view.
+     * Update the bundle attached to this EntityPageTop. 
      *
      * @param bundle
      */
@@ -102,6 +120,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	//configure each tab
     	configureWikiTab();
     	configureFilesTab();
+    	configureTablesTab();
+    	configureAdminTab();
 
     	//set area, if undefined
 		if (area == null) {
@@ -111,20 +131,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				area = EntityArea.FILES;
 			}
 		}
-
+		
     	//go to the tab corresponding to the area stated
 		if (area == EntityArea.WIKI) {
-			wikiTab.showTab();
+			tabs.showTab(wikiTab.asTab());
 		} else if (area == EntityArea.FILES) {
-			filesTab.showTab();
+			tabs.showTab(filesTab.asTab());
 		} else if (area == EntityArea.TABLES) {
-			tablesTab.showTab();
+			tabs.showTab(tablesTab.asTab());
 		} else if (area == EntityArea.ADMIN) {
-			adminTab.showTab();
+			tabs.showTab(adminTab.asTab());
 		}
 		
+		projectMetadata.setEntityBundle(bundle, versionNumber);
 		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader, getWikiPageId(area, areaToken, bundle.getRootWikiId()));
-    	configureFileHistory();
 	}
     
     public void clearState() {
@@ -146,7 +166,33 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void refresh() {
 		configure(bundle, versionNumber, projectHeader, area, areaToken);
 	}
-	
+	public void configureTablesTab() {
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				fireEntityUpdatedEvent();
+			}
+		};
+		
+		QueryChangeHandler qch = new QueryChangeHandler() {			
+			@Override
+			public void onQueryChange(Query newQuery) {
+				setTableQuery(newQuery);				
+			}
+
+			@Override
+			public Query getQueryString() {
+				return getTableQuery();
+			}
+
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				fireEntityUpdatedEvent();
+			}
+		};
+		tablesTab.configure(bundle, handler, qch);
+		
+	}
 	public void configureFilesTab() {
 		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
 			@Override
@@ -160,8 +206,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	public void configureWikiTab() {
 		String wikiPageId = getWikiPageId(area, areaToken, bundle.getRootWikiId());
-		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
+		final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+		final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
 				fireEntityUpdatedEvent();
@@ -171,12 +217,28 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				//if wiki area not specified and no wiki found, show Files tab instead for projects 
 				// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
 				if(area == null) {							
-					filesTab.showTab();
+					tabs.showTab(filesTab.asTab());
 				}
 			}
 		};
 		wikiTab.configure(projectHeader.getId(), wikiPageId, 
 				canEdit, callback, true);
+		
+		
+		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
+			@Override
+			public void invoke(String wikiPageId) {
+				view.configureProjectActionMenu(bundle, wikiPageId);
+				wikiTab.configure(projectHeader.getId(), wikiPageId, 
+						canEdit, callback, true);
+			}
+		};
+		wikiTab.setWikiReloadHandler(wikiReloadHandler);
+	}
+	
+	public void configureAdminTab() {
+		String projectId = projectHeader.getId();
+		adminTab.configure(projectId);
 	}
 		
 	@Override
@@ -300,18 +362,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return wikiPageId;
 	}
 	
-	public void configureFileHistory() {
-		Entity entity = bundle.getEntity();
-		if (entity != null && entity instanceof FileEntity) {
-			boolean isVisible = versionNumber != null;
-			view.setFileHistoryVisible(isVisible);
-			filesTab.setFileHistoryVisible(isVisible);
-		} else {
-			view.setFileHistoryVisible(false);
-			filesTab.setFileHistoryVisible(false);
-		}
-	}
-
+	
 	
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();

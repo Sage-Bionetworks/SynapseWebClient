@@ -116,14 +116,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 	}
 	
-	public void showTab() {
-		tab.showTab();
-	}
-	
-	public void hideTab() {
-		tab.hideTab();
-	}
-	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.setTabClickedCallback(onClickCallback);
 	}
@@ -142,11 +134,9 @@ public class FilesTab implements FilesTabView.Presenter{
 			fileTitleBar.asWidget().setVisible(false);
 		}
 		
-		String entityId = bundle.getEntity().getId();
-		Long versionNumber = null;
-		if (bundle.getEntity() instanceof Versionable) {
-			versionNumber = ((Versionable)bundle.getEntity()).getVersionNumber();
-		}
+		final String entityId = bundle.getEntity().getId();
+		boolean isVersionable = bundle.getEntity() instanceof Versionable;
+		final Long versionNumber = isVersionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null;
 		
 		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.FILES, null));
 		
@@ -168,8 +158,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			view.configureProgrammaticClients(entityId, versionNumber);	
 		}
 		
-		Long version = bundle.getEntity() instanceof Versionable ? ((Versionable)bundle.getEntity()).getVersionNumber() : null; 
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), version));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), versionNumber));
 		
 		boolean isProvVisible = !(isProject || isFolder);
 		view.setProvenanceVisible(isProvVisible);
@@ -178,27 +167,34 @@ public class FilesTab implements FilesTabView.Presenter{
 		}
 		view.configureModifiedAndCreatedWidget(bundle.getEntity());
 		
-		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		view.setWikiPageWidgetVisible(true);
+		final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
 		
-		wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), null, versionNumber), canEdit, new WikiPageWidget.Callback() {
+		view.setWikiPageWidgetVisible(true);
+		final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
+				@Override
+				public void pageUpdated() {
+					handler.onPersistSuccess(new EntityUpdatedEvent());
+				}
+				@Override
+				public void noWikiFound() {
+					view.setWikiPageWidgetVisible(false);
+				}
+			};
+			
+		wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), versionNumber), canEdit, wikiCallback, true);
+		
+		metadata.setFileHistoryVisible(isFile);
+		
+		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
-			public void pageUpdated() {
-				handler.onPersistSuccess(new EntityUpdatedEvent());
+			public void invoke(String wikiPageId) {
+				wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, wikiCallback, true);
 			}
-			@Override
-			public void noWikiFound() {
-				view.setWikiPageWidgetVisible(false);
-			}
-		}, true);
+		};
+		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 	}
 	
 	public Tab asTab(){
 		return tab;
 	}
-	
-	public void setFileHistoryVisible(boolean isVisible) {
-		metadata.setFileHistoryVisible(isVisible);
-	}
-
 }

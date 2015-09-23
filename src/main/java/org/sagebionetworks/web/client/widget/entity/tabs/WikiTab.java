@@ -22,14 +22,6 @@ public class WikiTab {
 		wikiPageWidget.asWidget().addStyleName("panel panel-default panel-body margin-bottom-0-imp");
 	}
 	
-	public void showTab() {
-		tab.showTab();
-	}
-	
-	public void hideTab() {
-		tab.hideTab();
-	}
-	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.setTabClickedCallback(onClickCallback);
 	}
