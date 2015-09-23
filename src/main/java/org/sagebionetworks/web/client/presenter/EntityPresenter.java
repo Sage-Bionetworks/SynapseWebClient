@@ -100,17 +100,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 				refresh();
 			}
 		});
-		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
-			@Override
-			public void areaChanged(EntityArea area, String areaToken) {
-				updateEntityArea(area, areaToken);
-			}
-
-			@Override
-			public void replaceArea(EntityArea area, String areaToken) {
-				replaceEntityArea(area, areaToken);
-			}
-		});
+		
 		headerWidget.refresh();
 	}
 

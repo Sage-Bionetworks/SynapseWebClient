@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class FilesTabViewImpl implements FilesTabView {
 	@UiField
@@ -51,7 +52,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	private JavaClientModalWidgetViewImpl javaLoadWidget;
 	private CommandLineClientModalWidgetViewImpl commandLineLoadWidget;
 	UserBadge createdByBadge, modifiedByBadge;
-	
+	@Inject
 	public FilesTabViewImpl(
 			RClientModalWidgetViewImpl rLoadWidget,
 			PythonClientModalWidgetViewImpl pythonLoadWidget,

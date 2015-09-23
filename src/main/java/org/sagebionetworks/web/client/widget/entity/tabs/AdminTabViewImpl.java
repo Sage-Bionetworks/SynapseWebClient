@@ -24,8 +24,7 @@ public class AdminTabViewImpl implements AdminTabView {
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, AdminTabViewImpl> {}
 	
 	Widget widget;
-	public AdminTabViewImpl(
-			) {
+	public AdminTabViewImpl() {
 		//empty constructor, you can include this widget in the ui xml
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);

@@ -1,64 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
-import org.sagebionetworks.web.client.widget.table.TableListWidget;
-import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.LIElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -75,8 +25,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	Div tabsUI;
 	
 	private Presenter presenter;
-	private PortalGinInjector ginInjector;
-	private ActionMenuWidget actionMenu;
 	
 	//project level info
 	@UiField
@@ -85,19 +33,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel projectDescriptionContainer;
 	@UiField
 	SimplePanel projectActionMenuContainer;
-	
-	
-	private Long versionNumber;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private EntityActionController controller;
-
+	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector, 
 			CookieProvider cookies) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.ginInjector = ginInjector;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -105,26 +47,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	
 	@Override
-	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
-			String entityTypeDisplay, Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader, String wikiPageId) {
-		this.versionNumber = versionNumber;
-		this.currentArea = area;
-		
-		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
-		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
-
+	public void setPageTitle(String title) {
+		synapseJSNIUtils.setPageTitle(title);
 	}
-	
+	@Override
+	public void setActionMenu(Widget w) {
+		projectActionMenuContainer.add(w);
+	}
 	@Override
 	public void setProjectMetadata(Widget w) {
 		projectMetadataContainer.setWidget(w);
 	}
 	
-	private void clearContent() {
-		projectMetadataContainer.setVisible(false);
-		projectDescriptionContainer.clear();
-		projectActionMenuContainer.clear();
-	}
 	
 	@Override
 	public Widget asWidget() {
@@ -151,98 +85,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	@Override
 	public void clear() {
-	}
-
-	@Override
-	public void configureProjectActionMenu(EntityBundle bundle, String wikiPageId) {
-		projectActionMenuContainer.clear();
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
-		projectActionMenuContainer.add(actionMenu.asWidget());
-	}
-
-	// Render the Project entity
-	private void renderProjectEntity(final EntityBundle bundle,
-			String entityTypeDisplay,
-			Synapse.EntityArea area, String wikiPageId) {		
-		// tab container
-		setTabSelected(area, false);
-
-		// Project header: Metadata & Description
-		entityMetadata.setEntityBundle(bundle, versionNumber); 		
-		projectMetadataContainer.add(entityMetadata.asWidget());
-		projectDescriptionContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
-
-		// Wiki Tab: Wiki
-		addWikiPageWidget(wikiPageContainer, bundle, wikiPageId, area);
-		
-		// File Tab: Files, Annotations & old
-		fileBrowserContainer.add(configureFilesBrowser(projectFilesBrowser, bundle.getEntity(), bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser()));
-		// Created By/Modified By
-		fileModifiedAndCreatedContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
-
-		// Tables Tab
-		tableListWidget.configure(bundle);
-		tableListWidgetContainer.setVisible(true);
-		
-		// Admin Tab: evaluations
-		evaluationList.configure(bundle.getEntity().getId(), new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean isVisible) {
-				if (isVisible)
-					DisplayUtils.show(adminListItem);
-			}
-		});
-		
-		// ActionMenu
-		projectActionMenuContainer.clear();
-		ActionMenuWidget actionMenu = createEntityActionMenu(bundle, wikiPageId);
-		projectActionMenuContainer.add(actionMenu.asWidget());
-	}
-	
-	/**
-	 * Create a new action menu for an entity.
-	 * @param bundle
-	 * @return
-	 */
-	private ActionMenuWidget createEntityActionMenu(EntityBundle bundle, String wikiPageId) {
-		actionMenu = ginInjector.createActionMenuWidget();
-		// Create a menu
-		// Create a controller.
-		controller = ginInjector.createEntityActionController();
-		actionMenu.addControllerWidget(controller.asWidget());
-		controller.configure(actionMenu, bundle, wikiPageId, new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
-			}
-		});
-		annotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				annotationsShown = !annotationsShown;
-				controller.onAnnotationsToggled(annotationsShown);
-				entityMetadata.setAnnotationsVisible(annotationsShown);
-			}
-		});
-		fileHistoryShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				fileHistoryShown = !fileHistoryShown;
-				controller.onFileHistoryToggled(fileHistoryShown);
-				entityMetadata.setFileHistoryVisible(fileHistoryShown);
-			}
-		});
-		return actionMenu;
-	}
-
-	@Override
-	public void setFileHistoryVisible(boolean isVisible) {
-		fileHistoryShown = isVisible;
-		if (controller != null) {
-			controller.onFileHistoryToggled(isVisible);
-		}
 	}
 	
 	@Override
