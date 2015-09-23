@@ -11,12 +11,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -169,6 +174,24 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setTextPreview(anyString());
+	}
+	
+	@Test
+	public void testLongContent(){
+		mainFileHandle.setContentType(PreviewWidget.APPLICATION_ZIP);
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("text/plain");
+		char[] charArray = new char[PreviewWidget.MAX_LENGTH + 100];
+	    Arrays.fill(charArray, 'a');
+	    when(mockResponse.getText()).thenReturn(new String(charArray));
+		testFileHandleList.add(fh);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).setTextPreview(captor.capture());
+		String textSentToView = captor.getValue();
+		Assert.assertEquals(PreviewWidget.MAX_LENGTH + "...".length(), textSentToView.length());
 	}
 	
 	@Test

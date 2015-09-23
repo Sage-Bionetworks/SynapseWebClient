@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetView;
 import org.sagebionetworks.web.client.widget.biodalliance13.HumanBiodallianceConfig;
 import org.sagebionetworks.web.client.widget.biodalliance13.MouseBiodallianceConfig;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class BiodallianceWidgetTest {
@@ -28,7 +29,7 @@ public class BiodallianceWidgetTest {
 	MouseBiodallianceConfig mockMouseConfig;
 	
 	BiodallianceWidget widget;
-	
+	SynapseAlert mockSynAlert;
 	@Before
 	public void before() {
 		mockView = mock(BiodallianceWidgetView.class);
@@ -36,8 +37,10 @@ public class BiodallianceWidgetTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockHumanConfig = mock(HumanBiodallianceConfig.class);
 		mockMouseConfig = mock(MouseBiodallianceConfig.class);
+		mockSynAlert = mock(SynapseAlert.class);
 		when(mockView.isAttached()).thenReturn(false);
-		widget = new BiodallianceWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockHumanConfig, mockMouseConfig);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		widget = new BiodallianceWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockHumanConfig, mockMouseConfig, mockSynAlert);
 	}
 	
 	@Test
@@ -66,6 +69,18 @@ public class BiodallianceWidgetTest {
 				any(BiodallianceConfigInterface.class), anyList());
 	}
 
+	@Test
+	public void testConfigureNotLoggedIn() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		WikiPageKey key = null;
+		Map<String, String> descriptor = new HashMap<String, String>();
+		Long wikiVersionInView = null;
+		Callback widgetRefreshRequired = null;
+		widget.configure(key, descriptor, widgetRefreshRequired, wikiVersionInView);
+		//verify that view does not try to show
+		verify(mockSynAlert).showMustLogin();
+	}
+	
 	@Test
 	public void testConfigureIsAlreadyAttached() {
 		when(mockView.isAttached()).thenReturn(true);
