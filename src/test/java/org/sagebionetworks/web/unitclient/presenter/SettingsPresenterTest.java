@@ -299,6 +299,10 @@ public class SettingsPresenterTest {
 		profilePresenter.getAPIKey();
 		verify(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 		verify(mockView).setApiKey(APIKEY);
+
+		//verify not cached
+		profilePresenter.getAPIKey();
+		verify(mockSynapseClient, times(2)).getAPIKey(any(AsyncCallback.class));
 	}
 	@Test
 	public void testGetAPIKeyFailure() {

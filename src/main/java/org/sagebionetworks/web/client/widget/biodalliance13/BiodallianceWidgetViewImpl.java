@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.biodalliance13;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtvisualizationwrappers.client.biodalliance13.Biodalliance013dev;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
@@ -20,6 +21,8 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 	
 	@UiField
 	SimplePanel container;
+	@UiField
+	Div synAlertContainer;
 	
 	Widget widget;
 	
@@ -68,5 +71,10 @@ public class BiodallianceWidgetViewImpl implements BiodallianceWidgetView {
 			BiodallianceConfigInterface currentConfig,
 			List<BiodallianceSource> sources) {
 		new Biodalliance013dev().show(urlPrefix, containerId, initChr, initViewStart, initViewEnd, currentConfig, sources);
+	}
+	
+	@Override
+	public void setSynAlert(Widget w) {
+		synAlertContainer.add(w);
 	}
 }

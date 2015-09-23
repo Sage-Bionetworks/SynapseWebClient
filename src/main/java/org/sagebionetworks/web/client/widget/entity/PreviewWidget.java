@@ -33,7 +33,7 @@ import com.google.inject.Inject;
 
 public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendererPresenter {
 	public static final String APPLICATION_ZIP = "application/zip";	
-	
+	public static final int MAX_LENGTH = 100000;
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB
 	}
@@ -167,6 +167,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 							if (statusCode == Response.SC_OK) {
 								String responseText = response.getText();
 								if (responseText != null && responseText.length() > 0) {
+									if (responseText.length() > MAX_LENGTH) {
+										responseText = responseText.substring(0, MAX_LENGTH) + "...";
+									}
+									
 									if (PreviewFileType.CODE == previewType) {
 										view.setCodePreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
 									} 
