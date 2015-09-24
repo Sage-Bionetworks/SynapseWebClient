@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.util.List;
 
@@ -158,7 +158,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setLoadingVisible(true);
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY;
+		int mask = ENTITY | ENTITY_PATH | ACCESS_REQUIREMENTS;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {

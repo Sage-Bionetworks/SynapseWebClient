@@ -1,13 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.DOI;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -116,15 +109,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.projectHeader = projectHeader;
     	this.area = area;
     	this.areaToken = areaToken;
+    	this.entity = entity;
     	
+    	//note: the files/tables/wiki tabs rely on the project bundle, so it is configured later
     	configureProject();
     	
-    	//configure tabs
-    	configureFilesTab();
-    	configureTablesTab();
+    	//configure admin tabs
     	configureAdminTab();
-    	//note: the wiki tab is always configured from the project bundle, so it is configured later (after getting the project bundle)
-
+    	
     	//set area, if undefined
 		if (area == null) {
 			if (entity instanceof Project) {
@@ -144,12 +136,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		} else if (area == EntityArea.ADMIN) {
 			tabs.showTab(adminTab.asTab());
 		}
-		
 		view.setPageTitle(entity.getName() + " - " + entity.getId());
 	}
     
     public void configureProject() {
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI ;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA ;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -169,6 +160,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	//set up owner project information
     	projectMetadata.setEntityBundle(projectBundle, null);
     	configureWikiTab();
+    	configureFilesTab();
+    	configureTablesTab();
     	controller.configure(actionMenu, projectBundle, projectBundle.getRootWikiId(), entityUpdateHandler);
     }
     
