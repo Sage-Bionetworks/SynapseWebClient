@@ -1619,6 +1619,7 @@ ol.lowerroman {
 .align-center {display: block; margin-left: auto; margin-right: auto;}
 .text-align-center { text-align: center;}
 
+
 .bottomright {
 	position: absolute;
 	bottom: 0;
@@ -1882,6 +1883,9 @@ a.projectTitle:hover {
 	width: 140px;
 	font-size: 16px;	
 }
+.entity-tab > a {
+	text-align: center;
+}
 
 .rowAdaptiveHeight{
     overflow: hidden; 
@@ -2050,13 +2054,6 @@ iframe[seamless] {
 .x-menu-list-item>a:visited,
 .x-menu-list-item>a:visited>* {
 	color: #333 !important;
-}
-
-.entity-tabs > li.active > a,
-.entity-tabs > li.active > a:hover,
-.entity-tabs > li.active > a:focus {
-	background-color: #f9f9f9 !important;
-	cursor: pointer !important;
 }
 
 /* popups with very long values (like some urls) are shown out of bounds in bootstrap. */

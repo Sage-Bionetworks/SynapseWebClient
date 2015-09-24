@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 
 public class FilesTab implements FilesTabView.Presenter{
@@ -65,6 +66,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			ProvenanceWidget provWidget,
 			WikiPageWidget wikiPageWidget
 			) {
+		this.view = view;
 		this.tab = tab;
 		this.fileTitleBar = fileTitleBar;
 		this.folderTitleBar = folderTitleBar;
@@ -181,14 +183,14 @@ public class FilesTab implements FilesTabView.Presenter{
 				}
 			};
 			
-		wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), versionNumber), canEdit, wikiCallback, true);
+		wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), versionNumber), canEdit, wikiCallback, false);
 		
 		metadata.setFileHistoryVisible(isFile);
 		
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
 			public void invoke(String wikiPageId) {
-				wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, wikiCallback, true);
+				wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, wikiCallback, false);
 			}
 		};
 		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);

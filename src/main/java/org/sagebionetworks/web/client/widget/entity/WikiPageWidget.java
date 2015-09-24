@@ -55,7 +55,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
 	private WikiPage currentPage;
-	private boolean isEmbeddedInOwnerPage;
+	private boolean showSubpages;
 	
 	// widgets
 	private SynapseAlert synapseAlert;
@@ -121,14 +121,14 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
-			final Callback callback, final boolean isEmbeddedInOwnerPage) {
+			final Callback callback, final boolean showSubpages) {
 		clear();
 		view.setMainPanelVisible(true);
 		view.setLoadingVisible(true);
 		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
 		this.wikiKey = wikiKey;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.showSubpages = showSubpages;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
 		this.synapseAlert.clear();
@@ -156,7 +156,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 							updateCurrentPage(result);
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							configureBreadcrumbs(isRootWiki, ownerObjectName);
-							configureWikiSubpagesWidget(isEmbeddedInOwnerPage);	
+							view.setWikiSubpagesWidgetVisible(showSubpages);
+							if (showSubpages) {
+								configureWikiSubpagesWidget();	
+							}
 							view.setLoadingVisible(false);
 						} catch (Exception e) {
 							onFailure(e);
@@ -186,10 +189,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	@Override
-	public void configureWikiSubpagesWidget(boolean isEmbeddedInOwnerPage) {
+	public void configureWikiSubpagesWidget() {
 		//check configuration of wikiKey
 		view.setWikiSubpagesContainers(wikiSubpages);
-		wikiSubpages.configure(wikiKey, null, isEmbeddedInOwnerPage, new CallbackP<WikiPageKey>() {
+		wikiSubpages.configure(wikiKey, null, true, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
 				wikiKey = param;
@@ -285,7 +288,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	private void refresh() {
 		view.setMainPanelVisible(true);
-		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
+		configure(wikiKey, canEdit, callback, showSubpages);
 	}
 
 	@Override
@@ -409,7 +412,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		if (caught instanceof NotFoundException && callback != null) {
 			callback.noWikiFound();
 		}
-		if (isEmbeddedInOwnerPage) {
+		if (showSubpages) {
 			view.setMarkdownVisible(false);
 			view.setWikiHistoryVisible(false);			
 			if (caught instanceof NotFoundException) {

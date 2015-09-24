@@ -175,6 +175,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiSubpagesPanel.add(wikiSubpages);
 	}
 
+	@Override
+	public void setWikiSubpagesWidgetVisible(boolean isVisible) {
+		wikiSubpagesPanel.setVisible(isVisible);
+	}
+	
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}

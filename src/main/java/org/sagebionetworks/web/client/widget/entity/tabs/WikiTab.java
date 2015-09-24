@@ -31,11 +31,11 @@ public class WikiTab {
 	}
 	
 	public void configure(String entityId, String wikiPageId, Boolean canEdit,
-			Callback callback, boolean isEmbeddedInOwnerPage) {
+			Callback callback) {
 		Long versionNumber = null; //version is always null for project
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		
-		wikiPageWidget.configure(wikiPageKey, canEdit, callback, isEmbeddedInOwnerPage);
+		wikiPageWidget.configure(wikiPageKey, canEdit, callback, true);
 		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
 	}
 	

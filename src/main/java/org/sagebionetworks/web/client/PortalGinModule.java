@@ -804,7 +804,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DetailedPaginationView.class).to(DetailedPaginationViewImpl.class);
 		
 		// EntityPageTop
-		bind(EntityPageTopViewImpl.class).in(Singleton.class);
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
 		
 		// Preview

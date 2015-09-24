@@ -223,7 +223,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 		wikiTab.configure(projectBundle.getEntity().getId(), projectBundle.getRootWikiId(), 
-				canEdit, callback, true);
+				canEdit, callback);
 		
 		
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
@@ -231,7 +231,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void invoke(String wikiPageId) {
 				controller.configure(actionMenu, projectBundle, wikiPageId, entityUpdateHandler);
 				wikiTab.configure(projectBundle.getEntity().getId(), wikiPageId, 
-						canEdit, callback, true);
+						canEdit, callback);
 			}
 		};
 		wikiTab.setWikiReloadHandler(wikiReloadHandler);

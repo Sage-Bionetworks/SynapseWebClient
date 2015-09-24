@@ -27,13 +27,14 @@ public interface WikiPageWidgetView extends IsWidget {
 		void reloadWikiPage();
 		void showRestoreWarning(Long versionToRestore);
 		public void restoreClicked();
-		void configureWikiSubpagesWidget(boolean isEmbeddedInOwnerPage);
+		void configureWikiSubpagesWidget();
 		void configureHistoryWidget(boolean canEdit);
 		void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName);
 	}
 	
 	void setWikiHistoryWidget(IsWidget historyWidget);
 	void setWikiSubpagesWidget(IsWidget historyWidget);
+	void setWikiSubpagesWidgetVisible(boolean isVisible);
 	void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages);
 	void showPopup(String title, String message, MessagePopup popupType,
 			org.sagebionetworks.web.client.utils.Callback okCallback,
