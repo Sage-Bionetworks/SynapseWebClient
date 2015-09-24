@@ -32,7 +32,10 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 * Upload table button pushed.
 		 */
 		void onUploadTable();
-				
+		/**
+		 * Report when a table is clicked
+		 */
+		void onTableClicked(String entityId);
 	}
 
 	/**

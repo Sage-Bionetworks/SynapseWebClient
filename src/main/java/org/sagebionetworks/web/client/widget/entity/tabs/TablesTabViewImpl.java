@@ -44,6 +44,8 @@ public class TablesTabViewImpl implements TablesTabView {
 	SimplePanel tableModifiedAndCreatedContainer;
 	@UiField
 	SimplePanel tableListWidgetContainer;
+	@UiField
+	SimplePanel synapseAlertContainer;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {}
 	
@@ -138,6 +140,10 @@ public class TablesTabViewImpl implements TablesTabView {
 	@Override
 	public void setActionMenu(Widget w) {
 		tableActionMenuContainer.add(w);
+	}
+	@Override
+	public void setSynapseAlert(Widget w) {
+		synapseAlertContainer.setWidget(w);
 	}
 }
 

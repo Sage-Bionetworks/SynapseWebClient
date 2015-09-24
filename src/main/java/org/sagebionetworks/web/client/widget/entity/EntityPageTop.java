@@ -9,6 +9,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
@@ -39,8 +40,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle projectBundle;
-	private EntityBundle bundle;
-	private Long versionNumber;
+	private Entity entity;
+	
 	private Synapse.EntityArea area;
 	private String areaToken;
 	private EntityHeader projectHeader;
@@ -111,9 +112,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void configure(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
-    	this.bundle = bundle;
-    	this.versionNumber = versionNumber;
+    public void configure(Entity entity, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	this.projectHeader = projectHeader;
     	this.area = area;
     	this.areaToken = areaToken;
@@ -128,7 +127,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
     	//set area, if undefined
 		if (area == null) {
-			if (bundle.getEntity() instanceof Project) {
+			if (entity instanceof Project) {
 				area = EntityArea.WIKI;
 			} else {
 				area = EntityArea.FILES;
@@ -146,48 +145,41 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			tabs.showTab(adminTab.asTab());
 		}
 		
-		view.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
+		view.setPageTitle(entity.getName() + " - " + entity.getId());
 	}
     
     public void configureProject() {
-    	//get the project entity bundle (unless we're looking at the project!)
-    	if (projectHeader.getId().equals(bundle.getEntity().getId())) {
-    		projectBundle = bundle;
-    		configureFromProjectBundle();
-    	} else {
-    		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI ;
-    		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
-    			@Override
-    			public void onSuccess(EntityBundle bundle) {
-					projectBundle = bundle;
-					configureFromProjectBundle();
-    			}
-    			
-    			@Override
-    			public void onFailure(Throwable caught) {
-    				view.showErrorMessage(caught.getMessage());
-    			}	
-    		};
-			synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
-    	}
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI ;
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onSuccess(EntityBundle bundle) {
+				projectBundle = bundle;
+				configureFromProjectBundle();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}	
+		};
+		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
     
     private void configureFromProjectBundle() {
     	//set up owner project information
-    	projectMetadata.setEntityBundle(projectBundle, versionNumber);
+    	projectMetadata.setEntityBundle(projectBundle, null);
     	configureWikiTab();
     	controller.configure(actionMenu, projectBundle, projectBundle.getRootWikiId(), entityUpdateHandler);
     }
     
     public void clearState() {
 		view.clear();
-		// remove handlers
-		this.bundle = null;
+		this.entity = null;
 	}
 
 	@Override
 	public Widget asWidget() {
-		if(bundle != null) {
+		if(entity != null) {
 			view.setPresenter(this);
 			return view.asWidget();
 		}
@@ -196,14 +188,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void refresh() {
-		configure(bundle, versionNumber, projectHeader, area, areaToken);
+		configure(entity, projectHeader, area, areaToken);
 	}
 	public void configureTablesTab() {
-		tablesTab.configure(bundle, entityUpdateHandler, areaToken);
+		tablesTab.configure(entity, projectBundle, entityUpdateHandler, areaToken);
 	}
 	
 	public void configureFilesTab() {
-		filesTab.configure(bundle, entityUpdateHandler);
+		filesTab.configure(entity, projectBundle, entityUpdateHandler);
 	}
 	
 	public void configureWikiTab() {

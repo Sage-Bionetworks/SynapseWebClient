@@ -5,13 +5,18 @@ import com.google.gwt.event.shared.GwtEvent;
 public class EntitySelectedEvent extends GwtEvent<EntitySelectedHandler> {
 
 	private static final Type TYPE = new Type<EntitySelectedHandler>();
+	private String selectedEntityId;
 	
-	public EntitySelectedEvent() {
-		
+	public EntitySelectedEvent(String selectedEntityId) {
+		this.selectedEntityId = selectedEntityId;
 	}
 	
 	public static Type getType() {
 		return TYPE;
+	}
+	
+	public String getSelectedEntityId() {
+		return selectedEntityId;
 	}
 	
 	@Override

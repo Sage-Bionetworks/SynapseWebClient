@@ -235,7 +235,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
   
 	public void fireEntitySelectedEvent() {
 		if (entitySelectedHandler != null) {
-			entitySelectedHandler.onSelection(new EntitySelectedEvent());
+			entitySelectedHandler.onSelection(new EntitySelectedEvent(getSelected()));
 		}
 	}
 

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 
 import java.util.List;
 
@@ -12,13 +12,10 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -32,12 +29,10 @@ import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.footer.Footer;
-import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -62,7 +57,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private Synapse.EntityArea area;
 	private String areaToken;
 	private CookieProvider cookies;
-	private SynapseJSNIUtils synapseJsniUtils;
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
@@ -74,7 +68,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
-			SynapseJSNIUtils synapseJsniUtils, SynapseAlert synAlert,
+			SynapseAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
 			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
 		this.headerWidget = headerWidget;
@@ -86,7 +80,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
-		this.synapseJsniUtils = synapseJsniUtils;
+		
 		//place widgets and configure
 		view.setEntityPageTopWidget(entityPageTop);
 		view.setFooterWidget(footerWidget);
@@ -164,7 +158,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setLoadingVisible(true);
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA | ROOT_WIKI_ID | DOI | FILE_NAME;
+		int mask = ENTITY;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -190,12 +184,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					}
 					EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
 					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					if (projectHeader != null)
-						loadBackgroundImage(projectHeader.getId());
-					EntityPresenter.filterToDownloadARs(bundle);
 					entityPageTop.clearState();
-					entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
-					entityPageTop.refresh();
+					entityPageTop.configure(bundle.getEntity(), projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);
 					view.setEntityPageTopVisible(true);
 					headerWidget.configure(false, projectHeader);
@@ -256,55 +246,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setLoadingVisible(false);
 		view.setEntityPageTopVisible(false);
 		view.setOpenTeamInvitesVisible(false);
-	}
-	
-	public void loadBackgroundImage(final String projectEntityId) {
-		//if an attachment is found that has a particular name, then it is set to the background.
-		//get the root wiki id
-		synapseClient.getRootWikiId(projectEntityId, ObjectType.ENTITY.toString(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String rootWikiId) {
-				if (rootWikiId != null) {
-					WikiPageKey wikiKey = new WikiPageKey(projectEntityId, ObjectType.ENTITY.toString(), rootWikiId);
-					loadBackgroundImage(wikiKey);
-				}
-			}
-			@Override
-			public void onFailure(Throwable e) {
-				//if anything goes wrong during image load, catch and log to console only
-				synapseJsniUtils.consoleError(e.getMessage());
-			}
-		});
-	}
-	
-	public void loadBackgroundImage(final WikiPageKey rootPageKey) {
-		synapseClient.getWikiAttachmentHandles(rootPageKey, new AsyncCallback<FileHandleResults>() {
-			@Override
-			public void onSuccess(FileHandleResults fileHandleResults) {
-				try {
-					if (fileHandleResults != null && fileHandleResults.getList() != null && !fileHandleResults.getList().isEmpty()) {
-						//look for special file name
-						for (FileHandle handle : fileHandleResults.getList()) {
-							if (ENTITY_BACKGROUND_IMAGE_NAME.equalsIgnoreCase(handle.getFileName())) {
-								String url = DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), rootPageKey, handle.getFileName(),false);
-								view.setBackgroundImageUrl(url);
-								view.setBackgroundImageVisible(true);
-								break;
-							}
-						}
-					}
-				} catch (Exception e) {
-					//if anything goes wrong during image load, catch and log to console only
-					onFailure(e);
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				//failed to load background image.  log in console only
-				synapseJsniUtils.consoleError(caught.getMessage());
-			}
-		});
 	}
 	
 	public static void filterToDownloadARs(EntityBundle bundle) {

@@ -14,5 +14,6 @@ public interface TablesTabView extends IsWidget {
 	void setTableEntityWidget(Widget w);
 	void setEntityMetadata(Widget w);
 	void setActionMenu(Widget w);
+	void setSynapseAlert(Widget w);
 	void configureModifiedAndCreatedWidget(Entity entity);
 }

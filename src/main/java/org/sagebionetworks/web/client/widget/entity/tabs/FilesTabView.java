@@ -18,6 +18,7 @@ public interface FilesTabView extends IsWidget {
 	void setMetadata(Widget w);
 	void setActionMenu(Widget w);
 	void setWikiPage(Widget w);
+	void setSynapseAlert(Widget w);
 	void configureProgrammaticClients(String entityId, Long versionNumber);
 	
 	void setProvenanceVisible(boolean visible);

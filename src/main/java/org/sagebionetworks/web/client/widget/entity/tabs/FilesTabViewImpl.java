@@ -43,6 +43,8 @@ public class FilesTabViewImpl implements FilesTabView {
 	SimplePanel fileMetadataContainer;
 	@UiField
 	SimplePanel fileActionMenuContainer;
+	@UiField
+	SimplePanel synapseAlertContainer;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
 	
@@ -185,5 +187,9 @@ public class FilesTabViewImpl implements FilesTabView {
 	@Override
 	public void setFileBrowserVisible(boolean visible) {
 		fileBrowserContainer.setVisible(visible);
+	}
+	@Override
+	public void setSynapseAlert(Widget w) {
+		synapseAlertContainer.setWidget(w);
 	}
 }

@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import static org.sagebionetworks.repo.model.EntityBundle.*;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -12,6 +15,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -21,6 +25,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class TablesTab implements TablesTabView.Presenter{
@@ -46,7 +51,8 @@ public class TablesTab implements TablesTabView.Presenter{
 	Entity entity;
 	Long versionNumber;
 	String areaToken;
-	
+	SynapseAlert synAlert;
+	SynapseClientAsync synapseClient;
 	@Inject
 	public TablesTab(
 			TablesTabView view,
@@ -58,7 +64,9 @@ public class TablesTab implements TablesTabView.Presenter{
 			EntityMetadata metadata,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
-			QueryTokenProvider queryTokenProvider
+			QueryTokenProvider queryTokenProvider,
+			SynapseAlert synAlert,
+			SynapseClientAsync synapseClient
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -70,6 +78,8 @@ public class TablesTab implements TablesTabView.Presenter{
 		this.controller = controller;
 		this.actionMenu = actionMenu;
 		this.queryTokenProvider = queryTokenProvider;
+		this.synAlert = synAlert;
+		this.synapseClient = synapseClient;
 		
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setTableList(tableListWidget.asWidget());
@@ -77,6 +87,7 @@ public class TablesTab implements TablesTabView.Presenter{
 		view.setEntityMetadata(metadata.asWidget());
 		view.setTableEntityWidget(v2TableWidget.asWidget());
 		view.setActionMenu(actionMenu.asWidget());
+		view.setSynapseAlert(synAlert.asWidget());
 		tab.configure("Tables", view.asWidget());
 		
 		actionMenu.addControllerWidget(controller.asWidget());
@@ -109,19 +120,39 @@ public class TablesTab implements TablesTabView.Presenter{
 				}
 			}
 		};
+		
+		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
+			@Override
+			public void invoke(String entityId) {
+				getTargetBundle(entityId, null);
+			}
+		});
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.setTabClickedCallback(onClickCallback);
 	}
 	
-	public void configure(EntityBundle bundle, EntityUpdatedHandler handler, String areaToken) {
+	public void configure(Entity entity, EntityBundle projectBundle, EntityUpdatedHandler handler, String areaToken) {
 		this.areaToken = areaToken;
-		entity = bundle.getEntity();
-		boolean isTable = entity instanceof TableEntity;
+		metadata.setEntityUpdatedHandler(handler);
 		
+		boolean isTable = entity instanceof TableEntity;
+		if (!isTable) {
+			//configure based on project
+			setTargetBundle(projectBundle);
+		} else {
+			getTargetBundle(entity.getId(), ((TableEntity)entity).getVersionNumber());
+		}
+		
+		view.configureModifiedAndCreatedWidget(entity);
+	}
+	
+	public void setTargetBundle(EntityBundle bundle) {
+		this.entity = bundle.getEntity();
 		breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 		versionNumber = null;
+		boolean isTable = entity instanceof TableEntity;
 		if (isTable) {
 			versionNumber = ((TableEntity)entity).getVersionNumber();
 		}
@@ -129,9 +160,28 @@ public class TablesTab implements TablesTabView.Presenter{
 		tableTitleBar.configure(bundle);
 		tab.setPlace(new Synapse(entity.getId(), versionNumber, EntityArea.TABLES, null));
 		v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
-		view.configureModifiedAndCreatedWidget(entity);
+	}
+	
+	public void getTargetBundle(String entityId, Long versionNumber) {
+		synAlert.clear();
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI | TABLE_DATA;
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onSuccess(EntityBundle bundle) {
+				setTargetBundle(bundle);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}			
+		};
 		
-		metadata.setEntityUpdatedHandler(handler);
+		if (versionNumber == null) {
+			synapseClient.getEntityBundle(entityId, mask, callback);
+		} else {
+			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+		}
 	}
 	
 	public Tab asTab(){

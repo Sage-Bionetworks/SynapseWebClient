@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -199,5 +200,9 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	public void showUploadFile() {
 		view.showUploadDialog(this.configuredEntityId);
+	}
+	
+	public void setEntitySelectedHandler(EntitySelectedHandler handler) {
+		view.setEntitySelectedHandler(handler);
 	}
 }
