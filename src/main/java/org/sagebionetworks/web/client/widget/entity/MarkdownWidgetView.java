@@ -10,7 +10,7 @@ public interface MarkdownWidgetView extends IsWidget {
 
 	public interface Presenter {
 
-		void configure(String md, WikiPageKey wikiKey, boolean isPreview,
+		void configure(String md, WikiPageKey wikiKey, String suffix,
 				Long wikiVersionInView);
 
 		void clear();

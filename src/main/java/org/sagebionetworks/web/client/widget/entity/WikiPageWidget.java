@@ -65,7 +65,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private WikiSubpagesWidget wikiSubpages;
 	private UserBadge createdByBadge;
 	private UserBadge modifiedByBadge;	
-
+	
+	private String suffix;
+	
 	public interface Callback{
 		public void pageUpdated();
 		public void noWikiFound();
@@ -121,7 +123,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
-			final Callback callback, final boolean showSubpages) {
+			final Callback callback, final boolean showSubpages, String suffix) {
 		clear();
 		view.setMainPanelVisible(true);
 		view.setLoadingVisible(true);
@@ -131,6 +133,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.showSubpages = showSubpages;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
+		this.suffix = suffix;
 		this.synapseAlert.clear();
 		// set up callback
 		if (callback != null)
@@ -178,13 +181,13 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void resetWikiMarkdown(String markdown) {
 		view.setMarkdownVisible(true);
 		if(!isCurrentVersion) {
-			markdownWidget.configure(markdown, wikiKey, false, versionInView);
+			markdownWidget.configure(markdown, wikiKey, suffix, versionInView);
 			view.setDiffVersionAlertVisible(true);
 			if (canEdit) {
 				view.setRestoreButtonVisible(true);
 			}
 		} else {
-			markdownWidget.configure(markdown, wikiKey, false, null);
+			markdownWidget.configure(markdown, wikiKey, suffix, null);
 		}
 	}
 	
@@ -288,7 +291,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	private void refresh() {
 		view.setMainPanelVisible(true);
-		configure(wikiKey, canEdit, callback, showSubpages);
+		configure(wikiKey, canEdit, callback, showSubpages, suffix);
 	}
 
 	@Override

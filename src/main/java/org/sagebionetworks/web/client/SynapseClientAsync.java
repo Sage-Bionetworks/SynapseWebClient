@@ -192,7 +192,7 @@ public interface SynapseClientAsync {
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
 	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 

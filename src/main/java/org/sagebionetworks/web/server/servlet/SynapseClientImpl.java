@@ -1148,13 +1148,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview,
+	public String markdown2Html(String markdown, String suffix,
 			Boolean isAlphaMode, String clientHostString)
 			throws RestServiceException {
 		try {
 			long startTime = System.currentTimeMillis();
 			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
-					markdown, isPreview, clientHostString);
+					markdown, suffix, clientHostString);
 			long endTime = System.currentTimeMillis();
 			float elapsedTime = endTime - startTime;
 			logInfo("Markdown processing took " + (elapsedTime / 1000f)
@@ -1403,7 +1403,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException, IOException {
 		String markdown = getMarkdown(key);
 		String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
-				markdown, false, null);
+				markdown, "", null);
 		String plainText = Jsoup.clean(html, "", Whitelist.none(),
 				new Document.OutputSettings().prettyPrint(false));
 		return plainText;

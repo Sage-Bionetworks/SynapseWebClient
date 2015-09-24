@@ -201,7 +201,7 @@ public class CrawlFilter implements Filter {
 		}
 		if (markdown != null) {
 			try {
-				String wikiHtml = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, false, "");
+				String wikiHtml = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, "", "");
 				//extract plain text from wiki html
 				markdown = Jsoup.parse(wikiHtml).text();
 			} catch (IOException e) {
