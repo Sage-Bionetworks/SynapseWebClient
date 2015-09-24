@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -25,9 +27,13 @@ public class FilesTabViewImpl implements FilesTabView {
 	@UiField
 	SimplePanel filesWikiPageContainer;
 	@UiField
-	SimplePanel filePreviewContainer;
+	Column filePreviewContainer;
 	@UiField
-	SimplePanel fileProvenanceContainer;
+	Div filePreviewContainerHighlightBox;
+	@UiField
+	Column fileProvenanceContainer;
+	@UiField
+	Div fileProvenanceContainerHighlightBox;
 	@UiField
 	HTMLPanel fileProgrammaticClientsContainer;
 	@UiField
@@ -66,8 +72,8 @@ public class FilesTabViewImpl implements FilesTabView {
 		//empty constructor, you can include this widget in the ui xml
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);
-		filePreviewContainer.getElement().setAttribute("highlight-box-title", "Preview");
-		fileProvenanceContainer.getElement().setAttribute("highlight-box-title", "Provenance");
+		filePreviewContainerHighlightBox.getElement().setAttribute("highlight-box-title", "Preview");
+		fileProvenanceContainerHighlightBox.getElement().setAttribute("highlight-box-title", "Provenance");
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
 		this.rLoadWidget = rLoadWidget;
@@ -106,12 +112,12 @@ public class FilesTabViewImpl implements FilesTabView {
 
 	@Override
 	public void setPreview(Widget w) {
-		filePreviewContainer.add(w);		
+		filePreviewContainerHighlightBox.add(w);		
 	}
 
 	@Override
 	public void setProvenance(Widget w) {
-		fileProvenanceContainer.add(w);		
+		fileProvenanceContainerHighlightBox.add(w);		
 	}
 
 	@Override
@@ -187,6 +193,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	@Override
 	public void setFileBrowserVisible(boolean visible) {
 		fileBrowserContainer.setVisible(visible);
+	}
+	@Override
+	public void setPreviewVisible(boolean visible) {
+		filePreviewContainer.setVisible(visible);
 	}
 	@Override
 	public void setSynapseAlert(Widget w) {

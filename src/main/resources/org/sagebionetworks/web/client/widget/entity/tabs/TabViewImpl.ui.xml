@@ -5,6 +5,8 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<b:TabListItem ui:field="tabItem" active="false" text="" addStyleNames="entity-tab"/>
-		<b:TabPane ui:field="tabPane" active="true" addStyleNames="margin-top-15" />
+		<b:TabPane ui:field="tabPane" active="true" addStyleNames="row tab-background padding-top-15">
+			<bh:Div ui:field="contentDiv" addStyleNames="margin-left-15 margin-right-15"/> 
+		</b:TabPane>
 	</bh:Div>
 </ui:UiBinder>

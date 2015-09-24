@@ -212,11 +212,18 @@ public class FilesTab implements FilesTabView.Presenter{
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		
-		//Title Bars
+		//action menu
+		actionMenu.asWidget().setVisible(isFile || isFolder);
+		
+		//Preview
+		view.setPreviewVisible(isFile);
+		//File title bar
 		fileTitleBar.asWidget().setVisible(isFile);
 		if (isFile) {
 			fileTitleBar.configure(bundle);
+			previewWidget.configure(bundle);
 		}
+		
 		folderTitleBar.asWidget().setVisible(isFolder);
 		if (isFolder) {
 			folderTitleBar.configure(bundle);
@@ -229,7 +236,8 @@ public class FilesTab implements FilesTabView.Presenter{
 		metadata.setFileHistoryVisible(isFile);
 		
 		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.FILES, null));
-		previewWidget.configure(bundle);
+		  
+		
 		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
 		
 		//File Browser

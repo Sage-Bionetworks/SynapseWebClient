@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -16,6 +17,8 @@ public class TabViewImpl implements TabView {
 	TabListItem tabItem;
 	@UiField
 	TabPane tabPane;
+	@UiField
+	Div contentDiv;
 	public interface TabViewImplUiBinder extends UiBinder<Widget, TabViewImpl> {}
 	Presenter presenter;
 	Widget widget;
@@ -40,8 +43,8 @@ public class TabViewImpl implements TabView {
 	@Override
 	public void configure(String tabTitle, Widget content) {
 		tabItem.setText(tabTitle);
-		tabPane.clear();
-		tabPane.add(content);
+		contentDiv.clear();
+		contentDiv.add(content);
 	}
 	
 	@Override

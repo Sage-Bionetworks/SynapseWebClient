@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<b:Row ui:field="tablesTabContainer" addStyleNames="tab-background margin-left-15 margin-right-15 padding-top-15 padding-bottom-15">
+	<b:Row ui:field="tablesTabContainer">
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
 			<g:SimplePanel ui:field="tableActionMenuContainer"/>
