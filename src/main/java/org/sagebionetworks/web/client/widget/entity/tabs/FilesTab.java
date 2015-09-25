@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -47,6 +48,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -68,7 +70,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
 	
-	boolean annotationsShown, fileHistoryShown, isProjectLevelDataShown;
+	boolean annotationsShown, fileHistoryShown;
 	private static int WIDGET_HEIGHT_PX = 270;
 	Map<String,String> configMap;
 	
@@ -165,8 +167,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		boolean isFolder = targetEntity instanceof Folder;
 		
 		//if we are not being configured with a file or folder, then project level should be shown
-		isProjectLevelDataShown = !(isFile || isFolder);
-		if (isProjectLevelDataShown) {
+		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
 			setTargetBundle(projectBundle);
 		} else {
@@ -186,6 +187,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				setTargetBundle(bundle);
+				tab.showTab();
 			}
 			
 			@Override
@@ -208,7 +210,8 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		boolean isFile = bundle.getEntity() instanceof FileEntity;
 		boolean isFolder = bundle.getEntity() instanceof Folder;
-
+		boolean isProject = bundle.getEntity() instanceof Project;
+		
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		
@@ -230,18 +233,19 @@ public class FilesTab implements FilesTabView.Presenter{
 		}
 		
 		//Metadata
-		metadata.asWidget().setVisible(isFile || isFolder);
-		
-		//File History
-		metadata.setFileHistoryVisible(isFile);
+		boolean isMetadataVisible = isFile || isFolder;
+		metadata.asWidget().setVisible(isMetadataVisible);
+		if (isMetadataVisible) {
+			metadata.setEntityBundle(bundle, versionNumber);
+			//File History
+//			metadata.setFileHistoryVisible(isFile);	
+		}
 		
 		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.FILES, null));
-		  
-		
 		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
 		
 		//File Browser
-		boolean isFilesBrowserVisible = isProjectLevelDataShown || isFolder;
+		boolean isFilesBrowserVisible = isProject || isFolder;
 		view.setFileBrowserVisible(isFilesBrowserVisible);
 		if (isFilesBrowserVisible) {
 			filesBrowser.configure(entityId, bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser());	
@@ -255,35 +259,37 @@ public class FilesTab implements FilesTabView.Presenter{
 
 		//Provenance
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), versionNumber));
-		boolean isProvVisible = !(isProjectLevelDataShown || isFolder);
-		view.setProvenanceVisible(isProvVisible);
-		if (isProvVisible){
+		view.setProvenanceVisible(isFile);
+		if (isFile){
 			provWidget.configure(null, configMap, null, null);	
 		}
 		//Created By and Modified By
 		view.configureModifiedAndCreatedWidget(bundle.getEntity());
 		
 		//Wiki Page
-		final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		view.setWikiPageWidgetVisible(!isProjectLevelDataShown);
-		final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
+		boolean isWikiPageVisible = !isProject;
+		view.setWikiPageWidgetVisible(isWikiPageVisible);
+		if (isWikiPageVisible) {
+			final boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+			final WikiPageWidget.Callback wikiCallback = new WikiPageWidget.Callback() {
+					@Override
+					public void pageUpdated() {
+						handler.onPersistSuccess(new EntityUpdatedEvent());
+					}
+					@Override
+					public void noWikiFound() {
+						view.setWikiPageWidgetVisible(false);
+					}
+				};
+			wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), versionNumber), canEdit, wikiCallback, false, "-files-tab");
+			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 				@Override
-				public void pageUpdated() {
-					handler.onPersistSuccess(new EntityUpdatedEvent());
-				}
-				@Override
-				public void noWikiFound() {
-					view.setWikiPageWidgetVisible(false);
+				public void invoke(String wikiPageId) {
+					wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, wikiCallback, false, "-files-tab");
 				}
 			};
-		wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), versionNumber), canEdit, wikiCallback, false, "-files-tab");
-		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
-			@Override
-			public void invoke(String wikiPageId) {
-				wikiPageWidget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, wikiCallback, false, "-files-tab");
-			}
-		};
-		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
+			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
+		}
 	}
 	
 	public Tab asTab(){
