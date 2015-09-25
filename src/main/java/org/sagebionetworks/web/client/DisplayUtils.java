@@ -157,7 +157,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String getIconThumbnailHtml(ImageResource icon) {
-		if(icon == null) return null;		
+		if(icon == null) return null;	
 		return "<span class=\"thumbnail-image-container\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
 	}
 	
