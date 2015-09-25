@@ -875,7 +875,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntitySearchBoxView.class).to(EntitySearchBoxViewImpl.class);
 
 		// EntityMetadata
-		bind(EntityMetadataViewImpl.class).in(Singleton.class);
 		bind(EntityMetadataView.class).to(EntityMetadataViewImpl.class);
 				
 		bind(UserProfileEditorWidget.class).to(UserProfileEditorWidgetImpl.class);
@@ -889,7 +888,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);
 
 		//single subpages view
-		bind(WikiSubpagesViewImpl.class).in(Singleton.class);
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
 		
 		// SubPages Order Editor
