@@ -117,6 +117,7 @@ public class FilesTabViewImpl implements FilesTabView {
 
 	@Override
 	public void setProvenance(Widget w) {
+		fileProvenanceContainerHighlightBox.clear();
 		fileProvenanceContainerHighlightBox.add(w);		
 	}
 

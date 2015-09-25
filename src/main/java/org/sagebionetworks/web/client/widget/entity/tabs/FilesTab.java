@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
@@ -64,9 +65,9 @@ public class FilesTab implements FilesTabView.Presenter{
 	ActionMenuWidget actionMenu;
 	FilesBrowser filesBrowser;
 	PreviewWidget previewWidget;
-	ProvenanceWidget provWidget;
 	WikiPageWidget wikiPageWidget;
 	EntityUpdatedHandler handler;
+	PortalGinInjector ginInjector;
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
 	
@@ -85,10 +86,10 @@ public class FilesTab implements FilesTabView.Presenter{
 			ActionMenuWidget actionMenu,
 			FilesBrowser filesBrowser,
 			PreviewWidget previewWidget,
-			ProvenanceWidget provWidget,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient
+			SynapseClientAsync synapseClient,
+			PortalGinInjector ginInjector
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -100,10 +101,10 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.actionMenu = actionMenu;
 		this.filesBrowser = filesBrowser;
 		this.previewWidget = previewWidget;
-		this.provWidget = provWidget;
 		this.wikiPageWidget = wikiPageWidget;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		this.ginInjector = ginInjector;
 		
 		previewWidget.asWidget().setHeight(WIDGET_HEIGHT_PX + "px");
 		view.setFileTitlebar(fileTitleBar.asWidget());
@@ -111,7 +112,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setFileBrowser(filesBrowser.asWidget());
 		view.setPreview(previewWidget.asWidget());
-		view.setProvenance(provWidget.asWidget());
 		view.setMetadata(metadata.asWidget());
 		view.setActionMenu(actionMenu.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
@@ -240,8 +240,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			//File History
 //			metadata.setFileHistoryVisible(isFile);	
 		}
-		
-		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.FILES, null));
+		EntityArea area = isProject ? EntityArea.FILES : null;
+		tab.setPlace(new Synapse(entityId, versionNumber, area, null));
 		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
 		
 		//File Browser
@@ -261,6 +261,8 @@ public class FilesTab implements FilesTabView.Presenter{
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(bundle.getEntity().getId(), versionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile){
+			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
+			view.setProvenance(provWidget.asWidget());
 			provWidget.configure(null, configMap, null, null);	
 		}
 		//Created By and Modified By
