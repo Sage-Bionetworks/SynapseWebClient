@@ -148,22 +148,34 @@ public class TablesTab implements TablesTabView.Presenter{
 		} else {
 			getTargetBundle(entity.getId(), ((TableEntity)entity).getVersionNumber());
 		}
-		
-		view.configureModifiedAndCreatedWidget(entity);
 	}
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		this.entity = bundle.getEntity();
-		breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
-		versionNumber = null;
 		boolean isTable = entity instanceof TableEntity;
+		boolean isProject = entity instanceof Project;
+		versionNumber = null;
+		metadata.asWidget().setVisible(isTable);
+		breadcrumb.asWidget().setVisible(isTable);
+		tableListWidget.asWidget().setVisible(isProject);
+		tableTitleBar.asWidget().setVisible(isTable);
+		actionMenu.asWidget().setVisible(isTable);
+		v2TableWidget.asWidget().setVisible(isTable);
+		
 		if (isTable) {
 			versionNumber = ((TableEntity)entity).getVersionNumber();
+			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
+			metadata.setEntityBundle(bundle, versionNumber);
+			tableTitleBar.configure(bundle);
+			view.configureModifiedAndCreatedWidget(entity);
+			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
+		} else if (isProject) {
+			tableListWidget.configure(bundle);
 		}
-		metadata.setEntityBundle(bundle, versionNumber);
-		tableTitleBar.configure(bundle);
+		
+		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
 		tab.setPlace(new Synapse(entity.getId(), versionNumber, EntityArea.TABLES, null));
-		v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
+		
 	}
 	
 	public void getTargetBundle(String entityId, Long versionNumber) {

@@ -27,7 +27,6 @@ public class TablesTabViewImpl implements TablesTabView {
 	@UiField
 	Button tableAPIDocsButton;
 
-	
 	@UiField
 	SimplePanel tableTitlebarContainer;
 	
