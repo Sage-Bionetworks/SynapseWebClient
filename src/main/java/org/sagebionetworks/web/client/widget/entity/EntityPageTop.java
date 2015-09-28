@@ -45,7 +45,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private Entity entity;
 	
 	private Synapse.EntityArea area;
-	private String areaToken;
+	private String wikiAreaToken, tablesAreaToken;
 	private EntityHeader projectHeader;
 	
 	private Tabs tabs;
@@ -134,15 +134,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     public void configure(Entity entity, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	this.projectHeader = projectHeader;
     	this.area = area;
-    	this.areaToken = areaToken;
+    	wikiAreaToken = null;
+    	tablesAreaToken = null;
     	this.entity = entity;
-    	
-    	//note: the files/tables/wiki tabs rely on the project bundle, so it is configured later
-    	configureProject();
-    	
-    	//configure admin tabs
-    	configureAdminTab();
-    	
+
     	//set area, if undefined
 		if (area == null) {
 			if (entity instanceof Project) {
@@ -155,14 +150,22 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	//go to the tab corresponding to the area stated
 		if (area == EntityArea.WIKI) {
 			tabs.showTab(wikiTab.asTab());
+			wikiAreaToken = areaToken;
 		} else if (area == EntityArea.FILES) {
 			tabs.showTab(filesTab.asTab());
 		} else if (area == EntityArea.TABLES) {
 			tabs.showTab(tablesTab.asTab());
+			tablesAreaToken = areaToken;
 		} else if (area == EntityArea.ADMIN) {
 			tabs.showTab(adminTab.asTab());
 		}
 		view.setPageTitle(entity.getName() + " - " + entity.getId());
+		
+    	//note: the files/tables/wiki tabs rely on the project bundle, so it is configured later
+    	configureProject();
+    	
+    	//configure admin tabs
+    	configureAdminTab();
 	}
     
     public void configureProject() {
@@ -205,12 +208,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return null;
 	}
 
-	@Override
-	public void refresh() {
-		configure(entity, projectHeader, area, areaToken);
-	}
 	public void configureTablesTab() {
-		tablesTab.configure(entity, projectBundle, entityUpdateHandler, areaToken);
+		tablesTab.configure(entity, projectBundle, entityUpdateHandler, tablesAreaToken);
 	}
 	
 	public void configureFilesTab() {
@@ -234,7 +233,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 		
-		String wikiId = getWikiPageId(areaToken, projectBundle.getRootWikiId());
+		String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 		wikiTab.configure(projectBundle.getEntity().getId(), wikiId, 
 				canEdit, callback);
 		

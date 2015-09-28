@@ -60,6 +60,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.accessRequirementDialog = accessRestrictionDialog;
 		shownAccessRequirements = new HashSet<Long>();
 		view.setPresenter(this);
+		view.clear();
 	}
 	
 	public void configure(EntityBundle bundle, boolean showChangeLink, boolean showIfProject, boolean showFlagLink, Callback entityUpdated) {

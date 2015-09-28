@@ -23,7 +23,7 @@ public class AdminTab implements AdminTabView.Presenter{
 		this.evaluationList = evaluationList;
 		
 		view.setEvaluationList(evaluationList.asWidget());
-		tab.configure("Admin", view.asWidget());
+		tab.configure("Challenge Admin", view.asWidget());
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {

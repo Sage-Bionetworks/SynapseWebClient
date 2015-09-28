@@ -171,11 +171,10 @@ public class TablesTab implements TablesTabView.Presenter{
 			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
 		} else if (isProject) {
 			tableListWidget.configure(bundle);
+			tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
 		}
 		
 		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
-		tab.setPlace(new Synapse(entity.getId(), versionNumber, EntityArea.TABLES, null));
-		
 	}
 	
 	public void getTargetBundle(String entityId, Long versionNumber) {
@@ -185,6 +184,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				setTargetBundle(bundle);
+				tab.showTab();
 			}
 			
 			@Override
@@ -209,7 +209,8 @@ public class TablesTab implements TablesTabView.Presenter{
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null){
 				areaToken = TABLE_QUERY_PREFIX + token;
-				tab.setPlace(new Synapse(entity.getId(), versionNumber, EntityArea.TABLES, areaToken));
+				tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
+				tab.showTab();
 			}
 		}
 	}
