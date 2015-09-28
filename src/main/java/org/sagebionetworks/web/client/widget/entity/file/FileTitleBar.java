@@ -113,14 +113,16 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		if (fileHandle instanceof S3FileHandleInterface){
 			S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 			Long synapseStorageLocationId = Long.valueOf(globalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"));
-			if (synapseStorageLocationId.equals(s3FileHandle.getStorageLocationId())) {
+			// Uploads to Synapse Storage often do not get their storage location field back-filled,
+			// so null also indicates a Synapse-Stored file
+			if (s3FileHandle.getStorageLocationId() == null || 
+					synapseStorageLocationId.equals(s3FileHandle.getStorageLocationId())) {
 				view.setFileLocation("| Synapse Storage");				
 			} else {
 				String description = "| s3://" + s3FileHandle.getBucketName() + "/";
 				if (s3FileHandle.getKey() != null) {
-					description += s3FileHandle.getKey() + "/";
+					description += s3FileHandle.getKey();
 				};
-				description += entityBundle.getEntity().getName();
 				view.setFileLocation(description);
 			}
 		}
