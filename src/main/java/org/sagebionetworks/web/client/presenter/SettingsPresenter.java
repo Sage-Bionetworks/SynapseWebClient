@@ -333,4 +333,39 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			}
 		});
 	}
+
+	@Override
+	public void changePassword() {
+		clearPasswordErrors();
+		String currentPassword = view.getCurrentPasswordField();
+		String password1 = view.getPassword1Field();
+		String password2 = view.getPassword2Field();
+		if (!checkPasswordDefined(currentPassword)) {
+			view.setCurrentPasswordErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			view.setCurrentPasswordInError(true);
+		} else if (!checkPasswordDefined(password1)){
+			view.setPassword1ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			view.setPassword1InError(true);
+		} else if (!checkPasswordDefined(password2) || !password1.equals(password2)) {
+			view.setPassword2ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			view.setPassword2InError(true);
+		} else {
+			view.setChangePasswordEnabled(false);
+			resetPassword(currentPassword, password1);
+		}
+	}
+	
+	public void clearPasswordErrors() {
+		view.setCurrentPasswordErrorMessage("");
+		view.setPassword1ErrorMessage("");
+		view.setPassword2ErrorMessage("");
+		view.setCurrentPasswordInError(false);
+		view.setPassword1InError(false);
+		view.setPassword2InError(false);
+	}
+	
+	private boolean checkPasswordDefined(String password) {
+		return password != null && !password.isEmpty();
+	}
+	
 }

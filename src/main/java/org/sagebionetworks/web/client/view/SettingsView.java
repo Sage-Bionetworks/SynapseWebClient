@@ -55,6 +55,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void addEmail(String emailAddress);
 		void onEditProfile();
 		void getAPIKey();
+
+		void changePassword();
 	}
 
 	public void setApiKey(String apiKey);
@@ -67,4 +69,26 @@ public interface SettingsView extends IsWidget, SynapseView {
 	public void setAPISynAlertWidget(Widget synAlert);
 	void hideAPIKey();
 	void showConfirm(String message, ConfirmCallback callback);
+
+	String getPassword1Field();
+
+	String getCurrentPasswordField();
+
+	String getPassword2Field();
+
+	void setCurrentPasswordInError(boolean inError);
+
+	void setCurrentPasswordErrorMessage(String message);
+
+	void setPassword1ErrorMessage(String message);
+
+	void setPassword1InError(boolean inError);
+
+	void setPassword2ErrorMessage(String message);
+
+	void setPassword2InError(boolean inError);
+
+	void setChangePasswordEnabled(boolean isEnabled);
+
+	void resetChangePasswordUI();
 }

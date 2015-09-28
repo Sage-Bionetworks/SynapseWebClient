@@ -19,6 +19,7 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -354,5 +355,79 @@ public class SettingsPresenterTest {
 		profilePresenter.changeApiKeyPostConfirmation();
 		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(e);
+	}
+	
+	@Test
+	public void testChangePasswordCurrentPasswordFailure() {
+		when(mockView.getCurrentPasswordField()).thenReturn("");
+		profilePresenter.changePassword();
+		verify(mockView).getCurrentPasswordField();
+		verify(mockView).getPassword1Field();
+		verify(mockView).getPassword2Field();
+		verify(mockView).setCurrentPasswordErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockView).setCurrentPasswordInError(true);
+	}
+	
+	@Test
+	public void testChangePasswordPassword1Failure() {
+		when(mockView.getCurrentPasswordField()).thenReturn(password);
+		when(mockView.getPassword1Field()).thenReturn("");
+		profilePresenter.changePassword();
+		verify(mockView).getCurrentPasswordField();
+		verify(mockView).getPassword1Field();
+		verify(mockView).getPassword2Field();
+		verify(mockView).setPassword1ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockView).setPassword1InError(true);
+	}
+	
+	@Test
+	public void testChangePasswordPassword2Failure() {
+		// empty second password
+		when(mockView.getCurrentPasswordField()).thenReturn(password);
+		when(mockView.getPassword1Field()).thenReturn(newPassword);
+		when(mockView.getPassword2Field()).thenReturn("");
+		profilePresenter.changePassword();
+		verify(mockView).getCurrentPasswordField();
+		verify(mockView).getPassword1Field();
+		verify(mockView).getPassword2Field();
+		verify(mockView).setPassword2ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockView).setPassword2InError(true);
+		
+		// unmatching second password
+		Mockito.reset(mockView);
+		when(mockView.getCurrentPasswordField()).thenReturn(password);
+		when(mockView.getPassword1Field()).thenReturn(newPassword);
+		when(mockView.getPassword2Field()).thenReturn(newPassword + "abc");
+		profilePresenter.changePassword();
+		verify(mockView).getCurrentPasswordField();
+		verify(mockView).getPassword1Field();
+		verify(mockView).getPassword2Field();
+		verify(mockView).setPassword2ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockView).setPassword2InError(true);
+	}
+	
+	@Test
+	public void testChangePasswordPasswordSuccess() {
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		when(mockView.getCurrentPasswordField()).thenReturn(password);
+		when(mockView.getPassword1Field()).thenReturn(newPassword);
+		when(mockView.getPassword2Field()).thenReturn(newPassword);
+		profilePresenter.changePassword();
+		verify(mockView).getCurrentPasswordField();
+		verify(mockView).getPassword1Field();
+		verify(mockView).getPassword2Field();
+		verify(mockView).setChangePasswordEnabled(false);
+		verify(mockUserService).changePassword(anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testClearPasswordErrors() {
+		profilePresenter.clearPasswordErrors();
+		verify(mockView).setCurrentPasswordErrorMessage("");
+		verify(mockView).setPassword1ErrorMessage("");
+		verify(mockView).setPassword2ErrorMessage("");
+		verify(mockView).setCurrentPasswordInError(false);
+		verify(mockView).setPassword1InError(false);
+		verify(mockView).setPassword2InError(false);
 	}
 }
