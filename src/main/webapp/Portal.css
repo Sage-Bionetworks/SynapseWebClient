@@ -663,6 +663,9 @@ a.shortBtn {
 .min-height-200 {
 	min-height: 200px;
 }
+.min-height-40 {
+	min-height: 40px;
+}
 
 .profile-image-40px {
 	width: 40px;	

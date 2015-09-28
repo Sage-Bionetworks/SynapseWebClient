@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -13,7 +16,7 @@ public class Tab implements TabView.Presenter {
 	TabView view;
 	GlobalApplicationState globalAppState;
 	Place place;
-	CallbackP<Tab> onClickCallback;
+	List<CallbackP<Tab>> onClickCallbacks;
 	
 	@Inject
 	public Tab(TabView view, GlobalApplicationState globalAppState) {
@@ -24,6 +27,7 @@ public class Tab implements TabView.Presenter {
 	
 	public void configure(String tabTitle, Widget content) {
 		view.configure(tabTitle, content);
+		onClickCallbacks = new ArrayList<CallbackP<Tab>>();
 	}
 	
 	public TabListItem getTabListItem() {
@@ -47,12 +51,14 @@ public class Tab implements TabView.Presenter {
 		view.setActive(false);
 	}
 	
-	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		this.onClickCallback = onClickCallback;
+	public void addTabClickedCallback(CallbackP<Tab> onClickCallback) {
+		onClickCallbacks.add(onClickCallback);
 	}
 	
 	@Override
 	public void onTabClicked() {
-		onClickCallback.invoke(this);
+		for (CallbackP<Tab> callbackP : onClickCallbacks) {
+			callbackP.invoke(this);
+		}
 	}
 }

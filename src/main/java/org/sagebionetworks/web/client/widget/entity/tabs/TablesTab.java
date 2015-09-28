@@ -4,6 +4,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -53,6 +54,9 @@ public class TablesTab implements TablesTabView.Presenter{
 	String areaToken;
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
+	
+	CallbackP<Boolean> showProjectInfoCallack;
+	
 	@Inject
 	public TablesTab(
 			TablesTabView view,
@@ -130,7 +134,7 @@ public class TablesTab implements TablesTabView.Presenter{
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		tab.setTabClickedCallback(onClickCallback);
+		tab.addTabClickedCallback(onClickCallback);
 	}
 	
 	public void configure(Entity entity, EntityBundle projectBundle, EntityUpdatedHandler handler, String areaToken) {
@@ -198,6 +202,18 @@ public class TablesTab implements TablesTabView.Presenter{
 		}
 	}
 	
+	public void setShowProjectInfoCallback(CallbackP<Boolean> callback) {
+		showProjectInfoCallack = callback;
+		tab.addTabClickedCallback(new CallbackP<Tab>() {
+			@Override
+			public void invoke(Tab param) {
+				boolean isProject = entity instanceof Project;
+				showProjectInfoCallack.invoke(isProject);
+			}
+		});
+
+	}
+	
 	public Query getTableQuery() {
 		if(areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
 			String token = areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
@@ -206,5 +222,9 @@ public class TablesTab implements TablesTabView.Presenter{
 			}
 		}
 		return null;
+	}
+	
+	public Entity getCurrentEntity() {
+		return entity;
 	}
 }

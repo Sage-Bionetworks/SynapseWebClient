@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -91,5 +92,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public void setTabs(Widget w) {
 		tabsUI.clear();
 		tabsUI.add(w);
+	}
+	
+	@Override
+	public void setProjectInformationVisible(boolean isVisible) {
+		projectMetaContainer.setVisible(isVisible);
 	}
 }

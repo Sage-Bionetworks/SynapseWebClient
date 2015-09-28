@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface FilesTabView extends IsWidget {
 	public interface Presenter {
 	}
-	
+	void setPresenter(Presenter p);
 	void setFileTitlebar(Widget w);
 	void setFolderTitlebar(Widget w);
 	void setBreadcrumb(Widget w);

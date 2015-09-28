@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.AdminTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
@@ -106,8 +107,25 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		tabs.addTab(filesTab.asTab());
 		tabs.addTab(tablesTab.asTab());
 		tabs.addTab(adminTab.asTab());
+		
+		CallbackP<Boolean> showHideProjectInfoCallback = new CallbackP<Boolean>() {
+			public void invoke(Boolean visible) {
+				view.setProjectInformationVisible(visible);
+			};
+		};
+		filesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
+		tablesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
+		
+		//on tab change to these tabs, always show project info
+		CallbackP<Tab> showProjectInfoCallback = new CallbackP<Tab>() {
+			public void invoke(Tab t) {
+				view.setProjectInformationVisible(true);
+			};
+		};
+		wikiTab.setTabClickedCallback(showProjectInfoCallback);
+		adminTab.setTabClickedCallback(showProjectInfoCallback);
 	}
-
+	
     /**
      * Update the bundle attached to this EntityPageTop. 
      *

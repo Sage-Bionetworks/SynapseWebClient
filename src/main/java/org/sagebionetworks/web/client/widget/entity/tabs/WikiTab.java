@@ -23,7 +23,7 @@ public class WikiTab {
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		tab.setTabClickedCallback(onClickCallback);
+		tab.addTabClickedCallback(onClickCallback);
 	}
 	
 	public void setWikiReloadHandler(CallbackP<String> wikiReloadHandler) {

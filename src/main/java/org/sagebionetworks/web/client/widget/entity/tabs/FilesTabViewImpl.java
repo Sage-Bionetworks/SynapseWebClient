@@ -53,7 +53,7 @@ public class FilesTabViewImpl implements FilesTabView {
 	SimplePanel synapseAlertContainer;
 	
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
-	
+	private Presenter presenter;
 	Widget widget;
 	private RClientModalWidgetViewImpl rLoadWidget;
 	private PythonClientModalWidgetViewImpl pythonLoadWidget;
@@ -85,6 +85,11 @@ public class FilesTabViewImpl implements FilesTabView {
 		fileProgrammaticClientsContainer.add(pythonLoadWidget.asWidget());
 		fileProgrammaticClientsContainer.add(javaLoadWidget.asWidget());
 		fileProgrammaticClientsContainer.add(commandLineLoadWidget.asWidget());
+	}
+	
+	@Override
+	public void setPresenter(Presenter p) {
+		presenter = p;
 	}
 	
 	@Override

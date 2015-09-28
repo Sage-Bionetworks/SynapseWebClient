@@ -27,7 +27,7 @@ public class AdminTab implements AdminTabView.Presenter{
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
-		tab.setTabClickedCallback(onClickCallback);
+		tab.addTabClickedCallback(onClickCallback);
 	}
 	
 	public void configure(String entityId) {
