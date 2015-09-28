@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -78,6 +79,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	Map<String,String> configMap;
 	
 	CallbackP<Boolean> showProjectInfoCallack;
+	EntityBundle projectBundle;
 	
 	@Inject
 	public FilesTab(FilesTabView view, 
@@ -155,8 +157,25 @@ public class FilesTab implements FilesTabView.Presenter{
 			}
 		};
 		filesBrowser.setEntitySelectedHandler(entitySelectedHandler);
+		initBreadcrumbLinkClickedHandler();
 	}
 
+	public void initBreadcrumbLinkClickedHandler() {
+		CallbackP<Place> breadcrumbClicked = new CallbackP<Place>() {
+			public void invoke(Place place) {
+				//if this is the project id, then just reconfigure from the project bundle
+				Synapse synapse = (Synapse)place;
+				String entityId = synapse.getEntityId();
+				Long versionNumber = synapse.getVersionNumber();
+				if (entityId.equals(projectBundle.getEntity().getId())) {
+					setTargetBundle(projectBundle);
+				} else {
+					getTargetBundle(entityId, versionNumber);
+				}
+			};
+		};
+		breadcrumb.setLinkClickedHandler(breadcrumbClicked);
+	}
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
 	}
@@ -174,6 +193,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	
 	
 	public void configure(Entity targetEntity, EntityBundle projectBundle, EntityUpdatedHandler handler) {
+		this.projectBundle = projectBundle;
 		this.handler = handler;
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
