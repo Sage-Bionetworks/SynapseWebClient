@@ -215,7 +215,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 			}
 		};
-		wikiTab.configure(projectBundle.getEntity().getId(), projectBundle.getRootWikiId(), 
+		
+		String wikiId = getWikiPageId(areaToken, projectBundle.getRootWikiId());
+		wikiTab.configure(projectBundle.getEntity().getId(), wikiId, 
 				canEdit, callback);
 		
 		
@@ -244,9 +246,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		projectMetadata.setEntityUpdatedHandler(handler);
 	}
 	
-	public String getWikiPageId(Synapse.EntityArea area, String areaToken, String rootWikiId) {
+	public String getWikiPageId(String areaToken, String rootWikiId) {
 		String wikiPageId = rootWikiId;
-		if (Synapse.EntityArea.WIKI == area && DisplayUtils.isDefined(areaToken))
+		if (DisplayUtils.isDefined(areaToken))
 			wikiPageId = areaToken;
 		return wikiPageId;
 	}
