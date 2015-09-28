@@ -6,7 +6,7 @@
 
 	<g:HTMLPanel styleName="margin-left-15 margin-right-15">		
 		<!--Project level information -->
-		<bh:Div addStyleNames="min-height-40">
+		<bh:Div addStyleNames="min-height-48">
 			<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15" ui:field="projectMetaContainer">
 				<b:Column size="XS_12">
 					<bh:Div addStyleNames="margin-left-15 margin-right-15">
