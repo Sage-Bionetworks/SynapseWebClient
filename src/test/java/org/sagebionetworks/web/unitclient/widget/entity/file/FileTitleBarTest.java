@@ -89,6 +89,6 @@ public class FileTitleBarTest {
 		handle.setStorageLocationId(2L);
 		fileTitleBar.setEntityBundle(mockBundle);
 		fileTitleBar.setS3Description();
-		verify(mockView).setFileLocation("| s3://" + handle.getBucketName() + "/" + handle.getKey() + "/" + "syn123");
+		verify(mockView).setFileLocation("| s3://" + handle.getBucketName() + "/" + handle.getKey());
 	}
 }
