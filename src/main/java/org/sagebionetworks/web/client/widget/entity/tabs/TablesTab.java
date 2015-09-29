@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -49,6 +50,7 @@ public class TablesTab implements TablesTabView.Presenter{
 	EntityUpdatedHandler handler;
 	QueryTokenProvider queryTokenProvider;
 	Entity entity;
+	EntityBundle projectBundle;
 	Long versionNumber;
 	String areaToken;
 	SynapseAlert synAlert;
@@ -116,6 +118,25 @@ public class TablesTab implements TablesTabView.Presenter{
 				getTargetBundle(entityId, null);
 			}
 		});
+		initBreadcrumbLinkClickedHandler();
+	}
+	
+	public void initBreadcrumbLinkClickedHandler() {
+		CallbackP<Place> breadcrumbClicked = new CallbackP<Place>() {
+			public void invoke(Place place) {
+				//if this is the project id, then just reconfigure from the project bundle
+				Synapse synapse = (Synapse)place;
+				String entityId = synapse.getEntityId();
+				Long versionNumber = synapse.getVersionNumber();
+				if (entityId.equals(projectBundle.getEntity().getId())) {
+					setTargetBundle(projectBundle);
+					tab.showTab();
+				} else {
+					getTargetBundle(entityId, versionNumber);
+				}
+			};
+		};
+		breadcrumb.setLinkClickedHandler(breadcrumbClicked);
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
@@ -124,6 +145,7 @@ public class TablesTab implements TablesTabView.Presenter{
 	
 	public void configure(Entity entity, EntityBundle projectBundle, EntityUpdatedHandler handler, String areaToken) {
 		this.areaToken = areaToken;
+		this.projectBundle = projectBundle;
 		metadata.setEntityUpdatedHandler(handler);
 		
 		boolean isTable = entity instanceof TableEntity;
@@ -145,6 +167,7 @@ public class TablesTab implements TablesTabView.Presenter{
 		tableListWidget.asWidget().setVisible(isProject);
 		tableTitleBar.asWidget().setVisible(isTable);
 		v2TableWidget.asWidget().setVisible(isTable);
+		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
 		
 		if (isTable) {
@@ -157,7 +180,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
 		} else if (isProject) {
 			tableListWidget.configure(bundle);
-			tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
+			tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, null));
 		}
 	}
 	
