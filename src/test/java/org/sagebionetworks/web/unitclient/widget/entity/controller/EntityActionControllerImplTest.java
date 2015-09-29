@@ -979,7 +979,6 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureDoiNotFound() throws Exception {
 		entityBundle.setDoi(null);
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		//initially hide, then show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
@@ -992,7 +991,6 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureDoiNotFoundNonEditable() throws Exception {
 		permissions.setCanEdit(false);
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		//initially hide, never show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
