@@ -65,7 +65,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	
 	@Inject
 	public EntityPresenter(EntityView view,
-			GlobalApplicationState globalApplicationState,
+			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, CookieProvider cookies,
 			SynapseAlert synAlert,
@@ -76,7 +76,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
 		this.synAlert = synAlert;
-		this.globalApplicationState = globalApplicationState;
+		this.globalApplicationState = globalAppState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
@@ -91,7 +91,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
-				refresh();
+				globalApplicationState.gotoLastPlace();
 			}
 		});
 		
