@@ -10,9 +10,9 @@
 		</bh:Div>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
 			<g:SimplePanel ui:field="fileBreadcrumbContainer"/>
-			<g:SimplePanel ui:field="folderTitlebarContainer"/>
-			<g:SimplePanel ui:field="fileTitlebarContainer"/>
-			<g:SimplePanel ui:field="fileMetadataContainer"/>
+			<g:SimplePanel ui:field="folderTitlebarContainer" visible="false"/>
+			<g:SimplePanel ui:field="fileTitlebarContainer" visible="false"/>
+			<g:SimplePanel ui:field="fileMetadataContainer" visible="false"/>
 		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="fileHistoryContainer"/>

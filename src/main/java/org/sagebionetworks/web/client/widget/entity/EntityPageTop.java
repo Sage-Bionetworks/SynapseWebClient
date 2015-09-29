@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,6 +47,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	private Synapse.EntityArea area;
 	private String wikiAreaToken, tablesAreaToken;
+	private Long filesVersionNumber;
 	private EntityHeader projectHeader;
 	
 	private Tabs tabs;
@@ -131,11 +133,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void configure(Entity entity, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
+    public void configure(Entity entity, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	this.projectHeader = projectHeader;
     	this.area = area;
     	wikiAreaToken = null;
     	tablesAreaToken = null;
+    	filesVersionNumber = versionNumber;
     	this.entity = entity;
 
     	//set area, if undefined
@@ -213,7 +216,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 	
 	public void configureFilesTab() {
-		filesTab.configure(entity, projectBundle, entityUpdateHandler);
+		filesTab.configure(entity, projectBundle, entityUpdateHandler, filesVersionNumber);
 	}
 	
 	public void configureWikiTab() {

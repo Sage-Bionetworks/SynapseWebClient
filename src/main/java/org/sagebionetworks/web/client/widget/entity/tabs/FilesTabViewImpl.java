@@ -130,7 +130,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setMetadata(Widget w) {
 		fileMetadataContainer.add(w);		
 	}
-
+	@Override
+	public void setMetadataVisible(boolean visible) {
+		fileMetadataContainer.setVisible(visible);
+	}
 	@Override
 	public void setActionMenu(Widget w) {
 		fileActionMenuContainer.add(w);		
@@ -211,5 +214,14 @@ public class FilesTabViewImpl implements FilesTabView {
 	@Override
 	public void setSynapseAlert(Widget w) {
 		synapseAlertContainer.setWidget(w);
+	}
+	
+	@Override
+	public void setFolderTitlebarVisible(boolean visible) {
+		folderTitlebarContainer.setVisible(visible);
+	}
+	@Override
+	public void setFileTitlebarVisible(boolean visible) {
+		fileTitlebarContainer.setVisible(visible);
 	}
 }

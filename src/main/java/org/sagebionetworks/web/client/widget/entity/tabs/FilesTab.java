@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -140,7 +141,9 @@ public class FilesTab implements FilesTabView.Presenter{
 				String entityId = synapse.getEntityId();
 				Long versionNumber = synapse.getVersionNumber();
 				if (entityId.equals(projectBundle.getEntity().getId())) {
+					currentVersionNumber = null;
 					setTargetBundle(projectBundle);
+					tab.showTab();
 				} else {
 					getTargetBundle(entityId, versionNumber);
 				}
@@ -164,12 +167,18 @@ public class FilesTab implements FilesTabView.Presenter{
 	}
 	
 	
-	public void configure(Entity targetEntity, EntityBundle projectBundle, EntityUpdatedHandler handler) {
+	public void configure(Entity targetEntity, EntityBundle projectBundle, EntityUpdatedHandler handler, Long versionNumber) {
 		this.projectBundle = projectBundle;
 		this.handler = handler;
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
 		filesBrowser.setEntityUpdatedHandler(handler);
+		
+		//reset view
+		view.setFileTitlebarVisible(false);
+		view.setFolderTitlebarVisible(false);
+		view.setPreviewVisible(false);
+		view.setMetadataVisible(false);
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
@@ -179,7 +188,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			//configure based on the project bundle
 			setTargetBundle(projectBundle);
 		} else {
-			getTargetBundle(targetEntity.getId(), getVersionNumber(targetEntity));
+			getTargetBundle(targetEntity.getId(), versionNumber);
 		}
 	}
 	
@@ -229,7 +238,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		currentEntity = bundle.getEntity();
 		
 		currentEntityId = currentEntity.getId();
-		currentVersionNumber = getVersionNumber(bundle.getEntity());
 		
 		boolean isFile = currentEntity instanceof FileEntity;
 		boolean isFolder = currentEntity instanceof Folder;
@@ -245,25 +253,25 @@ public class FilesTab implements FilesTabView.Presenter{
 		//Preview
 		view.setPreviewVisible(isFile);
 		//File title bar
-		fileTitleBar.asWidget().setVisible(isFile);
+		view.setFileTitlebarVisible(isFile);
 		if (isFile) {
 			fileTitleBar.configure(bundle);
 			previewWidget.configure(bundle);
 		}
 		
-		folderTitleBar.asWidget().setVisible(isFolder);
+		view.setFolderTitlebarVisible(isFolder);
 		if (isFolder) {
 			folderTitleBar.configure(bundle);
 		}
 		
 		//Metadata
 		boolean isMetadataVisible = isFile || isFolder;
-		metadata.asWidget().setVisible(isMetadataVisible);
+		view.setMetadataVisible(isMetadataVisible);
 		if (isMetadataVisible) {
 			initActionMenu(bundle);
 			metadata.setEntityBundle(bundle, currentVersionNumber);
 			//File History
-//			metadata.setFileHistoryVisible(isFile);	
+			metadata.setFileHistoryVisible(isFile && currentVersionNumber != null);	
 		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, area, null));

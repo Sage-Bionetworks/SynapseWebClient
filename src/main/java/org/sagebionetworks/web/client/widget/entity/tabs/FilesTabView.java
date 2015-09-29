@@ -10,12 +10,15 @@ public interface FilesTabView extends IsWidget {
 	}
 	void setPresenter(Presenter p);
 	void setFileTitlebar(Widget w);
+	void setFileTitlebarVisible(boolean visible);
 	void setFolderTitlebar(Widget w);
+	void setFolderTitlebarVisible(boolean visible);
 	void setBreadcrumb(Widget w);
 	void setFileBrowser(Widget w);
 	void setPreview(Widget w);
 	void setProvenance(Widget w);
 	void setMetadata(Widget w);
+	void setMetadataVisible(boolean visible);
 	void setActionMenu(Widget w);
 	void setWikiPage(Widget w);
 	void setSynapseAlert(Widget w);
