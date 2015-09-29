@@ -141,6 +141,10 @@ public class TablesTabViewImpl implements TablesTabView {
 		tableActionMenuContainer.add(w);
 	}
 	@Override
+	public void clearActionMenuContainer() {
+		tableActionMenuContainer.clear();
+	}
+	@Override
 	public void setSynapseAlert(Widget w) {
 		synapseAlertContainer.setWidget(w);
 	}

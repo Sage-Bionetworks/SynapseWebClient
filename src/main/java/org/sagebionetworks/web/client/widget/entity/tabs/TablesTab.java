@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -43,8 +44,6 @@ public class TablesTab implements TablesTabView.Presenter{
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
 	TableEntityWidget v2TableWidget;
-	EntityActionController controller;
-	ActionMenuWidget actionMenu;
 	boolean annotationsShown;
 	QueryChangeHandler qch;
 	EntityUpdatedHandler handler;
@@ -54,6 +53,7 @@ public class TablesTab implements TablesTabView.Presenter{
 	String areaToken;
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
+	PortalGinInjector ginInjector;
 	
 	CallbackP<Boolean> showProjectInfoCallack;
 	
@@ -66,11 +66,10 @@ public class TablesTab implements TablesTabView.Presenter{
 			BasicTitleBar tableTitleBar,
 			Breadcrumb breadcrumb,
 			EntityMetadata metadata,
-			EntityActionController controller,
-			ActionMenuWidget actionMenu,
 			QueryTokenProvider queryTokenProvider,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient
+			SynapseClientAsync synapseClient,
+			PortalGinInjector ginInjector
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -79,32 +78,18 @@ public class TablesTab implements TablesTabView.Presenter{
 		this.tableTitleBar = tableTitleBar;
 		this.breadcrumb = breadcrumb;
 		this.metadata = metadata;
-		this.controller = controller;
-		this.actionMenu = actionMenu;
 		this.queryTokenProvider = queryTokenProvider;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		this.ginInjector = ginInjector;
 		
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setTableList(tableListWidget.asWidget());
 		view.setTitlebar(tableTitleBar.asWidget());
 		view.setEntityMetadata(metadata.asWidget());
 		view.setTableEntityWidget(v2TableWidget.asWidget());
-		view.setActionMenu(actionMenu.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		tab.configure("Tables", view.asWidget());
-		
-		actionMenu.addControllerWidget(controller.asWidget());
-		
-		annotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				annotationsShown = !annotationsShown;
-				TablesTab.this.controller.onAnnotationsToggled(annotationsShown);
-				TablesTab.this.metadata.setAnnotationsVisible(annotationsShown);
-			}
-		});
 		
 		qch = new QueryChangeHandler() {			
 			@Override
@@ -159,8 +144,8 @@ public class TablesTab implements TablesTabView.Presenter{
 		breadcrumb.asWidget().setVisible(isTable);
 		tableListWidget.asWidget().setVisible(isProject);
 		tableTitleBar.asWidget().setVisible(isTable);
-		actionMenu.asWidget().setVisible(isTable);
 		v2TableWidget.asWidget().setVisible(isTable);
+		view.clearActionMenuContainer();
 		
 		if (isTable) {
 			versionNumber = ((TableEntity)entity).getVersionNumber();
@@ -168,13 +153,31 @@ public class TablesTab implements TablesTabView.Presenter{
 			metadata.setEntityBundle(bundle, versionNumber);
 			tableTitleBar.configure(bundle);
 			view.configureModifiedAndCreatedWidget(entity);
+			ActionMenuWidget actionMenu = initActionMenu(bundle);
 			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
 		} else if (isProject) {
 			tableListWidget.configure(bundle);
 			tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
 		}
+	}
+	
+	public ActionMenuWidget initActionMenu(EntityBundle bundle) {
+		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		view.setActionMenu(actionMenu.asWidget());
+		final EntityActionController controller = ginInjector.createEntityActionController();
+		actionMenu.addControllerWidget(controller.asWidget());
 		
+		annotationsShown = false;
+		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				annotationsShown = !annotationsShown;
+				controller.onAnnotationsToggled(annotationsShown);
+				TablesTab.this.metadata.setAnnotationsVisible(annotationsShown);
+			}
+		});
 		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
+		return actionMenu;
 	}
 	
 	public void getTargetBundle(String entityId, Long versionNumber) {
