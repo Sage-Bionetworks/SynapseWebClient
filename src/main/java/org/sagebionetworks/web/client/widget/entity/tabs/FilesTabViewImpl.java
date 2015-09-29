@@ -135,6 +135,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setActionMenu(Widget w) {
 		fileActionMenuContainer.add(w);		
 	}
+	@Override
+	public void clearActionMenuContainer() {
+		fileActionMenuContainer.clear();
+	}
 
 	@Override
 	public Widget asWidget() {

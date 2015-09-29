@@ -27,4 +27,5 @@ public interface FilesTabView extends IsWidget {
 	void setWikiPageWidgetVisible(boolean visible);
 	void setFileBrowserVisible(boolean visible);
 	void setPreviewVisible(boolean visible);
+	void clearActionMenuContainer();
 }

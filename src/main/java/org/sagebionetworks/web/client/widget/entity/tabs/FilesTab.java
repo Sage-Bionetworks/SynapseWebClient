@@ -60,9 +60,6 @@ public class FilesTab implements FilesTabView.Presenter{
 	BasicTitleBar folderTitleBar;
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
-	
-	EntityActionController controller;
-	ActionMenuWidget actionMenu;
 	FilesBrowser filesBrowser;
 	PreviewWidget previewWidget;
 	WikiPageWidget wikiPageWidget;
@@ -88,8 +85,6 @@ public class FilesTab implements FilesTabView.Presenter{
 			BasicTitleBar folderTitleBar,
 			Breadcrumb breadcrumb,
 			EntityMetadata metadata,
-			EntityActionController controller,
-			ActionMenuWidget actionMenu,
 			FilesBrowser filesBrowser,
 			PreviewWidget previewWidget,
 			WikiPageWidget wikiPageWidget,
@@ -103,8 +98,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.folderTitleBar = folderTitleBar;
 		this.breadcrumb = breadcrumb;
 		this.metadata = metadata;
-		this.controller = controller;
-		this.actionMenu = actionMenu;
 		this.filesBrowser = filesBrowser;
 		this.previewWidget = previewWidget;
 		this.wikiPageWidget = wikiPageWidget;
@@ -120,30 +113,9 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowser(filesBrowser.asWidget());
 		view.setPreview(previewWidget.asWidget());
 		view.setMetadata(metadata.asWidget());
-		view.setActionMenu(actionMenu.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
 		
 		tab.configure("Files", view.asWidget());
-		actionMenu.addControllerWidget(controller.asWidget());
-		
-		annotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				annotationsShown = !annotationsShown;
-				FilesTab.this.controller.onAnnotationsToggled(annotationsShown);
-				FilesTab.this.metadata.setAnnotationsVisible(annotationsShown);
-			}
-		});
-		fileHistoryShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				fileHistoryShown = !fileHistoryShown;
-				FilesTab.this.controller.onFileHistoryToggled(fileHistoryShown);
-				FilesTab.this.metadata.setFileHistoryVisible(fileHistoryShown);
-			}
-		});
 		
 		configMap = new HashMap<String,String>();
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
@@ -268,8 +240,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		
-		//action menu
-		actionMenu.asWidget().setVisible(isFile || isFolder);
+		view.clearActionMenuContainer();
 		
 		//Preview
 		view.setPreviewVisible(isFile);
@@ -289,13 +260,13 @@ public class FilesTab implements FilesTabView.Presenter{
 		boolean isMetadataVisible = isFile || isFolder;
 		metadata.asWidget().setVisible(isMetadataVisible);
 		if (isMetadataVisible) {
+			initActionMenu(bundle);
 			metadata.setEntityBundle(bundle, currentVersionNumber);
 			//File History
 //			metadata.setFileHistoryVisible(isFile);	
 		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, area, null));
-		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
 		
 		//File Browser
 		boolean isFilesBrowserVisible = isProject || isFolder;
@@ -345,6 +316,33 @@ public class FilesTab implements FilesTabView.Presenter{
 			};
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 		}
+	}
+	
+	public void initActionMenu(EntityBundle bundle) {
+		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		view.setActionMenu(actionMenu.asWidget());
+		final EntityActionController controller = ginInjector.createEntityActionController();
+		actionMenu.addControllerWidget(controller.asWidget());
+		
+		annotationsShown = false;
+		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				annotationsShown = !annotationsShown;
+				controller.onAnnotationsToggled(annotationsShown);
+				FilesTab.this.metadata.setAnnotationsVisible(annotationsShown);
+			}
+		});
+		fileHistoryShown = false;
+		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				fileHistoryShown = !fileHistoryShown;
+				controller.onFileHistoryToggled(fileHistoryShown);
+				FilesTab.this.metadata.setFileHistoryVisible(fileHistoryShown);
+			}
+		});
+		controller.configure(actionMenu, bundle, bundle.getRootWikiId(), handler);
 	}
 	
 	/**
