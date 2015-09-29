@@ -7,14 +7,14 @@ import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 
 import com.google.inject.Inject;
 
-public class AdminTab implements AdminTabView.Presenter{
+public class ChallengeTab implements ChallengeTabView.Presenter{
 	Tab tab;
-	AdminTabView view;
+	ChallengeTabView view;
 	AdministerEvaluationsList evaluationList;
 	
 	@Inject
-	public AdminTab(
-			AdminTabView view,
+	public ChallengeTab(
+			ChallengeTabView view,
 			Tab tab,
 			AdministerEvaluationsList evaluationList
 			) {
@@ -23,7 +23,7 @@ public class AdminTab implements AdminTabView.Presenter{
 		this.evaluationList = evaluationList;
 		
 		view.setEvaluationList(evaluationList.asWidget());
-		tab.configure("Challenge Admin", view.asWidget());
+		tab.configure("Challenge", view.asWidget());
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {

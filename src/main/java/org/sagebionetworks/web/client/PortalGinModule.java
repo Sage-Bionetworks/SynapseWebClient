@@ -326,8 +326,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.tabs.AdminTabView;
-import org.sagebionetworks.web.client.widget.entity.tabs.AdminTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabViewImpl;
 import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
@@ -1163,6 +1163,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(FilesTabView.class).to(FilesTabViewImpl.class);
 		bind(TablesTabView.class).to(TablesTabViewImpl.class);
-		bind(AdminTabView.class).to(AdminTabViewImpl.class);
+		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
 	}
 }

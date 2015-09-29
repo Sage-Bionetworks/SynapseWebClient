@@ -26,7 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
-import org.sagebionetworks.web.client.widget.entity.tabs.AdminTab;
+import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
@@ -53,7 +53,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private WikiTab wikiTab;
 	private FilesTab filesTab;
 	private TablesTab tablesTab;
-	private AdminTab adminTab;
+	private ChallengeTab adminTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
 	
@@ -69,7 +69,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			WikiTab wikiTab,
 			FilesTab filesTab,
 			TablesTab tablesTab,
-			AdminTab adminTab,
+			ChallengeTab adminTab,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu
 			) {
