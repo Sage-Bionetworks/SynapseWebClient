@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.TabPane;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

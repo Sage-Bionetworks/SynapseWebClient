@@ -135,6 +135,10 @@ public class TablesTabViewImpl implements TablesTabView {
 	public void setTableEntityWidget(Widget w) {
 		tableWidgetContainer.add(w);
 	}
+	@Override
+	public void clearTableEntityWidget() {
+		tableWidgetContainer.clear();
+	}
 	
 	@Override
 	public void setActionMenu(Widget w) {

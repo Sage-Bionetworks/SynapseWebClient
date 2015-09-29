@@ -1,6 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.DOI;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -37,21 +45,18 @@ public class TablesTab implements TablesTabView.Presenter{
 	public static final String TABLE_ROW_PREFIX = "row/";
 	public static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
 	
-	
 	Tab tab;
 	TablesTabView view;
 	TableListWidget tableListWidget;
 	BasicTitleBar tableTitleBar;
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
-	TableEntityWidget v2TableWidget;
 	boolean annotationsShown;
 	QueryChangeHandler qch;
 	EntityUpdatedHandler handler;
 	QueryTokenProvider queryTokenProvider;
 	Entity entity;
 	EntityBundle projectBundle;
-	Long versionNumber;
 	String areaToken;
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
@@ -62,8 +67,7 @@ public class TablesTab implements TablesTabView.Presenter{
 	@Inject
 	public TablesTab(
 			TablesTabView view,
-			Tab tab,
-			TableEntityWidget v2TableWidget,
+			Tab t,
 			TableListWidget tableListWidget,
 			BasicTitleBar tableTitleBar,
 			Breadcrumb breadcrumb,
@@ -74,8 +78,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			PortalGinInjector ginInjector
 			) {
 		this.view = view;
-		this.tab = tab;
-		this.v2TableWidget = v2TableWidget;
+		this.tab = t;
 		this.tableListWidget = tableListWidget;
 		this.tableTitleBar = tableTitleBar;
 		this.breadcrumb = breadcrumb;
@@ -89,7 +92,6 @@ public class TablesTab implements TablesTabView.Presenter{
 		view.setTableList(tableListWidget.asWidget());
 		view.setTitlebar(tableTitleBar.asWidget());
 		view.setEntityMetadata(metadata.asWidget());
-		view.setTableEntityWidget(v2TableWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
 		tab.configure("Tables", view.asWidget());
 		
@@ -115,7 +117,9 @@ public class TablesTab implements TablesTabView.Presenter{
 		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
 			@Override
 			public void invoke(String entityId) {
-				getTargetBundle(entityId, null);
+				areaToken = null;
+				getTargetBundle(entityId);
+				tab.showTab();
 			}
 		});
 		initBreadcrumbLinkClickedHandler();
@@ -127,12 +131,11 @@ public class TablesTab implements TablesTabView.Presenter{
 				//if this is the project id, then just reconfigure from the project bundle
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
-				Long versionNumber = synapse.getVersionNumber();
 				if (entityId.equals(projectBundle.getEntity().getId())) {
 					setTargetBundle(projectBundle);
 					tab.showTab();
 				} else {
-					getTargetBundle(entityId, versionNumber);
+					getTargetBundle(entityId);
 				}
 			};
 		};
@@ -146,6 +149,7 @@ public class TablesTab implements TablesTabView.Presenter{
 	public void configure(Entity entity, EntityBundle projectBundle, EntityUpdatedHandler handler, String areaToken) {
 		this.areaToken = areaToken;
 		this.projectBundle = projectBundle;
+		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
 		
 		boolean isTable = entity instanceof TableEntity;
@@ -153,7 +157,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			//configure based on project
 			setTargetBundle(projectBundle);
 		} else {
-			getTargetBundle(entity.getId(), ((TableEntity)entity).getVersionNumber());
+			getTargetBundle(entity.getId());
 		}
 	}
 	
@@ -161,26 +165,27 @@ public class TablesTab implements TablesTabView.Presenter{
 		this.entity = bundle.getEntity();
 		boolean isTable = entity instanceof TableEntity;
 		boolean isProject = entity instanceof Project;
-		versionNumber = null;
 		metadata.asWidget().setVisible(isTable);
 		breadcrumb.asWidget().setVisible(isTable);
 		tableListWidget.asWidget().setVisible(isProject);
 		tableTitleBar.asWidget().setVisible(isTable);
-		v2TableWidget.asWidget().setVisible(isTable);
 		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
-		
+		view.clearTableEntityWidget();
 		if (isTable) {
-			versionNumber = ((TableEntity)entity).getVersionNumber();
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
-			metadata.setEntityBundle(bundle, versionNumber);
+			metadata.setEntityBundle(bundle, null);
 			tableTitleBar.configure(bundle);
 			view.configureModifiedAndCreatedWidget(entity);
 			ActionMenuWidget actionMenu = initActionMenu(bundle);
+			
+			TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
+			view.setTableEntityWidget(v2TableWidget.asWidget());
 			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
 		} else if (isProject) {
+			areaToken = null;
 			tableListWidget.configure(bundle);
-			tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, null));
+			tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
 		}
 	}
 	
@@ -203,14 +208,13 @@ public class TablesTab implements TablesTabView.Presenter{
 		return actionMenu;
 	}
 	
-	public void getTargetBundle(String entityId, Long versionNumber) {
+	public void getTargetBundle(String entityId) {
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI | TABLE_DATA;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				setTargetBundle(bundle);
-				tab.showTab();
 			}
 			
 			@Override
@@ -219,11 +223,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			}			
 		};
 		
-		if (versionNumber == null) {
-			synapseClient.getEntityBundle(entityId, mask, callback);
-		} else {
-			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
-		}
+		synapseClient.getEntityBundle(entityId, mask, callback);
 	}
 	
 	public Tab asTab(){
