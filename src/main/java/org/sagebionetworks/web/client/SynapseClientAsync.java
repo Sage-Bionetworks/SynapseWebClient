@@ -308,7 +308,7 @@ public interface SynapseClientAsync {
 
 	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
-	void hexDecodeAndSerialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
+	void hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
 	
 	void getAPIKey(AsyncCallback<String> callback);
 
