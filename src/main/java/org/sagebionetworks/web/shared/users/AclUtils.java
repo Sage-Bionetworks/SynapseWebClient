@@ -5,8 +5,6 @@ import static org.sagebionetworks.repo.model.ACCESS_TYPE.CHANGE_SETTINGS;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.CREATE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE_SUBMISSION;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.DOWNLOAD;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.PARTICIPATE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ_PRIVATE_SUBMISSION;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.SUBMIT;
@@ -42,9 +40,6 @@ public class AclUtils {
 				CREATE, READ, UPDATE, DELETE)));		
 		// TODO replace this list with ModelConstants.ENITY_ADMIN_ACCESS_PERMISSIONS
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				CREATE, READ, UPDATE, DELETE, CHANGE_PERMISSIONS, CHANGE_SETTINGS)));
-		// TODO replace this list with ModelConstants.ENITY_ADMIN_ACCESS_PERMISSIONS
-		permToACCESS_TYPE.put(PermissionLevel.OWNER, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				CREATE, READ, UPDATE, DELETE, CHANGE_PERMISSIONS, CHANGE_SETTINGS)));
 
 		// Note, PARTICIPATE is no longer used, but to removed it would require updating all existing Evaluation ACLs

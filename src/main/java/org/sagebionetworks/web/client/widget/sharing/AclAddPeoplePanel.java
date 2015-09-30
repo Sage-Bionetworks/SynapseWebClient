@@ -62,7 +62,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 		return notifyPeopleCheckBox;
 	}
 	
-	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, final CallbackP<SynapseSuggestion> addPersonCallback,
+	public void configure(PermissionLevel[] permLevels, final CallbackP<SynapseSuggestion> addPersonCallback,
 						final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
 		clear();
 		
