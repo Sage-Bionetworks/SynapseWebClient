@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -23,7 +22,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -194,7 +192,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					}
 				};
 				
-				addPeoplePanel.configure(permList, permissionDisplay, addPersonCallback, makePublicCallback, isPubliclyVisible);
+				addPeoplePanel.configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
 				deleteAclButton.setEnabled(canEnableInheritance);
 				add(toolTipAndDeleteAclButton);
