@@ -2,8 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -231,7 +231,7 @@ public class AccessRequirementDialogTest {
 		verify(mockView, never()).showRequestAccessFromACTButton();
 		verify(mockView).showCloseButton();
 		
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), anyBoolean(), any(WikiPageWidget.Callback.class), anyBoolean());
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false), anyString());
 	}
 	
 	@Test

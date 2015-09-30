@@ -156,9 +156,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		// Hide the view panel contents until async callback completes
 		view.setBackgroundImageVisible(false);
 		view.setLoadingVisible(true);
-		// We want the entity, permissions and path.
-		// TODO : add REFERENCED_BY
-		int mask = ENTITY | ENTITY_PATH | ACCESS_REQUIREMENTS;
+		int mask = ENTITY | ENTITY_PATH;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
