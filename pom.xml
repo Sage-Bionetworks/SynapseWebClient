@@ -359,7 +359,7 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>develop-SNAPSHOT</version>
+			<version>2015-09-30-6b35dac-17</version>
 		</dependency>
 		
 		
