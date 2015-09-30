@@ -155,7 +155,6 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
-		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.CHANGE_SETTINGS);
 		return set;
 	}
