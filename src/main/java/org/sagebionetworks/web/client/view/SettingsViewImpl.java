@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -88,12 +89,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Row password2;
 	@UiField
-	HTMLPanel currentPasswordError;
-	@UiField
-	HTMLPanel password1Error;
-	@UiField
-	HTMLPanel password2Error;
-	
+	SimplePanel passwordSynAlertPanel;
 	@UiField
 	Button changePasswordBtn;
 	
@@ -220,14 +216,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 
 	@Override
-	public void passwordChangeFailed(String error) {
-		changePasswordBtn.setEnabled(true);
-		currentPasswordError.setTitle(error);
-		setCurrentPasswordInError(true);
-	}
-
-
-	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
@@ -293,17 +281,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public String getCurrentPasswordField() {
-		return currentPassword.getTitle();
-	}
-	
-	@Override
-	public void setCurrentPasswordErrorMessage(String message) {
-		currentPasswordError.setTitle(message);
+		return currentPasswordField.getText();
 	}
 	
 	@Override
 	public void setCurrentPasswordInError(boolean inError) {
-		currentPasswordError.setVisible(inError);
 		if (inError) {
 			currentPassword.addStyleName("has-error");
 		} else {
@@ -313,17 +295,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public String getPassword1Field() {
-		return password1.getTitle();
+		return password1Field.getText();
 	}
-	
-	@Override
-	public void setPassword1ErrorMessage(String message) {
-		password1Error.setTitle(message);
-	}
-	
+		
 	@Override
 	public void setPassword1InError(boolean inError) {
-		password1Error.setVisible(inError);
 		if (inError) {
 			password1.addStyleName("has-error");
 		} else {
@@ -333,17 +309,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public String getPassword2Field() {
-		return password2.getTitle();
-	}
-	
-	@Override
-	public void setPassword2ErrorMessage(String message) {
-		password2Error.setTitle(message);
+		return password2Field.getText();
 	}
 	
 	@Override
 	public void setPassword2InError(boolean inError) {
-		password2Error.setVisible(inError);
 		if (inError) {
 			password2.addStyleName("has-error");
 		} else {
@@ -414,18 +384,18 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 
 	@Override
-	public void setNotificationSynAlertWidget(Widget notificationSynAlert) {
+	public void setNotificationSynAlertWidget(IsWidget notificationSynAlert) {
 		notificationSynAlertPanel.setWidget(notificationSynAlert);
 	}
 
 
 	@Override
-	public void setAddressSynAlertWidget(Widget addressSynAlert) {
+	public void setAddressSynAlertWidget(IsWidget addressSynAlert) {
 		addressSynAlertPanel.setWidget(addressSynAlert);
 	}
 
 	@Override
-	public void setAPISynAlertWidget(Widget apiSynAlert) {
+	public void setAPISynAlertWidget(IsWidget apiSynAlert) {
 		apiSynAlertPanel.setWidget(apiSynAlert);
 	}
 	
@@ -444,5 +414,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setChangePasswordEnabled(boolean isEnabled) {
 		changePasswordBtn.setEnabled(isEnabled);
+	}
+
+
+	@Override
+	public void setPasswordSynAlertWidget(IsWidget synAlert) {
+		passwordSynAlertPanel.setWidget(synAlert);
 	}
 }

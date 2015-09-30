@@ -129,7 +129,8 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callFailureWith(null).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).passwordChangeFailed(anyString());		
+		verify(mockSynAlert).showError("Incorrect password. Please enter your existing Synapse password.");
+		verify(mockView).setCurrentPasswordInError(true);
 	}
 
 	@Test
@@ -138,7 +139,8 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).passwordChangeFailed(anyString());		
+		verify(mockSynAlert).showError("Password Change failed. Please try again.");
+		verify(mockView).setCurrentPasswordInError(true);
 	}
 	
 	@Test
@@ -326,7 +328,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testAsWidget() {
 		profilePresenter.asWidget();
-		verify(mockSynAlert, times(7)).clear();
+		verify(mockSynAlert, times(8)).clear();
 		verify(mockView).hideAPIKey();
 		verify(mockView).asWidget();
 	}
@@ -364,7 +366,7 @@ public class SettingsPresenterTest {
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
-		verify(mockView).setCurrentPasswordErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockSynAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 		verify(mockView).setCurrentPasswordInError(true);
 	}
 	
@@ -376,7 +378,7 @@ public class SettingsPresenterTest {
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
-		verify(mockView).setPassword1ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockSynAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 		verify(mockView).setPassword1InError(true);
 	}
 	
@@ -390,7 +392,7 @@ public class SettingsPresenterTest {
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
-		verify(mockView).setPassword2ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockSynAlert).showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 		verify(mockView).setPassword2InError(true);
 		
 		// unmatching second password
@@ -402,7 +404,7 @@ public class SettingsPresenterTest {
 		verify(mockView).getCurrentPasswordField();
 		verify(mockView).getPassword1Field();
 		verify(mockView).getPassword2Field();
-		verify(mockView).setPassword2ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		verify(mockSynAlert).showError(DisplayConstants.PASSWORDS_MISMATCH);
 		verify(mockView).setPassword2InError(true);
 	}
 	
@@ -423,9 +425,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testClearPasswordErrors() {
 		profilePresenter.clearPasswordErrors();
-		verify(mockView).setCurrentPasswordErrorMessage("");
-		verify(mockView).setPassword1ErrorMessage("");
-		verify(mockView).setPassword2ErrorMessage("");
+		verify(mockSynAlert).clear();
 		verify(mockView).setCurrentPasswordInError(false);
 		verify(mockView).setPassword1InError(false);
 		verify(mockView).setPassword2InError(false);

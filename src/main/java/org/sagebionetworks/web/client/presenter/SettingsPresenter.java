@@ -37,6 +37,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SynapseAlert apiSynAlert;
 	private SynapseAlert notificationSynAlert;
 	private SynapseAlert addressSynAlert;
+	private SynapseAlert passwordSynAlert;
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
 	
@@ -64,9 +65,11 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		apiSynAlert = ginInjector.getSynapseAlertWidget();
 		notificationSynAlert = ginInjector.getSynapseAlertWidget();
 		addressSynAlert = ginInjector.getSynapseAlertWidget();
-		view.setAPISynAlertWidget(apiSynAlert.asWidget());
-		view.setNotificationSynAlertWidget(notificationSynAlert.asWidget());
-		view.setAddressSynAlertWidget(addressSynAlert.asWidget());
+		passwordSynAlert = ginInjector.getSynapseAlertWidget();
+		view.setAPISynAlertWidget(apiSynAlert);
+		view.setNotificationSynAlertWidget(notificationSynAlert);
+		view.setAddressSynAlertWidget(addressSynAlert);
+		view.setPasswordSynAlertWidget(passwordSynAlert);
 	}
 
 	@Override
@@ -120,13 +123,17 @@ public class SettingsPresenter implements SettingsView.Presenter {
 									@Override
 									public void onFailure(
 											Throwable caught) {
-										view.passwordChangeFailed("Password Change failed. Please try again.");
+										passwordSynAlert.showError("Password Change failed. Please try again.");
+										view.setCurrentPasswordInError(true);
+										view.setChangePasswordEnabled(true);
 									}
 								});
 							}
 							@Override
 							public void onFailure(Throwable caught) {
-								view.passwordChangeFailed("Incorrect password. Please enter your existing Synapse password.");
+								passwordSynAlert.showError("Incorrect password. Please enter your existing Synapse password.");
+								view.setCurrentPasswordInError(true);
+								view.setChangePasswordEnabled(true);
 							}
 						});
 			} else {
@@ -242,6 +249,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
 		addressSynAlert.clear();
+		passwordSynAlert.clear();
 		updateUserStorage();
 		getUserNotificationEmail();
 		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
@@ -341,14 +349,17 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		String password1 = view.getPassword1Field();
 		String password2 = view.getPassword2Field();
 		if (!checkPasswordDefined(currentPassword)) {
-			view.setCurrentPasswordErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			view.setCurrentPasswordInError(true);
+			passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 		} else if (!checkPasswordDefined(password1)){
-			view.setPassword1ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 			view.setPassword1InError(true);
-		} else if (!checkPasswordDefined(password2) || !password1.equals(password2)) {
-			view.setPassword2ErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		} else if (!checkPasswordDefined(password2)) {
 			view.setPassword2InError(true);
+			passwordSynAlert.showError(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+		} else if (!password1.equals(password2)) {
+			view.setPassword2InError(true);
+			passwordSynAlert.showError(DisplayConstants.PASSWORDS_MISMATCH);
 		} else {
 			view.setChangePasswordEnabled(false);
 			resetPassword(currentPassword, password1);
@@ -356,9 +367,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	}
 	
 	public void clearPasswordErrors() {
-		view.setCurrentPasswordErrorMessage("");
-		view.setPassword1ErrorMessage("");
-		view.setPassword2ErrorMessage("");
+		passwordSynAlert.clear();
 		view.setCurrentPasswordInError(false);
 		view.setPassword1InError(false);
 		view.setPassword2InError(false);

@@ -45,35 +45,39 @@
 					    <bh:Div ui:field="changeSynapsePasswordHighlightBox" addStyleNames="highlight-box margin-bottom-20" >
 					        <bh:Div addStyleNames="form-horizontal">
 					            <b:Row ui:field="currentPassword" addStyleNames="form-group">
-					                <b:Column size="SM_3" addStyleNames="control-label">
+					                <b:Column size="SM_3" addStyleNames="control-label boldText">
 					                    <bh:Text>Current password</bh:Text>
 					                </b:Column>
 					                <b:Column size="SM_8">
 				                    	<g:PasswordTextBox ui:field="currentPasswordField" addStyleNames="form-control"/>
-										<g:HTMLPanel ui:field="currentPasswordError" visible="false" addStyleNames="help-block"></g:HTMLPanel>
 					                </b:Column>
 					            </b:Row>
 					            <b:Row ui:field="password1" addStyleNames="form-group">
-					                <b:Column size="SM_3" addStyleNames="control-label">
+					                <b:Column size="SM_3" addStyleNames="control-label boldText">
 					                    <bh:Text>New password</bh:Text>
 					                </b:Column>
 					                <b:Column size="SM_8">
 								    	<g:PasswordTextBox ui:field="password1Field" styleName="form-control"/>
-										<g:HTMLPanel ui:field="password1Error" visible="false" addStyleNames="help-block"></g:HTMLPanel>
 					                </b:Column>
 					            </b:Row>
 					            <b:Row ui:field="password2" addStyleNames="form-group">
-					                <b:Column size="SM_3" addStyleNames="control-label">
+					                <b:Column size="SM_3" addStyleNames="control-label boldText">
 					                    <bh:Text>Confirm password</bh:Text>
 					                </b:Column>
 					                <b:Column size="SM_8">
 								    	<g:PasswordTextBox ui:field="password2Field" styleName="form-control"/>
-										<g:HTMLPanel ui:field="password2Error" visible="false" addStyleNames="help-block"></g:HTMLPanel>
 					                </b:Column>
 					            </b:Row>
 								<b:Row>
-									<b:Button ui:field="changePasswordBtn" size="LARGE" addStyleNames="margin-top-10 margin-bottom-10" text="Change Password"/>
-								 	<g:FlowPanel ui:field="forgotPasswordContainer"/>
+								    <b:Column size="SM_12">
+								        <b:Button ui:field="changePasswordBtn" addStyleNames="margin-top-10 margin-bottom-10" text="Change Password"/>
+								 		<g:FlowPanel ui:field="forgotPasswordContainer"/>
+								    </b:Column>
+								</b:Row>
+								<b:Row>
+								    <b:Column size="SM_12">
+								        <g:SimplePanel ui:field="passwordSynAlertPanel"/>
+								    </b:Column>
 								</b:Row>
 							</bh:Div>
 						</bh:Div>
