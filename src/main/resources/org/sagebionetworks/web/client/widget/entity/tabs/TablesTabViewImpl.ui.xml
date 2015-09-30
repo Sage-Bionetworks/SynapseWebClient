@@ -9,12 +9,12 @@
 			<g:SimplePanel ui:field="tableActionMenuContainer"/>
 		</bh:Div>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
-			<g:SimplePanel ui:field="tableBreadcrumbContainer"/>
-			<g:SimplePanel ui:field="tableTitlebarContainer"/>
-			<g:SimplePanel ui:field="tableMetadataContainer"/>
+			<g:SimplePanel ui:field="tableBreadcrumbContainer" visible="false"/>
+			<g:SimplePanel ui:field="tableTitlebarContainer" visible="false"/>
+			<g:SimplePanel ui:field="tableMetadataContainer" visible="false"/>
 		</bh:Div>
 		<b:Column size="XS_12">
-			<g:SimplePanel ui:field="tableListWidgetContainer"/>
+			<g:SimplePanel ui:field="tableListWidgetContainer" visible="false"/>
 			<g:SimplePanel addStyleNames="margin-top-15" ui:field="tableWidgetContainer"/>
 			<g:SimplePanel addStyleNames="padding-bottom-15" ui:field="tableModifiedAndCreatedContainer"/>
 			<g:FlowPanel addStyleNames="help-panel">

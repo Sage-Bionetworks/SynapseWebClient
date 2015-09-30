@@ -152,5 +152,23 @@ public class TablesTabViewImpl implements TablesTabView {
 	public void setSynapseAlert(Widget w) {
 		synapseAlertContainer.setWidget(w);
 	}
+	
+	@Override
+	public void setBreadcrumbVisible(boolean visible) {
+		tableBreadcrumbContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void setEntityMetadataVisible(boolean visible) {
+		tableMetadataContainer.setVisible(visible);
+	}
+	@Override
+	public void setTableListVisible(boolean visible) {
+		tableListWidgetContainer.setVisible(visible);
+	}
+	@Override
+	public void setTitlebarVisible(boolean visible) {
+		tableTitlebarContainer.setVisible(visible);
+	}
 }
 

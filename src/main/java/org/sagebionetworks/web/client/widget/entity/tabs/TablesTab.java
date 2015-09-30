@@ -165,10 +165,10 @@ public class TablesTab implements TablesTabView.Presenter{
 		this.entity = bundle.getEntity();
 		boolean isTable = entity instanceof TableEntity;
 		boolean isProject = entity instanceof Project;
-		metadata.asWidget().setVisible(isTable);
-		breadcrumb.asWidget().setVisible(isTable);
-		tableListWidget.asWidget().setVisible(isProject);
-		tableTitleBar.asWidget().setVisible(isTable);
+		view.setEntityMetadataVisible(isTable);
+		view.setBreadcrumbVisible(isTable);
+		view.setTableListVisible(isProject);
+		view.setTitlebarVisible(isTable);
 		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
