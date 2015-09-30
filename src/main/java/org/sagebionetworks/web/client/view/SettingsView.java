@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface SettingsView extends IsWidget, SynapseView {
 	
@@ -26,11 +25,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	 * Shows the user that their password change succeeded
 	 */
 	public void showPasswordChangeSuccess();
-	
-	/**
-	 * Alerts the view that the password change failed
-	 */
-	public void passwordChangeFailed(String error);	
 	
 	public void updateStorageUsage(Long grandTotal);
 
@@ -55,16 +49,37 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void addEmail(String emailAddress);
 		void onEditProfile();
 		void getAPIKey();
+
+		void changePassword();
 	}
 
 	public void setApiKey(String apiKey);
 
 
-	public void setNotificationSynAlertWidget(Widget asWidget);
+	public void setNotificationSynAlertWidget(IsWidget asWidget);
 
-	public void setAddressSynAlertWidget(Widget asWidget);
+	public void setAddressSynAlertWidget(IsWidget asWidget);
 
-	public void setAPISynAlertWidget(Widget synAlert);
+	public void setAPISynAlertWidget(IsWidget synAlert);
+	
+	public void setPasswordSynAlertWidget(IsWidget synAlert);
+	
 	void hideAPIKey();
 	void showConfirm(String message, ConfirmCallback callback);
+
+	String getPassword1Field();
+
+	String getCurrentPasswordField();
+
+	String getPassword2Field();
+
+	void setCurrentPasswordInError(boolean inError);
+
+	void setPassword1InError(boolean inError);
+
+	void setPassword2InError(boolean inError);
+
+	void setChangePasswordEnabled(boolean isEnabled);
+
+	void resetChangePasswordUI();
 }
