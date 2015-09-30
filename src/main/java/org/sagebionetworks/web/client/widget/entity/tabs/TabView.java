@@ -9,6 +9,7 @@ public interface TabView {
 	void setPresenter(Presenter presenter);
 	void configure(String tabTitle, Widget content);
 	TabListItem getTabListItem();
+	void setTabListItemVisible(boolean visible);
 	TabPane getTabPane();
 	void setActive(boolean isActive);
 	public interface Presenter {

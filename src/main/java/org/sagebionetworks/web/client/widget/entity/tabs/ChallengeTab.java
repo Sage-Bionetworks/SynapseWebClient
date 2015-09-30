@@ -32,11 +32,11 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 	
 	public void configure(String entityId) {
 		tab.setPlace(new Synapse(entityId, null, EntityArea.ADMIN, null));
-		tab.getTabListItem().setVisible(false);
+		tab.setTabListItemVisible(false);
 		evaluationList.configure(entityId, new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isVisible) {
-				tab.getTabListItem().setVisible(isVisible);
+				tab.setTabListItemVisible(isVisible);
 			}
 		});
 	}

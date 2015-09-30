@@ -51,6 +51,10 @@ public class TabViewImpl implements TabView {
 	public TabListItem getTabListItem() {
 		return tabItem;
 	}
+	@Override
+	public void setTabListItemVisible(boolean visible) {
+		tabItem.setVisible(visible);
+	}
 	
 	@Override
 	public TabPane getTabPane() {
