@@ -65,7 +65,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		view.clear();
 		view.setLoadingVisible(true);
 		//hex decode the token
-		synapseClient.hexDecodeAndSerialize(tokenType, signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
+		synapseClient.hexDecodeAndDeserialize(tokenType, signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
 			@Override
 			public void onSuccess(SignedTokenInterface result) {
 				view.setLoadingVisible(false);
