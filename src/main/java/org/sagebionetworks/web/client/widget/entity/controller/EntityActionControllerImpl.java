@@ -206,18 +206,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.CREATE_DOI, false);
 		if (canEdit) {
 			actionMenu.addActionListener(Action.CREATE_DOI, this);
-			synapseClient.getEntityDoi(entity.getId(), getVersion(), new AsyncCallback<Doi>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					boolean isNotFound = caught instanceof NotFoundException;
-					//show command if not found
-					actionMenu.setActionVisible(Action.CREATE_DOI, isNotFound);
-					actionMenu.setActionEnabled(Action.CREATE_DOI, isNotFound);
-				}
-				public void onSuccess(Doi result) {
-					//if there's a Doi, then continue to not show command
-				};
-			});
+			if (entityBundle.getDoi() == null) {
+				//show command if not returned, thus not in existence
+				actionMenu.setActionVisible(Action.CREATE_DOI, true);
+				actionMenu.setActionEnabled(Action.CREATE_DOI, true);
+			}
 		}
 	}
 	

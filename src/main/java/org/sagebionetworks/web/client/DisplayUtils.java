@@ -47,7 +47,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -129,7 +128,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class DisplayUtils {
 	private static DateTimeFormat prettyFormat = null; 
@@ -157,7 +155,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String getIconThumbnailHtml(ImageResource icon) {
-		if(icon == null) return null;		
+		if(icon == null) return null;	
 		return "<span class=\"thumbnail-image-container\">" + AbstractImagePrototype.create(icon).getHTML() + "</span>";
 	}
 	

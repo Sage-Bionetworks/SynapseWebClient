@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -12,8 +16,6 @@ import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -24,11 +26,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -41,13 +43,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	
 	@UiField
-	DivElement changeSynapsePasswordUI;
+	Div changeSynapsePasswordUI;
 	@UiField
-	DivElement changeSynapsePasswordHighlightBox;
+	Div changeSynapsePasswordHighlightBox;
 	@UiField
-	DivElement apiKeyHighlightBox;
+	HTMLPanel apiKeyHighlightBox;
 	@UiField
-	DivElement editProfilePanel;
+	Div editProfilePanel;
 	@UiField
 	Panel apiKeyUI;
 	@UiField
@@ -58,17 +60,17 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Anchor forgotPasswordLink;
 	
 	@UiField
-	DivElement emailSettingsPanel;
+	Div emailSettingsPanel;
 	@UiField
-	DivElement changeEmailUI;
+	Div changeEmailUI;
 	@UiField
 	FlowPanel emailsPanel;
 	@UiField
 	TextBox newEmailField;
 	@UiField
-	DivElement newEmailError;
+	Span newEmailError;
 	@UiField
-	DivElement newEmailAlert;
+	Div newEmailAlert;
 	@UiField
 	Button addEmailButton;
 
@@ -81,23 +83,18 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	PasswordTextBox password2Field;
 	
 	@UiField
-	DivElement currentPassword;
+	Row currentPassword;
 	@UiField
-	DivElement password1;
+	Row password1;
 	@UiField
-	DivElement password2;
+	Row password2;
 	@UiField
-	DivElement currentPasswordError;
-	@UiField
-	DivElement password1Error;
-	@UiField
-	DivElement password2Error;
-	
+	SimplePanel passwordSynAlertPanel;
 	@UiField
 	Button changePasswordBtn;
 	
 	@UiField
-	SpanElement storageUsageSpan;
+	Span storageUsageSpan;
 	@UiField
 	TextBox apiKeyContainer;
 	
@@ -129,11 +126,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changePasswordBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				//validate passwords are filled in and match
-				if(checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
-					changePasswordBtn.setEnabled(false);
-					presenter.resetPassword(currentPasswordField.getValue(), password1Field.getValue());
-				}
+				presenter.changePassword();
 			}
 		});
 		
@@ -162,11 +155,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		});
 		forgotPasswordContainer.addStyleName("inline-block");
 		forgotPasswordContainer.add(forgotPasswordLink);
-		emailSettingsPanel.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Address");
+		emailSettingsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Address");
 		notificationsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Settings");
-		changeSynapsePasswordHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
-		apiKeyHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
-		editProfilePanel.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
+		changeSynapsePasswordHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
+		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
+		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
 		
 		newEmailField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
@@ -223,14 +216,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 
 	@Override
-	public void passwordChangeFailed(String error) {
-		changePasswordBtn.setEnabled(true);
-		currentPasswordError.setInnerHTML(error);
-		DisplayUtils.showFormError(currentPassword, currentPasswordError);
-	}
-
-
-	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
@@ -241,7 +226,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void clearStorageUsageUI() {
-		storageUsageSpan.setInnerText(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
+		storageUsageSpan.setText(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
 	}
 	
 	@Override
@@ -250,7 +235,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			clearStorageUsageUI();
 		}
 		else {
-			storageUsageSpan.setInnerText("You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false));
+			storageUsageSpan.setText("You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false));
 		}
 	}
 	
@@ -293,51 +278,53 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-
-	private boolean checkCurrentPassword() {
-		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
-		if (!DisplayUtils.isDefined(currentPasswordField.getText())){
-			currentPasswordError.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(currentPassword, currentPasswordError);
-			return false;
-		} else
-			return true;
+	
+	@Override
+	public String getCurrentPasswordField() {
+		return currentPasswordField.getText();
 	}
 	
-	private boolean checkPassword1() {
-		DisplayUtils.hideFormError(password1, password1Error);
-		if (!DisplayUtils.isDefined(password1Field.getText())){
-			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(password1, password1Error);
-			return false;
-		} else
-			return true;
+	@Override
+	public void setCurrentPasswordInError(boolean inError) {
+		if (inError) {
+			currentPassword.addStyleName("has-error");
+		} else {
+			currentPassword.removeStyleName("has-error");
+		}
 	}
 	
-	private boolean checkPassword2() {
-		DisplayUtils.hideFormError(password2, password2Error);
-		if (!DisplayUtils.isDefined(password2Field.getText())){
-			password2Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
-			DisplayUtils.showFormError(password2, password2Error);
-			return false;
-		} else
-			return true;
+	@Override
+	public String getPassword1Field() {
+		return password1Field.getText();
+	}
+		
+	@Override
+	public void setPassword1InError(boolean inError) {
+		if (inError) {
+			password1.addStyleName("has-error");
+		} else {
+			password1.removeStyleName("has-error");
+		}
 	}
 	
-	private boolean checkPasswordMatch() {
-		DisplayUtils.hideFormError(password2, password2Error);
-		if (!password1Field.getValue().equals(password2Field.getValue())) {
-			password2Error.setInnerHTML(DisplayConstants.PASSWORDS_MISMATCH);
-			DisplayUtils.showFormError(password2, password2Error);
-			return false;
-		} else
-			return true;
+	@Override
+	public String getPassword2Field() {
+		return password2Field.getText();
+	}
+	
+	@Override
+	public void setPassword2InError(boolean inError) {
+		if (inError) {
+			password2.addStyleName("has-error");
+		} else {
+			password2.removeStyleName("has-error");
+		}
 	}
 	
 	@Override
 	public void clear() {
 		resetChangePasswordUI();
-		storageUsageSpan.setInnerText("");
+		storageUsageSpan.setText("");
 		resetAddEmailUI();
 	}
 	
@@ -345,7 +332,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void showEmailChangeFailed(String error) {
 		addEmailButton.setEnabled(true);
 		DisplayUtils.show(newEmailError);
-		newEmailError.setInnerHTML(error);
+		newEmailError.setTitle(error);
 	}
 	
 	private void resetAddEmailUI() {
@@ -357,14 +344,15 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		DisplayUtils.hide(newEmailAlert);
 	}
 	
-	private void resetChangePasswordUI() {
+	@Override
+	public void resetChangePasswordUI() {
 		currentPasswordField.setValue("");
 		password1Field.setValue("");
 		password2Field.setValue("");
 		changePasswordBtn.setEnabled(true);
-		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
-		DisplayUtils.hideFormError(password1, password1Error);
-		DisplayUtils.hideFormError(password2, password2Error);
+		setCurrentPasswordInError(false);
+		setPassword1InError(false);
+		setPassword2InError(false);
 	}
 
 	private boolean checkEmailFormat(){
@@ -374,7 +362,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		}
 		else {
 			DisplayUtils.show(newEmailError);
-			newEmailError.setInnerHTML(WebConstants.INVALID_EMAIL_MESSAGE);
+			newEmailError.setTitle(WebConstants.INVALID_EMAIL_MESSAGE);
 			return false;
 		}
 	}
@@ -383,7 +371,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void showEmailChangeSuccess(String message) {
 		DisplayUtils.hide(changeEmailUI);
 		DisplayUtils.show(newEmailAlert);
-		newEmailAlert.setInnerHTML(message);
+		newEmailAlert.setTitle(message);
 	}
 
 	@Override
@@ -396,18 +384,18 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 
 	@Override
-	public void setNotificationSynAlertWidget(Widget notificationSynAlert) {
+	public void setNotificationSynAlertWidget(IsWidget notificationSynAlert) {
 		notificationSynAlertPanel.setWidget(notificationSynAlert);
 	}
 
 
 	@Override
-	public void setAddressSynAlertWidget(Widget addressSynAlert) {
+	public void setAddressSynAlertWidget(IsWidget addressSynAlert) {
 		addressSynAlertPanel.setWidget(addressSynAlert);
 	}
 
 	@Override
-	public void setAPISynAlertWidget(Widget apiSynAlert) {
+	public void setAPISynAlertWidget(IsWidget apiSynAlert) {
 		apiSynAlertPanel.setWidget(apiSynAlert);
 	}
 	
@@ -421,5 +409,16 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void showConfirm(String message, ConfirmCallback callback) {
 		Bootbox.confirm(message, callback);
+	}
+	
+	@Override
+	public void setChangePasswordEnabled(boolean isEnabled) {
+		changePasswordBtn.setEnabled(isEnabled);
+	}
+
+
+	@Override
+	public void setPasswordSynAlertWidget(IsWidget synAlert) {
+		passwordSynAlertPanel.setWidget(synAlert);
 	}
 }

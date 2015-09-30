@@ -158,11 +158,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			}
 			else if (fileHandle instanceof S3FileHandleInterface){
 				fileName.setInnerText(entityBundle.getFileName());
-
 				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 				presenter.setS3Description();
-				fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true));
 
+				fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true));
 				final String md5 = s3FileHandle.getContentMd5();
 				if (md5 != null) {
 					md5Link.configure(md5);

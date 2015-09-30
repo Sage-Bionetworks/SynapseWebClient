@@ -1,30 +1,25 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
-import org.sagebionetworks.repo.model.file.S3UploadDestination;
-import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import junit.framework.Assert;
 
 public class FileTitleBarTest {
 		
@@ -33,18 +28,33 @@ public class FileTitleBarTest {
 	AuthenticationController mockAuthController;
 	SynapseClientAsync mockSynapseClient;
 	EntityBundle mockBundle;
-	org.sagebionetworks.repo.model.Entity mockEntity;
+	GlobalApplicationState mockGlobalAppState;
+	org.sagebionetworks.repo.model.FileEntity mockFileEntity;
+	S3FileHandle handle;
+	Long synStorageLocationId = 1L;
 	@Before
 	public void setup(){	
 		mockView = mock(FileTitleBarView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		fileTitleBar = new FileTitleBar(mockView, mockAuthController, mockSynapseClient);
+		mockGlobalAppState = mock(GlobalApplicationState.class);
+		fileTitleBar = new FileTitleBar(mockView, mockAuthController, mockSynapseClient, mockGlobalAppState);
 		mockBundle = mock(EntityBundle.class);
-		mockEntity = mock(org.sagebionetworks.repo.model.Entity.class);
-		Mockito.when(mockEntity.getId()).thenReturn("syn123");
-		Mockito.when(mockEntity.getName()).thenReturn("syn123");
-		Mockito.when(mockBundle.getEntity()).thenReturn(mockEntity);
+		mockFileEntity = mock(org.sagebionetworks.repo.model.FileEntity.class);
+		Mockito.when(mockFileEntity.getId()).thenReturn("syn123");
+		Mockito.when(mockFileEntity.getName()).thenReturn("syn123");
+		Mockito.when(mockFileEntity.getDataFileHandleId()).thenReturn("syn123");
+		Mockito.when(mockBundle.getEntity()).thenReturn(mockFileEntity);
+		Mockito.when(mockGlobalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"))
+				.thenReturn(String.valueOf(synStorageLocationId));
+		List<FileHandle> fileHandles = new LinkedList<FileHandle>();
+		handle = new S3FileHandle();
+		handle.setId("syn123");
+		handle.setBucketName("testBucket");
+		handle.setKey("testKey");
+		handle.setStorageLocationId(synStorageLocationId);
+		fileHandles.add(handle);
+		Mockito.when(mockBundle.getFileHandles()).thenReturn(fileHandles);
 		verify(mockView).setPresenter(fileTitleBar);
 	}
 	
@@ -68,22 +78,17 @@ public class FileTitleBarTest {
 	}
 
 	@Test
-	public void testSetS3DescriptionForExternalS3() {
-		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
-		uploadDestinations.add(new ExternalS3UploadDestination());
-		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+	public void testSetS3DescriptionForSynapseStorage() {
 		fileTitleBar.setEntityBundle(mockBundle);
 		fileTitleBar.setS3Description();
-		verify(mockView).setFileLocation(anyString());
+		verify(mockView).setFileLocation("| Synapse Storage");
 	}
 
 	@Test
-	public void testSetS3DescriptionForSynapseStorage() {
-		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
-		uploadDestinations.add(new S3UploadDestination());
-		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+	public void testSetS3DescriptionForExternalS3() {
+		handle.setStorageLocationId(2L);
 		fileTitleBar.setEntityBundle(mockBundle);
 		fileTitleBar.setS3Description();
-		verify(mockView).setFileLocation(Mockito.eq("| Synapse Storage"));
+		verify(mockView).setFileLocation("| s3://" + handle.getBucketName() + "/" + handle.getKey());
 	}
 }
