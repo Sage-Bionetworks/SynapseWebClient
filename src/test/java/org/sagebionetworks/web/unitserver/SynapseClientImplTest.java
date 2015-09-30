@@ -1968,25 +1968,25 @@ public class SynapseClientImplTest {
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
 		String tokenTypeName = null;
-		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenEmpty() throws RestServiceException, SynapseException{
 		String tokenTypeName = "";
-		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenUnrecognized() throws RestServiceException, SynapseException{
 		String tokenTypeName = "InvalidTokenType";
-		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 	}
 	
 	@Test
 	public void testHandleSignedTokenJoinTeam() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 		synapseClient.handleSignedToken(token,TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).addTeamMember(joinTeamToken, TEST_HOME_PAGE_BASE+"#!Team:", TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/");
 	}
@@ -1994,20 +1994,13 @@ public class SynapseClientImplTest {
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenInvalidJoinTeam() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
-	}
-	
-	@Ignore
-	@Test(expected = BadRequestException.class)
-	public void testHandleSignedTokenJoinTeamWrongToken() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedNotificationSettingsToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, "invalid token");
 	}
 	
 	@Test
 	public void testHandleSignedTokenNotificationSettings() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedNotificationSettingsToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedNotificationSettingsToken);
 		synapseClient.handleSignedToken(token, TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).updateNotificationSettings(notificationSettingsToken);
 	}
@@ -2015,14 +2008,7 @@ public class SynapseClientImplTest {
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenInvalidNotificationSettings() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
-	}
-	
-	@Ignore
-	@Test(expected = BadRequestException.class)
-	public void testHandleSignedTokenNotificationSettingsWrongToken() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, "invalid token");
 	}
 	
 	@Test

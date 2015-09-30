@@ -2527,7 +2527,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public SignedTokenInterface hexDecodeAndSerialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
+	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
 		if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
 			//error interpreting the token type, respond with a bad request
 			throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
