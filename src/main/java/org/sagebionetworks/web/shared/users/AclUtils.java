@@ -49,15 +49,14 @@ public class AclUtils {
 
 		// Note, PARTICIPATE is no longer used, but to removed it would require updating all existing Evaluation ACLs
 		permToACCESS_TYPE.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				READ, SUBMIT, PARTICIPATE))); 
+				READ, SUBMIT))); 
 		permToACCESS_TYPE.put(PermissionLevel.CAN_SCORE_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				READ, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION)));
 		
 		// TODO replace this list with ModelConstants.EVALUATION_ADMIN_ACCESS_PERMISSIONS
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				READ, SUBMIT, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION, 
-				CHANGE_PERMISSIONS, UPDATE, DELETE, DELETE_SUBMISSION,
-				CREATE, PARTICIPATE, CHANGE_SETTINGS)));
+				CHANGE_PERMISSIONS, UPDATE, DELETE, DELETE_SUBMISSION)));
 		
 		// Build the reverse mapping from the first map
 		accessTypeToPerm = new HashMap<ACCESS_TYPE, Set<PermissionLevel>>();
