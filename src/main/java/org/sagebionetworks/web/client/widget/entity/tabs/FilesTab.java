@@ -1,16 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.DOI;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +39,6 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;

@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -118,8 +119,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			@Override
 			public void invoke(String entityId) {
 				areaToken = null;
-				getTargetBundle(entityId);
-				tab.showTab();
+				getTargetBundle(entityId, true);
 			}
 		});
 		initBreadcrumbLinkClickedHandler();
@@ -135,7 +135,7 @@ public class TablesTab implements TablesTabView.Presenter{
 					setTargetBundle(projectBundle);
 					tab.showTab();
 				} else {
-					getTargetBundle(entityId);
+					getTargetBundle(entityId, false);
 				}
 			};
 		};
@@ -157,7 +157,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			//configure based on project
 			setTargetBundle(projectBundle);
 		} else {
-			getTargetBundle(entity.getId());
+			getTargetBundle(entity.getId(), false);
 		}
 	}
 	
@@ -172,6 +172,7 @@ public class TablesTab implements TablesTabView.Presenter{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
+		view.clearModifiedAndCreatedWidget();
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
@@ -208,13 +209,17 @@ public class TablesTab implements TablesTabView.Presenter{
 		return actionMenu;
 	}
 	
-	public void getTargetBundle(String entityId) {
+	public void getTargetBundle(String entityId, final boolean showTab) {
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI | TABLE_DATA;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				setTargetBundle(bundle);
+				if (showTab) {
+					tab.setPlace(new Synapse(entity.getId(), null, null, areaToken));
+					tab.showTab();
+				}
 			}
 			
 			@Override

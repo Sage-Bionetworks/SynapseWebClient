@@ -97,7 +97,6 @@ public class TablesTabViewImpl implements TablesTabView {
 	
 	@Override
 	public void configureModifiedAndCreatedWidget(Entity entity)  {
-		tableModifiedAndCreatedContainer.clear();
 		createdByBadge.asWidget().removeFromParent();
 		modifiedByBadge.asWidget().removeFromParent();
 		
@@ -121,6 +120,10 @@ public class TablesTabViewImpl implements TablesTabView {
 		
 		attributionPanel.add(inlineHtml);
 		tableModifiedAndCreatedContainer.add(attributionPanel);
+	}
+	@Override
+	public void clearModifiedAndCreatedWidget() {
+		tableModifiedAndCreatedContainer.clear();
 	}
 	@Override
 	public void setEntityMetadata(Widget w) {
