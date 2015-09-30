@@ -12,8 +12,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_SUFFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
@@ -165,7 +167,7 @@ public class EntityActionControllerImplTest {
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
-		
+		entityBundle.setDoi(new Doi());
 		selected = new Reference();
 		selected.setTargetId("syn9876");
 		// Setup the mock entity selector to select an entity.
@@ -976,7 +978,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureDoiNotFound() throws Exception {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
+		entityBundle.setDoi(null);
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		//initially hide, then show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
@@ -989,7 +991,6 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureDoiNotFoundNonEditable() throws Exception {
 		permissions.setCanEdit(false);
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		//initially hide, never show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
@@ -1000,8 +1001,6 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureDoiFound() throws Exception {
-		Doi mockDoi = Mockito.mock(Doi.class);
-		AsyncMockStubber.callSuccessWith(mockDoi).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		//initially hide, never show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
