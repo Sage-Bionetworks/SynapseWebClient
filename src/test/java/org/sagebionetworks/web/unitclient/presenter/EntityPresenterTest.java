@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -45,7 +44,6 @@ import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.footer.Footer;
-import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -97,7 +95,7 @@ public class EntityPresenterTest {
 		mockEntityPageTop = mock(EntityPageTop.class);
 		mockFooterWidget = mock(Footer.class);
 		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
-				mockCookies, mockSynapseJSNIUtils, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget);
+				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -117,7 +115,6 @@ public class EntityPresenterTest {
 		verify(mockView).setHeaderWidget(mockHeaderWidget);
 		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
 		verify(mockEntityPageTop).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
-		verify(mockEntityPageTop).setAreaChangeHandler(any(AreaChangeHandler.class));
 		verify(mockHeaderWidget, never()).configure(false); // waits to configure for entity header
 		verify(mockHeaderWidget).refresh();
 	}	
@@ -131,14 +128,12 @@ public class EntityPresenterTest {
 		
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
-		verify(mockView).setBackgroundImageVisible(false);
 		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop).clearState();
-		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
-		verify(mockEntityPageTop).refresh();
+		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
 		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
 	}
@@ -151,14 +146,13 @@ public class EntityPresenterTest {
 		when(place.getEntityId()).thenReturn(entityId);
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
-		verify(mockView).setBackgroundImageVisible(false);
 		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop).clearState();
-		verify(mockEntityPageTop).configure(eq(eb), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
-		verify(mockEntityPageTop).refresh();
+		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
+		
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
 	}
 	
@@ -259,83 +253,6 @@ public class EntityPresenterTest {
 		
 		assertEquals(expectedFilteredARs, eb.getAccessRequirements());
 		assertEquals(expectedFilteredUnmetARs, eb.getUnmetAccessRequirements());
-	}
-	
-	@Test
-	public void testLoadBackgroundImage() {
-		String projectEntityId = "4";
-		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
-		FileHandle backgroundImageFile = mock(FileHandle.class);
-		when(backgroundImageFile.getFileName()).thenReturn(EntityPresenter.ENTITY_BACKGROUND_IMAGE_NAME);
-		fileHandles.add(backgroundImageFile);
-		rootWikiAttachments.setList(fileHandles);
-		entityPresenter.loadBackgroundImage(projectEntityId);
-		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		//and it should have found the background image and decided to show it!
-		verify(mockView).setBackgroundImageVisible(true);
-		verify(mockView).setBackgroundImageUrl(anyString());
-	}
-	
-	@Test
-	public void testLoadBackgroundImageNoMatch() {
-		String projectEntityId = "4";
-		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
-		FileHandle backgroundImageFile = mock(FileHandle.class);
-		when(backgroundImageFile.getFileName()).thenReturn("wrong file name.png");
-		fileHandles.add(backgroundImageFile);
-		rootWikiAttachments.setList(fileHandles);
-		entityPresenter.loadBackgroundImage(projectEntityId);
-		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		//mismatch file name, should not show a background image
-		verify(mockView, never()).setBackgroundImageVisible(true);
-		verify(mockView, never()).setBackgroundImageUrl(anyString());
-	}
-	
-	@Test
-	public void testLoadBackgroundImageNoRootWiki() {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		
-		String projectEntityId = "4";
-		entityPresenter.loadBackgroundImage(projectEntityId);
-		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynapseClient, never()).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		
-		//no root wiki
-		verify(mockView, never()).setBackgroundImageVisible(true);
-		verify(mockView, never()).setBackgroundImageUrl(anyString());
-	}
-	
-	@Test
-	public void testLoadBackgroundImageNoAttachments() {
-		String projectEntityId = "4";
-		entityPresenter.loadBackgroundImage(projectEntityId);
-		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		//no attachments
-		verify(mockView, never()).setBackgroundImageVisible(true);
-		verify(mockView, never()).setBackgroundImageUrl(anyString());
-	}
-	
-	@Test
-	public void testLoadBackgroundImageWikiIdFailure() {
-		String projectEntityId = "4";
-		String exceptionMessage= "my test error message";
-		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		entityPresenter.loadBackgroundImage(projectEntityId);
-		verify(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynapseJSNIUtils).consoleError(exceptionMessage);
-	}
-	
-	@Test
-	public void testLoadBackgroundImageAttachmentListFailure() {
-		String projectEntityId = "4";
-		String exceptionMessage= "my test error message while getting wiki attachments";
-		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		entityPresenter.loadBackgroundImage(projectEntityId);
-		verify(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockSynapseJSNIUtils).consoleError(exceptionMessage);
 	}
 	
 	@Test

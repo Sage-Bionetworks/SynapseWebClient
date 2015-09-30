@@ -154,7 +154,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	public void refresh() {
 		clear();
 		// Hide the view panel contents until async callback completes
-		view.setBackgroundImageVisible(false);
 		view.setLoadingVisible(true);
 		int mask = ENTITY | ENTITY_PATH;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
