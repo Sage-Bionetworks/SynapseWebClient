@@ -63,4 +63,5 @@ public interface WikiPageWidgetView extends IsWidget {
 	public void showErrorMessage(String message);
 	void showInfo(String title, String message);
 	public void clear();
+	void addStyleName(String style);
 }

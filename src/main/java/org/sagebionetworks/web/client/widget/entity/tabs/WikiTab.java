@@ -19,7 +19,7 @@ public class WikiTab {
 		this.tab = tab;
 		this.wikiPageWidget = wikiPageWidget;
 		tab.configure("Wiki", wikiPageWidget.asWidget());
-		wikiPageWidget.asWidget().addStyleName("panel panel-default panel-body margin-bottom-0-imp");
+		wikiPageWidget.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {

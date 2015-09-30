@@ -111,6 +111,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
 
 	public void showWikiHistory(boolean isVisible) {
 		view.setWikiHistoryVisible(isVisible);

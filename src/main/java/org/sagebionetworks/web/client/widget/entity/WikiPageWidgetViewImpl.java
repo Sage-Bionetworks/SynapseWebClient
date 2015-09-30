@@ -193,6 +193,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public Widget asWidget() {
 		return widget;
 	}
+	@Override
+	public void addStyleName(String style) {
+		widget.addStyleName(style);
+	}
 
 	@Override
 	public void showCreatedBy(boolean isVisible) {
