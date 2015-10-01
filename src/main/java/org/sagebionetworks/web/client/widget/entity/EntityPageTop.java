@@ -5,7 +5,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.*;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -136,7 +139,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		if (area == null) {
 			if (entity instanceof Project) {
 				area = EntityArea.WIKI;
-			} else {
+			} else if (entity instanceof TableEntity) {
+				area = EntityArea.TABLES;
+			} else { //if (entity instanceof FileEntity || entity instanceof Folder, or any other entity type)
 				area = EntityArea.FILES;
 			}
 		}

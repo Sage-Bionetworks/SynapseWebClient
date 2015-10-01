@@ -119,7 +119,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			@Override
 			public void invoke(String entityId) {
 				areaToken = null;
-				getTargetBundle(entityId, true);
+				getTargetBundle(entityId);
 			}
 		});
 		initBreadcrumbLinkClickedHandler();
@@ -135,7 +135,7 @@ public class TablesTab implements TablesTabView.Presenter{
 					setTargetBundle(projectBundle);
 					tab.showTab();
 				} else {
-					getTargetBundle(entityId, false);
+					getTargetBundle(entityId);
 				}
 			};
 		};
@@ -157,7 +157,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			//configure based on project
 			setTargetBundle(projectBundle);
 		} else {
-			getTargetBundle(entity.getId(), false);
+			getTargetBundle(entity.getId());
 		}
 	}
 	
@@ -209,17 +209,15 @@ public class TablesTab implements TablesTabView.Presenter{
 		return actionMenu;
 	}
 	
-	public void getTargetBundle(String entityId, final boolean showTab) {
+	public void getTargetBundle(String entityId) {
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI | TABLE_DATA;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				setTargetBundle(bundle);
-				if (showTab) {
-					tab.setPlace(new Synapse(entity.getId(), null, null, areaToken));
-					tab.showTab();
-				}
+				tab.setPlace(new Synapse(entity.getId(), null, null, areaToken));
+				tab.showTab();
 			}
 			
 			@Override
