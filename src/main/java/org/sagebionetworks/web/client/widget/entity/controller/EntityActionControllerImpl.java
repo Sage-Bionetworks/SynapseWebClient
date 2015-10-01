@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -782,13 +781,21 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onEditFileMetadata() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckEditFileMetadata();
-			}
-		});
+		Synapse place = ((Synapse)globalApplicationState.getCurrentPlace());
+		Long version = place.getVersionNumber();
+		// Can only edit file metadata of the current file version
+		if (version == null) {
+			// Validate the user can update this entity.
+			preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+				@Override
+				public void invoke() {
+					postCheckEditFileMetadata();
+				}
+			});
+		} else {
+			view.showErrorMessage("Can only edit the metadata of the most recent file version.");
+		}
+		
 	}
 	
 	/**
