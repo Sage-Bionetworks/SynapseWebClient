@@ -32,19 +32,24 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.i18n.server.testing.MockMessageCatalogContext;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FilesTabTest {
@@ -77,16 +82,26 @@ public class FilesTabTest {
 	@Mock
 	EntityBundle mockProjectEntityBundle;
 	@Mock
+	EntityBundle mockFileEntityBundle;
+	@Mock
+	FileEntity mockFileEntity;
+	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	Project mockProjectEntity;
 	@Mock
 	UserEntityPermissions mockPermissions;
-	
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	EntityActionController mockEntityActionController;
+	@Mock
+	ProvenanceWidget mockProvenanceWidget;
 	@Mock
 	CallbackP<Boolean> mockProjectInfoCallback;
 	
 	FilesTab tab;
+	String fileEntityId = "syn4444";
 	String entityId = "syn7777777";
 	
 	@Before
@@ -102,6 +117,19 @@ public class FilesTabTest {
 				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
 				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
+		
+		when(mockFileEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
+		when(mockFileEntityBundle.getEntity()).thenReturn(mockFileEntity);
+		when(mockFileEntity.getId()).thenReturn(fileEntityId);
+		when(mockFileEntityBundle.getPermissions()).thenReturn(mockPermissions);
+		
+		AsyncMockStubber.callSuccessWith(mockFileEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockFileEntityBundle).when(mockSynapseClientAsync).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		
+		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
+		when(mockPortalGinInjector.createEntityActionController()).thenReturn(mockEntityActionController);
+		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
+		
 	}
 
 	@Test
@@ -166,6 +194,64 @@ public class FilesTabTest {
 		assertEquals(EntityArea.FILES, place.getArea());
 		assertNull(place.getAreaToken());
 	}
+	
+	@Test
+	public void testConfigureWithFile() {
+		Long version = 4L;
+		
+		boolean canCertifiedUserAddChild = false;
+		boolean isCertifiedUser = true;
+		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
+		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
+		
+		tab.configure(mockFileEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		
+		verify(mockSynapseClientAsync).getEntityBundleForVersion(eq(fileEntityId), eq(version), anyInt(), any(AsyncCallback.class));
+		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		
+		verify(mockView).setFileTitlebarVisible(false);
+		verify(mockView).setFileTitlebarVisible(true);
+		verify(mockView, times(2)).setFolderTitlebarVisible(false);
+		verify(mockView).setPreviewVisible(false);
+		verify(mockView).setPreviewVisible(true);
+		verify(mockView).setMetadataVisible(false);
+		verify(mockView).setMetadataVisible(true);
+		
+		verify(mockFileTitleBar).configure(mockFileEntityBundle);
+		verify(mockPreviewWidget).configure(mockFileEntityBundle);
+		
+		verify(mockEntityMetadata).setEntityBundle(mockFileEntityBundle, version);
+		//show file history since we are asking for a specific version
+		verify(mockEntityMetadata).setFileHistoryVisible(true);
+		
+		
+		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
+		//hide project info
+		verify(mockProjectInfoCallback).invoke(false);
+		
+		verify(mockView).clearActionMenuContainer();
+		verify(mockView).setProgrammaticClientsVisible(true);
+		verify(mockView).configureProgrammaticClients(fileEntityId, version);
+		verify(mockView).setProvenanceVisible(true);
+		verify(mockView).configureModifiedAndCreatedWidget(mockFileEntity);
+		verify(mockView).setWikiPageWidgetVisible(true);
+		
+		verify(mockView).setFileBrowserVisible(false);
+		verify(mockPortalGinInjector).createActionMenuWidget();
+		verify(mockPortalGinInjector).createEntityActionController();
+		verify(mockPortalGinInjector).getProvenanceRenderer();
+		
+		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
+		verify(mockTab).setPlace(captor.capture());
+		Synapse place = (Synapse)captor.getValue();
+		assertEquals(fileEntityId, place.getEntityId());
+		assertEquals(version, place.getVersionNumber());
+		assertNull(place.getArea());
+		assertNull(place.getAreaToken());
+	}
+
 
 	@Test
 	public void testAsTab() {
