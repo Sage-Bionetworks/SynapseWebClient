@@ -35,16 +35,13 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class TablesTab implements TablesTabView.Presenter{
+public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public static final String TABLE_QUERY_PREFIX = "query/";
-	public static final String TABLE_ROW_PREFIX = "row/";
-	public static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
 	
 	Tab tab;
 	TablesTabView view;
@@ -53,7 +50,6 @@ public class TablesTab implements TablesTabView.Presenter{
 	Breadcrumb breadcrumb;
 	EntityMetadata metadata;
 	boolean annotationsShown;
-	QueryChangeHandler qch;
 	EntityUpdatedHandler handler;
 	QueryTokenProvider queryTokenProvider;
 	Entity entity;
@@ -96,25 +92,6 @@ public class TablesTab implements TablesTabView.Presenter{
 		view.setSynapseAlert(synAlert.asWidget());
 		tab.configure("Tables", view.asWidget());
 		
-		qch = new QueryChangeHandler() {			
-			@Override
-			public void onQueryChange(Query newQuery) {
-				setTableQuery(newQuery);				
-			}
-
-			@Override
-			public Query getQueryString() {
-				return getTableQuery();
-			}
-
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				if (handler != null) {
-					handler.onPersistSuccess(event);
-				}
-			}
-		};
-		
 		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
 			@Override
 			public void invoke(String entityId) {
@@ -123,6 +100,13 @@ public class TablesTab implements TablesTabView.Presenter{
 			}
 		});
 		initBreadcrumbLinkClickedHandler();
+	}
+	
+	@Override
+	public void onPersistSuccess(EntityUpdatedEvent event) {
+		if (handler != null) {
+			handler.onPersistSuccess(event);
+		}
 	}
 	
 	public void initBreadcrumbLinkClickedHandler() {
@@ -182,7 +166,7 @@ public class TablesTab implements TablesTabView.Presenter{
 			
 			TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
-			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
+			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), this, actionMenu);
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
@@ -233,7 +217,7 @@ public class TablesTab implements TablesTabView.Presenter{
 		return tab;
 	}
 	
-	public void setTableQuery(Query newQuery) {
+	public void onQueryChange(Query newQuery) {
 		if(newQuery != null){
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null){
@@ -256,7 +240,7 @@ public class TablesTab implements TablesTabView.Presenter{
 
 	}
 	
-	public Query getTableQuery() {
+	public Query getQueryString() {
 		if(areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
 			String token = areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
 			if(token != null){
