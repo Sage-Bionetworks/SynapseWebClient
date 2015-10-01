@@ -236,7 +236,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		wikiTab.configure(projectBundle.getEntity().getId(), wikiId, 
 				canEdit, callback);
 		
-		
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
 			public void invoke(String wikiPageId) {
