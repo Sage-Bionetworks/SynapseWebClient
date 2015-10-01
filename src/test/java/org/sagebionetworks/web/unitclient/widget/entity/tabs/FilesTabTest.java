@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -82,9 +83,12 @@ public class FilesTabTest {
 	@Mock
 	EntityBundle mockProjectEntityBundle;
 	@Mock
-	EntityBundle mockFileEntityBundle;
+	EntityBundle mockEntityBundle;
 	@Mock
 	FileEntity mockFileEntity;
+	@Mock
+	Folder mockFolderEntity;
+	
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
@@ -101,6 +105,7 @@ public class FilesTabTest {
 	CallbackP<Boolean> mockProjectInfoCallback;
 	
 	FilesTab tab;
+	String folderEntityId = "syn1";
 	String fileEntityId = "syn4444";
 	String entityId = "syn7777777";
 	
@@ -118,13 +123,14 @@ public class FilesTabTest {
 				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
-		when(mockFileEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
-		when(mockFileEntityBundle.getEntity()).thenReturn(mockFileEntity);
+		when(mockEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
+		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
+		when(mockFolderEntity.getId()).thenReturn(folderEntityId);
 		when(mockFileEntity.getId()).thenReturn(fileEntityId);
-		when(mockFileEntityBundle.getPermissions()).thenReturn(mockPermissions);
+		when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		
-		AsyncMockStubber.callSuccessWith(mockFileEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockFileEntityBundle).when(mockSynapseClientAsync).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClientAsync).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.createEntityActionController()).thenReturn(mockEntityActionController);
@@ -219,10 +225,10 @@ public class FilesTabTest {
 		verify(mockView).setMetadataVisible(false);
 		verify(mockView).setMetadataVisible(true);
 		
-		verify(mockFileTitleBar).configure(mockFileEntityBundle);
-		verify(mockPreviewWidget).configure(mockFileEntityBundle);
+		verify(mockFileTitleBar).configure(mockEntityBundle);
+		verify(mockPreviewWidget).configure(mockEntityBundle);
 		
-		verify(mockEntityMetadata).setEntityBundle(mockFileEntityBundle, version);
+		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
 		//show file history since we are asking for a specific version
 		verify(mockEntityMetadata).setFileHistoryVisible(true);
 		
@@ -248,6 +254,67 @@ public class FilesTabTest {
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(fileEntityId, place.getEntityId());
 		assertEquals(version, place.getVersionNumber());
+		assertNull(place.getArea());
+		assertNull(place.getAreaToken());
+		
+		//quick test to verify that reconfiguring with the same entity/version should cause nothing to change (certainly should not ask for the entity bundle again).
+		reset(mockSynapseClientAsync);
+		tab.configure(mockFileEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		verifyZeroInteractions(mockSynapseClientAsync);
+	}
+	
+
+	@Test
+	public void testConfigureWithFolder() {
+		when(mockEntityBundle.getEntity()).thenReturn(mockFolderEntity);
+		Long version = null;
+		
+		boolean canCertifiedUserAddChild = true;
+		boolean isCertifiedUser = true;
+		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
+		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
+		
+		tab.configure(mockFolderEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		
+		verify(mockSynapseClientAsync).getEntityBundle(eq(folderEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		
+		verify(mockView, times(2)).setFileTitlebarVisible(false);
+		verify(mockView).setFolderTitlebarVisible(false);
+		verify(mockView).setFolderTitlebarVisible(true);
+		verify(mockView, times(2)).setPreviewVisible(false);
+		verify(mockView).setMetadataVisible(false);
+		verify(mockView).setMetadataVisible(true);
+		
+		verify(mockBasicTitleBar).configure(mockEntityBundle);
+		
+		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
+		//show file history since we are asking for a specific version
+		verify(mockEntityMetadata).setFileHistoryVisible(false);
+		
+		
+		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
+		//hide project info
+		verify(mockProjectInfoCallback).invoke(false);
+		
+		verify(mockView).clearActionMenuContainer();
+		verify(mockView).setProgrammaticClientsVisible(false);
+		verify(mockView).setProvenanceVisible(false);
+		verify(mockView).configureModifiedAndCreatedWidget(mockFolderEntity);
+		verify(mockView).setWikiPageWidgetVisible(true);
+		
+		verify(mockView).setFileBrowserVisible(true);
+		verify(mockFilesBrowser).configure(folderEntityId, canCertifiedUserAddChild, isCertifiedUser);
+		verify(mockPortalGinInjector).createActionMenuWidget();
+		verify(mockPortalGinInjector).createEntityActionController();
+		
+		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
+		verify(mockTab).setPlace(captor.capture());
+		Synapse place = (Synapse)captor.getValue();
+		assertEquals(folderEntityId, place.getEntityId());
+		assertNull(place.getVersionNumber());
 		assertNull(place.getArea());
 		assertNull(place.getAreaToken());
 	}
