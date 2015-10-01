@@ -204,4 +204,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.addSynapseAlertWidget(synapseAlert.asWidget());
 		synapseAlert.showError("Unable to load image preview");
 	}
+	
+	public void setHeight(String height) {
+		view.setHeight(height);
+	}
 }

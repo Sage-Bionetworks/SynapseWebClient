@@ -96,7 +96,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.ginInjector = ginInjector;
 		view.setPresenter(this);
 		
-		previewWidget.asWidget().setHeight(WIDGET_HEIGHT_PX + "px");
+		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
 		view.setFileTitlebar(fileTitleBar.asWidget());
 		view.setFolderTitlebar(folderTitleBar.asWidget());
 		view.setBreadcrumb(breadcrumb.asWidget());
@@ -223,11 +223,8 @@ public class FilesTab implements FilesTabView.Presenter{
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		EntityPresenter.filterToDownloadARs(bundle);
-		
 		currentEntity = bundle.getEntity();
-		
 		currentEntityId = currentEntity.getId();
-		
 		boolean isFile = currentEntity instanceof FileEntity;
 		boolean isFolder = currentEntity instanceof Folder;
 		boolean isProject = currentEntity instanceof Project;
@@ -236,9 +233,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
-		
 		view.clearActionMenuContainer();
-		
 		//Preview
 		view.setPreviewVisible(isFile);
 		//File title bar
