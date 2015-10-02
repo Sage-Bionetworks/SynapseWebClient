@@ -231,7 +231,7 @@ public class AccessRequirementDialogTest {
 		verify(mockView, never()).showRequestAccessFromACTButton();
 		verify(mockView).showCloseButton();
 		
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false), anyString());
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
 	}
 	
 	@Test

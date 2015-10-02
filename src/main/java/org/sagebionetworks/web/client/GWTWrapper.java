@@ -32,4 +32,6 @@ public interface GWTWrapper {
 	String getUserAgent();
 	
 	String getAppVersion();
+	
+	int nextRandomInt();
 }

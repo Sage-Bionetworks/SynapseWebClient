@@ -232,7 +232,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void noWikiFound() {
 				//if wiki area not specified and no wiki found, show Files tab instead for projects 
 				// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
-				if(area == null) {							
+				if(area == null && entity instanceof Project) {							
 					tabs.showTab(filesTab.asTab());
 				}
 			}

@@ -96,7 +96,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			@Override
 			public void invoke(String entityId) {
 				areaToken = null;
-				getTargetBundle(entityId);
+				getTargetBundleAndDisplay(entityId);
 			}
 		});
 		initBreadcrumbLinkClickedHandler();
@@ -119,7 +119,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 					setTargetBundle(projectBundle);
 					tab.showTab();
 				} else {
-					getTargetBundle(entityId);
+					getTargetBundleAndDisplay(entityId);
 				}
 			};
 		};
@@ -141,7 +141,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			//configure based on project
 			setTargetBundle(projectBundle);
 		} else {
-			getTargetBundle(entity.getId());
+			getTargetBundleAndDisplay(entity.getId());
 		}
 	}
 	
@@ -193,7 +193,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		return actionMenu;
 	}
 	
-	public void getTargetBundle(String entityId) {
+	public void getTargetBundleAndDisplay(String entityId) {
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI | TABLE_DATA;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
