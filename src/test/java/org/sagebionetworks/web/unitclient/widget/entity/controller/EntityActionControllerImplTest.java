@@ -491,7 +491,7 @@ public class EntityActionControllerImplTest {
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
-		verify(mockGlobalApplicationState).gotoLastPlace(new Synapse(parentId, null, EntityArea.TABLES, null) );
+		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null) );
 	}
 	
 	@Test
