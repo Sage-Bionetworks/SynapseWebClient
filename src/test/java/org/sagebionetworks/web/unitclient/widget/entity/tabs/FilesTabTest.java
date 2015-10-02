@@ -16,10 +16,14 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
@@ -88,7 +92,14 @@ public class FilesTabTest {
 	FileEntity mockFileEntity;
 	@Mock
 	Folder mockFolderEntity;
-	
+	@Mock
+	Link mockLinkEntity;
+	@Mock
+	Reference mockReference;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
@@ -108,7 +119,8 @@ public class FilesTabTest {
 	String folderEntityId = "syn1";
 	String fileEntityId = "syn4444";
 	String entityId = "syn7777777";
-	
+	String linkEntityId = "syn333";
+	Long linkEntityVersion=3L;
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
@@ -120,9 +132,10 @@ public class FilesTabTest {
 		
 		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
 				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
-				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector);
+				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector,mockGlobalApplicationState);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFolderEntity.getId()).thenReturn(folderEntityId);
@@ -135,7 +148,9 @@ public class FilesTabTest {
 		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
 		when(mockPortalGinInjector.createEntityActionController()).thenReturn(mockEntityActionController);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
-		
+		when(mockLinkEntity.getLinksTo()).thenReturn(mockReference);
+		when(mockReference.getTargetId()).thenReturn(linkEntityId);
+		when(mockReference.getTargetVersionNumber()).thenReturn(linkEntityVersion);
 	}
 
 	@Test
@@ -319,6 +334,18 @@ public class FilesTabTest {
 		assertNull(place.getAreaToken());
 	}
 
+	@Test
+	public void testGetLinkBundleAndDisplay() {
+		when(mockEntityBundle.getEntity()).thenReturn(mockLinkEntity);
+		tab.getTargetBundleAndDisplay("syn303033", null);
+		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Synapse place = (Synapse)captor.getValue();
+		assertEquals(linkEntityId, place.getEntityId());
+		assertEquals(linkEntityVersion, place.getVersionNumber());
+		assertNull(place.getArea());
+		assertNull(place.getAreaToken());
+	}
 
 	@Test
 	public void testAsTab() {
