@@ -636,6 +636,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.EDIT_FILE_METADATA);
 		verify(mockEditFileMetadataModalWidget, never()).configure(any(FileEntity.class), anyString(), any(Callback.class));
 		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockView).showErrorMessage("Can only edit the metadata of the most recent file version.");
 	}
 	
 	@Test
