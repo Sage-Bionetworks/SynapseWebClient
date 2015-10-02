@@ -601,6 +601,45 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testEditFileMetadataIsCurrent(){
+		Entity file = new FileEntity();
+		file.setId(entityId);
+		file.setParentId(parentId);
+		entityBundle.setEntity(file);
+		
+		// Most current version represented by null
+		Synapse currentPlace = new Synapse(currentUserId, null, null, currentUserId);
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(currentPlace);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		// method under test
+		controller.onAction(Action.EDIT_FILE_METADATA);
+		verify(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testEditFileMetadataIsNotCurrent(){
+		Entity file = new FileEntity();
+		file.setId(entityId);
+		file.setParentId(parentId);
+		entityBundle.setEntity(file);
+		// currentPlace returns a non-null versionNumber
+		Synapse currentPlace = new Synapse(currentUserId, 1L, null, currentUserId);
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(currentPlace);
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockEditFileMetadataModalWidget).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
+		// method under test
+		controller.onAction(Action.EDIT_FILE_METADATA);
+		verify(mockEditFileMetadataModalWidget, never()).configure(any(FileEntity.class), anyString(), any(Callback.class));
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockView).showErrorMessage("Can only edit the metadata of the most recent file version.");
+	}
+	
+	@Test
 	public void testEditProjectMetadata(){
 		Entity project = new Project();
 		project.setId(entityId);
