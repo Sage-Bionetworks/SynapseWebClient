@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -119,10 +118,10 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), eq(suffix), any(Long.class));
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockBreadcrumb, never()).configure(anyList(), anyString());
 		verify(mockHistoryWidget).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
 		verify(mockView, times(2)).setWikiHistoryWidget(any(IsWidget.class));
@@ -140,7 +139,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		boolean canEdit = false;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
@@ -155,7 +154,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
@@ -170,7 +169,7 @@ public class WikiPageWidgetTest {
 		boolean canEdit = false;
 		boolean showSubpages = true;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 	
@@ -182,7 +181,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = false;
 		boolean canEdit = false;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, mockCallback, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, mockCallback, showSubpages);
 		verify(mockSynapseAlert).show404();
 		verify(mockCallback).noWikiFound();
 	}
@@ -194,7 +193,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, mockCallback, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, mockCallback, showSubpages);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 	
@@ -204,7 +203,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = false;
 		boolean canEdit = false;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		verify(mockSynapseAlert).show403();
 	}
 	
@@ -214,7 +213,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = false;
 		boolean canEdit = false;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(0);
 		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
@@ -228,7 +227,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		verify(mockSynapseAlert).handleException(any(Exception.class));
 	}
 	
@@ -287,7 +286,7 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		boolean canEdit = false;
 		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages, suffix);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		
 		// fail to reload wiki page
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));

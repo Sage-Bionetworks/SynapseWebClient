@@ -299,11 +299,11 @@ public class FilesTab implements FilesTabView.Presenter{
 						view.setWikiPageWidgetVisible(false);
 					}
 				};
-			wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), currentVersionNumber), canEdit, wikiCallback, false, "-files-tab");
+			wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), currentVersionNumber), canEdit, wikiCallback, false);
 			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 				@Override
 				public void invoke(String wikiPageId) {
-					wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), wikiPageId, currentVersionNumber), canEdit, wikiCallback, false, "-files-tab");
+					wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), wikiPageId, currentVersionNumber), canEdit, wikiCallback, false);
 				}
 			};
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);

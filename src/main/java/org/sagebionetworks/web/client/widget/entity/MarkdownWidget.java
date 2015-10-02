@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +49,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	private String md;
 	private WikiPageKey wikiKey;
 	private Long wikiVersionInView;
-	private String suffix;
 	private MarkdownWidgetView view;
 	private SynapseAlert synAlert;
 	
@@ -75,13 +75,13 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void configure(final String md, final WikiPageKey wikiKey, final String suffix, final Long wikiVersionInView) {
+	public void configure(final String md, final WikiPageKey wikiKey, final Long wikiVersionInView) {
 		clear();
 		this.md = md;
 		this.wikiKey = wikiKey;
-		this.suffix= suffix;
 		this.wikiVersionInView = wikiVersionInView;
-		synapseClient.markdown2Html(md, suffix, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
+		final String uniqueSuffix = new Date().getTime() + "";
+		synapseClient.markdown2Html(md, uniqueSuffix, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(final String result) {
 				view.callbackWhenAttached(new Callback() {
@@ -90,8 +90,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 						if(result != null && !result.isEmpty()) {
 							view.setEmptyVisible(false);
 							view.setMarkdown(result);
-							loadMath(wikiKey, suffix);
-							loadWidgets(wikiKey, suffix);
+							loadMath(wikiKey, uniqueSuffix);
+							loadWidgets(wikiKey, uniqueSuffix);
 							loadTableSorters();
 						} else {
 							view.setEmptyVisible(true);
@@ -203,14 +203,14 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		return contentTypes;
 	}
 	
-	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final String suffix, final boolean isIgnoreLoadingFailure) {
+	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isIgnoreLoadingFailure) {
 		synAlert.clear();
 		//get the wiki page
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				wikiKey.setWikiPageId(page.getId());
-				configure(page.getMarkdown(), wikiKey, suffix, null);
+				configure(page.getMarkdown(), wikiKey, null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -224,7 +224,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	
 	public void refresh() {
-		configure(md, wikiKey, suffix, null);
+		configure(md, wikiKey, null);
 	}
 	
 	public Widget asWidget() {

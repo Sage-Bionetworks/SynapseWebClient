@@ -184,7 +184,7 @@ public class MarkdownEditorWidgetTest {
 		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyString(), any(Long.class));
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).showPreviewModal();
 	}
 	
@@ -192,7 +192,7 @@ public class MarkdownEditorWidgetTest {
 	public void testPreviewFailure() throws Exception {
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyString(), any(Long.class));
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).showPreviewModal();
 	}
 	

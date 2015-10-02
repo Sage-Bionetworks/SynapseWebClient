@@ -150,7 +150,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		joinWidget.sendJoinRequestStep1(challengeInfoKey);
 		verify(mockView).setJoinWizardCallback(any(Callback.class));
-		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),anyString(), eq(false));
+		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(false));
 		verify(mockView).setCurrentWizardContent(mockWikiPageWidget);
 		verify(mockView, times(2)).setButtonsEnabled(anyBoolean());
 	}
@@ -186,7 +186,7 @@ public class JoinTeamWidgetTest {
 		verify(mockView).setCurrentWizardPanelVisible(true);
 		verify(mockView).setJoinWizardPrimaryButtonText("Accept");
 		verify(mockView).setCurrentWizardContent(mockWikiPageWidget);
-		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),anyString(), eq(true));
+		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(true));
 	}
 
 	

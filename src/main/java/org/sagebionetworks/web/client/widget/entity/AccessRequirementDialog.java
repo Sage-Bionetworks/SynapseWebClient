@@ -110,7 +110,7 @@ public class AccessRequirementDialog implements AccessRequirementDialogView.Pres
      		if (!DisplayUtils.isDefined(terms)) {
      			//get wiki terms
      			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-     			wikiPageWidget.configure(wikiKey, false, null, false, "-access-requirement-dialog");
+     			wikiPageWidget.configure(wikiKey, false, null, false);
      			view.showWikiTermsUI();
      		} else {
      			view.setTerms(terms);

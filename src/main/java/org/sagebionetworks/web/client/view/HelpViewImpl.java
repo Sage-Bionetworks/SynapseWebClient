@@ -76,7 +76,7 @@ public class HelpViewImpl extends Composite implements HelpView {
 			@Override
 			public void noWikiFound() {
 			}
-		}, false, "-help");
+		}, false);
 	}
 	
 	@Override

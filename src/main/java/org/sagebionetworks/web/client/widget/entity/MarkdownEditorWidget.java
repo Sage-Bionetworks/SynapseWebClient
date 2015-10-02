@@ -162,7 +162,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.configure(currentPage.getMarkdown());
 		view.setTitleEditorVisible(currentPage.getParentWikiId() != null);
 		view.setTitle(currentPage.getTitle());
-		formattingGuide.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, "-formatting-guide", true);
+		formattingGuide.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, true);
 		globalApplicationState.setIsEditing(true);
 		setMarkdownTextAreaHandlers();
   	  	resizeMarkdownTextArea();
@@ -232,7 +232,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void showPreview() {
 	    //get the html for the markdown
-		markdownPreview.configure(view.getMarkdown(), wikiKey, "-preview", null);
+		markdownPreview.configure(view.getMarkdown(), wikiKey, null);
 		view.showPreviewModal();
 	}
 	
