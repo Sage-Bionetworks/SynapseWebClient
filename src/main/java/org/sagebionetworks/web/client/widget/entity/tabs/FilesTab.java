@@ -9,10 +9,13 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
@@ -57,6 +60,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	PortalGinInjector ginInjector;
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
+	GlobalApplicationState globalApplicationState;
 	Entity currentEntity;
 	String currentEntityId;
 	Long currentVersionNumber;
@@ -80,7 +84,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
-			PortalGinInjector ginInjector
+			PortalGinInjector ginInjector,
+			GlobalApplicationState globalApplicationState
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -94,6 +99,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 		
 		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
@@ -115,7 +121,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		EntitySelectedHandler entitySelectedHandler = new EntitySelectedHandler() {
 			@Override
 			public void onSelection(EntitySelectedEvent event) {
-				getTargetBundle(event.getSelectedEntityId(), null);
+				getTargetBundleAndDisplay(event.getSelectedEntityId(), null);
 			}
 		};
 		filesBrowser.setEntitySelectedHandler(entitySelectedHandler);
@@ -134,7 +140,7 @@ public class FilesTab implements FilesTabView.Presenter{
 					setTargetBundle(projectBundle);
 					tab.showTab();
 				} else {
-					getTargetBundle(entityId, versionNumber);
+					getTargetBundleAndDisplay(entityId, versionNumber);
 				}
 			};
 		};
@@ -177,7 +183,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			//configure based on the project bundle
 			setTargetBundle(projectBundle);
 		} else {
-			getTargetBundle(targetEntity.getId(), versionNumber);
+			getTargetBundleAndDisplay(targetEntity.getId(), versionNumber);
 		}
 	}
 	
@@ -192,7 +198,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		return a == b || (a != null && a.equals(b));
 	}
 	  
-	public void getTargetBundle(String entityId, Long versionNumber) {
+	public void getTargetBundleAndDisplay(String entityId, Long versionNumber) {
 		//only ask for it if we are showing a different entity/version
 		if (equal(currentEntityId,entityId) && equal(currentVersionNumber, versionNumber)) {
 			return;
@@ -205,6 +211,16 @@ public class FilesTab implements FilesTabView.Presenter{
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
+				if (bundle.getEntity() instanceof Link) {
+					//short circuit.  redirect to target entity
+					Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+					//go to link target
+					String entityId = ref.getTargetId();
+					Long versionNumber = ref.getTargetVersionNumber();
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
+					return;
+				}
+				
 				setTargetBundle(bundle);
 				tab.showTab();
 			}

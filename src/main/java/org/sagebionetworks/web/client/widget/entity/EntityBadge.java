@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
@@ -92,6 +93,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				className = Project.class.getName();
 			} else if (entityType.equalsIgnoreCase("table")) {
 				className = TableEntity.class.getName();
+			} else if (entityType.equalsIgnoreCase("link")) {
+				className = Link.class.getName();
 			}
 		}
 		return DisplayUtils.getIconTypeForEntityClassName(className);
