@@ -29,7 +29,7 @@
 		<gwtboostrap3.version>1.2-gwt-2.7.0</gwtboostrap3.version>
 		<gwtboostrap3.extras.version>1.0-gwt-2.7.0</gwtboostrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gwtvisualizationwrappers.version>1.4-gwt-2.7.0</gwtvisualizationwrappers.version>
+		<gwtvisualizationwrappers.version>1.5-gwt-2.7.0</gwtvisualizationwrappers.version>
 	</properties>
 
 	<repositories>
