@@ -28,8 +28,6 @@ public class EntityViewImpl implements EntityView {
 	@UiField
 	SimplePanel synAlertContainer;
 	@UiField
-	Image entityBackgroundImage;
-	@UiField
 	HTMLPanel loadingUI;
 	@UiField
 	Heading accessDependentMessage;
@@ -97,17 +95,6 @@ public class EntityViewImpl implements EntityView {
 		accessDependentMessage.setVisible(false);
 		loadingUI.setVisible(false);
 		Window.scrollTo(0, 0); // scroll user to top of page
-	}
-
-	
-	@Override
-	public void setBackgroundImageVisible(boolean isVisible) {
-		entityBackgroundImage.setVisible(isVisible);
-	}
-
-	@Override
-	public void setBackgroundImageUrl(String url) {
-		entityBackgroundImage.setUrl(url);
 	}
 	
 	@Override

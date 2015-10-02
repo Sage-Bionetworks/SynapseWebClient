@@ -32,7 +32,6 @@ import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {
@@ -192,6 +191,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 	public void setEntitySelectedHandler(EntitySelectedHandler handler) {
 		entitySelectedHandler = handler;
+		//if adding a selection handler, then the component user want to make this selectable
+		makeSelectable();
 	}
 	
 	public EntitySelectedHandler getEntitySelectedHandler() {
@@ -235,7 +236,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
   
 	public void fireEntitySelectedEvent() {
 		if (entitySelectedHandler != null) {
-			entitySelectedHandler.onSelection(new EntitySelectedEvent());
+			entitySelectedHandler.onSelection(new EntitySelectedEvent(getSelected()));
 		}
 	}
 

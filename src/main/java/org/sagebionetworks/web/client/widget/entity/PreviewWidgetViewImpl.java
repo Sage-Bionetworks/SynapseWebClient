@@ -150,5 +150,4 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		clear();
 		add(w);
 	}
-	
 }

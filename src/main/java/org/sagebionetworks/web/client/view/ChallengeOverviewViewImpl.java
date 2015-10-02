@@ -98,7 +98,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 			@Override
 			public void noWikiFound() {
 			}
-		}, false);
+		}, false, "-challenge-overview");
 	}
 
 	@Override

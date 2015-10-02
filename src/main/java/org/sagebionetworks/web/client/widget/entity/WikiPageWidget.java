@@ -55,7 +55,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
 	private WikiPage currentPage;
-	private boolean isEmbeddedInOwnerPage;
+	private boolean showSubpages;
 	
 	// widgets
 	private SynapseAlert synapseAlert;
@@ -65,7 +65,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private WikiSubpagesWidget wikiSubpages;
 	private UserBadge createdByBadge;
 	private UserBadge modifiedByBadge;	
-
+	
+	private String suffix;
+	
 	public interface Callback{
 		public void pageUpdated();
 		public void noWikiFound();
@@ -109,6 +111,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
 
 	public void showWikiHistory(boolean isVisible) {
 		view.setWikiHistoryVisible(isVisible);
@@ -121,16 +127,17 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
-			final Callback callback, final boolean isEmbeddedInOwnerPage) {
+			final Callback callback, final boolean showSubpages, String suffix) {
 		clear();
 		view.setMainPanelVisible(true);
 		view.setLoadingVisible(true);
 		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
 		this.wikiKey = wikiKey;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.showSubpages = showSubpages;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
+		this.suffix = suffix;
 		this.synapseAlert.clear();
 		// set up callback
 		if (callback != null)
@@ -156,7 +163,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 							updateCurrentPage(result);
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							configureBreadcrumbs(isRootWiki, ownerObjectName);
-							configureWikiSubpagesWidget(isEmbeddedInOwnerPage);	
+							view.setWikiSubpagesWidgetVisible(showSubpages);
+							if (showSubpages) {
+								configureWikiSubpagesWidget();	
+							}
 							view.setLoadingVisible(false);
 						} catch (Exception e) {
 							onFailure(e);
@@ -175,21 +185,21 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void resetWikiMarkdown(String markdown) {
 		view.setMarkdownVisible(true);
 		if(!isCurrentVersion) {
-			markdownWidget.configure(markdown, wikiKey, false, versionInView);
+			markdownWidget.configure(markdown, wikiKey, suffix, versionInView);
 			view.setDiffVersionAlertVisible(true);
 			if (canEdit) {
 				view.setRestoreButtonVisible(true);
 			}
 		} else {
-			markdownWidget.configure(markdown, wikiKey, false, null);
+			markdownWidget.configure(markdown, wikiKey, suffix, null);
 		}
 	}
 	
 	@Override
-	public void configureWikiSubpagesWidget(boolean isEmbeddedInOwnerPage) {
+	public void configureWikiSubpagesWidget() {
 		//check configuration of wikiKey
 		view.setWikiSubpagesContainers(wikiSubpages);
-		wikiSubpages.configure(wikiKey, null, isEmbeddedInOwnerPage, new CallbackP<WikiPageKey>() {
+		wikiSubpages.configure(wikiKey, null, true, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
 				wikiKey = param;
@@ -285,7 +295,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	private void refresh() {
 		view.setMainPanelVisible(true);
-		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
+		configure(wikiKey, canEdit, callback, showSubpages, suffix);
 	}
 
 	@Override
@@ -409,7 +419,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		if (caught instanceof NotFoundException && callback != null) {
 			callback.noWikiFound();
 		}
-		if (isEmbeddedInOwnerPage) {
+		if (showSubpages) {
 			view.setMarkdownVisible(false);
 			view.setWikiHistoryVisible(false);			
 			if (caught instanceof NotFoundException) {

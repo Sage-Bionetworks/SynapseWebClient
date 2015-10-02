@@ -90,8 +90,6 @@ public class WikiSubpageNavigationTreeTest {
 	public void testConfigure() {
 		Synapse rootPlace = new Synapse("");
 		tree.configure(wikiHeaders, ownerObjectName, rootPlace, currentWikiKey, true, mockReloadWikiPageCallback);
-		Synapse currentPlace = new Synapse(currentWikiKey.getOwnerObjectId(), currentWikiKey.getVersion(), Synapse.EntityArea.WIKI, currentWikiKey.getWikiPageId());
-		Mockito.verify(mockGlobalApplicationState).pushCurrentPlace(currentPlace);
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
 		SubpageNavTreeNode cNode = bNode.getChildren().get(0);

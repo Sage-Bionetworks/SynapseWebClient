@@ -663,6 +663,9 @@ a.shortBtn {
 .min-height-200 {
 	min-height: 200px;
 }
+.min-height-48 {
+	min-height: 48px;
+}
 
 .profile-image-40px {
 	width: 40px;	
@@ -1619,6 +1622,7 @@ ol.lowerroman {
 .align-center {display: block; margin-left: auto; margin-right: auto;}
 .text-align-center { text-align: center;}
 
+
 .bottomright {
 	position: absolute;
 	bottom: 0;
@@ -1852,12 +1856,6 @@ a.projectTitle:hover {
 	color: #555;
 } 
 
-.entityBackgroundImage {
-	position: absolute;
-    width: 100%;
-    z-index: -1;
-}
-
 .dropLargeIconText {
 	position: relative;
 	top: 4px;
@@ -1881,6 +1879,9 @@ a.projectTitle:hover {
 .entity-tab {
 	width: 140px;
 	font-size: 16px;	
+}
+.entity-tab > a {
+	text-align: center;
 }
 
 .rowAdaptiveHeight{
@@ -2050,13 +2051,6 @@ iframe[seamless] {
 .x-menu-list-item>a:visited,
 .x-menu-list-item>a:visited>* {
 	color: #333 !important;
-}
-
-.entity-tabs > li.active > a,
-.entity-tabs > li.active > a:hover,
-.entity-tabs > li.active > a:focus {
-	background-color: #f9f9f9 !important;
-	cursor: pointer !important;
 }
 
 /* popups with very long values (like some urls) are shown out of bounds in bootstrap. */

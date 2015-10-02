@@ -80,7 +80,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
 		this.globalApplicationState = globalApplicationState;
-		this.markdownPreview = markdownPreview;
 		widgetSelectionState = new WidgetSelectionState();
 		markdownPreview = ginInjector.getMarkdownWidget();
 		formattingGuide = ginInjector.getMarkdownWidget();
@@ -163,7 +162,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.configure(currentPage.getMarkdown());
 		view.setTitleEditorVisible(currentPage.getParentWikiId() != null);
 		view.setTitle(currentPage.getTitle());
-		formattingGuide.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false, true);
+		formattingGuide.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, "-formatting-guide", true);
 		globalApplicationState.setIsEditing(true);
 		setMarkdownTextAreaHandlers();
   	  	resizeMarkdownTextArea();
@@ -233,7 +232,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void showPreview() {
 	    //get the html for the markdown
-		markdownPreview.configure(view.getMarkdown(), wikiKey, true, null);
+		markdownPreview.configure(view.getMarkdown(), wikiKey, "-preview", null);
 		view.showPreviewModal();
 	}
 	

@@ -47,9 +47,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	private ResourceLoader resourceLoader;
 	private String md;
 	private WikiPageKey wikiKey;
-	private boolean isPreview;
 	private Long wikiVersionInView;
-	
+	private String suffix;
 	private MarkdownWidgetView view;
 	private SynapseAlert synAlert;
 	
@@ -76,13 +75,13 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	}
 	
 	@Override
-	public void configure(final String md, final WikiPageKey wikiKey, final boolean isPreview, final Long wikiVersionInView) {
+	public void configure(final String md, final WikiPageKey wikiKey, final String suffix, final Long wikiVersionInView) {
 		clear();
 		this.md = md;
 		this.wikiKey = wikiKey;
-		this.isPreview= isPreview;
+		this.suffix= suffix;
 		this.wikiVersionInView = wikiVersionInView;
-		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
+		synapseClient.markdown2Html(md, suffix, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(final String result) {
 				view.callbackWhenAttached(new Callback() {
@@ -91,8 +90,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 						if(result != null && !result.isEmpty()) {
 							view.setEmptyVisible(false);
 							view.setMarkdown(result);
-							loadMath(wikiKey, isPreview);
-							loadWidgets(wikiKey, isPreview);
+							loadMath(wikiKey, suffix);
+							loadWidgets(wikiKey, suffix);
 							loadTableSorters();
 						} else {
 							view.setEmptyVisible(true);
@@ -126,8 +125,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		}
 	}
 	
-	public void loadMath(WikiPageKey wikiKey, boolean isPreview) {
-		final String suffix = isPreview ? "-preview" : "";
+	public void loadMath(WikiPageKey wikiKey, String suffix) {
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = WidgetConstants.DIV_ID_MATHJAX_PREFIX + i + suffix;
@@ -164,9 +162,8 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		}
 	}
 	
-	public Set<String> loadWidgets(WikiPageKey wikiKey, boolean isPreview) {
+	public Set<String> loadWidgets(WikiPageKey wikiKey, String suffix) {
 		Set<String> contentTypes = new HashSet<String>();
-		final String suffix = isPreview ? "-preview" : "";
 		//look for every element that has the right format
 		int i = 0;
 		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
@@ -206,14 +203,14 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		return contentTypes;
 	}
 	
-	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview, final boolean isIgnoreLoadingFailure) {
+	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final String suffix, final boolean isIgnoreLoadingFailure) {
 		synAlert.clear();
 		//get the wiki page
 		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				wikiKey.setWikiPageId(page.getId());
-				configure(page.getMarkdown(), wikiKey, isPreview, null);
+				configure(page.getMarkdown(), wikiKey, suffix, null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -227,7 +224,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
 	
 	public void refresh() {
-		configure(md, wikiKey, isPreview, null);
+		configure(md, wikiKey, suffix, null);
 	}
 	
 	public Widget asWidget() {

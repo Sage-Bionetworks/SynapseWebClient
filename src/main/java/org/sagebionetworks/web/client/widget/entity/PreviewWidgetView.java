@@ -14,6 +14,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setImagePreview(String fullFileUrl, String previewUrl);
 	public void setCodePreview(String text);
 	public void setTextPreview(String text);
+	public void setHeight(String height);
 	/**
 	 * text must not be escaped (a regular expression will be used to split it into cells)
 	 * @param text
