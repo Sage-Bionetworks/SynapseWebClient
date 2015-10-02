@@ -80,7 +80,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
-		final String uniqueSuffix = new Date().getTime() + "";
+		final String uniqueSuffix = new Date().getTime() + "-" + gwt.nextRandomInt();
 		synapseClient.markdown2Html(md, uniqueSuffix, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(final String result) {

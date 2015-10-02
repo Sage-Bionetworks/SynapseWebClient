@@ -7,6 +7,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Navigator;
@@ -89,6 +90,11 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public String getAppVersion() {
 		return Navigator.getAppVersion();
+	}
+	
+	@Override
+	public int nextRandomInt() {
+		return Random.nextInt();
 	}
 	
 }
