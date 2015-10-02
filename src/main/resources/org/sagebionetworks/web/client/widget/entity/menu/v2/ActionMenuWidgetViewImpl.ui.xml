@@ -25,7 +25,7 @@
 						addStyleNames="dropdown-menu-right">
 						<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_TABLE_DATA">Upload
 							Data To Table</a:ActionMenuItem>
-						<a:ActionMenuItem action="EDIT_TABLE_DATA">Edit
+						<a:ActionMenuItem icon="EDIT" action="EDIT_TABLE_DATA">Edit
 							Query Results</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DOWNLOAD"
 							action="DOWNLOAD_TABLE_QUERY_RESULTS">Download Query Results</a:ActionMenuItem>
@@ -40,7 +40,7 @@
 						<a:ActionMenuItem icon="CODE_FORK" action="EDIT_PROVENANCE">Edit Provenance</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TROPHY" action="SUBMIT_TO_CHALLENGE">Submit To Challenge</a:ActionMenuItem>
 						<a:ActionMenuItem icon="ARROWS" action="MOVE_ENTITY">Move</a:ActionMenuItem>
-						<a:ActionMenuItem action="CREATE_DOI">Create DOI</a:ActionMenuItem>
+						<a:ActionMenuItem icon="EXTERNAL_LINK" action="CREATE_DOI">Create DOI</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DATABASE" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
 						<a:ActionMenuItem icon="LINK" action="CREATE_LINK">Save Link to This Page</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TRASH_O" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
