@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
@@ -25,6 +26,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 import org.sagebionetworks.repo.model.EntityType;
 
 /**
@@ -47,7 +49,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private boolean canEdit;
 	private EntityQuery query;
 	private EntityBundle parentBundle;
-	
+	private CallbackP<String> onTableClickCallback;
 	@Inject
 	public TableListWidget(PreflightController preflightController,
 			TableListWidgetView view,
@@ -192,6 +194,21 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public void tableCreated() {
 		// Back to page one.
 		queryForOnePage(OFFSET_ZERO);
+	}
+	
+	/**
+	 * Invokes callback when a table entity is clicked in the table list. 
+	 * @param callback
+	 */
+	public void setTableClickedCallback(CallbackP<String> callback) {
+		this.onTableClickCallback = callback;
+	}
+	
+	@Override
+	public void onTableClicked(String entityId) {
+		if (onTableClickCallback != null) {
+			onTableClickCallback.invoke(entityId);
+		}
 	}
 	
 }

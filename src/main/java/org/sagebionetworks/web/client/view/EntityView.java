@@ -36,8 +36,6 @@ public interface EntityView extends IsWidget {
 	 * @param entity
 	 * @param entityMetadata 
 	 */
-	void setBackgroundImageVisible(boolean isVisible);
-	void setBackgroundImageUrl(String url);
 	void setFooterWidget(IsWidget footerWidget);
 	void setHeaderWidget(IsWidget headerWidget);
 	void setEntityPageTopWidget(IsWidget entityPageTopWidget);

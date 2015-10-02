@@ -121,11 +121,16 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@Override
 	public void configure(String entityId, boolean canCertifiedUserAddChild) {
 		entityTreeBrowser.configure(entityId);
+		
 		if (canCertifiedUserAddChild) {
 			topBar.setVisible(true);
 		}
 	}
-
+	
+	public void setEntitySelectedHandler(org.sagebionetworks.web.client.events.EntitySelectedHandler handler) {
+		entityTreeBrowser.setEntitySelectedHandler(handler);
+	};
+	
 	@Override
 	public void showQuizInfoDialog() {
 		quizInfoDialog.show();

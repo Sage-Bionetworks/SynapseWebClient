@@ -10,13 +10,12 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,7 +24,8 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 
 	private BreadcrumbView view;
 	private GlobalApplicationState globalApplicationState;
-
+	private CallbackP<Place> callback;
+	
 	@Inject
 	public Breadcrumb(BreadcrumbView view, GlobalApplicationState globalApplicationState) {
 		this.view = view;
@@ -89,10 +89,19 @@ public class Breadcrumb implements BreadcrumbView.Presenter, SynapseWidgetPresen
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
+	public void setLinkClickedHandler(CallbackP<Place> callback) {
+		this.callback = callback;
+	}
 
 	@Override
 	public void goTo(Place place) {
-		globalApplicationState.getPlaceChanger().goTo(place);
+		if (callback == null) {
+			globalApplicationState.getPlaceChanger().goTo(place);	
+		} else {
+			callback.invoke(place);
+		}
+		
 	}
 
 }

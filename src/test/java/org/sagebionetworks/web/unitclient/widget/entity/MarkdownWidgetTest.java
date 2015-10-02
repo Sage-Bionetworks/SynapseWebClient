@@ -81,20 +81,20 @@ public class MarkdownWidgetTest {
 	
 	@Test
 	public void testConfigureSuccess() {
-		boolean isPreview = true;
+		String suffix = "-markdown-widget-test";
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
 		
-		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
 		//only the first getElementById called by each getElementById finds its target so it doesn't look forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
-		when(mockView.getElementById(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0" + "-preview")).thenReturn(mockElementWrapper);
-		when(mockView.getElementById(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + "-preview")).thenReturn(mockElementWrapper);
+		when(mockView.getElementById(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0" + suffix)).thenReturn(mockElementWrapper);
+		when(mockView.getElementById(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + suffix)).thenReturn(mockElementWrapper);
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
-		presenter.configure(testMarkdown, mockWikiPageKey, isPreview, null);
+		presenter.configure(testMarkdown, mockWikiPageKey, suffix, null);
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
-		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(suffix), anyBoolean(), anyString(), any(AsyncCallback.class));
 		verify(mockView).setMarkdown(sampleHTML);
 		
 		// Called three times between tablesorter, loadMath, and loadWidgets, 
@@ -111,38 +111,36 @@ public class MarkdownWidgetTest {
 		verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptor(Mockito.eq(mockWikiPageKey), anyString(), anyMap(), any(Callback.class), any(Long.class));
-		verify(mockView).addWidget(any(Widget.class), Mockito.eq(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + "-preview"));
+		verify(mockView).addWidget(any(Widget.class), Mockito.eq(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + suffix));
 	}
 	
 	@Test
 	public void testConfigureFailure() {
-		boolean isPreview = true;
-		
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
-		presenter.configure(testMarkdown, mockWikiPageKey, isPreview, null);
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		presenter.configure(testMarkdown, mockWikiPageKey, "-suffix", null);
 		
 		verify(mockSynAlert).handleException(caught);
 	}
 	
 	@Test
 	public void testLoadMarkdownFromWikiPageSuccess() {
-		boolean isPreview = true;
+		String suffix = "-markdown-widget-test";
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
 		AsyncMockStubber.callSuccessWith(mockWikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
 		//only the first getElementById called by each getElementById finds its target so it doesn't look forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
-		when(mockView.getElementById(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0" + "-preview")).thenReturn(mockElementWrapper);
-		when(mockView.getElementById(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + "-preview")).thenReturn(mockElementWrapper);
+		when(mockView.getElementById(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0" + suffix)).thenReturn(mockElementWrapper);
+		when(mockView.getElementById(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + suffix)).thenReturn(mockElementWrapper);
 		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
 		
-		presenter.loadMarkdownFromWikiPage(mockWikiPageKey, isPreview, true);
+		presenter.loadMarkdownFromWikiPage(mockWikiPageKey, suffix, true);
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
 		verify(mockWikiPageKey).setWikiPageId(anyString());
 		
-		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(suffix), anyBoolean(), anyString(), any(AsyncCallback.class));
 		verify(mockView, Mockito.times(2)).setEmptyVisible(false);
 		verify(mockView).clearMarkdown();
 		verify(mockView).setMarkdown(sampleHTML);
@@ -160,23 +158,23 @@ public class MarkdownWidgetTest {
 		verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetDescriptor(elementContentType);
 		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), anyMap(), any(Callback.class), any(Long.class));
-		verify(mockView).addWidget(any(Widget.class), Mockito.eq(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + "-preview"));
+		verify(mockView).addWidget(any(Widget.class), Mockito.eq(org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "0" + suffix));
 	}
 	
 
 	@Test
 	public void testLoadMarkdownFromWikiEmpty() {
-		boolean isPreview = true;
+		String suffix = "-markdown-widget-test";
 		String sampleHTML = "";
-		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(sampleHTML).when(mockSynapseClient).markdown2Html(anyString(), anyString(), anyBoolean(), anyString(), any(AsyncCallback.class));
 		String markdown="input markdown that is transformed into empty html";
-		presenter.configure(markdown, mockWikiPageKey, isPreview, 1L);
+		presenter.configure(markdown, mockWikiPageKey, suffix, 1L);
 		
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(isPreview), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).markdown2Html(anyString(), Mockito.eq(suffix), anyBoolean(), anyString(), any(AsyncCallback.class));
 		verify(mockView).setEmptyVisible(false);
 		verify(mockView).setEmptyVisible(true);
 		verify(mockView).clearMarkdown();
@@ -185,9 +183,9 @@ public class MarkdownWidgetTest {
 	
 	@Test
 	public void testLoadMarkdownFromWikiPageFailure() {
-		boolean isPreview = true;
+		String suffix = "-markdown-widget-test";
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.loadMarkdownFromWikiPage(mockWikiPageKey, isPreview, false);
+		presenter.loadMarkdownFromWikiPage(mockWikiPageKey, suffix, false);
 		verify(mockSynAlert).showError(anyString());
 	}
 }

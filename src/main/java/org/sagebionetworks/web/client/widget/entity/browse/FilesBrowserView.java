@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.UploadView;
+import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,6 +27,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 
 	public void setNewFolderDialogVisible(boolean visible);
 
+	public void setEntitySelectedHandler(EntitySelectedHandler handler);
 	/**
 	 * Presenter interface
 	 */
