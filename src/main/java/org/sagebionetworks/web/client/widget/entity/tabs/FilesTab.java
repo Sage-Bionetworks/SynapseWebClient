@@ -174,6 +174,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFolderTitlebarVisible(false);
 		view.setPreviewVisible(false);
 		view.setMetadataVisible(false);
+		view.setWikiPageWidgetVisible(false);
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
