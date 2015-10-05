@@ -193,6 +193,7 @@ public class FilesTabTest {
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
 		verify(mockView, times(2)).setPreviewVisible(false);
 		verify(mockView, times(2)).setMetadataVisible(false);
+		verify(mockView, times(2)).setWikiPageWidgetVisible(false);
 		
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 		//show project info
@@ -202,7 +203,6 @@ public class FilesTabTest {
 		verify(mockView).setProgrammaticClientsVisible(false);
 		verify(mockView).setProvenanceVisible(false);
 		verify(mockView).configureModifiedAndCreatedWidget(mockProjectEntity);
-		verify(mockView).setWikiPageWidgetVisible(false);
 		
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(entityId, canCertifiedUserAddChild, isCertifiedUser);
@@ -239,6 +239,8 @@ public class FilesTabTest {
 		verify(mockView).setPreviewVisible(true);
 		verify(mockView).setMetadataVisible(false);
 		verify(mockView).setMetadataVisible(true);
+		verify(mockView).setWikiPageWidgetVisible(false);
+		verify(mockView).setWikiPageWidgetVisible(true);
 		
 		verify(mockFileTitleBar).configure(mockEntityBundle);
 		verify(mockPreviewWidget).configure(mockEntityBundle);
@@ -302,6 +304,8 @@ public class FilesTabTest {
 		verify(mockView, times(2)).setPreviewVisible(false);
 		verify(mockView).setMetadataVisible(false);
 		verify(mockView).setMetadataVisible(true);
+		verify(mockView).setWikiPageWidgetVisible(false);
+		verify(mockView).setWikiPageWidgetVisible(true);
 		
 		verify(mockBasicTitleBar).configure(mockEntityBundle);
 		
