@@ -7,8 +7,11 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.base.form.AbstractForm;
+import org.gwtbootstrap3.client.ui.base.form.AbstractForm.SubmitCompleteEvent;
 import org.gwtbootstrap3.client.ui.html.Text;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -43,14 +46,22 @@ public class LoginModalViewImpl implements LoginModalView {
 	Alert alert;
 	
 	Modal modal;
+	Presenter presenter;
 	
 	@Inject
 	public LoginModalViewImpl(Binder binder){
 		modal = binder.createAndBindUi(this);
+		formPanel.addSubmitCompleteHandler(new AbstractForm.SubmitCompleteHandler() {
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				presenter.onSubmitComplete(event.getResults());			
+			}
+		});
 	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
+		this.presenter = presenter;
 		KeyDownHandler login = new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {

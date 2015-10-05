@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -28,10 +32,29 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 
 	@Override
 	public void onPrimary() {
+		setLoading(true);
 		view.submitForm(action, method, encodingType);
-		view.hideModal();
 	}
-
+	
+	@Override
+	public void onSubmitComplete(String resultHtml) {
+		/**
+		 * Unfortunately, gwt does not have a nice way to ask for the status code of a submit complete event, so we need to parse it :(
+		 * https://groups.google.com/forum/#!topic/google-web-toolkit/yuHZkiL-x5U
+		 * https://groups.google.com/forum/#!topic/google-web-toolkit/v7Qi8cbp0MM
+		 */
+		if(resultHtml == null) resultHtml = "";
+		//try to parse
+		UploadResult uploadResult = AddAttachmentHelper.getUploadResult(resultHtml);
+		onSubmitComplete(uploadResult);
+	}
+	public void onSubmitComplete(UploadResult uploadResult) {
+		if (UploadStatus.SUCCESS.equals(uploadResult.getUploadStatus())) {
+			view.hideModal();
+		} else {
+			setErrorMessage(uploadResult.getMessage());
+		}
+	}
 	
 	public void setLoading(boolean loading) {
 		view.showAlert(false);

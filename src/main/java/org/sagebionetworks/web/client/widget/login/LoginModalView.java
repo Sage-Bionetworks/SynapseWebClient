@@ -15,6 +15,7 @@ public interface LoginModalView extends IsWidget {
 		 * Called when the primary button is pressed.
 		 */
 		void onPrimary();
+		void onSubmitComplete(String results);
 	}
 
 	/**
