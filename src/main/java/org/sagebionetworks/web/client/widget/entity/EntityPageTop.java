@@ -222,6 +222,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 	
 	public void configureWikiTab() {
+		final boolean isWikiTabShown = (area == null && entity instanceof Project) || area == EntityArea.WIKI;
 		final boolean canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
 		final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 			@Override
@@ -232,7 +233,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void noWikiFound() {
 				//if wiki area not specified and no wiki found, show Files tab instead for projects 
 				// Note: The fix for SWC-1785 was to set this check to area == null.  Prior to this change it was area != WIKI.
-				if(area == null && entity instanceof Project) {							
+				if(isWikiTabShown) {
 					tabs.showTab(filesTab.asTab());
 				}
 			}
@@ -242,6 +243,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		wikiTab.configure(projectBundle.getEntity().getId(), wikiId, 
 				canEdit, callback);
 		
+		if (isWikiTabShown) {
+			//initially push the configured place into the browser history
+			tabs.showTab(wikiTab.asTab());
+		}
+
 		CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 			@Override
 			public void invoke(String wikiPageId) {
