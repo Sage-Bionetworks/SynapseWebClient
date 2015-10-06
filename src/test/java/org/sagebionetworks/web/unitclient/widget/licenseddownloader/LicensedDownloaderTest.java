@@ -239,11 +239,12 @@ public class LicensedDownloaderTest {
 	public void testGetDirectDownloadUrlFileEntity() {
 		String entityId = "syn99999";
 		Long versionNumber = 8888L;
+		String filename = "test.txt";
 		FileEntity f = new FileEntity();
 		FileHandle h = new S3FileHandle();
 		f.setId(entityId);
 		f.setVersionNumber(versionNumber);
-		String downloadUrl = licensedDownloader.getDirectDownloadURL(f, h);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(f, h, filename);
 		assertTrue(downloadUrl.startsWith(baseFileHandleUrl));
 		assertTrue(downloadUrl.contains(entityId));
 		assertTrue(downloadUrl.contains(Long.toString(versionNumber)));
@@ -253,23 +254,27 @@ public class LicensedDownloaderTest {
 	public void testGetDirectDownloadUrlExternalFileEntity() {
 		ExternalFileHandle h = new ExternalFileHandle();
 		String url = "http://www.jhodgson.com/test.txt";
+		String filename = "override.txt";
 		h.setExternalURL(url);
-		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h, filename);
 		assertEquals(url, downloadUrl);
 	}
 	
 	@Test
 	public void testGetDirectDownloadUrlSftpExternalFileEntity() {
+		String filename = "override.txt";
 		String sftpProxy = "http://mytestproxy.com/sftp";
 		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
 		
 		ExternalFileHandle h = new ExternalFileHandle();
 		String url = "sftp://www.jhodgson.com/test.txt";
-		when(mockGwt.encodeQueryString(anyString())).thenReturn(url);
+		when(mockGwt.encodeQueryString(url)).thenReturn(url);
+		when(mockGwt.encodeQueryString(filename)).thenReturn(filename);
 		h.setExternalURL(url);
-		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h, filename);
 		
 		assertTrue(downloadUrl.startsWith(sftpProxy));
 		assertTrue(downloadUrl.contains(url));
+		assertTrue(downloadUrl.contains(filename));
 	}
 }
