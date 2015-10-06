@@ -290,13 +290,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param globalAppState
 	 * @return
 	 */
-	public static String getSftpProxyLink(String realSftpUrl, GlobalApplicationState globalAppState, GWTWrapper gwt) {
+	public static String getSftpProxyLink(String fileNameOverride, String realSftpUrl, GlobalApplicationState globalAppState, GWTWrapper gwt) {
 		String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 		if (sftpProxy != null) {
 			String delimiter = sftpProxy.contains("?") ? "&" : "?";
 			
 			String escapedRealSftpUrl = gwt.encodeQueryString(realSftpUrl);
-			return sftpProxy + delimiter + "url="+escapedRealSftpUrl;
+			String escapedFileNameOverride = gwt.encodeQueryString(fileNameOverride);
+			return sftpProxy + delimiter + "url="+escapedRealSftpUrl + "&filename=" + escapedFileNameOverride;
 		} else {
 			//unlikely state
 			throw new IllegalArgumentException("Unable to determine SFTP endpoint");
@@ -308,7 +309,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			Callback callback = new Callback() {
 				@Override
 				public void invoke() {
-					view.submitForm(getSftpProxyLink(url, globalAppState, gwt));		
+					view.submitForm(getSftpProxyLink("", url, globalAppState, gwt));		
 				}
 			};
 			checkForExistingFileName(fileNames[currIndex], callback);

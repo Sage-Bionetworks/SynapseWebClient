@@ -7,21 +7,23 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.base.form.AbstractForm;
-import org.gwtbootstrap3.client.ui.base.form.AbstractForm.SubmitCompleteEvent;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.EventHandlerUtils;
+import org.sagebionetworks.web.client.utils.JavaScriptCallback;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -47,18 +49,32 @@ public class LoginModalViewImpl implements LoginModalView {
 	
 	Modal modal;
 	Presenter presenter;
+	private HandlerRegistration messageHandler;
 	
 	@Inject
 	public LoginModalViewImpl(Binder binder){
 		modal = binder.createAndBindUi(this);
-		formPanel.addSubmitCompleteHandler(new AbstractForm.SubmitCompleteHandler() {
+		modal.addAttachHandler(new AttachEvent.Handler() {
 			@Override
-			public void onSubmitComplete(SubmitCompleteEvent event) {
-				presenter.onSubmitComplete(event.getResults());			
+			public void onAttachOrDetach(AttachEvent event) {
+				if (event.isAttached())
+					onAttach();
 			}
 		});
 	}
-
+	
+	public void onAttach() {
+		//register to listen for the "message" events
+		if (messageHandler == null) {
+			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
+				@Override
+				public void invoke(JavaScriptObject event) {
+					presenter.onSubmitComplete(UploaderViewImpl._getMessage(event));
+				}
+			});
+		}
+	}
+	
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;

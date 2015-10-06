@@ -116,7 +116,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 				if (this.authenticationController.isLoggedIn()) {
 					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 					if (fileHandle != null) {
-						directDownloadURL = getDirectDownloadURL(fileEntity, fileHandle);
+						String fileNameOverride = entityBundle.getFileName();
+						directDownloadURL = getDirectDownloadURL(fileEntity, fileHandle, fileNameOverride);
 					}
 				}
 			}
@@ -173,7 +174,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 		view.clear();
 	}
 	
-	public String getDirectDownloadURL(FileEntity fileEntity, FileHandle fileHandle) {
+	public String getDirectDownloadURL(FileEntity fileEntity, FileHandle fileHandle, String fileNameOverride) {
 		String externalUrl = null;
 		if (fileHandle instanceof ExternalFileHandle) {
 			externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
@@ -185,7 +186,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter {
 		else {
 			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
 				//point to sftp proxy instead
-				directDownloadURL = Uploader.getSftpProxyLink(externalUrl, globalApplicationState, gwt);
+				directDownloadURL = Uploader.getSftpProxyLink(fileNameOverride, externalUrl, globalApplicationState, gwt);
 			} else {
 				directDownloadURL = externalUrl;	
 			}

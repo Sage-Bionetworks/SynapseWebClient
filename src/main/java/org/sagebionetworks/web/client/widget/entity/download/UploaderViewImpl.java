@@ -197,7 +197,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		}
 	}
 	
-	private static native String _getMessage(JavaScriptObject event) /*-{
+	public static native String _getMessage(JavaScriptObject event) /*-{
 		console.log("event received: "+event);
 		console.log("event.data received: "+event.data);
 		if (event !== undefined && event.data !== undefined)
