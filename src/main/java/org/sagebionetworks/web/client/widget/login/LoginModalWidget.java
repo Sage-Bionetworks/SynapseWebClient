@@ -5,7 +5,6 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,10 +35,14 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 		view.hideModal();
 	}
 	
+	/**
+	 * This is only called when the servlet responds with html that does a postMessage, where the message is an UploadResult (json representation).
+	 * If successful, then the servlet streams the resulting file to the browser.
+	 */
 	@Override
 	public void onSubmitComplete(String resultHtml) {
 		/**
-		 * Unfortunately, gwt does not have a nice way to ask for the status code of a submit complete event, so we need to parse it :(
+		 * Unfortunately, gwt does not have a nice way to ask for the status code of a submit complete event.
 		 * https://groups.google.com/forum/#!topic/google-web-toolkit/yuHZkiL-x5U
 		 * https://groups.google.com/forum/#!topic/google-web-toolkit/v7Qi8cbp0MM
 		 */
