@@ -8,11 +8,11 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EventHandlerUtils;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,7 +20,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -54,25 +53,6 @@ public class LoginModalViewImpl implements LoginModalView {
 	@Inject
 	public LoginModalViewImpl(Binder binder){
 		modal = binder.createAndBindUi(this);
-		modal.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached())
-					onAttach();
-			}
-		});
-	}
-	
-	public void onAttach() {
-		//register to listen for the "message" events
-		if (messageHandler == null) {
-			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
-				@Override
-				public void invoke(JavaScriptObject event) {
-					presenter.onSubmitComplete(UploaderViewImpl._getMessage(event));
-				}
-			});
-		}
 	}
 	
 	@Override
@@ -116,6 +96,11 @@ public class LoginModalViewImpl implements LoginModalView {
 	public void showErrorMessage(String error) {
 		this.alert.setText(error);
 	}
+	
+	@Override
+	public void showErrorMessagePopup(String error) {
+		DisplayUtils.showErrorMessage(error);
+	}
 
 	@Override
 	public void setLoading(boolean loading) {
@@ -153,12 +138,33 @@ public class LoginModalViewImpl implements LoginModalView {
 	
 	@Override
 	public void submitForm(String actionUrl, String method, String encodingType) {
+		initMessageHandler();
 		if (encodingType != null)
 			FormElement.as(formPanel.getElement()).setEnctype(encodingType);
 		formPanel.setAction(actionUrl);
 		formPanel.setMethod(method);
 		formPanel.submit();
 	}
+	
+	private void clearMessageHandler() {
+		if (messageHandler != null) {
+			messageHandler.removeHandler();
+			messageHandler = null;
+		}
+	}
+	
+	protected void initMessageHandler() {
+		clearMessageHandler();
+		//register to listen for the "message" events
+		messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
+			@Override
+			public void invoke(JavaScriptObject event) {
+				presenter.onSubmitComplete(UploaderViewImpl._getMessage(event));
+				clearMessageHandler();
+			}
+		});
+	}
+
 	
 	@Override
 	public void clearForm() {

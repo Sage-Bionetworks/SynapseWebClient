@@ -32,8 +32,8 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 
 	@Override
 	public void onPrimary() {
-		setLoading(true);
 		view.submitForm(action, method, encodingType);
+		view.hideModal();
 	}
 	
 	@Override
@@ -49,10 +49,8 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 		onSubmitComplete(uploadResult);
 	}
 	public void onSubmitComplete(UploadResult uploadResult) {
-		if (UploadStatus.SUCCESS.equals(uploadResult.getUploadStatus())) {
-			view.hideModal();
-		} else {
-			setErrorMessage(uploadResult.getMessage());
+		if (UploadStatus.FAILED.equals(uploadResult.getUploadStatus())) {
+			view.showErrorMessagePopup(uploadResult.getMessage());
 		}
 	}
 	
