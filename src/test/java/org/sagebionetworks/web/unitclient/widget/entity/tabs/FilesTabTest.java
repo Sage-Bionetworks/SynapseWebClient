@@ -379,4 +379,14 @@ public class FilesTabTest {
 		verify(mockView).setProgrammaticClientsVisible(false);
 		verify(mockView).setProvenanceVisible(false);
 	}
+	
+	@Test
+	public void testShowProjectLoadError() {
+		Exception projectLoadError = new Exception("error loading project");
+		tab.setProject(projectEntityId, null, projectLoadError);
+		tab.showProjectLevelUI();
+		Synapse expectedPlace = new Synapse(projectEntityId, null, EntityArea.FILES, null);
+		verify(mockTab).setPlace(expectedPlace);
+		verify(mockSynapseAlert).handleException(projectLoadError);
+	}
 }

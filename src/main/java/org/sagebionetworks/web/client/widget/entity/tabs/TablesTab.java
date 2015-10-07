@@ -165,6 +165,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void resetView() {
+		synAlert.clear();
 		view.setEntityMetadataVisible(false);
 		view.setBreadcrumbVisible(false);
 		view.setTableListVisible(false);

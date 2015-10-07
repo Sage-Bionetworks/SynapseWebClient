@@ -306,5 +306,29 @@ public class TablesTabTest {
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 	}
+	
+	@Test
+	public void testResetView() {
+		tab.resetView();
+		verify(mockSynapseAlert).clear();
+		verify(mockView).setEntityMetadataVisible(false);
+		verify(mockView).setBreadcrumbVisible(false);
+		verify(mockView).setTableListVisible(false);
+		verify(mockView).setTitlebarVisible(false);
+		verify(mockView).clearActionMenuContainer();
+		verify(mockView).clearTableEntityWidget();
+		verify(mockView).clearActionMenuContainer();
+		verify(mockView).clearModifiedAndCreatedWidget();
+		verify(mockProjectInfoCallback).invoke(false);
+	}
 
+	@Test
+	public void testShowProjectLoadError() {
+		Exception projectLoadError = new Exception("error loading project");
+		tab.setProject(projectEntityId, null, projectLoadError);
+		tab.showProjectLevelUI();
+		Synapse expectedPlace = new Synapse(projectEntityId, null, EntityArea.TABLES, null);
+		verify(mockTab).setPlace(expectedPlace);
+		verify(mockSynapseAlert).handleException(projectLoadError);
+	}
 }
