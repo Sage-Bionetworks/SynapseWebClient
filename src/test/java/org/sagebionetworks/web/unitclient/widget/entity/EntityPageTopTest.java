@@ -190,6 +190,29 @@ public class EntityPageTopTest {
 		verify(mockChallengeTab).configure(projectEntityId);
 	}
 	
+
+	@Test
+	public void testConfigureWithFileAndFailureToLoadProject(){
+		Exception projectLoadError = new Exception("failed to load project");
+		AsyncMockStubber.callFailureWith(projectLoadError).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = 5L;
+		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockTabs).showTab(mockFilesInnerTab);
+		verify(mockView).setPageTitle(anyString());
+		
+		verify(mockEntityMetadata, never()).setEntityBundle(mockProjectBundle, null);
+		EntityBundle expectedProjectEntityBundle = null;
+		
+		verify(mockWikiTab).configure(eq(projectEntityId), eq((String)null), eq(false), any(WikiPageWidget.Callback.class));
+		verify(mockFilesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
+		verify(mockFilesTab).configure(mockFileEntity, mockEntityUpdatedHandler, versionNumber);
+		verify(mockTablesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
+		verify(mockTablesTab).configure(mockFileEntity, mockEntityUpdatedHandler, areaToken);
+		verify(mockChallengeTab).configure(projectEntityId);
+	}
+	
 	@Test
 	public void testConfigureWithTable(){
 		Synapse.EntityArea area = null;

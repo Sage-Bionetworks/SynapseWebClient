@@ -162,6 +162,7 @@ public class FilesTabTest {
 		verify(mockView).setPreview(any(Widget.class));
 		verify(mockView).setMetadata(any(Widget.class));
 		verify(mockView).setWikiPage(any(Widget.class));
+		verify(mockView).setSynapseAlert(any(Widget.class));
 		
 		verify(mockFilesBrowser).setEntitySelectedHandler(any(EntitySelectedHandler.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
@@ -361,5 +362,21 @@ public class FilesTabTest {
 	public void testAsTab() {
 		assertEquals(mockTab, tab.asTab());
 	}
-
+	
+	@Test
+	public void testResetView() {
+		tab.resetView();
+		verify(mockSynapseAlert).clear();
+		verify(mockView).setFileTitlebarVisible(false);
+		verify(mockView).setFolderTitlebarVisible(false);
+		verify(mockView).setPreviewVisible(false);
+		verify(mockView).setMetadataVisible(false);
+		verify(mockView).setWikiPageWidgetVisible(false);
+		verify(mockView).setFileBrowserVisible(false);
+		verify(mockView).clearActionMenuContainer();
+		verify(mockView).clearModifiedAndCreatedWidget();
+		verify(mockBreadcrumb).clear();
+		verify(mockView).setProgrammaticClientsVisible(false);
+		verify(mockView).setProvenanceVisible(false);
+	}
 }

@@ -132,18 +132,11 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 	
-//	public void updatePlace(Entity entity) {
-//		boolean isProject = entity instanceof Project;
-//		EntityArea area = isProject ? EntityArea.TABLES : null;
-//		tab.setPlace(new Synapse(entity.getId(), null, area, null));
-//	}
-	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
 		this.projectEntityId = projectEntityId;
 		this.projectBundle = projectBundle;
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
-	
 	
 	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken) {
 		this.entity = entity;
