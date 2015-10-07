@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -197,7 +198,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		}
 	}
 	
-	private static native String _getMessage(JavaScriptObject event) /*-{
+	public static native String _getMessage(JavaScriptObject event) /*-{
 		console.log("event received: "+event);
 		console.log("event.data received: "+event.data);
 		if (event !== undefined && event.data !== undefined)
@@ -205,27 +206,22 @@ public class UploaderViewImpl extends FlowPanel implements
 		else return null;
 	}-*/;
 	
-	@Override
-	protected void onAttach() {
-		//register to listen for the "message" events
-		if (messageHandler == null) {
-			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
-				@Override
-				public void invoke(JavaScriptObject event) {
-					handleSubmitResult(_getMessage(event));
-				}
-			});
-		}
-		super.onAttach();
-	}
-	
-	@Override
-	protected void onDetach() {
+	private void clearMessageHandler() {
 		if (messageHandler != null) {
 			messageHandler.removeHandler();
 			messageHandler = null;
 		}
-		super.onDetach();
+	}
+	protected void initMessageHandler() {
+		clearMessageHandler();
+		//register to listen for the "message" events
+		messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
+			@Override
+			public void invoke(JavaScriptObject event) {
+				handleSubmitResult(_getMessage(event));
+				clearMessageHandler();
+			}
+		});
 	}
 	
 	@Override
@@ -352,6 +348,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	@Override
 	public void submitForm(String actionUrl) {
+		initMessageHandler();
 		showSpinningProgress();
 		formPanel.setAction(actionUrl);
 		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));

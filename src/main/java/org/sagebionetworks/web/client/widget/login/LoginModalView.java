@@ -15,6 +15,7 @@ public interface LoginModalView extends IsWidget {
 		 * Called when the primary button is pressed.
 		 */
 		void onPrimary();
+		void onSubmitComplete(String results);
 	}
 
 	/**
@@ -42,6 +43,13 @@ public interface LoginModalView extends IsWidget {
 	 * @param error
 	 */
 	public void showErrorMessage(String error);
+	
+	/**
+	 * Show an error message.
+	 * 
+	 * @param error
+	 */
+	public void showErrorMessagePopup(String error);
 
 	/**
 	 * Change the state of the primary button.
