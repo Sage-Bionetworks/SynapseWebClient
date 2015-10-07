@@ -163,7 +163,8 @@ public class TablesTabTest {
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
-		tab.configure(mockTableEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken);
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, areaToken);
 		
 		verify(mockSynapseClientAsync).getEntityBundle(eq(tableEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
@@ -209,7 +210,8 @@ public class TablesTabTest {
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
-		tab.configure(file, mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken);
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(file, mockEntityUpdatedHandler, areaToken);
 		
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
@@ -246,7 +248,9 @@ public class TablesTabTest {
 
 	@Test
 	public void testSetTableQueryWithNoToken() {
-		tab.configure(mockTableEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, null);
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, null);
+		
 		reset(mockTab);
 		String queryToken = queryTokenProvider.queryToToken(query);
 		tab.onQueryChange(query);
@@ -261,7 +265,10 @@ public class TablesTabTest {
 		query.setOffset(1L);
 		String startToken = queryTokenProvider.queryToToken(query);
 		// Start with a token.
-		tab.configure(mockTableEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, TablesTab.TABLE_QUERY_PREFIX + startToken);
+		
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, TablesTab.TABLE_QUERY_PREFIX + startToken);
+		
 		reset(mockTab);
 		String queryToken = queryTokenProvider.queryToToken(query);
 		tab.onQueryChange(query);
@@ -274,26 +281,28 @@ public class TablesTabTest {
 
 	@Test
 	public void testGetTableQuery() {
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		
 		String queryAreaToken;
 		Query query1 = null;
 		queryAreaToken = null;
-		tab.configure(mockTableEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertNull(query1);
 		
 		queryAreaToken = "something else";
-		tab.configure(mockTableEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertNull(query1);
 		String token = queryTokenProvider.queryToToken(query);
 		queryAreaToken = "query/"+token;
-		tab.configure(mockTableEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 		query.setSql("SELECT 'query/' FROM syn123 LIMIT 1");
 		token = queryTokenProvider.queryToToken(query);
 		queryAreaToken = "query/"+token;
-		tab.configure(mockTableEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 	}
