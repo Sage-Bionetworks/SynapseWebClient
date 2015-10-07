@@ -71,6 +71,8 @@ public class FilesTab implements FilesTabView.Presenter{
 	
 	CallbackP<Boolean> showProjectInfoCallack;
 	EntityBundle projectBundle;
+	Throwable projectBundleLoadError;
+	String projectEntityId;
 	
 	@Inject
 	public FilesTab(FilesTabView view, 
@@ -110,6 +112,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setPreview(previewWidget.asWidget());
 		view.setMetadata(metadata.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
+		view.setSynapseAlert(synAlert.asWidget());
 		
 		tab.configure("Files", view.asWidget());
 		
@@ -135,12 +138,12 @@ public class FilesTab implements FilesTabView.Presenter{
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
 				Long versionNumber = synapse.getVersionNumber();
-				if (entityId.equals(projectBundle.getEntity().getId())) {
-					currentVersionNumber = null;
-					setTargetBundle(projectBundle);
-					tab.showTab();
+				if (entityId.equals(projectEntityId)) {
+				    currentVersionNumber = null;
+				    showProjectLevelUI();
+				    tab.showTab();
 				} else {
-					getTargetBundleAndDisplay(entityId, versionNumber);
+				    getTargetBundleAndDisplay(entityId, versionNumber);
 				}
 			};
 		};
@@ -161,31 +164,62 @@ public class FilesTab implements FilesTabView.Presenter{
 		});
 	}
 	
-	
-	public void configure(Entity targetEntity, EntityBundle projectBundle, EntityUpdatedHandler handler, Long versionNumber) {
-		this.projectBundle = projectBundle;
-		this.handler = handler;
-		fileTitleBar.setEntityUpdatedHandler(handler);
-		metadata.setEntityUpdatedHandler(handler);
-		filesBrowser.setEntityUpdatedHandler(handler);
-		
-		//reset view
+	public void resetView() {
+		synAlert.clear();
 		view.setFileTitlebarVisible(false);
 		view.setFolderTitlebarVisible(false);
 		view.setPreviewVisible(false);
 		view.setMetadataVisible(false);
 		view.setWikiPageWidgetVisible(false);
+		view.setFileBrowserVisible(false);
+		view.clearActionMenuContainer();
+		breadcrumb.clear();
+		view.clearModifiedAndCreatedWidget();
+		view.setProgrammaticClientsVisible(false);
+		view.setProvenanceVisible(false);
+	}
+	
+	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
+		this.projectEntityId = projectEntityId;
+		this.projectBundle = projectBundle;
+		this.projectBundleLoadError = projectBundleLoadError;
+	}
+	
+	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
+		this.handler = handler;
+		synAlert.clear();
+		fileTitleBar.setEntityUpdatedHandler(handler);
+		metadata.setEntityUpdatedHandler(handler);
+		filesBrowser.setEntityUpdatedHandler(handler);
+		
+		//reset view
+		resetView();
 		
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
 		
+		tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, null, null));
 		//if we are not being configured with a file or folder, then project level should be shown
 		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
-			setTargetBundle(projectBundle);
+			showProjectLevelUI();
 		} else {
 			getTargetBundleAndDisplay(targetEntity.getId(), versionNumber);
 		}
+	}
+	
+	public void showProjectLevelUI() {
+		tab.setPlace(new Synapse(projectEntityId, null, EntityArea.FILES, null));
+		if (projectBundle != null) {
+			setTargetBundle(projectBundle);	
+		} else {
+			showError(projectBundleLoadError);
+		}
+	}
+	
+	public void showError(Throwable error) {
+		resetView();
+		synAlert.handleException(error);
 	}
 	
 	public Long getVersionNumber(Entity entity) {
@@ -228,8 +262,10 @@ public class FilesTab implements FilesTabView.Presenter{
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}			
+				showError(caught);
+				tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, null, null));
+				tab.showTab();
+			}	
 		};
 		if (versionNumber == null) {
 			synapseClient.getEntityBundle(entityId, mask, callback);
