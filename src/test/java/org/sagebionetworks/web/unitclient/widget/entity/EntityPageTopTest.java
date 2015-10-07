@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
@@ -169,6 +170,24 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId);
+		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, projectWikiId, mockEntityUpdatedHandler);
+	}
+	
+	@Test
+	public void testConfigureWithProjectWikiToken(){
+		Synapse.EntityArea area = EntityArea.WIKI;
+		//verify this wiki id area token is passed to the wiki tab configuration and the entity action controller configuration
+		String areaToken = "1234";
+		Long versionNumber = null;
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		
+		verify(mockWikiTab).configure(eq(projectEntityId), eq(areaToken), eq(canEdit), any(WikiPageWidget.Callback.class));
+		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockFilesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, versionNumber);
+		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
+		verify(mockTablesTab).configure(mockProjectEntity, mockEntityUpdatedHandler, null);
+		verify(mockChallengeTab).configure(projectEntityId);
+		verify(mockEntityActionController).configure(mockActionMenuWidget, mockProjectBundle, areaToken, mockEntityUpdatedHandler);
 	}
 	
 	@Test
