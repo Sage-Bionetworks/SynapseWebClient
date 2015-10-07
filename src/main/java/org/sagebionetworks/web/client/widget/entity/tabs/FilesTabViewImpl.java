@@ -171,6 +171,11 @@ public class FilesTabViewImpl implements FilesTabView {
 	}
 	
 	@Override
+	public void clearModifiedAndCreatedWidget() {
+		fileModifiedAndCreatedContainer.clear();	
+	}
+	
+	@Override
 	public void configureModifiedAndCreatedWidget(Entity entity)  {
 		fileModifiedAndCreatedContainer.clear();
 		createdByBadge.asWidget().removeFromParent();
