@@ -35,7 +35,7 @@
 				<b:Column size="XS_12, MD_6" offset="MD_3">
 					<bh:Div>
 						<b:Alert type="SUCCESS">
-							<b:Heading size="H3" ui:field="successMessage" />
+							<b:Heading size="H3" ui:field="successMessage" addStyleNames="color-white" />
 						</b:Alert>
 					</bh:Div>
 				</b:Column>

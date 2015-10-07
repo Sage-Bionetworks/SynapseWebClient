@@ -150,8 +150,9 @@ public class EntityPageTopTest {
 		String areaToken = null;
 		Long versionNumber = null;
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
-		//area was not defined for this project, should try to go to wiki tab by default.
-		verify(mockTabs).showTab(mockWikiInnerTab);
+		//Area was not defined for this project, should try to go to wiki tab by default.
+		//Once to show the active tab, and once after configuration so that the place is pushed into the history.
+		verify(mockTabs, times(2)).showTab(mockWikiInnerTab);
 		verify(mockView).setPageTitle(anyString());
 		
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
