@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.shared.users;
 
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.CHANGE_PERMISSIONS;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.CHANGE_SETTINGS;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.CREATE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE_SUBMISSION;
@@ -19,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.util.ModelConstants;
 
 public class AclUtils {
 
@@ -38,9 +38,8 @@ public class AclUtils {
 				CREATE, READ, UPDATE)));
 		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				CREATE, READ, UPDATE, DELETE)));		
-		// TODO replace this list with ModelConstants.ENITY_ADMIN_ACCESS_PERMISSIONS
-		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				CREATE, READ, UPDATE, DELETE, CHANGE_PERMISSIONS, CHANGE_SETTINGS)));
+
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, ModelConstants.ENITY_ADMIN_ACCESS_PERMISSIONS);
 
 		// Note, PARTICIPATE is no longer used, but to removed it would require updating all existing Evaluation ACLs
 		permToACCESS_TYPE.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
@@ -48,10 +47,8 @@ public class AclUtils {
 		permToACCESS_TYPE.put(PermissionLevel.CAN_SCORE_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
 				READ, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION)));
 		
-		// TODO replace this list with ModelConstants.EVALUATION_ADMIN_ACCESS_PERMISSIONS
-		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				READ, SUBMIT, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION, 
-				CHANGE_PERMISSIONS, UPDATE, DELETE, DELETE_SUBMISSION)));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION,
+				ModelConstants.EVALUATION_ADMIN_ACCESS_PERMISSIONS);
 		
 		// Build the reverse mapping from the first map
 		accessTypeToPerm = new HashMap<ACCESS_TYPE, Set<PermissionLevel>>();
