@@ -199,69 +199,70 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
-    
-    private void configureTabs() {
-    	configureCurrentAreaTab();
-    	gwt.scheduleDeferred(new Callback() {
+
+	private void configureTabs() {
+		configureCurrentAreaTab();
+		gwt.scheduleDeferred(new Callback() {
 			@Override
 			public void invoke() {
 				configureOtherAreaTabs();
 			}
 		});
-    }
-    
-    public void configureCurrentAreaTab() {
-    	if (area == null) {
-    		configureWikiTab();
+	}
+
+	public void configureCurrentAreaTab() {
+		if (area == null) {
+			configureWikiTab();
 			configureFilesTab();
-    	} else {
-    		switch(area){
-	    		case FILES :
-	    			configureFilesTab();
-	    			break;
-	    		case WIKI :
-	    			configureWikiTab();
-	    			break;
-	    		case TABLES :
-	    			configureTablesTab();
-	    			break;
-	    		case ADMIN :
-	    			configureAdminTab();
-	    			break;
-	    		default :
-	    	}
-    	}
-    }
-    public void configureOtherAreaTabs() {
-    	if (area == null) {
-    		configureTablesTab();
+		} else {
+			switch (area) {
+			case FILES:
+				configureFilesTab();
+				break;
+			case WIKI:
+				configureWikiTab();
+				break;
+			case TABLES:
+				configureTablesTab();
+				break;
+			case ADMIN:
+				configureAdminTab();
+				break;
+			default:
+			}
+		}
+	}
+
+	public void configureOtherAreaTabs() {
+		if (area == null) {
+			configureTablesTab();
 			configureAdminTab();
-    	} else {
-	    	switch(area){
-				case FILES :
-					configureWikiTab();
-					configureTablesTab();
-					configureAdminTab();
-					break;
-				case WIKI :
-					configureFilesTab();
-					configureTablesTab();
-					configureAdminTab();
-					break;
-				case TABLES :
-					configureWikiTab();
-					configureFilesTab();
-					configureAdminTab();
-					break;
-				case ADMIN :
-					configureWikiTab();
-					configureFilesTab();
-					configureTablesTab();
-					break;
-				default :
-	    	}
-    	}
-    }
+		} else {
+			switch (area) {
+			case FILES:
+				configureWikiTab();
+				configureTablesTab();
+				configureAdminTab();
+				break;
+			case WIKI:
+				configureFilesTab();
+				configureTablesTab();
+				configureAdminTab();
+				break;
+			case TABLES:
+				configureWikiTab();
+				configureFilesTab();
+				configureAdminTab();
+				break;
+			case ADMIN:
+				configureWikiTab();
+				configureFilesTab();
+				configureTablesTab();
+				break;
+			default:
+			}
+		}
+	}
 
     
     public void clearState() {
