@@ -184,7 +184,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			public void onSuccess(EntityBundle bundle) {
 				projectBundle = bundle;
 				projectMetadata.setEntityBundle(projectBundle, null);
-				controller.configure(actionMenu, projectBundle, projectBundle.getRootWikiId(), entityUpdateHandler);
+				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+				controller.configure(actionMenu, projectBundle, wikiId, entityUpdateHandler);
 				configureTabs();
 			}
 			
