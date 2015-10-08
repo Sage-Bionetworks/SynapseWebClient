@@ -3,10 +3,12 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -80,6 +82,16 @@ public class GWTWrapperImpl implements GWTWrapper {
 		    } 
 		};
 		timer.schedule(delayMillis);
+	}
+	
+	@Override
+	public void scheduleDeferred(final Callback callback) {
+		Scheduler.get().scheduleDeferred(new Command() {
+			@Override
+			public void execute() {
+				callback.invoke();
+			}
+		});
 	}
 	
 	@Override
