@@ -27,6 +27,7 @@ public interface FilesTabView extends IsWidget {
 	void setProvenanceVisible(boolean visible);
 	void setProgrammaticClientsVisible(boolean visible);
 	void configureModifiedAndCreatedWidget(Entity entity);
+	void clearModifiedAndCreatedWidget();
 	void setWikiPageWidgetVisible(boolean visible);
 	void setFileBrowserVisible(boolean visible);
 	void setPreviewVisible(boolean visible);

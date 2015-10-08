@@ -43,6 +43,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle projectBundle;
+	private Throwable projectBundleLoadError;
 	private Entity entity;
 	
 	private Synapse.EntityArea area;
@@ -118,10 +119,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		filesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
 		tablesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
 		
-		//on tab change to these tabs, always show project info
+		//on tab change to these tabs, always show project info (if not null)
 		CallbackP<Tab> showProjectInfoCallback = new CallbackP<Tab>() {
 			public void invoke(Tab t) {
-				view.setProjectInformationVisible(true);
+				view.setProjectInformationVisible(projectBundle != null);
 			};
 		};
 		wikiTab.setTabClickedCallback(showProjectInfoCallback);
@@ -175,28 +176,32 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     
     public void configureProject() {
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA ;
+		projectBundle = null;
+		projectBundleLoadError = null;
+		view.setProjectInformationVisible(false);
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				projectBundle = bundle;
-				configureFromProjectBundle();
+				projectMetadata.setEntityBundle(projectBundle, null);
+				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+				controller.configure(actionMenu, projectBundle, wikiId, entityUpdateHandler);
+				configureTabs();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				projectBundleLoadError = caught;
+				configureTabs();
 			}	
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
     
-    private void configureFromProjectBundle() {
-    	//set up owner project information
-    	projectMetadata.setEntityBundle(projectBundle, null);
+    private void configureTabs() {
     	configureWikiTab();
     	configureFilesTab();
     	configureTablesTab();
-    	controller.configure(actionMenu, projectBundle, projectBundle.getRootWikiId(), entityUpdateHandler);
     }
     
     public void clearState() {
@@ -214,16 +219,24 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	public void configureTablesTab() {
-		tablesTab.configure(entity, projectBundle, entityUpdateHandler, tablesAreaToken);
+		tablesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+		tablesTab.configure(entity, entityUpdateHandler, tablesAreaToken);
 	}
 	
 	public void configureFilesTab() {
-		filesTab.configure(entity, projectBundle, entityUpdateHandler, filesVersionNumber);
+		filesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+		filesTab.configure(entity, entityUpdateHandler, filesVersionNumber);
 	}
 	
 	public void configureWikiTab() {
 		final boolean isWikiTabShown = (area == null && entity instanceof Project) || area == EntityArea.WIKI;
-		final boolean canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
+		boolean canEdit = false;
+		String wikiId = null;
+		
+		if (projectBundle != null) {
+			canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
+			wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+		}
 		final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
@@ -239,8 +252,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 		
-		String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-		wikiTab.configure(projectBundle.getEntity().getId(), wikiId, 
+		wikiTab.configure(projectHeader.getId(), wikiId, 
 				canEdit, callback);
 		
 		if (isWikiTabShown) {
