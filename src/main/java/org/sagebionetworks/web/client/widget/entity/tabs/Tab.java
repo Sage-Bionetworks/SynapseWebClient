@@ -49,7 +49,6 @@ public class Tab implements TabView.Presenter {
 	
 	public void showTab() {
 		globalAppState.pushCurrentPlace(place);
-		globalAppState.setLastPlace(place);
 		view.setActive(true);
 	}
 	

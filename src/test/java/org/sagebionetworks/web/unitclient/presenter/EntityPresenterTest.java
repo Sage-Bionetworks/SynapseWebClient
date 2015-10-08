@@ -18,6 +18,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -50,6 +51,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
@@ -262,5 +264,17 @@ public class EntityPresenterTest {
 		verify(mockSynAlert).show403(anyString());
 		verify(mockView).setEntityPageTopVisible(false);
 		verify(mockView).setOpenTeamInvitesVisible(true);
+	}
+	
+	@Test
+	public void testEntityUpdatedHandler() {
+		ArgumentCaptor<EntityUpdatedHandler> captor = ArgumentCaptor.forClass(EntityUpdatedHandler.class);
+		verify(mockEntityPageTop).setEntityUpdatedHandler(captor.capture());
+		Place mockPlace = mock(Place.class);
+		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(mockPlace);
+		//invoke and verify
+		captor.getValue().onPersistSuccess(null);
+		
+		verify(mockPlaceChanger).goTo(mockPlace);
 	}
 }
