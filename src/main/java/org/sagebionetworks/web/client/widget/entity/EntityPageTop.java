@@ -16,11 +16,13 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -58,6 +60,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private ChallengeTab adminTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
+	private GWTWrapper gwt;
 	
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
@@ -73,7 +76,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			TablesTab tablesTab,
 			ChallengeTab adminTab,
 			EntityActionController controller,
-			ActionMenuWidget actionMenu
+			ActionMenuWidget actionMenu,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -85,6 +89,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.projectMetadata = projectMetadata;
 		this.controller = controller;
 		this.actionMenu = actionMenu;
+		this.gwt = gwt;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -169,9 +174,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		
     	//note: the files/tables/wiki tabs rely on the project bundle, so they are configured later
     	configureProject();
-    	
-    	//configure challenge admin tab
-    	configureAdminTab();
 	}
     
     public void configureProject() {
@@ -197,12 +199,71 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
-    
-    private void configureTabs() {
-    	configureWikiTab();
-    	configureFilesTab();
-    	configureTablesTab();
-    }
+
+	private void configureTabs() {
+		configureCurrentAreaTab();
+		gwt.scheduleDeferred(new Callback() {
+			@Override
+			public void invoke() {
+				configureOtherAreaTabs();
+			}
+		});
+	}
+
+	public void configureCurrentAreaTab() {
+		if (area == null) {
+			configureWikiTab();
+			configureFilesTab();
+		} else {
+			switch (area) {
+			case FILES:
+				configureFilesTab();
+				break;
+			case WIKI:
+				configureWikiTab();
+				break;
+			case TABLES:
+				configureTablesTab();
+				break;
+			case ADMIN:
+				configureAdminTab();
+				break;
+			default:
+			}
+		}
+	}
+
+	public void configureOtherAreaTabs() {
+		if (area == null) {
+			configureTablesTab();
+			configureAdminTab();
+		} else {
+			switch (area) {
+			case FILES:
+				configureWikiTab();
+				configureTablesTab();
+				configureAdminTab();
+				break;
+			case WIKI:
+				configureFilesTab();
+				configureTablesTab();
+				configureAdminTab();
+				break;
+			case TABLES:
+				configureWikiTab();
+				configureFilesTab();
+				configureAdminTab();
+				break;
+			case ADMIN:
+				configureWikiTab();
+				configureFilesTab();
+				configureTablesTab();
+				break;
+			default:
+			}
+		}
+	}
+
     
     public void clearState() {
 		view.clear();
