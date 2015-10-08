@@ -15,11 +15,13 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
@@ -83,6 +85,8 @@ public class EntityPageTopTest {
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
+	@Mock
+	GWTWrapper mockGWTWrapper;
 	
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
@@ -98,8 +102,9 @@ public class EntityPageTopTest {
 		
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockEntityActionController, 
-				mockActionMenuWidget);
+				mockActionMenuWidget, mockGWTWrapper);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
+		AsyncMockStubber.callWithInvoke().when(mockGWTWrapper).scheduleDeferred(any(Callback.class));
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
