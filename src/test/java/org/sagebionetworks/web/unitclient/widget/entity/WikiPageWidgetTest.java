@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -83,6 +84,7 @@ public class WikiPageWidgetTest {
 	
 	@Before
 	public void before() throws Exception{
+		MockitoAnnotations.initMocks(this);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockSynapseAlert, mockHistoryWidget, mockMarkdownWidget,
 				mockBreadcrumb, mockSubpages, mockInjector, mockModifiedCreatedBy);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
@@ -141,7 +143,6 @@ public class WikiPageWidgetTest {
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
-		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 		verify(mockView).setNoWikiCannotEditMessageVisible(true);
 	}
 	
@@ -156,7 +157,6 @@ public class WikiPageWidgetTest {
 		verify(mockSynapseAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
 		verify(mockView).setWikiHistoryVisible(false);
-		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 		verify(mockView).setNoWikiCanEditMessageVisible(true);
 	}
 
@@ -242,7 +242,6 @@ public class WikiPageWidgetTest {
 		verify(mockMarkdownWidget).clear();
 		verify(mockBreadcrumb).clear();
 		verify(mockSubpages).clearState();
-		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 		verify(mockView).setWikiHeadingText("");
 	}
 
@@ -262,7 +261,6 @@ public class WikiPageWidgetTest {
 		verify(mockView).setDiffVersionAlertVisible(false);
 		verify(mockCallbackP).invoke(anyString());
 		//also verify that the created by and modified by are updated when wiki page is reloaded
-		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 	}
 
