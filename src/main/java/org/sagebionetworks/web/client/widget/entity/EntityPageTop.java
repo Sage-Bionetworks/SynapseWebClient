@@ -10,16 +10,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
-import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
-import org.sagebionetworks.repo.model.file.S3UploadDestination;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -190,7 +184,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				projectBundle = bundle;
-				configureStorageLocation();
 				projectMetadata.setEntityBundle(projectBundle, null);
 				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
 				controller.configure(actionMenu, projectBundle, wikiId, entityUpdateHandler);
@@ -204,32 +197,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}	
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
-    }
-    
-    public void configureStorageLocation() {
-    	synapseClient.getUploadDestinations(entity.getId(), new AsyncCallback<List<UploadDestination>>() {
-			public void onSuccess(List<UploadDestination> uploadDestinations) {
-				if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
-					projectMetadata.setStorageLocationText("Synapse Storage");
-				} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
-					ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
-					projectMetadata.setStorageLocationText(externalUploadDestination.getUrl());
-				} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
-					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
-					String description = "s3://" + externalUploadDestination.getBucket() + "/";
-					if (externalUploadDestination.getBaseKey() != null) {
-						description += externalUploadDestination.getBaseKey();
-					};
-					projectMetadata.setStorageLocationText(description);
-				}
-				projectMetadata.setStorageLocationVisible(true);
-			}
-
-			@Override
-			public void onFailure(Throwable err) {
-				projectMetadata.setStorageLocationVisible(false);
-			};
-		});
     }
 
 	private void configureTabs() {

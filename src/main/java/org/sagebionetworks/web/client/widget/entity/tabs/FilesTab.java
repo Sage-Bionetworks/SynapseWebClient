@@ -13,7 +13,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -25,10 +24,6 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
-import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
-import org.sagebionetworks.repo.model.file.S3UploadDestination;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -269,8 +264,6 @@ public class FilesTab implements FilesTabView.Presenter{
 					Long versionNumber = ref.getTargetVersionNumber();
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
 					return;
-				} else if (bundle.getEntity() instanceof Folder && bundle.getPermissions().getCanUpload()) {
-					configureStorageLocation(String.valueOf(entityId));
 				}
 				setTargetBundle(bundle);
 				tab.showTab();
@@ -290,31 +283,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		}
 	}
 	
-	 public void configureStorageLocation(String containerEntityId) {
-		 synapseClient.getUploadDestinations(containerEntityId, new AsyncCallback<List<UploadDestination>>() {
-			public void onSuccess(List<UploadDestination> uploadDestinations) {
-				if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
-					metadata.setStorageLocationText("Synapse Storage");
-				} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
-					ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
-					metadata.setStorageLocationText(externalUploadDestination.getUrl());
-				} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
-					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
-					String description = "s3://" + externalUploadDestination.getBucket() + "/";
-					if (externalUploadDestination.getBaseKey() != null) {
-						description += externalUploadDestination.getBaseKey();
-					};
-					metadata.setStorageLocationText(description);
-				}
-				metadata.setStorageLocationVisible(true);
-			}
-
-			@Override
-			public void onFailure(Throwable arg0) {
-				metadata.setStorageLocationVisible(false);
-			};
-		});
-    }
+	
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		EntityPresenter.filterToDownloadARs(bundle);

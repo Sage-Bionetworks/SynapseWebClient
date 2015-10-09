@@ -1,16 +1,25 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
+import org.sagebionetworks.repo.model.file.S3UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,18 +31,21 @@ public class EntityMetadata implements Presenter {
 	private DoiWidget doiWidget;
 	private FileHistoryWidget fileHistoryWidget;
 	private RestrictionWidget restrictionWidget;
+	private SynapseClientAsync synapseClient;
 	
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
 			DoiWidget doiWidget,
 			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget,
-			FileHistoryWidget fileHistoryWidget) {
+			FileHistoryWidget fileHistoryWidget, 
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.restrictionWidget = restrictionWidget;
+		this.synapseClient = synapseClient;
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
@@ -58,6 +70,9 @@ public class EntityMetadata implements Presenter {
 		} else {
 			view.setRestrictionPanelVisible(en instanceof TableEntity
 					|| en instanceof Folder);
+		}
+		if (en instanceof Folder || en instanceof Project) {
+			configureStorageLocation(en.getId());
 		}
 		restrictionWidget.configure(bundle, true, false, true, new Callback() {
 			@Override
@@ -93,13 +108,31 @@ public class EntityMetadata implements Presenter {
 		doiWidget.clear();
 		view.clear();
 	}
-
-	public void setStorageLocationText(String description) {
-		view.setUploadDestinationText(description);
-	}
 	
-	public void setStorageLocationVisible(boolean isVisible) {
-		view.setUploadDestinationPanelVisible(isVisible);
-	}
+	 public void configureStorageLocation(String containerEntityId) {
+		 synapseClient.getUploadDestinations(containerEntityId, new AsyncCallback<List<UploadDestination>>() {
+			public void onSuccess(List<UploadDestination> uploadDestinations) {
+				if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
+					view.setUploadDestinationText("Synapse Storage");
+				} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
+					ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
+					view.setUploadDestinationText(externalUploadDestination.getUrl());
+				} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
+					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
+					String description = "s3://" + externalUploadDestination.getBucket() + "/";
+					if (externalUploadDestination.getBaseKey() != null) {
+						description += externalUploadDestination.getBaseKey();
+					};
+					view.setUploadDestinationText(description);
+				}
+				view.setUploadDestinationPanelVisible(true);
+			}
+
+			@Override
+			public void onFailure(Throwable arg0) {
+				view.setUploadDestinationPanelVisible(false);
+			};
+		});
+    }
 	
 }
