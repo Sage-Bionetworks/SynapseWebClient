@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Date;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -11,15 +11,17 @@ import com.google.inject.Inject;
 public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Presenter {
 
 	private ModifiedCreatedByWidgetView view;
+	private GWTWrapper gwt;
 	private UserBadge createdByBadge;
 	private UserBadge modifiedByBadge;
 	
 	@Inject
 	public ModifiedCreatedByWidget(ModifiedCreatedByWidgetView view, UserBadge createdByBadge,
-			UserBadge modifiedByBadge) {
+			UserBadge modifiedByBadge, GWTWrapper gwt) {
 		this.view = view;
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
+		this.gwt = gwt;
 		view.setCreatedBadge(createdByBadge);
 		view.setModifiedBadge(modifiedByBadge);
 	}
@@ -27,8 +29,8 @@ public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Pres
 	public void configure(Date createdOn, String createdBy, Date modifiedOn, String modifiedBy) {
 		createdByBadge.configure(createdBy);
 		modifiedByBadge.configure(modifiedBy);
-		view.setCreatedOnText(" on " + DisplayUtils.convertDataToPrettyString(createdOn));
-		view.setModifiedOnText(" on " + DisplayUtils.convertDataToPrettyString(modifiedOn));
+		view.setCreatedOnText(" on " + gwt.getFormattedDateString(createdOn));
+		view.setModifiedOnText(" on " + gwt.getFormattedDateString(modifiedOn));
 		view.setVisible(true);
 	}
 
