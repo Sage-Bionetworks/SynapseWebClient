@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -60,6 +61,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
 	PortalGinInjector ginInjector;
+	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	CallbackP<Boolean> showProjectInfoCallack;
 	
@@ -74,7 +76,8 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			QueryTokenProvider queryTokenProvider,
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
-			PortalGinInjector ginInjector
+			PortalGinInjector ginInjector,
+			ModifiedCreatedByWidget modifiedCreatedBy
 			) {
 		this.view = view;
 		this.tab = t;
@@ -86,12 +89,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
+		this.modifiedCreatedBy = modifiedCreatedBy;
 		
 		view.setBreadcrumb(breadcrumb.asWidget());
 		view.setTableList(tableListWidget.asWidget());
 		view.setTitlebar(tableTitleBar.asWidget());
 		view.setEntityMetadata(metadata.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
+		view.setModifiedCreatedBy(modifiedCreatedBy);
 		tab.configure("Tables", view.asWidget());
 		
 		tableListWidget.setTableClickedCallback(new CallbackP<String>() {
@@ -173,7 +178,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		showProjectInfoCallack.invoke(false);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
-		view.clearModifiedAndCreatedWidget();
+		modifiedCreatedBy.clear();
 	}
 	
 	public void showError(Throwable error) {
@@ -192,13 +197,13 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
-		view.clearModifiedAndCreatedWidget();
+		modifiedCreatedBy.clear();
 		
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
 			tableTitleBar.configure(bundle);
-			view.configureModifiedAndCreatedWidget(entity);
+			modifiedCreatedBy.configure( entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			ActionMenuWidget actionMenu = initActionMenu(bundle);
 			
 			TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();

@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,7 +40,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
@@ -100,6 +100,8 @@ public class TablesTabTest {
 	CallbackP<Boolean> mockProjectInfoCallback;
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
+	@Mock
+	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	
 	String projectEntityId = "syn666666";
 	String tableEntityId = "syn22";
@@ -114,7 +116,7 @@ public class TablesTabTest {
 		queryTokenProvider = new QueryTokenProvider(new AdapterFactoryImpl());
 		tab = new TablesTab(mockView, mockTab, mockTableListWidget, mockBasicTitleBar, 
 				mockBreadcrumb, mockEntityMetadata, queryTokenProvider, mockSynapseAlert, mockSynapseClientAsync,
-				mockPortalGinInjector);
+				mockPortalGinInjector, mockModifiedCreatedBy);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		AccessRequirement tou = new TermsOfUseAccessRequirement();
 		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
@@ -183,7 +185,7 @@ public class TablesTabTest {
 		verify(mockView).setTitlebarVisible(true);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
-		verify(mockView).clearModifiedAndCreatedWidget();
+		verify(mockModifiedCreatedBy).clear();
 		
 		//hide project info
 		verify(mockProjectInfoCallback).invoke(false);
@@ -221,7 +223,7 @@ public class TablesTabTest {
 		verify(mockView).setTitlebarVisible(false);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
-		verify(mockView).clearModifiedAndCreatedWidget();
+		verify(mockModifiedCreatedBy).clear();
 		
 		//show project info
 		verify(mockProjectInfoCallback).invoke(true);
@@ -318,7 +320,7 @@ public class TablesTabTest {
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
 		verify(mockView).clearActionMenuContainer();
-		verify(mockView).clearModifiedAndCreatedWidget();
+		verify(mockModifiedCreatedBy).clear();
 		verify(mockProjectInfoCallback).invoke(false);
 	}
 

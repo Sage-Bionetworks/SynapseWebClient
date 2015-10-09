@@ -2,9 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.CommandLineClientModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JavaClientModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PythonClientModalWidgetViewImpl;
@@ -14,9 +11,8 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -171,39 +167,6 @@ public class FilesTabViewImpl implements FilesTabView {
 	}
 	
 	@Override
-	public void clearModifiedAndCreatedWidget() {
-		fileModifiedAndCreatedContainer.clear();	
-	}
-	
-	@Override
-	public void configureModifiedAndCreatedWidget(Entity entity)  {
-		fileModifiedAndCreatedContainer.clear();
-		createdByBadge.asWidget().removeFromParent();
-		modifiedByBadge.asWidget().removeFromParent();
-		
-		FlowPanel attributionPanel = new FlowPanel();
-		createdByBadge.configure(entity.getCreatedBy());
-		modifiedByBadge.configure(entity.getModifiedBy());
-		
-		InlineHTML inlineHtml = new InlineHTML(DisplayConstants.CREATED_BY);
-		attributionPanel.add(inlineHtml);
-		Widget createdByBadgeWidget = createdByBadge.asWidget();
-		createdByBadgeWidget.addStyleName("movedown-4 margin-left-5");
-		attributionPanel.add(createdByBadgeWidget);
-		
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getCreatedOn()) + "<br>" + DisplayConstants.MODIFIED_BY);
-		
-		attributionPanel.add(inlineHtml);
-		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
-		modifiedByBadgeWidget.addStyleName("movedown-4 margin-left-5");
-		attributionPanel.add(modifiedByBadgeWidget);
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getModifiedOn()));
-		
-		attributionPanel.add(inlineHtml);
-		fileModifiedAndCreatedContainer.add(attributionPanel);
-	}
-	
-	@Override
 	public void setWikiPageWidgetVisible(boolean visible) {
 		filesWikiPageContainer.setVisible(visible);
 	}
@@ -228,5 +191,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	@Override
 	public void setFileTitlebarVisible(boolean visible) {
 		fileTitlebarContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
+		fileModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);
 	}
 }

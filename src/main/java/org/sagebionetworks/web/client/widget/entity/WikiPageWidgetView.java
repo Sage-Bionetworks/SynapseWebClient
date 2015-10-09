@@ -23,7 +23,6 @@ public interface WikiPageWidgetView extends IsWidget {
 		public void showPreview(final Long versionToPreview, Long currentVersion);
 		void restoreConfirmed();
 		void resetWikiMarkdown(String markdown);
-		void configureCreatedModifiedBy();
 		void reloadWikiPage();
 		void showRestoreWarning(Long versionToRestore);
 		public void restoreClicked();
@@ -43,17 +42,11 @@ public interface WikiPageWidgetView extends IsWidget {
 	void setMarkdownWidget(IsWidget markdownWidget);
 	void setBreadcrumbWidget(IsWidget breadcrumb);
 	void setSynapseAlertWidget(IsWidget synapseAlert);
-	void setModifiedByBadge(IsWidget modifiedByUserBadge);
-	void setModifiedByText(String modifiedByText);
-	void setCreatedByBadge(IsWidget createdByUserBadge);
-	void setCreatedByText(String createdByText);
 	void setWikiHeadingText(String title);
 	public void setRestoreButtonVisible(boolean isVisible);
 	public void setDiffVersionAlertVisible(boolean isVisible);
-	public void showCreatedBy(boolean isVisible);
-	public void showModifiedBy(boolean isVisible);
 	public void setBreadcrumbsVisible(boolean isVisible);
-	public void setCreatedModifiedVisible(boolean isVisible);
+	public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible);
 	public void setNoWikiCannotEditMessageVisible(boolean isVisible);
 	public void setMarkdownVisible(boolean isVisible);
 	public void setMainPanelVisible(boolean isVisible);
@@ -64,4 +57,5 @@ public interface WikiPageWidgetView extends IsWidget {
 	void showInfo(String title, String message);
 	public void clear();
 	void addStyleName(String style);
+	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 }

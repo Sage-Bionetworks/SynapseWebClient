@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -65,6 +66,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	String currentEntityId;
 	Long currentVersionNumber;
 	boolean annotationsShown, fileHistoryShown;
+	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	Map<String,String> configMap;
@@ -87,7 +89,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalApplicationState
+			GlobalApplicationState globalApplicationState,
+			ModifiedCreatedByWidget modifiedCreatedBy
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -102,6 +105,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
+		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		
 		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
@@ -113,6 +117,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setMetadata(metadata.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
+		view.setModifiedCreatedBy(modifiedCreatedBy);
 		
 		tab.configure("Files", view.asWidget());
 		
@@ -174,7 +179,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		view.clearModifiedAndCreatedWidget();
+		modifiedCreatedBy.clear();
 		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
 	}
@@ -335,7 +340,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			provWidget.configure(null, configMap, null, null);
 		}
 		//Created By and Modified By
-		view.configureModifiedAndCreatedWidget(currentEntity);
+		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), 
+				currentEntity.getModifiedOn(), currentEntity.getModifiedBy());
 		
 		//Wiki Page
 		boolean isWikiPageVisible = !isProject;
