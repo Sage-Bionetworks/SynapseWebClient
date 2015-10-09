@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -89,8 +88,6 @@ public class EntityPageTopTest {
 	@Mock
 	UserEntityPermissions mockPermissions;
 	@Mock
-	GlobalApplicationState mockGlobalAppState;
-	@Mock
 	EntityActionController mockEntityActionController;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
@@ -110,7 +107,7 @@ public class EntityPageTopTest {
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockEntityActionController, 
-				mockActionMenuWidget, mockGlobalAppState);
+				mockActionMenuWidget);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);

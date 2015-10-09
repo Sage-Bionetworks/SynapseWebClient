@@ -68,7 +68,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
-	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -80,9 +79,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			TablesTab tablesTab,
 			ChallengeTab adminTab,
 			EntityActionController controller,
-			ActionMenuWidget actionMenu,
-			GlobalApplicationState globalApplicationState
-			) {
+			ActionMenuWidget actionMenu) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -93,7 +90,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.projectMetadata = projectMetadata;
 		this.controller = controller;
 		this.actionMenu = actionMenu;
-		this.globalApplicationState = globalApplicationState;
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
