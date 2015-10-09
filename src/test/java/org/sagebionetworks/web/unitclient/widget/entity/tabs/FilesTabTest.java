@@ -125,6 +125,7 @@ public class FilesTabTest {
 	CallbackP<Boolean> mockProjectInfoCallback;
 	
 	FilesTab tab;
+	String projectEntityId = "syn9";
 	String folderEntityId = "syn1";
 	String fileEntityId = "syn4444";
 	String entityId = "syn7777777";
@@ -170,6 +171,7 @@ public class FilesTabTest {
 		verify(mockView).setPreview(any(Widget.class));
 		verify(mockView).setMetadata(any(Widget.class));
 		verify(mockView).setWikiPage(any(Widget.class));
+		verify(mockView).setSynapseAlert(any(Widget.class));
 		
 		verify(mockFilesBrowser).setEntitySelectedHandler(any(EntitySelectedHandler.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
@@ -192,7 +194,8 @@ public class FilesTabTest {
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
-		tab.configure(table, mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(table, mockEntityUpdatedHandler, version);
 		
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -208,16 +211,16 @@ public class FilesTabTest {
 		//show project info
 		verify(mockProjectInfoCallback).invoke(true);
 		
-		verify(mockView).clearActionMenuContainer();
-		verify(mockView).setProgrammaticClientsVisible(false);
-		verify(mockView).setProvenanceVisible(false);
+		verify(mockView, times(2)).clearActionMenuContainer();
+		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
+		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockView).configureModifiedAndCreatedWidget(mockProjectEntity);
 		
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(entityId, canCertifiedUserAddChild, isCertifiedUser);
 		
 		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab).setPlace(captor.capture());
+		verify(mockTab, times(3)).setPlace(captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(entityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
@@ -234,7 +237,8 @@ public class FilesTabTest {
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
-		tab.configure(mockFileEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
 		
 		verify(mockSynapseClientAsync).getEntityBundleForVersion(eq(fileEntityId), eq(version), anyInt(), any(AsyncCallback.class));
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -263,20 +267,20 @@ public class FilesTabTest {
 		//hide project info
 		verify(mockProjectInfoCallback).invoke(false);
 		
-		verify(mockView).clearActionMenuContainer();
+		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView).setProgrammaticClientsVisible(true);
 		verify(mockView).configureProgrammaticClients(fileEntityId, version);
 		verify(mockView).setProvenanceVisible(true);
 		verify(mockView).configureModifiedAndCreatedWidget(mockFileEntity);
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
-		verify(mockView).setFileBrowserVisible(false);
+		verify(mockView, times(2)).setFileBrowserVisible(false);
 		verify(mockPortalGinInjector).createActionMenuWidget();
 		verify(mockPortalGinInjector).createEntityActionController();
 		verify(mockPortalGinInjector).getProvenanceRenderer();
 		
 		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab).setPlace(captor.capture());
+		verify(mockTab, times(2)).setPlace(captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(fileEntityId, place.getEntityId());
 		assertEquals(version, place.getVersionNumber());
@@ -285,7 +289,9 @@ public class FilesTabTest {
 		
 		//quick test to verify that reconfiguring with the same entity/version should cause nothing to change (certainly should not ask for the entity bundle again).
 		reset(mockSynapseClientAsync);
-		tab.configure(mockFileEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
+		
 		verifyZeroInteractions(mockSynapseClientAsync);
 	}
 	
@@ -300,7 +306,8 @@ public class FilesTabTest {
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
-		tab.configure(mockFolderEntity, mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
+		tab.configure(mockFolderEntity, mockEntityUpdatedHandler, version);
 		
 		verify(mockSynapseClientAsync).getEntityBundle(eq(folderEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -327,9 +334,9 @@ public class FilesTabTest {
 		//hide project info
 		verify(mockProjectInfoCallback).invoke(false);
 		
-		verify(mockView).clearActionMenuContainer();
-		verify(mockView).setProgrammaticClientsVisible(false);
-		verify(mockView).setProvenanceVisible(false);
+		verify(mockView, times(2)).clearActionMenuContainer();
+		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
+		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockView).configureModifiedAndCreatedWidget(mockFolderEntity);
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
@@ -339,7 +346,7 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).createEntityActionController();
 		
 		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab).setPlace(captor.capture());
+		verify(mockTab, times(2)).setPlace(captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(folderEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
@@ -396,5 +403,32 @@ public class FilesTabTest {
 		tab.configureStorageLocation(folderEntityId);
 		verify(mockEntityMetadata).setStorageLocationText("Synapse Storage");
 		verify(mockEntityMetadata).setStorageLocationVisible(true);
+	}
+	
+	@Test
+	public void testResetView() {
+		tab.resetView();
+		verify(mockSynapseAlert).clear();
+		verify(mockView).setFileTitlebarVisible(false);
+		verify(mockView).setFolderTitlebarVisible(false);
+		verify(mockView).setPreviewVisible(false);
+		verify(mockView).setMetadataVisible(false);
+		verify(mockView).setWikiPageWidgetVisible(false);
+		verify(mockView).setFileBrowserVisible(false);
+		verify(mockView).clearActionMenuContainer();
+		verify(mockView).clearModifiedAndCreatedWidget();
+		verify(mockBreadcrumb).clear();
+		verify(mockView).setProgrammaticClientsVisible(false);
+		verify(mockView).setProvenanceVisible(false);
+	}
+	
+	@Test
+	public void testShowProjectLoadError() {
+		Exception projectLoadError = new Exception("error loading project");
+		tab.setProject(projectEntityId, null, projectLoadError);
+		tab.showProjectLevelUI();
+		Synapse expectedPlace = new Synapse(projectEntityId, null, EntityArea.FILES, null);
+		verify(mockTab).setPlace(expectedPlace);
+		verify(mockSynapseAlert).handleException(projectLoadError);
 	}
 }

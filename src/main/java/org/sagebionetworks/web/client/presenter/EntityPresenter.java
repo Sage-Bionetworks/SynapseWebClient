@@ -92,7 +92,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
-				globalApplicationState.gotoLastPlace();
+				//reload
+				globalApplicationState.getPlaceChanger().goTo(globalApplicationState.getCurrentPlace());
 			}
 		});
 		

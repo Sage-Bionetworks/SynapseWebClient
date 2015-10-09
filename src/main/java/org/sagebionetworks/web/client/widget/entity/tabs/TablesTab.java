@@ -54,6 +54,8 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	QueryTokenProvider queryTokenProvider;
 	Entity entity;
 	EntityBundle projectBundle;
+	Throwable projectBundleLoadError;
+	String projectEntityId;
 	String areaToken;
 	SynapseAlert synAlert;
 	SynapseClientAsync synapseClient;
@@ -115,11 +117,11 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				//if this is the project id, then just reconfigure from the project bundle
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
-				if (entityId.equals(projectBundle.getEntity().getId())) {
-					setTargetBundle(projectBundle);
-					tab.showTab();
+				if (entityId.equals(projectEntityId)) {
+				    showProjectLevelUI();
+				    tab.showTab();
 				} else {
-					getTargetBundleAndDisplay(entityId);
+				    getTargetBundleAndDisplay(entityId);
 				}
 			};
 		};
@@ -130,19 +132,53 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 	
-	public void configure(Entity entity, EntityBundle projectBundle, EntityUpdatedHandler handler, String areaToken) {
-		this.areaToken = areaToken;
+	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
+		this.projectEntityId = projectEntityId;
 		this.projectBundle = projectBundle;
+		this.projectBundleLoadError = projectBundleLoadError;
+	}
+	
+	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken) {
+		this.entity = entity;
+		this.areaToken = areaToken;
 		this.handler = handler;
 		metadata.setEntityUpdatedHandler(handler);
-		
+		synAlert.clear();
 		boolean isTable = entity instanceof TableEntity;
+		
 		if (!isTable) {
 			//configure based on project
-			setTargetBundle(projectBundle);
+			showProjectLevelUI();
 		} else {
 			getTargetBundleAndDisplay(entity.getId());
 		}
+	}
+	
+	
+	public void showProjectLevelUI() {
+		tab.setPlace(new Synapse(projectEntityId, null, EntityArea.TABLES, null));
+		if (projectBundle != null) {
+			setTargetBundle(projectBundle);	
+		} else {
+			showError(projectBundleLoadError);
+		}
+	}
+	
+	public void resetView() {
+		synAlert.clear();
+		view.setEntityMetadataVisible(false);
+		view.setBreadcrumbVisible(false);
+		view.setTableListVisible(false);
+		view.setTitlebarVisible(false);
+		showProjectInfoCallack.invoke(false);
+		view.clearActionMenuContainer();
+		view.clearTableEntityWidget();
+		view.clearModifiedAndCreatedWidget();
+	}
+	
+	public void showError(Throwable error) {
+		resetView();
+		synAlert.handleException(error);
 	}
 	
 	public void setTargetBundle(EntityBundle bundle) {
@@ -157,6 +193,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		view.clearModifiedAndCreatedWidget();
+		
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
@@ -170,7 +207,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
-			tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
 		}
 	}
 	
@@ -200,16 +236,16 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				setTargetBundle(bundle);
-				tab.setPlace(new Synapse(entity.getId(), null, null, areaToken));
 				tab.showTab();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				showError(caught);
+				tab.showTab();
 			}			
 		};
-		
+		tab.setPlace(new Synapse(entityId, null, null, null));
 		synapseClient.getEntityBundle(entityId, mask, callback);
 	}
 	
