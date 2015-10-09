@@ -181,6 +181,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		breadcrumb.clear();
 		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
+		modifiedCreatedBy.setVisible(false);
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {

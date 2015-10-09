@@ -384,6 +384,7 @@ public class FilesTabTest {
 		verify(mockBreadcrumb).clear();
 		verify(mockView).setProgrammaticClientsVisible(false);
 		verify(mockView).setProvenanceVisible(false);
+		verify(mockModifiedCreatedBy).setVisible(false);
 	}
 	
 	@Test

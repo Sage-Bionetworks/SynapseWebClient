@@ -178,6 +178,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		showProjectInfoCallack.invoke(false);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
+		modifiedCreatedBy.setVisible(false);
 	}
 	
 	public void showError(Throwable error) {
@@ -196,12 +197,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
-		
+		modifiedCreatedBy.setVisible(false);
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
 			tableTitleBar.configure(bundle);
-			modifiedCreatedBy.configure( entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
+			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			ActionMenuWidget actionMenu = initActionMenu(bundle);
 			
 			TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();

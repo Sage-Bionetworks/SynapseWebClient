@@ -14,11 +14,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -176,7 +178,7 @@ public class TablesTabTest {
 		verify(mockEntityMetadata).setEntityBundle(mockTableEntityBundle, null);
 		verify(mockTableEntityWidget).configure(eq(mockTableEntityBundle), eq(canCertifiedUserEdit), eq(tab), eq(mockActionMenuWidget));
 		verify(mockView).setTableEntityWidget(any(Widget.class));
-		
+		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
 		verify(mockView).setEntityMetadataVisible(true);
@@ -185,7 +187,8 @@ public class TablesTabTest {
 		verify(mockView).setTitlebarVisible(true);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
-		
+		verify(mockModifiedCreatedBy).setVisible(false);
+
 		//hide project info
 		verify(mockProjectInfoCallback).invoke(false);
 		
@@ -213,16 +216,16 @@ public class TablesTabTest {
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(file, mockEntityUpdatedHandler, areaToken);
-		
+		verify(mockModifiedCreatedBy, Mockito.never()).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		
 		verify(mockView).setEntityMetadataVisible(false);
 		verify(mockView).setBreadcrumbVisible(false);
 		verify(mockView).setTableListVisible(true);
 		verify(mockView).setTitlebarVisible(false);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
-		
+		verify(mockModifiedCreatedBy).setVisible(false);
+
 		//show project info
 		verify(mockProjectInfoCallback).invoke(true);
 		
@@ -319,6 +322,7 @@ public class TablesTabTest {
 		verify(mockView).clearTableEntityWidget();
 		verify(mockView).clearActionMenuContainer();
 		verify(mockProjectInfoCallback).invoke(false);
+		verify(mockModifiedCreatedBy).setVisible(false);
 	}
 
 	@Test
