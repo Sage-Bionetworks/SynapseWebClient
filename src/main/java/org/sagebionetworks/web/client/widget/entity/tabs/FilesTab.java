@@ -243,7 +243,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		return a == b || (a != null && a.equals(b));
 	}
 	  
-	public void getTargetBundleAndDisplay(final String entityId, Long versionNumber) {
+	public void getTargetBundleAndDisplay(String entityId, Long versionNumber) {
 		//only ask for it if we are showing a different entity/version
 		if (equal(currentEntityId,entityId) && equal(currentVersionNumber, versionNumber)) {
 			return;
