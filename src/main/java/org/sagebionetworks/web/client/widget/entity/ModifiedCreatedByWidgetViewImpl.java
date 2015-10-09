@@ -59,13 +59,6 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	}
 
 	@Override
-	public void clear() {
-		container.setVisible(false);
-		modifiedOnText.setText("");
-		createdOnText.setText("");		
-	}
-
-	@Override
 	public void setVisible(boolean isVisible) {
 		container.setVisible(isVisible);
 	}

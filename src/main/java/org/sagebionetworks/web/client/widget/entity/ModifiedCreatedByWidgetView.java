@@ -16,7 +16,5 @@ public interface ModifiedCreatedByWidgetView extends IsWidget {
 
 	void setCreatedBadge(IsWidget createdBadge);
 
-	void clear();
-
 	void setVisible(boolean b);
 }
