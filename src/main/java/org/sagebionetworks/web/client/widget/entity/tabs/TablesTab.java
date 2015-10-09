@@ -178,7 +178,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		showProjectInfoCallack.invoke(false);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
-		modifiedCreatedBy.clear();
 	}
 	
 	public void showError(Throwable error) {
@@ -197,7 +196,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
-		modifiedCreatedBy.clear();
 		
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);

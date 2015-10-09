@@ -185,7 +185,6 @@ public class TablesTabTest {
 		verify(mockView).setTitlebarVisible(true);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
-		verify(mockModifiedCreatedBy).clear();
 		
 		//hide project info
 		verify(mockProjectInfoCallback).invoke(false);
@@ -223,7 +222,6 @@ public class TablesTabTest {
 		verify(mockView).setTitlebarVisible(false);
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
-		verify(mockModifiedCreatedBy).clear();
 		
 		//show project info
 		verify(mockProjectInfoCallback).invoke(true);
@@ -320,7 +318,6 @@ public class TablesTabTest {
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
 		verify(mockView).clearActionMenuContainer();
-		verify(mockModifiedCreatedBy).clear();
 		verify(mockProjectInfoCallback).invoke(false);
 	}
 

@@ -39,12 +39,6 @@ public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Pres
 		return view.asWidget();
 	}
 
-	public void clear() {
-		createdByBadge.clearState();
-		modifiedByBadge.clearState();
-		view.clear();
-	}
-
 	public void setVisible(boolean isVisible) {
 		view.setVisible(isVisible);
 	}

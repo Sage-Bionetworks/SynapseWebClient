@@ -179,7 +179,6 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		modifiedCreatedBy.clear();
 		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
 	}

@@ -45,11 +45,4 @@ public class ModifiedCreatedByWidgetTest {
 		verify(mockView).setModifiedOnText(" on " + mockGWT.getFormattedDateString(date));
 	}
 	
-	@Test
-	public void testClear() {
-		presenter.clear();
-		verify(mockCreatedByBadge).clearState();
-		verify(mockModifiedByBadge).clearState();
-		verify(mockView).clear();
-	}
 }
