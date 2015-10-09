@@ -93,5 +93,13 @@ public class EntityMetadata implements Presenter {
 		doiWidget.clear();
 		view.clear();
 	}
+
+	public void setStorageLocationText(String description) {
+		view.setUploadDestinationText(description);
+	}
+	
+	public void setStorageLocationVisible(boolean isVisible) {
+		view.setUploadDestinationPanelVisible(isVisible);
+	}
 	
 }

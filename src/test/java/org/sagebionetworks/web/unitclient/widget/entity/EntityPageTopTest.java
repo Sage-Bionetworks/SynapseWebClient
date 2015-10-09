@@ -1,8 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +23,11 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -75,7 +88,8 @@ public class EntityPageTopTest {
 	Tab mockChallengeInnerTab;
 	@Mock
 	UserEntityPermissions mockPermissions;
-	
+	@Mock
+	GlobalApplicationState mockGlobalAppState;
 	@Mock
 	EntityActionController mockEntityActionController;
 	@Mock
@@ -94,10 +108,9 @@ public class EntityPageTopTest {
 		when(mockWikiTab.asTab()).thenReturn(mockWikiInnerTab);
 		when(mockTablesTab.asTab()).thenReturn(mockTablesInnerTab);
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
-		
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockEntityActionController, 
-				mockActionMenuWidget);
+				mockActionMenuWidget, mockGlobalAppState);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);
@@ -105,7 +118,6 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getRootWikiId()).thenReturn(projectWikiId);
 		when(mockProjectHeader.getId()).thenReturn(projectEntityId);
 		when(mockProjectBundle.getPermissions()).thenReturn(mockPermissions);
-		
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 	}
 	
@@ -146,6 +158,7 @@ public class EntityPageTopTest {
 	
 	@Test
 	public void testConfigureWithProject(){
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = null;
@@ -161,6 +174,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).configure(mockProjectEntity, mockProjectBundle, mockEntityUpdatedHandler, versionNumber);		
 		verify(mockTablesTab).configure(mockProjectEntity, mockProjectBundle, mockEntityUpdatedHandler, areaToken);
 		verify(mockChallengeTab).configure(projectEntityId);
+		verify(mockEntityMetadata).setStorageLocationText("Synapse Storage");
 	}
 	
 	@Test
@@ -171,7 +185,6 @@ public class EntityPageTopTest {
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockTabs).showTab(mockFilesInnerTab);
 		verify(mockView).setPageTitle(anyString());
-		
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
@@ -229,7 +242,41 @@ public class EntityPageTopTest {
 		//and the root wiki id if area token is not defined
 		assertEquals(rootWikiId, pageTop.getWikiPageId("", rootWikiId));
 		assertEquals(rootWikiId, pageTop.getWikiPageId(null, rootWikiId));
-		
+	}
+
+	@Test
+	public void testConfigureStorageLocationExternalS3() {
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalS3UploadDestination exS3Destination = new ExternalS3UploadDestination();
+		exS3Destination.setBucket("testBucket");
+		exS3Destination.setBaseKey("testBaseKey");
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		Long versionNumber = 5L;
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, null, null);
+		verify(mockEntityMetadata).setStorageLocationText("s3://testBucket/testBaseKey");
+		verify(mockEntityMetadata).setStorageLocationVisible(true);
 	}
 	
+	@Test
+	public void testConfigureStorageLocationExternal() {
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
+		exS3Destination.setUrl("testUrl.com");
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		Long versionNumber = 5L;
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, null, null);
+		verify(mockEntityMetadata).setStorageLocationText("testUrl.com");
+		verify(mockEntityMetadata).setStorageLocationVisible(true);
+	}
+	
+	@Test
+	public void testConfigureStorageLocationSynapseStorage() {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		Long versionNumber = 5L;
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, null, null);
+		verify(mockEntityMetadata).setStorageLocationText("Synapse Storage");
+		verify(mockEntityMetadata).setStorageLocationVisible(true);
+	}
 }

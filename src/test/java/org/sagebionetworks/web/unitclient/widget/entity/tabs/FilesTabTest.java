@@ -1,10 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +33,9 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -32,7 +47,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -42,17 +56,12 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
-import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
-import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.i18n.server.testing.MockMessageCatalogContext;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -356,4 +365,36 @@ public class FilesTabTest {
 		assertEquals(mockTab, tab.asTab());
 	}
 
+	@Test
+	public void testConfigureStorageLocationExternalS3() {
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalS3UploadDestination exS3Destination = new ExternalS3UploadDestination();
+		exS3Destination.setBucket("testBucket");
+		exS3Destination.setBaseKey("testBaseKey");
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		tab.configureStorageLocation(folderEntityId);
+		verify(mockEntityMetadata).setStorageLocationText("s3://testBucket/testBaseKey");
+		verify(mockEntityMetadata).setStorageLocationVisible(true);
+	}
+	
+	@Test
+	public void testConfigureStorageLocationExternal() {
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalUploadDestination exS3Destination = new ExternalUploadDestination();
+		exS3Destination.setUrl("testUrl.com");
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		tab.configureStorageLocation(folderEntityId);
+		verify(mockEntityMetadata).setStorageLocationText("testUrl.com");
+		verify(mockEntityMetadata).setStorageLocationVisible(true);
+	}
+	
+	@Test
+	public void testConfigureStorageLocationSynapseStorage() {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		tab.configureStorageLocation(folderEntityId);
+		verify(mockEntityMetadata).setStorageLocationText("Synapse Storage");
+		verify(mockEntityMetadata).setStorageLocationVisible(true);
+	}
 }

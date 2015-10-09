@@ -79,7 +79,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Button anonymousFlagModalOkButton;
 	
 	@UiField
-	Div accessRestrictionDialogContainer;
+	Span accessRestrictionDialogContainer;
 	
 	Presenter presenter;
 	
