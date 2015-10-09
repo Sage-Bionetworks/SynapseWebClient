@@ -29,6 +29,8 @@ public interface GWTWrapper {
 	
 	void scheduleExecution(Callback callback, int delay);
 	
+	void scheduleDeferred(Callback callback);
+	
 	String getUserAgent();
 	
 	String getAppVersion();

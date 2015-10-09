@@ -16,11 +16,13 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -43,6 +45,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityPageTopView view;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle projectBundle;
+	private Throwable projectBundleLoadError;
 	private Entity entity;
 	
 	private Synapse.EntityArea area;
@@ -57,6 +60,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private ChallengeTab adminTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
+	private GWTWrapper gwt;
 	
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
@@ -72,7 +76,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			TablesTab tablesTab,
 			ChallengeTab adminTab,
 			EntityActionController controller,
-			ActionMenuWidget actionMenu
+			ActionMenuWidget actionMenu,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -84,6 +89,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.projectMetadata = projectMetadata;
 		this.controller = controller;
 		this.actionMenu = actionMenu;
+		this.gwt = gwt;
 		
 		initTabs();
 		view.setTabs(tabs.asWidget());
@@ -118,10 +124,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		filesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
 		tablesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
 		
-		//on tab change to these tabs, always show project info
+		//on tab change to these tabs, always show project info (if not null)
 		CallbackP<Tab> showProjectInfoCallback = new CallbackP<Tab>() {
 			public void invoke(Tab t) {
-				view.setProjectInformationVisible(true);
+				view.setProjectInformationVisible(projectBundle != null);
 			};
 		};
 		wikiTab.setTabClickedCallback(showProjectInfoCallback);
@@ -168,36 +174,96 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		
     	//note: the files/tables/wiki tabs rely on the project bundle, so they are configured later
     	configureProject();
-    	
-    	//configure challenge admin tab
-    	configureAdminTab();
 	}
     
     public void configureProject() {
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA ;
+		projectBundle = null;
+		projectBundleLoadError = null;
+		view.setProjectInformationVisible(false);
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				projectBundle = bundle;
-				configureFromProjectBundle();
+				projectMetadata.setEntityBundle(projectBundle, null);
+				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+				controller.configure(actionMenu, projectBundle, wikiId, entityUpdateHandler);
+				configureTabs();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				projectBundleLoadError = caught;
+				configureTabs();
 			}	
 		};
 		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
-    
-    private void configureFromProjectBundle() {
-    	//set up owner project information
-    	projectMetadata.setEntityBundle(projectBundle, null);
-    	configureWikiTab();
-    	configureFilesTab();
-    	configureTablesTab();
-    	controller.configure(actionMenu, projectBundle, projectBundle.getRootWikiId(), entityUpdateHandler);
-    }
+
+	private void configureTabs() {
+		configureCurrentAreaTab();
+		gwt.scheduleDeferred(new Callback() {
+			@Override
+			public void invoke() {
+				configureOtherAreaTabs();
+			}
+		});
+	}
+
+	public void configureCurrentAreaTab() {
+		if (area == null) {
+			configureWikiTab();
+			configureFilesTab();
+		} else {
+			switch (area) {
+			case FILES:
+				configureFilesTab();
+				break;
+			case WIKI:
+				configureWikiTab();
+				break;
+			case TABLES:
+				configureTablesTab();
+				break;
+			case ADMIN:
+				configureAdminTab();
+				break;
+			default:
+			}
+		}
+	}
+
+	public void configureOtherAreaTabs() {
+		if (area == null) {
+			configureTablesTab();
+			configureAdminTab();
+		} else {
+			switch (area) {
+			case FILES:
+				configureWikiTab();
+				configureTablesTab();
+				configureAdminTab();
+				break;
+			case WIKI:
+				configureFilesTab();
+				configureTablesTab();
+				configureAdminTab();
+				break;
+			case TABLES:
+				configureWikiTab();
+				configureFilesTab();
+				configureAdminTab();
+				break;
+			case ADMIN:
+				configureWikiTab();
+				configureFilesTab();
+				configureTablesTab();
+				break;
+			default:
+			}
+		}
+	}
+
     
     public void clearState() {
 		view.clear();
@@ -214,16 +280,24 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	public void configureTablesTab() {
-		tablesTab.configure(entity, projectBundle, entityUpdateHandler, tablesAreaToken);
+		tablesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+		tablesTab.configure(entity, entityUpdateHandler, tablesAreaToken);
 	}
 	
 	public void configureFilesTab() {
-		filesTab.configure(entity, projectBundle, entityUpdateHandler, filesVersionNumber);
+		filesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
+		filesTab.configure(entity, entityUpdateHandler, filesVersionNumber);
 	}
 	
 	public void configureWikiTab() {
 		final boolean isWikiTabShown = (area == null && entity instanceof Project) || area == EntityArea.WIKI;
-		final boolean canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
+		boolean canEdit = false;
+		String wikiId = null;
+		
+		if (projectBundle != null) {
+			canEdit = projectBundle.getPermissions().getCanCertifiedUserEdit();
+			wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+		}
 		final WikiPageWidget.Callback callback = new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
@@ -239,8 +313,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 		
-		String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-		wikiTab.configure(projectBundle.getEntity().getId(), wikiId, 
+		wikiTab.configure(projectHeader.getId(), wikiId, 
 				canEdit, callback);
 		
 		if (isWikiTabShown) {
