@@ -50,7 +50,7 @@ public class AclUtils {
 		
 		// TODO replace this list with ModelConstants.EVALUATION_ADMIN_ACCESS_PERMISSIONS
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
-				READ, SUBMIT, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION, 
+				CREATE, READ, SUBMIT, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION, 
 				CHANGE_PERMISSIONS, UPDATE, DELETE, DELETE_SUBMISSION)));
 		
 		// Build the reverse mapping from the first map
