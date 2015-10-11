@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.presenter.SearchUtil;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
@@ -50,7 +51,9 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
     
 	@Override
 	public void search(String value) {
-		if(searchAll) {
+		if (value.charAt(0) == '@') {
+			globalApplicationState.getPlaceChanger().goTo(new PeopleSearch(value.substring(1)));
+		} else if(searchAll) {
 			SearchQuery query = SearchQueryUtils.getAllTypesSearchQuery();
 			query.setQueryTerm(Arrays.asList(value.split(" ")));
 			try {
@@ -58,8 +61,8 @@ public class HomeSearchBox implements HomeSearchBoxView.Presenter, SynapseWidget
 			} catch (JSONObjectAdapterException e) {
 				// if fail, fall back on regular search
 			}
+			SearchUtil.searchForTerm(value, globalApplicationState, synapseClient);
 		}
-		SearchUtil.searchForTerm(value, globalApplicationState, synapseClient);
 	}
 	
 	@Override
