@@ -14,8 +14,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.doi.Doi;
@@ -24,6 +26,7 @@ import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -56,16 +59,19 @@ public class EntityMetadataTest {
 	Doi mockDoi;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJSNIUtils mockJSNI;
 	
 	String entityId = "syn123";
 	String entityName = "testEntity";
+	Entity en = new Folder();
 	EntityMetadata widget;
 	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget, 
-				mockFileHistoryWidget, mockSynapseClient);
+				mockFileHistoryWidget, mockSynapseClient, mockJSNI);
 		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 	}
 	
@@ -85,6 +91,7 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		Long versionNumber = -122L;
+		en.setId(entityId);
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setRestrictionPanelVisible(false);
@@ -153,8 +160,9 @@ public class EntityMetadataTest {
 		exS3Destination.setBaseKey("testBaseKey");
 		uploadDestinations.add(exS3Destination);
 		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
-		widget.configureStorageLocation(entityId);
+		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("s3://testBucket/testBaseKey");
+		verify(mockView).setUploadDestinationPanelVisible(false);
 		verify(mockView).setUploadDestinationPanelVisible(true);
 	}
 	
@@ -165,17 +173,36 @@ public class EntityMetadataTest {
 		exS3Destination.setUrl("testUrl.com");
 		uploadDestinations.add(exS3Destination);
 		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
-		widget.configureStorageLocation(entityId);
+		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("testUrl.com");
+		verify(mockView).setUploadDestinationPanelVisible(false);
 		verify(mockView).setUploadDestinationPanelVisible(true);
 	}
 	
 	@Test
 	public void testConfigureStorageLocationSynapseStorage() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
-		widget.configureStorageLocation(entityId);
+		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("Synapse Storage");
+		verify(mockView).setUploadDestinationPanelVisible(false);
 		verify(mockView).setUploadDestinationPanelVisible(true);
+	}
+	
+	@Test
+	public void testConfigureStorageLocationFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("This is an exception!")).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		widget.configureStorageLocation(en);
+		verify(mockJSNI).consoleLog("This is an exception!");
+		verify(mockView).setUploadDestinationPanelVisible(false);
+		verify(mockView, Mockito.never()).setUploadDestinationPanelVisible(true);
+	}
+	
+	@Test
+	public void testConfigureStorageLocationFile() {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		widget.configureStorageLocation(new FileEntity());
+		verify(mockView).setUploadDestinationPanelVisible(false);
+		verify(mockView, Mockito.never()).setUploadDestinationPanelVisible(true);
 	}
 	
 }

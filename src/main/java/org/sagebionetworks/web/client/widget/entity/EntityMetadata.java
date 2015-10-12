@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,6 +33,7 @@ public class EntityMetadata implements Presenter {
 	private FileHistoryWidget fileHistoryWidget;
 	private RestrictionWidget restrictionWidget;
 	private SynapseClientAsync synapseClient;
+	private SynapseJSNIUtils jsni;
 	
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
@@ -39,13 +41,15 @@ public class EntityMetadata implements Presenter {
 			AnnotationsRendererWidget annotationsWidget,
 			RestrictionWidget restrictionWidget,
 			FileHistoryWidget fileHistoryWidget, 
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient, 
+			SynapseJSNIUtils jsni) {
 		this.view = view;
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.restrictionWidget = restrictionWidget;
 		this.synapseClient = synapseClient;
+		this.jsni = jsni;
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
@@ -71,9 +75,7 @@ public class EntityMetadata implements Presenter {
 			view.setRestrictionPanelVisible(en instanceof TableEntity
 					|| en instanceof Folder);
 		}
-		if (en instanceof Folder || en instanceof Project) {
-			configureStorageLocation(en.getId());
-		}
+		configureStorageLocation(en);
 		restrictionWidget.configure(bundle, true, false, true, new Callback() {
 			@Override
 			public void invoke() {
@@ -109,30 +111,34 @@ public class EntityMetadata implements Presenter {
 		view.clear();
 	}
 	
-	 public void configureStorageLocation(String containerEntityId) {
-		 synapseClient.getUploadDestinations(containerEntityId, new AsyncCallback<List<UploadDestination>>() {
-			public void onSuccess(List<UploadDestination> uploadDestinations) {
-				if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
-					view.setUploadDestinationText("Synapse Storage");
-				} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
-					ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
-					view.setUploadDestinationText(externalUploadDestination.getUrl());
-				} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
-					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
-					String description = "s3://" + externalUploadDestination.getBucket() + "/";
-					if (externalUploadDestination.getBaseKey() != null) {
-						description += externalUploadDestination.getBaseKey();
-					};
-					view.setUploadDestinationText(description);
+	 public void configureStorageLocation(Entity en) {
+		 view.setUploadDestinationPanelVisible(false);
+		 if (en instanceof Folder || en instanceof Project) {
+			 String containerEntityId = en.getId();
+			 synapseClient.getUploadDestinations(containerEntityId, new AsyncCallback<List<UploadDestination>>() {
+				public void onSuccess(List<UploadDestination> uploadDestinations) {
+					if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
+						view.setUploadDestinationText("Synapse Storage");
+					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
+						ExternalUploadDestination externalUploadDestination = (ExternalUploadDestination) uploadDestinations.get(0);
+						view.setUploadDestinationText(externalUploadDestination.getUrl());
+					} else if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
+						ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
+						String description = "s3://" + externalUploadDestination.getBucket() + "/";
+						if (externalUploadDestination.getBaseKey() != null) {
+							description += externalUploadDestination.getBaseKey();
+						};
+						view.setUploadDestinationText(description);
+					}
+					view.setUploadDestinationPanelVisible(true);
 				}
-				view.setUploadDestinationPanelVisible(true);
-			}
-
-			@Override
-			public void onFailure(Throwable arg0) {
-				view.setUploadDestinationPanelVisible(false);
-			};
-		});
+	
+				@Override
+				public void onFailure(Throwable err) {
+					jsni.consoleLog(err.getMessage());
+				};
+			});
+		 }
     }
 	
 }
