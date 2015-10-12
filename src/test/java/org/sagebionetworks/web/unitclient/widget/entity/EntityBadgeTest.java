@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -177,6 +178,17 @@ public class EntityBadgeTest {
 		header.setId("syn93847");
 		widget.entityClicked(header);
 		verify(mockPlaceChanger).goTo(any(Synapse.class));
+	}
+	
+	@Test
+	public void testEntityClickedCustomHandler() throws Exception {
+		CallbackP<String> mockEntityClicked = mock(CallbackP.class);
+		widget.setEntityClickedHandler(mockEntityClicked);
+		String id = "syn77";
+		EntityQueryResult header = new EntityQueryResult();
+		header.setId(id);
+		widget.entityClicked(header);
+		verify(mockEntityClicked).invoke(id);
 	}
 	
 	@Test
