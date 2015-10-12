@@ -164,7 +164,7 @@ public class FilesTabTest {
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		
-		verify(mockFilesBrowser).setEntitySelectedHandler(any(EntitySelectedHandler.class));
+		verify(mockFilesBrowser).setEntityClickedHandler(any(CallbackP.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
 	}
 	

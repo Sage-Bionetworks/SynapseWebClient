@@ -121,13 +121,13 @@ public class FilesTab implements FilesTabView.Presenter{
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
-		EntitySelectedHandler entitySelectedHandler = new EntitySelectedHandler() {
+		CallbackP<String> entityClicked = new CallbackP<String> () {
 			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				getTargetBundleAndDisplay(event.getSelectedEntityId(), null);
+			public void invoke(String id) {
+				getTargetBundleAndDisplay(id, null);
 			}
 		};
-		filesBrowser.setEntitySelectedHandler(entitySelectedHandler);
+		filesBrowser.setEntityClickedHandler(entityClicked);
 		initBreadcrumbLinkClickedHandler();
 	}
 
