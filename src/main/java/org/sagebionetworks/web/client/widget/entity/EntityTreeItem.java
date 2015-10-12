@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -52,6 +53,10 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	
 	public void showTypeIcon() {
 		entityBadge.hideLoadingIcon();
+	}
+	
+	public void setEntityClickedHandler(CallbackP<String> callback) {
+		entityBadge.setEntityClickedHandler(callback);
 	}
 	
 	public EntityQueryResult getHeader() {
