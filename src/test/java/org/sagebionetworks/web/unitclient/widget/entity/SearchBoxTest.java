@@ -13,8 +13,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 

@@ -370,8 +370,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
@@ -834,10 +832,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// User Suggest Box
 		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
-
-		// Home Search Box
-		bind(HomeSearchBoxViewImpl.class).in(Singleton.class);
-		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
 		
 		bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
 		bind(FileInputWidget.class).to(FileInputWidgetImpl.class);
