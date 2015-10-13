@@ -908,6 +908,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public AccessControlList updateTeamAcl(AccessControlList acl)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.updateTeamACL(acl);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public AccessControlList getTeamAcl(String teamId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getTeamACL(teamId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public AccessControlList deleteAcl(String ownerEntityId)

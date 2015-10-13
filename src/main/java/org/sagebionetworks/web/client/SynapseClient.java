@@ -265,6 +265,10 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public AccessControlList updateAcl(AccessControlList aclEW, boolean recursive) throws RestServiceException;
 
+	public AccessControlList updateTeamAcl(AccessControlList acl) throws RestServiceException;
+	
+	public AccessControlList getTeamAcl(String teamId) throws RestServiceException;
+	
 	public AccessControlList deleteAcl(String ownerEntityId) throws RestServiceException;
 
 	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;

@@ -117,4 +117,8 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 	@Override
 	public void showErrorMessage(String message) {
 	}
+	
+	public void setPublicPrivateButtonVisible(boolean isVisible) {
+		makePublicButton.setVisible(isVisible);
+	}
 }

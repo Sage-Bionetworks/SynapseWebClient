@@ -100,7 +100,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId) {
 		this.publicAclPrincipalId = publicAclPrincipalId;
 	}
-	
+	@Override
+	public void setPublicPrivateButtonVisible(boolean isVisible) {
+		addPeoplePanel.setPublicPrivateButtonVisible(isVisible);
+	}
 	@Override
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
 		this.isPubliclyVisible = isPubliclyVisible;

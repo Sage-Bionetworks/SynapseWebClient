@@ -167,6 +167,9 @@ public interface SynapseClientAsync {
 	
 	public void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
 	
+	public void updateTeamAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
+	public void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
+	
 	public void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
