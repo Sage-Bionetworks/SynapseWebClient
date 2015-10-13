@@ -15,6 +15,8 @@
 	                <g:SimplePanel ui:field="mediaObjectContainer"/>
 	            </b:Column>    
 	    		<b:Column ui:field="commandsContainer" size="MD_3">
+	    			<b:Button pull="RIGHT" text="Permissions" ui:field="shareButton"/>
+	    			<g:SimplePanel ui:field="aclModalContainer"/>
 	    		    <b:ButtonGroup pull="RIGHT">
 	    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
 		    		    <b:DropDownMenu>

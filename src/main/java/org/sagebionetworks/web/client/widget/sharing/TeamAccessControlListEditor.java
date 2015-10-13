@@ -91,7 +91,7 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 
 	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
 		HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
-		permissionDisplay.put(PermissionLevel.CAN_MESSAGE_TEAM, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_PARTICIPATE);
+		permissionDisplay.put(PermissionLevel.CAN_MESSAGE_TEAM, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_MESSAGE_TEAM);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER_TEAM, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
 		return permissionDisplay;
 	}
