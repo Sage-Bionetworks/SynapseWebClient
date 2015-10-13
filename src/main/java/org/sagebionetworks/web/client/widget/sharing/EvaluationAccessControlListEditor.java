@@ -210,7 +210,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private void setViewDetails() {
 		validateEditorState();
 		view.showLoading();
-		view.buildWindow(false, false, true);
+		view.buildWindow(false, false, true, PermissionLevel.CAN_VIEW);
 		populateAclEntries();
 		updateIsPublicAccess();
 	}

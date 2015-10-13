@@ -150,7 +150,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 						refresh(teamId);
 					}
 				};
-				view.setShareButtonVisible(isAdmin);
 				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 				view.setPublicJoinVisible(canPublicJoin);
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());

@@ -16,8 +16,6 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -27,7 +25,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -138,13 +135,11 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			userBadge.setSize(BadgeSize.LARGE);
 			Widget userBadgeView = userBadge.asWidget();
 			left.add(userBadgeView);
+			if (teamMember.getIsTeamAdmin()) {
+				//otherwise, indicate that this row user is an admin (via label)
+				left.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
+			}
 			if (isAdmin) {
-				//add simple combo
-				ListBox combo = getAccessCombo(member.getOwnerId(), teamMember.getIsTeamAdmin());
-				SimplePanel wrap = new SimplePanel();
-				wrap.addStyleName("margin-top-5");
-				wrap.add(combo);
-				left.add(wrap);
 				//add delete member button
 				Button leaveButton = DisplayUtils.createButton("Remove", ButtonType.DANGER);
 				leaveButton.addStyleName("pull-right margin-left-5");
@@ -161,10 +156,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 					}
 				});
 				right.add(leaveButton);
-			} else if (teamMember.getIsTeamAdmin()) {
-				//otherwise, indicate that this row user is an admin (via label)
-				left.add(new HTML("<span>"+ADMIN_ACCESS+"</span>"));
-			}
+			} 
 			
 			singleRow.add(mediaContainer);
 		}
@@ -193,24 +185,6 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		lc.add(ul);
 		if (entries.size() > 1)
 			mainContainer.add(lc);
-	}
-	
-	private ListBox getAccessCombo(final String ownerId, boolean isAdmin) {
-		final ListBox accessCombo = new ListBox();
-		accessCombo.setStyleName("form-control");
-		accessCombo.addItem(MEMBER_ACCESS);
-		accessCombo.addItem(ADMIN_ACCESS);
-		accessCombo.setWidth("150px");
-		accessCombo.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				boolean isAdmin = accessCombo.getSelectedIndex() == 1;
-				presenter.setIsAdmin(ownerId, isAdmin);
-			}
-		});
-		accessCombo.setSelectedIndex(isAdmin ? 1 : 0);
-		
-		return accessCombo;
 	}
 	
 	private Anchor createPaginationAnchor(String anchorName, final int newStart) {

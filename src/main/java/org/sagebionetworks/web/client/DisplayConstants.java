@@ -120,7 +120,7 @@ public class DisplayConstants {
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
-	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
+	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Team manager";
 	public static final String MENU_PERMISSION_LEVEL_CAN_PARTICIPATE = "Can participate";
 	public static final String MENU_PERMISSION_LEVEL_CAN_SCORE = "Can score";
 	public static final String MENU_PERMISSION_LEVEL_CAN_MESSAGE_TEAM = "Can e-mail team";

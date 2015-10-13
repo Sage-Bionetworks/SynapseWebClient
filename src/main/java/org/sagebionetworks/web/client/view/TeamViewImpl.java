@@ -263,10 +263,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 		synapseEmailField.setValue(teamEmail);
 	}
 	@Override
-	public void setShareButtonVisible(boolean isVisible) {
-		shareButton.setVisible(isVisible);
-	}
-	@Override
 	public void setAclModalWidget(Widget asWidget) {
 		aclModalContainer.setWidget(asWidget);
 	}

@@ -35,6 +35,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private Long publicAclPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
+	private PermissionLevel defaultPermissionLevel;
 	
 	private SharingPermissionsGrid permissionsGrid;
 	
@@ -119,9 +120,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission) {		
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel) {		
 		clear();
-		
+		this.defaultPermissionLevel = defaultPermissionLevel;
 		// Display Permissions grid.
 		showEditColumns = canChangePermission && !isInherited;
 		CallbackP<Long> removeUserCallback = null;
@@ -267,7 +268,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			String principalIdStr = selectedUser.getId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
-			presenter.setAccess(principalId, PermissionLevel.CAN_VIEW);
+			presenter.setAccess(principalId, defaultPermissionLevel);
 			// clear selections
 			addPeoplePanel.getSuggestBox().clear();
 		} else {

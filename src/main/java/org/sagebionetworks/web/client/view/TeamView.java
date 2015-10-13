@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -43,5 +42,4 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setTotalMemberCount(String string);
 	void setMediaObjectPanel(Team team);
 	void setTeamEmailAddress(String teamEmail);
-	void setShareButtonVisible(boolean isVisible);
 }

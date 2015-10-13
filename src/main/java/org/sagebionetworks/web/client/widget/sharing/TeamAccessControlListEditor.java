@@ -148,7 +148,10 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 	private void setViewDetails() {
 		validateEditorState();
 		view.showLoading();
-		view.buildWindow(false, false, true);
+		boolean isInherited = false;
+		boolean canEnableInheritance = false;
+		boolean canChangePermission = true;
+		view.buildWindow(isInherited, canEnableInheritance, canChangePermission, PermissionLevel.CAN_MESSAGE_TEAM);
 		populateAclEntries();
 	}
 
