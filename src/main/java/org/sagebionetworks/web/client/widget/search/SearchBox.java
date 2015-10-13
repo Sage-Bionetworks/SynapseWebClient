@@ -26,7 +26,6 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 	
 	@Inject
 	public SearchBox(SearchBoxView view, 
-			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			AdapterFactory adapterFactory,
 			SynapseClientAsync synapseClient) {
@@ -49,19 +48,21 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 
 	@Override
 	public void search(String value) {
-		if (value.charAt(0) == '@') {
-			globalApplicationState.getPlaceChanger().goTo(new PeopleSearch(value.substring(1)));
-		} else {
-			if (searchAll) {
-				SearchQuery query = SearchQueryUtils.getAllTypesSearchQuery();
-				query.setQueryTerm(Arrays.asList(value.split(" ")));
-				try {
-					value = query.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-				} catch (JSONObjectAdapterException e) {
-					// if fail, fall back on regular search
+		if (value != null && !value.isEmpty()) {
+			if (value.charAt(0) == '@') {
+				globalApplicationState.getPlaceChanger().goTo(new PeopleSearch(value.substring(1)));
+			} else {
+				if(searchAll) {
+					SearchQuery query = SearchQueryUtils.getAllTypesSearchQuery();
+					query.setQueryTerm(Arrays.asList(value.split(" ")));
+					try {
+						value = query.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+					} catch (JSONObjectAdapterException e) {
+						// if fail, fall back on regular search
+					}
 				}
+				SearchUtil.searchForTerm(value, globalApplicationState, synapseClient);
 			}
-			SearchUtil.searchForTerm(value, globalApplicationState, synapseClient);
 		}
 	}
 
