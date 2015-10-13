@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
@@ -44,6 +45,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private CallbackP<String> customEntityClickHandler;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -192,9 +194,18 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		}
 	}
 	
+	public void setEntityClickedHandler(CallbackP<String> callback) {
+		customEntityClickHandler = callback;
+	}
+	
 	@Override
 	public void entityClicked(EntityQueryResult entityHeader) {
-		globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));
+		showLoadingIcon();
+		if (customEntityClickHandler == null) {
+			globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));	
+		} else {
+			customEntityClickHandler.invoke(entityHeader.getId());
+		}
 	}
 	
 	public void hideLoadingIcon() {

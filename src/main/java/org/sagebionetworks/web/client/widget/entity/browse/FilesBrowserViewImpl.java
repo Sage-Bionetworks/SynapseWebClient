@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
@@ -130,6 +131,11 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	public void setEntitySelectedHandler(org.sagebionetworks.web.client.events.EntitySelectedHandler handler) {
 		entityTreeBrowser.setEntitySelectedHandler(handler);
 	};
+	
+	@Override
+	public void setEntityClickedHandler(CallbackP<String> callback) {
+		entityTreeBrowser.setEntityClickedHandler(callback);
+	}
 	
 	@Override
 	public void showQuizInfoDialog() {
