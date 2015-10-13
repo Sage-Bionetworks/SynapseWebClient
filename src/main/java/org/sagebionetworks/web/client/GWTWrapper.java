@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -36,4 +38,6 @@ public interface GWTWrapper {
 	String getAppVersion();
 	
 	int nextRandomInt();
+
+	String getFormattedDateString(Date date);
 }

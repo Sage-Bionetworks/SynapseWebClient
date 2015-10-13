@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import org.sagebionetworks.repo.model.Entity;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -23,13 +21,11 @@ public interface FilesTabView extends IsWidget {
 	void setWikiPage(Widget w);
 	void setSynapseAlert(Widget w);
 	void configureProgrammaticClients(String entityId, Long versionNumber);
-	
 	void setProvenanceVisible(boolean visible);
 	void setProgrammaticClientsVisible(boolean visible);
-	void configureModifiedAndCreatedWidget(Entity entity);
-	void clearModifiedAndCreatedWidget();
 	void setWikiPageWidgetVisible(boolean visible);
 	void setFileBrowserVisible(boolean visible);
 	void setPreviewVisible(boolean visible);
 	void clearActionMenuContainer();
+	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 }

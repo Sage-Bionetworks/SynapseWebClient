@@ -1,18 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -49,19 +44,10 @@ public class TablesTabViewImpl implements TablesTabView {
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, TablesTabViewImpl> {}
 	
 	Widget widget;
-	UserBadge createdByBadge, modifiedByBadge;
+	
 	@Inject
-	public TablesTabViewImpl(
-			UserBadge createdByBadge,
-			UserBadge modifiedByBadge
-			) {
-		//empty constructor, you can include this widget in the ui xml
-		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
+	public TablesTabViewImpl(TabsViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
-		
-		this.createdByBadge = createdByBadge;
-		this.modifiedByBadge = modifiedByBadge;
-		
 		initClickHandlers();
 	}
 	
@@ -95,36 +81,6 @@ public class TablesTabViewImpl implements TablesTabView {
 		tableTitlebarContainer.add(w);
 	}
 	
-	@Override
-	public void configureModifiedAndCreatedWidget(Entity entity)  {
-		createdByBadge.asWidget().removeFromParent();
-		modifiedByBadge.asWidget().removeFromParent();
-		
-		FlowPanel attributionPanel = new FlowPanel();
-		createdByBadge.configure(entity.getCreatedBy());
-		modifiedByBadge.configure(entity.getModifiedBy());
-		
-		InlineHTML inlineHtml = new InlineHTML(DisplayConstants.CREATED_BY);
-		attributionPanel.add(inlineHtml);
-		Widget createdByBadgeWidget = createdByBadge.asWidget();
-		createdByBadgeWidget.addStyleName("movedown-4 margin-left-5");
-		attributionPanel.add(createdByBadgeWidget);
-		
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getCreatedOn()) + "<br>" + DisplayConstants.MODIFIED_BY);
-		
-		attributionPanel.add(inlineHtml);
-		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
-		modifiedByBadgeWidget.addStyleName("movedown-4 margin-left-5");
-		attributionPanel.add(modifiedByBadgeWidget);
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.convertDataToPrettyString(entity.getModifiedOn()));
-		
-		attributionPanel.add(inlineHtml);
-		tableModifiedAndCreatedContainer.add(attributionPanel);
-	}
-	@Override
-	public void clearModifiedAndCreatedWidget() {
-		tableModifiedAndCreatedContainer.clear();
-	}
 	@Override
 	public void setEntityMetadata(Widget w) {
 		tableMetadataContainer.add(w);
@@ -172,6 +128,11 @@ public class TablesTabViewImpl implements TablesTabView {
 	@Override
 	public void setTitlebarVisible(boolean visible) {
 		tableTitlebarContainer.setVisible(visible);
+	}
+
+	@Override
+	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
+		tableModifiedAndCreatedContainer.setWidget(modifiedCreatedBy);		
 	}
 }
 
