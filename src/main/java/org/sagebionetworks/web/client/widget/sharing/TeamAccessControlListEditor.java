@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -287,7 +288,6 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 	}
 	
 	protected void applyChanges(AsyncCallback<AccessControlList> callback) {
-		// Apply changes
 		synapseClient.updateTeamAcl(acl, callback);
 	}
 	
@@ -322,16 +322,5 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
 			}
 		});
-	}
-	/**
-	 * This handler is notified when there are changes made to the editor.
-	 */
-	public interface HasChangesHandler{
-		/**
-		 * Called with true then the user has changes in the editor.  Called with false when there are no changes in this editor.
-		 * @param hasChanges True when there are changes.  False when there are no changes.
-		 */
-		void hasChanges(boolean hasChanges);
-		
 	}
 }

@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.sharing.TeamAccessControlListEditor.HasChangesHandler;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

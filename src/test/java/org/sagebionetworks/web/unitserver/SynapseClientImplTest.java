@@ -317,6 +317,8 @@ public class SynapseClientImplTest {
 				.thenReturn(acl);
 		when(mockSynapse.updateACL((AccessControlList) any(), eq(false)))
 				.thenReturn(acl);
+		when(mockSynapse.updateTeamACL(any(AccessControlList.class))).thenReturn(acl);
+		when(mockSynapse.getTeamACL(anyString())).thenReturn(acl);
 
 		EntityHeader bene = new EntityHeader();
 		bene.setId("syn999");
@@ -2160,5 +2162,19 @@ public class SynapseClientImplTest {
 	public void testCreateStorageLocationSettingFailure() throws SynapseException, RestServiceException {
 		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenThrow(new Exception());
 		synapseClient.createStorageLocationSetting(entityId, new ExternalStorageLocationSetting());
+	}
+	
+	@Test
+	public void testUpdateTeamAcl() throws SynapseException, RestServiceException {
+		AccessControlList returnedAcl = synapseClient.updateTeamAcl(acl);
+		verify(mockSynapse).updateTeamACL(acl);
+		assertEquals(acl, returnedAcl);
+	}
+	@Test
+	public void testGetTeamAcl() throws SynapseException, RestServiceException {
+		String teamId = "14";
+		AccessControlList returnedAcl = synapseClient.getTeamAcl(teamId);
+		verify(mockSynapse).getTeamACL(teamId);
+		assertEquals(acl, returnedAcl);
 	}
 }
