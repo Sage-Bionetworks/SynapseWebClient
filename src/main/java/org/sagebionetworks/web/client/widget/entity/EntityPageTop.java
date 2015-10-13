@@ -64,7 +64,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	private EntityActionController controller;
 	private ActionMenuWidget actionMenu;
-	boolean annotationsShown;
+	private boolean annotationsShown;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -77,8 +77,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			ChallengeTab adminTab,
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
-			GWTWrapper gwt
-			) {
+			GWTWrapper gwt) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -264,7 +263,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 	}
 
-    
     public void clearState() {
 		view.clear();
 		this.entity = null;

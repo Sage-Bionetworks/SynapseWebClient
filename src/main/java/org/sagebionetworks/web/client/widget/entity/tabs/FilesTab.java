@@ -1,6 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.DOI;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -260,7 +270,6 @@ public class FilesTab implements FilesTabView.Presenter{
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
 					return;
 				}
-				
 				setTargetBundle(bundle);
 				tab.showTab();
 			}
@@ -278,6 +287,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
 		}
 	}
+	
+	
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		EntityPresenter.filterToDownloadARs(bundle);

@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -85,7 +85,6 @@ public class EntityPageTopTest {
 	Tab mockChallengeInnerTab;
 	@Mock
 	UserEntityPermissions mockPermissions;
-	
 	@Mock
 	EntityActionController mockEntityActionController;
 	@Mock
@@ -106,7 +105,6 @@ public class EntityPageTopTest {
 		when(mockWikiTab.asTab()).thenReturn(mockWikiInnerTab);
 		when(mockTablesTab.asTab()).thenReturn(mockTablesInnerTab);
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
-		
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockEntityActionController, 
 				mockActionMenuWidget, mockGWTWrapper);
@@ -118,7 +116,6 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getRootWikiId()).thenReturn(projectWikiId);
 		when(mockProjectHeader.getId()).thenReturn(projectEntityId);
 		when(mockProjectBundle.getPermissions()).thenReturn(mockPermissions);
-		
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 	}
 	
@@ -210,7 +207,6 @@ public class EntityPageTopTest {
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockTabs).showTab(mockFilesInnerTab);
 		verify(mockView).setPageTitle(anyString());
-		
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class));
@@ -233,9 +229,8 @@ public class EntityPageTopTest {
 		verify(mockTabs).showTab(mockFilesInnerTab);
 		verify(mockView).setPageTitle(anyString());
 		
-		verify(mockEntityMetadata, never()).setEntityBundle(mockProjectBundle, null);
+		verify(mockEntityMetadata, Mockito.never()).setEntityBundle(mockProjectBundle, null);
 		EntityBundle expectedProjectEntityBundle = null;
-		
 		verify(mockWikiTab).configure(eq(projectEntityId), eq((String)null), eq(false), any(WikiPageWidget.Callback.class));
 		verify(mockFilesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
 		verify(mockFilesTab).configure(mockFileEntity, mockEntityUpdatedHandler, versionNumber);
@@ -299,7 +294,5 @@ public class EntityPageTopTest {
 		//and the root wiki id if area token is not defined
 		assertEquals(rootWikiId, pageTop.getWikiPageId("", rootWikiId));
 		assertEquals(rootWikiId, pageTop.getWikiPageId(null, rootWikiId));
-		
 	}
-	
 }
