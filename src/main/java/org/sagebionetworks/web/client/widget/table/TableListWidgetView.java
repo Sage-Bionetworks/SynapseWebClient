@@ -2,11 +2,9 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 

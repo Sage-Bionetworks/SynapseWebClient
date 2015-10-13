@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.core.client.GWT;
@@ -72,6 +74,11 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public DateTimeFormat getDateTimeFormat(PredefinedFormat format) {
 		return DateTimeFormat.getFormat(format);
+	}
+	
+	@Override
+	public String getFormattedDateString(Date date) {
+		return DisplayUtils.convertDataToPrettyString(date);
 	}
 	
 	@Override

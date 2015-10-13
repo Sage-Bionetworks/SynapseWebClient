@@ -5,7 +5,6 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.LinkedGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;

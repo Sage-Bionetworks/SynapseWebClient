@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import org.sagebionetworks.repo.model.Entity;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -20,7 +18,6 @@ public interface TablesTabView extends IsWidget {
 	void setEntityMetadataVisible(boolean visible);
 	void setActionMenu(Widget w);
 	void setSynapseAlert(Widget w);
-	void configureModifiedAndCreatedWidget(Entity entity);
-	void clearModifiedAndCreatedWidget();
 	void clearActionMenuContainer();
+	void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 }

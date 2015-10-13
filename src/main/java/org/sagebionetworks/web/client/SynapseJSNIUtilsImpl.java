@@ -482,12 +482,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _showTwitterFeed(String dataWidgetId,
 			String elementId, String linkColorHex, String borderColorHex,
 			int heightInPx) /*-{
-		var element = $doc.getElementById(elementId);
-		$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-			height : heightInPx,
-			chrome : "nofooter noheader",
-			linkColor : linkColorHex,
-			borderColor : borderColorHex
-		});
+		if (typeof $wnd.twttr !== 'undefined') {
+			var element = $doc.getElementById(elementId);
+			$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
+				height : heightInPx,
+				chrome : "nofooter noheader",
+				linkColor : linkColorHex,
+				borderColor : borderColorHex
+			});
+		}
+		
 	}-*/;
 }

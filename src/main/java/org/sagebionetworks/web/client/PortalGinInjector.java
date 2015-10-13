@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
@@ -349,4 +350,5 @@ public interface PortalGinInjector extends Ginjector {
 	public FileHistoryWidget getFileHistoryWidget();
 	
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
+	public ModifiedCreatedByWidget getModifiedCreatedByWidget();
 }

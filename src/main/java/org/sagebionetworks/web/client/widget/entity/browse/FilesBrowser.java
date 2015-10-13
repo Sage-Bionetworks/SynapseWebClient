@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -204,5 +205,9 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	
 	public void setEntitySelectedHandler(EntitySelectedHandler handler) {
 		view.setEntitySelectedHandler(handler);
+	}
+	
+	public void setEntityClickedHandler(CallbackP<String> callback) {
+		view.setEntityClickedHandler(callback);
 	}
 }

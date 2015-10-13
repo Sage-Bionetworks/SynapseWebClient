@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -118,6 +120,8 @@ public class FilesTabTest {
 	ProvenanceWidget mockProvenanceWidget;
 	@Mock
 	CallbackP<Boolean> mockProjectInfoCallback;
+	@Mock
+	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	
 	FilesTab tab;
 	String projectEntityId = "syn9";
@@ -137,7 +141,7 @@ public class FilesTabTest {
 		
 		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
 				mockBreadcrumb, mockEntityMetadata, mockFilesBrowser, mockPreviewWidget, 
-				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector,mockGlobalApplicationState);
+				mockWikiPageWidget, mockSynapseAlert, mockSynapseClientAsync, mockPortalGinInjector,mockGlobalApplicationState, mockModifiedCreatedBy);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -168,7 +172,7 @@ public class FilesTabTest {
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		
-		verify(mockFilesBrowser).setEntitySelectedHandler(any(EntitySelectedHandler.class));
+		verify(mockFilesBrowser).setEntityClickedHandler(any(CallbackP.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
 	}
 	
@@ -209,8 +213,7 @@ public class FilesTabTest {
 		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
 		verify(mockView, times(2)).setProvenanceVisible(false);
-		verify(mockView).configureModifiedAndCreatedWidget(mockProjectEntity);
-		
+		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(entityId, canCertifiedUserAddChild, isCertifiedUser);
 		
@@ -266,7 +269,7 @@ public class FilesTabTest {
 		verify(mockView).setProgrammaticClientsVisible(true);
 		verify(mockView).configureProgrammaticClients(fileEntityId, version);
 		verify(mockView).setProvenanceVisible(true);
-		verify(mockView).configureModifiedAndCreatedWidget(mockFileEntity);
+		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
 		verify(mockView, times(2)).setFileBrowserVisible(false);
@@ -332,7 +335,7 @@ public class FilesTabTest {
 		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProgrammaticClientsVisible(false);
 		verify(mockView, times(2)).setProvenanceVisible(false);
-		verify(mockView).configureModifiedAndCreatedWidget(mockFolderEntity);
+		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
 		verify(mockView).setFileBrowserVisible(true);
@@ -378,10 +381,10 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(false);
 		verify(mockView).setFileBrowserVisible(false);
 		verify(mockView).clearActionMenuContainer();
-		verify(mockView).clearModifiedAndCreatedWidget();
 		verify(mockBreadcrumb).clear();
 		verify(mockView).setProgrammaticClientsVisible(false);
 		verify(mockView).setProvenanceVisible(false);
+		verify(mockModifiedCreatedBy).setVisible(false);
 	}
 	
 	@Test

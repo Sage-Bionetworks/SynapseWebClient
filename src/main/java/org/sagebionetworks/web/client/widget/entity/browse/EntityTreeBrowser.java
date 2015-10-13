@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -47,7 +48,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private String currentSelection;
 	private final int MAX_FOLDER_LIMIT = 100;
 	EntitySelectedHandler entitySelectedHandler;
-	
+	CallbackP<String> entityClickedHandler;
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, SynapseClientAsync synapseClient,
@@ -68,6 +69,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.clear();
 		// remove handlers
 		entitySelectedHandler = null;
+		entityClickedHandler = null;
 	}
 
 	public void clear() {
@@ -195,6 +197,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		makeSelectable();
 	}
 	
+	public void setEntityClickedHandler(CallbackP<String> callback) {
+		entityClickedHandler = callback;
+	}
+	
 	public EntitySelectedHandler getEntitySelectedHandler() {
 		return entitySelectedHandler;
 	}
@@ -260,6 +266,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			boolean isRootItem, boolean isExpandable) {
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
+		if (entityClickedHandler != null) {
+			childItem.setEntityClickedHandler(entityClickedHandler);
+		}
 		return childItem;
 	}
 

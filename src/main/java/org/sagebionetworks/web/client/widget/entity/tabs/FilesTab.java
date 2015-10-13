@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -75,6 +76,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	String currentEntityId;
 	Long currentVersionNumber;
 	boolean annotationsShown, fileHistoryShown;
+	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	Map<String,String> configMap;
@@ -97,7 +99,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalApplicationState
+			GlobalApplicationState globalApplicationState,
+			ModifiedCreatedByWidget modifiedCreatedBy
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -112,6 +115,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
+		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		
 		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
@@ -123,6 +127,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setMetadata(metadata.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
+		view.setModifiedCreatedBy(modifiedCreatedBy);
 		
 		tab.configure("Files", view.asWidget());
 		
@@ -131,13 +136,13 @@ public class FilesTab implements FilesTabView.Presenter{
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
-		EntitySelectedHandler entitySelectedHandler = new EntitySelectedHandler() {
+		CallbackP<String> entityClicked = new CallbackP<String> () {
 			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				getTargetBundleAndDisplay(event.getSelectedEntityId(), null);
+			public void invoke(String id) {
+				getTargetBundleAndDisplay(id, null);
 			}
 		};
-		filesBrowser.setEntitySelectedHandler(entitySelectedHandler);
+		filesBrowser.setEntityClickedHandler(entityClicked);
 		initBreadcrumbLinkClickedHandler();
 	}
 
@@ -184,9 +189,9 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		view.clearModifiedAndCreatedWidget();
 		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
+		modifiedCreatedBy.setVisible(false);
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
@@ -346,7 +351,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			provWidget.configure(null, configMap, null, null);
 		}
 		//Created By and Modified By
-		view.configureModifiedAndCreatedWidget(currentEntity);
+		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), 
+				currentEntity.getModifiedOn(), currentEntity.getModifiedBy());
 		
 		//Wiki Page
 		boolean isWikiPageVisible = !isProject;

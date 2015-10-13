@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -22,7 +21,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -63,8 +61,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private MarkdownWidget markdownWidget;
 	private Breadcrumb breadcrumb;
 	private WikiSubpagesWidget wikiSubpages;
-	private UserBadge createdByBadge;
-	private UserBadge modifiedByBadge;	
+	private ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -76,7 +73,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			SynapseClientAsync synapseClient,
 			SynapseAlert synapseAlert, WikiHistoryWidget historyWidget,
 			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
-			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector) {
+			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector,
+			ModifiedCreatedByWidget modifiedCreatedBy) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synapseAlert = synapseAlert;
@@ -84,15 +82,13 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
 		this.breadcrumb = breadcrumb;
+		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		view.setSynapseAlertWidget(synapseAlert);
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
-		createdByBadge = ginInjector.getUserBadgeWidget();
-		modifiedByBadge = ginInjector.getUserBadgeWidget();
-		view.setModifiedByBadge(modifiedByBadge);
-		view.setCreatedByBadge(createdByBadge);
+		view.setModifiedCreatedBy(modifiedCreatedBy);
 	}
 	
 	public void clear(){
@@ -101,7 +97,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		markdownWidget.clear();
 		breadcrumb.clear();
 		wikiSubpages.clearState();
-		view.setCreatedModifiedVisible(false);
 		view.setWikiHeadingText("");
 	}
 
@@ -116,12 +111,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	public void showWikiHistory(boolean isVisible) {
 		view.setWikiHistoryVisible(isVisible);
-	}
-	public void showCreatedBy(boolean isVisible) {
-		view.showCreatedBy(isVisible);
-	}
-	public void showModifiedBy(boolean isVisible) {
-		view.showModifiedBy(isVisible);
 	}
 	
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
@@ -245,18 +234,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		}
 	}	
 	
-	@Override
-	public void configureCreatedModifiedBy() {
-		view.setCreatedModifiedVisible(true);
-		modifiedByBadge.configure(currentPage.getModifiedBy());
-		createdByBadge.configure(currentPage.getCreatedBy());
-		// added check for testing, as Date is not instantiable/mockable
-		if (currentPage.getModifiedOn() != null) {
-			view.setModifiedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getModifiedOn()));
-			view.setCreatedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getCreatedOn()));
-		}
-	}
-
 	public void setOwnerObjectName(final CallbackP<String> callback) {
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -374,8 +351,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		resetWikiMarkdown(currentPage.getMarkdown());
 		configureWikiTitle(isRootWiki, currentPage.getTitle());
 		configureHistoryWidget(canEdit);
-		configureCreatedModifiedBy();
+		modifiedCreatedBy.configure(result.getCreatedOn(), result.getCreatedBy(), result.getModifiedOn(), result.getModifiedBy());
 	}
+	
 	@Override
 	public void reloadWikiPage() {
 		synapseAlert.clear();
@@ -469,6 +447,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	public void setCanEdit(boolean canEdit) {
 		this.canEdit = canEdit;
+	}
+
+	public void setModifiedCreatedByVisible(boolean isVisible) {
+		modifiedCreatedBy.setVisible(isVisible);
 	}
 	
 }
