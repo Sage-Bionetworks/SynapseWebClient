@@ -162,7 +162,6 @@ public class EntityPageTopTest {
 	
 	@Test
 	public void testConfigureWithProject(){
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = null;
@@ -185,7 +184,6 @@ public class EntityPageTopTest {
 	
 	@Test
 	public void testConfigureWithProjectWikiToken(){
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClientAsync).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		Synapse.EntityArea area = EntityArea.WIKI;
 		//verify this wiki id area token is passed to the wiki tab configuration and the entity action controller configuration
 		String areaToken = "1234";
