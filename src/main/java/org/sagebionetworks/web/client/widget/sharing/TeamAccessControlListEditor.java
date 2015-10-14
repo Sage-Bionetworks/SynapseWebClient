@@ -170,7 +170,7 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 					header.getUserName();
 				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), false, title, "", header.getIsIndividual()));
 			} else {
-				showErrorMessage("Could not find user " + principalId);
+				view.showErrorMessage("Could not find user " + principalId);
 			}
 		}
 	}
@@ -252,7 +252,7 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 			setViewDetails();
 		} else {
 			// not found
-			showErrorMessage("ACL does not have a record for " + principalIdToRemove);
+			view.showErrorMessage("ACL does not have a record for " + principalIdToRemove);
 		}
 	}
 
@@ -307,9 +307,6 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 		if (this.acl == null) throw new IllegalStateException(NULL_ACL_MESSAGE);
 	}
 	
-	private void showErrorMessage(String s) {
-		view.showErrorMessage(s);
-	}
 
 	public void refresh() {
 		refresh(new AsyncCallback<Void>() {
@@ -319,7 +316,7 @@ public class TeamAccessControlListEditor implements AccessControlListEditorView.
 
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+				view.showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
 			}
 		});
 	}

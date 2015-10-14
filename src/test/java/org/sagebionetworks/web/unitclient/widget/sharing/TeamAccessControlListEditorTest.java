@@ -20,10 +20,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -36,8 +39,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
+import org.sagebionetworks.web.client.widget.sharing.TeamAccessControlListEditor;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -45,181 +50,132 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class EvaluationAccessControlListEditorTest {
+public class TeamAccessControlListEditorTest {
 	
 	// The ACLEditor
-	private EvaluationAccessControlListEditor acle;
+	private TeamAccessControlListEditor acle;
 	
-	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
-	
-	// Mock components
+	@Mock
 	private SynapseClientAsync mockSynapseClient;
-	private ChallengeClientAsync mockChallengeClient;
+	@Mock
 	private AuthenticationController mockAuthenticationController;
+	@Mock
 	private AccessControlListEditorView mockACLEView;
-	private UserAccountServiceAsync mockUserAccountService;
+	@Mock
 	private Callback mockPushToSynapseCallback;
+	@Mock
+	private GlobalApplicationState mockGlobalApplicationState;
 	
 	// Test Synapse objects
-	private static final long OWNER_ID = 1L;
+	
 	private static final long ADMIN_ID = 2L;
 	private static final long USER_ID = 3L;
 	private static final long USER2_ID = 4L;
-	private static final Long TEST_PUBLIC_PRINCIPAL_ID = 789l;
-	private static final Long TEST_AUTHENTICATED_PRINCIPAL_ID = 123l;
-	private static final Long TEST_ANONYMOUS_PRINCIPAL_ID = 422l;
-	private static final String EVALUATION_ID = "101";
-	private static final String CONTENT_SOURCE = "syn102";
-	private static AccessControlList acl;
-	private static UserEvaluationPermissions uep;
-	private static Evaluation evaluation;
+	private static final String TEAM_ID = "101";
+	
+	private static AccessControlList acl, aclClone;
+	private static Team team;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
-	GlobalApplicationState mockGlobalApplicationState;
-	EvaluationAccessControlListEditor.HasChangesHandler mockHasChangesHandler;
+	AccessControlListEditor.HasChangesHandler mockHasChangesHandler;
 	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		// set up test Synapse objects
-		evaluation = new Evaluation();
-		evaluation.setId(EVALUATION_ID);
-		evaluation.setContentSource(CONTENT_SOURCE);
-		evaluation.setName("Test Evaluation");
-		acl = createACL(EVALUATION_ID);
-		uep = createUEP();
+		team = new Team();
+		team.setId(TEAM_ID);
+		team.setName("Test Team");
+		acl = createACL(TEAM_ID);
+		aclClone = createACL(TEAM_ID); 
 		userGroupHeaderRP = AccessControlListEditorTest.createUGHRP();
-		
-		// set up mocks
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockChallengeClient = mock(ChallengeClientAsync.class);
-		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
-		mockACLEView = mock(AccessControlListEditorView.class);
-		mockUserAccountService = mock(UserAccountServiceAsync.class);
-		
-		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(TEST_PUBLIC_PRINCIPAL_ID + "");
-		AsyncMockStubber.callSuccessWith(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getEvaluationAcl(anyString(), any(AsyncCallback.class));
-		
-		AsyncMockStubber.callSuccessWith(uep.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getUserEvaluationPermissions(anyString(), any(AsyncCallback.class));
 		
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
-
+		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).getTeamAcl(anyString(), any(AsyncCallback.class));
 		mockPushToSynapseCallback = mock(Callback.class);
 		
 		// instantiate the ACLEditor
-		acle = new EvaluationAccessControlListEditor(mockACLEView,
+		acle = new TeamAccessControlListEditor(mockACLEView,
 				mockSynapseClient,
 				mockAuthenticationController,
-				mockGlobalApplicationState,
-				new JSONObjectAdapterImpl(),
-				mockChallengeClient
+				mockGlobalApplicationState
 		);
 		
-		mockHasChangesHandler = mock(EvaluationAccessControlListEditor.HasChangesHandler.class);
-		acle.configure(evaluation, mockHasChangesHandler);
+		mockHasChangesHandler = mock(AccessControlListEditor.HasChangesHandler.class);
+		acle.configure(team, mockHasChangesHandler);
 		acle.refresh();
 	}
 	
-	private static AccessControlList createACL(String entityId) {
+
+	public static AccessControlList createACL(String teamId) {
 		// create the set of permissions
 		Set<ResourceAccess> resourceAccesses = new HashSet<ResourceAccess>();
 		
-		// add the owner admin user
-		ResourceAccess ownerRA = new ResourceAccess();
-		ownerRA.setPrincipalId(OWNER_ID);
-		ownerRA.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER_EVALUATION));
-		resourceAccesses.add(ownerRA);
-		
-		// add the non-owner admin user
+		// add admin user
 		ResourceAccess adminRA = new ResourceAccess();
 		adminRA.setPrincipalId(ADMIN_ID);
-		adminRA.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER_EVALUATION));
+		adminRA.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_ADMINISTER_TEAM));
 		resourceAccesses.add(adminRA);
 		
 		// add the non-owner non-admin user
 		ResourceAccess userRA = new ResourceAccess();
 		userRA.setPrincipalId(USER_ID);
-		userRA.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
+		userRA.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_MESSAGE_TEAM));
 		resourceAccesses.add(userRA);
 		
 		// create the ACL
 		AccessControlList acl = new AccessControlList();
-		acl.setId(entityId);
+		acl.setId(teamId);
 		acl.setResourceAccess(resourceAccesses);
 		return acl;
 	}
-	
-	private static UserEvaluationPermissions createUEP() {
-		UserEvaluationPermissions uep = new UserEvaluationPermissions();
-		uep.setCanChangePermissions(true);
-		uep.setCanPublicRead(false);
-		uep.setOwnerPrincipalId(OWNER_ID);
-		return uep;
-	}
-
-	//can't create ACL (acl created for every evaluation)
-	//can't delete ACL.  No ACL inheritance for evaluation
-	
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void addAccessTest() throws Exception {
 		// create response ACL: add permissions for USER
 		ResourceAccess ra = new ResourceAccess();
-		ra.setPrincipalId(USER_ID);
-		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
-		acl.getResourceAccess().add(ra);
+		ra.setPrincipalId(USER2_ID);
+		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_MESSAGE_TEAM));
+		aclClone.getResourceAccess().add(ra);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(aclClone).when(mockSynapseClient).updateTeamAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
 		// update
 		acle.asWidget();
-		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
+		acle.setAccess(USER2_ID, PermissionLevel.CAN_ADMINISTER_TEAM);
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 		
-		verify(mockChallengeClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateTeamAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		acl.setCreationDate(returnedACL.getCreationDate());
 		
-		//add/remove public ready, verify it's reflected in UEP
-		boolean canPublicRead = acle.getUserEvaluationPermissions().getCanPublicRead();
-		assertFalse(canPublicRead);
-		acle.setAccess(TEST_PUBLIC_PRINCIPAL_ID, PermissionLevel.CAN_VIEW);
-		canPublicRead = acle.getUserEvaluationPermissions().getCanPublicRead();
-		assertTrue("setting access to the public principal didn't update the user entity permissions (ACL editor view might be wrong)", canPublicRead);
-		acle.removeAccess(TEST_PUBLIC_PRINCIPAL_ID);
-		canPublicRead = acle.getUserEvaluationPermissions().getCanPublicRead();
-		assertFalse("removing access to the public principal didn't update the user entity permissions (ACL editor view might be wrong)", canPublicRead);
-		
-		assertEquals("Updated ACL is invalid", acl, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView).setPublicAclPrincipalId(anyLong());
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void changeAccessTest() throws Exception {
 		// create response ACL: decrease ADMIN's permissions
-		for (ResourceAccess resourceAccess : acl.getResourceAccess())
+		for (ResourceAccess resourceAccess : aclClone.getResourceAccess())
 			if (resourceAccess.getPrincipalId().equals(USER_ID))
-				resourceAccess.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
+				resourceAccess.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_MESSAGE_TEAM));
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(aclClone).when(mockSynapseClient).updateTeamAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
 		// update
 		acle.asWidget();
-		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
+		acle.setAccess(USER_ID, PermissionLevel.CAN_MESSAGE_TEAM);
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 		
-		verify(mockChallengeClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateTeamAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		acl.setCreationDate(returnedACL.getCreationDate());
 		
@@ -239,21 +195,21 @@ public class EvaluationAccessControlListEditorTest {
 		// create response ACL: remove ADMIN's permissions
 		ResourceAccess toRemove = null;
 		for (ResourceAccess resourceAccess : acl.getResourceAccess())
-			if (resourceAccess.getPrincipalId().equals(USER_ID))
+			if (resourceAccess.getPrincipalId().equals(ADMIN_ID))
 				toRemove = resourceAccess;
-		acl.getResourceAccess().remove(toRemove);
+		aclClone.getResourceAccess().remove(toRemove);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(aclClone).when(mockSynapseClient).updateTeamAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
 		// update
 		acle.asWidget();
-		acle.removeAccess(USER_ID);
+		acle.removeAccess(ADMIN_ID);
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).invoke();
 		
-		verify(mockChallengeClient).updateEvaluationAcl(captor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateTeamAcl(captor.capture(), any(AsyncCallback.class));
 		AccessControlList returnedACL = captor.getValue();
 		acl.setCreationDate(returnedACL.getCreationDate());
 		
@@ -261,26 +217,11 @@ public class EvaluationAccessControlListEditorTest {
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 	}
 	
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void setAdminAccessTest() throws Exception {
-		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
-		
-		// update
-		acle.asWidget();
-		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
-		acle.pushChangesToSynapse(mockPushToSynapseCallback);
-		
-		verify(mockACLEView).showErrorMessage(anyString());
-	}
-	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void pushNoChangesTest() throws Exception {		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(aclClone).when(mockSynapseClient).updateTeamAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		
 		// attempt to push changes when none have been made
 		acle.asWidget();
@@ -290,8 +231,7 @@ public class EvaluationAccessControlListEditorTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void removeAccessNotFoundTest() throws Exception {		
-		// configure mocks
-		AsyncMockStubber.callSuccessWith(acl).when(mockChallengeClient).updateEvaluationAcl(any(AccessControlList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).updateTeamAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		
 		// attempt to remove permissions for user not on ACL
 		acle.asWidget();
