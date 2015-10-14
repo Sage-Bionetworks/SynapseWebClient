@@ -505,6 +505,11 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				
 			}
+			@Override
+			public void refreshWindowFromCache() {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 

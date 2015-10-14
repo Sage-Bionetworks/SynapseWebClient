@@ -236,16 +236,6 @@ public class GlobalApplicationStateImplTest {
 	}
 	
 	@Test
-	public void testReplaceCurrentPlace(){
-		String newToken = "/some/new/token";
-		Place mockPlace = mock(Place.class);
-		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
-		globalApplicationState.replaceCurrentPlace(mockPlace);
-		verify(mockCookieProvider).setCookie(anyString(), anyString(), any(Date.class));
-		verify(mockSynapseJSNIUtils).replaceHistoryState(newToken);
-	}
-	
-	@Test
 	public void testPushCurrentPlace(){
 		String newToken = "/some/new/token";
 		Place mockPlace = mock(Place.class);
