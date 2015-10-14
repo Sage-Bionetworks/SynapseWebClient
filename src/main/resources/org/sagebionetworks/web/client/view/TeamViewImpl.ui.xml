@@ -17,7 +17,7 @@
 	    		<b:Column ui:field="commandsContainer" size="MD_3">
 		    		<b:ButtonToolBar addStyleNames="pull-right">
 						<b:ButtonGroup>
-							<b:Button text="Roles" ui:field="shareButton"/>
+							<b:Button text="Roles" icon="USER_MD" ui:field="shareButton"/>
 						</b:ButtonGroup>
 						<b:ButtonGroup>
 		    		        <b:Button dataToggle="DROPDOWN" text="Tools" icon="COG"/>
