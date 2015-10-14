@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.shared.users;
 
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.CHANGE_PERMISSIONS;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.CREATE;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE;
-import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE_SUBMISSION;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ_PRIVATE_SUBMISSION;
 import static org.sagebionetworks.repo.model.ACCESS_TYPE.SUBMIT;
@@ -49,6 +47,9 @@ public class AclUtils {
 		
 		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION,
 				ModelConstants.EVALUATION_ADMIN_ACCESS_PERMISSIONS);
+		
+		permToACCESS_TYPE.put(PermissionLevel.CAN_MESSAGE_TEAM, ModelConstants.TEAM_MESSENGER_PERMISSIONS);
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_TEAM, ModelConstants.TEAM_ADMIN_PERMISSIONS);
 		
 		// Build the reverse mapping from the first map
 		accessTypeToPerm = new HashMap<ACCESS_TYPE, Set<PermissionLevel>>();

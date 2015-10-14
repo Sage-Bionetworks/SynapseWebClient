@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import java.util.Map;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -10,8 +8,8 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -21,14 +19,11 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AclAddPeoplePanel extends Composite implements SynapseView {
 	public interface AclAddPeoplePanelUiBinder extends UiBinder<Widget, AclAddPeoplePanel> {};
-	
-	public static final String ACCESS_LEVEL_PLACEHOLDER_TEXT = "Select access level...";
 	
 	@UiField
 	Div suggestBoxPanel;
@@ -116,5 +111,9 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 
 	@Override
 	public void showErrorMessage(String message) {
+	}
+	
+	public void setPublicPrivateButtonVisible(boolean isVisible) {
+		makePublicButton.setVisible(isVisible);
 	}
 }

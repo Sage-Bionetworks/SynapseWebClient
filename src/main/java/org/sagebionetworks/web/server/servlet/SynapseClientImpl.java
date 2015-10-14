@@ -912,6 +912,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public AccessControlList updateTeamAcl(AccessControlList acl)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.updateTeamACL(acl);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public AccessControlList getTeamAcl(String teamId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getTeamACL(teamId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public AccessControlList deleteAcl(String ownerEntityId)
@@ -2200,19 +2222,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public void setIsTeamAdmin(String currentUserId, String targetUserId,
-			String teamId, boolean isTeamAdmin) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.setTeamMemberPermissions(teamId, targetUserId,
-					isTeamAdmin);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
+	
 	@Override
 	public void deleteTeamMember(String currentUserId, String targetUserId,
 			String teamId) throws RestServiceException {

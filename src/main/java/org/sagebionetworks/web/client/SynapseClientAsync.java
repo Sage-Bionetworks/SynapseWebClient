@@ -167,6 +167,9 @@ public interface SynapseClientAsync {
 	
 	public void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
 	
+	public void updateTeamAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
+	public void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
+	
 	public void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
@@ -270,7 +273,6 @@ public interface SynapseClientAsync {
 	void deleteMembershipInvitation(String invitationId, AsyncCallback<Void> callback);
 	void updateTeam(Team team, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
-	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	
