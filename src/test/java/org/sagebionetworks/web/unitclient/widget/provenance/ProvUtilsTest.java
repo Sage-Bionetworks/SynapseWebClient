@@ -457,6 +457,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				
 			}
+			@Override
+			public void refreshWindowFromCache() {
+				// TODO Auto-generated method stub
+				
+			}
 		};
 	}
 }

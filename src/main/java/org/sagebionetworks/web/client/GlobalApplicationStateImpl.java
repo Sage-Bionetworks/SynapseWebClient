@@ -298,17 +298,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		wikiBasedEntites.add(properties.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.sagebionetworks.web.client.GlobalApplicationState#replaceCurrentPlace(com.google.gwt.place.shared.Place)
-	 */
-	@Override
-	public void replaceCurrentPlace(Place currentPlace) {
-		setCurrentPlace(currentPlace);
-		String token = appPlaceHistoryMapper.getToken(currentPlace);
-		this.synapseJSNIUtils.replaceHistoryState(token);
-	}
-
 	@Override
 	public void pushCurrentPlace(Place targetPlace) {
 		//only push this place into the history if it is a place change

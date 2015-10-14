@@ -81,4 +81,6 @@ public interface SynapseJSNIUtils {
 	public void initOnPopStateHandler();
 	
 	public void showTwitterFeed(String dataWidgetId, String elementId, String linkColor, String borderColor, int height);
+	
+	public void refreshWindowFromCache();
 }
