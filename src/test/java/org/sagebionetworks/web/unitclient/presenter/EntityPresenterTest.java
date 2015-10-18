@@ -97,7 +97,7 @@ public class EntityPresenterTest {
 		mockEntityPageTop = mock(EntityPageTop.class);
 		mockFooterWidget = mock(Footer.class);
 		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
-				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget);
+				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget, mockSynapseJSNIUtils);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -270,11 +270,9 @@ public class EntityPresenterTest {
 	public void testEntityUpdatedHandler() {
 		ArgumentCaptor<EntityUpdatedHandler> captor = ArgumentCaptor.forClass(EntityUpdatedHandler.class);
 		verify(mockEntityPageTop).setEntityUpdatedHandler(captor.capture());
-		Place mockPlace = mock(Place.class);
-		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(mockPlace);
 		//invoke and verify
 		captor.getValue().onPersistSuccess(null);
 		
-		verify(mockPlaceChanger).goTo(mockPlace);
+		verify(mockSynapseJSNIUtils).refreshWindowFromCache();
 	}
 }

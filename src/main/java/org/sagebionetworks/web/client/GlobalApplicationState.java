@@ -76,14 +76,6 @@ public interface GlobalApplicationState {
 	public void setCurrentPlace(Place currentPlace);
 	
 	/**
-	 * This can be used to change the URL in the browser without adding new history or reloading the page.
-	 * Instead of adding history it will rewrite the current history.
-	 * 
-	 * @param currentPlace
-	 */
-	public void replaceCurrentPlace(Place currentPlace);
-	
-	/**
 	 * Sets the App Place History Mapper
 	 * @param appPlaceHistoryMapper
 	 */
