@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -23,6 +22,7 @@ public interface TeamView extends IsWidget, SynapseView {
 		void showDeleteModal();
 		void showLeaveModal();
 		void showInviteModal();
+		void shareButtonClicked();
 		void clear();
 	}
 
@@ -37,8 +37,10 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setOpenMembershipRequestWidget(Widget asWidget);
 	void setOpenUserInvitationsWidget(Widget asWidget);
 	void setMemberListWidget(Widget asWidget);
+	void setAclModalWidget(Widget asWidget);
 	void setPublicJoinVisible(Boolean canPublicJoin);
 	void setTotalMemberCount(String string);
 	void setMediaObjectPanel(Team team);
 	void setTeamEmailAddress(String teamEmail);
+	void setShareButtonVisible(boolean isVisible);
 }

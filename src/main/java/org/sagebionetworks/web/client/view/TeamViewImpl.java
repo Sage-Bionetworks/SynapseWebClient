@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.DropdownButton;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -26,9 +26,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TeamViewImpl extends Composite implements TeamView {
-
-	private static final String PUBLIC_JOIN_TEXT = "People can join this team without team manager authorization";
-
 
 	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
 
@@ -74,9 +71,11 @@ public class TeamViewImpl extends Composite implements TeamView {
 	AnchorListItem inviteMemberItem;
 	@UiField
 	TextBox synapseEmailField;
+	@UiField
+	Button shareButton;
+	@UiField
+	SimplePanel aclModalContainer;
 	
-	private Team team;
-	private DropdownButton toolsButton;
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
@@ -96,6 +95,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		setDropdownHandlers();
+		shareButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.shareButtonClicked();
+			}
+		});
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -256,5 +261,13 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setTeamEmailAddress(String teamEmail) {
 		synapseEmailField.setValue(teamEmail);
+	}
+	@Override
+	public void setShareButtonVisible(boolean isVisible) {
+		shareButton.setVisible(isVisible);
+	}
+	@Override
+	public void setAclModalWidget(Widget asWidget) {
+		aclModalContainer.setWidget(asWidget);
 	}
 }

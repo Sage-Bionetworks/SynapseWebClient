@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
@@ -32,17 +33,21 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	TextBox idField;
 	@UiField
-	SimplePanel doiPanel;
+	Span doiPanel;
 	@UiField
 	Collapse annotationsContent;
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
-	SimplePanel restrictionPanel;
+	Span restrictionPanel;
 	@UiField
 	Collapse fileHistoryContent;
 	@UiField
 	SimplePanel fileHistoryContainer;
+	@UiField
+	Span uploadDestinationPanel;
+	@UiField
+	Span uploadDestinationField;
 		
 	@UiField(provided = true)
 	final IconsImageBundle icons;
@@ -63,17 +68,29 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	@Override
 	public void setDoiWidget(IsWidget doiWidget) {
-		doiPanel.setWidget(doiWidget);
+		doiPanel.clear();
+		doiPanel.add(doiWidget);
 	}
 
 	@Override
 	public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
 		annotationsContainer.setWidget(annotationsWidget);		
 	}
+	
+	@Override
+	public void setUploadDestinationPanelVisible(boolean isVisible) {
+		uploadDestinationPanel.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setUploadDestinationText(String text) {
+		uploadDestinationField.setText(text);
+	}
 
 	@Override
 	public void setRestrictionWidget(IsWidget restrictionWidget) {
-		restrictionPanel.setWidget(restrictionWidget);
+		restrictionPanel.clear();
+		restrictionPanel.add(restrictionWidget);
 	}
 
 	@Override
@@ -104,6 +121,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		fileHistoryContent.hide();
 		dataUseContainer.setVisible(false);
 		annotationsContent.hide();
+		uploadDestinationField.setText("");
+		uploadDestinationPanel.setVisible(false);
 	}
 	
 	@Override

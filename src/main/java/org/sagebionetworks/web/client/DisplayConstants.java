@@ -123,6 +123,8 @@ public class DisplayConstants {
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String MENU_PERMISSION_LEVEL_CAN_PARTICIPATE = "Can participate";
 	public static final String MENU_PERMISSION_LEVEL_CAN_SCORE = "Can score";
+	public static final String MENU_PERMISSION_LEVEL_CAN_MESSAGE_TEAM = "Can e-mail team";
+	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER_TEAM = "Team manager";
 	public static final String LABEL_PERMISSION_TEXT_ADD_PEOPLE = "Add People";
 	public static final String BUTTON_SHOW_R_CLIENT_INSTALL = "Show R Client Installation Code";
 	public static final String LABEL_R_CLIENT_INSTALL = "Install R Client";

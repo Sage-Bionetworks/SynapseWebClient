@@ -55,7 +55,6 @@ public class MemberListWidgetTest {
 		
 		AsyncMockStubber.callSuccessWith(getTestTeamMembers()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
 	
 	private TeamMemberPagedResults getTestTeamMembers() {
@@ -120,25 +119,5 @@ public class MemberListWidgetTest {
 		widget.removeMember("a user id");
 		verify(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(eq(badRequestMessage));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testSetIsAdmin() throws Exception {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		widget.setIsAdmin("a user id", true);
-		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockTeamUpdatedCallback).invoke();
-	}
-
-	public void testSetIsAdminFailure() throws Exception {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		widget.setIsAdmin("a user id", true);
-		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
-		//also refreshes members to get correct admin state
-		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 }

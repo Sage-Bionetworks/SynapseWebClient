@@ -1,6 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.DOI;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
+import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +38,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -65,6 +76,7 @@ public class FilesTab implements FilesTabView.Presenter{
 	String currentEntityId;
 	Long currentVersionNumber;
 	boolean annotationsShown, fileHistoryShown;
+	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	Map<String,String> configMap;
@@ -87,7 +99,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalApplicationState
+			GlobalApplicationState globalApplicationState,
+			ModifiedCreatedByWidget modifiedCreatedBy
 			) {
 		this.view = view;
 		this.tab = tab;
@@ -102,6 +115,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
+		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		
 		previewWidget.setHeight(WIDGET_HEIGHT_PX + "px");
@@ -113,6 +127,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setMetadata(metadata.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setSynapseAlert(synAlert.asWidget());
+		view.setModifiedCreatedBy(modifiedCreatedBy);
 		
 		tab.configure("Files", view.asWidget());
 		
@@ -174,9 +189,9 @@ public class FilesTab implements FilesTabView.Presenter{
 		view.setFileBrowserVisible(false);
 		view.clearActionMenuContainer();
 		breadcrumb.clear();
-		view.clearModifiedAndCreatedWidget();
 		view.setProgrammaticClientsVisible(false);
 		view.setProvenanceVisible(false);
+		modifiedCreatedBy.setVisible(false);
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
@@ -255,7 +270,6 @@ public class FilesTab implements FilesTabView.Presenter{
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, null, null));
 					return;
 				}
-				
 				setTargetBundle(bundle);
 				tab.showTab();
 			}
@@ -273,6 +287,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
 		}
 	}
+	
+	
 	
 	public void setTargetBundle(EntityBundle bundle) {
 		EntityPresenter.filterToDownloadARs(bundle);
@@ -335,7 +351,8 @@ public class FilesTab implements FilesTabView.Presenter{
 			provWidget.configure(null, configMap, null, null);
 		}
 		//Created By and Modified By
-		view.configureModifiedAndCreatedWidget(currentEntity);
+		modifiedCreatedBy.configure(currentEntity.getCreatedOn(), currentEntity.getCreatedBy(), 
+				currentEntity.getModifiedOn(), currentEntity.getModifiedBy());
 		
 		//Wiki Page
 		boolean isWikiPageVisible = !isProject;

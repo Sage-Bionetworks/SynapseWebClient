@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.presenter;
 
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 
 import java.util.List;
 
@@ -16,11 +17,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -37,7 +38,6 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -61,6 +61,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	private SynapseJSNIUtils synapseJSNIUtils; 
 	
 	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
 	
@@ -71,7 +72,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			SynapseClientAsync synapseClient, CookieProvider cookies,
 			SynapseAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
-			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
+			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget,
+			SynapseJSNIUtils synJSNIUtils) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
@@ -81,6 +83,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
+		this.synapseJSNIUtils = synJSNIUtils;
 		
 		//place widgets and configure
 		view.setEntityPageTopWidget(entityPageTop);
@@ -92,8 +95,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
-				//reload
-				globalApplicationState.getPlaceChanger().goTo(globalApplicationState.getCurrentPlace());
+				//reload current window
+				synapseJSNIUtils.refreshWindowFromCache();
 			}
 		});
 		
@@ -117,27 +120,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		refresh();
 	}
 	
-	public void updateEntityArea(EntityArea area, String areaToken) {
-		clear();
-		this.area = area;
-		this.areaToken = areaToken;
-		place.setArea(area);
-		place.setAreaToken(areaToken);
-		place.setNoRestartActivity(true);
-		globalApplicationState.getPlaceChanger().goTo(place);
-	}
-	
-	@Override
-	public void replaceEntityArea(EntityArea area, String areaToken) {
-		clear();
-		this.area = area;
-		this.areaToken = areaToken;
-		place.setArea(area);
-		place.setAreaToken(areaToken);
-		place.setNoRestartActivity(true);
-		globalApplicationState.replaceCurrentPlace(place);
-	}
-
 	@Override
 	public void clear() {
 		synAlert.clear();

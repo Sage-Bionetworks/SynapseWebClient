@@ -265,6 +265,10 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public AccessControlList updateAcl(AccessControlList aclEW, boolean recursive) throws RestServiceException;
 
+	public AccessControlList updateTeamAcl(AccessControlList acl) throws RestServiceException;
+	
+	public AccessControlList getTeamAcl(String teamId) throws RestServiceException;
+	
 	public AccessControlList deleteAcl(String ownerEntityId) throws RestServiceException;
 
 	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;
@@ -347,7 +351,6 @@ public interface SynapseClient extends RemoteService {
 	public ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
 	public void deleteMembershipInvitation(String invitationId) throws RestServiceException;
-	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	public Team updateTeam(Team team) throws RestServiceException;
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
