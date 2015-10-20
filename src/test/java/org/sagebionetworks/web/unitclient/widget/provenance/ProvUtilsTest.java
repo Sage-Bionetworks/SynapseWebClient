@@ -458,9 +458,9 @@ public class ProvUtilsTest {
 				
 			}
 			@Override
-			public void refreshWindowFromCache() {
+			public String getCurrentURL() {
 				// TODO Auto-generated method stub
-				
+				return null;
 			}
 		};
 	}
