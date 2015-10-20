@@ -82,5 +82,5 @@ public interface SynapseJSNIUtils {
 	
 	public void showTwitterFeed(String dataWidgetId, String elementId, String linkColor, String borderColor, int height);
 	
-	public void refreshWindowFromCache();
+	public String getCurrentURL();
 }

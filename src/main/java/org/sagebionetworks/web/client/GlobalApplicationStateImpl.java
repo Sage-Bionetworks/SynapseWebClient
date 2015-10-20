@@ -317,4 +317,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public String getSynapseVersion() {
 		return synapseVersion;
 	}
+	
+	@Override
+	public void refreshPage() {
+		//get the place associated to the current url
+		AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
+		String currentUrl = synapseJSNIUtils.getCurrentURL();
+		String place = currentUrl.substring(currentUrl.indexOf("!"));
+		Place currentPlace = appPlaceHistoryMapper.getPlace(place);
+		getPlaceChanger().goTo(currentPlace);
+	}
 }
