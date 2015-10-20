@@ -261,4 +261,30 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.initOnPopStateHandler();
 		verify(mockSynapseJSNIUtils).initOnPopStateHandler();
 	}
+	
+	@Test
+	public void testRefreshPage() {
+		Synapse place = new Synapse("syn1234");
+		// Start with the current place 
+		when(mockPlaceController.getWhere()).thenReturn(place);
+
+		Place mockPlace = mock(Place.class);
+		String historyToken = "!Synapse:syn123";
+		String currentUrl = "https://www.synapse.org/#"+historyToken;
+		when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
+		when(mockAppPlaceHistoryMapper.getPlace(historyToken)).thenReturn(mockPlace);
+		
+		globalApplicationState.refreshPage();
+		verify(mockPlaceController).goTo(mockPlace);
+		
+		reset(mockPlaceController);
+		when(mockPlaceController.getWhere()).thenReturn(place);
+		historyToken = "!Synapse:syn123/wiki/12345";
+		currentUrl = "https://www.synapse.org/#"+historyToken;
+		when(mockSynapseJSNIUtils.getCurrentURL()).thenReturn(currentUrl);
+		when(mockAppPlaceHistoryMapper.getPlace(historyToken)).thenReturn(mockPlace);
+	
+		globalApplicationState.refreshPage();
+		verify(mockPlaceController).goTo(mockPlace);
+	}
 }
