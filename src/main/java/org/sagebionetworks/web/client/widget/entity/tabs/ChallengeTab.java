@@ -30,8 +30,8 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 	
-	public void configure(String entityId) {
-		tab.setPlace(new Synapse(entityId, null, EntityArea.ADMIN, null));
+	public void configure(String entityId, String entityName) {
+		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.ADMIN, null));
 		tab.setTabListItemVisible(false);
 		evaluationList.configure(entityId, new CallbackP<Boolean>() {
 			@Override

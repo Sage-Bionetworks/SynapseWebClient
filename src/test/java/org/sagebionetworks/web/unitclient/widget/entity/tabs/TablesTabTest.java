@@ -106,7 +106,9 @@ public class TablesTabTest {
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	
 	String projectEntityId = "syn666666";
+	String projectName = "a test project";
 	String tableEntityId = "syn22";
+	String tableName = "test table";
 	QueryTokenProvider queryTokenProvider;
 	
 	TablesTab tab;
@@ -124,6 +126,7 @@ public class TablesTabTest {
 		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
+		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		
 		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
@@ -133,6 +136,7 @@ public class TablesTabTest {
 		when(mockTableEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockTableEntityBundle.getEntity()).thenReturn(mockTableEntity);
 		when(mockTableEntity.getId()).thenReturn(tableEntityId);
+		when(mockTableEntity.getName()).thenReturn(tableName);
 		when(mockTableEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		
 		AsyncMockStubber.callSuccessWith(mockTableEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
@@ -192,8 +196,8 @@ public class TablesTabTest {
 		//hide project info
 		verify(mockProjectInfoCallback).invoke(false);
 		
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab).setPlace(captor.capture());
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab).setEntityNameAndPlace(eq(tableName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(tableEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
@@ -231,7 +235,7 @@ public class TablesTabTest {
 		
 		verify(mockTableListWidget).configure(mockProjectEntityBundle);
 		
-		Synapse place = getNewPlace();
+		Synapse place = getNewPlace(projectName);
 		assertEquals(projectEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.TABLES, place.getArea());
@@ -243,9 +247,9 @@ public class TablesTabTest {
 		assertEquals(mockTab, tab.asTab());
 	}
 	
-	private Synapse getNewPlace() {
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab).setPlace(captor.capture());
+	private Synapse getNewPlace(String expectedName) {
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab).setEntityNameAndPlace(eq(expectedName), captor.capture());
 		return (Synapse)captor.getValue();
 	}
 
@@ -258,7 +262,7 @@ public class TablesTabTest {
 		String queryToken = queryTokenProvider.queryToToken(query);
 		tab.onQueryChange(query);
 		
-		Synapse place = getNewPlace();
+		Synapse place = getNewPlace(tableName);
 		assertEquals(EntityArea.TABLES, place.getArea());
 		assertTrue(place.getAreaToken().contains(queryToken));
 	}
@@ -276,7 +280,7 @@ public class TablesTabTest {
 		String queryToken = queryTokenProvider.queryToToken(query);
 		tab.onQueryChange(query);
 		
-		Synapse place = getNewPlace();
+		Synapse place = getNewPlace(tableName);
 		assertEquals(EntityArea.TABLES, place.getArea());
 		assertTrue(place.getAreaToken().contains(queryToken));
 	}
@@ -331,7 +335,7 @@ public class TablesTabTest {
 		tab.setProject(projectEntityId, null, projectLoadError);
 		tab.showProjectLevelUI();
 		Synapse expectedPlace = new Synapse(projectEntityId, null, EntityArea.TABLES, null);
-		verify(mockTab).setPlace(expectedPlace);
+		verify(mockTab).setEntityNameAndPlace(projectEntityId, expectedPlace);
 		verify(mockSynapseAlert).handleException(projectLoadError);
 	}
 }

@@ -169,7 +169,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		} else if (area == EntityArea.ADMIN) {
 			tabs.showTab(adminTab.asTab());
 		}
-		view.setPageTitle(entity.getName() + " - " + entity.getId());
 		
     	//note: the files/tables/wiki tabs rely on the project bundle, so they are configured later
     	configureProject();
@@ -311,7 +310,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			}
 		};
 		
-		wikiTab.configure(projectHeader.getId(), wikiId, 
+		wikiTab.configure(projectHeader.getId(), projectHeader.getName(), wikiId, 
 				canEdit, callback);
 		
 		if (isWikiTabShown) {
@@ -330,7 +329,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	public void configureAdminTab() {
 		String projectId = projectHeader.getId();
-		adminTab.configure(projectId);
+		adminTab.configure(projectId, projectHeader.getName());
 	}
 		
 	@Override

@@ -66,5 +66,4 @@ public class TabViewImpl implements TabView {
 		tabItem.setActive(isActive);
 		tabPane.setVisible(isActive);
 	}
-	
 }

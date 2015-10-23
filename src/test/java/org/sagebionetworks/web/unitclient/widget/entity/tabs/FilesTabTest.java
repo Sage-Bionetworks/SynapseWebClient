@@ -125,8 +125,11 @@ public class FilesTabTest {
 	
 	FilesTab tab;
 	String projectEntityId = "syn9";
+	String projectName = "proyecto";
 	String folderEntityId = "syn1";
+	String folderName = "folder 1";
 	String fileEntityId = "syn4444";
+	String fileName = "filename.txt";
 	String entityId = "syn7777777";
 	String linkEntityId = "syn333";
 	Long linkEntityVersion=3L;
@@ -137,6 +140,7 @@ public class FilesTabTest {
 		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(entityId);
+		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		
 		tab = new FilesTab(mockView, mockTab, mockFileTitleBar, mockBasicTitleBar,
@@ -148,7 +152,9 @@ public class FilesTabTest {
 		when(mockEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFolderEntity.getId()).thenReturn(folderEntityId);
+		when(mockFolderEntity.getName()).thenReturn(folderName);
 		when(mockFileEntity.getId()).thenReturn(fileEntityId);
+		when(mockFileEntity.getName()).thenReturn(fileName);
 		when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
@@ -217,10 +223,10 @@ public class FilesTabTest {
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(entityId, canCertifiedUserAddChild, isCertifiedUser);
 		
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab, times(3)).setPlace(captor.capture());
-		Synapse place = (Synapse)captor.getValue();
-		assertEquals(entityId, place.getEntityId());
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(projectName), captor.capture());
+		Synapse place = captor.getValue();
+		assertEquals(projectEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.FILES, place.getArea());
 		assertNull(place.getAreaToken());
@@ -277,8 +283,8 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).createEntityActionController();
 		verify(mockPortalGinInjector).getProvenanceRenderer();
 		
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab, times(2)).setPlace(captor.capture());
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(fileName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(fileEntityId, place.getEntityId());
 		assertEquals(version, place.getVersionNumber());
@@ -343,8 +349,8 @@ public class FilesTabTest {
 		verify(mockPortalGinInjector).createActionMenuWidget();
 		verify(mockPortalGinInjector).createEntityActionController();
 		
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab, times(2)).setPlace(captor.capture());
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(folderName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(folderEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
@@ -393,7 +399,7 @@ public class FilesTabTest {
 		tab.setProject(projectEntityId, null, projectLoadError);
 		tab.showProjectLevelUI();
 		Synapse expectedPlace = new Synapse(projectEntityId, null, EntityArea.FILES, null);
-		verify(mockTab).setPlace(expectedPlace);
+		verify(mockTab).setEntityNameAndPlace(projectEntityId, expectedPlace);
 		verify(mockSynapseAlert).handleException(projectLoadError);
 	}
 }

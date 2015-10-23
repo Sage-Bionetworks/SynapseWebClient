@@ -161,12 +161,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	
 	public void showProjectLevelUI() {
-		tab.setPlace(new Synapse(projectEntityId, null, EntityArea.TABLES, null));
+		String title = projectEntityId;
 		if (projectBundle != null) {
+			title = projectBundle.getEntity().getName();
 			setTargetBundle(projectBundle);	
 		} else {
 			showError(projectBundleLoadError);
 		}
+		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.TABLES, null));
 	}
 	
 	public void resetView() {
@@ -233,23 +235,25 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		return actionMenu;
 	}
 	
-	public void getTargetBundleAndDisplay(String entityId) {
+	public void getTargetBundleAndDisplay(final String entityId) {
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS  | DOI | TABLE_DATA;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
+				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(entityId, null, null, null));
 				setTargetBundle(bundle);
 				tab.showTab();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				tab.setEntityNameAndPlace(entityId, new Synapse(entityId, null, null, null));
 				showError(caught);
 				tab.showTab();
 			}			
 		};
-		tab.setPlace(new Synapse(entityId, null, null, null));
+		
 		synapseClient.getEntityBundle(entityId, mask, callback);
 	}
 	
@@ -262,7 +266,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			String token = queryTokenProvider.queryToToken(newQuery);
 			if(token != null){
 				areaToken = TABLE_QUERY_PREFIX + token;
-				tab.setPlace(new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
+				tab.setEntityNameAndPlace(entity.getName(), new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
 				tab.showTab();
 			}
 		}

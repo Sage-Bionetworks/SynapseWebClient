@@ -213,7 +213,7 @@ public class FilesTab implements FilesTabView.Presenter{
 		boolean isFile = targetEntity instanceof FileEntity;
 		boolean isFolder = targetEntity instanceof Folder;
 		
-		tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, null, null));
+		tab.setEntityNameAndPlace(targetEntity.getName(), new Synapse(currentEntityId, currentVersionNumber, null, null));
 		//if we are not being configured with a file or folder, then project level should be shown
 		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
@@ -224,12 +224,14 @@ public class FilesTab implements FilesTabView.Presenter{
 	}
 	
 	public void showProjectLevelUI() {
-		tab.setPlace(new Synapse(projectEntityId, null, EntityArea.FILES, null));
+		String title = projectEntityId;
 		if (projectBundle != null) {
-			setTargetBundle(projectBundle);	
+			setTargetBundle(projectBundle);
+			title = projectBundle.getEntity().getName();
 		} else {
 			showError(projectBundleLoadError);
 		}
+		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.FILES, null));
 	}
 	
 	public void showError(Throwable error) {
@@ -277,7 +279,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			@Override
 			public void onFailure(Throwable caught) {
 				showError(caught);
-				tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, null, null));
+				tab.setEntityNameAndPlace(currentEntityId, new Synapse(currentEntityId, currentVersionNumber, null, null));
 				tab.showTab();
 			}	
 		};
@@ -327,7 +329,7 @@ public class FilesTab implements FilesTabView.Presenter{
 			metadata.setFileHistoryVisible(isFile && currentVersionNumber != null);	
 		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
-		tab.setPlace(new Synapse(currentEntityId, currentVersionNumber, area, null));
+		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, currentVersionNumber, area, null));
 		
 		//File Browser
 		boolean isFilesBrowserVisible = isProject || isFolder;
