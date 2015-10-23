@@ -161,13 +161,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	
 	public void showProjectLevelUI() {
+		String title = projectEntityId;
 		if (projectBundle != null) {
-			tab.setEntityNameAndPlace(projectBundle.getEntity().getName(), new Synapse(projectEntityId, null, EntityArea.TABLES, null));
+			title = projectBundle.getEntity().getName();
 			setTargetBundle(projectBundle);	
 		} else {
-			tab.setEntityNameAndPlace(projectEntityId, new Synapse(projectEntityId, null, EntityArea.TABLES, null));
 			showError(projectBundleLoadError);
 		}
+		tab.setEntityNameAndPlace(title, new Synapse(projectEntityId, null, EntityArea.TABLES, null));
 	}
 	
 	public void resetView() {
