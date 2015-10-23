@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.shared.WikiPageKey;
-
-import com.google.gwt.place.shared.Place;
 
 public class WikiTabTest {
 	@Mock
@@ -50,16 +51,17 @@ public class WikiTabTest {
 
 	@Test
 	public void testConfigure() {
-		String entityId = "syn1"; 
+		String entityId = "syn1";
+		String entityName = "mr. bean";
 		String wikiPageId = "9";
 		Boolean canEdit = true;
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
-		tab.configure(entityId, wikiPageId, canEdit, callback);
+		tab.configure(entityId, entityName, wikiPageId, canEdit, callback);
 		
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback), eq(true));
-		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
-		verify(mockTab).setPlace(captor.capture());
-		Synapse place = (Synapse)captor.getValue();
+		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
+		Synapse place = captor.getValue();
 		assertEquals(entityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.WIKI, place.getArea());
