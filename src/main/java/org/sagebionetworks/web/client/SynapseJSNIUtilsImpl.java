@@ -473,16 +473,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void refreshWindowFromCache() {
-		_refreshWindowFromCache();
-	}
-	
-	private static native void _refreshWindowFromCache()/*-{
-		//pass false so to not force reloading the current page from the server
-		$wnd.location.reload(false);
-	}-*/;
-	
-	@Override
 	public void showTwitterFeed(String dataWidgetId, String elementId,
 			String linkColor, String borderColor, int height) {
 		_showTwitterFeed(dataWidgetId, elementId, linkColor, borderColor, height);		
@@ -502,4 +492,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 		
 	}-*/;
+	
+	@Override
+	public String getCurrentURL() {
+		return Location.getHref();
+	}
+	
+	@Override
+	public String getCurrentHostName() {
+		return Location.getHostName();
+	}
+	
 }

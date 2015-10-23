@@ -458,9 +458,14 @@ public class ProvUtilsTest {
 				
 			}
 			@Override
-			public void refreshWindowFromCache() {
+			public String getCurrentURL() {
 				// TODO Auto-generated method stub
-				
+				return null;
+			}
+			@Override
+			public String getCurrentHostName() {
+				// TODO Auto-generated method stub
+				return null;
 			}
 		};
 	}

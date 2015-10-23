@@ -97,7 +97,7 @@ public class EntityPresenterTest {
 		mockEntityPageTop = mock(EntityPageTop.class);
 		mockFooterWidget = mock(Footer.class);
 		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
-				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget, mockSynapseJSNIUtils);
+				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -273,6 +273,6 @@ public class EntityPresenterTest {
 		//invoke and verify
 		captor.getValue().onPersistSuccess(null);
 		
-		verify(mockSynapseJSNIUtils).refreshWindowFromCache();
+		verify(mockGlobalApplicationState).refreshPage();
 	}
 }

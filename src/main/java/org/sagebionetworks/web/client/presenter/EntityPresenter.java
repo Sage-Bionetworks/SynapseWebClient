@@ -61,7 +61,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
-	private SynapseJSNIUtils synapseJSNIUtils; 
 	
 	public static final String ENTITY_BACKGROUND_IMAGE_NAME="entity_background_image_3141592653.png";
 	
@@ -72,8 +71,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			SynapseClientAsync synapseClient, CookieProvider cookies,
 			SynapseAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
-			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget,
-			SynapseJSNIUtils synJSNIUtils) {
+			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
@@ -83,7 +81,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
-		this.synapseJSNIUtils = synJSNIUtils;
 		
 		//place widgets and configure
 		view.setEntityPageTopWidget(entityPageTop);
@@ -96,7 +93,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				//reload current window
-				synapseJSNIUtils.refreshWindowFromCache();
+				//get the place based on the current url
+				globalApplicationState.refreshPage();
 			}
 		});
 		

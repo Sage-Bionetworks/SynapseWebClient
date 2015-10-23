@@ -117,4 +117,6 @@ public interface GlobalApplicationState {
 	 * This method initializes the handler for on pop state event.
 	 */
 	public void initOnPopStateHandler();
+	
+	public void refreshPage();
 }
