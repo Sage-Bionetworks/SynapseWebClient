@@ -23,6 +23,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -44,6 +45,7 @@ public class HeaderTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	PlaceChanger mockPlaceChanger;
 	FavoriteWidget mockFavWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -57,8 +59,11 @@ public class HeaderTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockFavWidget = mock(FavoriteWidget.class);
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget);
+		//by default, mock that we are on the production website
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -67,6 +72,7 @@ public class HeaderTest {
 	@Test
 	public void testSetPresenter() {
 		verify(mockView).setPresenter(header);
+		verify(mockView).setStagingAlertVisible(false);
 	}
 
 	@Test
@@ -186,5 +192,26 @@ public class HeaderTest {
 		header.configure(false);
 		verify(mockView, never()).showLargeLogo();
 		verify(mockView).showSmallLogo();
+	}
+	
+	@Test
+	public void testInitStagingAlert() {
+		//case insensitive
+		Mockito.reset(mockView);
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("WwW.SynapsE.ORG");
+		header.initStagingAlert();
+		verify(mockView).setStagingAlertVisible(false);
+
+		//staging
+		Mockito.reset(mockView);
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("staging.synapse.org");
+		header.initStagingAlert();
+		verify(mockView).setStagingAlertVisible(true);
+
+		//local
+		Mockito.reset(mockView);
+		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
+		header.initStagingAlert();
+		verify(mockView).setStagingAlertVisible(true);
 	}
 }

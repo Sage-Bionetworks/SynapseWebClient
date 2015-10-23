@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -15,12 +16,15 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
+
+	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
 
 	public static enum MenuItems {
 		DATASETS, TOOLS, NETWORKS, PEOPLE, PROJECTS
@@ -31,19 +35,28 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private FavoriteWidget favWidget;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public Header(HeaderView view, AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
-			FavoriteWidget favWidget) {
+			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.favWidget = favWidget;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.clear();
 		view.setProjectFavoriteWidget(favWidget);
 		view.setPresenter(this);
+		initStagingAlert();
+	}
+	
+	public void initStagingAlert() {
+		String hostName = synapseJSNIUtils.getCurrentHostName().toLowerCase();
+		boolean visible = !hostName.contains(WWW_SYNAPSE_ORG);
+		view.setStagingAlertVisible(visible);
 	}
 	
 	public void setMenuItemActive(MenuItems menuItem) {

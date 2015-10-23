@@ -462,6 +462,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
+			@Override
+			public String getCurrentHostName() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		};
 	}
 }

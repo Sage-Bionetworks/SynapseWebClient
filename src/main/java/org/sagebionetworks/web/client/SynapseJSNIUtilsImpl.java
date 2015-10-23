@@ -498,4 +498,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return Location.getHref();
 	}
 	
+	@Override
+	public String getCurrentHostName() {
+		return Location.getHostName();
+	}
+	
 }
