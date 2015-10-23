@@ -30,13 +30,13 @@ public class WikiTab {
 		wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 	}
 	
-	public void configure(String entityId, String wikiPageId, Boolean canEdit,
+	public void configure(String entityId, String entityName, String wikiPageId, Boolean canEdit,
 			Callback callback) {
 		Long versionNumber = null; //version is always null for project
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
 		
 		wikiPageWidget.configure(wikiPageKey, canEdit, callback, true);
-		tab.setPlace(new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
+		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, versionNumber, EntityArea.WIKI, wikiPageId));
 	}
 	
 	public Tab asTab(){
