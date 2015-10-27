@@ -49,6 +49,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -688,6 +689,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		projectSynAlert.clear();
 		teamSynAlert.clear();
 		String token = place.toToken();
+		if (authenticationController.isLoggedIn() && token.startsWith("message/")) {
+			//show alert message and go to view current profile
+			String message = token.substring("message/".length());
+			message = URL.decode(message);
+			view.showInfo("", message);
+			token = "v";
+		}
+		if (authenticationController.isLoggedIn() && token.equals("v")) {
+			//replace url with current user id
+			place.setUserId(authenticationController.getCurrentUserPrincipalId());
+			place.setArea(ProfileArea.PROJECTS);
+			globalApplicationState.pushCurrentPlace(place);
+			
+		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
 			updateProfileView(place.getUserId(), place.getArea());
