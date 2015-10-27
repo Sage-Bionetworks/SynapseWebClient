@@ -34,7 +34,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 			hasLoaded = true;
 			FlowPanel linkContainer = new FlowPanel();
 			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
-			JsArray<Element> headingElements = _allHeaderElements(this.getElement());
+			JsArray<Element> headingElements = _localHeaderElements(this.getElement());
 			
 			//look for these special header ids (that were added by the markdown processor for us), and create links to them
 			
@@ -67,7 +67,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 		}
 	}
 	
-	private static native JsArray<Element> _allHeaderElements(Element el) /*-{
+	private static native JsArray<Element> _localHeaderElements(Element el) /*-{
 		//find all header elements in the DOM
 		var allHeaderElements = $wnd.jQuery(":header");
 		//filter all header elements down to the collection of header elements that are descendents of the local markdown element
