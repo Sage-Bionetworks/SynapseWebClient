@@ -5,11 +5,11 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
+		<g:SimplePanel ui:field="synAlertContainer" />
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400">
 			<b:Heading ui:field="title" size="H1" />
 			<b:Lead ui:field="message"/>
 		</bh:Div>
-		<g:SimplePanel ui:field="synAlertContainer" />
 		<bh:Div addStyleNames="clear"/>
 		<g:SimplePanel ui:field="footer" />
 	</bh:Div>

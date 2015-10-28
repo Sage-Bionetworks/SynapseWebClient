@@ -10,15 +10,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAlias;
+import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;
 
 public class OAuth2AliasServlet extends OAuth2SessionServlet {
 	
 	private static final String PROFILE_MESSAGE_PLACE = "/#!Profile:message/";
+	private static final String ERROR_PLACE = "/#!Error:";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -59,13 +62,14 @@ public class OAuth2AliasServlet extends OAuth2SessionServlet {
 			request.setAuthenticationCode(authorizationCode);
 			PrincipalAlias response = client.bindOAuthProvidersUserId(request);
 			resp.sendRedirect(PROFILE_MESSAGE_PLACE + URLEncoder.encode(provider.name() + " has been successfully linked to your Synapse account. ", "UTF-8"));
-		} catch (SynapseServerException e) {
-			resp.setStatus(e.getStatusCode());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (SynapseException e) {
-			// 400 error
-			resp.setStatus(HttpStatus.BAD_REQUEST.value());
-			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
+		} catch (Exception e) {
+			LogEntry entry = new LogEntry();
+			entry.setLabel("Unable to link with " + provider);
+			entry.setMessage(e.getMessage());
+//			entry.setStacktrace(ExceptionUtils.getStackTrace(e));
+			String entryString = SerializationUtils.serializeAndHexEncode(entry);
+			resp.sendRedirect(ERROR_PLACE + entryString);
+			
 		}
 	}
 }
