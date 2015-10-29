@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,6 +66,17 @@ public class TabTest {
 		verify(mockView).setActive(true);
 		//verify showing tab also attempts to update the page title
 		verify(mockSynapseJSNIUtils).setPageTitle(anyString());
+	}
+	
+	@Test
+	public void testSetEntityNameAndPlaceNotActive() {
+		when(mockView.isActive()).thenReturn(false);
+		//verify page title is not set during this process (if tab is not active)
+		String entityName = "one project to rule them all";
+		String entityId = "syn123";
+		Synapse place = new Synapse(entityId);
+		tab.setEntityNameAndPlace(entityName, place);
+		verify(mockSynapseJSNIUtils, never()).setPageTitle(anyString());
 	}
 	
 }
