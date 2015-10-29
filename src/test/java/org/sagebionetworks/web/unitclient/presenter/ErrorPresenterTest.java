@@ -66,6 +66,7 @@ public class ErrorPresenterTest {
 	}
 	@Test
 	public void testShowLogEntryLoggedIn() throws RestServiceException {
+		when(mockSynAlert.isUserLoggedIn()).thenReturn(true);
 		presenter.showLogEntry("");
 		verify(mockView).clear();
 		verify(mockView, times(2)).setPresenter(presenter);
