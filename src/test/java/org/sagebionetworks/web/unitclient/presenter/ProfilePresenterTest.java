@@ -41,6 +41,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
@@ -249,6 +250,8 @@ public class ProfilePresenterTest {
 		ProfileArea initialTab = ProfileArea.PROJECTS;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(isOwner);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		//TODO: remove alpha mode website mock below after ORCID exposed in profile 
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		profilePresenter.updateProfileView(userId, initialTab);
 		
 		verify(mockView).clear();
@@ -256,6 +259,7 @@ public class ProfilePresenterTest {
 		verify(mockView).showLoading();
 		verify(mockView).setSortText(SortOptionEnum.LATEST_ACTIVITY.sortText);
 		verify(mockView).setProfileEditButtonVisible(isOwner);
+		verify(mockView).setOrcIDLinkButtonVisible(isOwner);
 		verify(mockView).showTabs(isOwner);
 		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 	}
