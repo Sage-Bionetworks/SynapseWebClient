@@ -86,4 +86,12 @@ public class Tab implements TabView.Presenter {
 			callbackP.invoke(this);
 		}
 	}
+	
+	/**
+	 * For testing purposes only
+	 * @param entityName
+	 */
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
 }
