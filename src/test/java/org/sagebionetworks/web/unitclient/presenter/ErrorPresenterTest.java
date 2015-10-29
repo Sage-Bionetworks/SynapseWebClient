@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -40,7 +40,7 @@ public class ErrorPresenterTest {
 		mockSynAlert = mock(SynapseAlert.class);
 		mockLogEntry = mock(LogEntry.class);
 		presenter = new ErrorPresenter(mockView, mockSynapse, mockSynAlert, mockJsniUtils);
-		
+		when(mockSynAlert.isUserLoggedIn()).thenReturn(false);
 		AsyncMockStubber.callSuccessWith(mockLogEntry).when(mockSynapse).hexDecodeLogEntry(
 				anyString(), any(AsyncCallback.class));
 		
@@ -55,13 +55,25 @@ public class ErrorPresenterTest {
 	}
 	
 	@Test
-	public void testShowLogEntry() throws RestServiceException {
+	public void testShowLogEntryAnonymous() throws RestServiceException {
 		presenter.showLogEntry("");
 		verify(mockView).clear();
 		verify(mockView, times(2)).setPresenter(presenter);
 		verify(mockSynAlert).clear();
 		verify(mockView).setEntry(mockLogEntry);
 		verify(mockJsniUtils, times(3)).consoleError(anyString());
+		verify(mockSynAlert).showMustLogin();
+	}
+	@Test
+	public void testShowLogEntryLoggedIn() throws RestServiceException {
+		when(mockSynAlert.isUserLoggedIn()).thenReturn(true);
+		presenter.showLogEntry("");
+		verify(mockView).clear();
+		verify(mockView, times(2)).setPresenter(presenter);
+		verify(mockSynAlert).clear();
+		verify(mockView).setEntry(mockLogEntry);
+		verify(mockJsniUtils, times(3)).consoleError(anyString());
+		verify(mockSynAlert, never()).showMustLogin();
 	}
 	
 	@Test

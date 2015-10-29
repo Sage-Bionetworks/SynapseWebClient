@@ -86,6 +86,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button editProfileButton;
 	@UiField
+	Button linkORCIDButton;
+	@UiField
 	Button importLinkedIn;
 	@UiField
 	SimplePanel editUserProfilePanel;
@@ -399,6 +401,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				synapseEmailField.selectAll();
+			}
+		});
+		
+		linkORCIDButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
 			}
 		});
 
@@ -882,6 +891,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setProfileEditButtonVisible(boolean isVisible) {
 		this.editProfileButton.setVisible(isVisible);
 		this.importLinkedIn.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setOrcIDLinkButtonVisible(boolean isVisible) {
+		this.linkORCIDButton.setVisible(isVisible);		
 	}
 
 	@Override

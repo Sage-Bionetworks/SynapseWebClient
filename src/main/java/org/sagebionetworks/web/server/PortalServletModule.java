@@ -33,7 +33,8 @@ import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
-import org.sagebionetworks.web.server.servlet.oauth2.OAuth2Servlet;
+import org.sagebionetworks.web.server.servlet.oauth2.OAuth2AliasServlet;
+import org.sagebionetworks.web.server.servlet.oauth2.OAuth2SessionServlet;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.PlaceTokenizer;
@@ -128,8 +129,12 @@ public class PortalServletModule extends ServletModule {
 		bind(JiraJavaClient.class).to(JiraJavaClientImpl.class);
 		
 		// OAuth2 
-		bind(OAuth2Servlet.class).in(Singleton.class);
-		serve("/Portal/oauth2callback").with(OAuth2Servlet.class);
+		bind(OAuth2SessionServlet.class).in(Singleton.class);
+		serve("/Portal/oauth2callback").with(OAuth2SessionServlet.class);
+		
+		bind(OAuth2AliasServlet.class).in(Singleton.class);
+		serve("/Portal/oauth2AliasCallback").with(OAuth2AliasServlet.class);
+
 		
 		// The Rest template provider should be a singleton.
 		bind(RestTemplateProviderImpl.class).in(Singleton.class);

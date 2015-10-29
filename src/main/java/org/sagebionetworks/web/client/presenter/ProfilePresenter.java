@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -23,6 +24,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -49,6 +51,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -201,7 +204,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clear();
 		view.showLoading();
 		view.setSortText(currentProjectSort.sortText);
-		view.setProfileEditButtonVisible(isOwner);	
+		view.setProfileEditButtonVisible(isOwner);
+		//TODO: remove isInTestWebsite condition once UserBundle is in place and we can display orc id link.
+		view.setOrcIDLinkButtonVisible(isOwner && DisplayUtils.isInTestWebsite(cookies));
 		view.showTabs(isOwner);
 		myTeamsWidget.clear();
 		myTeamsWidget.configure(false);
@@ -688,6 +693,26 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		projectSynAlert.clear();
 		teamSynAlert.clear();
 		String token = place.toToken();
+		if (token.startsWith("message/")) {
+			//show alert message and go to view current profile
+			String message = token.substring("message/".length());
+			message = gwt.decodeQueryString(message);
+			view.showInfo("", message);
+			token = "v";
+		}
+		if (token.equals("v") || token.startsWith("v/")) {
+			Place gotoPlace = null;
+			if (authenticationController.isLoggedIn()) {
+				//replace url with current user id
+				token = authenticationController.getCurrentUserPrincipalId() + token.substring(1);
+				gotoPlace = new Profile(token);
+			} else {
+				//does not make sense, go home
+				gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+			}
+			globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			return;
+		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
 			updateProfileView(place.getUserId(), place.getArea());
