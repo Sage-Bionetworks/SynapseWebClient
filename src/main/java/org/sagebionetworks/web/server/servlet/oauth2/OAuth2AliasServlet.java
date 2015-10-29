@@ -61,7 +61,7 @@ public class OAuth2AliasServlet extends OAuth2SessionServlet {
 			request.setProvider(provider);
 			request.setAuthenticationCode(authorizationCode);
 			PrincipalAlias response = client.bindOAuthProvidersUserId(request);
-			resp.sendRedirect(PROFILE_MESSAGE_PLACE + URLEncoder.encode(provider.name() + " has been successfully linked to your Synapse account. ", "UTF-8"));
+			resp.sendRedirect(PROFILE_MESSAGE_PLACE + URLEncoder.encode(provider.name() + " has been successfully linked to your Synapse account.", "UTF-8"));
 		} catch (Exception e) {
 			LogEntry entry = new LogEntry();
 			entry.setLabel("Unable to link with " + provider);

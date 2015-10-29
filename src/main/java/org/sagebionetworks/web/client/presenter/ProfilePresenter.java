@@ -692,7 +692,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (authenticationController.isLoggedIn() && token.startsWith("message/")) {
 			//show alert message and go to view current profile
 			String message = token.substring("message/".length());
-			message = URL.decode(message);
+			message = URL.decodeQueryString(message);
 			view.showInfo("", message);
 			token = "v";
 		}
