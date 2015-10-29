@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -50,16 +51,25 @@ public class Tab implements TabView.Presenter {
 	public void setEntityNameAndPlace(String entityName, Synapse place) {
 		this.place = place;
 		this.entityName = entityName;
+		updatePageTitle();
 	}
 	
 	public void showTab() {
 		globalAppState.pushCurrentPlace(place);
 		view.setActive(true);
-		String entityId = "";
-		if (place != null) {
-			entityId = " - " +  place.getEntityId();
+		updatePageTitle();
+	}
+	
+	public void updatePageTitle() {
+		if (view.isActive()) {
+			if (entityName != null) {
+				String entityId = "";
+				if (place != null) {
+					entityId = " - " +  place.getEntityId();
+				}
+				synapseJSNIUtils.setPageTitle(entityName + entityId);
+			}
 		}
-		synapseJSNIUtils.setPageTitle(entityName + entityId);
 	}
 	
 	public void hideTab() {
