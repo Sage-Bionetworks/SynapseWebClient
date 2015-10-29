@@ -73,7 +73,7 @@ public class OAuth2AliasServletTest {
 		assertNotNull(request);
 		assertEquals(OAuthProvider.ORCID, request.getProvider());
 		assertEquals(authCode, request.getAuthenticationCode());
-		verify(mockResponse).sendRedirect("/#!Profile:message/ORCID+has+been+successfully+linked+to+your+Synapse+account.");
+		verify(mockResponse).sendRedirect("/#!Profile:oauth_bound");
 	}
 	
 	@Test

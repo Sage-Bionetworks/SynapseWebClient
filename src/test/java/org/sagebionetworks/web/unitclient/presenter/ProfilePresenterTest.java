@@ -1342,14 +1342,10 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testMessagePlaceToken() {
-		String message = "Display+to+user";
-		String decodedMessage = "Display to user";
-		when(mockGwt.decodeQueryString(message)).thenReturn(decodedMessage);
-		String token = "message/"+message;
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		String token = "oauth_bound";
 		when(place.toToken()).thenReturn(token);
 		profilePresenter.setPlace(place);
-		verify(mockView).showInfo("", decodedMessage);
+		verify(mockView).showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 	}
 
 	@Test

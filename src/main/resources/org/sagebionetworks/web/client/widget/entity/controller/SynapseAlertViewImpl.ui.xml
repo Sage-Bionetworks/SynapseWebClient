@@ -10,6 +10,10 @@
   			<bh:Strong text="Please login to access this resource." />
   			<b:Button ui:field="loginButton" icon="SIGN_IN" addStyleNames="margin-left-10">Log in</b:Button>
   		</b:Alert>
+  		<b:Alert ui:field="suggestLoginAlert" type="INFO">
+  			<bh:Strong text="If you feel this is due to anonymous browsing, please " />
+  			<b:Button ui:field="loginButton2" icon="SIGN_IN" addStyleNames="margin-left-10">Log in</b:Button>
+  		</b:Alert>
   		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp">
   			<bh:Strong ui:field="alertText"></bh:Strong>
   		</b:Alert>

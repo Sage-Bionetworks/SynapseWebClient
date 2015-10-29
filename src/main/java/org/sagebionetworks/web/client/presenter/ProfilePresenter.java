@@ -693,11 +693,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		projectSynAlert.clear();
 		teamSynAlert.clear();
 		String token = place.toToken();
-		if (token.startsWith("message/")) {
-			//show alert message and go to view current profile
-			String message = token.substring("message/".length());
-			message = gwt.decodeQueryString(message);
-			view.showInfo("", message);
+		if (token.equals("oauth_bound")) {
+			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";
 		}
 		if (token.equals("v") || token.startsWith("v/")) {

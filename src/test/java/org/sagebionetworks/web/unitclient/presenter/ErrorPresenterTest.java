@@ -62,7 +62,7 @@ public class ErrorPresenterTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).setEntry(mockLogEntry);
 		verify(mockJsniUtils, times(3)).consoleError(anyString());
-		verify(mockSynAlert).showMustLogin();
+		verify(mockSynAlert).showSuggestLogin();
 	}
 	@Test
 	public void testShowLogEntryLoggedIn() throws RestServiceException {
@@ -73,7 +73,7 @@ public class ErrorPresenterTest {
 		verify(mockSynAlert).clear();
 		verify(mockView).setEntry(mockLogEntry);
 		verify(mockJsniUtils, times(3)).consoleError(anyString());
-		verify(mockSynAlert, never()).showMustLogin();
+		verify(mockSynAlert, never()).showSuggestLogin();
 	}
 	
 	@Test
