@@ -8,15 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAlias;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.springframework.http.HttpStatus;
 
 public class OAuth2AliasServlet extends OAuth2SessionServlet {
 	
