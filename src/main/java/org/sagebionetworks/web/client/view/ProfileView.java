@@ -61,6 +61,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setShowProfileButtonVisible(boolean isVisible);
 	void setHideProfileButtonVisible(boolean isVisible);
 	void setProfileEditButtonVisible(boolean isVisible);
+	void setOrcIDLinkButtonVisible(boolean isVisible);
 	void setProjectSortVisible(boolean isVisible);
 	void addUserProfileModalWidget(IsWidget userProfileModalWidget);
 	void addSortOption(SortOptionEnum sort);

@@ -204,7 +204,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clear();
 		view.showLoading();
 		view.setSortText(currentProjectSort.sortText);
-		view.setProfileEditButtonVisible(isOwner);	
+		view.setProfileEditButtonVisible(isOwner);
+		//TODO: remove isInTestWebsite condition once UserBundle is in place and we can display orc id link.
+		view.setOrcIDLinkButtonVisible(isOwner && DisplayUtils.isInTestWebsite(cookies));
 		view.showTabs(isOwner);
 		myTeamsWidget.clear();
 		myTeamsWidget.configure(false);
