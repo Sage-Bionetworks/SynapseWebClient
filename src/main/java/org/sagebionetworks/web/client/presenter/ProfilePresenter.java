@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -23,6 +24,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -696,12 +698,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			view.showInfo("", message);
 			token = "v";
 		}
-		if (authenticationController.isLoggedIn() && token.equals("v")) {
-			//replace url with current user id
-			place.setUserId(authenticationController.getCurrentUserPrincipalId());
-			place.setArea(ProfileArea.PROJECTS);
-			globalApplicationState.pushCurrentPlace(place);
-			
+		if (token.equals("v") || token.startsWith("v/")) {
+			Place gotoPlace = null;
+			if (authenticationController.isLoggedIn()) {
+				//replace url with current user id
+				token = authenticationController.getCurrentUserPrincipalId() + token.substring(1);
+				gotoPlace = new Profile(token);
+			} else {
+				//does not make sense, go home
+				gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+			}
+			globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			return;
 		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
