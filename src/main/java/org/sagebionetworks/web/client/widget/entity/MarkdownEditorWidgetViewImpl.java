@@ -57,6 +57,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public AnchorListItem attachmentLink;
 	@UiField
+	public AnchorListItem genomeBrowserLink;
+	@UiField
 	public AnchorListItem buttonLink;
 	@UiField
 	public AnchorListItem entityListLink;
@@ -185,6 +187,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.widget = binder.createAndBindUi(this);
 		editWidgetButton.addClickHandler(getClickHandler(MarkdownEditorAction.EDIT_WIDGET));
 		attachmentLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ATTACHMENT));
+		genomeBrowserLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BIODALLIANCE_GENOME_BROWSER));
 		buttonLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BUTTON_LINK));
 		entityListLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_ENTITY_LIST));
 		imageLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE));

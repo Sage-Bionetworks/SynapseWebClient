@@ -507,17 +507,20 @@ public class UploaderTest {
 	
 	@Test
 	public void testGetSftpProxyLink() throws UnsupportedEncodingException {
-		
 		String sftpProxy = "http://mytestproxy.com/sftp";
+		String filename = "override that.txt";
 		//test with existing query param
 		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy +"?gwt.codesvr=localhost:9999");
 		//and the sftp link contains characters that should be escaped
 		String sftpLink = "sftp://this/and/that.txt?foo=bar";
 		String encodedUrl = URLEncoder.encode(sftpLink, "UTF-8");
-		when(gwt.encodeQueryString(anyString())).thenReturn(encodedUrl);
-		String sftpProxyLink = Uploader.getSftpProxyLink(sftpLink, mockGlobalApplicationState, gwt);
+		String encodedFilename = URLEncoder.encode(filename, "UTF-8");
+		when(gwt.encodeQueryString(sftpLink)).thenReturn(encodedUrl);
+		when(gwt.encodeQueryString(filename)).thenReturn(encodedFilename);
+		String sftpProxyLink = Uploader.getSftpProxyLink(filename, sftpLink, mockGlobalApplicationState, gwt);
 		//verify that the sftp link was encoded
 		assertTrue(sftpProxyLink.contains(encodedUrl));
+		assertTrue(sftpProxyLink.contains(encodedFilename));
 		//and that it did not add another '?' for the url param
 		assertTrue(sftpProxyLink.contains("&url="));
 	}

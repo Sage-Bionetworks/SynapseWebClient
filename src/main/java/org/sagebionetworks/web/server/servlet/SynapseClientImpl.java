@@ -2,8 +2,9 @@ package org.sagebionetworks.web.server.servlet;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -911,6 +912,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public AccessControlList updateTeamAcl(AccessControlList acl)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.updateTeamACL(acl);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public AccessControlList getTeamAcl(String teamId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getTeamACL(teamId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public AccessControlList deleteAcl(String ownerEntityId)
@@ -1151,13 +1174,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview,
+	public String markdown2Html(String markdown, String suffix,
 			Boolean isAlphaMode, String clientHostString)
 			throws RestServiceException {
 		try {
 			long startTime = System.currentTimeMillis();
 			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
-					markdown, isPreview, clientHostString);
+					markdown, suffix, clientHostString);
 			long endTime = System.currentTimeMillis();
 			float elapsedTime = endTime - startTime;
 			logInfo("Markdown processing took " + (elapsedTime / 1000f)
@@ -1406,7 +1429,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException, IOException {
 		String markdown = getMarkdown(key);
 		String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
-				markdown, false, null);
+				markdown, "", null);
 		String plainText = Jsoup.clean(html, "", Whitelist.none(),
 				new Document.OutputSettings().prettyPrint(false));
 		return plainText;
@@ -2199,19 +2222,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public void setIsTeamAdmin(String currentUserId, String targetUserId,
-			String teamId, boolean isTeamAdmin) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.setTeamMemberPermissions(teamId, targetUserId,
-					isTeamAdmin);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
+	
 	@Override
 	public void deleteTeamMember(String currentUserId, String targetUserId,
 			String teamId) throws RestServiceException {
@@ -2530,7 +2541,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public SignedTokenInterface hexDecodeAndSerialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
+	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
 		if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
 			//error interpreting the token type, respond with a bad request
 			throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
@@ -3072,7 +3083,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			//first, get the entity bundle with all information that we want
-			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES;
+			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS;
 			EntityBundle bundle = synapseClient.getEntityBundle(entityId, partsMask);
 			//now get the profile for the last modified by
 			UserProfile modifiedByProfile = synapseClient.getUserProfile(bundle.getEntity().getModifiedBy());
@@ -3173,25 +3184,4 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	/**
-	 * Update an entity.
-	 */
-	@Override
-	public void updateFileEntity(FileEntity toUpdate, String fileHandleId,
-			String fileName, String contentType) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			S3FileHandle newHandle = synapseClient.createS3FileHandleCopy(fileHandleId, fileName, contentType);
-			toUpdate.setDataFileHandleId(newHandle.getId());
-			synapseClient.putEntity(toUpdate);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	
-	
 }

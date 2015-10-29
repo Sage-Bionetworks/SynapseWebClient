@@ -167,6 +167,9 @@ public interface SynapseClientAsync {
 	
 	public void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
 	
+	public void updateTeamAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
+	public void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
+	
 	public void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
 
 	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
@@ -192,7 +195,7 @@ public interface SynapseClientAsync {
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
 	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
@@ -270,7 +273,6 @@ public interface SynapseClientAsync {
 	void deleteMembershipInvitation(String invitationId, AsyncCallback<Void> callback);
 	void updateTeam(Team team, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
-	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	
@@ -308,7 +310,7 @@ public interface SynapseClientAsync {
 
 	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
-	void hexDecodeAndSerialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
+	void hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
 	
 	void getAPIKey(AsyncCallback<String> callback);
 
@@ -443,7 +445,4 @@ public interface SynapseClientAsync {
 	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
 	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
-
-	void updateFileEntity(FileEntity fileEntity, String fileHandleId, String fileName,
-			String contentType, AsyncCallback<Void> asyncCallback);
 }

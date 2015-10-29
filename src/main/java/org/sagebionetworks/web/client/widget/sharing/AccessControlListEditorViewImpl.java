@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -23,7 +22,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -37,6 +35,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private Long publicAclPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
+	private PermissionLevel defaultPermissionLevel;
 	
 	private SharingPermissionsGrid permissionsGrid;
 	
@@ -102,7 +101,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId) {
 		this.publicAclPrincipalId = publicAclPrincipalId;
 	}
-	
+	@Override
+	public void setPublicPrivateButtonVisible(boolean isVisible) {
+		addPeoplePanel.setPublicPrivateButtonVisible(isVisible);
+	}
 	@Override
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
 		this.isPubliclyVisible = isPubliclyVisible;
@@ -118,9 +120,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission) {		
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel) {		
 		clear();
-		
+		this.defaultPermissionLevel = defaultPermissionLevel;
 		// Display Permissions grid.
 		showEditColumns = canChangePermission && !isInherited;
 		CallbackP<Long> removeUserCallback = null;
@@ -194,7 +196,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					}
 				};
 				
-				addPeoplePanel.configure(permList, permissionDisplay, addPersonCallback, makePublicCallback, isPubliclyVisible);
+				addPeoplePanel.configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
 				deleteAclButton.setEnabled(canEnableInheritance);
 				add(toolTipAndDeleteAclButton);
@@ -266,7 +268,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			String principalIdStr = selectedUser.getId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
-			presenter.setAccess(principalId, PermissionLevel.CAN_VIEW);
+			presenter.setAccess(principalId, defaultPermissionLevel);
 			// clear selections
 			addPeoplePanel.getSuggestBox().clear();
 		} else {

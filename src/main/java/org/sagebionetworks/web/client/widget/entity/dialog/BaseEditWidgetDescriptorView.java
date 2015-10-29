@@ -36,6 +36,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	
 	public List<String> getNewFileHandleIds();
 	public List<String> getDeletedFileHandleIds();
+	void clearErrors();
 	
 	public interface Presenter {
 		

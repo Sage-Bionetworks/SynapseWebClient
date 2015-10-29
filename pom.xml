@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2015-08-28-1912-1f0bb52</synapse.version>
+ 		<synapse.version>109.0</synapse.version>
 		<gwtVersion>2.7.0</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -26,9 +26,11 @@
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.0-beta8</log4j.version>
+		<markdown.version>2015-10-14-d491778-18</markdown.version>
 		<gwtboostrap3.version>1.2-gwt-2.7.0</gwtboostrap3.version>
 		<gwtboostrap3.extras.version>1.0-gwt-2.7.0</gwtboostrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<gwtvisualizationwrappers.version>1.5-gwt-2.7.0</gwtvisualizationwrappers.version>
 	</properties>
 
 	<repositories>
@@ -290,10 +292,6 @@
 	</build>
 
 	<dependencies>
-		<!-- Provides light-weight GWT wrappers for boostrap support
-			Currently, using a modified (forked from the origial) of this
-			libray to support gwt 2.5.1 as the origial libary requires 2.6+.
-			As soon as we move to GWT 2.6 we should use the origial libary. -->
 		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3</artifactId>
@@ -303,7 +301,13 @@
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3-extras</artifactId>
 			<version>${gwtboostrap3.extras.version}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>org.gwtvisualizationwrappers</groupId>
+			<artifactId>gwtvisualizationwrappers</artifactId>
+			<version>${gwtvisualizationwrappers.version}</version>
+		</dependency>
+				
 		<!-- Sage Bionetworks Dependencies -->
 		<dependency>
 			<groupId>javax.mail</groupId>
@@ -356,7 +360,7 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>2015-06-22-6486f39-16</version>
+			<version>${markdown.version}</version>
 		</dependency>
 		
 		

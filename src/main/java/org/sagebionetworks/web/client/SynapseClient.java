@@ -265,6 +265,10 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public AccessControlList updateAcl(AccessControlList aclEW, boolean recursive) throws RestServiceException;
 
+	public AccessControlList updateTeamAcl(AccessControlList acl) throws RestServiceException;
+	
+	public AccessControlList getTeamAcl(String teamId) throws RestServiceException;
+	
 	public AccessControlList deleteAcl(String ownerEntityId) throws RestServiceException;
 
 	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;
@@ -284,7 +288,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString) throws RestServiceException;
+	public String markdown2Html(String markdown, String suffix, Boolean isAlpha, String clientHostString) throws RestServiceException;
 	
 	public Activity getActivityForEntity(String entityId) throws RestServiceException;
 	
@@ -347,7 +351,6 @@ public interface SynapseClient extends RemoteService {
 	public ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
 	public void deleteMembershipInvitation(String invitationId) throws RestServiceException;
-	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	public Team updateTeam(Team team) throws RestServiceException;
 	public TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
@@ -380,7 +383,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;
 	
-	public SignedTokenInterface hexDecodeAndSerialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
+	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
 	
 	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	
@@ -545,6 +548,4 @@ public interface SynapseClient extends RemoteService {
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
-	
-	void updateFileEntity(FileEntity fileEntity, String id, String fileName, String contentType) throws RestServiceException;
 }

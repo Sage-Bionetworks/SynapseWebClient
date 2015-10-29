@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
@@ -133,22 +134,29 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		final ListBox listBox = new ListBox();
 		
 		if (aclEntry.isOwner()) {
-			listBox.addItem(permissionDisplay.get(PermissionLevel.OWNER));
+			listBox.addItem(DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
 			listBox.setEnabled(false);
 			return listBox;
 		}
 		
 		PermissionLevel permLevel = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));
+		boolean foundMatchingPermissionLevel = false;
 		for (int i = 0; i < permissionLevels.length; i++) {
 			listBox.addItem(permissionDisplay.get(permissionLevels[i]));
-			if (permissionLevels[i].equals(permLevel))
+			if (permissionLevels[i].equals(permLevel)) {
+				foundMatchingPermissionLevel = true;
 				listBox.setSelectedIndex(i);
+			}
+		}
+		if (!foundMatchingPermissionLevel) {
+			listBox.addItem("Custom");
+			listBox.setSelectedIndex(listBox.getItemCount()-1);
 		}
 		
 		listBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				if (setAccessCallback != null)
+				if (setAccessCallback != null && listBox.getSelectedIndex() < permissionLevels.length)
 					setAccessCallback.invoke(principalId, permissionLevels[listBox.getSelectedIndex()]);
 			}
 		});

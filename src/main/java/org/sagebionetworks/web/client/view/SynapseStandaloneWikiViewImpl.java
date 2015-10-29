@@ -60,7 +60,7 @@ public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView 
 	@Override
 	public void configure(String markdown, WikiPageKey wikiKey) {
 		clear();
-		markdownWidget.configure(markdown, wikiKey, false, null);
+		markdownWidget.configure(markdown, wikiKey, null);
 		markdownContainer.setVisible(true);
 	}
 

@@ -7,7 +7,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,8 +26,6 @@ public class EntityViewImpl implements EntityView {
 	SimplePanel openInvitesPanel;
 	@UiField
 	SimplePanel synAlertContainer;
-	@UiField
-	Image entityBackgroundImage;
 	@UiField
 	HTMLPanel loadingUI;
 	@UiField
@@ -97,17 +94,6 @@ public class EntityViewImpl implements EntityView {
 		accessDependentMessage.setVisible(false);
 		loadingUI.setVisible(false);
 		Window.scrollTo(0, 0); // scroll user to top of page
-	}
-
-	
-	@Override
-	public void setBackgroundImageVisible(boolean isVisible) {
-		entityBackgroundImage.setVisible(isVisible);
-	}
-
-	@Override
-	public void setBackgroundImageUrl(String url) {
-		entityBackgroundImage.setUrl(url);
 	}
 	
 	@Override

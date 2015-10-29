@@ -317,6 +317,8 @@ public class SynapseClientImplTest {
 				.thenReturn(acl);
 		when(mockSynapse.updateACL((AccessControlList) any(), eq(false)))
 				.thenReturn(acl);
+		when(mockSynapse.updateTeamACL(any(AccessControlList.class))).thenReturn(acl);
+		when(mockSynapse.getTeamACL(anyString())).thenReturn(acl);
 
 		EntityHeader bene = new EntityHeader();
 		bene.setId("syn999");
@@ -350,7 +352,7 @@ public class SynapseClientImplTest {
 		bundle.setUnmetAccessRequirements(accessRequirements);
 		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(mask)))
 				.thenReturn(bundle);
-		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES)))
+		when(mockSynapse.getEntityBundle(anyString(), Matchers.eq(ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS)))
 				.thenReturn(bundle);
 
 		EntityBundle emptyBundle = new EntityBundle();
@@ -1961,31 +1963,32 @@ public class SynapseClientImplTest {
 		EntityBundlePlus entityBundlePlus = synapseClient.getEntityInfo(entityId);
 		assertEquals(entity, entityBundlePlus.getEntityBundle().getEntity());
 		assertEquals(annos, entityBundlePlus.getEntityBundle().getAnnotations());
+		assertEquals(eup, entityBundlePlus.getEntityBundle().getPermissions());
 		assertEquals(testUserProfile, entityBundlePlus.getProfile());
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
 		String tokenTypeName = null;
-		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenEmpty() throws RestServiceException, SynapseException{
 		String tokenTypeName = "";
-		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 	}
 	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenUnrecognized() throws RestServiceException, SynapseException{
 		String tokenTypeName = "InvalidTokenType";
-		synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 	}
 	
 	@Test
 	public void testHandleSignedTokenJoinTeam() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedJoinTeamToken);
 		synapseClient.handleSignedToken(token,TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).addTeamMember(joinTeamToken, TEST_HOME_PAGE_BASE+"#!Team:", TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/");
 	}
@@ -1993,20 +1996,13 @@ public class SynapseClientImplTest {
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenInvalidJoinTeam() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
-	}
-	
-	@Ignore
-	@Test(expected = BadRequestException.class)
-	public void testHandleSignedTokenJoinTeamWrongToken() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.JoinTeam.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedNotificationSettingsToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, "invalid token");
 	}
 	
 	@Test
 	public void testHandleSignedTokenNotificationSettings() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedNotificationSettingsToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, encodedNotificationSettingsToken);
 		synapseClient.handleSignedToken(token, TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).updateNotificationSettings(notificationSettingsToken);
 	}
@@ -2014,14 +2010,7 @@ public class SynapseClientImplTest {
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenInvalidNotificationSettings() throws RestServiceException, SynapseException{
 		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, "invalid token");
-	}
-	
-	@Ignore
-	@Test(expected = BadRequestException.class)
-	public void testHandleSignedTokenNotificationSettingsWrongToken() throws RestServiceException, SynapseException{
-		String tokenTypeName = NotificationTokenType.Settings.name();
-		SignedTokenInterface token = synapseClient.hexDecodeAndSerialize(tokenTypeName, encodedJoinTeamToken);
+		SignedTokenInterface token = synapseClient.hexDecodeAndDeserialize(tokenTypeName, "invalid token");
 	}
 	
 	@Test
@@ -2173,5 +2162,19 @@ public class SynapseClientImplTest {
 	public void testCreateStorageLocationSettingFailure() throws SynapseException, RestServiceException {
 		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenThrow(new Exception());
 		synapseClient.createStorageLocationSetting(entityId, new ExternalStorageLocationSetting());
+	}
+	
+	@Test
+	public void testUpdateTeamAcl() throws SynapseException, RestServiceException {
+		AccessControlList returnedAcl = synapseClient.updateTeamAcl(acl);
+		verify(mockSynapse).updateTeamACL(acl);
+		assertEquals(acl, returnedAcl);
+	}
+	@Test
+	public void testGetTeamAcl() throws SynapseException, RestServiceException {
+		String teamId = "14";
+		AccessControlList returnedAcl = synapseClient.getTeamAcl(teamId);
+		verify(mockSynapse).getTeamACL(teamId);
+		assertEquals(acl, returnedAcl);
 	}
 }

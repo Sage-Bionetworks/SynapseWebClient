@@ -12,6 +12,7 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,8 +58,12 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	
 	@Override
 	public void okClicked() {
-		if (selectedHandler != null)
+		//check for valid selection
+		if (selectedEntity == null || selectedEntity.getTargetId() == null) {
+			view.showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+		} else if (selectedHandler != null) {
 			selectedHandler.onSelected(selectedEntity);
+		}
 	}
 	public Reference getSelectedEntity() {
 		return selectedEntity;

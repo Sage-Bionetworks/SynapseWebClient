@@ -30,4 +30,8 @@ public interface EntityMetadataView extends IsWidget {
 
 	void setEntityId(String text);
 
+	void setUploadDestinationPanelVisible(boolean isVisible);
+
+	void setUploadDestinationText(String text);
+
 }

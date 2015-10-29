@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -36,6 +37,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -68,7 +70,8 @@ public class EntityBadgeTest {
 	List<Annotation> annotationList;
 	Annotations annotations;
 	UserBadge mockUserBadge;
-	SynapseJSNIUtils mockSynapseJSNIUtils; 
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	UserEntityPermissions mockPermissions;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -80,6 +83,8 @@ public class EntityBadgeTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockTransformer = mock(AnnotationTransformer.class);
 		mockUserBadge = mock(UserBadge.class);
+		mockPermissions = mock(UserEntityPermissions.class);
+		when(mockPermissions.getCanPublicRead()).thenReturn(true);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockTransformer, mockUserBadge, mockSynapseJSNIUtils);
@@ -104,6 +109,7 @@ public class EntityBadgeTest {
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
 //		when(bundle.getAnnotations()).thenReturn(value);
+		when(bundle.getPermissions()).thenReturn(mockPermissions);
 		EntityBundlePlus entityBundlePlus = new EntityBundlePlus();
 		entityBundlePlus.setEntityBundle(bundle);
 		entityBundlePlus.setProfile(userProfile);
@@ -175,6 +181,17 @@ public class EntityBadgeTest {
 	}
 	
 	@Test
+	public void testEntityClickedCustomHandler() throws Exception {
+		CallbackP<String> mockEntityClicked = mock(CallbackP.class);
+		widget.setEntityClickedHandler(mockEntityClicked);
+		String id = "syn77";
+		EntityQueryResult header = new EntityQueryResult();
+		header.setId(id);
+		widget.entityClicked(header);
+		verify(mockEntityClicked).invoke(id);
+	}
+	
+	@Test
 	public void testShowTypeIcon() throws Exception {
 		EntityHeader header = new EntityHeader();
 		header.setId("syn93847");
@@ -211,7 +228,8 @@ public class EntityBadgeTest {
 	public void testAddAnnotationsAndWikiStatusEmpty() throws Exception {
 		rootWikiKeyId = null;
 		annotationList.clear();
-		widget.addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiKeyId);
+		widget.addAnnotations(keyValueDisplay, annotations);
+		widget.addWikiStatus(keyValueDisplay, rootWikiKeyId);
 		//verify nothing was added to keyValueDisplay
 		assertTrue(map.isEmpty());
 		assertTrue(order.isEmpty());
@@ -221,15 +239,33 @@ public class EntityBadgeTest {
 	public void testWikiStatus() throws Exception {
 		rootWikiKeyId = "8888";
 		annotationList.clear();
-		widget.addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiKeyId);
+		widget.addWikiStatus(keyValueDisplay, rootWikiKeyId);
 		assertEquals(1, map.size());
 		assertEquals(1, order.size());
 	}
 	
 	@Test
+	public void testAddPublic() throws Exception {
+		widget.addPublicPrivate(keyValueDisplay, mockPermissions);
+		assertEquals(1, map.size());
+		assertEquals(1, order.size());
+		assertEquals("Public", map.keySet().iterator().next());
+	}
+	@Test
+	public void testAddPrivate() throws Exception {
+		when(mockPermissions.getCanPublicRead()).thenReturn(false);
+		widget.addPublicPrivate(keyValueDisplay, mockPermissions);
+		assertEquals(1, map.size());
+		assertEquals(1, order.size());
+		assertEquals("Private", map.keySet().iterator().next());
+	}
+
+	
+	@Test
 	public void testAddAnnotationsAndWikiStatus() throws Exception {
 		rootWikiKeyId = "8888";
-		widget.addAnnotationsAndWikiStatus(keyValueDisplay, annotations, rootWikiKeyId);
+		widget.addAnnotations(keyValueDisplay, annotations);
+		widget.addWikiStatus(keyValueDisplay, rootWikiKeyId);
 		//in the @before we set up 3 annotation keys.  Plus the has a wiki note.
 		assertEquals(4, map.size());
 		assertEquals(4, order.size());

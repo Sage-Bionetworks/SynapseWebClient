@@ -9,7 +9,6 @@
 	<g:HTMLPanel>
 		<!-- HEADER -->
 		<g:SimplePanel ui:field="headerPanel"/>
-		<g:Image ui:field="entityBackgroundImage" addStyleNames="entityBackgroundImage" />
 		<g:SimplePanel ui:field="synAlertContainer"/>
 		<g:HTMLPanel ui:field="loadingUI" addStyleNames="min-height-500">
 			<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />

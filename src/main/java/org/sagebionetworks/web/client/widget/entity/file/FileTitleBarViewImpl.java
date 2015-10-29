@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -76,7 +75,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	
 	@Inject
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
-			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloaderHandler,
 			FavoriteWidget favoriteWidget,
 			GlobalApplicationState globalAppState,
@@ -159,12 +157,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				}
 			}
 			else if (fileHandle instanceof S3FileHandleInterface){
-				fileName.setInnerText(fileHandle.getFileName());
-
+				fileName.setInnerText(entityBundle.getFileName());
 				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
 				presenter.setS3Description();
-				fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true));
 
+				fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true));
 				final String md5 = s3FileHandle.getContentMd5();
 				if (md5 != null) {
 					md5Link.configure(md5);

@@ -472,7 +472,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		});
 	}-*/;
 	
-	
 	@Override
 	public void showTwitterFeed(String dataWidgetId, String elementId,
 			String linkColor, String borderColor, int height) {
@@ -482,12 +481,26 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _showTwitterFeed(String dataWidgetId,
 			String elementId, String linkColorHex, String borderColorHex,
 			int heightInPx) /*-{
-		var element = $doc.getElementById(elementId);
-		$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-			height : heightInPx,
-			chrome : "nofooter noheader",
-			linkColor : linkColorHex,
-			borderColor : borderColorHex
-		});
+		if (typeof $wnd.twttr !== 'undefined') {
+			var element = $doc.getElementById(elementId);
+			$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
+				height : heightInPx,
+				chrome : "nofooter noheader",
+				linkColor : linkColorHex,
+				borderColor : borderColorHex
+			});
+		}
+		
 	}-*/;
+	
+	@Override
+	public String getCurrentURL() {
+		return Location.getHref();
+	}
+	
+	@Override
+	public String getCurrentHostName() {
+		return Location.getHostName();
+	}
+	
 }

@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -54,6 +53,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	public static final String MOVE_PREFIX = "Move ";
 
+	public static final String EDIT_WIKI_PREFIX = "Edit ";
+	public static final String EDIT_WIKI_SUFFIX = " Wiki";
+	
 	public static final String THE = "The ";
 
 	public static final String WAS_SUCCESSFULLY_DELETED = " was successfully deleted.";
@@ -170,10 +172,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureProvenance();
 			configureChangeStorageLocation();
 			configureCreateDOI();
-			//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
-//			configureEditProjectMetadataAction();
-			//TODO: Dependent on PLFM-3457
-//			configureEditFileMetadataAction();
+			configureEditProjectMetadataAction();
+			configureEditFileMetadataAction();
 		}
 	}
 	
@@ -205,18 +205,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.CREATE_DOI, false);
 		if (canEdit) {
 			actionMenu.addActionListener(Action.CREATE_DOI, this);
-			synapseClient.getEntityDoi(entity.getId(), getVersion(), new AsyncCallback<Doi>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					boolean isNotFound = caught instanceof NotFoundException;
-					//show command if not found
-					actionMenu.setActionVisible(Action.CREATE_DOI, isNotFound);
-					actionMenu.setActionEnabled(Action.CREATE_DOI, isNotFound);
-				}
-				public void onSuccess(Doi result) {
-					//if there's a Doi, then continue to not show command
-				};
-			});
+			if (entityBundle.getDoi() == null) {
+				//show command if not returned, thus not in existence
+				actionMenu.setActionVisible(Action.CREATE_DOI, true);
+				actionMenu.setActionEnabled(Action.CREATE_DOI, true);
+			}
 		}
 	}
 	
@@ -260,6 +253,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.addActionListener(Action.EDIT_WIKI_PAGE, this);
+			actionMenu.setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+enityTypeDisplay+EDIT_WIKI_SUFFIX);
 		}else{
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, false);
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, false);
@@ -472,13 +466,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isRenameOnly(Entity entity){
-//TODO: Dependent on PLFM-3457
-//		if(entity instanceof FileEntity){
-//			return false;
-//TODO: Dependent on PLFM-3538 and SWC-2560 (applying and handling the new access type CHANGE_SETTINGS).
-//		}else if(entity instanceof Project){
-//			return false;
-//		}
+		if(entity instanceof FileEntity){
+			return false;
+		} else if(entity instanceof Project){
+			return false;
+		}
 		return true;
 	}
 	
@@ -789,20 +781,28 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onEditFileMetadata() {
-		// Validate the user can update this entity.
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
-			@Override
-			public void invoke() {
-				postCheckEditFileMetadata();
-			}
-		});
+		Synapse place = ((Synapse)globalApplicationState.getCurrentPlace());
+		Long version = place.getVersionNumber();
+		// Can only edit file metadata of the current file version
+		if (version == null) {
+			// Validate the user can update this entity.
+			preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+				@Override
+				public void invoke() {
+					postCheckEditFileMetadata();
+				}
+			});
+		} else {
+			view.showErrorMessage("Can only edit the metadata of the most recent file version.");
+		}
+		
 	}
 	
 	/**
 	 * Called if the preflight check for edit file metadata passes.
 	 */
-	private void postCheckEditFileMetadata(){
-		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), entityBundle.getFileHandles(), new Callback() {
+	private void postCheckEditFileMetadata() {
+		editFileMetadataModalWidget.configure((FileEntity)entityBundle.getEntity(), entityBundle.getFileName(), new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
@@ -824,9 +824,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * Called if the preflight check for a edit project metadata passes.
 	 */
 	private void postCheckEditProjectMetadata(){
-		//TODO: use permissions.getCanChangeSettings() when available
-//		boolean canChangeSettings = permissions.getCanChangeSettings();
-		boolean canChangeSettings = true;
+		Boolean canChangeSettings = permissions.getCanChangeSettings();
+		if (canChangeSettings == null) {
+			canChangeSettings = false;
+		}
 		editProjectMetadataModalWidget.configure((Project)entityBundle.getEntity(), canChangeSettings, new Callback() {
 			@Override
 			public void invoke() {
@@ -871,7 +872,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				// Go to entity's parent
 				Place gotoPlace = createDeletePlace();
-				globalApplicationState.gotoLastPlace(gotoPlace);
+				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
 			}
 			
 			@Override

@@ -50,11 +50,8 @@ public class EvaluationAccessControlListEditorTest {
 	// The ACLEditor
 	private EvaluationAccessControlListEditor acle;
 	
-	// JSON utility components
-	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
 	
-
 	// Mock components
 	private SynapseClientAsync mockSynapseClient;
 	private ChallengeClientAsync mockChallengeClient;

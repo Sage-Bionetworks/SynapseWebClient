@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Italic;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -55,16 +54,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Alert diffVersionAlert;
 	
 	@UiField
-	Span modifiedOnField;
-	
-	@UiField
-	Span createdOnField;
-	
-	@UiField
-	Span modifiedByBadgePanel;
-	
-	@UiField
-	Span createdByBadgePanel;
+	SimplePanel modifiedCreatedByPanel;
 	
 	@UiField
 	Button wikiHistoryButton;
@@ -83,12 +73,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@UiField
 	HTMLPanel loadingPanel;
-	
-	@UiField
-	HTMLPanel modifiedByPanel;
-	
-	@UiField
-	HTMLPanel createdByPanel;
 	
 	@UiField
 	SimplePanel breadcrumbPanel;
@@ -175,6 +159,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		wikiSubpagesPanel.add(wikiSubpages);
 	}
 
+	@Override
+	public void setWikiSubpagesWidgetVisible(boolean isVisible) {
+		wikiSubpagesPanel.setVisible(isVisible);
+	}
+	
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
@@ -188,16 +177,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public Widget asWidget() {
 		return widget;
 	}
-
 	@Override
-	public void showCreatedBy(boolean isVisible) {
-		createdByPanel.setVisible(isVisible);
+	public void addStyleName(String style) {
+		widget.addStyleName(style);
 	}
 
-	@Override
-	public void showModifiedBy(boolean isVisible) {
-		modifiedByPanel.setVisible(isVisible);
-	}
 
 	/*
 	 *     +------+
@@ -226,29 +210,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages) {
 		wikiSubpages.setContainers(wikiSubpagesPanel, wikiPagePanel);
 	}
-	
-	@Override
-	public void setModifiedByBadge(IsWidget modifiedByUserBadge) {
-		modifiedByBadgePanel.clear();
-		modifiedByBadgePanel.add(modifiedByUserBadge);
-	}
-	
-	@Override
-	public void setModifiedByText(String modifiedByText) {
-		modifiedOnField.setText(modifiedByText);
-	}
-	
-	@Override
-	public void setCreatedByBadge(IsWidget createdByUserBadge) {
-		createdByBadgePanel.clear();
-		createdByBadgePanel.add(createdByUserBadge);
-	}
-	
-	@Override
-	public void setCreatedByText(String createdByText) {
-		createdOnField.setText(createdByText);
-	}
-
 	
 	@Override
 	public void setWikiHistoryWidget(IsWidget historyWidget) {
@@ -287,7 +248,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void setCreatedModifiedVisible(boolean isVisible) {
+	public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible) {
 		createdModifiedHistoryPanel.setVisible(isVisible);
 	}
 
@@ -324,5 +285,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		} else {
 			historyCollapse.hide();
 		}
+	}
+
+	@Override
+	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
+		modifiedCreatedByPanel.setWidget(modifiedCreatedBy);
 	}
 }

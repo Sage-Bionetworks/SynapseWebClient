@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
-import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -28,12 +27,15 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private EntityBundle entityBundle;
 	private SynapseClientAsync synapseClient;
+	private GlobalApplicationState globalAppState;
 	
 	@Inject
-	public FileTitleBar(FileTitleBarView view, AuthenticationController authenticationController, SynapseClientAsync synapseClient) {
+	public FileTitleBar(FileTitleBarView view, AuthenticationController authenticationController,
+			SynapseClientAsync synapseClient, GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 	}	
 	
@@ -107,27 +109,23 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void setS3Description() {
-		final String entityId = entityBundle.getEntity().getId();
-		synapseClient.getUploadDestinations(entityId, new AsyncCallback<List<UploadDestination>>() {
-			public void onSuccess(List<UploadDestination> uploadDestinations) {
-				if (uploadDestinations.get(0) instanceof ExternalS3UploadDestination) {
-					ExternalS3UploadDestination externalUploadDestination = (ExternalS3UploadDestination) uploadDestinations.get(0);
-					String description = "| s3://" + externalUploadDestination.getBucket() + "/";
-					if (externalUploadDestination.getBaseKey() != null) {
-						description += externalUploadDestination.getBaseKey() + "/";
-					};
-					description += entityBundle.getEntity().getName();
-					view.setFileLocation(description);
-				} else {
-					view.setFileLocation("| Synapse Storage");
-				}
+		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+		if (fileHandle instanceof S3FileHandleInterface){
+			S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
+			Long synapseStorageLocationId = Long.valueOf(globalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"));
+			// Uploads to Synapse Storage often do not get their storage location field back-filled,
+			// so null also indicates a Synapse-Stored file
+			if (s3FileHandle.getStorageLocationId() == null || 
+					synapseStorageLocationId.equals(s3FileHandle.getStorageLocationId())) {
+				view.setFileLocation("| Synapse Storage");				
+			} else {
+				String description = "| s3://" + s3FileHandle.getBucketName() + "/";
+				if (s3FileHandle.getKey() != null) {
+					description += s3FileHandle.getKey();
+				};
+				view.setFileLocation(description);
 			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				DisplayUtils.showErrorMessage("Failed to get the upload destination for entity Id " + entityId);
-			}
-		});
+		}
 	}
 
 

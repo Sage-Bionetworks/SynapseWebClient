@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -10,11 +11,18 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	
 	ProfileImageView view;
 	String baseUrl;
+	Callback removePictureCallback;
 	
 	@Inject
 	public ProfileImageWidgetImpl(ProfileImageView view, SynapseJSNIUtils jniUtils){
 		this.view = view;
+		view.setPresenter(this);
 		baseUrl = jniUtils.getBaseProfileAttachmentUrl();
+	}
+	
+	@Override
+	public void setRemovePictureCallback(Callback removePictureCallback) {
+		this.removePictureCallback = removePictureCallback;
 	}
 
 	@Override
@@ -24,7 +32,9 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 
 	@Override
 	public void configure(String userId, String fileHandleId) {
-		if(fileHandleId != null){
+		boolean hasProfilePicture = fileHandleId != null;
+		view.setRemovePictureButtonVisible(hasProfilePicture);
+		if (hasProfilePicture) {
 			String url = buildUrl(userId, fileHandleId, true, true);
 			view.setImageUrl(url);
 		}else{
@@ -34,6 +44,8 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 	
 	@Override
 	public void configure(String fileHandleId) {
+		boolean hasProfilePicture = fileHandleId != null;
+		view.setRemovePictureButtonVisible(hasProfilePicture);
 		if(fileHandleId != null){
 			String url = buildUrl(null, fileHandleId, false, false);
 			view.setImageUrl(url);
@@ -54,6 +66,13 @@ public class ProfileImageWidgetImpl implements ProfileImageWidget {
 		builder.append("&"+WebConstants.USER_PROFILE_APPLIED+"=");
 		builder.append(applied);
 		return builder.toString();
+	}
+
+	@Override
+	public void onRemovePicture() {
+		if (removePictureCallback != null) {
+			removePictureCallback.invoke();
+		}
 	}
 
 }

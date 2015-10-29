@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.sharing.TeamAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
@@ -34,6 +35,7 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class TeamPresenterTest {
 
@@ -51,6 +53,7 @@ public class TeamPresenterTest {
 	MemberListWidget mockMemberListWidget;
 	OpenMembershipRequestsWidget mockOpenMembershipRequestsWidget;
 	OpenUserInvitationsWidget mockOpenUserInvitationsWidget;
+	TeamAccessControlListModalWidget mockTeamAccessControlListModalWidget;
 	Team mockTeam;
 	TeamBundle mockTeamBundle;
 	TeamMembershipStatus mockTeamMembershipStatus;
@@ -82,7 +85,12 @@ public class TeamPresenterTest {
 		mockMemberListWidget = mock(MemberListWidget.class);
 		mockOpenMembershipRequestsWidget = mock(OpenMembershipRequestsWidget.class);
 		mockOpenUserInvitationsWidget = mock(OpenUserInvitationsWidget.class);
-		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, mockInviteModal, mockJoinWidget, mockMemberListWidget, mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget);
+		mockTeamAccessControlListModalWidget = mock(TeamAccessControlListModalWidget.class);
+		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, 
+				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
+				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
+				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget,
+				mockTeamAccessControlListModalWidget);
 		mockTeam = mock(Team.class);
 		when(mockTeam.getName()).thenReturn(teamName);
 		mockTeamBundle = mock(TeamBundle.class);
@@ -99,6 +107,25 @@ public class TeamPresenterTest {
 		when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
 		when(mockTeam.getId()).thenReturn(teamId);
 		when(mockTeam.getIcon()).thenReturn(teamIcon);
+	}
+	
+	@Test
+	public void testConstruction() {
+		verify(mockView).setPresenter(presenter);
+		verify(mockView).setSynAlertWidget(any(Widget.class));
+		verify(mockView).setLeaveTeamWidget(any(Widget.class));
+		verify(mockView).setDeleteTeamWidget(any(Widget.class));
+		verify(mockView).setEditTeamWidget(any(Widget.class));
+		verify(mockView).setInviteMemberWidget(any(Widget.class));
+		verify(mockView).setJoinTeamWidget(any(Widget.class));
+		verify(mockView).setOpenMembershipRequestWidget(any(Widget.class));
+		verify(mockView).setOpenUserInvitationsWidget(any(Widget.class));
+		verify(mockView).setMemberListWidget(any(Widget.class));
+		verify(mockView).setAclModalWidget(any(Widget.class));
+		verify(mockLeaveModal).setRefreshCallback(any(Callback.class));
+		verify(mockEditModal).setRefreshCallback(any(Callback.class));
+		verify(mockDeleteModal).setRefreshCallback(any(Callback.class));
+		verify(mockInviteModal).setRefreshCallback(any(Callback.class));
 	}
 	
 	@Test
@@ -126,6 +153,7 @@ public class TeamPresenterTest {
 		verify(mockOpenUserInvitationsWidget).configure(eq(teamId), any(Callback.class));
 		verify(mockView).showAdminMenuItems();
 		verify(mockView).setTeamEmailAddress(anyString());
+		verify(mockView).setShareButtonVisible(true);
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
@@ -136,16 +164,19 @@ public class TeamPresenterTest {
 		boolean isAdmin = false;
 		when(mockTeamBundle.isUserAdmin()).thenReturn(isAdmin);
 		when(mockTeamMembershipStatus.getIsMember()).thenReturn(false);
+		//SWC-2655: also test null canPublicJoin
+		when(mockTeam.getCanPublicJoin()).thenReturn(null);
 		presenter.refresh(teamId);
 		
 		//once
-		verify(mockView).setPublicJoinVisible(canPublicJoin);
+		verify(mockView).setPublicJoinVisible(false);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
-	
+		verify(mockView).setShareButtonVisible(false);
+		
 		//never
 		verify(mockView, never()).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
@@ -166,7 +197,7 @@ public class TeamPresenterTest {
 		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
-		
+		verify(mockView).setShareButtonVisible(false);
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
@@ -185,5 +216,11 @@ public class TeamPresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		assertEquals("", presenter.getTeamEmail("basic"));
 	}
-	
+	@Test
+	public void testShareButtonClicked() {
+		presenter.refresh(teamId);
+		presenter.shareButtonClicked();
+		verify(mockTeamAccessControlListModalWidget).configure(mockTeam);
+		verify(mockTeamAccessControlListModalWidget).showSharing(any(Callback.class));
+	}
 }

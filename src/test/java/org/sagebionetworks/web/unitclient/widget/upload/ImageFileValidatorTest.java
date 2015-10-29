@@ -2,16 +2,13 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
-
-import com.google.gwt.junit.GWTMockUtilities;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class ImageFileValidatorTest {

@@ -123,7 +123,6 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		permissionDisplay.put(PermissionLevel.CAN_SCORE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_SCORE);
 		permissionDisplay.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_PARTICIPATE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
-		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);
 		return permissionDisplay;
 	}
 	
@@ -211,7 +210,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private void setViewDetails() {
 		validateEditorState();
 		view.showLoading();
-		view.buildWindow(false, false, true);
+		view.buildWindow(false, false, true, PermissionLevel.CAN_VIEW);
 		populateAclEntries();
 		updateIsPublicAccess();
 	}

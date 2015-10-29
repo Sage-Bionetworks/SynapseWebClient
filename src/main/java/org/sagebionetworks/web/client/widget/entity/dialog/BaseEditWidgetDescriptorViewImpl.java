@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -28,16 +29,20 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 	SimplePanel paramsPanel;
 	@UiField
 	Button okButton;
-	
+	@UiField
+	SimplePanel errorContainer;
 	private Presenter presenter;
 	private WidgetEditorPresenter widgetDescriptorPresenter;
 	private WidgetRegistrar widgetRegistrar;
 	private DialogCallback dialogCallback;
+	private SynapseAlert synAlert;
 	
 	@Inject
-	public BaseEditWidgetDescriptorViewImpl(Binder binder, WidgetRegistrar widgetRegistrar) {
+	public BaseEditWidgetDescriptorViewImpl(Binder binder, WidgetRegistrar widgetRegistrar, SynapseAlert synAlert) {
 		this.modal = (Modal)binder.createAndBindUi(this);
 		this.widgetRegistrar = widgetRegistrar;
+		this.synAlert = synAlert;
+		errorContainer.setWidget(synAlert.asWidget());
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -59,7 +64,7 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 			modal.show();
 		} else {
 			//widget editor presenter not found for this content type
-			DisplayUtils.showErrorMessage("No editor was found for the selected widget.");
+			showErrorMessage("No editor was found for the selected widget.");
 		}
 	}
 
@@ -76,7 +81,7 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		synAlert.showError(message);
 	}
 
 	@Override
@@ -91,6 +96,7 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 	@Override
 	public void setWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> widgetDescriptor) {
 		//clear out params panel.  Get the right params editor based on the descriptor (it's concrete class, and configure based on the parameters inside of it).
+		synAlert.clear();
 		okButton.setEnabled(true);
 		paramsPanel.clear();
 		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, dialogCallback);
@@ -127,5 +133,9 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 	
 	@Override
 	public void clear() {
+	}
+	@Override
+	public void clearErrors() {
+		synAlert.clear();
 	}
 }

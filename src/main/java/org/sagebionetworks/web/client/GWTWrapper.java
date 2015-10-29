@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -29,7 +31,13 @@ public interface GWTWrapper {
 	
 	void scheduleExecution(Callback callback, int delay);
 	
+	void scheduleDeferred(Callback callback);
+	
 	String getUserAgent();
 	
 	String getAppVersion();
+	
+	int nextRandomInt();
+
+	String getFormattedDateString(Date date);
 }

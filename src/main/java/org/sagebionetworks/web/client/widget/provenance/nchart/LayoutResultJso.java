@@ -20,9 +20,11 @@ public class LayoutResultJso extends JavaScriptObject implements LayoutResult {
 	public final List<XYPoint> getPointsForId(String provGraphNodeId) {
 		List<XYPoint> points = new ArrayList<XYPoint>();
 		// convert javascript array to XYPoint list
-		JsArray<XYPointJso> pointsJs = _getPointsForId(provGraphNodeId); 
-		for(int i=0; i<pointsJs.length(); i++) {
-			points.add(pointsJs.get(i));
+		JsArray<XYPointJso> pointsJs = _getPointsForId(provGraphNodeId);
+		if (pointsJs != null) {
+			for(int i=0; i<pointsJs.length(); i++) {
+				points.add(pointsJs.get(i));
+			}
 		}
 		return points;
 	}

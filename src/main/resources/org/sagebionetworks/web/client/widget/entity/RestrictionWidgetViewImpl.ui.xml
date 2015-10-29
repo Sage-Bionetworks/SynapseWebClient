@@ -84,6 +84,6 @@
 			</b:ModalFooter>
 		</b:Modal>
 		
-		<bh:Div ui:field="accessRestrictionDialogContainer" />
+		<bh:Span ui:field="accessRestrictionDialogContainer"/>
 	</bh:Span>
 </ui:UiBinder>

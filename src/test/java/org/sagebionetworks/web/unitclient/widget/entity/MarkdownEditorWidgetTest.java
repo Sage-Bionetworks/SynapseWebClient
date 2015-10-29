@@ -179,12 +179,12 @@ public class MarkdownEditorWidgetTest {
 		AsyncMockStubber
 				.callSuccessWith(htmlReturned)
 				.when(mockSynapseClient)
-				.markdown2Html(anyString(), anyBoolean(), anyBoolean(),anyString(),
+				.markdown2Html(anyString(), anyString(), anyBoolean(),anyString(),
 						any(AsyncCallback.class));
 		
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).showPreviewModal();
 	}
 	
@@ -192,7 +192,7 @@ public class MarkdownEditorWidgetTest {
 	public void testPreviewFailure() throws Exception {
 		//call showPreview through handleCommand
 		presenter.handleCommand(MarkdownEditorAction.PREVIEW);
-		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), anyBoolean(), any(Long.class));
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).showPreviewModal();
 	}
 	

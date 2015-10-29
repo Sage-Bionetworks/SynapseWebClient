@@ -97,6 +97,12 @@ import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetView;
+import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditorView;
+import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditorViewImpl;
+import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorView;
+import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
@@ -144,6 +150,8 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidgetView;
+import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItemView;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItemViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
@@ -320,6 +328,16 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.TabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.TabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
+import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabViewImpl;
+import org.sagebionetworks.web.client.widget.entity.tabs.TabsView;
+import org.sagebionetworks.web.client.widget.entity.tabs.TabsViewImpl;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
 import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
@@ -354,8 +372,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBoxView;
-import org.sagebionetworks.web.client.widget.search.HomeSearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
@@ -788,7 +804,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DetailedPaginationView.class).to(DetailedPaginationViewImpl.class);
 		
 		// EntityPageTop
-		bind(EntityPageTopViewImpl.class).in(Singleton.class);
 		bind(EntityPageTopView.class).to(EntityPageTopViewImpl.class);
 		
 		// Preview
@@ -819,10 +834,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// User Suggest Box
 		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
-
-		// Home Search Box
-		bind(HomeSearchBoxViewImpl.class).in(Singleton.class);
-		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
 		
 		bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
 		bind(FileInputWidget.class).to(FileInputWidgetImpl.class);
@@ -860,7 +871,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntitySearchBoxView.class).to(EntitySearchBoxViewImpl.class);
 
 		// EntityMetadata
-		bind(EntityMetadataViewImpl.class).in(Singleton.class);
 		bind(EntityMetadataView.class).to(EntityMetadataViewImpl.class);
 				
 		bind(UserProfileEditorWidget.class).to(UserProfileEditorWidgetImpl.class);
@@ -874,7 +884,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);
 
 		//single subpages view
-		bind(WikiSubpagesViewImpl.class).in(Singleton.class);
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
 		
 		// SubPages Order Editor
@@ -1141,6 +1150,16 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EditFileMetadataModalWidget.class).to(EditFileMetadataModalWidgetImpl.class);
 		bind(EditProjectMetadataModalView.class).to(EditProjectMetadataModalViewImpl.class);
 		bind(EditProjectMetadataModalWidget.class).to(EditProjectMetadataModalWidgetImpl.class);
-
+		bind(BiodallianceWidgetView.class).to(BiodallianceWidgetViewImpl.class);
+		bind(BiodallianceSourceEditorView.class).to(BiodallianceSourceEditorViewImpl.class);
+		bind(BiodallianceEditorView.class).to(BiodallianceEditorViewImpl.class);
+		
+		bind(TabView.class).to(TabViewImpl.class);
+		bind(TabsView.class).to(TabsViewImpl.class);
+		
+		bind(FilesTabView.class).to(FilesTabViewImpl.class);
+		bind(TablesTabView.class).to(TablesTabViewImpl.class);
+		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
+		bind(ModifiedCreatedByWidgetView.class).to(ModifiedCreatedByWidgetViewImpl.class);
 	}
 }

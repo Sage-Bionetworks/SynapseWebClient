@@ -92,6 +92,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		fileHandleIds.add("4");
 		when(mockView.getNewFileHandleIds()).thenReturn(fileHandleIds);
 		presenter.apply();
+		verify(mockView).clearErrors();
 		verify(mockView).hide();
 		//it should always update the entity attachments
 		verify(mockView).updateDescriptorFromView();
@@ -107,6 +108,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		//set widget by telling it to edit a new one
 		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), WidgetConstants.YOUTUBE_CONTENT_TYPE);
 		presenter.apply();
+		verify(mockView).clearErrors();
 		//verify it updates the descriptor from the view, and updates the entity attachments
 		verify(mockView).updateDescriptorFromView();
 	}

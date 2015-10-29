@@ -1,12 +1,17 @@
 package org.sagebionetworks.web.client;
 
+import java.util.Date;
+
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Navigator;
@@ -72,6 +77,11 @@ public class GWTWrapperImpl implements GWTWrapper {
 	}
 	
 	@Override
+	public String getFormattedDateString(Date date) {
+		return DisplayUtils.convertDataToPrettyString(date);
+	}
+	
+	@Override
 	public void scheduleExecution(final Callback callback, int delayMillis) {
 		Timer timer = new Timer() { 
 		    public void run() { 
@@ -82,6 +92,16 @@ public class GWTWrapperImpl implements GWTWrapper {
 	}
 	
 	@Override
+	public void scheduleDeferred(final Callback callback) {
+		Scheduler.get().scheduleDeferred(new Command() {
+			@Override
+			public void execute() {
+				callback.invoke();
+			}
+		});
+	}
+	
+	@Override
 	public String getUserAgent() {
 		return Navigator.getUserAgent();
 	}
@@ -89,6 +109,11 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public String getAppVersion() {
 		return Navigator.getAppVersion();
+	}
+	
+	@Override
+	public int nextRandomInt() {
+		return Random.nextInt();
 	}
 	
 }

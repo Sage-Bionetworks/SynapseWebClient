@@ -14,4 +14,8 @@ public interface ProfileImageView extends IsWidget{
 	 * @param url
 	 */
 	public void setImageUrl(String url);
+
+	public void setRemovePictureButtonVisible(boolean isVisible);
+
+	void setPresenter(ProfileImageWidget presenter);
 }

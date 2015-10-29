@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -22,7 +21,6 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -55,7 +53,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
 	private WikiPage currentPage;
-	private boolean isEmbeddedInOwnerPage;
+	private boolean showSubpages;
 	
 	// widgets
 	private SynapseAlert synapseAlert;
@@ -63,9 +61,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private MarkdownWidget markdownWidget;
 	private Breadcrumb breadcrumb;
 	private WikiSubpagesWidget wikiSubpages;
-	private UserBadge createdByBadge;
-	private UserBadge modifiedByBadge;	
-
+	private ModifiedCreatedByWidget modifiedCreatedBy;
+	
 	public interface Callback{
 		public void pageUpdated();
 		public void noWikiFound();
@@ -76,7 +73,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			SynapseClientAsync synapseClient,
 			SynapseAlert synapseAlert, WikiHistoryWidget historyWidget,
 			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
-			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector) {
+			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector,
+			ModifiedCreatedByWidget modifiedCreatedBy) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synapseAlert = synapseAlert;
@@ -84,15 +82,13 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
 		this.breadcrumb = breadcrumb;
+		this.modifiedCreatedBy = modifiedCreatedBy;
 		view.setPresenter(this);
 		view.setSynapseAlertWidget(synapseAlert);
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
-		createdByBadge = ginInjector.getUserBadgeWidget();
-		modifiedByBadge = ginInjector.getUserBadgeWidget();
-		view.setModifiedByBadge(modifiedByBadge);
-		view.setCreatedByBadge(createdByBadge);
+		view.setModifiedCreatedBy(modifiedCreatedBy);
 	}
 	
 	public void clear(){
@@ -101,7 +97,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		markdownWidget.clear();
 		breadcrumb.clear();
 		wikiSubpages.clearState();
-		view.setCreatedModifiedVisible(false);
 		view.setWikiHeadingText("");
 	}
 
@@ -109,26 +104,24 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public Widget asWidget() {
 		return view.asWidget();
 	}
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
 
 	public void showWikiHistory(boolean isVisible) {
 		view.setWikiHistoryVisible(isVisible);
 	}
-	public void showCreatedBy(boolean isVisible) {
-		view.showCreatedBy(isVisible);
-	}
-	public void showModifiedBy(boolean isVisible) {
-		view.showModifiedBy(isVisible);
-	}
 	
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
-			final Callback callback, final boolean isEmbeddedInOwnerPage) {
+			final Callback callback, final boolean showSubpages) {
 		clear();
 		view.setMainPanelVisible(true);
 		view.setLoadingVisible(true);
 		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
 		this.wikiKey = wikiKey;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.showSubpages = showSubpages;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
 		this.synapseAlert.clear();
@@ -156,7 +149,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 							updateCurrentPage(result);
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							configureBreadcrumbs(isRootWiki, ownerObjectName);
-							configureWikiSubpagesWidget(isEmbeddedInOwnerPage);	
+							view.setWikiSubpagesWidgetVisible(showSubpages);
+							if (showSubpages) {
+								configureWikiSubpagesWidget();	
+							}
 							view.setLoadingVisible(false);
 						} catch (Exception e) {
 							onFailure(e);
@@ -175,21 +171,21 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void resetWikiMarkdown(String markdown) {
 		view.setMarkdownVisible(true);
 		if(!isCurrentVersion) {
-			markdownWidget.configure(markdown, wikiKey, false, versionInView);
+			markdownWidget.configure(markdown, wikiKey, versionInView);
 			view.setDiffVersionAlertVisible(true);
 			if (canEdit) {
 				view.setRestoreButtonVisible(true);
 			}
 		} else {
-			markdownWidget.configure(markdown, wikiKey, false, null);
+			markdownWidget.configure(markdown, wikiKey, null);
 		}
 	}
 	
 	@Override
-	public void configureWikiSubpagesWidget(boolean isEmbeddedInOwnerPage) {
+	public void configureWikiSubpagesWidget() {
 		//check configuration of wikiKey
 		view.setWikiSubpagesContainers(wikiSubpages);
-		wikiSubpages.configure(wikiKey, null, isEmbeddedInOwnerPage, new CallbackP<WikiPageKey>() {
+		wikiSubpages.configure(wikiKey, null, true, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
 				wikiKey = param;
@@ -238,18 +234,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		}
 	}	
 	
-	@Override
-	public void configureCreatedModifiedBy() {
-		view.setCreatedModifiedVisible(true);
-		modifiedByBadge.configure(currentPage.getModifiedBy());
-		createdByBadge.configure(currentPage.getCreatedBy());
-		// added check for testing, as Date is not instantiable/mockable
-		if (currentPage.getModifiedOn() != null) {
-			view.setModifiedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getModifiedOn()));
-			view.setCreatedByText(" on " + DisplayUtils.convertDataToPrettyString(currentPage.getCreatedOn()));
-		}
-	}
-
 	public void setOwnerObjectName(final CallbackP<String> callback) {
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -285,7 +269,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	private void refresh() {
 		view.setMainPanelVisible(true);
-		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
+		configure(wikiKey, canEdit, callback, showSubpages);
 	}
 
 	@Override
@@ -367,8 +351,9 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		resetWikiMarkdown(currentPage.getMarkdown());
 		configureWikiTitle(isRootWiki, currentPage.getTitle());
 		configureHistoryWidget(canEdit);
-		configureCreatedModifiedBy();
+		modifiedCreatedBy.configure(result.getCreatedOn(), result.getCreatedBy(), result.getModifiedOn(), result.getModifiedBy());
 	}
+	
 	@Override
 	public void reloadWikiPage() {
 		synapseAlert.clear();
@@ -409,7 +394,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		if (caught instanceof NotFoundException && callback != null) {
 			callback.noWikiFound();
 		}
-		if (isEmbeddedInOwnerPage) {
+		if (showSubpages) {
 			view.setMarkdownVisible(false);
 			view.setWikiHistoryVisible(false);			
 			if (caught instanceof NotFoundException) {
@@ -462,6 +447,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	public void setCanEdit(boolean canEdit) {
 		this.canEdit = canEdit;
+	}
+
+	public void setModifiedCreatedByVisible(boolean isVisible) {
+		modifiedCreatedBy.setVisible(isVisible);
 	}
 	
 }

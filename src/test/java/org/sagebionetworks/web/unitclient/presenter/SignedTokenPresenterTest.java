@@ -59,7 +59,7 @@ public class SignedTokenPresenterTest {
 		AsyncMockStubber.callSuccessWith(responseMessage).when(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		
 		//by default, decode into a JoinTeamSignedToken
-		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndSerialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new JoinTeamSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockView).setPresenter(presenter);
@@ -70,7 +70,7 @@ public class SignedTokenPresenterTest {
 	public void testSetPlace() {
 		presenter.setPlace(testPlace);
 		
-		verify(mockSynapseClient).hexDecodeAndSerialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView, times(2)).clear();
@@ -83,7 +83,7 @@ public class SignedTokenPresenterTest {
 		Exception ex = new Exception("something bad happened");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
-		verify(mockSynapseClient).hexDecodeAndSerialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).handleException(ex);
 		verify(mockView, times(2)).clear();
@@ -93,9 +93,9 @@ public class SignedTokenPresenterTest {
 	@Test
 	public void testSetPlaceFailureHexDecode() {
 		Exception ex = new Exception("something bad happened during hex decode");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).hexDecodeAndSerialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
-		verify(mockSynapseClient).hexDecodeAndSerialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockView).clear();
 		//loading shown and hidden for single async call
@@ -106,10 +106,10 @@ public class SignedTokenPresenterTest {
 	@Test
 	public void testSetPlaceUnsubscribe() {
 		//For the unsubscribe token, a special view is shown.  
-		AsyncMockStubber.callSuccessWith(new NotificationSettingsSignedToken()).when(mockSynapseClient).hexDecodeAndSerialize(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new NotificationSettingsSignedToken()).when(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		
-		verify(mockSynapseClient).hexDecodeAndSerialize(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).hexDecodeAndDeserialize(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).handleSignedToken(any(SignedTokenInterface.class), anyString(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockView).clear();

@@ -18,10 +18,6 @@
 					<b:FormLabel>File name</b:FormLabel>
 					<b:TextBox ui:field="fileNameField" />
 				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel>File content type</b:FormLabel>
-					<b:TextBox ui:field="contentTypeField" />
-				</b:FormGroup>
 			</bh:Div>
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 		</b:ModalBody>

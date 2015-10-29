@@ -23,7 +23,6 @@ public interface MemberListWidgetView extends IsWidget, SynapseView {
 	public interface Presenter extends SynapsePresenter {
 		//used for the user profile links
 		void goTo(Place place);
-		void setIsAdmin(String principalId, boolean isAdmin);
 		void removeMember(String principalId);
 		
 		void jumpToOffset(int offset);

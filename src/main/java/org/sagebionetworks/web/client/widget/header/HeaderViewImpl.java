@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.header;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -99,6 +100,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Anchor goToStandardSite;
 	@UiField
 	SimplePanel searchBoxContainer;
+	@UiField
+	Alert stagingAlert;
+	
 	private Presenter presenter;
 	private SearchBox searchBox;
 	private CookieProvider cookies;
@@ -357,6 +361,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		}
 	}
 
+	@Override
+	public void setStagingAlertVisible(boolean visible) {
+		stagingAlert.setVisible(visible);	
+	}
+	
 	/*
 	 * Private Methods
 	 */

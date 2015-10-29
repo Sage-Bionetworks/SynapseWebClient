@@ -289,7 +289,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				sendJoinRequestStep2();
 			}
 		});
-		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true, false);
+		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, false);
 		view.setCurrentWizardContent(wikiPage);			
 	}
 	
@@ -321,9 +321,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				view.setJoinWizardPrimaryButtonText("Accept");
 				if (text == null || text.trim().isEmpty()) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-					boolean isPreview=true;
 					boolean isIgnoreLoadingFailure=true;
-					wikiPage.loadMarkdownFromWikiPage(wikiKey, isPreview, isIgnoreLoadingFailure);
+					wikiPage.loadMarkdownFromWikiPage(wikiKey, isIgnoreLoadingFailure);
 					view.setAccessRequirementHTML("");
 					view.setCurrentWizardPanelVisible(true);
 					view.setCurrentWizardContent(wikiPage);

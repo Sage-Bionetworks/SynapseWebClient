@@ -87,6 +87,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getProjectBackgroundConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getPreviewConfigEditor();
+		} else if(contentTypeKey.equals(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE)) {
+			presenter = ginInjector.getBiodallianceEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		if (presenter != null)
 			presenter.configure(wikiKey, model, dialogCallback);
@@ -157,6 +159,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getChallengeParticipantsWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getPreviewWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE)) {
+			presenter = ginInjector.getBiodallianceRenderer();
 		}
 		//TODO: add other widget descriptors to this mapping as they become available
 		
@@ -244,6 +248,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.PREVIEW_CONTENT_TYPE, WidgetConstants.PREVIEW_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.JOIN_TEAM_CONTENT_TYPE, WidgetConstants.JOIN_TEAM_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.BIODALLIANCE13_CONTENT_TYPE, WidgetConstants.BIODALLIANCE_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

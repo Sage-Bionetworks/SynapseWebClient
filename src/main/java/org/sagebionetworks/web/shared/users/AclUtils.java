@@ -1,5 +1,14 @@
 package org.sagebionetworks.web.shared.users;
 
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.CREATE;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.DELETE;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.READ_PRIVATE_SUBMISSION;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.SUBMIT;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.UPDATE;
+import static org.sagebionetworks.repo.model.ACCESS_TYPE.UPDATE_SUBMISSION;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -7,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.util.ModelConstants;
 
 public class AclUtils {
 
@@ -19,35 +29,28 @@ public class AclUtils {
 	// because the elements are all ENUMS.
 	static {
 		permToACCESS_TYPE = new HashMap<PermissionLevel, Set<ACCESS_TYPE>>();
-		TreeSet<ACCESS_TYPE> accessList = new TreeSet<ACCESS_TYPE>();
+		
+		permToACCESS_TYPE.put(PermissionLevel.CAN_VIEW, new TreeSet<ACCESS_TYPE>(Arrays.asList(
+				READ)));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT, new TreeSet<ACCESS_TYPE>(Arrays.asList(
+				CREATE, READ, UPDATE)));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(Arrays.asList(
+				CREATE, READ, UPDATE, DELETE)));		
 
-		accessList.add(ACCESS_TYPE.READ);
-		permToACCESS_TYPE.put(PermissionLevel.CAN_VIEW, new TreeSet<ACCESS_TYPE>(accessList));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, ModelConstants.ENITY_ADMIN_ACCESS_PERMISSIONS);
 
-		//Score in Evaluation (must clean up new access_type, does not modify existing permission levels)
-		permToACCESS_TYPE.put(PermissionLevel.CAN_SCORE_EVALUATION, addTypes(accessList, ACCESS_TYPE.READ_PRIVATE_SUBMISSION, ACCESS_TYPE.UPDATE_SUBMISSION));
-				
-		//Participate in Evaluation (must clean up new access_type, does not modify existing permission levels)
-		permToACCESS_TYPE.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, addTypes(accessList, ACCESS_TYPE.PARTICIPATE, ACCESS_TYPE.SUBMIT));
+		// Note, PARTICIPATE is no longer used, but to removed it would require updating all existing Evaluation ACLs
+		permToACCESS_TYPE.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
+				READ, SUBMIT))); 
+		permToACCESS_TYPE.put(PermissionLevel.CAN_SCORE_EVALUATION, new TreeSet<ACCESS_TYPE>(Arrays.asList(
+				READ, READ_PRIVATE_SUBMISSION, UPDATE_SUBMISSION)));
 		
-		accessList.add(ACCESS_TYPE.UPDATE);
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION,
+				ModelConstants.EVALUATION_ADMIN_ACCESS_PERMISSIONS);
 		
-		accessList.add(ACCESS_TYPE.CREATE);
-		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT, new TreeSet<ACCESS_TYPE>(accessList));
+		permToACCESS_TYPE.put(PermissionLevel.CAN_MESSAGE_TEAM, ModelConstants.TEAM_MESSENGER_PERMISSIONS);
+		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_TEAM, ModelConstants.TEAM_ADMIN_PERMISSIONS);
 		
-		accessList.add(ACCESS_TYPE.DELETE);
-		permToACCESS_TYPE.put(PermissionLevel.CAN_EDIT_DELETE, new TreeSet<ACCESS_TYPE>(accessList));
-		
-		accessList.add(ACCESS_TYPE.CHANGE_PERMISSIONS);
-		accessList.add(ACCESS_TYPE.CHANGE_SETTINGS);
-		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER, new TreeSet<ACCESS_TYPE>(accessList));
-		
-		//Administer an Evaluation (must clean up new access_types, does not modify existing permission levels)
-		permToACCESS_TYPE.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, addTypes(accessList, ACCESS_TYPE.PARTICIPATE, ACCESS_TYPE.SUBMIT, ACCESS_TYPE.READ_PRIVATE_SUBMISSION, ACCESS_TYPE.UPDATE_SUBMISSION, ACCESS_TYPE.DELETE_SUBMISSION));
-		
-		accessList.add(ACCESS_TYPE.DOWNLOAD);
-		permToACCESS_TYPE.put(PermissionLevel.OWNER, new TreeSet<ACCESS_TYPE>(accessList));
-
 		// Build the reverse mapping from the first map
 		accessTypeToPerm = new HashMap<ACCESS_TYPE, Set<PermissionLevel>>();
 		for (ACCESS_TYPE type : ACCESS_TYPE.values()) {
@@ -63,14 +66,6 @@ public class AclUtils {
 		}
 	}
 
-	private static Set<ACCESS_TYPE> addTypes(Set<ACCESS_TYPE> accessList, ACCESS_TYPE...access_TYPEs) {
-		TreeSet<ACCESS_TYPE> newSet = new TreeSet<ACCESS_TYPE>(accessList);
-		for (ACCESS_TYPE type : access_TYPEs) {
-			newSet.add(type);
-		}
-		return newSet;
-	}
-	
 	public static PermissionLevel getPermissionLevel(Set<ACCESS_TYPE> accessTypes) {
 		for (PermissionLevel level : PermissionLevel.values()) {
 			if (accessTypes.equals(permToACCESS_TYPE.get(level))) {

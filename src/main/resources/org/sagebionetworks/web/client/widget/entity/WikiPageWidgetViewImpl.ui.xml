@@ -29,16 +29,7 @@
 		        <bh:Italic ui:field="noWikiCannotEditMessage" text="A Wiki has not been created." visible="false"/>
 		    	<g:SimplePanel ui:field="markdownPanel"/>
 		    	<g:FlowPanel addStyleNames="margin-top-10 clearleft" ui:field="createdModifiedHistoryPanel">
-				    <g:HTMLPanel ui:field="modifiedByPanel">
-	   			        Modified by
-	   			        <bh:Span ui:field="modifiedByBadgePanel" addStyleNames="movedown-4" />
-				        <bh:Span ui:field="modifiedOnField"/>
-				    </g:HTMLPanel>
-				    <g:HTMLPanel ui:field="createdByPanel">
-				        Created by 
-				        <bh:Span ui:field="createdByBadgePanel" addStyleNames="movedown-4"/>
-				        <bh:Span ui:field="createdOnField"/>
-				    </g:HTMLPanel>
+				    <g:SimplePanel ui:field="modifiedCreatedByPanel"/>
 				    <b:Button ui:field="wikiHistoryButton" iconPosition="LEFT" icon="CARET_SQUARE_O_RIGHT" 
 				        text="Wiki History" addStyleNames="margin-top-10"/>
 				    <b:Collapse ui:field="historyCollapse" toggle="false">

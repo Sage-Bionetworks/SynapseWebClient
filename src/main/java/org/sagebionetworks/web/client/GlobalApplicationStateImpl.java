@@ -77,7 +77,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		} catch (Throwable t) {
 			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
 		} finally {
-			synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage());
+			synapseJSNIUtils.consoleError(UNCAUGHT_JS_EXCEPTION + e.getMessage() + ": " + e.getStackTrace());	
 		}
 	}
 	
@@ -297,21 +297,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		wikiBasedEntites.add(properties.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.sagebionetworks.web.client.GlobalApplicationState#replaceCurrentPlace(com.google.gwt.place.shared.Place)
-	 */
-	@Override
-	public void replaceCurrentPlace(Place currentPlace) {
-		setCurrentPlace(currentPlace);
-		String token = appPlaceHistoryMapper.getToken(currentPlace);
-		this.synapseJSNIUtils.replaceHistoryState(token);
-	}
-
 	@Override
 	public void pushCurrentPlace(Place targetPlace) {
 		//only push this place into the history if it is a place change
 		if (targetPlace != null && !(targetPlace.equals(getCurrentPlace()))) {
+			setLastPlace(getCurrentPlace());
 			setCurrentPlace(targetPlace);
 			String token = appPlaceHistoryMapper.getToken(targetPlace);
 			this.synapseJSNIUtils.pushHistoryState(token);
@@ -325,5 +315,15 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	public String getSynapseVersion() {
 		return synapseVersion;
+	}
+	
+	@Override
+	public void refreshPage() {
+		//get the place associated to the current url
+		AppPlaceHistoryMapper appPlaceHistoryMapper = getAppPlaceHistoryMapper();
+		String currentUrl = synapseJSNIUtils.getCurrentURL();
+		String place = currentUrl.substring(currentUrl.indexOf("!"));
+		Place currentPlace = appPlaceHistoryMapper.getPlace(place);
+		getPlaceChanger().goTo(currentPlace);
 	}
 }

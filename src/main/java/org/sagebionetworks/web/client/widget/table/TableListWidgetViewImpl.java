@@ -5,7 +5,6 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.LinkedGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
@@ -45,6 +44,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	SimplePanel paginationPanel;
 	
 	HTMLPanel panel;
+	Presenter presenter;
 	
 	@Inject
 	public TableListWidgetViewImpl(Binder binder) {
@@ -54,13 +54,19 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void configure(List<EntityQueryResult> tables) {
 		tablesList.clear();
-		for(EntityQueryResult header: tables){
-			tablesList.add(new EntityLinkedGroupItem(HeadingSize.H3, header));
+		for(final EntityQueryResult header: tables){
+			tablesList.add(new EntityLinkedGroupItem(HeadingSize.H3, header, new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.onTableClicked(header.getId());
+				}
+			}));
 		}
 	}
 	
 	@Override
 	public void setPresenter(final Presenter presenter) {
+		this.presenter = presenter;
 		this.addTable.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
