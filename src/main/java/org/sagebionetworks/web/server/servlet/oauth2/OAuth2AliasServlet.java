@@ -17,7 +17,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class OAuth2AliasServlet extends OAuth2Servlet {
 	
-	private static final String PROFILE_MESSAGE_PLACE = "/#!Profile:message/";
+	private static final String PROFILE_BIND_SUCCESS_PLACE = "/#!Profile:oauth_bound";
 	private static final String ERROR_PLACE = "/#!Error:";
 	private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class OAuth2AliasServlet extends OAuth2Servlet {
 			request.setProvider(provider);
 			request.setAuthenticationCode(authorizationCode);
 			PrincipalAlias response = client.bindOAuthProvidersUserId(request);
-			resp.sendRedirect(PROFILE_MESSAGE_PLACE + URLEncoder.encode(provider.name() + " has been successfully linked to your Synapse account.", "UTF-8"));
+			resp.sendRedirect(PROFILE_BIND_SUCCESS_PLACE);
 		} catch (Exception e) {
 			LogEntry entry = new LogEntry();
 			entry.setLabel("Unable to link with " + provider);
