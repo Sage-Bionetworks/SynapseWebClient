@@ -51,6 +51,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -80,6 +81,7 @@ import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -119,6 +121,7 @@ public class ProfilePresenterTest {
 	TeamListWidget mockTeamListWidget;
 	SynapseAlert mockSynAlert;
 	OpenTeamInvitationsWidget mockTeamInviteWidget;
+	String targetUserId = "12345";
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -221,6 +224,8 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isEditing()).thenReturn(false);
 		setupTestChallengePagedResults();
+		
+		when(place.toToken()).thenReturn(targetUserId);
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
@@ -286,7 +291,6 @@ public class ProfilePresenterTest {
 	@Test
 	public void testPublicView() throws JSONObjectAdapterException{
 		//view another user profile
-		String targetUserId = "12345";
 		userProfile.setOwnerId(targetUserId);
 		setupGetUserProfile();
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
@@ -1330,6 +1334,60 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true);
 		verify(mockView).setSynapseEmailVisible(false);
+	}
+	
+	@Test
+	public void testMessagePlaceToken() {
+		String message = "Display+to+user";
+		String decodedMessage = "Display to user";
+		when(mockGwt.decodeQueryString(message)).thenReturn(decodedMessage);
+		String token = "message/"+message;
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(place.toToken()).thenReturn(token);
+		profilePresenter.setPlace(place);
+		verify(mockView).showInfo("", decodedMessage);
+	}
+
+	@Test
+	public void testVTokenAnonymous() {
+		//go home if trying to access Profile:v while anonymous
+		String token = "v";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(place.toToken()).thenReturn(token);
+		profilePresenter.setPlace(place);
+		verify(mockPlaceChanger).goTo(any(Home.class));
+	}
+	
+	@Test
+	public void testVTokenLoggedIn() {
+		//go home if trying to access Profile:v while anonymous
+		String token = "v";
+		String currentUserId = "94837";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+		when(place.toToken()).thenReturn(token);
+		profilePresenter.setPlace(place);
+		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Profile capturedPlace = (Profile)captor.getValue();
+		assertEquals(currentUserId, capturedPlace.getUserId());
+		//default area, projects
+		assertEquals(ProfileArea.PROJECTS, capturedPlace.getArea());
+	}
+	@Test
+	public void testVWithAreaTokenLoggedIn() {
+		//go home if trying to access Profile:v while anonymous
+		String token = "v/settings";
+		String currentUserId = "94837";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
+		when(place.toToken()).thenReturn(token);
+		profilePresenter.setPlace(place);
+		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Profile capturedPlace = (Profile)captor.getValue();
+		assertEquals(currentUserId, capturedPlace.getUserId());
+		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
 	}
 
 
