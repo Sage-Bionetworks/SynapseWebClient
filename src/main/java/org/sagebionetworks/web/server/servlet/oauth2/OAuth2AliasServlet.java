@@ -15,7 +15,7 @@ import org.sagebionetworks.repo.model.principal.PrincipalAlias;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
-public class OAuth2AliasServlet extends OAuth2SessionServlet {
+public class OAuth2AliasServlet extends OAuth2Servlet {
 	
 	private static final String PROFILE_MESSAGE_PLACE = "/#!Profile:message/";
 	private static final String ERROR_PLACE = "/#!Error:";

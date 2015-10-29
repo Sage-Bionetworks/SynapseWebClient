@@ -25,6 +25,12 @@ public interface SynapseAlert extends IsWidget {
 	void showMustLogin();
 	
 	/**
+	 * Called to instruct the widget to let the user decide if logging in might help solve a shown error.
+	 * 
+	 */
+	void showSuggestLogin();
+	
+	/**
 	 * Convenience method to answer if the user is currently logged in.
 	 * @return
 	 */

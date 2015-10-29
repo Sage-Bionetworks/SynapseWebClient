@@ -56,7 +56,7 @@ public class ErrorPresenter extends AbstractActivity implements ErrorView.Presen
 				jsniUtils.consoleError(result.getMessage());
 				jsniUtils.consoleError(result.getStacktrace());
 				if (!synAlert.isUserLoggedIn()) {
-					synAlert.showMustLogin();
+					synAlert.showSuggestLogin();
 				}
 			}
 			
