@@ -12,6 +12,7 @@ public interface TabView {
 	void setTabListItemVisible(boolean visible);
 	TabPane getTabPane();
 	void setActive(boolean isActive);
+	boolean isActive();
 	public interface Presenter {
 		void onTabClicked();
 	}
