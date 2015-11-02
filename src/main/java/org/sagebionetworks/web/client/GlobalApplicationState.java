@@ -119,4 +119,6 @@ public interface GlobalApplicationState {
 	public void initOnPopStateHandler();
 	
 	public void refreshPage();
+	
+	public void recordPlaceVisit(Place targetPlace);
 }
