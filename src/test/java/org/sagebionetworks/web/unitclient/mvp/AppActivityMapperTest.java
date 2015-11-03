@@ -86,7 +86,7 @@ public class AppActivityMapperTest {
 		verify(mockAll).setPlace((Home) anyObject());
 		
 		// validate that the place change was recorded
-		verify(mockSynapseJSNIUtils, Mockito.times(1)).recordPageVisit(historyToken);
+		verify(mockGlobalApplicationState).recordPlaceVisit(unknownPlace);
 	}
 	
 	/*
