@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.logging.log4j.core.pattern.NDCPatternConverter;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -12,12 +14,14 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget.Species;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.core.shared.GWT;
@@ -42,6 +46,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	
 	@UiField
 	SimplePanel cytoscapeView;
+	@UiField
+	SimplePanel fileHandleListContainer;
 	
 	private Presenter presenter;
 	private IconsImageBundle icons;
@@ -60,7 +66,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
 			PortalGinInjector ginInjector,
 			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController,
-			BiodallianceWidget biodallianceWidget) {		
+			BiodallianceWidget biodallianceWidget, FileHandleList fileHandleList) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
@@ -73,7 +79,13 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		this.authenticationController = authenticationController;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());	
+		footer.add(footerWidget.asWidget());
+		fileHandleList.configure("Upload something!", true, true, new ArrayList<FileHandle>(), new CallbackP<String>() {
+			public void invoke(String fileHandleId) {
+				DisplayUtils.showInfo("FileHandleId=", fileHandleId);
+			};
+		});
+		fileHandleListContainer.add(fileHandleList.asWidget());
 //		cytoscapeView.addAttachHandler(new AttachEvent.Handler() {
 //			@Override
 //			public void onAttachOrDetach(AttachEvent event) {

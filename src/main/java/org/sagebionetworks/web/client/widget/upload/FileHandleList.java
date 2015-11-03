@@ -8,9 +8,11 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileHandleList implements FileHandleListView.Presenter {
+public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	FileHandleUploadWidget uploadWidget;
 	FileHandleListView view;
 	PortalGinInjector ginInjector;
@@ -50,7 +52,7 @@ public class FileHandleList implements FileHandleListView.Presenter {
 		this.fileHandleClickedCallback = fileHandleClickedCallback;
 		view.setToolbarVisible(canDelete);
 		view.setUploadWidgetVisible(canUpload);
-		
+		addFileHandles(fileList);
 		uploadWidget.reset();
 		uploadWidget.configure(uploadButtonText, new CallbackP<FileUpload>() {
 			@Override
@@ -65,17 +67,19 @@ public class FileHandleList implements FileHandleListView.Presenter {
 		for (FileHandle fileHandle : fileList) {
 			addLink(fileHandle.getId(), fileHandle.getFileName());
 		}
+		refreshLinks();
 	}
 	
 	public void addFileLink(FileUpload fileUpload) {
 		addLink(fileUpload.getFileHandleId(), fileUpload.getFileMeta().getFileName());
+		refreshLinks();
 	}
 	
 	private void addLink(String fileHandleId, String fileName) {
 		FileHandleLink link = ginInjector.getFileHandleLink();
 		link.configure(fileHandleId, fileName, fileHandleClickedCallback);
+		link.setSelectVisible(isToolbarVisible);
 		links.add(link);
-		view.addFileLink(link.asWidget());
 	}
 	
 	private void refreshLinks() {
@@ -86,7 +90,9 @@ public class FileHandleList implements FileHandleListView.Presenter {
 		
 		boolean toolbarVisible = isToolbarVisible && links.size() > 0;
 		view.setToolbarVisible(toolbarVisible);
-		checkSelectionState();
+		if (toolbarVisible) {
+			checkSelectionState();	
+		}
 	}
 	
 	@Override
@@ -153,5 +159,10 @@ public class FileHandleList implements FileHandleListView.Presenter {
 			fileHandleIds.add(link.getFileHandleId());
 		}
 		return fileHandleIds;
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }
