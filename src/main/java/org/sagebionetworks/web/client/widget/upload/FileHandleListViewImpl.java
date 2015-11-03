@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.widget.SelectionToolbar;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,7 +20,7 @@ public class FileHandleListViewImpl implements FileHandleListView {
 	@UiField
 	SelectionToolbar selectionToolbar;
 	@UiField
-	Div fileLinksContainer;
+	TBody fileLinksContainer;
 	@UiField
 	Div fileUploadContainer;
 	@Inject
