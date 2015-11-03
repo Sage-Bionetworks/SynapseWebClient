@@ -106,4 +106,9 @@ public class SelectionToolbar implements IsWidget {
 	public Widget asWidget() {
 		return widget;
 	}
+	
+	public void hideReordering() {
+		moveUpButton.setVisible(false);
+		moveDownButton.setVisible(false);
+	}
 }
