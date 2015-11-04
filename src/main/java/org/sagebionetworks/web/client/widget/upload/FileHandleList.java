@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -62,7 +63,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		view.setUploadWidgetVisible(false);
 		this.fileHandleClickedCallback = fileHandleClickedCallback;
 		uploadWidget.reset();
-		uploadWidget.configure("Upload...", fileUploadedCallback);
+		uploadWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, fileUploadedCallback);
 		return this;
 	};
 	
