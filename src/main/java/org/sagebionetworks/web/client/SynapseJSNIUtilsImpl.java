@@ -34,7 +34,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _recordPageVisit(String token) /*-{
-		$wnd._gaq.push(['_trackPageview', token]);
+		$wnd.ga('set', 'page', '/#'+token);
+		$wnd.ga('send', 'pageview');
 	}-*/;
 	
 	@Override
