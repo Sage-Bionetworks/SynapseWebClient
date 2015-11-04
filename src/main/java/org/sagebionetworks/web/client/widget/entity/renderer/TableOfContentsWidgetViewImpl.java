@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -44,23 +45,26 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 			}
 			for (int j = 0; j < headingElements.length(); j++) {
 				Element heading = headingElements.get(j);
-				String text = heading.getInnerHTML();
-				//create links to all headers in the page
-				final Element scrollToElement = heading;
-				SimplePanel wrapper = new SimplePanel();
-				Anchor a = new Anchor();
-				a.setHTML(text);
-				a.addStyleName("link");
-				a.addStyleName(heading.getAttribute("toc-style"));
-				
-				a.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						Window.scrollTo(0, scrollToElement.getOffsetTop());
-					}
-				});
-				wrapper.add(a);
-				linkContainer.add(wrapper);
+				String tocStyle = heading.getAttribute("toc-style");
+				if (DisplayUtils.isDefined(tocStyle)) {
+					String text = heading.getInnerHTML();
+					//create links to all headers in the page
+					final Element scrollToElement = heading;
+					SimplePanel wrapper = new SimplePanel();
+					Anchor a = new Anchor();
+					a.setHTML(text);
+					a.addStyleName("link");
+					a.addStyleName(tocStyle);
+					
+					a.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							Window.scrollTo(0, scrollToElement.getOffsetTop());
+						}
+					});
+					wrapper.add(a);
+					linkContainer.add(wrapper);
+				}
 			}
 			
 			add(linkContainer);
