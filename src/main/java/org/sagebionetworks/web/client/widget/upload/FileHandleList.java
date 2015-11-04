@@ -38,7 +38,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		selectionChangedCallback = new Callback() {
 			@Override
 			public void invoke() {
-				refreshLinks();
+				refreshLinkUI();
 			}
 		};
 		
@@ -84,25 +84,13 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		view.setToolbarVisible(isToolbarVisible);
 		return this;
 	}
-	/**
-	 * Set the list of file handles.  This greatly depends on the context, so for the enhanced profile feature I'll need to find a way to get this list from the file handle ids for both the ACT and owner.
-	 * @param fileList
-	 * @return
-	 */
-	public FileHandleList setFileHandles(List<FileHandle> fileList) {
-		for (FileHandle fileHandle : fileList) {
-			addLink(fileHandle.getId(), fileHandle.getFileName());
-		}
-		refreshLinks();
-		return this;
-	}
 	
 	public void addFileLink(FileUpload fileUpload) {
-		addLink(fileUpload.getFileHandleId(), fileUpload.getFileMeta().getFileName());
-		refreshLinks();
+		addFileLink(fileUpload.getFileHandleId(), fileUpload.getFileMeta().getFileName());
+		refreshLinkUI();
 	}
 	
-	private void addLink(String fileHandleId, String fileName) {
+	public void addFileLink(String fileHandleId, String fileName) {
 		FileHandleLink link = ginInjector.getFileHandleLink();
 		link.configure(fileHandleId, fileName, fileHandleClickedCallback)
 		.setFileSelectCallback(selectionChangedCallback)
@@ -110,7 +98,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		links.add(link);
 	}
 	
-	private void refreshLinks() {
+	public void refreshLinkUI() {
 		view.clearFileLinks();
 		for (FileHandleLink fileHandleLink : links) {
 			view.addFileLink(fileHandleLink.asWidget());
@@ -133,7 +121,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 				it.remove();
 			}
 		}
-		refreshLinks();
+		refreshLinkUI();
 	}
 	
 	/**
