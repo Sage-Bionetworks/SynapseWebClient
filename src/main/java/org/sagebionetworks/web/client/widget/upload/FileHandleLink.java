@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -30,6 +31,7 @@ public class FileHandleLink implements IsWidget {
 	
 	String fileHandleId;
 	CallbackP<String> fileClickedCallback;
+	Callback selectionChangedCallback;
 	@Inject
 	public FileHandleLink(FileHandleLinkUiBinder binder) {
 		widget = binder.createAndBindUi(this);
@@ -37,15 +39,36 @@ public class FileHandleLink implements IsWidget {
 		fileHandleLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				fileClickedCallback.invoke(fileHandleId);
+				if (fileClickedCallback != null) {
+					fileClickedCallback.invoke(fileHandleId);	
+				}
+			}
+		});
+		select.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (selectionChangedCallback != null) {
+					selectionChangedCallback.invoke();
+				}
 			}
 		});
 	}
 	
-	public void configure(String fileHandleId, String fileName, CallbackP<String> fileClickedCallback) {
+	public FileHandleLink configure(String fileHandleId, String fileName, CallbackP<String> fileClickedCallback) {
 		this.fileClickedCallback = fileClickedCallback;
 		this.fileHandleId = fileHandleId;
 		fileHandleLink.setText(fileName);
+		return this;
+	}
+	
+	public FileHandleLink setFileClickedCallback(CallbackP<String> fileClickedCallback) {
+		this.fileClickedCallback = fileClickedCallback;
+		return this;
+	}
+	
+	public FileHandleLink setFileSelectCallback(Callback selectionChangedCallback) {
+		this.selectionChangedCallback = selectionChangedCallback;
+		return this;
 	}
 	
 	public boolean isSelected() {

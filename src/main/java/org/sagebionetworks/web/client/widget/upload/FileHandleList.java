@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -18,7 +19,8 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	PortalGinInjector ginInjector;
 	boolean isToolbarVisible, changingSelection;
 	CallbackP<String> fileHandleClickedCallback;
-	
+	Callback selectionChangedCallback;
+	CallbackP<FileUpload> fileUploadedCallback;
 	List<FileHandleLink> links;
 	
 	@Inject
@@ -32,42 +34,67 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		view.setUploadWidget(uploadWidget.asWidget());
-	}
-	
-	/**
-	 * 
-	 * - canDelete if true then show delete buttons.
-	 * - canUpload if true then show upload
-	 * - List of file handles.  This greatly depends on the context, so for the enhanced profile feature I'll need to find a way to get this list from the file handle ids for both the ACT and owner.
-	 * - On file click handler callback.  When file handle is clicked, then this will be called and given the file handle id clicked.
-	 */
-	public void configure(
-			String uploadButtonText,
-			boolean canDelete, 
-			boolean canUpload, 
-			List<FileHandle> fileList, 
-			CallbackP<String> fileHandleClickedCallback){
-		links = new ArrayList<FileHandleLink>();
-		this.isToolbarVisible = canDelete;
-		this.fileHandleClickedCallback = fileHandleClickedCallback;
-		view.setToolbarVisible(canDelete);
-		view.setUploadWidgetVisible(canUpload);
-		addFileHandles(fileList);
-		uploadWidget.reset();
-		uploadWidget.configure(uploadButtonText, new CallbackP<FileUpload>() {
+		
+		selectionChangedCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refreshLinks();
+			}
+		};
+		
+		fileUploadedCallback = new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				addFileLink(fileUpload);
 			}
-		});	
-		
+		};
+	}
+	
+	/**
+	 * - canUpload if true then show upload
+	 * - On file click handler callback.  When file handle is clicked, then this will be called and given the file handle id clicked.
+	 */
+	public FileHandleList configure(
+			CallbackP<String> fileHandleClickedCallback){
+		links = new ArrayList<FileHandleLink>();
+		this.isToolbarVisible = false;
+		view.setToolbarVisible(false);
+		view.setUploadWidgetVisible(false);
+		this.fileHandleClickedCallback = fileHandleClickedCallback;
+		uploadWidget.reset();
+		uploadWidget.configure("Upload...", fileUploadedCallback);
+		return this;
 	};
 	
-	public void addFileHandles(List<FileHandle> fileList) {
+	public FileHandleList setUploadButtonText(String uploadButtonText) {
+		uploadWidget.configure(uploadButtonText, fileUploadedCallback);
+		return this;
+	}
+	public FileHandleList setCanUpload(boolean canUpload) {
+		view.setUploadWidgetVisible(canUpload);
+		return this;
+	}
+	/**
+	 * If true then show toolbar with the delete button.
+	 * @param canDelete
+	 * @return
+	 */
+	public FileHandleList setCanDelete(boolean canDelete) {
+		this.isToolbarVisible = canDelete;
+		view.setToolbarVisible(isToolbarVisible);
+		return this;
+	}
+	/**
+	 * Set the list of file handles.  This greatly depends on the context, so for the enhanced profile feature I'll need to find a way to get this list from the file handle ids for both the ACT and owner.
+	 * @param fileList
+	 * @return
+	 */
+	public FileHandleList setFileHandles(List<FileHandle> fileList) {
 		for (FileHandle fileHandle : fileList) {
 			addLink(fileHandle.getId(), fileHandle.getFileName());
 		}
 		refreshLinks();
+		return this;
 	}
 	
 	public void addFileLink(FileUpload fileUpload) {
@@ -77,8 +104,9 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 	
 	private void addLink(String fileHandleId, String fileName) {
 		FileHandleLink link = ginInjector.getFileHandleLink();
-		link.configure(fileHandleId, fileName, fileHandleClickedCallback);
-		link.setSelectVisible(isToolbarVisible);
+		link.configure(fileHandleId, fileName, fileHandleClickedCallback)
+		.setFileSelectCallback(selectionChangedCallback)
+		.setSelectVisible(isToolbarVisible);
 		links.add(link);
 	}
 	

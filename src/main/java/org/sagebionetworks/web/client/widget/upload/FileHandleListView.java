@@ -2,16 +2,12 @@ package org.sagebionetworks.web.client.widget.upload;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.web.client.utils.CallbackP;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface FileHandleListView extends IsWidget {
 	
 	public interface Presenter{
-		void configure(String uploadButtonText, boolean canDelete, boolean canUpload, List<FileHandle> fileList, CallbackP<String> fileHandleClickedCallback);
 		List<String> getFileHandleIds();
 		void deleteSelected();
 		void selectNone();

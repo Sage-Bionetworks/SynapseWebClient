@@ -80,11 +80,15 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		fileHandleList.configure("Upload something!", true, true, new ArrayList<FileHandle>(), new CallbackP<String>() {
+		fileHandleList.configure(new CallbackP<String>() {
 			public void invoke(String fileHandleId) {
 				DisplayUtils.showInfo("FileHandleId=", fileHandleId);
 			};
-		});
+		})
+		.setCanDelete(true)
+		.setCanUpload(true)
+		.setUploadButtonText("Upload something!")
+		.setFileHandles(new ArrayList<FileHandle>());
 		fileHandleListContainer.add(fileHandleList.asWidget());
 //		cytoscapeView.addAttachHandler(new AttachEvent.Handler() {
 //			@Override
