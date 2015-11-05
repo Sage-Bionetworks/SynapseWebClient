@@ -82,6 +82,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 @UiField
 	 org.gwtbootstrap3.client.ui.Anchor urlField;
 	 @UiField
+	 org.gwtbootstrap3.client.ui.Anchor orcIdField;
+	 @UiField
 	 TextBox synapseEmailField;
 	@UiField
 	Button editProfileButton;
@@ -685,8 +687,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 urlField.setHref(url);
 		 synapseEmailField.setText(userName+"@synapse.org");
 	}
+	
+	@Override
+	public void setOrcIdVisible(boolean isVisible) {
+		orcIdField.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setOrcId(String href) {
+		 orcIdField.setText(href);
+		 orcIdField.setHref(href);
+	}
 		 
-			@Override
+	@Override
 	public void refreshHeader() {
 		headerWidget.refresh();
 	}

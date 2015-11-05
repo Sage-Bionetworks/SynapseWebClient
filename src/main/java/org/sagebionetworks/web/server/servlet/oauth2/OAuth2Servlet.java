@@ -90,7 +90,16 @@ public abstract class OAuth2Servlet extends HttpServlet {
 	 * Creates a Synapse client that can only make anonymous calls
 	 */
 	protected SynapseClient createSynapseClient() {
+		return createSynapseClient(null);
+	}
+	/**
+	 * Creates a Synapse client
+	 */
+	protected SynapseClient createSynapseClient(String sessionToken) {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
+		if (sessionToken != null) {
+			synapseClient.setSessionToken(sessionToken);	
+		}
 		synapseClient.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		return synapseClient;
 	}

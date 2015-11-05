@@ -292,7 +292,7 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 		synapseClient.setFileEndpoint(StackConfiguration
 				.getFileServiceEndpoint());
 		// Append the portal's version information to the user agent.
-		synapseClient.appendUserAgent(SynapseClientImpl.PORTAL_USER_AGENT);
+		synapseClient.appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);
 		return synapseClient;
 	}
 }

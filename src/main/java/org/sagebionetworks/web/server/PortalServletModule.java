@@ -28,6 +28,7 @@ import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
+import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
@@ -73,6 +74,9 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Challenge service
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
+		
+		bind(UserProfileClientImpl.class).in(Singleton.class);
+		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
 		
 		// Setup the Search service
 		bind(SearchServiceImpl.class).in(Singleton.class);
