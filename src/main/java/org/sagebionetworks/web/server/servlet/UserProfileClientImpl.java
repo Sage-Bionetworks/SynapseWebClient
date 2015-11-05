@@ -68,7 +68,7 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public UserBundle getUserBundle(long principalId, int mask) throws RestServiceException {
+	public UserBundle getUserBundle(Long principalId, int mask) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getUserBundle(principalId, mask);

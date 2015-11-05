@@ -45,7 +45,7 @@ public interface UserProfileClient extends RemoteService {
 
 	UserBundle getMyOwnUserBundle(int mask) throws RestServiceException;
 
-	UserBundle getUserBundle(long principalId, int mask)
+	UserBundle getUserBundle(Long principalId, int mask)
 			throws RestServiceException;
 
 	String getFileURL(FileHandleAssociation fileHandleAssociation)

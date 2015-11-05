@@ -42,7 +42,7 @@ public interface UserProfileClientAsync {
 
 	void getMyOwnUserBundle(int mask, AsyncCallback<UserBundle> callback);
 
-	void getUserBundle(long principalId, int mask,
+	void getUserBundle(Long principalId, int mask,
 			AsyncCallback<UserBundle> callback);
 
 	void getFileURL(FileHandleAssociation fileHandleAssociation,

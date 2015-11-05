@@ -70,7 +70,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setEmptyProjectUIVisible(boolean b);
 	void setSynapseEmailVisible(boolean isVisible);
 	void setOrcIdVisible(boolean isVisible);
-	void setOrcId(String text, String href);
+	void setOrcId(String href);
 	
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();

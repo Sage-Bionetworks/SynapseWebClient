@@ -13,6 +13,8 @@ import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAlias;
 import org.sagebionetworks.util.SerializationUtils;
+import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.server.servlet.UserDataProvider;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class OAuth2AliasServlet extends OAuth2Servlet {
@@ -53,7 +55,8 @@ public class OAuth2AliasServlet extends OAuth2Servlet {
 			String authorizationCode)
 			throws IOException {
 		try {
-			SynapseClient client = createSynapseClient();
+			String sessionToken = UserDataProvider.getThreadLocalUserToken(req);
+			SynapseClient client = createSynapseClient(sessionToken);
 			OAuthValidationRequest request = new OAuthValidationRequest();
 			request.setProvider(provider);
 			request.setAuthenticationCode(authorizationCode);

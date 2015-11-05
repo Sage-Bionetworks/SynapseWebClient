@@ -694,8 +694,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setOrcId(String text, String href) {
-		 orcIdField.setText(text);
+	public void setOrcId(String href) {
+		 orcIdField.setText(href);
 		 orcIdField.setHref(href);
 	}
 		 

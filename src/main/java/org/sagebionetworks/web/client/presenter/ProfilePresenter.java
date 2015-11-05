@@ -241,7 +241,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void getUserProfile(final ProfileArea initialTab) {
 		//ask for everything in the user bundle
 		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED | IS_ACT_MEMBER;
-		userProfileClient.getUserBundle(Long.parseLong(currentUserId), mask, new AsyncCallback<UserBundle>() {
+		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
+		view.setOrcIdVisible(false);
+		userProfileClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
@@ -257,13 +259,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				
 				String orcId = bundle.getORCID();
 				if (orcId != null && orcId.length() > 0) {
-					view.setOrcId("orcid.org/"+orcId, "https://orcid.org/" + orcId);
+					view.setOrcId(orcId);
 					view.setOrcIdVisible(true);
-				} else {
-					//clear orc id
-					view.setOrcIdVisible(false);
 				}
-				
 			}
 			@Override
 			public void onFailure(Throwable caught) {
