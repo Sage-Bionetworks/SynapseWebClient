@@ -8,10 +8,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -21,6 +20,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
@@ -47,11 +47,10 @@ import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -65,9 +64,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
 	
+	public static int PROFILE = 0x1;
+	public static int ORC_ID = 0x2;
+	public static int VERIFICATION_SUBMISSION = 0x4;
+	public static int IS_CERTIFIED = 0x8;
+	public static int IS_VERIFIED = 0x10;
+	public static int IS_ACT_MEMBER = 0x20;
+	
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
+	private UserProfileClientAsync userProfileClient;
 	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -108,7 +115,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			UserProfileClientAsync userProfileClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -123,6 +131,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		this.userProfileClient = userProfileClient;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -230,45 +239,36 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void getUserProfile(final ProfileArea initialTab) {
-		this.profileSynAlert.clear();
-		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+		//ask for everything in the user bundle
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED | IS_ACT_MEMBER;
+		userProfileClient.getUserBundle(Long.parseLong(currentUserId), mask, new AsyncCallback<UserBundle>() {
 			@Override
-			public void onSuccess(UserProfile profile) {
-					initializeShowHideProfile(isOwner);
-					getIsCertifiedAndUpdateView(profile, isOwner);
+			public void onSuccess(UserBundle bundle) {
+				view.hideLoading();
+				initializeShowHideProfile(isOwner);
+				view.setSynapseEmailVisible(authenticationController.isLoggedIn());
+				boolean isCertified = bundle.getIsCertified();
+				if (isCertified) {
+					view.addCertifiedBadge();
+				} else {
+					initializeShowHideCertification(isOwner);
 				}
+				view.setProfile(bundle.getUserProfile(), isOwner);
+				
+				String orcId = bundle.getORCID();
+				if (orcId != null && orcId.length() > 0) {
+					view.setOrcId("orcid.org/"+orcId, "https://orcid.org/" + orcId);
+					view.setOrcIdVisible(true);
+				} else {
+					//clear orc id
+					view.setOrcIdVisible(false);
+				}
+				
+			}
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
 				profileSynAlert.handleException(caught);
-			}
-		});
-	}
-	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner) {
-		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
-		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String passingRecordJson) {
-				try {
-					view.hideLoading();
-					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					if (passingRecord != null)
-						view.addCertifiedBadge();
-					view.setProfile(profile, isOwner);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.hideLoading();
-				if (caught instanceof NotFoundException) {
-					view.setProfile(profile, isOwner);
-					initializeShowHideCertification(isOwner);
-				}
-				else
-					view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}

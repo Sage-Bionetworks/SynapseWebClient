@@ -178,9 +178,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
-public class SynapseClientImpl extends RemoteServiceServlet implements
+public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
@@ -189,9 +187,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			.create("text/html", MESSAGE_CHARSET);
 
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-	// This will be appended to the User-Agent header.
-	public static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
-			+ PortalVersionHolder.getVersionInfo();
 	static {// kick off initialization (like pattern compilation) by referencing
 			// it
 		SynapseMarkdownProcessor.getInstance();
@@ -223,72 +218,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				}
 			});
 
-	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
 	private volatile HashSet<String> wikiBasedEntities;
-
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
-
-	/**
-	 * Essentially the constructor. Setup
-	 * org.sagebionetworks.client.SynapseClient client.
-	 * 
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
-	}
-
-	/**
-	 * Injected with Gin
-	 */
-	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
-	/**
-	 * This allows tests provide mock org.sagebionetworks.client.SynapseClient
-	 * ojbects
-	 * 
-	 * @param provider
-	 */
-	public void setSynapseProvider(SynapseProvider provider) {
-		this.synapseProvider = provider;
-	}
-
-	/**
-	 * This allows integration tests to override the token provider.
-	 * 
-	 * @param tokenProvider
-	 */
-	public void setTokenProvider(TokenProvider tokenProvider) {
-		this.tokenProvider = tokenProvider;
-	}
 	
 	public void setMarkdownCache(Cache<MarkdownCacheRequest, WikiPage> wikiToMarkdown) {
 		this.wiki2Markdown = wikiToMarkdown;
-	}
-
-	/**
-	 * Validate that the service is ready to go. If any of the injected data is
-	 * missing then it cannot run. Public for tests.
-	 */
-	public void validateService() {
-		if (synapseProvider == null)
-			throw new IllegalStateException("The SynapseProvider was not set");
-		if (tokenProvider == null) {
-			throw new IllegalStateException("The token provider was not set");
-		}
-	}
-
-	@Override
-	public String getSessionToken() {
-		// By default, we get the token from the request cookies.
-		return UserDataProvider.getThreadLocalUserToken(this
-				.getThreadLocalRequest());
 	}
 
 	/*
@@ -404,34 +339,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 		return aa.toJSONString();
 	}
-
 	
-	private org.sagebionetworks.client.SynapseClient createAnonymousSynapseClient() {
-		return createSynapseClient(null);
-	}
-	
-	private org.sagebionetworks.client.SynapseClient createSynapseClient() {
-		return createSynapseClient(tokenProvider.getSessionToken());
-	}
-	/**
-	 * The org.sagebionetworks.client.SynapseClient client is stateful so we
-	 * must create a new one for each request
-	 */
-	private org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
-		// Create a new syanpse
-		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider
-				.createNewClient();
-		synapseClient.setSessionToken(sessionToken);
-		synapseClient.setRepositoryEndpoint(urlProvider
-				.getRepositoryServiceUrl());
-		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setFileEndpoint(StackConfiguration
-				.getFileServiceEndpoint());
-		// Append the portal's version information to the user agent.
-		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
-		return synapseClient;
-	}
-
 	@Override
 	public SerializableWhitelist junk(SerializableWhitelist l) {
 		return null;
@@ -534,10 +442,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		log.info(message);
 	}
 
-	@Override
-	public String getRepositoryServiceUrl() {
-		return urlProvider.getRepositoryServiceUrl();
-	}
 	
 	/**
 	 * Update an entity.

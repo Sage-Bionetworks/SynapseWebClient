@@ -54,6 +54,9 @@
 					        		<b:Anchor ui:field="urlField" target="_blank" />
 					        	</bh:Div>
 					        	<g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
+					        	<bh:Div>
+					        		<b:Anchor ui:field="orcIdField" target="_blank" />
+					        	</bh:Div>
 				        	</bh:Div>
 				        	<b:Row>
 				        		<b:Column size="XS_12">
