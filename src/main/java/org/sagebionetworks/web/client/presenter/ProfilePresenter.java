@@ -242,13 +242,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		//ask for everything in the user bundle
 		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED | IS_ACT_MEMBER;
 		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
+		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		view.setOrcIdVisible(false);
 		userProfileClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
 				initializeShowHideProfile(isOwner);
-				view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 				boolean isCertified = bundle.getIsCertified();
 				if (isCertified) {
 					view.addCertifiedBadge();
