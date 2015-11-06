@@ -1304,6 +1304,58 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testInitShowHideGetVerifiedNotOwner() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
+		profilePresenter.initializeShowHideVerification(false);
+		verify(mockView).setVerificationAlertVisible(false);
+		verify(mockView).setVerificationButtonVisible(false);
+	}
+	
+	@Test
+	public void testInitShowHideGetVerifiedNullCookieValue() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn(null);
+		profilePresenter.initializeShowHideVerification(true);
+		verify(mockView).setVerificationAlertVisible(true);
+		verify(mockView).setVerificationButtonVisible(false);
+	}
+	
+	@Test
+	public void testInitShowHideGetVerifiedEmptyCookieValue() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("");
+		profilePresenter.initializeShowHideVerification(true);
+		verify(mockView).setVerificationAlertVisible(true);
+		verify(mockView).setVerificationButtonVisible(false);
+	}
+	
+	@Test
+	public void testInitShowHideGetVerifiedTrueCookieValue() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("true");
+		profilePresenter.initializeShowHideVerification(true);
+		verify(mockView).setVerificationAlertVisible(true);
+		verify(mockView).setVerificationButtonVisible(false);
+	}
+	@Test
+	public void testInitShowHideGetVerifiedFalseCookieValue() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		when(mockCookies.getCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()))).thenReturn("false");
+		profilePresenter.initializeShowHideVerification(true);
+		verify(mockView).setVerificationAlertVisible(false);
+		verify(mockView).setVerificationButtonVisible(true);
+	}
+
+	@Test
+	public void testVerifiedDismissed() {
+		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
+		profilePresenter.setVerifyDismissed();
+		verify(mockCookies).setCookie(eq(ProfilePresenter.USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + userProfile.getOwnerId()), eq(Boolean.FALSE.toString()), any(Date.class));
+		verify(mockView).setVerificationButtonVisible(true);
+	}
+	
+	@Test
 	public void testShowEmailIfLoggedIn() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("123");
