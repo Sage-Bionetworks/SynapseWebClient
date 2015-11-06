@@ -71,7 +71,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setSynapseEmailVisible(boolean isVisible);
 	void setOrcIdVisible(boolean isVisible);
 	void setOrcId(String href);
-	
+	void setVerificationAlertVisible(boolean isVisible);
+	void setVerificationButtonVisible(boolean isVisible);
 	public interface Presenter extends SynapsePresenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
@@ -93,6 +94,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 		void refreshTeamInvites();
+		void verificationAlertClicked();
+		void setVerifyDismissed();
 	}
 
 	void addMyTeamProjectsFilter();
@@ -110,6 +113,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamSynAlertWidget(Widget profileSynAlert);
 
 	void addCertifiedBadge();
+	void addVerifiedBadge();
 
 	void showTabs(boolean isOwner);
 

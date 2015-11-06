@@ -63,6 +63,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
+	public static final String USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.validation.message.visible.state";
 	
 	public static int PROFILE = 0x1;
 	public static int ORC_ID = 0x2;
@@ -214,8 +215,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.showLoading();
 		view.setSortText(currentProjectSort.sortText);
 		view.setProfileEditButtonVisible(isOwner);
-		//TODO: remove isInTestWebsite condition once UserBundle is in place and we can display orc id link.
-		view.setOrcIDLinkButtonVisible(isOwner && DisplayUtils.isInTestWebsite(cookies));
+		view.setOrcIDLinkButtonVisible(isOwner);
 		view.showTabs(isOwner);
 		myTeamsWidget.clear();
 		myTeamsWidget.configure(false);
@@ -255,6 +255,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				} else {
 					initializeShowHideCertification(isOwner);
 				}
+				//TODO: profile verification should not be in alpha mode only
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					boolean isVerified = bundle.getIsVerified();
+					if (isVerified) {
+						view.addVerifiedBadge();
+					} else {
+						initializeShowHideVerification(isOwner);
+					}
+				}
+				
 				view.setProfile(bundle.getUserProfile(), isOwner);
 				
 				String orcId = bundle.getORCID();
@@ -307,6 +317,28 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			//not the owner
 			//hide certification message
 			view.setGetCertifiedVisible(false);
+		}
+	}
+	
+	public void initializeShowHideVerification(boolean isOwner) {
+		if (isOwner) {
+			boolean isVerificationAlertVisible = false;
+			try {
+				String cookieValue = cookies.getCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
+					isVerificationAlertVisible = true;	
+				}
+			} catch (Exception e) {
+				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
+			}
+			view.setVerificationAlertVisible(isVerificationAlertVisible);
+			//show the submit verification button if the full alert isn't visible
+			view.setVerificationButtonVisible(!isVerificationAlertVisible);
+		} else {
+			//not the owner
+			//hide message
+			view.setVerificationAlertVisible(false);
+			view.setVerificationButtonVisible(false);
 		}
 	}
 	
@@ -898,6 +930,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
 		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
 	}
+	@Override
+	public void setVerifyDismissed() {
+		//set verify message visible=false for a year
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
+		//and show button instead
+		view.setVerificationButtonVisible(true);
+	}
 	
 	/**
 	 * For testing purposes only
@@ -978,6 +1019,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void verificationAlertClicked() {
+		view.showInfo("TODO", "pop up validation submission dialog");
 	}
 }
 
