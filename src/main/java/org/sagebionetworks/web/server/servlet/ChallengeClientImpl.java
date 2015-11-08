@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,10 +7,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
@@ -27,10 +23,8 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.ChallengeClient;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
@@ -44,103 +38,10 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
-
 @SuppressWarnings("serial")
-public class ChallengeClientImpl extends RemoteServiceServlet implements
-		ChallengeClient, TokenProvider {
+public class ChallengeClientImpl extends SynapseClientBase implements
+		ChallengeClient {
 	
-	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
-	
-	// This will be appended to the User-Agent header.
-	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
-			+ PortalVersionHolder.getVersionInfo();
-
-	private static class PortalVersionHolder {
-		private static String versionInfo = "";
-
-		static {
-			InputStream s = ChallengeClientImpl.class
-					.getResourceAsStream("/version-info.properties");
-			Properties prop = new Properties();
-			try {
-				prop.load(s);
-			} catch (IOException e) {
-				throw new RuntimeException(
-						"version-info.properties file not found", e);
-			}
-			versionInfo = prop
-					.getProperty("org.sagebionetworks.portal.version");
-		}
-
-		private static String getVersionInfo() {
-			return versionInfo;
-		}
-
-	}
-	private TokenProvider tokenProvider = this;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
-
-	/**
-	 * Essentially the constructor. Setup
-	 * org.sagebionetworks.client.SynapseClient client.
-	 * 
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
-	}
-
-	/**
-	 * Injected with Gin
-	 */
-	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
-	/**
-	 * This allows tests provide mock org.sagebionetworks.client.SynapseClient
-	 * ojbects
-	 * 
-	 * @param provider
-	 */
-	public void setSynapseProvider(SynapseProvider provider) {
-		this.synapseProvider = provider;
-	}
-
-	/**
-	 * This allows integration tests to override the token provider.
-	 * 
-	 * @param tokenProvider
-	 */
-	public void setTokenProvider(TokenProvider tokenProvider) {
-		this.tokenProvider = tokenProvider;
-	}
-
-	/**
-	 * Validate that the service is ready to go. If any of the injected data is
-	 * missing then it cannot run. Public for tests.
-	 */
-	public void validateService() {
-		if (synapseProvider == null)
-			throw new IllegalStateException("The SynapseProvider was not set");
-		if (tokenProvider == null) {
-			throw new IllegalStateException("The token provider was not set");
-		}
-	}
-
-	@Override
-	public String getSessionToken() {
-		// By default, we get the token from the request cookies.
-		return UserDataProvider.getThreadLocalUserToken(this
-				.getThreadLocalRequest());
-	}
-
 	/**
 	 * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
 	 * @param in
@@ -153,32 +54,7 @@ public class ChallengeClientImpl extends RemoteServiceServlet implements
 	/*
 	 * ChallengeClient Service Methods
 	 */
-	private org.sagebionetworks.client.SynapseClient createSynapseClient() {
-		return createSynapseClient(tokenProvider.getSessionToken());
-	}
-	/**
-	 * The org.sagebionetworks.client.SynapseClient client is stateful so we
-	 * must create a new one for each request
-	 */
-	private org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
-		// Create a new syanpse
-		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider
-				.createNewClient();
-		synapseClient.setSessionToken(sessionToken);
-		synapseClient.setRepositoryEndpoint(urlProvider
-				.getRepositoryServiceUrl());
-		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setFileEndpoint(StackConfiguration
-				.getFileServiceEndpoint());
-		// Append the portal's version information to the user agent.
-		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
-		return synapseClient;
-	}
-
-
-	private static final Integer MAX_LIMIT = Integer.MAX_VALUE;
-	private static final Integer ZERO_OFFSET = 0;
-
+	
 	// before we hit this limit we will use another mechanism to find users
 	private static final int EVALUATION_PAGINATION_LIMIT = Integer.MAX_VALUE;
 	private static final int EVALUATION_PAGINATION_OFFSET = 0;

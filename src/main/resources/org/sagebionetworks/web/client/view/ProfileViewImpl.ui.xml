@@ -45,22 +45,48 @@
 				        	
 				        	<!-- View Profile Panel -->
 				        	<bh:Div ui:field="viewProfilePanel" addStyleNames="margin-bottom-10">
+								<b:Modal title="Validated" closable="true" fade="true"
+									dataBackdrop="STATIC" dataKeyboard="true" b:id="validatedModal">
+									<b:ModalBody>
+										<g:HTML>TODO: contain verification submission fields</g:HTML>
+									</b:ModalBody>
+									<b:ModalFooter>
+										<b:Button type="PRIMARY" dataDismiss="MODAL">Close</b:Button>
+									</b:ModalFooter>
+								</b:Modal>
+								<b:Button ui:field="verifiedBadge" dataTarget="#validatedModal" dataToggle="MODAL" type="PRIMARY">validated</b:Button>
+				        	
 					        	<g:Image ui:field="certificationBadge" resource='{sageImageBundle.certificate}' addStyleNames="displayInline imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10" height="32px" width="25px"/>
 					        	<b:Heading ui:field="displayNameField" addStyleNames="displayInline" size="H2" />
 					        	<b:Heading ui:field="headlineField" addStyleNames="user-profile-headline" size="H4" />
-					        	<bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />	
+					        	<b:Alert type="INFO" ui:field="verifyAlert" dismissable="true">
+									<g:FocusPanel ui:field="verifyFocusPanel" addStyleNames="imageButton">
+										<bh:Div>
+										    <b:Heading size="H5" addStyleNames="boldText color-white" text="Profile validation" />
+											<bh:Paragraph text="Certified users with validated profiles can access Bridge, Controlled Use data derived from ResearchKit apps."/>
+											<bh:Paragraph>
+												<bh:Text>Fill out your user profile and link to your ORCID, then </bh:Text>
+												<bh:Strong>validate your profile today!</bh:Strong>
+											</bh:Paragraph>
+										</bh:Div>
+									</g:FocusPanel>
+								</b:Alert>
+								<b:Button ui:field="submitProfileValidationButton" type="INFO" size="EXTRA_SMALL" >Validate my profile</b:Button>
+								<bh:Paragraph ui:field="industryLocationField" addStyleNames="user-profile-industry-location" />	
 					        	<bh:Paragraph ui:field="summaryField" addStyleNames="user-profile-summary" />
 					        	<bh:Div>
 					        		<b:Anchor ui:field="urlField" target="_blank" />
 					        	</bh:Div>
+					        	<bh:Div>
+					        		<b:Anchor ui:field="orcIdField" target="_blank" />
+					        	</bh:Div>
 					        	<g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 				        	</bh:Div>
 				        	<b:Row>
-				        		<b:Column size="XS_6">
+				        		<b:Column size="XS_12">
 				        			<b:Button ui:field="importLinkedIn" icon="LINKEDIN_SQUARE">Import from LinkedIn</b:Button>
-				        		</b:Column>
-				        		<b:Column size="XS_6">
 				        			<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO" pull="RIGHT" >Edit Profile</b:Button>
+				        			<b:Button ui:field="linkORCIDButton" pull="RIGHT" addStyleNames="margin-right-10">Link to ORCID</b:Button>
 				        		</b:Column>
 				        	</b:Row>
 				        	<g:SimplePanel ui:field="editUserProfilePanel"/>

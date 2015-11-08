@@ -8,11 +8,11 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -20,9 +20,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -45,9 +47,9 @@ import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -61,10 +63,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		
 	public static final String USER_PROFILE_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.visible.state";
 	public static final String USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.certification.message.visible.state";
+	public static final String USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY = "org.sagebionetworks.synapse.user.profile.validation.message.visible.state";
+	
+	public static int PROFILE = 0x1;
+	public static int ORC_ID = 0x2;
+	public static int VERIFICATION_SUBMISSION = 0x4;
+	public static int IS_CERTIFIED = 0x8;
+	public static int IS_VERIFIED = 0x10;
+	public static int IS_ACT_MEMBER = 0x20;
 	
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
+	private UserProfileClientAsync userProfileClient;
 	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -105,7 +116,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			UserProfileClientAsync userProfileClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -120,6 +132,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
+		this.userProfileClient = userProfileClient;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -201,7 +214,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clear();
 		view.showLoading();
 		view.setSortText(currentProjectSort.sortText);
-		view.setProfileEditButtonVisible(isOwner);	
+		view.setProfileEditButtonVisible(isOwner);
+		view.setOrcIDLinkButtonVisible(isOwner);
 		view.showTabs(isOwner);
 		myTeamsWidget.clear();
 		myTeamsWidget.configure(false);
@@ -225,45 +239,44 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void getUserProfile(final ProfileArea initialTab) {
-		this.profileSynAlert.clear();
-		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
+		//ask for everything in the user bundle
+		int mask = PROFILE | ORC_ID | VERIFICATION_SUBMISSION | IS_CERTIFIED | IS_VERIFIED | IS_ACT_MEMBER;
+		Long currentUserIdLong = currentUserId != null ?  Long.parseLong(currentUserId)  : null;
+		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
+		view.setOrcIdVisible(false);
+		userProfileClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
-			public void onSuccess(UserProfile profile) {
-					initializeShowHideProfile(isOwner);
-					getIsCertifiedAndUpdateView(profile, isOwner);
+			public void onSuccess(UserBundle bundle) {
+				view.hideLoading();
+				initializeShowHideProfile(isOwner);
+				boolean isCertified = bundle.getIsCertified();
+				if (isCertified) {
+					view.addCertifiedBadge();
+				} else {
+					initializeShowHideCertification(isOwner);
 				}
+				//TODO: profile verification should not be in alpha mode only
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					boolean isVerified = bundle.getIsVerified();
+					if (isVerified) {
+						view.addVerifiedBadge();
+					} else {
+						initializeShowHideVerification(isOwner);
+					}
+				}
+				
+				view.setProfile(bundle.getUserProfile(), isOwner);
+				
+				String orcId = bundle.getORCID();
+				if (orcId != null && orcId.length() > 0) {
+					view.setOrcId(orcId);
+					view.setOrcIdVisible(true);
+				}
+			}
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
 				profileSynAlert.handleException(caught);
-			}
-		});
-	}
-	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner) {
-		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
-		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String passingRecordJson) {
-				try {
-					view.hideLoading();
-					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					if (passingRecord != null)
-						view.addCertifiedBadge();
-					view.setProfile(profile, isOwner);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.hideLoading();
-				if (caught instanceof NotFoundException) {
-					view.setProfile(profile, isOwner);
-					initializeShowHideCertification(isOwner);
-				}
-				else
-					view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
@@ -304,6 +317,28 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			//not the owner
 			//hide certification message
 			view.setGetCertifiedVisible(false);
+		}
+	}
+	
+	public void initializeShowHideVerification(boolean isOwner) {
+		if (isOwner) {
+			boolean isVerificationAlertVisible = false;
+			try {
+				String cookieValue = cookies.getCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
+					isVerificationAlertVisible = true;	
+				}
+			} catch (Exception e) {
+				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
+			}
+			view.setVerificationAlertVisible(isVerificationAlertVisible);
+			//show the submit verification button if the full alert isn't visible
+			view.setVerificationButtonVisible(!isVerificationAlertVisible);
+		} else {
+			//not the owner
+			//hide message
+			view.setVerificationAlertVisible(false);
+			view.setVerificationButtonVisible(false);
 		}
 	}
 	
@@ -688,6 +723,23 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		projectSynAlert.clear();
 		teamSynAlert.clear();
 		String token = place.toToken();
+		if (token.equals("oauth_bound")) {
+			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
+			token = "v";
+		}
+		if (token.equals("v") || token.startsWith("v/")) {
+			Place gotoPlace = null;
+			if (authenticationController.isLoggedIn()) {
+				//replace url with current user id
+				token = authenticationController.getCurrentUserPrincipalId() + token.substring(1);
+				gotoPlace = new Profile(token);
+			} else {
+				//does not make sense, go home
+				gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+			}
+			globalApplicationState.getPlaceChanger().goTo(gotoPlace);
+			return;
+		}
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
 			updateProfileView(place.getUserId(), place.getArea());
@@ -878,6 +930,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
 		cookies.setCookie(USER_PROFILE_CERTIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
 	}
+	@Override
+	public void setVerifyDismissed() {
+		//set verify message visible=false for a year
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookies.setCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId, Boolean.toString(false), yearFromNow);
+		//and show button instead
+		view.setVerificationButtonVisible(true);
+	}
 	
 	/**
 	 * For testing purposes only
@@ -958,6 +1019,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void verificationAlertClicked() {
+		view.showInfo("TODO", "pop up validation submission dialog");
 	}
 }
 

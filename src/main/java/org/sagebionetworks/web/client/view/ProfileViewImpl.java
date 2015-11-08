@@ -82,9 +82,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 @UiField
 	 org.gwtbootstrap3.client.ui.Anchor urlField;
 	 @UiField
+	 org.gwtbootstrap3.client.ui.Anchor orcIdField;
+	 @UiField
 	 TextBox synapseEmailField;
 	@UiField
 	Button editProfileButton;
+	@UiField
+	Button linkORCIDButton;
 	@UiField
 	Button importLinkedIn;
 	@UiField
@@ -234,6 +238,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	FocusPanel alertFocusPanel;
 	
+	@UiField
+	Alert verifyAlert;
+	@UiField
+	FocusPanel verifyFocusPanel;
+	@UiField
+	Button verifiedBadge;
+	@UiField
+	Button submitProfileValidationButton;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
@@ -319,6 +332,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new Quiz("Certification"));
 			}
 		});
+		
+		verifyFocusPanel.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.verificationAlertClicked();
+			}
+		});
+		
+		submitProfileValidationButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.verificationAlertClicked();
+			}
+		});
 
 		initCertificationBadge();
 
@@ -401,6 +428,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				synapseEmailField.selectAll();
 			}
 		});
+		
+		linkORCIDButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow("/Portal/oauth2AliasCallback?oauth2provider=ORCID", "_self", "");
+			}
+		});
+		
+		verifyAlert.addClosedHandler(new AlertClosedHandler() {
+			@Override
+			public void onClosed(AlertClosedEvent evt) {
+				presenter.setVerifyDismissed();
+			}
+		});
+		
 
 	}
 	
@@ -676,8 +718,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 urlField.setHref(url);
 		 synapseEmailField.setText(userName+"@synapse.org");
 	}
+	
+	@Override
+	public void setOrcIdVisible(boolean isVisible) {
+		orcIdField.setVisible(isVisible);
+	}
+	
+	@Override
+	public void setOrcId(String href) {
+		 orcIdField.setText(href);
+		 orcIdField.setHref(href);
+	}
 		 
-			@Override
+	@Override
 	public void refreshHeader() {
 		headerWidget.refresh();
 	}
@@ -710,6 +763,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void clear() {
 		certificationBadge.setVisible(false);
+		verifiedBadge.setVisible(false);
+		submitProfileValidationButton.setVisible(false);
 		viewProfilePanel.setVisible(false);
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
@@ -722,6 +777,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		challengesTabContent.clear();
 		hideTabContainers();
 		getCertifiedAlert.setVisible(false);
+		verifyAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
@@ -883,6 +939,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.editProfileButton.setVisible(isVisible);
 		this.importLinkedIn.setVisible(isVisible);
 	}
+	
+	@Override
+	public void setOrcIDLinkButtonVisible(boolean isVisible) {
+		this.linkORCIDButton.setVisible(isVisible);		
+	}
 
 	@Override
 	public void addUserProfileModalWidget(IsWidget userProfileModalWidget) {
@@ -897,5 +958,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setSynapseEmailVisible(boolean isVisible) {
 		synapseEmailField.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationAlertVisible(boolean isVisible) {
+		verifyAlert.setVisible(isVisible);
+	}
+	@Override
+	public void addVerifiedBadge() {
+		verifiedBadge.setVisible(true);
+	}
+	@Override
+	public void setVerificationButtonVisible(boolean isVisible) {
+		submitProfileValidationButton.setVisible(isVisible);
 	}
 }

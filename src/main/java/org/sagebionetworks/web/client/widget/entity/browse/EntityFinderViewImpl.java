@@ -91,6 +91,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	
 	private Reference selectedRef; // DO NOT SET THIS DIRECTLY, use setSelected... methods
 	private Long maxVersion = 0L;
+	boolean isFinderComponentsInitialized;
 	@Inject
 	public EntityFinderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -113,10 +114,6 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				modal.hide();
 			}
 		});
-		createMyEntityBrowserWidget();		
-		createSearchBoxWidget();			
-		createEnterIdWidget();
-		showTopRightContainer(myEntitiesBrowserContainer);
 		
 		ClickHandler currentVersionClickHandler = new ClickHandler() {
 			@Override
@@ -136,6 +133,14 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				updateSelectedView();
 			}
 		});
+		isFinderComponentsInitialized = false;
+	}
+	
+	private void initFinderComponents() {
+		createMyEntityBrowserWidget();		
+		createSearchBoxWidget();			
+		createEnterIdWidget();
+		showTopRightContainer(myEntitiesBrowserContainer);
 	}
 	
 	private void hideAllRightTopWidgets() {
@@ -365,6 +370,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	@Override
 	public void show() {
 		//show modal
+		if (!isFinderComponentsInitialized) {
+			isFinderComponentsInitialized = true;
+			initFinderComponents();
+		}
 		modal.show();
 	}
 	

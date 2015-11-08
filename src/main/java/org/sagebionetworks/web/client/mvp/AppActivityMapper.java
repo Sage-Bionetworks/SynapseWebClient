@@ -112,13 +112,13 @@ public class AppActivityMapper implements ActivityMapper {
 
 	@Override
 	public Activity getActivity(Place place) {
-		synapseJSNIUtils.recordPageVisit(synapseJSNIUtils.getCurrentHistoryToken());
-	    
 		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
 		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
 	    
 	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
-		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();		
+		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
+		
+		globalApplicationState.recordPlaceVisit(place);
 		
 		// set current and last places
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 

@@ -57,9 +57,9 @@
 			    </g:FlowPanel>
 			</bh:Span>
 			<b:Alert ui:field="stagingAlert" type="WARNING" visible="false">
-				<b:Heading size="H4" text="This is not the currently deployed" addStyleNames="color-white displayInline margin-right-5" />
-				<b:Anchor href="https://www.synapse.org" text="production" addStyleNames="font-size-20" />
-				<b:Heading size="H4" text="environment." addStyleNames="color-white displayInline margin-left-5" />
+				<b:Heading size="H3" text="This website is for testing only." addStyleNames="color-white margin-right-5" />
+				<b:Heading size="H4" text="Any data created will be deleted shortly.  To do your work please visit " addStyleNames="color-white displayInline margin-right-5" />
+				<b:Anchor href="https://www.synapse.org" text="www.synapse.org" addStyleNames="font-size-20" />
 			</b:Alert>
 		</b:Column>
 	</b:Row>

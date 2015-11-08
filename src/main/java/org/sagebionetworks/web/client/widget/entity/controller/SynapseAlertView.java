@@ -40,7 +40,10 @@ public interface SynapseAlertView extends IsWidget {
 	 * Show a special login alert, that includes a link to the login page.
 	 */
 	void showLoginAlert();
-	
+	/**
+	 * Show a special login alert to let the user decide if logging in might help. Includes a link to the login page.
+	 */
+	void showSuggestLoginAlert();
 	void setPresenter(Presenter p);
 
 	/**

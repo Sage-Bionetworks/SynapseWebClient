@@ -137,6 +137,7 @@ import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
+import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 
@@ -351,4 +352,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 	public ModifiedCreatedByWidget getModifiedCreatedByWidget();
+	public FileHandleLink getFileHandleLink();
 }
