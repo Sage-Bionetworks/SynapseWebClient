@@ -35,7 +35,9 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -133,6 +135,7 @@ public class EntityPageTopTest {
 		verify(mockTabs).addTab(mockTablesInnerTab);
 		verify(mockTabs).addTab(mockChallengeInnerTab);
 		
+		verify(mockActionMenuWidget).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
 		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockFilesTab).setShowProjectInfoCallback(captor.capture());
 		
