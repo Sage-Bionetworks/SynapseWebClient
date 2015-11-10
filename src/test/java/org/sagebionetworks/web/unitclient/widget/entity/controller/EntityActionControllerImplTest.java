@@ -190,16 +190,16 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.table));
-		verify(mockActionMenu).addActionListener(Action.DELETE_ENTITY, controller);
+		verify(mockActionMenu).setActionListener(Action.DELETE_ENTITY, controller);
 		// share
 		verify(mockActionMenu).setActionEnabled(Action.SHARE, true);
 		verify(mockActionMenu).setActionVisible(Action.SHARE, true);
-		verify(mockActionMenu).addActionListener(Action.SHARE, controller);
+		verify(mockActionMenu).setActionListener(Action.SHARE, controller);
 		// rename
 		verify(mockActionMenu).setActionEnabled(Action.CHANGE_ENTITY_NAME, true);
 		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, true);
 		verify(mockActionMenu).setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+EntityTypeUtils.getDisplayName(EntityType.table));
-		verify(mockActionMenu).addActionListener(Action.CHANGE_ENTITY_NAME, controller);
+		verify(mockActionMenu).setActionListener(Action.CHANGE_ENTITY_NAME, controller);
 		// upload
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
@@ -246,7 +246,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu, never()).setActionVisible(any(Action.class), eq(true));
 		verify(mockActionMenu, never()).setActionEnabled(any(Action.class), eq(true));
-		verify(mockActionMenu, never()).addActionListener(any(Action.class), any(ActionListener.class));
+		verify(mockActionMenu, never()).setActionListener(any(Action.class), any(ActionListener.class));
 	}
 	
 	@Test
@@ -284,7 +284,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
-		verify(mockActionMenu).addActionListener(Action.EDIT_WIKI_PAGE, controller);
+		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
 		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.project)+EDIT_WIKI_SUFFIX);
 	}
 	
@@ -295,7 +295,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
-		verify(mockActionMenu).addActionListener(Action.EDIT_WIKI_PAGE, controller);
+		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
 		verify(mockActionMenu).setActionText(Action.EDIT_WIKI_PAGE, EDIT_WIKI_PREFIX+EntityTypeUtils.getDisplayName(EntityType.folder)+EDIT_WIKI_SUFFIX);
 	}
 	
@@ -307,7 +307,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_WIKI_PAGE, false);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
-		verify(mockActionMenu).addActionListener(Action.EDIT_WIKI_PAGE, controller);
+		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
 	}
 	
 	@Test
@@ -327,7 +327,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, false);
 		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, false);
-		verify(mockActionMenu).addActionListener(Action.VIEW_WIKI_SOURCE, controller);
+		verify(mockActionMenu).setActionListener(Action.VIEW_WIKI_SOURCE, controller);
 	}
 	
 	@Test
@@ -338,7 +338,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.VIEW_WIKI_SOURCE, true);
 		verify(mockActionMenu).setActionVisible(Action.VIEW_WIKI_SOURCE, true);
-		verify(mockActionMenu).addActionListener(Action.VIEW_WIKI_SOURCE, controller);
+		verify(mockActionMenu).setActionListener(Action.VIEW_WIKI_SOURCE, controller);
 	}
 	
 	@Test
@@ -364,7 +364,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, true);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.MOVE_ENTITY, MOVE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.folder));
-		verify(mockActionMenu).addActionListener(Action.MOVE_ENTITY, controller);
+		verify(mockActionMenu).setActionListener(Action.MOVE_ENTITY, controller);
 	}
 	
 	@Test
@@ -373,7 +373,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, true);
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, true);
-		verify(mockActionMenu).addActionListener(Action.UPLOAD_NEW_FILE, controller);
+		verify(mockActionMenu).setActionListener(Action.UPLOAD_NEW_FILE, controller);
 	}
 	
 	
@@ -384,7 +384,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.UPLOAD_NEW_FILE, false);
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_NEW_FILE, false);
-		verify(mockActionMenu).addActionListener(Action.UPLOAD_NEW_FILE, controller);
+		verify(mockActionMenu).setActionListener(Action.UPLOAD_NEW_FILE, controller);
 	}
 	
 	@Test
@@ -395,7 +395,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
-		verify(mockActionMenu).addActionListener(Action.EDIT_PROVENANCE, controller);
+		verify(mockActionMenu).setActionListener(Action.EDIT_PROVENANCE, controller);
 	}
 	
 	@Test
@@ -406,7 +406,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.EDIT_PROVENANCE, canEdit);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
-		verify(mockActionMenu).addActionListener(Action.EDIT_PROVENANCE, controller);
+		verify(mockActionMenu).setActionListener(Action.EDIT_PROVENANCE, controller);
 	}
 	
 	@Test
@@ -911,7 +911,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, wikiPageId,mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.ADD_WIKI_SUBPAGE, true);
 		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
-		verify(mockActionMenu).addActionListener(Action.ADD_WIKI_SUBPAGE, controller);
+		verify(mockActionMenu).setActionListener(Action.ADD_WIKI_SUBPAGE, controller);
 	}
 	
 	@Test
