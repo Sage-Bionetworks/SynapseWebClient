@@ -104,6 +104,13 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
+	public void setActionListener(Action action, ActionListener listner) {
+		List<ActionListener> actionListeners = getActionListeners(action);
+		actionListeners.clear();
+		actionListeners.add(listner);
+	}
+	
+	@Override
 	public void addActionListener(Action action, ActionListener listener) {
 		getActionListeners(action).add(listener);
 	}
