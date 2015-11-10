@@ -216,6 +216,7 @@ public class WebConstants {
 	public static final String STAGE_X = "StageX";
 	
 	public static final String CERTIFICATION = "Certification";
+	public static final String VALIDATION = "Validation";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
