@@ -117,25 +117,25 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 		this.actionMenu.setBasicDivderVisible(canEdit);
 		// Listen to action events.
-		this.actionMenu.addActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
+		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
 				onUploadTableData();
 			}
 		});
-		this.actionMenu.addActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, new ActionListener() {
+		this.actionMenu.setActionListener(Action.DOWNLOAD_TABLE_QUERY_RESULTS, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
 				onDownloadResults();
 			}
 		});
-		this.actionMenu.addActionListener(Action.EDIT_TABLE_DATA, new ActionListener() {
+		this.actionMenu.setActionListener(Action.EDIT_TABLE_DATA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
 				onEditResults();
 			}
 		});
-		this.actionMenu.addActionListener(Action.TOGGLE_TABLE_SCHEMA, new ActionListener() {
+		this.actionMenu.setActionListener(Action.TOGGLE_TABLE_SCHEMA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
 				view.toggleSchema();
