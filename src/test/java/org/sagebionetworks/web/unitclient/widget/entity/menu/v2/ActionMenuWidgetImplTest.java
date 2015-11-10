@@ -59,18 +59,33 @@ public class ActionMenuWidgetImplTest {
 	}
 	
 	@Test
-	public void testActionListener(){
+	public void testSetActionListener(){
 		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
-		widget.addActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
+		ActionListener mockActionListener2 = Mockito.mock(ActionListener.class);
+		widget.setActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener2);
+		widget.setActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
 		widget.onAction(Action.CHANGE_ENTITY_NAME);
 		// Should get forwarded to the listener
 		verify(mockActionListener).onAction(Action.CHANGE_ENTITY_NAME);
+		verify(mockActionListener2, never()).onAction(Action.CHANGE_ENTITY_NAME);
+	}
+	
+	@Test
+	public void testAddActionListener(){
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionListener mockActionListener2 = Mockito.mock(ActionListener.class);
+		widget.addActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener2);
+		widget.addActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
+		widget.onAction(Action.CHANGE_ENTITY_NAME);
+		// Should get forwarded to the listeners
+		verify(mockActionListener).onAction(Action.CHANGE_ENTITY_NAME);
+		verify(mockActionListener2).onAction(Action.CHANGE_ENTITY_NAME);
 	}
 	
 	@Test
 	public void testReset(){
 		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
-		widget.addActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
+		widget.setActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
 		// Now reset the the widget
 		widget.reset();
 		// nothing should happen here.

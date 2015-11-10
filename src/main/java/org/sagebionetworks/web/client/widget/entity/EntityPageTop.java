@@ -99,7 +99,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		view.setActionMenu(actionMenu.asWidget());
 		
 		annotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
+		actionMenu.setActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
 				annotationsShown = !annotationsShown;
