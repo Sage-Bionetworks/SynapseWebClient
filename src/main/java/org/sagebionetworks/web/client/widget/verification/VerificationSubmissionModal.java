@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -86,6 +87,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				getRawFileHandleUrlAndOpen(fileHandleId);
 			}
 		};
+		view.setPresenter(this);
 	}
 	
 	public VerificationSubmissionModal configure(UserBundle userBundle) {
@@ -117,8 +119,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	
 	public void show() {
 		view.clear();
-		if (isPreconditionsMet()) {
-			if (userBundle.getVerificationSubmission() == null) {
+		if (userBundle.getVerificationSubmission() == null) {
+			if (isPreconditionsMet()) {
 				//show wiki on validation process
 				view.setWikiPageVisible(true);
 				loadWikiHelpContent();
@@ -136,36 +138,39 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				view.setOrcID(userBundle.getORCID());
 				view.setEmails(profile.getEmails());
 				view.setTitle("Profile Validation");
-			} else {
-				//view an existing verification submission
-				VerificationSubmission submission = userBundle.getVerificationSubmission();
-				boolean isACTMember = userBundle.getIsACTMember();
-				view.setOKButtonVisible(true);
-				VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
-				if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
-					//pending
-					view.setApproveButtonVisible(isACTMember);
-					view.setRejectButtonVisible(isACTMember);
-					view.setTitle("Profile Validation");
-				} else if (VerificationStateEnum.APPROVED.equals(currentState.getState())) {
-					//approved
-					view.setSuspendButtonVisible(isACTMember);
-					view.setTitle("Validated");
-				} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
-					view.setTitle("Validation Suspended");
-					view.setSuspendedReason(currentState.getReason());
-				}
-				if (isACTMember) {
-					fileHandleList.configure(fileHandleClickedCallback)
-						.setCanDelete(false)
-						.setCanUpload(false);
-					for (AttachmentMetadata metadata : submission.getAttachments()) {
-						fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
-					}
-					
-					view.setOrcID(userBundle.getORCID());
-					view.setEmails(userBundle.getUserProfile().getEmails());
-				}
+			}
+		} else {
+			//view an existing verification submission
+			VerificationSubmission submission = userBundle.getVerificationSubmission();
+			
+			view.setFirstName(submission.getFirstName());
+			view.setLastName(submission.getLastName());
+			view.setLocation(submission.getLocation());
+			view.setOrganization(submission.getCompany());
+			view.setOrcID(submission.getOrcid());
+			view.setEmails(submission.getEmails());
+			
+			boolean isACTMember = userBundle.getIsACTMember();
+			view.setOKButtonVisible(true);
+			VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+			if (VerificationStateEnum.SUBMITTED.equals(currentState.getState())) {
+				//pending
+				view.setApproveButtonVisible(isACTMember);
+				view.setRejectButtonVisible(isACTMember);
+				view.setTitle("Profile Validation");
+			} else if (VerificationStateEnum.APPROVED.equals(currentState.getState())) {
+				//approved
+				view.setSuspendButtonVisible(isACTMember);
+				view.setTitle("Validated");
+			} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
+				view.setTitle("Validation Suspended");
+				view.setSuspendedReason(currentState.getReason());
+			}
+			fileHandleList.configure(fileHandleClickedCallback)
+				.setCanDelete(false)
+				.setCanUpload(false);
+			for (AttachmentMetadata metadata : submission.getAttachments()) {
+				fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
 			}
 			fileHandleList.refreshLinkUI();
 			view.show();
