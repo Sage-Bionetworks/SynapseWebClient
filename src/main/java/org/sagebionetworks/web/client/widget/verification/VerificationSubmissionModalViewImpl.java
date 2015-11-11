@@ -59,6 +59,8 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@UiField
 	Button cancelButton;
 	@UiField
+	Button deleteButton;
+	@UiField
 	Button okButton;
 	@UiField
 	Modal dialog;
@@ -106,6 +108,12 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 				presenter.suspendVerification();
 			}
 		});
+		deleteButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.deleteVerification();
+			}
+		});
 	}
 
 	@Override
@@ -138,6 +146,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		approveButton.setVisible(false);
 		rejectButton.setVisible(false);
 		suspendButton.setVisible(false);
+		deleteButton.setVisible(false);
 		dialog.setTitle("");
 	}
 
@@ -264,5 +273,9 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	public void setPromptModal(Widget w) {
 		promptModalContainer.clear();
 		promptModalContainer.add(w);
+	}
+	@Override
+	public void setDeleteButtonVisible(boolean visible) {
+		deleteButton.setVisible(visible);
 	}
 }

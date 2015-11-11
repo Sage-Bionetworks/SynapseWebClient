@@ -26,6 +26,7 @@ public interface VerificationSubmissionModalView extends SynapseView {
 	void setSubmitButtonVisible(boolean visible);
 	void setCancelButtonVisible(boolean visible);
 	void setOKButtonVisible(boolean visible);
+	void setDeleteButtonVisible(boolean visible);
 	void setApproveButtonVisible(boolean visible);
 	void setRejectButtonVisible(boolean visible);
 	void setSuspendButtonVisible(boolean visible);
@@ -43,5 +44,6 @@ public interface VerificationSubmissionModalView extends SynapseView {
 		void rejectVerification();
 		
 		void suspendVerification();
+		void deleteVerification();
 	}
 }

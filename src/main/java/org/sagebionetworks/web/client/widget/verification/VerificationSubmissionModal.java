@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
@@ -24,7 +25,6 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -39,7 +39,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	private VerificationSubmissionModalView view;
 	private SynapseJSNIUtils jsniUtils;
 	private PromptModalView promptModal;
-	
+	private CookieProvider cookies;
 	CallbackP<String> fileHandleClickedCallback;
 	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
@@ -54,7 +54,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			SynapseAlert synAlert,
 			FileHandleList fileHandleList,
 			SynapseJSNIUtils jsniUtils,
-			PromptModalView promptModalView
+			PromptModalView promptModalView,
+			CookieProvider cookies
 			) {
 		this.view = view;
 		this.userProfileClient = userProfileClient;
@@ -64,6 +65,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		this.fileHandleList = fileHandleList;
 		this.jsniUtils = jsniUtils;
 		this.promptModal = promptModalView;
+		this.cookies = cookies;
 		promptModal.configure("", "Reason", "OK", "");
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -149,6 +151,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			view.setOrganization(submission.getCompany());
 			view.setOrcID(submission.getOrcid());
 			view.setEmails(submission.getEmails());
+			
+			view.setDeleteButtonVisible(DisplayUtils.isInTestWebsite(cookies));
 			
 			boolean isACTMember = userBundle.getIsACTMember();
 			view.setOKButtonVisible(true);
@@ -246,7 +250,6 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				synAlert.handleException(caught);
 			}
 		});
-
 	}
 	
 	@Override
@@ -265,6 +268,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		for (String fileHandleId : fileHandleList.getFileHandleIds()) {
 			AttachmentMetadata meta = new AttachmentMetadata();
 			meta.setId(fileHandleId);
+			attachments.add(meta);
 		}
 		sub.setAttachments(attachments);
 		sub.setCompany(profile.getCompany());
@@ -291,6 +295,21 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		promptModal.clear();
 		actRejectState = VerificationStateEnum.SUSPENDED;
 		promptModal.show();
-
+	}
+	
+	@Override
+	public void deleteVerification() {
+		long verificationId = Long.parseLong(userBundle.getVerificationSubmission().getId());
+		userProfileClient.deleteVerificationSubmission(verificationId, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Submission deleted.", "");
+				view.hide();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 }
