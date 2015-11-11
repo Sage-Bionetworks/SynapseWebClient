@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
@@ -40,6 +41,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	private SynapseJSNIUtils jsniUtils;
 	private PromptModalView promptModal;
 	private CookieProvider cookies;
+	private GlobalApplicationState globalAppState;
+	
 	CallbackP<String> fileHandleClickedCallback;
 	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
@@ -55,7 +58,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 			FileHandleList fileHandleList,
 			SynapseJSNIUtils jsniUtils,
 			PromptModalView promptModalView,
-			CookieProvider cookies
+			CookieProvider cookies,
+			GlobalApplicationState globalAppState
 			) {
 		this.view = view;
 		this.userProfileClient = userProfileClient;
@@ -66,6 +70,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		this.jsniUtils = jsniUtils;
 		this.promptModal = promptModalView;
 		this.cookies = cookies;
+		this.globalAppState = globalAppState;
 		promptModal.configure("", "Reason", "OK", "");
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -140,11 +145,14 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				view.setOrcID(userBundle.getORCID());
 				view.setEmails(profile.getEmails());
 				view.setTitle("Profile Validation");
+				
+				fileHandleList.refreshLinkUI();
+				view.show();
 			}
 		} else {
 			//view an existing verification submission
 			VerificationSubmission submission = userBundle.getVerificationSubmission();
-			
+			view.setWikiPageVisible(false);
 			view.setFirstName(submission.getFirstName());
 			view.setLastName(submission.getLastName());
 			view.setLocation(submission.getLocation());
@@ -161,13 +169,13 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 				//pending
 				view.setApproveButtonVisible(isACTMember);
 				view.setRejectButtonVisible(isACTMember);
-				view.setTitle("Profile Validation");
+				view.setTitle("Profile Validation Pending");
 			} else if (VerificationStateEnum.APPROVED.equals(currentState.getState())) {
 				//approved
 				view.setSuspendButtonVisible(isACTMember);
-				view.setTitle("Validated");
+				view.setTitle("Profile Validated");
 			} else if (VerificationStateEnum.SUSPENDED.equals(currentState.getState()) || VerificationStateEnum.REJECTED.equals(currentState.getState())) {
-				view.setTitle("Validation Suspended");
+				view.setTitle("Profile Validation Suspended");
 				view.setSuspendedReason(currentState.getReason());
 			}
 			fileHandleList.configure(fileHandleClickedCallback)
@@ -242,14 +250,20 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		userProfileClient.updateVerificationState(verificationId, newState, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Submission state has been updated.", "");
-				view.hide();
+				handleSuccess("Submission state has been updated.");
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	public void handleSuccess(String message) {
+		view.showInfo(message, "");
+		view.hide();
+
+		globalAppState.refreshPage();
 	}
 	
 	@Override
@@ -280,9 +294,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		userProfileClient.createVerificationSubmission(sub, new AsyncCallback<VerificationSubmission>() {
 			@Override
 			public void onSuccess(VerificationSubmission result) {
-				//submitted, hide modal
-				view.showInfo("Successfully submitted profile for validation.", "");
-				view.hide();
+				handleSuccess("Successfully submitted profile for validation.");
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -303,8 +315,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		userProfileClient.deleteVerificationSubmission(verificationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Submission deleted.", "");
-				view.hide();
+				handleSuccess("Submission deleted.");
 			}
 			@Override
 			public void onFailure(Throwable caught) {
