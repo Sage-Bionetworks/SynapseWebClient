@@ -10,6 +10,9 @@ import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.verification.VerificationState;
+import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
+import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -263,12 +266,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 				//TODO: profile verification should not be in alpha mode only
 				if (DisplayUtils.isInTestWebsite(cookies)) {
-					boolean isVerified = bundle.getIsVerified();
-					if (isVerified) {
-						view.addVerifiedBadge();
-					} else {
-						initializeShowHideVerification(isOwner);
-					}
+					initializeVerificationUI();
 				}
 				
 				view.setProfile(bundle.getUserProfile(), isOwner);
@@ -326,25 +324,49 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void initializeShowHideVerification(boolean isOwner) {
-		if (isOwner) {
-			boolean isVerificationAlertVisible = false;
-			try {
-				String cookieValue = cookies.getCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
-				if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
-					isVerificationAlertVisible = true;	
-				}
-			} catch (Exception e) {
-				//if there are any problems getting the certification message visibility state, ignore and use default (hide)
-			}
-			view.setVerificationAlertVisible(isVerificationAlertVisible);
-			//show the submit verification button if the full alert isn't visible
-			view.setVerificationButtonVisible(!isVerificationAlertVisible);
+	public void initializeVerificationUI() {
+		view.setVerificationAlertVisible(false);
+		view.setVerificationButtonVisible(false);
+		view.setVerificationSuspendedButtonVisible(false);
+		view.setVerificationSubmittedButtonVisible(false);
+		boolean isVerified = currentUserBundle.getIsVerified();
+		if (isVerified) {
+			view.addVerifiedBadge();
 		} else {
-			//not the owner
-			//hide message
-			view.setVerificationAlertVisible(false);
-			view.setVerificationButtonVisible(false);
+			//The UI is depends on the current state
+			VerificationSubmission submission = currentUserBundle.getVerificationSubmission();
+			boolean isACTMember = currentUserBundle.getIsACTMember();
+			
+			if (submission == null) {
+				//no submission.  if the owner, provide way to submit
+				if (isOwner) {
+					boolean isVerificationAlertVisible = false;
+					try {
+						String cookieValue = cookies.getCookie(USER_PROFILE_VERIFICATION_VISIBLE_STATE_KEY + "." + currentUserId);
+						if (cookieValue == null || !cookieValue.equalsIgnoreCase("false")) {
+							isVerificationAlertVisible = true;	
+						}
+					} catch (Exception e) {
+						//if there are any problems getting the certification message visibility state, ignore and use default (hide)
+					}
+					view.setVerificationAlertVisible(isVerificationAlertVisible);
+					//show the submit verification button if the full alert isn't visible
+					view.setVerificationButtonVisible(!isVerificationAlertVisible);
+				}
+			} else {
+				//there's a submission in a state other than approved.  Show UI if owner or act member
+				if (isOwner || isACTMember) {
+					VerificationState currentState = submission.getStateHistory().get(submission.getStateHistory().size()-1);
+					if (currentState.getState() == VerificationStateEnum.REJECTED || currentState.getState() == VerificationStateEnum.SUSPENDED) {
+						view.setVerificationSuspendedButtonVisible(true);
+					} else if (currentState.getState() == VerificationStateEnum.SUBMITTED) {
+						view.setVerificationSubmittedButtonVisible(true);
+					}
+					
+				}
+			}
+			
+			
 		}
 	}
 	
@@ -1028,7 +1050,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void verificationAlertClicked() {
+	public void showVerificationSubmissionModal() {
 		verificationModal.configure(currentUserBundle)
 			.show();
 	}

@@ -245,6 +245,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button verifiedBadge;
 	@UiField
+	Button verificationSubmittedButton;
+	@UiField
+	Button verificationSuspendedButton;
+	@UiField
 	Button submitProfileValidationButton;
 	
 	private Presenter presenter;
@@ -336,17 +340,29 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verifyFocusPanel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.verificationAlertClicked();
+				presenter.showVerificationSubmissionModal();
 			}
 		});
 		
 		submitProfileValidationButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.verificationAlertClicked();
+				presenter.showVerificationSubmissionModal();
 			}
 		});
-
+		verificationSubmittedButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showVerificationSubmissionModal();
+			}
+		});
+		verificationSuspendedButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.showVerificationSubmissionModal();
+			}
+		});
+		
 		initCertificationBadge();
 
 		moreProjectsButton.addClickHandler(new ClickHandler() {
@@ -970,5 +986,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setVerificationButtonVisible(boolean isVisible) {
 		submitProfileValidationButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSubmittedButtonVisible(boolean isVisible) {
+		verificationSubmittedButton.setVisible(isVisible);
+	}
+	@Override
+	public void setVerificationSuspendedButtonVisible(boolean isVisible) {
+		verificationSuspendedButton.setVisible(isVisible);
 	}
 }
