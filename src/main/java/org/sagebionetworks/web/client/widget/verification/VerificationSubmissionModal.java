@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.HashMap;
 
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
@@ -135,6 +134,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 					fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
 				}
 			}
+			view.show();
 		}
 	}
 	
@@ -142,20 +142,20 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		if (userBundle.getVerificationSubmission() == null) {
 			//new submission.  make sure orc id is set and profile is populated.
 			if (!DisplayUtils.isDefined(userBundle.getORCID())) {
-				view.showErrorMessage("ORC ID must be linked before requesting profile validation.");
+				view.showErrorMessage("Please link your ORC ID before requesting profile validation.");
 				return false;
 			}
 			UserProfile profile = userBundle.getUserProfile();
 			if (!DisplayUtils.isDefined(profile.getFirstName()) || !DisplayUtils.isDefined(profile.getLastName())) {
-				view.showErrorMessage("First and last name must be filled in before requesting profile validation.");
+				view.showErrorMessage("Please fill in your first and last name before requesting profile validation.");
 				return false;
 			}
 			if (!DisplayUtils.isDefined(profile.getCompany())) {
-				view.showErrorMessage("Affiliation must be filled in before requesting profile validation.");
+				view.showErrorMessage("Please fill in your affiliation before requesting profile validation.");
 				return false;
 			}
 			if (!DisplayUtils.isDefined(profile.getLocation())) {
-				view.showErrorMessage("City,Country must be filled in before requesting profile validation.");
+				view.showErrorMessage("Please fill in your city and country before requesting profile validation.");
 				return false;
 			}
 		}
