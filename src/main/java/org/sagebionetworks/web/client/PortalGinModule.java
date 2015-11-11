@@ -546,6 +546,8 @@ import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalView;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModalViewImpl;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
@@ -1164,5 +1166,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeTabView.class).to(ChallengeTabViewImpl.class);
 		bind(ModifiedCreatedByWidgetView.class).to(ModifiedCreatedByWidgetViewImpl.class);
 		bind(FileHandleListView.class).to(FileHandleListViewImpl.class);
+		bind(VerificationSubmissionModalView.class).to(VerificationSubmissionModalViewImpl.class);
 	}
 }

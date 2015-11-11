@@ -7,20 +7,24 @@
 	<b:Modal ui:field="dialog" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
 		<b:ModalBody>
 			<bh:Div ui:field="wikiPageContainer" />
-			<b:Heading size="H4" ui:field="reasonHeading" />
-			<bh:Div ui:field="publicallyVisible" addStyleNames="bg-info">
-				<b:Heading size="H4">Publicly Visible</b:Heading>
+			<b:Heading size="H4" ui:field="reasonHeading" addStyleNames="color-white"/>
+			<bh:Div ui:field="publicallyVisible" addStyleNames="bg-primary padding-10 rounded">
+				<b:Heading size="H4" text="Publicly visible" addStyleNames="color-white"/>
 				<b:Row>
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>First name</b:FormLabel>
-							<b:TextBox name="firstName" ui:field="firstName" enabled="false"/>
+							<bh:Div addStyleNames="greyBackground rounded">
+								<b:TextBox ui:field="firstName" enabled="false"/>
+							</bh:Div>
 						</b:FormGroup>
 					</b:Column>
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Last name</b:FormLabel>
-							<b:TextBox name="lastName" ui:field="lastName" enabled="false"/>
+							<bh:Div addStyleNames="greyBackground rounded">
+								<b:TextBox ui:field="lastName" enabled="false"/>
+							</bh:Div>
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
@@ -28,13 +32,17 @@
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Affiliation</b:FormLabel>
-							<b:TextBox name="currentAffiliation" ui:field="currentAffiliation" enabled="false"/>
+							<bh:Div addStyleNames="greyBackground rounded">
+								<b:TextBox ui:field="currentAffiliation" enabled="false"/>
+							</bh:Div>
 						</b:FormGroup>
 					</b:Column>
 					<b:Column size="SM_6">
 						<b:FormGroup>
 							<b:FormLabel>Location</b:FormLabel>
-							<b:TextBox name="location" ui:field="location" enabled="false"/>
+							<bh:Div addStyleNames="greyBackground rounded">
+								<b:TextBox ui:field="location" enabled="false"/>
+							</bh:Div>
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
@@ -42,13 +50,15 @@
 					<b:Column size="SM_12">
 						<b:FormGroup>
 							<b:FormLabel>ORC ID</b:FormLabel>
-							<b:Anchor name="orcIdAnchor" ui:field="orcIdAnchor"/>
+							<bh:Div>
+								<b:Anchor ui:field="orcIdAnchor" addStyleNames="color-white" target="_blank" />
+							</bh:Div>
 						</b:FormGroup>
 					</b:Column>
 				</b:Row>
 			</bh:Div>
-			<bh:Div ui:field="actOnly" addStyleNames="bg-warning">
-				<b:Heading size="H4">Visible to the Sage Bionetworks Access and Compliance Team only</b:Heading>
+			<bh:Div ui:field="actOnly" addStyleNames="bg-warning padding-10 rounded margin-top-10">
+				<b:Heading size="H4" text="Visible to the Sage Bionetworks Access and Compliance Team only"/>
 				<b:Row>
 					<b:Column size="SM_12">
 						<b:FormGroup>

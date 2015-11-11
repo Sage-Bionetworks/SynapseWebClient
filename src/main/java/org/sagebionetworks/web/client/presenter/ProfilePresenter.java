@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionModal;
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
@@ -101,7 +102,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public SynapseAlert profileSynAlert;
 	public SynapseAlert projectSynAlert;
 	public SynapseAlert teamSynAlert;
-
+	public VerificationSubmissionModal verificationModal;
+	public UserBundle currentUserBundle;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -117,7 +119,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
-			UserProfileClientAsync userProfileClient) {
+			UserProfileClientAsync userProfileClient,
+			VerificationSubmissionModal verificationModal) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -133,6 +136,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
+		this.verificationModal = verificationModal;
+		
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -248,6 +253,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
+				currentUserBundle = bundle;
 				initializeShowHideProfile(isOwner);
 				boolean isCertified = bundle.getIsCertified();
 				if (isCertified) {
@@ -1023,7 +1029,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void verificationAlertClicked() {
-		view.showInfo("TODO", "pop up validation submission dialog");
+		verificationModal.configure(currentUserBundle)
+			.show();
 	}
 }
 

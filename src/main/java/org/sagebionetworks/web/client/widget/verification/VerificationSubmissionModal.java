@@ -54,6 +54,8 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 		this.synAlert = synAlert;
 		this.fileHandleList = fileHandleList;
 		this.jsniUtils = jsniUtils;
+		view.setFileHandleList(fileHandleList.asWidget());
+		view.setWikiPage(helpWikiPage.asWidget());
 		fileHandleClickedCallback = new CallbackP<String>(){
 			@Override
 			public void invoke(String fileHandleId) {
@@ -109,6 +111,13 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 					.setUploadButtonText("Upload evidence...")
 					.setCanDelete(true)
 					.setCanUpload(true);
+				UserProfile profile = userBundle.getUserProfile();
+				view.setFirstName(profile.getFirstName());
+				view.setLastName(profile.getLastName());
+				view.setLocation(profile.getLocation());
+				view.setOrganization(profile.getCompany());
+				view.setOrcID(userBundle.getORCID());
+				view.setEmails(profile.getEmails());
 			} else {
 				//view an existing verification submission
 				VerificationSubmission submission = userBundle.getVerificationSubmission();
@@ -127,12 +136,18 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 					//show reason
 					view.setSuspendedReason(currentState.getReason());
 				}
-				fileHandleList.configure(fileHandleClickedCallback)
-					.setCanDelete(false)
-					.setCanUpload(false);
-				for (AttachmentMetadata metadata : submission.getAttachments()) {
-					fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
+				if (isACTMember) {
+					fileHandleList.configure(fileHandleClickedCallback)
+						.setCanDelete(false)
+						.setCanUpload(false);
+					for (AttachmentMetadata metadata : submission.getAttachments()) {
+						fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
+					}
+					view.setOrcID(userBundle.getORCID());
+					view.setEmails(userBundle.getUserProfile().getEmails());
 				}
+				
+				
 			}
 			view.show();
 		}
@@ -183,6 +198,7 @@ public class VerificationSubmissionModal implements VerificationSubmissionModalV
 	
 	public void loadWikiHelpContent(WikiPageKey key) {
 		helpWikiPage.loadMarkdownFromWikiPage(key, false);
+		view.setWikiPageVisible(true);
 	}
 	
 	@Override

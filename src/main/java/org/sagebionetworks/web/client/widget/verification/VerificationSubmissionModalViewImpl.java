@@ -93,7 +93,6 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	@Override
 	public void showLoading() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
